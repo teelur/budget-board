@@ -13,6 +13,9 @@ import {
 import { IBalance } from "~/models/balance";
 import { getSortedBalanceDates } from "./balances";
 import { IAccount, liabilityAccountTypes } from "~/models/account";
+import { areStringsEqual } from "./utils";
+import { getFormattedCategoryValue } from "./category";
+import { ICategory } from "~/models/category";
 
 export const chartColors = [
   "indigo.6",
@@ -90,6 +93,52 @@ export const buildTransactionChartSeries = (
     name: getMonthAndYearDateString(month),
     color: chartColors[i % chartColors.length] ?? "gray.6",
   }));
+
+/**
+ * Builds chart data for spending categories based on a list of transactions and categories.
+ *
+ * Iterates through each transaction, determines its formatted category name,
+ * and aggregates the transaction amounts by category. The result is an array
+ * of objects, each representing a category and the total amount spent in that category.
+ *
+ * @param transactions - An array of transaction objects to be aggregated.
+ * @param categories - An array of category objects used to format and match transaction categories.
+ * @returns An array of objects, each containing a `name` (category) and `value` (total amount spent).
+ */
+export const BuildSpendingCategoryChartData = (
+  transactions: ITransaction[],
+  categories: ICategory[]
+) => {
+  const chartData: any[] = [];
+
+  const filteredTransactions = transactions.filter(
+    (transaction) =>
+      !areStringsEqual(transaction.category ?? "", "Income") &&
+      !areStringsEqual(transaction.category ?? "", "Hide from Budgets")
+  );
+
+  filteredTransactions.forEach((transaction) => {
+    const formattedTransactionCategory = getFormattedCategoryValue(
+      transaction.category ?? "",
+      categories
+    );
+    const chartDataPoint = chartData.find((data) =>
+      areStringsEqual(data.name, formattedTransactionCategory)
+    );
+
+    if (chartDataPoint == null) {
+      chartData.push({
+        name: formattedTransactionCategory,
+        value: transaction.amount * -1,
+        color: chartColors[chartData.length % chartColors.length] ?? "gray.6",
+      });
+    } else {
+      chartDataPoint.value += transaction.amount * -1;
+    }
+  });
+
+  return chartData;
+};
 
 interface BalanceChartData {
   date: Date;

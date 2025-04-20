@@ -7,6 +7,7 @@ import NetCashFlowTab from "./NetCashFlowTab/NetCashFlowTab";
 import AssetsTab from "./AssetsTab/AssetsTab";
 import LiabilitiesTab from "./LiabilitiesTab/LiabilitiesTab";
 import NetWorthTab from "./NetWorthTab/NetWorthTab";
+import SpendingCategoriesTab from "./SpendingCategoriesTab/SpendingCategoriesTab";
 
 const Trends = (): React.ReactNode => {
   return (
@@ -14,6 +15,7 @@ const Trends = (): React.ReactNode => {
       <Tabs variant="outline" defaultValue="spending" keepMounted={false}>
         <Tabs.List grow>
           <Tabs.Tab value="spending">Spending</Tabs.Tab>
+          <Tabs.Tab value="spendigCategories">Spending Categories</Tabs.Tab>
           <Tabs.Tab value="netCashFlow">Net Cash Flow</Tabs.Tab>
           <Tabs.Tab value="assets">Assets</Tabs.Tab>
           <Tabs.Tab value="liabilities">Liabilities</Tabs.Tab>
@@ -21,6 +23,9 @@ const Trends = (): React.ReactNode => {
         </Tabs.List>
         <Tabs.Panel value="spending">
           <SpendingTab />
+        </Tabs.Panel>
+        <Tabs.Panel value="spendigCategories">
+          <SpendingCategoriesTab />
         </Tabs.Panel>
         <Tabs.Panel value="netCashFlow">
           <NetCashFlowTab />
