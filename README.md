@@ -22,9 +22,12 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 - Create and track goals for savings/loan payoff
 - Graphs to view trends over time (Spending, Assets, Liabilities, Net Worth, and more)
 
-### Bugs and Feature Requests
+### Feedback
 
-Feel free to open an issue if you notice any bugs or have any feature requests!
+- [Notice a bug?](https://github.com/teelur/budget-board/issues/new/choose)
+- [Have a feature request?](https://github.com/teelur/budget-board/discussions/categories/feature-requests)
+- [Have any feedback?](https://github.com/teelur/budget-board/discussions/categories/feedback)
+- [Have a question?](https://github.com/teelur/budget-board/discussions/categories/q-a)
 
 ### Screenshots
 
