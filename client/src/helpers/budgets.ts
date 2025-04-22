@@ -1,7 +1,8 @@
 import { CashFlowValue, IBudget } from "~/models/budget";
-import { ICategory } from "~/models/category";
+import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
 import { areStringsEqual } from "./utils";
 import {
+  getFormattedCategoryValue,
   getIsParentCategory,
   getParentCategory,
   getSubCategories,
@@ -218,3 +219,81 @@ export const groupBudgetsByCategory = (
         ]),
       new Map()
     );
+
+/**
+ * Builds a hierarchical tree structure of budget categories from the provided budgets and categories.
+ *
+ * Parent categories are added as root nodes, and subcategories are added as children under their
+ * respective parents. Only categories that are not parent categories themselves are added as subcategories.
+ *
+ * @param budgets - An array of budget objects to be organized into the category tree.
+ * @param categories - An array of all available categories used to determine parent-child relationships.
+ * @returns An array of `ICategoryNode` objects representing the root nodes of the category tree, each with their subcategories populated.
+ */
+export const buildBudgetCategoryTree = (
+  budgets: IBudget[],
+  categories: ICategory[]
+): ICategoryNode[] => {
+  const categoryTree: ICategoryNode[] = [];
+
+  budgets.forEach((budget) => {
+    const parentCategory = getParentCategory(budget.category, categories);
+
+    if (
+      !categoryTree.some((category) =>
+        areStringsEqual(category.value, parentCategory)
+      )
+    ) {
+      categoryTree.push(
+        new CategoryNode({
+          value: getFormattedCategoryValue(parentCategory, categories),
+          parent: "",
+        })
+      );
+    }
+
+    if (!getIsParentCategory(budget.category, categories)) {
+      const parent = categoryTree.find((category) =>
+        areStringsEqual(category.value, parentCategory)
+      );
+
+      if (parent) {
+        parent.subCategories.push(
+          new CategoryNode({
+            value: getFormattedCategoryValue(budget.category, categories),
+            parent: parentCategory,
+          })
+        );
+      }
+    }
+  });
+
+  return categoryTree;
+};
+
+export const getTotalLimitForCategory = (
+  budgets: IBudget[],
+  category: ICategoryNode
+): number => {
+  if (budgets.some((b) => areStringsEqual(b.category, category.value))) {
+    return budgets.reduce((total, budget) => {
+      if (areStringsEqual(budget.category, category.value)) {
+        return total + budget.limit;
+      }
+
+      return total;
+    }, 0);
+  }
+
+  return budgets.reduce((total, budget) => {
+    if (
+      category.subCategories.some((subCategory) =>
+        areStringsEqual(subCategory.value, budget.category)
+      )
+    ) {
+      return total + budget.limit;
+    }
+
+    return total;
+  }, 0);
+};

@@ -2,7 +2,7 @@ import classes from "./BudgetCard.module.css";
 
 import { convertNumberToCurrency } from "~/helpers/currency";
 import {
-  ActionIcon,
+  Button,
   Card,
   Flex,
   Group,
@@ -21,23 +21,22 @@ import { translateAxiosError } from "~/helpers/requests";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { useField } from "@mantine/form";
-import { TrashIcon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { getBudgetValueColor } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 
 interface BudgetCardProps {
-  id: string;
+  budgets: IBudget[];
   categoryDisplayString: string;
   amount: number;
-  limit: number;
   isIncome: boolean;
 }
 
-const BudgetCard = (props: BudgetCardProps): React.ReactNode => {
+const BudgetCard2 = (props: BudgetCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const newLimitField = useField<number | string>({
-    initialValue: props.limit ?? 0,
+    initialValue: props.budgets[0]?.limit ?? 0,
     validate: (value) => (value !== "" ? null : "Invalid limit"),
   });
 
@@ -84,19 +83,24 @@ const BudgetCard = (props: BudgetCardProps): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["budgets"] }),
   });
 
+  const limit = React.useMemo(
+    () => props.budgets.reduce((n: number, b: IBudget) => n + b.limit, 0),
+    [props.budgets]
+  );
+
   const percentComplete = roundAwayFromZero(
-    ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100
+    ((props.amount * (props.isIncome ? 1 : -1)) / limit) * 100
   );
 
   const handleEdit = (newLimit?: number | string) => {
     if (newLimit === "") {
       return;
     }
-    if (props.id.length === 0) {
+    if (props.budgets.length === 0) {
       return;
     }
     doEditBudget.mutate({
-      id: props.id,
+      id: props.budgets[0]!.id,
       limit: Number(newLimit),
     });
   };
@@ -104,8 +108,6 @@ const BudgetCard = (props: BudgetCardProps): React.ReactNode => {
   return (
     <Card
       className={classes.root}
-      p="0.5rem"
-      w="100%"
       radius="md"
       onClick={toggle}
       bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
@@ -114,25 +116,36 @@ const BudgetCard = (props: BudgetCardProps): React.ReactNode => {
       <LoadingOverlay
         visible={doEditBudget.isPending || doDeleteBudget.isPending}
       />
-      <Group gap="1rem" align="flex-start" wrap="nowrap">
-        <Stack gap={0} w="100%">
-          <Group
-            justify="space-between"
-            align="center"
-            style={{ containerType: "inline-size" }}
-          >
-            <Text className={classes.title} fw={600}>
-              {props.categoryDisplayString}
-            </Text>
-            <Group gap={5} justify="flex-end" align="center">
-              <Text className={classes.text} fw={700}>
+      <Stack className={classes.budgetContainer}>
+        <Group className={classes.dataContainer}>
+          <Group className={classes.budgetNameContainer}>
+            <Text className={classes.text}>{props.categoryDisplayString}</Text>
+            {isSelected && (
+              <Button
+                size="compact-sm"
+                bg="red"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  doDeleteBudget.mutate(props.budgets[0]!.id);
+                }}
+              >
+                <Group gap="0.125rem">
+                  <Trash2Icon size={18} />
+                  <Text>Delete</Text>
+                </Group>
+              </Button>
+            )}
+          </Group>
+          <Group className={classes.budgetValuesContainer}>
+            <Flex className={classes.numberContainer}>
+              <Text className={classes.text}>
                 {convertNumberToCurrency(
                   props.amount * (props.isIncome ? 1 : -1),
                   false
                 )}
               </Text>
-              <Text className={classes.textSmall}> of </Text>
-              {/* TODO: Limit min should be the total of all children if it is a parent */}
+            </Flex>
+            <Flex className={classes.numberContainer}>
               {isSelected ? (
                 <Flex onClick={(e) => e.stopPropagation()}>
                   <NumberInput
@@ -145,79 +158,54 @@ const BudgetCard = (props: BudgetCardProps): React.ReactNode => {
                     placeholder="Limit"
                     radius="md"
                     styles={{
-                      root: {
-                        maxWidth: "100px",
-                      },
                       input: {
                         padding: "0 10px",
-                        fontSize: "16px",
+                        fontSize: "14px",
+                        lineHeight: "20px",
                       },
                     }}
                   />
                 </Flex>
               ) : (
-                <Text className={classes.text} fw={700}>
-                  {convertNumberToCurrency(props.limit, false)}
+                <Text className={classes.text}>
+                  {convertNumberToCurrency(limit, false)}
                 </Text>
               )}
-            </Group>
-          </Group>
-          <Group
-            gap={5}
-            justify="flex-end"
-            align="center"
-            style={{ containerType: "inline-size" }}
-          >
-            <Flex style={{ flex: "1 1 auto" }}>
-              <Progress.Root size={16} radius="xl" w="100%">
-                <Progress.Section
-                  value={percentComplete}
-                  color={getBudgetValueColor(
-                    roundAwayFromZero(props.amount),
-                    props.limit,
-                    props.isIncome
-                  )}
-                >
-                  <Progress.Label>{percentComplete.toFixed(0)}%</Progress.Label>
-                </Progress.Section>
-              </Progress.Root>
             </Flex>
-            <Text
-              size="md"
-              fw={700}
-              c={getBudgetValueColor(
-                roundAwayFromZero(props.amount),
-                props.limit,
-                props.isIncome
-              )}
-            >
-              {convertNumberToCurrency(
-                roundAwayFromZero(
-                  props.limit - props.amount * (props.isIncome ? 1 : -1)
-                ),
-                false
-              )}
-            </Text>
-            <Text size="md"> left</Text>
+            <Flex className={classes.numberContainer}>
+              <Text
+                className={classes.text}
+                c={getBudgetValueColor(
+                  roundAwayFromZero(props.amount),
+                  limit,
+                  props.isIncome
+                )}
+              >
+                {convertNumberToCurrency(
+                  roundAwayFromZero(
+                    limit - props.amount * (props.isIncome ? 1 : -1)
+                  ),
+                  false
+                )}
+              </Text>
+            </Flex>
           </Group>
-        </Stack>
-        {isSelected && (
-          <Group style={{ alignSelf: "stretch" }}>
-            <ActionIcon
-              color="red"
-              onClick={(e) => {
-                e.stopPropagation();
-                doDeleteBudget.mutate(props.id);
-              }}
-              h="100%"
-            >
-              <TrashIcon size="1rem" />
-            </ActionIcon>
-          </Group>
-        )}
-      </Group>
+        </Group>
+        <Progress.Root size={16} radius="xl">
+          <Progress.Section
+            value={percentComplete}
+            color={getBudgetValueColor(
+              roundAwayFromZero(props.amount),
+              limit,
+              props.isIncome
+            )}
+          >
+            <Progress.Label>{percentComplete.toFixed(0)}%</Progress.Label>
+          </Progress.Section>
+        </Progress.Root>
+      </Stack>
     </Card>
   );
 };
 
-export default BudgetCard;
+export default BudgetCard2;

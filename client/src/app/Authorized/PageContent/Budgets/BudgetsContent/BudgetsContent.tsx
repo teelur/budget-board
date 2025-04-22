@@ -4,7 +4,11 @@ import { getParentCategory, getSubCategories } from "~/helpers/category";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import { buildCategoryToTransactionsTotalMap } from "~/helpers/transactions";
-import { BudgetGroup, getBudgetGroupForCategory } from "~/helpers/budgets";
+import {
+  BudgetGroup,
+  buildBudgetCategoryTree,
+  getBudgetGroupForCategory,
+} from "~/helpers/budgets";
 import BudgetsGroupHeader from "./BudgetGroupHeader/BudgetsGroupHeader";
 import BudgetTotalCard from "./BudgetTotalCard/BudgetTotalCard";
 import BudgetsGroup from "./BudgetsGroup/BudgetsGroup";
@@ -22,6 +26,13 @@ interface BudgetsContentProps {
 const BudgetsContent = (props: BudgetsContentProps) => {
   const categoryToTransactionsTotalMap: Map<string, number> =
     buildCategoryToTransactionsTotalMap(props.transactions);
+
+  const budgetCategoryTree = buildBudgetCategoryTree(
+    props.budgets,
+    props.categories
+  ).sort((a, b) => {
+    return a.value.localeCompare(b.value);
+  });
 
   const unbudgetedCategoryToTransactionsTotalMap = new Map<string, number>(
     Array.from(categoryToTransactionsTotalMap).filter(
@@ -52,6 +63,9 @@ const BudgetsContent = (props: BudgetsContentProps) => {
                     getParentCategory(budget.category, props.categories)
                   )
               )}
+              categoryTree={budgetCategoryTree.filter((category) =>
+                areStringsEqual(category.value, "income")
+              )}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
             />
@@ -69,6 +83,9 @@ const BudgetsContent = (props: BudgetsContentProps) => {
                   getBudgetGroupForCategory(
                     getParentCategory(budget.category, props.categories)
                   )
+              )}
+              categoryTree={budgetCategoryTree.filter(
+                (category) => !areStringsEqual(category.value, "income")
               )}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}

@@ -331,16 +331,26 @@ export const buildCategoryToTransactionsTotalMap = (
 ): Map<string, number> => {
   const categoryToTransactionsTotalMap = new Map<string, number>();
   transactions.forEach((transaction) => {
-    const category = getTransactionCategory(
-      transaction.category ?? "",
-      transaction.subcategory ?? ""
-    ).toLocaleLowerCase();
+    const currentTotalCategory =
+      categoryToTransactionsTotalMap.get(
+        (transaction.category ?? "").toLocaleLowerCase()
+      ) ?? 0;
 
-    const currentTotal = categoryToTransactionsTotalMap.get(category) ?? 0;
     categoryToTransactionsTotalMap.set(
-      category,
-      currentTotal + transaction.amount
+      (transaction.category ?? "").toLocaleLowerCase(),
+      currentTotalCategory + transaction.amount
     );
+
+    if (transaction.subcategory !== null && transaction.subcategory !== "") {
+      const currentTotalSubCategory =
+        categoryToTransactionsTotalMap.get(
+          transaction.subcategory.toLocaleLowerCase()
+        ) ?? 0;
+      categoryToTransactionsTotalMap.set(
+        transaction.subcategory.toLocaleLowerCase(),
+        currentTotalSubCategory + transaction.amount
+      );
+    }
   });
   return categoryToTransactionsTotalMap;
 };

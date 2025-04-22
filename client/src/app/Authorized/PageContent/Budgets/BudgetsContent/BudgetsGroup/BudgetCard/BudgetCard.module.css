@@ -1,58 +1,27 @@
 .root {
-  padding: 0.5rem;
-  width: 100%;
-
   &:hover {
     outline: 1px solid var(--mantine-primary-color-filled);
   }
 }
 
-.budgetContainer {
-  gap: 0.25rem;
-}
-
-.dataContainer {
-  display: flex;
-  flex-direction: row;
-  container-type: inline-size;
-  gap: 0;
-  wrap: nowrap;
-}
-
-.budgetNameContainer {
-  width: 50%;
-
-  @container (max-width: 480px) {
-    width: 40%;
-  }
-}
-
-.budgetValuesContainer {
-  width: 50%;
-  justify-content: space-around;
-  gap: 0;
-
-  @container (max-width: 480px) {
-    width: 60%;
-  }
-}
-
-.numberContainer {
-  display: flex;
-  flex-direction: row;
-  gap: 0;
-  align-items: center;
-  width: 33%;
-  justify-content: center;
-}
-
-.text {
+.title {
   font-size: 1.2rem;
-  font-weight: 600;
 
   @container (max-width: 380px) {
     font-size: 1rem;
   }
+}
+
+.text {
+  font-size: 1.1rem;
+
+  @container (max-width: 380px) {
+    font-size: 1rem;
+  }
+}
+
+.textSmall {
+  font-size: 1rem;
 
   @container (max-width: 300px) {
     font-size: 0.8rem;
