@@ -34,6 +34,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
     return a.value.localeCompare(b.value);
   });
 
+  // TODO: Break this out from the existing map.
   const unbudgetedCategoryToTransactionsTotalMap = new Map<string, number>(
     Array.from(categoryToTransactionsTotalMap).filter(
       ([category, _]) =>
@@ -47,6 +48,27 @@ const BudgetsContent = (props: BudgetsContentProps) => {
     )
   );
 
+  const incomeBudgets = props.budgets.filter(
+    (budget) =>
+      BudgetGroup.Income ===
+      getBudgetGroupForCategory(
+        getParentCategory(budget.category, props.categories)
+      )
+  );
+  const incomeCategoryTree = budgetCategoryTree.filter((category) =>
+    areStringsEqual(category.value, "income")
+  );
+  const expenseBudgets = props.budgets.filter(
+    (budget) =>
+      BudgetGroup.Spending ===
+      getBudgetGroupForCategory(
+        getParentCategory(budget.category, props.categories)
+      )
+  );
+  const expenseCategoryTree = budgetCategoryTree.filter(
+    (category) => !areStringsEqual(category.value, "income")
+  );
+
   return (
     <Group gap="0.5rem" align="flex-start">
       <Stack w={{ base: "100%", md: "70%" }}>
@@ -56,16 +78,8 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             <Skeleton h={65} radius="md" />
           ) : (
             <BudgetsGroup
-              budgets={props.budgets.filter(
-                (budget) =>
-                  BudgetGroup.Income ===
-                  getBudgetGroupForCategory(
-                    getParentCategory(budget.category, props.categories)
-                  )
-              )}
-              categoryTree={budgetCategoryTree.filter((category) =>
-                areStringsEqual(category.value, "income")
-              )}
+              budgets={incomeBudgets}
+              categoryTree={incomeCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
             />
@@ -77,16 +91,8 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             <Skeleton h={65} radius="md" />
           ) : (
             <BudgetsGroup
-              budgets={props.budgets.filter(
-                (budget) =>
-                  BudgetGroup.Spending ===
-                  getBudgetGroupForCategory(
-                    getParentCategory(budget.category, props.categories)
-                  )
-              )}
-              categoryTree={budgetCategoryTree.filter(
-                (category) => !areStringsEqual(category.value, "income")
-              )}
+              budgets={expenseBudgets}
+              categoryTree={expenseCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
             />

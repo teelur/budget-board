@@ -1,4 +1,4 @@
-import cardClasses from "../BudgetsGroup/BudgetCard/BudgetCard.module.css";
+import cardClasses from "../BudgetsGroup/BudgetParentCard/BudgetParentCard.module.css";
 import groupClasses from "./BudgetsGroupHeader.module.css";
 
 import { Group, Text } from "@mantine/core";

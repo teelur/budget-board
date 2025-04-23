@@ -199,7 +199,7 @@ export const getBudgetAmount = (
  * @param {IBudget[]} budgets - An array of budget objects.
  * @returns {Map<string, IBudget[]>} - A map from category to list of budgets.
  */
-export const groupBudgetsByCategory = (
+export const buildCategoryToBudgetsMap = (
   budgets: IBudget[]
 ): Map<string, IBudget[]> =>
   budgets
@@ -296,4 +296,45 @@ export const getTotalLimitForCategory = (
 
     return total;
   }, 0);
+};
+
+export const buildCategoryToLimitsMap = (
+  budgets: IBudget[],
+  categories: ICategoryNode[]
+): Map<string, number> => {
+  const categoryToLimitsMap = new Map<string, number>();
+
+  budgets.forEach((budget) => {
+    if (categoryToLimitsMap.has(budget.category)) {
+      categoryToLimitsMap.set(
+        budget.category,
+        categoryToLimitsMap.get(budget.category)! + budget.limit
+      );
+    } else {
+      categoryToLimitsMap.set(budget.category, budget.limit);
+    }
+
+    // If the budget is for a subcategory, add the limit to the parent category
+    if (!categories.some((c) => areStringsEqual(c.value, budget.category))) {
+      const parentCategory =
+        categories
+          .flatMap((c) => c.subCategories)
+          .find((c) => areStringsEqual(c.value, budget.category))?.parent ?? "";
+
+      if (!parentCategory) {
+        return;
+      }
+
+      if (categoryToLimitsMap.has(parentCategory)) {
+        categoryToLimitsMap.set(
+          parentCategory,
+          categoryToLimitsMap.get(parentCategory)! + budget.limit
+        );
+      } else {
+        categoryToLimitsMap.set(parentCategory, budget.limit);
+      }
+    }
+  });
+
+  return categoryToLimitsMap;
 };

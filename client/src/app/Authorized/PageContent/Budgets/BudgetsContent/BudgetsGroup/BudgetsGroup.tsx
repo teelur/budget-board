@@ -1,19 +1,19 @@
 import classes from "./BudgetsGroup.module.css";
 
-import { Group, Stack, Text } from "@mantine/core";
-import { IBudget } from "~/models/budget";
+import { Stack, Text } from "@mantine/core";
+import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
-import BudgetCard from "./BudgetCard/BudgetCard";
-import { getParentCategory } from "~/helpers/category";
 import { ICategory, ICategoryNode } from "~/models/category";
 import {
-  BudgetGroup,
-  getBudgetAmount,
-  getBudgetGroupForCategory,
-  getTotalLimitForCategory,
-  groupBudgetsByCategory,
+  buildCategoryToBudgetsMap,
+  buildCategoryToLimitsMap,
 } from "~/helpers/budgets";
-import { CornerDownRightIcon } from "lucide-react";
+import BudgetParentCard from "./BudgetParentCard/BudgetParentCard";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { notifications } from "@mantine/notifications";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { translateAxiosError } from "~/helpers/requests";
 
 interface BudgetsGroupProps {
   budgets: IBudget[];
@@ -23,103 +23,72 @@ interface BudgetsGroupProps {
 }
 
 const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
-  const categoryToBudgetsMap = groupBudgetsByCategory(props.budgets);
+  const categoryToBudgetsMap = buildCategoryToBudgetsMap(props.budgets);
+  const categoryToLimitsMap = buildCategoryToLimitsMap(
+    props.budgets,
+    props.categoryTree
+  );
 
-  // const buildCardsList = (): React.ReactNode[] => {
-  //   const cards: React.ReactNode[] = [];
-  //   categoryToBudgetsMap.forEach((budgets, category) =>
-  //     cards.push(
-  //       <BudgetCard2
-  //         key={category}
-  //         budgets={budgets}
-  //         categoryDisplayString={getFormattedCategoryValue(
-  //           category,
-  //           props.categories
-  //         )}
-  //         amount={getBudgetAmount(
-  //           category.toLocaleLowerCase(),
-  //           props.categoryToTransactionsTotalMap,
-  //           props.categories
-  //         )}
-  //         isIncome={
-  //           BudgetGroup.Income ===
-  //           getBudgetGroupForCategory(
-  //             getParentCategory(category, props.categories)
-  //           )
-  //         }
-  //       />
-  //     )
-  //   );
-  //   return cards;
-  // };
+  const { request } = React.useContext<any>(AuthContext);
+  const queryClient = useQueryClient();
+  const doEditBudget = useMutation({
+    mutationFn: async (newBudget: IBudgetUpdateRequest) =>
+      await request({
+        url: "/api/budget",
+        method: "PUT",
+        data: newBudget,
+      }),
+    onMutate: async (variables: IBudgetUpdateRequest) => {
+      await queryClient.cancelQueries({ queryKey: ["budgets"] });
 
-  const buildBudgetsCardsList = (
-    categoryTree: ICategoryNode[]
-  ): React.ReactNode[] => {
-    const cards: React.ReactNode[] = [];
+      const previousBudgets: IBudget[] =
+        queryClient.getQueryData(["budgets"]) ?? [];
 
-    categoryTree.forEach((category) => {
-      cards.push(
-        <BudgetCard
-          key={category.value}
-          id={
-            (categoryToBudgetsMap.get(category.value)?.length ?? 0) === 1
-              ? categoryToBudgetsMap.get(category.value)!.at(0)!.id
-              : ""
-          }
-          categoryDisplayString={category.value}
-          amount={
-            props.categoryToTransactionsTotalMap.get(
-              category.value.toLocaleLowerCase()
-            ) ?? 0
-          }
-          limit={getTotalLimitForCategory(props.budgets, category)}
-          isIncome={
-            BudgetGroup.Income ===
-            getBudgetGroupForCategory(
-              getParentCategory(category.value, props.categories)
-            )
-          }
-        />
+      queryClient.setQueryData(["budgets"], (oldBudgets: IBudget[]) =>
+        oldBudgets?.map((oldBudget) =>
+          oldBudget.id === variables.id
+            ? { ...oldBudget, limit: variables.limit }
+            : oldBudget
+        )
       );
 
-      category.subCategories
-        .sort((a, b) => a.value.localeCompare(b.value))
-        .forEach((subCategory) => {
-          cards.push(
-            <Group gap={10} key={subCategory.value} w="100%" wrap="nowrap">
-              <CornerDownRightIcon />
-              <BudgetCard
-                id=""
-                categoryDisplayString={subCategory.value}
-                amount={getBudgetAmount(
-                  subCategory.value.toLocaleLowerCase(),
-                  props.categoryToTransactionsTotalMap,
-                  props.categories
-                )}
-                limit={getTotalLimitForCategory(props.budgets, subCategory)}
-                isIncome={
-                  BudgetGroup.Income ===
-                  getBudgetGroupForCategory(
-                    getParentCategory(category.value, props.categories)
-                  )
-                }
-              />
-            </Group>
-          );
-        });
-    });
+      return { previousBudgets };
+    },
+    onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
+      queryClient.setQueryData(["budgets"], context?.previousBudgets ?? []);
+      notifications.show({ message: translateAxiosError(error), color: "red" });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+  });
 
-    return cards;
-  };
+  const doDeleteBudget = useMutation({
+    mutationFn: async (id: string) =>
+      await request({
+        url: "/api/budget",
+        method: "DELETE",
+        params: { guid: id },
+      }),
+    onSuccess: async () =>
+      await queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+  });
 
   return (
     <Stack className={classes.root}>
       {props.budgets.length > 0 ? (
-        <>
-          <>{buildBudgetsCardsList(props.categoryTree)}</>
-          {/* <>{buildCardsList()}</> */}
-        </>
+        props.categoryTree.map((category) => (
+          <BudgetParentCard
+            key={category.value}
+            categoryTree={category}
+            categoryToBudgetsMap={categoryToBudgetsMap}
+            categoryToLimitsMap={categoryToLimitsMap}
+            categoryToTransactionsTotalMap={
+              props.categoryToTransactionsTotalMap
+            }
+            doEditBudget={doEditBudget.mutate}
+            doDeleteBudget={doDeleteBudget.mutate}
+            isPending={doEditBudget.isPending || doDeleteBudget.isPending}
+          />
+        ))
       ) : (
         <Text size="sm">No budgets.</Text>
       )}
