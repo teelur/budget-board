@@ -36,9 +36,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
-  const limit = props.categoryToLimitsMap.get(props.categoryTree.value) ?? 0;
+  const limit =
+    props.categoryToLimitsMap.get(props.categoryTree.value.toLowerCase()) ?? 0;
   const amount =
-    props.categoryToTransactionsTotalMap.get(props.categoryTree.value) ?? 0;
+    props.categoryToTransactionsTotalMap.get(
+      props.categoryTree.value.toLowerCase()
+    ) ?? 0;
 
   const newLimitField = useField<number | string>({
     initialValue: limit ?? 0,
@@ -46,8 +49,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   });
 
   const percentComplete = roundAwayFromZero(
-    (((props.categoryToTransactionsTotalMap.get(props.categoryTree.value) ??
-      0) *
+    (((props.categoryToTransactionsTotalMap.get(
+      props.categoryTree.value.toLowerCase()
+    ) ?? 0) *
       (isIncome ? 1 : -1)) /
       limit) *
       100
@@ -67,132 +71,145 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   };
 
   return (
-    <Card
-      className={classes.root}
-      p="0.5rem"
-      w="100%"
-      radius="md"
-      onClick={toggle}
-      bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
-      shadow="md"
-    >
+    <Card className={classes.root} p="0.25rem" w="100%" radius="md">
       <LoadingOverlay visible={props.isPending} />
-      <Stack gap={0}>
-        <Group gap="1rem" align="flex-start" wrap="nowrap">
-          <Stack gap={0} w="100%">
-            <Group
-              justify="space-between"
-              align="center"
-              style={{ containerType: "inline-size" }}
-            >
-              <Text className={classes.title} fw={600}>
-                {props.categoryTree.value}
-              </Text>
-              <Group gap={5} justify="flex-end" align="center">
-                <Text className={classes.text} fw={700}>
-                  {convertNumberToCurrency(0 * (isIncome ? 1 : -1), false)}
+      <Stack gap={5}>
+        <Card
+          className={classes.budgetCard}
+          p="0.25rem 0.5rem"
+          radius="md"
+          bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
+          onClick={toggle}
+        >
+          <Group gap="1rem" align="flex-start" wrap="nowrap">
+            <Stack gap={0} w="100%">
+              <Group
+                justify="space-between"
+                align="center"
+                style={{ containerType: "inline-size" }}
+              >
+                <Text className={classes.title} fw={600}>
+                  {props.categoryTree.value}
                 </Text>
-                <Text className={classes.textSmall}> of </Text>
-                {/* TODO: Limit min should be the total of all children if it is a parent */}
-                {isSelected ? (
-                  <Flex onClick={(e) => e.stopPropagation()}>
-                    <NumberInput
-                      {...newLimitField.getInputProps()}
-                      onBlur={() => handleEdit(newLimitField.getValue())}
-                      min={0}
-                      max={999999}
-                      step={1}
-                      prefix="$"
-                      placeholder="Limit"
-                      radius="md"
-                      styles={{
-                        root: {
-                          maxWidth: "100px",
-                        },
-                        input: {
-                          padding: "0 10px",
-                          fontSize: "16px",
-                        },
-                      }}
-                    />
-                  </Flex>
-                ) : (
+                <Group gap={5} justify="flex-end" align="center">
                   <Text className={classes.text} fw={700}>
-                    {convertNumberToCurrency(limit, false)}
-                  </Text>
-                )}
-              </Group>
-            </Group>
-            <Group
-              gap={5}
-              justify="flex-end"
-              align="center"
-              style={{ containerType: "inline-size" }}
-            >
-              <Flex style={{ flex: "1 1 auto" }}>
-                <Progress.Root size={16} radius="xl" w="100%">
-                  <Progress.Section
-                    value={percentComplete}
-                    color={getBudgetValueColor(
-                      roundAwayFromZero(amount),
-                      limit,
-                      isIncome
+                    {convertNumberToCurrency(
+                      amount * (isIncome ? 1 : -1),
+                      false
                     )}
-                  >
-                    <Progress.Label>
-                      {percentComplete.toFixed(0)}%
-                    </Progress.Label>
-                  </Progress.Section>
-                </Progress.Root>
-              </Flex>
-              <Text
-                size="md"
-                fw={700}
-                c={getBudgetValueColor(
-                  roundAwayFromZero(amount),
-                  limit,
-                  isIncome
-                )}
+                  </Text>
+                  <Text className={classes.textSmall}> of </Text>
+                  {/* TODO: Limit min should be the total of all children if it is a parent */}
+                  {isSelected ? (
+                    <Flex onClick={(e) => e.stopPropagation()}>
+                      <NumberInput
+                        {...newLimitField.getInputProps()}
+                        onBlur={() => handleEdit(newLimitField.getValue())}
+                        min={0}
+                        max={999999}
+                        step={1}
+                        prefix="$"
+                        placeholder="Limit"
+                        radius="md"
+                        size="xs"
+                        styles={{
+                          root: {
+                            maxWidth: "100px",
+                          },
+                          input: {
+                            padding: "0 10px",
+                            fontSize: "16px",
+                          },
+                        }}
+                      />
+                    </Flex>
+                  ) : (
+                    <Text className={classes.text} fw={700}>
+                      {convertNumberToCurrency(limit, false)}
+                    </Text>
+                  )}
+                </Group>
+              </Group>
+              <Group
+                gap={5}
+                justify="flex-end"
+                align="baseline"
+                style={{ containerType: "inline-size" }}
               >
-                {convertNumberToCurrency(
-                  roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
-                  false
-                )}
-              </Text>
-              <Text size="md"> left</Text>
-            </Group>
+                <Flex style={{ flex: "1 1 auto" }}>
+                  <Progress.Root size={16} radius="xl" w="100%">
+                    <Progress.Section
+                      value={percentComplete}
+                      color={getBudgetValueColor(
+                        roundAwayFromZero(amount),
+                        limit,
+                        isIncome
+                      )}
+                    >
+                      <Progress.Label>
+                        {percentComplete.toFixed(0)}%
+                      </Progress.Label>
+                    </Progress.Section>
+                  </Progress.Root>
+                </Flex>
+                <Text
+                  size="md"
+                  fw={700}
+                  c={getBudgetValueColor(
+                    roundAwayFromZero(amount),
+                    limit,
+                    isIncome
+                  )}
+                >
+                  {convertNumberToCurrency(
+                    roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
+                    false
+                  )}
+                </Text>
+                <Text size="md"> left</Text>
+              </Group>
+            </Stack>
+            {isSelected && (
+              <Group style={{ alignSelf: "stretch" }}>
+                <ActionIcon
+                  color="red"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    props.doDeleteBudget("");
+                  }}
+                  h="100%"
+                >
+                  <TrashIcon size="1rem" />
+                </ActionIcon>
+              </Group>
+            )}
+          </Group>
+        </Card>
+        {props.categoryTree.subCategories.length > 0 && (
+          <Stack gap={5}>
+            {props.categoryTree.subCategories.map((subCategory) => (
+              <BudgetChildCard
+                key={subCategory.value}
+                id=""
+                categoryValue={subCategory.value}
+                amount={
+                  props.categoryToTransactionsTotalMap.get(
+                    subCategory.value.toLowerCase()
+                  ) ?? 0
+                }
+                limit={
+                  props.categoryToLimitsMap.get(
+                    subCategory.value.toLowerCase()
+                  ) ?? 0
+                }
+                isIncome={isIncome}
+                doEditBudget={props.doEditBudget}
+                doDeleteBudget={props.doDeleteBudget}
+                isPending={props.isPending}
+              />
+            ))}
           </Stack>
-          {isSelected && (
-            <Group style={{ alignSelf: "stretch" }}>
-              <ActionIcon
-                color="red"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  props.doDeleteBudget("");
-                }}
-                h="100%"
-              >
-                <TrashIcon size="1rem" />
-              </ActionIcon>
-            </Group>
-          )}
-        </Group>
-        <Stack gap={5}>
-          {props.categoryTree.subCategories.map((subCategory) => (
-            <BudgetChildCard
-              key={subCategory.value}
-              id=""
-              categoryValue={subCategory.value}
-              amount={0}
-              limit={0}
-              isIncome={false}
-              doEditBudget={props.doEditBudget}
-              isSelected={isSelected}
-              doDeleteBudget={props.doDeleteBudget}
-              isPending={props.isPending}
-            />
-          ))}
-        </Stack>
+        )}
       </Stack>
     </Card>
   );

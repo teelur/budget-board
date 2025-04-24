@@ -213,8 +213,8 @@ export const buildCategoryToBudgetsMap = (
     })
     .reduce(
       (budgetMap: any, item: IBudget) =>
-        budgetMap.set(item.category.toLowerCase(), [
-          ...(budgetMap.get(item.category.toLowerCase()) || []),
+        budgetMap.set(item.category.toLocaleLowerCase(), [
+          ...(budgetMap.get(item.category.toLocaleLowerCase()) || []),
           item,
         ]),
       new Map()
@@ -305,13 +305,17 @@ export const buildCategoryToLimitsMap = (
   const categoryToLimitsMap = new Map<string, number>();
 
   budgets.forEach((budget) => {
-    if (categoryToLimitsMap.has(budget.category)) {
+    if (categoryToLimitsMap.has(budget.category.toLocaleLowerCase())) {
       categoryToLimitsMap.set(
-        budget.category,
-        categoryToLimitsMap.get(budget.category)! + budget.limit
+        budget.category.toLocaleLowerCase(),
+        categoryToLimitsMap.get(budget.category.toLocaleLowerCase())! +
+          budget.limit
       );
     } else {
-      categoryToLimitsMap.set(budget.category, budget.limit);
+      categoryToLimitsMap.set(
+        budget.category.toLocaleLowerCase(),
+        budget.limit
+      );
     }
 
     // If the budget is for a subcategory, add the limit to the parent category
@@ -325,13 +329,17 @@ export const buildCategoryToLimitsMap = (
         return;
       }
 
-      if (categoryToLimitsMap.has(parentCategory)) {
+      if (categoryToLimitsMap.has(parentCategory.toLocaleLowerCase())) {
         categoryToLimitsMap.set(
-          parentCategory,
-          categoryToLimitsMap.get(parentCategory)! + budget.limit
+          parentCategory.toLocaleLowerCase(),
+          categoryToLimitsMap.get(parentCategory.toLocaleLowerCase())! +
+            budget.limit
         );
       } else {
-        categoryToLimitsMap.set(parentCategory, budget.limit);
+        categoryToLimitsMap.set(
+          parentCategory.toLocaleLowerCase(),
+          budget.limit
+        );
       }
     }
   });

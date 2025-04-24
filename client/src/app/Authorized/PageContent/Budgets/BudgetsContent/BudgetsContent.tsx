@@ -1,6 +1,6 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
 import { IBudget } from "~/models/budget";
-import { getParentCategory, getSubCategories } from "~/helpers/category";
+import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import { buildCategoryToTransactionsTotalMap } from "~/helpers/transactions";
@@ -34,17 +34,27 @@ const BudgetsContent = (props: BudgetsContentProps) => {
     return a.value.localeCompare(b.value);
   });
 
-  // TODO: Break this out from the existing map.
+  // TODO: Finish filtering out unbudgeted categories
   const unbudgetedCategoryToTransactionsTotalMap = new Map<string, number>(
-    Array.from(categoryToTransactionsTotalMap).filter(
-      ([category, _]) =>
-        !props.budgets.some(
-          (budget) =>
-            areStringsEqual(budget.category, category) ||
-            getSubCategories(budget.category, props.categories).some(
-              (subCategory) => areStringsEqual(subCategory.value, category)
+    Array.from(categoryToTransactionsTotalMap.entries()).filter(
+      ([key, _value]) => {
+        if (key.length === 0) {
+          return true;
+        }
+        if (getIsParentCategory(key, props.categories)) {
+          return !budgetCategoryTree.some((budgetCategory) =>
+            areStringsEqual(budgetCategory.value, key)
+          );
+        }
+        const parentCategory = getParentCategory(key, props.categories);
+        return !budgetCategoryTree.some(
+          (budgetCategory) =>
+            areStringsEqual(budgetCategory.value, parentCategory) ||
+            budgetCategory.subCategories.some((subCategory) =>
+              areStringsEqual(subCategory.value, parentCategory)
             )
-        )
+        );
+      }
     )
   );
 

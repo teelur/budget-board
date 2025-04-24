@@ -18,6 +18,7 @@ import { useField } from "@mantine/form";
 import { CornerDownRight, TrashIcon } from "lucide-react";
 import { getBudgetValueColor } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
+import { useDisclosure } from "@mantine/hooks";
 
 interface BudgetChildCardProps {
   id: string;
@@ -25,13 +26,14 @@ interface BudgetChildCardProps {
   amount: number;
   limit: number;
   isIncome: boolean;
-  isSelected?: boolean;
   doEditBudget: (variables: IBudgetUpdateRequest) => void;
   doDeleteBudget: (id: string) => void;
   isPending: boolean;
 }
 
 const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
+  const [isSelected, { toggle }] = useDisclosure(false);
+
   const newLimitField = useField<number | string>({
     initialValue: props.limit ?? 0,
     validate: (value) => (value !== "" ? null : "Invalid limit"),
@@ -58,11 +60,13 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     <Group wrap="nowrap">
       <CornerDownRight />
       <Card
-        p="0.5rem"
+        className={classes.budgetCard}
+        p="0.25rem 0.5rem"
         w="100%"
         radius="md"
-        bg={props.isSelected ? "var(--mantine-primary-color-light)" : ""}
+        bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
         shadow="md"
+        onClick={toggle}
       >
         <LoadingOverlay visible={props.isPending} />
         <Group gap="1rem" align="flex-start" wrap="nowrap">
@@ -84,7 +88,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 </Text>
                 <Text className={classes.textSmall}> of </Text>
                 {/* TODO: Limit min should be the total of all children if it is a parent */}
-                {props.isSelected ? (
+                {isSelected ? (
                   <Flex onClick={(e) => e.stopPropagation()}>
                     <NumberInput
                       {...newLimitField.getInputProps()}
@@ -95,6 +99,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       prefix="$"
                       placeholder="Limit"
                       radius="md"
+                      size="xs"
                       styles={{
                         root: {
                           maxWidth: "100px",
@@ -154,7 +159,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               <Text size="md"> left</Text>
             </Group>
           </Stack>
-          {props.isSelected && (
+          {isSelected && (
             <Group style={{ alignSelf: "stretch" }}>
               <ActionIcon
                 color="red"
