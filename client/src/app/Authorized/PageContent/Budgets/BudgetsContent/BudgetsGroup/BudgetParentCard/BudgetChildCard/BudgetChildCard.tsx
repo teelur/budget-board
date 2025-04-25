@@ -12,13 +12,18 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { IBudgetUpdateRequest } from "~/models/budget";
+import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
 import { useField } from "@mantine/form";
 import { CornerDownRight, TrashIcon } from "lucide-react";
 import { getBudgetValueColor } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { translateAxiosError } from "~/helpers/requests";
 
 interface BudgetChildCardProps {
   id: string;
@@ -39,6 +44,49 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     validate: (value) => (value !== "" ? null : "Invalid limit"),
   });
 
+  const { request } = React.useContext<any>(AuthContext);
+  const queryClient = useQueryClient();
+  const doEditBudget = useMutation({
+    mutationFn: async (newBudget: IBudgetUpdateRequest) =>
+      await request({
+        url: "/api/budget",
+        method: "PUT",
+        data: newBudget,
+      }),
+    onMutate: async (variables: IBudgetUpdateRequest) => {
+      await queryClient.cancelQueries({ queryKey: ["budgets"] });
+
+      const previousBudgets: IBudget[] =
+        queryClient.getQueryData(["budgets"]) ?? [];
+
+      queryClient.setQueryData(["budgets"], (oldBudgets: IBudget[]) =>
+        oldBudgets?.map((oldBudget) =>
+          oldBudget.id === variables.id
+            ? { ...oldBudget, limit: variables.limit }
+            : oldBudget
+        )
+      );
+
+      return { previousBudgets };
+    },
+    onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
+      queryClient.setQueryData(["budgets"], context?.previousBudgets ?? []);
+      notifications.show({ message: translateAxiosError(error), color: "red" });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+  });
+
+  const doDeleteBudget = useMutation({
+    mutationFn: async (id: string) =>
+      await request({
+        url: "/api/budget",
+        method: "DELETE",
+        params: { guid: id },
+      }),
+    onSuccess: async () =>
+      await queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+  });
+
   const handleEdit = (newLimit?: number | string) => {
     if (newLimit === "") {
       return;
@@ -46,7 +94,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     if (props.id.length === 0) {
       return;
     }
-    props.doEditBudget({
+    doEditBudget.mutate({
       id: props.id,
       limit: Number(newLimit),
     });
@@ -68,7 +116,9 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
         shadow="md"
         onClick={toggle}
       >
-        <LoadingOverlay visible={props.isPending} />
+        <LoadingOverlay
+          visible={doEditBudget.isPending || doDeleteBudget.isPending}
+        />
         <Group gap="1rem" align="flex-start" wrap="nowrap">
           <Stack gap={0} w="100%">
             <Group
@@ -165,7 +215,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 color="red"
                 onClick={(e) => {
                   e.stopPropagation();
-                  props.doDeleteBudget(props.id);
+                  doDeleteBudget.mutate(props.id);
                 }}
                 h="100%"
               >
