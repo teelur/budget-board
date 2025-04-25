@@ -21,6 +21,7 @@ import { getBudgetValueColor } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
+import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -30,6 +31,7 @@ export interface BudgetParentCardProps {
   doEditBudget: (variables: IBudgetUpdateRequest) => void;
   doDeleteBudget: (id: string) => void;
   isPending: boolean;
+  selectedDate?: Date;
 }
 
 const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
@@ -42,6 +44,11 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     props.categoryToTransactionsTotalMap.get(
       props.categoryTree.value.toLowerCase()
     ) ?? 0;
+
+  const budgets =
+    props.categoryToBudgetsMap.get(props.categoryTree.value.toLowerCase()) ??
+    [];
+  const id = budgets.length === 1 ? budgets[0]?.id ?? "" : "";
 
   const newLimitField = useField<number | string>({
     initialValue: limit ?? 0,
@@ -61,14 +68,79 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     if (newLimit === "") {
       return;
     }
-    if ("".length === 0) {
+    if (id.length === 0) {
       return;
     }
     props.doEditBudget({
-      id: "",
+      id,
       limit: Number(newLimit),
     });
   };
+
+  interface ChildCards {
+    budgetChildCards: React.ReactNode[];
+    unbudgetChildCards: React.ReactNode[];
+  }
+
+  const buildChildren = (): ChildCards => {
+    const budgetChildCards: React.ReactNode[] = [];
+    const unbudgetChildCards: React.ReactNode[] = [];
+
+    props.categoryTree.subCategories.forEach((subCategory) => {
+      if (
+        props.categoryToBudgetsMap.has(subCategory.value.toLocaleLowerCase())
+      ) {
+        const budgets =
+          props.categoryToBudgetsMap.get(
+            subCategory.value.toLocaleLowerCase()
+          ) ?? [];
+        const budget = budgets[0] ?? null;
+        const budgetId = budget?.id ?? "";
+        budgetChildCards.push(
+          <BudgetChildCard
+            key={subCategory.value}
+            id={budgetId}
+            categoryValue={subCategory.value}
+            amount={
+              props.categoryToTransactionsTotalMap.get(
+                subCategory.value.toLowerCase()
+              ) ?? 0
+            }
+            limit={
+              props.categoryToLimitsMap.get(subCategory.value.toLowerCase()) ??
+              0
+            }
+            isIncome={isIncome}
+            doEditBudget={props.doEditBudget}
+            doDeleteBudget={props.doDeleteBudget}
+            isPending={props.isPending}
+          />
+        );
+      } else if (
+        props.categoryToTransactionsTotalMap.has(
+          subCategory.value.toLocaleLowerCase()
+        )
+      ) {
+        unbudgetChildCards.push(
+          <UnbudgetChildCard
+            key={subCategory.value}
+            category={subCategory.value}
+            amount={
+              props.categoryToTransactionsTotalMap.get(
+                subCategory.value.toLowerCase()
+              ) ?? 0
+            }
+            selectedDate={props.selectedDate}
+            isIncome={isIncome}
+          />
+        );
+      }
+    });
+
+    return { budgetChildCards, unbudgetChildCards };
+  };
+
+  const { budgetChildCards, unbudgetChildCards } = buildChildren();
 
   return (
     <Card className={classes.root} p="0.25rem" w="100%" radius="md">
@@ -79,7 +151,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
           p="0.25rem 0.5rem"
           radius="md"
           bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
-          onClick={toggle}
+          onClick={() => id.length > 0 && toggle()}
+          shadow="md"
         >
           <Group gap="1rem" align="flex-start" wrap="nowrap">
             <Stack gap={0} w="100%">
@@ -187,27 +260,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
         </Card>
         {props.categoryTree.subCategories.length > 0 && (
           <Stack gap={5}>
-            {props.categoryTree.subCategories.map((subCategory) => (
-              <BudgetChildCard
-                key={subCategory.value}
-                id=""
-                categoryValue={subCategory.value}
-                amount={
-                  props.categoryToTransactionsTotalMap.get(
-                    subCategory.value.toLowerCase()
-                  ) ?? 0
-                }
-                limit={
-                  props.categoryToLimitsMap.get(
-                    subCategory.value.toLowerCase()
-                  ) ?? 0
-                }
-                isIncome={isIncome}
-                doEditBudget={props.doEditBudget}
-                doDeleteBudget={props.doDeleteBudget}
-                isPending={props.isPending}
-              />
-            ))}
+            {budgetChildCards.length > 0 && budgetChildCards}
+            {unbudgetChildCards.length > 0 && unbudgetChildCards}
           </Stack>
         )}
       </Stack>

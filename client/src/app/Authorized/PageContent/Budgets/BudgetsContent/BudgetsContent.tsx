@@ -1,14 +1,10 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
 import { IBudget } from "~/models/budget";
-import { getIsParentCategory, getParentCategory } from "~/helpers/category";
+import { buildCategoriesTree, getParentCategory } from "~/helpers/category";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import { buildCategoryToTransactionsTotalMap } from "~/helpers/transactions";
-import {
-  BudgetGroup,
-  buildBudgetCategoryTree,
-  getBudgetGroupForCategory,
-} from "~/helpers/budgets";
+import { BudgetGroup, getBudgetGroupForCategory } from "~/helpers/budgets";
 import BudgetsGroupHeader from "./BudgetGroupHeader/BudgetsGroupHeader";
 import BudgetTotalCard from "./BudgetTotalCard/BudgetTotalCard";
 import BudgetsGroup from "./BudgetsGroup/BudgetsGroup";
@@ -27,32 +23,19 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const categoryToTransactionsTotalMap: Map<string, number> =
     buildCategoryToTransactionsTotalMap(props.transactions);
 
-  const budgetCategoryTree = buildBudgetCategoryTree(
-    props.budgets,
-    props.categories
-  ).sort((a, b) => {
-    return a.value.localeCompare(b.value);
-  });
+  const categoryTree = buildCategoriesTree(props.categories);
 
-  // TODO: Finish filtering out unbudgeted categories
   const unbudgetedCategoryToTransactionsTotalMap = new Map<string, number>(
     Array.from(categoryToTransactionsTotalMap.entries()).filter(
       ([key, _value]) => {
         if (key.length === 0) {
           return true;
         }
-        if (getIsParentCategory(key, props.categories)) {
-          return !budgetCategoryTree.some((budgetCategory) =>
-            areStringsEqual(budgetCategory.value, key)
-          );
-        }
-        const parentCategory = getParentCategory(key, props.categories);
-        return !budgetCategoryTree.some(
-          (budgetCategory) =>
-            areStringsEqual(budgetCategory.value, parentCategory) ||
-            budgetCategory.subCategories.some((subCategory) =>
-              areStringsEqual(subCategory.value, parentCategory)
-            )
+        return !props.budgets.some((budget) =>
+          areStringsEqual(
+            getParentCategory(budget.category, props.categories),
+            getParentCategory(key, props.categories)
+          )
         );
       }
     )
@@ -65,7 +48,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         getParentCategory(budget.category, props.categories)
       )
   );
-  const incomeCategoryTree = budgetCategoryTree.filter((category) =>
+  const incomeCategoryTree = categoryTree.filter((category) =>
     areStringsEqual(category.value, "income")
   );
   const expenseBudgets = props.budgets.filter(
@@ -75,7 +58,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         getParentCategory(budget.category, props.categories)
       )
   );
-  const expenseCategoryTree = budgetCategoryTree.filter(
+  const expenseCategoryTree = categoryTree.filter(
     (category) => !areStringsEqual(category.value, "income")
   );
 
@@ -92,6 +75,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               categoryTree={incomeCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
+              selectedDate={props.selectedDate}
             />
           )}
         </Stack>
@@ -105,6 +89,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               categoryTree={expenseCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
+              selectedDate={props.selectedDate}
             />
           )}
         </Stack>

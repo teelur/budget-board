@@ -20,6 +20,7 @@ interface BudgetsGroupProps {
   categoryToTransactionsTotalMap: Map<string, number>;
   categoryTree: ICategoryNode[];
   categories: ICategory[];
+  selectedDate?: Date;
 }
 
 const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
@@ -75,20 +76,31 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
   return (
     <Stack className={classes.root}>
       {props.budgets.length > 0 ? (
-        props.categoryTree.map((category) => (
-          <BudgetParentCard
-            key={category.value}
-            categoryTree={category}
-            categoryToBudgetsMap={categoryToBudgetsMap}
-            categoryToLimitsMap={categoryToLimitsMap}
-            categoryToTransactionsTotalMap={
-              props.categoryToTransactionsTotalMap
-            }
-            doEditBudget={doEditBudget.mutate}
-            doDeleteBudget={doDeleteBudget.mutate}
-            isPending={doEditBudget.isPending || doDeleteBudget.isPending}
-          />
-        ))
+        props.categoryTree.map((category) => {
+          if (
+            categoryToBudgetsMap.has(category.value.toLocaleLowerCase()) ||
+            category.subCategories.some((subCategory) =>
+              categoryToBudgetsMap.has(subCategory.value.toLocaleLowerCase())
+            )
+          ) {
+            return (
+              <BudgetParentCard
+                key={category.value}
+                categoryTree={category}
+                categoryToBudgetsMap={categoryToBudgetsMap}
+                categoryToLimitsMap={categoryToLimitsMap}
+                categoryToTransactionsTotalMap={
+                  props.categoryToTransactionsTotalMap
+                }
+                doEditBudget={doEditBudget.mutate}
+                doDeleteBudget={doDeleteBudget.mutate}
+                isPending={doEditBudget.isPending || doDeleteBudget.isPending}
+                selectedDate={props.selectedDate}
+              />
+            );
+          }
+          return null;
+        })
       ) : (
         <Text size="sm">No budgets.</Text>
       )}
