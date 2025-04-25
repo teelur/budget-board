@@ -325,7 +325,11 @@ export const buildCategoryToLimitsMap = (
           .flatMap((c) => c.subCategories)
           .find((c) => areStringsEqual(c.value, budget.category))?.parent ?? "";
 
-      if (!parentCategory) {
+      // We only want to add the limit to the parent category if it is not already in the budgets
+      if (
+        !parentCategory ||
+        budgets.some((b) => areStringsEqual(b.category, parentCategory))
+      ) {
         return;
       }
 

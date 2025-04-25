@@ -31,9 +31,6 @@ interface BudgetChildCardProps {
   amount: number;
   limit: number;
   isIncome: boolean;
-  doEditBudget: (variables: IBudgetUpdateRequest) => void;
-  doDeleteBudget: (id: string) => void;
-  isPending: boolean;
 }
 
 const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {

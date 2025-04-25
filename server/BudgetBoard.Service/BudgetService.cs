@@ -1,5 +1,6 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using Microsoft.EntityFrameworkCore;
@@ -34,8 +35,43 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
                 Limit = budget.Limit,
                 UserID = userData.Id
             };
-
             userData.Budgets.Add(newBudget);
+
+            var parentCategory =
+                TransactionCategoriesHelpers.GetParentCategory(
+                    budget.Category,
+                    userData.TransactionCategories.Select(
+                        tc => new CategoryBase
+                        {
+                            Value = tc.Value,
+                            Parent = tc.Parent
+                        }));
+            if (!string.IsNullOrEmpty(parentCategory)
+                )
+            {
+                if (!userData.Budgets.Any((b) =>
+                    b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)))
+                {
+
+                    var newParentBudget = new Budget
+                    {
+                        Date = budget.Date,
+                        Category = parentCategory,
+                        Limit = GetBudgetChildrenLimit(parentCategory, budget.Date, userData),
+                        UserID = userData.Id
+                    };
+                    userData.Budgets.Add(newParentBudget);
+                }
+                else
+                {
+                    var parentBudget = userData.Budgets.SingleOrDefault(b =>
+                        b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase));
+                    if (parentBudget != null && parentBudget.Limit < parentBudget.Limit + budget.Limit)
+                    {
+                        parentBudget.Limit += budget.Limit;
+                    }
+                }
+            }
         }
 
         await _userDataContext.SaveChangesAsync();
@@ -60,7 +96,59 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
             throw new BudgetBoardServiceException("The budget you are trying to update does not exist.");
         }
 
+        // TODO: This logic is fucked. Figure it out.
+
+        var oldLimit = budget.Limit;
+
         budget.Limit = updatedBudget.Limit;
+
+        var parentCategory =
+                TransactionCategoriesHelpers.GetParentCategory(
+                    budget.Category,
+                    userData.TransactionCategories.Select(
+                        tc => new CategoryBase
+                        {
+                            Value = tc.Value,
+                            Parent = tc.Parent
+                        }));
+        if (!string.IsNullOrEmpty(parentCategory))
+        {
+            var parentBudget = userData.Budgets.SingleOrDefault(b =>
+                b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase));
+            if (parentBudget != null)
+            {
+                if (parentBudget.Limit < parentBudget.Limit + updatedBudget.Limit - oldLimit)
+                {
+                    parentBudget.Limit += updatedBudget.Limit - oldLimit;
+                }
+                else
+                {
+                    parentBudget.Limit -= updatedBudget.Limit;
+                }
+            }
+            else
+            {
+                var childrenLimitTotal = userData.Budgets
+                    .Where(b =>
+                        TransactionCategoriesHelpers.GetParentCategory(
+                            b.Category, _userDataContext.TransactionCategories
+                                .Select(tc => new CategoryBase
+                                {
+                                    Value = tc.Value,
+                                    Parent = tc.Parent
+                                }))
+                        .Equals(budget.Category, StringComparison.CurrentCultureIgnoreCase))
+                    .Sum(b => b.Limit);
+                var newParentBudget = new Budget
+                {
+                    Date = budget.Date,
+                    Category = parentCategory,
+                    Limit = childrenLimitTotal - oldLimit + updatedBudget.Limit,
+                    UserID = userData.Id
+                };
+                userData.Budgets.Add(newParentBudget);
+            }
+        }
 
         await _userDataContext.SaveChangesAsync();
     }
@@ -87,6 +175,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         {
             users = await _userDataContext.ApplicationUsers
                 .Include(u => u.Budgets)
+                .Include(u => u.TransactionCategories)
                 .ToListAsync();
             foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
         }
@@ -103,5 +192,25 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         }
 
         return foundUser;
+    }
+
+    private decimal GetBudgetChildrenLimit(string parentCategory, DateTime date, ApplicationUser userData)
+    {
+        var budgetsForMonth = userData.Budgets
+            .Where(b => b.Date.Month == date.Month && b.Date.Year == date.Year)
+            .ToList();
+
+        var childrenBudgets = budgetsForMonth
+            .Where(b => TransactionCategoriesHelpers.GetParentCategory(
+                b.Category, _userDataContext.TransactionCategories
+                    .Select(tc => new CategoryBase
+                    {
+                        Value = tc.Value,
+                        Parent = tc.Parent
+                    }))
+            .Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase))
+            .ToList();
+
+        return childrenBudgets.Sum(b => b.Limit);
     }
 }

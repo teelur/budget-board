@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
@@ -30,7 +31,6 @@ public class BudgetServiceTests
 
         var budget = _budgetCreateRequestFaker.Generate();
 
-
         // Act
         Func<Task> act = async () => await budgetService.CreateBudgetsAsync(Guid.NewGuid(), [budget]);
 
@@ -46,7 +46,6 @@ public class BudgetServiceTests
         var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
 
         var budget = _budgetCreateRequestFaker.Generate();
-        await helper.UserDataContext.SaveChangesAsync();
 
         // Act
         await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
@@ -64,12 +63,154 @@ public class BudgetServiceTests
         var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
 
         var budget = _budgetCreateRequestFaker.Generate();
-        await helper.UserDataContext.SaveChangesAsync();
 
         // Act
         Func<Task> act = async () => await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget, budget]);
         // Assert
         await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Budget category already exists for this month!");
+    }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_WhenCreateChild_ShouldCreateParent()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Category = "Paycheck";
+
+        // Act
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        var parentBudget = new Budget
+        {
+            Date = budget.Date,
+            Category = "Income",
+            Limit = budget.Limit,
+            UserID = helper.demoUser.Id
+        };
+
+        helper.UserDataContext.Budgets.Should().HaveCount(2);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == "Income");
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == budget.Category);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Date == budget.Date);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Limit == budget.Limit);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.UserID == helper.demoUser.Id);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Date == parentBudget.Date);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == parentBudget.Category);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Limit == parentBudget.Limit);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.UserID == parentBudget.UserID);
+    }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_WhenCreateChildAndChildAlreadyExists_ShouldCreateParentWithSumOfLimits()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
+
+        var budgetFaker = new BudgetFaker();
+        var child1Budget = budgetFaker.Generate();
+        child1Budget.UserID = helper.demoUser.Id;
+        child1Budget.Category = "Bonus";
+        child1Budget.Limit = 1000;
+        child1Budget.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(child1Budget);
+
+        var child2Budget = budgetFaker.Generate();
+        child2Budget.UserID = helper.demoUser.Id;
+        child2Budget.Category = "Service & Parts";
+        child2Budget.Limit = 200;
+        child2Budget.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(child2Budget);
+
+        var child3Budget = budgetFaker.Generate();
+        child3Budget.UserID = helper.demoUser.Id;
+        child3Budget.Category = "Paycheck";
+        child3Budget.Limit = 300;
+        child3Budget.Date = DateTime.Today.AddMonths(-1);
+
+        helper.UserDataContext.Budgets.Add(child3Budget);
+
+        helper.UserDataContext.SaveChanges();
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Category = "Paycheck";
+        budget.Limit = 200;
+        budget.Date = DateTime.Today;
+
+        // Act
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(5);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == "Income");
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Limit == child1Budget.Limit + budget.Limit);
+    }
+
+    [Fact]
+    public async Task CreateBudgetAsync_WhenParentCategoryExistsAndHasLimitSmallerThanNewBudget_ShouldUpdateLimit()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
+
+        var budgetFaker = new BudgetFaker();
+        var parentBudget = budgetFaker.Generate();
+        parentBudget.UserID = helper.demoUser.Id;
+        parentBudget.Category = "Income";
+        parentBudget.Limit = 1000;
+
+        helper.UserDataContext.Budgets.Add(parentBudget);
+        helper.UserDataContext.SaveChanges();
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Category = "Paycheck";
+        budget.Limit = 200;
+
+        var oldLimit = parentBudget.Limit;
+
+        // Act
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(2);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == parentBudget.Category);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == budget.Category);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Limit == oldLimit + budget.Limit);
+    }
+
+    [Fact]
+    public async Task CreateBudgetAsync_WhenParentCategoryExistsAndHasLimitLargerThanNewBudget_ShouldNotUpdateLimit()
+    {   // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
+
+        var budgetFaker = new BudgetFaker();
+        var parentBudget = budgetFaker.Generate();
+        parentBudget.UserID = helper.demoUser.Id;
+        parentBudget.Category = "Income";
+        parentBudget.Limit = 1000;
+
+        helper.UserDataContext.Budgets.Add(parentBudget);
+        helper.UserDataContext.SaveChanges();
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Category = "Paycheck";
+        budget.Limit = 200;
+
+        // Act
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(2);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == parentBudget.Category);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == budget.Category);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Limit == parentBudget.Limit);
     }
 
     [Fact]
@@ -140,6 +281,48 @@ public class BudgetServiceTests
 
         // Assert
         await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The budget you are trying to update does not exist.");
+    }
+
+    [Fact]
+    public async Task UpdateBudgetAsync_WhenParentBudgetLessThanSumOfChildBudgets_ShouldUpdateParentBudget()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
+
+        var budgetFaker = new BudgetFaker();
+        var parentBudget = budgetFaker.Generate();
+        parentBudget.UserID = helper.demoUser.Id;
+        parentBudget.Category = "Income";
+        parentBudget.Limit = 1000;
+
+        helper.UserDataContext.Budgets.Add(parentBudget);
+
+        var childBudget = budgetFaker.Generate();
+        childBudget.UserID = helper.demoUser.Id;
+        childBudget.Category = "Paycheck";
+        childBudget.Limit = 200;
+
+
+        helper.UserDataContext.Budgets.Add(childBudget);
+        helper.UserDataContext.SaveChanges();
+
+        var budget = _budgetUpdateRequestFaker.Generate();
+        budget.ID = childBudget.ID;
+        budget.Limit = 3000;
+
+        var parentOldLimit = parentBudget.Limit;
+        var childOldLimit = childBudget.Limit;
+
+        // Act
+        await budgetService.UpdateBudgetAsync(helper.demoUser.Id, budget);
+
+        // Assert
+        var updatedParentBudget = helper.UserDataContext.Budgets.Single(b => b.Category == parentBudget.Category);
+        updatedParentBudget
+            .Limit
+            .Should()
+            .Be(parentOldLimit + (budget.Limit - childOldLimit));
     }
 
     [Fact]

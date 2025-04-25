@@ -22,20 +22,22 @@ import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
 import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
+import { notifications } from "@mantine/notifications";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { translateAxiosError } from "~/helpers/requests";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
   categoryToBudgetsMap: Map<string, IBudget[]>;
   categoryToLimitsMap: Map<string, number>;
   categoryToTransactionsTotalMap: Map<string, number>;
-  doEditBudget: (variables: IBudgetUpdateRequest) => void;
-  doDeleteBudget: (id: string) => void;
-  isPending: boolean;
   selectedDate?: Date;
 }
 
 const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
-  const [isSelected, { toggle }] = useDisclosure(false);
+  const [isSelected, { toggle, close }] = useDisclosure(false);
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
   const limit =
@@ -64,6 +66,49 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       100
   );
 
+  const { request } = React.useContext<any>(AuthContext);
+  const queryClient = useQueryClient();
+  const doEditBudget = useMutation({
+    mutationFn: async (newBudget: IBudgetUpdateRequest) =>
+      await request({
+        url: "/api/budget",
+        method: "PUT",
+        data: newBudget,
+      }),
+    onMutate: async (variables: IBudgetUpdateRequest) => {
+      await queryClient.cancelQueries({ queryKey: ["budgets"] });
+
+      const previousBudgets: IBudget[] =
+        queryClient.getQueryData(["budgets"]) ?? [];
+
+      queryClient.setQueryData(["budgets"], (oldBudgets: IBudget[]) =>
+        oldBudgets?.map((oldBudget) =>
+          oldBudget.id === variables.id
+            ? { ...oldBudget, limit: variables.limit }
+            : oldBudget
+        )
+      );
+
+      return { previousBudgets };
+    },
+    onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
+      queryClient.setQueryData(["budgets"], context?.previousBudgets ?? []);
+      notifications.show({ message: translateAxiosError(error), color: "red" });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+  });
+
+  const doDeleteBudget = useMutation({
+    mutationFn: async (id: string) =>
+      await request({
+        url: "/api/budget",
+        method: "DELETE",
+        params: { guid: id },
+      }),
+    onSuccess: async () =>
+      await queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+  });
+
   const handleEdit = (newLimit?: number | string) => {
     if (newLimit === "") {
       return;
@@ -71,7 +116,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     if (id.length === 0) {
       return;
     }
-    props.doEditBudget({
+    doEditBudget.mutate({
       id,
       limit: Number(newLimit),
     });
@@ -111,9 +156,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               0
             }
             isIncome={isIncome}
-            doEditBudget={props.doEditBudget}
-            doDeleteBudget={props.doDeleteBudget}
-            isPending={props.isPending}
           />
         );
       } else if (
@@ -144,16 +186,23 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
 
   return (
     <Card className={classes.root} p="0.25rem" w="100%" radius="md">
-      <LoadingOverlay visible={props.isPending} />
       <Stack gap={5}>
         <Card
           className={classes.budgetCard}
           p="0.25rem 0.5rem"
           radius="md"
           bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
-          onClick={() => id.length > 0 && toggle()}
+          onClick={() => {
+            if (id.length > 0) {
+              newLimitField.setValue(limit);
+              toggle();
+            }
+          }}
           shadow="md"
         >
+          <LoadingOverlay
+            visible={doEditBudget.isPending || doDeleteBudget.isPending}
+          />
           <Group gap="1rem" align="flex-start" wrap="nowrap">
             <Stack gap={0} w="100%">
               <Group
@@ -248,7 +297,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   color="red"
                   onClick={(e) => {
                     e.stopPropagation();
-                    props.doDeleteBudget("");
+                    doDeleteBudget.mutate(id);
+                    close();
                   }}
                   h="100%"
                 >
