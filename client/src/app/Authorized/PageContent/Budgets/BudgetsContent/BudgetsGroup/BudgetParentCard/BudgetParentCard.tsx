@@ -258,12 +258,13 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
             )}
           </Group>
         </Card>
-        {props.categoryTree.subCategories.length > 0 && (
-          <Stack gap={5}>
-            {budgetChildCards.length > 0 && budgetChildCards}
-            {unbudgetChildCards.length > 0 && unbudgetChildCards}
-          </Stack>
-        )}
+        {props.categoryTree.subCategories.length > 0 &&
+          (budgetChildCards.length > 0 || unbudgetChildCards.length > 0) && (
+            <Stack gap={5}>
+              {budgetChildCards.length > 0 && budgetChildCards}
+              {unbudgetChildCards.length > 0 && unbudgetChildCards}
+            </Stack>
+          )}
       </Stack>
     </Card>
   );
