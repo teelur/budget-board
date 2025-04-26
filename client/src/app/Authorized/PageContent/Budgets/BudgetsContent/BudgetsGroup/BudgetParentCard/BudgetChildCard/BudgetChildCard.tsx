@@ -1,4 +1,4 @@
-import classes from "../BudgetParentCard.module.css";
+import classes from "./BudgetChildCard.module.css";
 
 import { convertNumberToCurrency } from "~/helpers/currency";
 import {
@@ -192,7 +192,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 </Progress.Root>
               </Flex>
               <Text
-                size="md"
+                size="0.9rem"
                 fw={700}
                 c={getBudgetValueColor(
                   roundAwayFromZero(props.amount),

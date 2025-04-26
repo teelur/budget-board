@@ -6,11 +6,3 @@
     var(--mantine-color-dark-6)
   );
 }
-
-.content {
-  padding: 0;
-}
-
-.unbudgetCards {
-  gap: 0.5rem;
-}

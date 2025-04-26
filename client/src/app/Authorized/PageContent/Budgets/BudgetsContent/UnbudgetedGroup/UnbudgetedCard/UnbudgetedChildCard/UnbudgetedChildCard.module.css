@@ -4,3 +4,11 @@
     var(--mantine-color-dark-4)
   );
 }
+
+.text {
+  font-size: 0.9rem;
+
+  @container (max-width: 380px) {
+    font-size: 0.8rem;
+  }
+}

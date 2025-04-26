@@ -1,4 +1,4 @@
-import classes from "./UnbudgetChildCard.module.css";
+import classes from "./UnbudgetedChildCard.module.css";
 
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { ActionIcon, Card, Group, LoadingOverlay, Text } from "@mantine/core";
@@ -6,19 +6,20 @@ import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { CornerDownRight, PlusIcon } from "lucide-react";
+import { CornerDownRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 
-interface UnbudgetChildCardProps {
-  selectedDate?: Date;
+interface UnbudgetedChildCardProps {
   category: string;
   amount: number;
-  isIncome: boolean;
+  selectedDate?: Date;
 }
 
-const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
+const UnbudgetedChildCard = (
+  props: UnbudgetedChildCardProps
+): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
@@ -38,26 +39,19 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
   });
 
   return (
-    <Group wrap="nowrap">
-      <CornerDownRight />
-      <Card p="0.5rem" radius="md" w="100%">
+    <Group w="100%" align="center" wrap="nowrap" gap="0.5rem">
+      <CornerDownRightIcon size={20} />
+      <Card className={classes.root} radius="md" p="0.5rem" w="100%">
         <LoadingOverlay visible={doAddBudget.isPending} />
-        <Group
-          justify="space-between"
-          w="100%"
-          style={{ containerType: "inline-size" }}
-        >
+        <Group w="100%" justify="space-between">
           <Text className={classes.text} fw={600}>
             {props.category}
           </Text>
           <Group gap="sm">
             <Text className={classes.text} fw={600}>
-              {convertNumberToCurrency(
-                props.amount * (props.isIncome ? 1 : -1),
-                false
-              )}
+              {convertNumberToCurrency(props.amount, false)}
             </Text>
-            {props.selectedDate && props.category !== "Uncategorized" && (
+            {props.selectedDate && (
               <ActionIcon
                 size="sm"
                 onClick={() =>
@@ -80,4 +74,4 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
   );
 };
 
-export default UnbudgetChildCard;
+export default UnbudgetedChildCard;

@@ -25,22 +25,6 @@ const BudgetsContent = (props: BudgetsContentProps) => {
 
   const categoryTree = buildCategoriesTree(props.categories);
 
-  const unbudgetedCategoryToTransactionsTotalMap = new Map<string, number>(
-    Array.from(categoryToTransactionsTotalMap.entries()).filter(
-      ([key, _value]) => {
-        if (key.length === 0) {
-          return true;
-        }
-        return !props.budgets.some((budget) =>
-          areStringsEqual(
-            getParentCategory(budget.category, props.categories),
-            getParentCategory(key, props.categories)
-          )
-        );
-      }
-    )
-  );
-
   const incomeBudgets = props.budgets.filter(
     (budget) =>
       BudgetGroup.Income ===
@@ -60,6 +44,17 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   );
   const expenseCategoryTree = categoryTree.filter(
     (category) => !areStringsEqual(category.value, "income")
+  );
+
+  const unbudgetedCategoryTree = categoryTree.filter(
+    (category) =>
+      !props.budgets.some((budget) =>
+        areStringsEqual(
+          getParentCategory(budget.category, props.categories),
+          getParentCategory(category.value, props.categories)
+        )
+      ) &&
+      categoryToTransactionsTotalMap.has(category.value.toLocaleLowerCase())
   );
 
   return (
@@ -97,9 +92,8 @@ const BudgetsContent = (props: BudgetsContentProps) => {
           <Skeleton h={65} radius="md" />
         ) : (
           <UnbudgetedGroup
-            unbudgetedCategoryToTransactionsTotalMap={
-              unbudgetedCategoryToTransactionsTotalMap
-            }
+            categoryTree={unbudgetedCategoryTree}
+            categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
             categories={props.categories}
             selectedDate={props.selectedDate}
           />
