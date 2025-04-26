@@ -125,6 +125,15 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     });
   };
 
+  const childLimitsTotal = props.categoryTree.subCategories.reduce(
+    (acc, subCategory) => {
+      const limit =
+        props.categoryToLimitsMap.get(subCategory.value.toLowerCase()) ?? 0;
+      return acc + limit;
+    },
+    0
+  );
+
   interface ChildCards {
     budgetChildCards: React.ReactNode[];
     unbudgetChildCards: React.ReactNode[];
@@ -226,13 +235,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     )}
                   </Text>
                   <Text className={classes.textSmall}> of </Text>
-                  {/* TODO: Limit min should be the total of all children if it is a parent */}
                   {isSelected ? (
                     <Flex onClick={(e) => e.stopPropagation()}>
                       <NumberInput
                         {...newLimitField.getInputProps()}
                         onBlur={() => handleEdit(newLimitField.getValue())}
-                        min={0}
+                        min={childLimitsTotal}
                         max={999999}
                         step={1}
                         prefix="$"

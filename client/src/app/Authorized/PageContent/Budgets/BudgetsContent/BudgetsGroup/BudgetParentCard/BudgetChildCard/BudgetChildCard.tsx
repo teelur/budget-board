@@ -139,7 +139,6 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   )}
                 </Text>
                 <Text className={classes.textSmall}> of </Text>
-                {/* TODO: Limit min should be the total of all children if it is a parent */}
                 {isSelected ? (
                   <Flex onClick={(e) => e.stopPropagation()}>
                     <NumberInput
