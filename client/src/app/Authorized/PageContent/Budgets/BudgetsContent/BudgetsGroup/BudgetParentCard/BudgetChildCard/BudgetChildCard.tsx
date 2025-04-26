@@ -111,7 +111,12 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
         radius="md"
         bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
         shadow="md"
-        onClick={toggle}
+        onClick={() => {
+          if (props.id.length > 0) {
+            newLimitField.setValue(props.limit);
+            toggle();
+          }
+        }}
       >
         <LoadingOverlay
           visible={doEditBudget.isPending || doDeleteBudget.isPending}

@@ -52,7 +52,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const budgets =
     props.categoryToBudgetsMap.get(props.categoryTree.value.toLowerCase()) ??
     [];
-  const id = budgets.length === 1 ? budgets[0]?.id ?? "" : "";
+  const id =
+    budgets.length === 1 && props.selectedDate ? budgets[0]?.id ?? "" : "";
 
   const newLimitField = useField<number | string>({
     initialValue: limit ?? 0,
@@ -141,8 +142,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
           props.categoryToBudgetsMap.get(
             subCategory.value.toLocaleLowerCase()
           ) ?? [];
-        const budget = budgets[0] ?? null;
-        const budgetId = budget?.id ?? "";
+        const budgetId =
+          budgets.length === 1 && props.selectedDate
+            ? budgets[0]?.id ?? ""
+            : "";
         budgetChildCards.push(
           <BudgetChildCard
             key={subCategory.value}

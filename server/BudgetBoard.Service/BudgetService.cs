@@ -50,7 +50,9 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
                 )
             {
                 if (!userData.Budgets.Any((b) =>
-                    b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)))
+                    b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase) &&
+                    b.Date.Month == budget.Date.Month &&
+                    b.Date.Year == budget.Date.Year))
                 {
 
                     var newParentBudget = new Budget
@@ -65,7 +67,9 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
                 else
                 {
                     var parentBudget = userData.Budgets.SingleOrDefault(b =>
-                        b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase));
+                        b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase) &&
+                        b.Date.Month == budget.Date.Month &&
+                        b.Date.Year == budget.Date.Year);
                     if (parentBudget != null && parentBudget.Limit < parentBudget.Limit + budget.Limit)
                     {
                         parentBudget.Limit += budget.Limit;
