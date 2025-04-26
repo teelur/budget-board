@@ -43,7 +43,11 @@ const BudgetsContent = (props: BudgetsContentProps) => {
       )
   );
   const expenseCategoryTree = categoryTree.filter(
-    (category) => !areStringsEqual(category.value, "income")
+    (category) =>
+      !areStringsEqual(category.value, "income") &&
+      props.budgets.some((budget) =>
+        areStringsEqual(budget.category, category.value)
+      )
   );
 
   const unbudgetedCategoryTree = categoryTree.filter(
@@ -105,9 +109,12 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         h={{ base: "auto", md: "100%" }}
       >
         <BudgetTotalCard
+          incomeCategories={incomeCategoryTree}
+          expenseCategories={expenseCategoryTree}
           budgets={props.budgets}
-          categories={props.categories}
           transactions={props.transactions}
+          categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+          unbudgetedCategoryTree={unbudgetedCategoryTree}
           isPending={props.isPending ?? false}
         />
       </Stack>

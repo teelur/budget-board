@@ -6,42 +6,60 @@ import BudgetTotalItem from "./BudgetTotalItem/BudgetTotalItem";
 import { IBudget } from "~/models/budget";
 import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
-import {
-  BudgetGroup,
-  getBudgetsForGroup,
-  sumBudgetAmounts,
-} from "~/helpers/budgets";
 import { areStringsEqual } from "~/helpers/utils";
 import { sumTransactionAmounts } from "~/helpers/transactions";
 
 interface BudgetTotalCardProps {
+  incomeCategories: ICategory[];
+  expenseCategories: ICategory[];
   budgets: IBudget[];
-  categories: ICategory[];
   transactions: ITransaction[];
+  categoryToTransactionsTotalMap: Map<string, number>;
+  unbudgetedCategoryTree: ICategory[];
   isPending: boolean;
 }
 
 const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
-  const incomeTransactionsTotal = sumTransactionAmounts(
-    props.transactions.filter((t) =>
-      areStringsEqual(t.category ?? "", "Income")
-    )
-  );
-  const incomeBudgetsTotal = sumBudgetAmounts(
-    getBudgetsForGroup(props.budgets, BudgetGroup.Income, props.categories)
+  const incomeBudgetsTotal = props.budgets
+    .filter((b) => areStringsEqual(b.category, "Income"))
+    .reduce((acc, b) => acc + b.limit, 0);
+  const incomeTransactionsTotal = props.incomeCategories.reduce(
+    (acc, category) => {
+      const transactionsTotal = props.categoryToTransactionsTotalMap.get(
+        category.value.toLocaleLowerCase()
+      );
+      return acc + (transactionsTotal ?? 0);
+    },
+    0
   );
 
-  const spendingTransactionsTotal = sumTransactionAmounts(
-    props.transactions.filter(
-      (t) => !areStringsEqual(t.category ?? "", "Income")
+  const expenseBudgetsTotal = props.budgets
+    .filter((b) =>
+      props.expenseCategories.some((c) => areStringsEqual(b.category, c.value))
     )
+    .reduce((acc, b) => acc + b.limit, 0);
+  const expenseTransactionsTotal = props.expenseCategories.reduce(
+    (acc, category) => {
+      const transactionsTotal = props.categoryToTransactionsTotalMap.get(
+        category.value.toLocaleLowerCase()
+      );
+      return acc + (transactionsTotal ?? 0);
+    },
+    0
   );
-  const spendingBudgetsTotal = sumBudgetAmounts(
-    getBudgetsForGroup(props.budgets, BudgetGroup.Spending, props.categories)
-  );
+
+  const unbudgetedTransactionsTotal =
+    props.unbudgetedCategoryTree
+      .map((category) => {
+        const transactionsTotal = props.categoryToTransactionsTotalMap.get(
+          category.value.toLocaleLowerCase()
+        );
+        return transactionsTotal ?? 0;
+      })
+      .reduce((acc, total) => acc + total, 0) +
+    (props.categoryToTransactionsTotalMap.get("") ?? 0);
 
   const totalTransactionsTotal = sumTransactionAmounts(props.transactions);
-  const totalBudgetsTotal = incomeBudgetsTotal - spendingBudgetsTotal;
 
   return (
     <Card className={classes.root} radius="md" shadow="md">
@@ -58,9 +76,16 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
           />
           <BudgetTotalItem
             label="Expenses"
-            amount={spendingTransactionsTotal}
-            total={spendingBudgetsTotal}
+            amount={expenseTransactionsTotal}
+            total={expenseBudgetsTotal}
             isIncome={false}
+          />
+          <BudgetTotalItem
+            label="Unbudgeted"
+            amount={unbudgetedTransactionsTotal}
+            total={incomeBudgetsTotal - expenseBudgetsTotal}
+            isIncome
+            hideProgress
           />
         </Card>
       )}
@@ -69,9 +94,8 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
       ) : (
         <Card className={classes.group} radius="md">
           <BudgetTotalItem
-            label="Total"
+            label="Net Spending"
             amount={totalTransactionsTotal}
-            total={totalBudgetsTotal}
             isIncome
             hideProgress
           />
