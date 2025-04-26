@@ -3,11 +3,13 @@ import classes from "./BudgetParentCard.module.css";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import {
   ActionIcon,
+  Button,
   Card,
   Flex,
   Group,
   LoadingOverlay,
   NumberInput,
+  Popover,
   Progress,
   Stack,
   Text,
@@ -292,19 +294,38 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               </Group>
             </Stack>
             {isSelected && (
-              <Group style={{ alignSelf: "stretch" }}>
-                <ActionIcon
-                  color="red"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    doDeleteBudget.mutate(id);
-                    close();
-                  }}
-                  h="100%"
-                >
-                  <TrashIcon size="1rem" />
-                </ActionIcon>
-              </Group>
+              <Flex
+                style={{ alignSelf: "stretch" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Popover>
+                  <Popover.Target>
+                    <ActionIcon color="red" h="100%">
+                      <TrashIcon size="1rem" />
+                    </ActionIcon>
+                  </Popover.Target>
+                  <Popover.Dropdown p="0.5rem" maw={200}>
+                    <Stack gap={5}>
+                      <Text size="sm" fw={500}>
+                        Are you sure you want to delete this budget?
+                      </Text>
+                      <Text size="sm" fw={500}>
+                        All children will also be deleted.
+                      </Text>
+                      <Button
+                        color="red"
+                        size="compact-xs"
+                        onClick={() => {
+                          doDeleteBudget.mutate(id);
+                          close();
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </Stack>
+                  </Popover.Dropdown>
+                </Popover>
+              </Flex>
             )}
           </Group>
         </Card>

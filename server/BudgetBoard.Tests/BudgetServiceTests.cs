@@ -362,4 +362,45 @@ public class BudgetServiceTests
         // Assert
         await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The budget you are trying to delete does not exist.");
     }
+
+    [Fact]
+    public async Task DeleteBudgetAsync_WhenParentBudgetHasChildren_ShouldDeleteChildren()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
+
+        var budgetFaker = new BudgetFaker();
+        var parentBudget = budgetFaker.Generate();
+        parentBudget.UserID = helper.demoUser.Id;
+        parentBudget.Category = "Income";
+        parentBudget.Limit = 1000;
+        parentBudget.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(parentBudget);
+        var childBudget = budgetFaker.Generate();
+
+        childBudget.UserID = helper.demoUser.Id;
+        childBudget.Category = "Paycheck";
+        childBudget.Limit = 200;
+        childBudget.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(childBudget);
+
+        var childBudget2 = budgetFaker.Generate();
+        childBudget2.UserID = helper.demoUser.Id;
+        childBudget2.Category = "Paycheck";
+        childBudget2.Limit = 200;
+        childBudget2.Date = DateTime.Today.AddMonths(-1);
+
+        helper.UserDataContext.Budgets.Add(childBudget2);
+
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await budgetService.DeleteBudgetAsync(helper.demoUser.Id, parentBudget.ID);
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(1);
+    }
 }

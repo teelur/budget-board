@@ -164,6 +164,34 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         }
 
         _userDataContext.Budgets.Remove(budget);
+
+        if (TransactionCategoriesHelpers.GetIsParentCategory(
+            budget.Category,
+            userData.TransactionCategories.Select(tc => new CategoryBase
+            {
+                Value = tc.Value,
+                Parent = tc.Parent
+            })))
+        {
+            var childrenBudgets = userData.Budgets
+               .Where(b => TransactionCategoriesHelpers.GetParentCategory(
+                   b.Category, _userDataContext.TransactionCategories
+                       .Select(tc => new CategoryBase
+                       {
+                           Value = tc.Value,
+                           Parent = tc.Parent
+                       }))
+                   .Equals(budget.Category, StringComparison.CurrentCultureIgnoreCase))
+               .ToList();
+            var childrenBudgetsForMonth = childrenBudgets
+                .Where(b => b.Date.Month == budget.Date.Month && b.Date.Year == budget.Date.Year)
+                .ToList();
+            foreach (var childBudget in childrenBudgetsForMonth)
+            {
+                _userDataContext.Budgets.Remove(childBudget);
+            }
+        }
+
         await _userDataContext.SaveChangesAsync();
     }
 

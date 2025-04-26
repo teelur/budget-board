@@ -13,4 +13,13 @@ public static class TransactionCategoriesHelpers
             .FirstOrDefault(c => c.Value.Equals(category, StringComparison.CurrentCultureIgnoreCase))?.Parent;
         return parentCategory ?? string.Empty;
     }
+
+    public static bool GetIsParentCategory(string category, IEnumerable<ICategory> customCategories)
+    {
+        var allCategories = TransactionCategoriesConstants.DefaultTransactionCategories
+            .Concat(customCategories)
+            .ToList();
+        return allCategories
+            .Any(c => c.Parent.Equals(category, StringComparison.CurrentCultureIgnoreCase));
+    }
 }
