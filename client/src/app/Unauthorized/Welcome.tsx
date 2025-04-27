@@ -50,7 +50,7 @@ const Welcome = (): React.ReactNode => {
   };
 
   return (
-    <Container size="lg" w="500px">
+    <Container size="lg" w="500px" maw="100%">
       <Stack align="center" gap={10}>
         <Text size="xl">Welcome to</Text>
         <BudgetBoardLogo
