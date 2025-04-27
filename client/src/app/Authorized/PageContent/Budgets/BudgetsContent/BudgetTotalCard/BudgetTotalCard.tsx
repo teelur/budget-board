@@ -94,7 +94,7 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
       ) : (
         <Card className={classes.group} radius="md">
           <BudgetTotalItem
-            label="Net Spending"
+            label="Net Cash Flow"
             amount={totalTransactionsTotal}
             isIncome
             hideProgress
