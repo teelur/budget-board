@@ -75,7 +75,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public async Task CreateAccountAsync_DuplicateName_ThrowsError()
+    public async Task CreateAccountAsync_DuplicateName_ShouldStillCreateAccount()
     {
         // Arrange
         var helper = new TestHelper();
@@ -83,27 +83,28 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
 
         var institutionFaker = new InstitutionFaker();
         var institution = institutionFaker.Generate();
-
         institution.UserID = helper.demoUser.Id;
+
         helper.UserDataContext.Institutions.Add(institution);
 
         var accountFaker = new AccountFaker();
-        var firstAccount = accountFaker.Generate();
-        firstAccount.UserID = helper.demoUser.Id;
-        firstAccount.InstitutionID = institution.ID;
-        firstAccount.Name = "Test Account";
-
-        helper.UserDataContext.Accounts.Add(firstAccount);
-
-        var account = _accountCreateRequestFaker.Generate();
+        var account = accountFaker.Generate();
+        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
         account.Name = "Test Account";
 
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var duplicateAccount = _accountCreateRequestFaker.Generate();
+        duplicateAccount.Name = account.Name;
+        duplicateAccount.InstitutionID = institution.ID;
+
         // Act
-        var createAccountAct = () => accountService.CreateAccountAsync(helper.demoUser.Id, account);
+        await accountService.CreateAccountAsync(helper.demoUser.Id, duplicateAccount);
 
         // Assert
-        await createAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("An account with this name already exists!");
+        helper.demoUser.Accounts.Should().HaveCount(2);
     }
 
     [Fact]
