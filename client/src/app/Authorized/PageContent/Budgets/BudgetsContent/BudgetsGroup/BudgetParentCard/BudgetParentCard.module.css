@@ -1,0 +1,37 @@
+.root {
+  outline: 1px solid var(--mantine-color-default-border);
+  background-color: light-dark(
+    var(--mantine-color-gray-1),
+    var(--mantine-color-dark-8)
+  );
+}
+
+.budgetCard {
+  &:hover {
+    outline: 1px solid var(--mantine-primary-color-filled);
+  }
+}
+
+.title {
+  font-size: 1.2rem;
+
+  @container (max-width: 380px) {
+    font-size: 1rem;
+  }
+}
+
+.text {
+  font-size: 1.1rem;
+
+  @container (max-width: 380px) {
+    font-size: 1rem;
+  }
+}
+
+.textSmall {
+  font-size: 1rem;
+
+  @container (max-width: 300px) {
+    font-size: 0.8rem;
+  }
+}

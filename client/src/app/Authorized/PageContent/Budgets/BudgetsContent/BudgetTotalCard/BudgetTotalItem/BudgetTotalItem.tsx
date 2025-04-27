@@ -7,14 +7,14 @@ import { Flex, Group, Progress, Stack, Text } from "@mantine/core";
 interface BudgetTotalItemProps {
   label: string;
   amount: number;
-  total: number;
+  total?: number;
   isIncome: boolean;
   hideProgress?: boolean;
 }
 
 const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
   const percentComplete = Math.round(
-    ((props.amount * (props.isIncome ? 1 : -1)) / props.total) * 100
+    ((props.amount * (props.isIncome ? 1 : -1)) / (props.total ?? 0)) * 100
   );
 
   return (
@@ -26,26 +26,32 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
         <Flex gap="0.25rem">
           <Text
             className={classes.text}
-            c={getBudgetValueColor(props.amount, props.total, props.isIncome)}
+            c={getBudgetValueColor(
+              props.amount,
+              props.total ?? 0,
+              props.isIncome
+            )}
           >
             {convertNumberToCurrency(
               props.amount * (props.isIncome ? 1 : -1),
               false
             )}
           </Text>
-          <Text className={classes.text}>of</Text>
-          <Text className={classes.text}>
-            {convertNumberToCurrency(props.total, false)}
-          </Text>
+          {props.total ? <Text className={classes.text}>of</Text> : null}
+          {props.total ? (
+            <Text className={classes.text}>
+              {convertNumberToCurrency(props.total, false)}
+            </Text>
+          ) : null}
         </Flex>
       </Group>
-      {!props.hideProgress && props.total > 0 && (
+      {!props.hideProgress && (props.total ?? 0) > 0 && (
         <Progress.Root size={16} radius="xl">
           <Progress.Section
             value={percentComplete > 100 ? 100 : percentComplete}
             color={getBudgetValueColor(
               props.amount,
-              props.total,
+              props.total ?? 0,
               props.isIncome
             )}
           >
