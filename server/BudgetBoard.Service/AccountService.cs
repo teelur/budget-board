@@ -45,7 +45,7 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
             Subtype = account.Subtype,
             HideTransactions = account.HideTransactions,
             HideAccount = account.HideAccount,
-            Source = AccountSource.Manual,
+            Source = account.Source ?? AccountSource.Manual,
             UserID = userData.Id
         };
 
