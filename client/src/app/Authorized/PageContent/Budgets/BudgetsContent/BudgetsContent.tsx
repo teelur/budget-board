@@ -10,6 +10,7 @@ import BudgetTotalCard from "./BudgetTotalCard/BudgetTotalCard";
 import BudgetsGroup from "./BudgetsGroup/BudgetsGroup";
 import UnbudgetedGroup from "./UnbudgetedGroup/UnbudgetedGroup";
 import { areStringsEqual } from "~/helpers/utils";
+import FixParentBudgetButton from "./FixParentBudgetButton/FixParentBudgetButton";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
@@ -116,6 +117,11 @@ const BudgetsContent = (props: BudgetsContentProps) => {
           categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
           unbudgetedCategoryTree={unbudgetedCategoryTree}
           isPending={props.isPending ?? false}
+        />
+        <FixParentBudgetButton
+          budgets={props.budgets}
+          categoryTree={categoryTree}
+          categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
         />
       </Stack>
     </Group>
