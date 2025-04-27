@@ -10,6 +10,7 @@ import { CornerDownRight, PlusIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
+import { roundAwayFromZero } from "~/helpers/utils";
 
 interface UnbudgetChildCardProps {
   selectedDate?: Date;
@@ -36,6 +37,10 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
       notifications.show({ message: translateAxiosError(error), color: "red" });
     },
   });
+
+  if (roundAwayFromZero(props.amount) === 0) {
+    return null;
+  }
 
   return (
     <Group wrap="nowrap">

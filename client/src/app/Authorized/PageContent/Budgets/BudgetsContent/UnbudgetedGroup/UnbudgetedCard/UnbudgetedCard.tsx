@@ -20,6 +20,7 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { ICategoryNode } from "~/models/category";
 import UnbudgetedChildCard from "./UnbudgetedChildCard/UnbudgetedChildCard";
+import { roundAwayFromZero } from "~/helpers/utils";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -45,6 +46,16 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
       notifications.show({ message: translateAxiosError(error), color: "red" });
     },
   });
+
+  if (
+    roundAwayFromZero(
+      props.categoryToTransactionsTotalMap.get(
+        props.categoryTree.value.toLocaleLowerCase()
+      ) ?? 0
+    ) === 0
+  ) {
+    return null;
+  }
 
   return (
     <Stack gap="0.5rem" w="100%">
