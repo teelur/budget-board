@@ -16,6 +16,12 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
+        if (userData.Accounts.Any(a => account.SyncID != null && a.SyncID == account.SyncID))
+        {
+            _logger.LogError("Attempted to create an account with a duplicate SyncID.");
+            throw new BudgetBoardServiceException("An account with this SyncID already exists.");
+        }
+
         if (!userData.Institutions.Any(i => i.ID == account.InstitutionID))
         {
             _logger.LogError("Attempted to create an account with an invalid institution ID.");

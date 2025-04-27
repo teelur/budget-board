@@ -108,6 +108,72 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
+    public async Task CreateAccountAsync_WhenDuplicateSyncID_ShouldThrowError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+
+        var institutionFaker = new InstitutionFaker();
+        var institution = institutionFaker.Generate();
+        institution.UserID = helper.demoUser.Id;
+
+        helper.UserDataContext.Institutions.Add(institution);
+
+        var accountFaker = new AccountFaker();
+        var account = accountFaker.Generate();
+        account.UserID = helper.demoUser.Id;
+        account.InstitutionID = institution.ID;
+        account.SyncID = "TestSyncID";
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var duplicateAccount = _accountCreateRequestFaker.Generate();
+        duplicateAccount.SyncID = account.SyncID;
+        duplicateAccount.InstitutionID = institution.ID;
+
+        // Act
+        var createAccountAct = () => accountService.CreateAccountAsync(helper.demoUser.Id, duplicateAccount);
+
+        // Assert
+        await createAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("An account with this SyncID already exists.");
+    }
+
+    [Fact]
+    public async Task CreateAccountAsync_WhenSyncIDNull_ShouldNotFlagAsDuplicate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+
+        var institutionFaker = new InstitutionFaker();
+        var institution = institutionFaker.Generate();
+        institution.UserID = helper.demoUser.Id;
+
+        helper.UserDataContext.Institutions.Add(institution);
+
+        var accountFaker = new AccountFaker();
+        var account = accountFaker.Generate();
+        account.UserID = helper.demoUser.Id;
+        account.InstitutionID = institution.ID;
+        account.SyncID = null;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var duplicateAccount = _accountCreateRequestFaker.Generate();
+        duplicateAccount.SyncID = null;
+        duplicateAccount.InstitutionID = institution.ID;
+
+        // Act
+        await accountService.CreateAccountAsync(helper.demoUser.Id, duplicateAccount);
+
+        // Assert
+        helper.demoUser.Accounts.Should().HaveCount(2);
+    }
+
+    [Fact]
     public async Task CreateAccountAsync_NewAccount_HappyPath()
     {
         // Arrange
