@@ -4,8 +4,8 @@
 
 ---
 
-[![Build and Publish](https://github.com/tshea113/budget-board/actions/workflows/docker-image-ci-build.yml/badge.svg)](https://github.com/tshea113/budget-board/actions/workflows/docker-image-ci-build.yml)
-![GitHub Release](https://img.shields.io/github/v/release/tshea113/budget-board)
+[![Build and Publish](https://github.com/teelur/budget-board/actions/workflows/docker-image-ci-build.yml/badge.svg)](https://github.com/teelur/budget-board/actions/workflows/docker-image-ci-build.yml)
+![GitHub Release](https://img.shields.io/github/v/release/teelur/budget-board)
 
 A simple app for tracking monthly spending and working towards financial goals.
 
@@ -22,9 +22,12 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 - Create and track goals for savings/loan payoff
 - Graphs to view trends over time (Spending, Assets, Liabilities, Net Worth, and more)
 
-### Bugs and Feature Requests
+### Feedback
 
-Feel free to open an issue if you notice any bugs or have any feature requests!
+- [Notice a bug?](https://github.com/teelur/budget-board/issues/new/choose)
+- [Have a feature request?](https://github.com/teelur/budget-board/discussions/categories/feature-requests)
+- [Have any feedback?](https://github.com/teelur/budget-board/discussions/categories/feedback)
+- [Have a question?](https://github.com/teelur/budget-board/discussions/categories/q-a)
 
 ### Screenshots
 
@@ -40,7 +43,8 @@ This project is deployed using Docker Compose.
 The `compose.yml` and `compose.override.yml` files are used to deploy the app.
 Both files are able to deploy the app as is, but it is recommended to at least update the database password.
 
-See the [wiki](https://github.com/tshea113/budget-board/wiki/Deploying-via-Docker-Compose) for more details about configuring the compose override file.
+See the [wiki](https://github.com/teelur/budget-board/wiki/Deploying-via-Docker-Compose) for more details about configuring the compose override file.
+
 ### Deploy
 
 Deploy the app by running the following command:
@@ -51,4 +55,4 @@ docker compose up -d
 
 You can now access the app at `localhost:6253`.
 
-Check out the [wiki](https://github.com/tshea113/budget-board/wiki) for more details about configuration and using the app :)
+Check out the [wiki](https://github.com/teelur/budget-board/wiki) for more details about configuration and using the app :)

@@ -1,6 +1,6 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
 import { IBudget } from "~/models/budget";
-import { getParentCategory, getSubCategories } from "~/helpers/category";
+import { buildCategoriesTree, getParentCategory } from "~/helpers/category";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import { buildCategoryToTransactionsTotalMap } from "~/helpers/transactions";
@@ -10,6 +10,7 @@ import BudgetTotalCard from "./BudgetTotalCard/BudgetTotalCard";
 import BudgetsGroup from "./BudgetsGroup/BudgetsGroup";
 import UnbudgetedGroup from "./UnbudgetedGroup/UnbudgetedGroup";
 import { areStringsEqual } from "~/helpers/utils";
+import FixParentBudgetButton from "./FixParentBudgetButton/FixParentBudgetButton";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
@@ -23,17 +24,42 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const categoryToTransactionsTotalMap: Map<string, number> =
     buildCategoryToTransactionsTotalMap(props.transactions);
 
-  const unbudgetedCategoryToTransactionsTotalMap = new Map<string, number>(
-    Array.from(categoryToTransactionsTotalMap).filter(
-      ([category, _]) =>
-        !props.budgets.some(
-          (budget) =>
-            areStringsEqual(budget.category, category) ||
-            getSubCategories(budget.category, props.categories).some(
-              (subCategory) => areStringsEqual(subCategory.value, category)
-            )
+  const categoryTree = buildCategoriesTree(props.categories);
+
+  const incomeBudgets = props.budgets.filter(
+    (budget) =>
+      BudgetGroup.Income ===
+      getBudgetGroupForCategory(
+        getParentCategory(budget.category, props.categories)
+      )
+  );
+  const incomeCategoryTree = categoryTree.filter((category) =>
+    areStringsEqual(category.value, "income")
+  );
+  const expenseBudgets = props.budgets.filter(
+    (budget) =>
+      BudgetGroup.Spending ===
+      getBudgetGroupForCategory(
+        getParentCategory(budget.category, props.categories)
+      )
+  );
+  const expenseCategoryTree = categoryTree.filter(
+    (category) =>
+      !areStringsEqual(category.value, "income") &&
+      props.budgets.some((budget) =>
+        areStringsEqual(budget.category, category.value)
+      )
+  );
+
+  const unbudgetedCategoryTree = categoryTree.filter(
+    (category) =>
+      !props.budgets.some((budget) =>
+        areStringsEqual(
+          getParentCategory(budget.category, props.categories),
+          getParentCategory(category.value, props.categories)
         )
-    )
+      ) &&
+      categoryToTransactionsTotalMap.has(category.value.toLocaleLowerCase())
   );
 
   return (
@@ -45,15 +71,11 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             <Skeleton h={65} radius="md" />
           ) : (
             <BudgetsGroup
-              budgets={props.budgets.filter(
-                (budget) =>
-                  BudgetGroup.Income ===
-                  getBudgetGroupForCategory(
-                    getParentCategory(budget.category, props.categories)
-                  )
-              )}
+              budgets={incomeBudgets}
+              categoryTree={incomeCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
+              selectedDate={props.selectedDate}
             />
           )}
         </Stack>
@@ -63,15 +85,11 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             <Skeleton h={65} radius="md" />
           ) : (
             <BudgetsGroup
-              budgets={props.budgets.filter(
-                (budget) =>
-                  BudgetGroup.Spending ===
-                  getBudgetGroupForCategory(
-                    getParentCategory(budget.category, props.categories)
-                  )
-              )}
+              budgets={expenseBudgets}
+              categoryTree={expenseCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
+              selectedDate={props.selectedDate}
             />
           )}
         </Stack>
@@ -79,9 +97,8 @@ const BudgetsContent = (props: BudgetsContentProps) => {
           <Skeleton h={65} radius="md" />
         ) : (
           <UnbudgetedGroup
-            unbudgetedCategoryToTransactionsTotalMap={
-              unbudgetedCategoryToTransactionsTotalMap
-            }
+            categoryTree={unbudgetedCategoryTree}
+            categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
             categories={props.categories}
             selectedDate={props.selectedDate}
           />
@@ -93,10 +110,18 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         h={{ base: "auto", md: "100%" }}
       >
         <BudgetTotalCard
+          incomeCategories={incomeCategoryTree}
+          expenseCategories={expenseCategoryTree}
           budgets={props.budgets}
-          categories={props.categories}
           transactions={props.transactions}
+          categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+          unbudgetedCategoryTree={unbudgetedCategoryTree}
           isPending={props.isPending ?? false}
+        />
+        <FixParentBudgetButton
+          budgets={props.budgets}
+          categoryTree={categoryTree}
+          categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
         />
       </Stack>
     </Group>

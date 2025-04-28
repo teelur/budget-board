@@ -3,60 +3,53 @@ import classes from "./BudgetsGroup.module.css";
 import { Stack, Text } from "@mantine/core";
 import { IBudget } from "~/models/budget";
 import React from "react";
-import BudgetCard from "./BudgetCard/BudgetCard";
+import { ICategory, ICategoryNode } from "~/models/category";
 import {
-  getFormattedCategoryValue,
-  getParentCategory,
-} from "~/helpers/category";
-import { ICategory } from "~/models/category";
-import {
-  BudgetGroup,
-  getBudgetAmount,
-  getBudgetGroupForCategory,
-  groupBudgetsByCategory,
+  buildCategoryToBudgetsMap,
+  buildCategoryToLimitsMap,
 } from "~/helpers/budgets";
+import BudgetParentCard from "./BudgetParentCard/BudgetParentCard";
 
 interface BudgetsGroupProps {
   budgets: IBudget[];
   categoryToTransactionsTotalMap: Map<string, number>;
+  categoryTree: ICategoryNode[];
   categories: ICategory[];
+  selectedDate?: Date;
 }
 
 const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
-  const categoryToBudgetsMap = groupBudgetsByCategory(props.budgets);
-
-  const buildCardsList = (): React.ReactNode[] => {
-    const cards: React.ReactNode[] = [];
-    categoryToBudgetsMap.forEach((budgets, category) =>
-      cards.push(
-        <BudgetCard
-          key={category}
-          budgets={budgets}
-          categoryDisplayString={getFormattedCategoryValue(
-            category,
-            props.categories
-          )}
-          amount={getBudgetAmount(
-            category.toLocaleLowerCase(),
-            props.categoryToTransactionsTotalMap,
-            props.categories
-          )}
-          isIncome={
-            BudgetGroup.Income ===
-            getBudgetGroupForCategory(
-              getParentCategory(category, props.categories)
-            )
-          }
-        />
-      )
-    );
-    return cards;
-  };
+  const categoryToBudgetsMap = buildCategoryToBudgetsMap(props.budgets);
+  const categoryToLimitsMap = buildCategoryToLimitsMap(
+    props.budgets,
+    props.categoryTree
+  );
 
   return (
     <Stack className={classes.root}>
       {props.budgets.length > 0 ? (
-        buildCardsList()
+        props.categoryTree.map((category) => {
+          if (
+            categoryToBudgetsMap.has(category.value.toLocaleLowerCase()) ||
+            category.subCategories.some((subCategory) =>
+              categoryToBudgetsMap.has(subCategory.value.toLocaleLowerCase())
+            )
+          ) {
+            return (
+              <BudgetParentCard
+                key={category.value}
+                categoryTree={category}
+                categoryToBudgetsMap={categoryToBudgetsMap}
+                categoryToLimitsMap={categoryToLimitsMap}
+                categoryToTransactionsTotalMap={
+                  props.categoryToTransactionsTotalMap
+                }
+                selectedDate={props.selectedDate}
+              />
+            );
+          }
+          return null;
+        })
       ) : (
         <Text size="sm">No budgets.</Text>
       )}

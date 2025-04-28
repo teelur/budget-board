@@ -243,6 +243,7 @@ public class SimpleFinService(
             {
                 foundAccount.InstitutionID = institutionId;
                 foundAccount.Source = AccountSource.SimpleFIN;
+
                 _userDataContext.SaveChanges();
             }
             else

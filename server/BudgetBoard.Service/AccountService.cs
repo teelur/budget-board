@@ -16,10 +16,10 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (userData.Accounts.Any(a => a.Name.Equals(account.Name, StringComparison.OrdinalIgnoreCase)))
+        if (userData.Accounts.Any(a => account.SyncID != null && a.SyncID == account.SyncID))
         {
-            _logger.LogError("Attempted to create an account with a duplicate name.");
-            throw new BudgetBoardServiceException("An account with this name already exists!");
+            _logger.LogError("Attempted to create an account with a duplicate SyncID.");
+            throw new BudgetBoardServiceException("An account with this SyncID already exists.");
         }
 
         if (!userData.Institutions.Any(i => i.ID == account.InstitutionID))
@@ -45,7 +45,7 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
             Subtype = account.Subtype,
             HideTransactions = account.HideTransactions,
             HideAccount = account.HideAccount,
-            Source = AccountSource.Manual,
+            Source = account.Source ?? AccountSource.Manual,
             UserID = userData.Id
         };
 
