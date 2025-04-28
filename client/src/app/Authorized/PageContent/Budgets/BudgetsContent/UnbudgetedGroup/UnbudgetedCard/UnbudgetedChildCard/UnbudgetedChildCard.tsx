@@ -10,6 +10,7 @@ import { CornerDownRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
+import { roundAwayFromZero } from "~/helpers/utils";
 
 interface UnbudgetedChildCardProps {
   category: string;
@@ -37,6 +38,10 @@ const UnbudgetedChildCard = (
       notifications.show({ message: translateAxiosError(error), color: "red" });
     },
   });
+
+  if (roundAwayFromZero(props.amount) === 0) {
+    return null;
+  }
 
   return (
     <Group w="100%" align="center" wrap="nowrap" gap="0.5rem">
