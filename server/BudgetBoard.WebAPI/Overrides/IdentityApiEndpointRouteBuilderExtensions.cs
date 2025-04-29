@@ -88,8 +88,13 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return TypedResults.Ok();
             });
         }
+        else
+        {
+            // If registration is disabled, we need to return a 404 for the /register endpoint.
+            routeGroup.MapPost("/register", () => TypedResults.NotFound("Registration is disabled."));
+        }
 
-        if (configureOptions.ExcludeLoginPost)
+        if (!configureOptions.ExcludeLoginPost)
         {
             routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>>
                 ([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
@@ -124,7 +129,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             });
         }
 
-        if (configureOptions.ExcludeRefreshPost)
+        if (!configureOptions.ExcludeRefreshPost)
         {
             routeGroup.MapPost("/refresh", async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>>
                 ([FromBody] RefreshRequest refreshRequest, [FromServices] IServiceProvider sp) =>
@@ -147,7 +152,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             });
         }
 
-        if (configureOptions.ExcludeConfirmEmailGet)
+        if (!configureOptions.ExcludeConfirmEmailGet)
         {
             routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
                 ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
@@ -201,7 +206,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             });
         }
 
-        if (configureOptions.ExcludeResendConfirmationEmailPost)
+        if (!configureOptions.ExcludeResendConfirmationEmailPost)
         {
 
             routeGroup.MapPost("/resendConfirmationEmail", async Task<Ok>
@@ -218,7 +223,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 });
         }
 
-        if (configureOptions.ExcludeForgotPasswordPost)
+        if (!configureOptions.ExcludeForgotPasswordPost)
         {
             routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>
                 ([FromBody] ForgotPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
@@ -240,7 +245,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             });
         }
 
-        if (configureOptions.ExcludeResetPasswordPost)
+        if (!configureOptions.ExcludeResetPasswordPost)
         {
             routeGroup.MapPost("/resetPassword", async Task<Results<Ok, ValidationProblem>>
                 ([FromBody] ResetPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
@@ -276,11 +281,11 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             });
         }
 
-        if (configureOptions.ExcludeManageGroup)
+        if (!configureOptions.ExcludeManageGroup)
         {
             var accountGroup = routeGroup.MapGroup("/manage").RequireAuthorization();
 
-            if (configureOptions.Exclude2faPost)
+            if (!configureOptions.Exclude2faPost)
             {
                 accountGroup.MapPost("/2fa", async Task<Results<Ok<TwoFactorResponse>, ValidationProblem, NotFound>>
                     (ClaimsPrincipal claimsPrincipal, [FromBody] TwoFactorRequest tfaRequest, [FromServices] IServiceProvider sp) =>
@@ -357,7 +362,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 });
             }
 
-            if (configureOptions.ExcludegInfoGet)
+            if (!configureOptions.ExcludegInfoGet)
             {
                 accountGroup.MapGet("/info", async Task<Results<Ok<InfoResponse>, ValidationProblem, NotFound>>
                     (ClaimsPrincipal claimsPrincipal, [FromServices] IServiceProvider sp) =>
@@ -372,7 +377,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 });
             }
 
-            if (configureOptions.ExcludeInfoPost)
+            if (!configureOptions.ExcludeInfoPost)
             {
                 accountGroup.MapPost("/info", async Task<Results<Ok<InfoResponse>, ValidationProblem, NotFound>>
                     (ClaimsPrincipal claimsPrincipal, [FromBody] InfoRequest infoRequest, HttpContext context, [FromServices] IServiceProvider sp) =>
