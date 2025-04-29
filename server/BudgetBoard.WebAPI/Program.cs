@@ -169,7 +169,10 @@ app.UseForwardedHeaders();
 app.UseSerilogRequestLogging();
 
 // Create routes for the identity endpoints
-app.MyMapIdentityApi<ApplicationUser>();
+app.MyMapIdentityApi<ApplicationUser>(new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
+{
+    ExcludeRegisterPost = builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS")
+});
 
 // Activate the CORS policy
 app.UseCors(MyAllowSpecificOrigins);
