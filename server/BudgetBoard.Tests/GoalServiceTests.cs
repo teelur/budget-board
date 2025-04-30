@@ -209,19 +209,19 @@ public class GoalServiceTests
         var balance0 = balanceFaker.Generate();
         balance0.AccountID = account.ID;
         balance0.Amount = -54080;
-        balance0.DateTime = DateTime.Now;
+        balance0.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
         var balance1 = balanceFaker.Generate();
         balance1.AccountID = account.ID;
         balance1.Amount = -52000;
-        balance1.DateTime = DateTime.Now.AddMonths(-1);
+        balance1.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-1);
 
         helper.UserDataContext.Balances.Add(balance1);
 
         var balance2 = balanceFaker.Generate();
         balance2.AccountID = account.ID;
         balance2.Amount = -50000;
-        balance2.DateTime = DateTime.Now.AddMonths(-2);
+        balance2.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-2);
 
         account.Balances = [balance0, balance1, balance2];
 
@@ -267,19 +267,19 @@ public class GoalServiceTests
         var balance0 = balanceFaker.Generate();
         balance0.AccountID = account.ID;
         balance0.Amount = -54080;
-        balance0.DateTime = DateTime.Now;
+        balance0.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
         var balance1 = balanceFaker.Generate();
         balance1.AccountID = account.ID;
         balance1.Amount = -52000;
-        balance1.DateTime = DateTime.Now.AddMonths(-1);
+        balance1.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-1);
 
         helper.UserDataContext.Balances.Add(balance1);
 
         var balance2 = balanceFaker.Generate();
         balance2.AccountID = account.ID;
         balance2.Amount = -50000;
-        balance2.DateTime = DateTime.Now.AddMonths(-2);
+        balance2.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-2);
 
         account.Balances = [balance0, balance1, balance2];
 
@@ -291,7 +291,7 @@ public class GoalServiceTests
         goal.UserID = helper.demoUser.Id;
 
         goal.Accounts = [account];
-        goal.CompleteDate = DateTime.Now.AddYears(5);
+        goal.CompleteDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddYears(5);
         goal.Amount = 0;
         goal.InitialAmount = -60000;
         goal.MonthlyContribution = null;
