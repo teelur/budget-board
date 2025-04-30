@@ -60,18 +60,19 @@ const Register = (props: RegisterProps): React.ReactNode => {
         });
       })
       .catch((error: AxiosError) => {
-        if (error?.response?.data) {
-          const errorData = error.response.data as ValidationError;
-          if (
-            error.status === 400 &&
-            errorData.title === "One or more validation errors occurred."
-          ) {
-            notifications.show({
-              title: "One or more validation errors occurred.",
-              color: "red",
-              message: Object.values(errorData.errors).join("\n"),
-            });
-          }
+        if (
+          error?.response?.data &&
+          error.status === 400 &&
+          (error.response.data as ValidationError).title ===
+            "One or more validation errors occurred."
+        ) {
+          notifications.show({
+            title: "One or more validation errors occurred.",
+            color: "red",
+            message: Object.values(
+              (error.response.data as ValidationError).errors
+            ).join("\n"),
+          });
         } else {
           notifications.show({
             color: "red",

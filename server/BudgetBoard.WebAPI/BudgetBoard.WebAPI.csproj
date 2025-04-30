@@ -42,10 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Overrides\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BudgetBoard.Database\BudgetBoard.Database.csproj" />
     <ProjectReference Include="..\BudgetBoard.Service\BudgetBoard.Service.csproj" />
   </ItemGroup>
