@@ -16,16 +16,18 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
     public async Task CreateBudgetsAsync(Guid userGuid, IEnumerable<IBudgetCreateRequest> budgets)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        int newBudgetsCount = 0;
+
         foreach (var budget in budgets)
         {
-            // Do not allow duplicate categories in a given month
+            // Ignore duplicate categories in a given month
             if (userData.Budgets.Any((b) =>
             b.Date.Month == budget.Date.Month
             && b.Date.Year == budget.Date.Year
             && b.Category.Equals(budget.Category, StringComparison.CurrentCultureIgnoreCase)))
             {
-                _logger.LogError("Attempt to create duplicate budget category.");
-                throw new BudgetBoardServiceException("Budget category already exists for this month!");
+                continue;
             }
 
             Budget newBudget = new()
@@ -36,6 +38,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
                 UserID = userData.Id
             };
             userData.Budgets.Add(newBudget);
+            newBudgetsCount++;
 
             var parentCategory =
                 TransactionCategoriesHelpers.GetParentCategory(
@@ -63,6 +66,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
                         UserID = userData.Id
                     };
                     userData.Budgets.Add(newParentBudget);
+                    newBudgetsCount++;
                 }
                 else
                 {
@@ -79,6 +83,12 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         }
 
         await _userDataContext.SaveChangesAsync();
+
+        if (newBudgetsCount == 0)
+        {
+            _logger.LogError("Attempt to create duplicate budgets.");
+            throw new BudgetBoardServiceException("The budgets you are trying to create already exist.");
+        }
     }
 
     public async Task<IEnumerable<IBudgetResponse>> ReadBudgetsAsync(Guid userGuid, DateTime date)
