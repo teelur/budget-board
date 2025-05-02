@@ -64,7 +64,7 @@
     "react-scan": "^0.3.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.29.1",
-    "vite": "^6.2.6"
+    "vite": "^6.2.7"
   },
   "resolutions": {
     "react-is": "^19.0.0"
