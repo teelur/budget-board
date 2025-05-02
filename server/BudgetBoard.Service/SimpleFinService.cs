@@ -228,6 +228,15 @@ public class SimpleFinService(
 
     private async Task SyncAccountsAsync(ApplicationUser userData, IEnumerable<ISimpleFinAccount> accountsData)
     {
+        // This is a temporary fix for a bug that didn't assign account source for manual accounts.
+        // I will remove this later once we can be sure this won't affect anyone.
+        foreach (var account in userData.Accounts)
+        {
+            if (string.IsNullOrEmpty(account.Source))
+            {
+                account.Source = account.SyncID != null ? AccountSource.SimpleFIN : AccountSource.Manual;
+            }
+        }
         foreach (var accountData in accountsData)
         {
             var institutionId = userData.Institutions.FirstOrDefault(institution => institution.Name == accountData.Org.Name)?.ID;
