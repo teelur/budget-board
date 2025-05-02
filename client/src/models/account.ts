@@ -13,6 +13,7 @@ export interface IAccountCreateRequest {
   subtype: string;
   hideTransactions: boolean;
   hideAccount: boolean;
+  source: AccountSource;
 }
 
 export interface IAccountUpdateRequest {
