@@ -87,7 +87,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         if (newBudgetsCount == 0)
         {
             _logger.LogError("Attempt to create duplicate budgets.");
-            throw new BudgetBoardServiceException("The budgets you are trying to create already exist.");
+            throw new BudgetBoardServiceException("The budget(s) you are trying to create already exist.");
         }
     }
 

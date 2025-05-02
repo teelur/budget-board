@@ -62,12 +62,24 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(Mock.Of<ILogger<IBudgetService>>(), helper.UserDataContext);
 
+        var budgetFaker = new BudgetFaker();
+        var existingBudget = budgetFaker.Generate();
+        existingBudget.UserID = helper.demoUser.Id;
+        existingBudget.Date = DateTime.Today;
+        existingBudget.Category = "Paycheck";
+        existingBudget.Limit = 1000;
+
+        helper.UserDataContext.Budgets.Add(existingBudget);
+        helper.UserDataContext.SaveChanges();
+
         var budget = _budgetCreateRequestFaker.Generate();
+        budget.Date = DateTime.Today;
+        budget.Category = "Paycheck";
 
         // Act
-        Func<Task> act = async () => await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget, budget]);
+        Func<Task> act = async () => await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Budget category already exists for this month!");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The budget(s) you are trying to create already exist.");
     }
 
     [Fact]
