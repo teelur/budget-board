@@ -7,7 +7,7 @@ import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
-import { IAccountCreateRequest } from "~/models/account";
+import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import { IInstitution, IInstitutionCreateRequest } from "~/models/institution";
 
 interface CreateAccountModalProps {
@@ -122,6 +122,7 @@ const CreateAccountModal = (props: CreateAccountModalProps) => {
     await doCreateAccount.mutateAsync({
       name: values.name,
       institutionID: institution[0]!.id,
+      source: AccountSource.Manual,
     } as IAccountCreateRequest);
     form.reset();
     props.onClose();
