@@ -69,5 +69,5 @@
   "resolutions": {
     "react-is": "^19.0.0"
   },
-  "packageManager": "yarn@4.8.1"
+  "packageManager": "yarn@4.9.1"
 }
