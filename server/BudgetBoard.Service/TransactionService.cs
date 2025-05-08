@@ -221,6 +221,36 @@ public class TransactionService(ILogger<ITransactionService> logger, UserDataCon
         await _userDataContext.SaveChangesAsync();
     }
 
+    public async Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest transactionImportRequest)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var transactions = transactionImportRequest.Transactions;
+        var accountNameToIDMap = transactionImportRequest.AccountNameToIDMap;
+        foreach (var transaction in transactions)
+        {
+            var account = userData.Accounts.FirstOrDefault(a => a.ID == accountNameToIDMap.FirstOrDefault(a => a.AccountName == transaction.Account)?.AccountID);
+            if (account == null)
+            {
+                _logger.LogError("Attempt to add transaction to account that does not exist.");
+                throw new BudgetBoardServiceException("The account you are trying to add a transaction to does not exist.");
+            }
+
+            var newTransaction = new TransactionCreateRequest
+            {
+                SyncID = string.Empty,
+                Amount = transaction.Amount,
+                Date = transaction.Date,
+                Category = transaction.Category ?? string.Empty,
+                Subcategory = string.Empty,
+                MerchantName = transaction.Description,
+                Source = TransactionSource.Manual.Value,
+                AccountID = account.ID
+            };
+
+            await CreateTransactionAsync(userGuid, newTransaction);
+        }
+    }
+
     private async Task<IApplicationUser> GetCurrentUserAsync(string id)
     {
         List<ApplicationUser> users;

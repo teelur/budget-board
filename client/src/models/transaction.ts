@@ -1,5 +1,23 @@
 import { ICategory } from "./category";
 
+export interface ITransactionImport {
+  date: Date | null;
+  description: string | null;
+  category: string | null;
+  amount: number | null;
+  account: string | null;
+}
+
+export interface IAccountNameToIDKeyValuePair {
+  accountName: string;
+  accountID: string;
+}
+
+export interface ITransactionImportRequest {
+  transactions: ITransactionImport[];
+  accountNameToIDMap: IAccountNameToIDKeyValuePair[];
+}
+
 export interface ITransactionCreateRequest {
   syncID: string | null;
   amount: number;
