@@ -6,6 +6,7 @@ export interface ITransactionImport {
   category: string | null;
   amount: number | null;
   account: string | null;
+  type: string | null;
 }
 
 export interface IAccountNameToIDKeyValuePair {
@@ -14,7 +15,7 @@ export interface IAccountNameToIDKeyValuePair {
 }
 
 export interface ITransactionImportRequest {
-  transactions: ITransactionImport[];
+  transactions: ITransactionCreateRequest[];
   accountNameToIDMap: IAccountNameToIDKeyValuePair[];
 }
 

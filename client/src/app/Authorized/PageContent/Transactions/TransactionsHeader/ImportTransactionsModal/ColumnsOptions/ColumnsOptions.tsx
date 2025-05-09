@@ -12,6 +12,7 @@ interface ColumnsOptionsProps {
   expensesColumnValues: string[];
   expensesColumnValue: string | null;
   setExpensesColumnValue: (value: string | null) => void;
+  handleAmountChange: () => void;
 }
 
 const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
@@ -22,16 +23,18 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
         <Stack>
           <Checkbox
             checked={props.invertAmount}
-            onChange={(event) =>
-              props.setInvertAmount(event.currentTarget.checked)
-            }
+            onChange={(event) => {
+              props.setInvertAmount(event.currentTarget.checked);
+              props.handleAmountChange();
+            }}
             label="Invert amount"
           />
           <Checkbox
             checked={props.includeExpensesColumn}
-            onChange={(event) =>
-              props.setIncludeExpensesColumn(event.currentTarget.checked)
-            }
+            onChange={(event) => {
+              props.setIncludeExpensesColumn(event.currentTarget.checked);
+              props.handleAmountChange();
+            }}
             label="Include income/expenses column"
           />
         </Stack>
@@ -41,7 +44,10 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             data={props.columns}
             clearable
             value={props.expensesColumn}
-            onChange={(value) => props.setExpensesColumn(value ?? "")}
+            onChange={(value) => {
+              props.setExpensesColumn(value ?? "");
+              props.handleAmountChange();
+            }}
           />
         )}
         {props.expensesColumn && (
@@ -50,7 +56,10 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             data={props.expensesColumnValues}
             clearable
             value={props.expensesColumnValue}
-            onChange={(value) => props.setExpensesColumnValue(value ?? "")}
+            onChange={(value) => {
+              props.setExpensesColumnValue(value ?? "");
+              props.handleAmountChange();
+            }}
           />
         )}
       </Group>

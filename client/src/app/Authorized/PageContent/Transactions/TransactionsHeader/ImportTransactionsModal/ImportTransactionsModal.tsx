@@ -1,4 +1,4 @@
-import { Button, Modal, Stack } from "@mantine/core";
+import { Button, LoadingOverlay, Modal, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -22,6 +22,8 @@ import AccountMapping from "./AccountMapping/AccountMapping";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
+
+  const [isLoading, setIsLoading] = React.useState(false);
   const [headers, setHeaders] = React.useState<string[]>([]);
   const [csvData, setCsvData] = React.useState<unknown[]>([]);
   const [importedData, setImportedData] = React.useState<ITransactionImport[]>(
@@ -29,20 +31,6 @@ const ImportTransactionsModal = () => {
   );
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
     React.useState<Map<string, string>>(new Map<string, string>());
-
-  const delimiterField = useField<string>({
-    initialValue: ",",
-    validateOnBlur: true,
-    validate: (value) => {
-      if (!value) {
-        return "Delimiter is required";
-      }
-      if (value.length > 1) {
-        return "Delimiter must be a single character";
-      }
-      return null;
-    },
-  });
 
   const fileField = useField<File | null>({
     initialValue: null,
@@ -57,15 +45,40 @@ const ImportTransactionsModal = () => {
       return null;
     },
   });
-
+  const delimiterField = useField<string>({
+    initialValue: ",",
+    validateOnBlur: true,
+    validate: (value) => {
+      if (!value) {
+        return "Delimiter is required";
+      }
+      if (value.length > 1) {
+        return "Delimiter must be a single character";
+      }
+      return null;
+    },
+  });
+  const dateField = useField<string | null>({
+    initialValue: null,
+  });
+  const descriptionField = useField<string | null>({
+    initialValue: null,
+  });
+  const categoryField = useField<string | null>({
+    initialValue: null,
+  });
+  const amountField = useField<string | null>({
+    initialValue: null,
+  });
+  const accountField = useField<string | null>({
+    initialValue: null,
+  });
   const includeExpensesColumnField = useField<boolean>({
     initialValue: false,
   });
-
   const invertAmountField = useField<boolean>({
     initialValue: false,
   });
-
   const expensesColumnField = useField<string | null>({
     initialValue: "",
     validateOnBlur: true,
@@ -76,7 +89,6 @@ const ImportTransactionsModal = () => {
       return null;
     },
   });
-
   const expensesColumnValueField = useField<string | null>({
     initialValue: null,
     validateOnBlur: true,
@@ -110,23 +122,249 @@ const ImportTransactionsModal = () => {
     expensesColumnValueField.getValue(),
   ]);
 
-  const dateField = useField<string | null>({
-    initialValue: null,
-  });
-  const descriptionField = useField<string | null>({
-    initialValue: null,
-  });
-  const categoryField = useField<string | null>({
-    initialValue: null,
-  });
-  const amountField = useField<string | null>({
-    initialValue: null,
-  });
-  const accountField = useField<string | null>({
-    initialValue: null,
-  });
+  const resetData = () => {
+    fileField.reset();
+    delimiterField.reset();
 
-  const setColumn = (column: string, value: string) => {
+    setHeaders([]);
+    setCsvData([]);
+    setImportedData([]);
+
+    dateField.reset();
+    descriptionField.reset();
+    categoryField.reset();
+    amountField.reset();
+    accountField.reset();
+
+    invertAmountField.reset();
+    includeExpensesColumnField.reset();
+    expensesColumnField.reset();
+    expensesColumnValueField.reset();
+
+    setAccountNameToAccountIdMap(new Map<string, string>());
+  };
+
+  React.useEffect(() => {
+    console.log("loading", isLoading);
+  }, [isLoading]);
+
+  const processFile = async () => {
+    try {
+      setIsLoading(true);
+      const file = fileField.getValue();
+      const delimiter = delimiterField.getValue();
+      if (
+        !file ||
+        file.type !== "text/csv" ||
+        !delimiter ||
+        delimiter.length !== 1
+      ) {
+        resetData();
+        return;
+      }
+
+      const text = await file.text();
+      const parsed = Papa.parse(text, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: true,
+        delimiter,
+      });
+
+      if (parsed.errors.length > 0) {
+        parsed.errors.forEach((error) => {
+          notifications.show({
+            color: "red",
+            message: `Error parsing CSV: ${error.message}`,
+          });
+        });
+        resetData();
+        return;
+      }
+      if (parsed.data.length === 0) {
+        notifications.show({
+          color: "red",
+          message: "CSV file is empty",
+        });
+        resetData();
+        return;
+      }
+      if (parsed.meta.fields) {
+        setHeaders(parsed.meta.fields);
+      } else {
+        notifications.show({
+          color: "red",
+          message: "CSV file has no headers",
+        });
+        resetData();
+        return;
+      }
+
+      setCsvData(parsed.data);
+      setImportedData([]);
+
+      // The headers will auto-populate if they match the default values
+      dateField.setValue(
+        parsed.meta.fields?.find((header) =>
+          areStringsEqual(header.toLowerCase(), "date")
+        ) ?? null
+      );
+      descriptionField.setValue(
+        parsed.meta.fields?.find((header) =>
+          areStringsEqual(header.toLowerCase(), "description")
+        ) ?? null
+      );
+      categoryField.setValue(
+        parsed.meta.fields?.find((header) =>
+          areStringsEqual(header.toLowerCase(), "category")
+        ) ?? null
+      );
+      amountField.setValue(
+        parsed.meta.fields?.find((header) =>
+          areStringsEqual(header.toLowerCase(), "amount")
+        ) ?? null
+      );
+      accountField.setValue(
+        parsed.meta.fields?.find((header) =>
+          areStringsEqual(header.toLowerCase(), "account")
+        ) ?? null
+      );
+
+      // The table will auto-populate if any of the headers are defined.
+      if (
+        dateField.getValue() ||
+        descriptionField.getValue() ||
+        categoryField.getValue() ||
+        amountField.getValue() ||
+        accountField.getValue()
+      ) {
+        const importedTransactions: ITransactionImport[] = parsed.data.map(
+          (row: any) => ({
+            date: dateField.getValue()
+              ? new Date(row[dateField.getValue()!])
+              : null,
+            description: descriptionField.getValue()
+              ? row[descriptionField.getValue()!]
+              : null,
+            category: categoryField.getValue()
+              ? row[categoryField.getValue()!]
+              : null,
+            amount: amountField.getValue()
+              ? row[amountField.getValue()!]
+              : null,
+            account: accountField.getValue()
+              ? row[accountField.getValue()!]
+              : null,
+            type: null,
+          })
+        );
+
+        setImportedData(importedTransactions);
+
+        // The user will need to map the imported account names to existing accounts in the app.
+        if (accountField.getValue()) {
+          const accountNameToAccountIdMap = new Map<string, string>();
+          importedTransactions.forEach((transaction) => {
+            if (
+              transaction.account &&
+              !accountNameToAccountIdMap.has(transaction.account)
+            ) {
+              accountNameToAccountIdMap.set(transaction.account, "");
+            }
+          });
+          setAccountNameToAccountIdMap(accountNameToAccountIdMap);
+        }
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const parseFileData = () => {
+    try {
+      setIsLoading(true);
+      // We don't want the table to show a bunch of empty rows if none of the columns are set.
+      if (
+        !dateField.getValue() &&
+        !descriptionField.getValue() &&
+        !categoryField.getValue() &&
+        !amountField.getValue() &&
+        !accountField.getValue()
+      ) {
+        setImportedData([]);
+        setAccountNameToAccountIdMap(new Map<string, string>());
+        return;
+      }
+
+      const includeExpensesColumn = includeExpensesColumnField.getValue();
+      const expensesColumnName = expensesColumnField.getValue();
+
+      const importedTransactions: ITransactionImport[] = csvData.map(
+        (row: any) => ({
+          date: dateField.getValue()
+            ? new Date(row[dateField.getValue()!])
+            : null,
+          description: descriptionField.getValue()
+            ? row[descriptionField.getValue()!]
+            : null,
+          category: categoryField.getValue()
+            ? row[categoryField.getValue()!]
+            : null,
+          amount: amountField.getValue() ? row[amountField.getValue()!] : null,
+          account: accountField.getValue()
+            ? row[accountField.getValue()!]
+            : null,
+          type:
+            includeExpensesColumn &&
+            expensesColumnName &&
+            expensesColumnName.length > 0
+              ? row[expensesColumnName]
+              : null,
+        })
+      );
+
+      const expensesColumnValue = expensesColumnValueField.getValue();
+
+      if (includeExpensesColumn && expensesColumnName && expensesColumnValue) {
+        importedTransactions.forEach((transaction) => {
+          if (areStringsEqual(transaction.type ?? "", expensesColumnValue)) {
+            transaction.amount = transaction.amount
+              ? transaction.amount * -1
+              : null;
+          }
+        });
+      }
+
+      if (invertAmountField.getValue()) {
+        importedTransactions.forEach((transaction) => {
+          if (transaction.amount) {
+            transaction.amount = transaction.amount
+              ? transaction.amount * -1
+              : null;
+          }
+        });
+      }
+
+      setImportedData(importedTransactions);
+
+      if (accountField.getValue()) {
+        const accountNameToAccountIdMap = new Map<string, string>();
+        importedTransactions.forEach((transaction) => {
+          if (
+            transaction.account &&
+            !accountNameToAccountIdMap.has(transaction.account)
+          ) {
+            accountNameToAccountIdMap.set(transaction.account, "");
+          }
+        });
+        setAccountNameToAccountIdMap(accountNameToAccountIdMap);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const setColumn = async (column: string, value: string) => {
     switch (column) {
       case "date":
         dateField.setValue(value);
@@ -144,178 +382,7 @@ const ImportTransactionsModal = () => {
         accountField.setValue(value);
         break;
     }
-    handleColumnsChange();
-  };
-
-  const resetData = () => {
-    fileField.reset();
-    delimiterField.reset();
-
-    setHeaders([]);
-    setCsvData([]);
-    setImportedData([]);
-
-    dateField.reset();
-    descriptionField.reset();
-    categoryField.reset();
-    amountField.reset();
-    accountField.reset();
-
-    includeExpensesColumnField.reset();
-    invertAmountField.reset();
-
-    setAccountNameToAccountIdMap(new Map<string, string>());
-  };
-
-  const handleColumnsChange = () => {
-    if (
-      !dateField.getValue() &&
-      !descriptionField.getValue() &&
-      !categoryField.getValue() &&
-      !amountField.getValue() &&
-      !accountField.getValue()
-    ) {
-      setImportedData([]);
-      setAccountNameToAccountIdMap(new Map<string, string>());
-      return;
-    }
-
-    const importedTransactions: ITransactionImport[] = csvData.map(
-      (row: any) => ({
-        date: dateField.getValue()
-          ? new Date(row[dateField.getValue()!])
-          : null,
-        description: descriptionField.getValue()
-          ? row[descriptionField.getValue()!]
-          : null,
-        category: categoryField.getValue()
-          ? row[categoryField.getValue()!]
-          : null,
-        amount: amountField.getValue() ? row[amountField.getValue()!] : null,
-        account: accountField.getValue() ? row[accountField.getValue()!] : null,
-      })
-    );
-
-    setImportedData(importedTransactions);
-
-    if (accountField.getValue()) {
-      const accountNameToAccountIdMap = new Map<string, string>();
-      importedTransactions.forEach((transaction) => {
-        if (
-          transaction.account &&
-          !accountNameToAccountIdMap.has(transaction.account)
-        ) {
-          accountNameToAccountIdMap.set(transaction.account, "");
-        }
-      });
-      setAccountNameToAccountIdMap(accountNameToAccountIdMap);
-    }
-  };
-
-  // TODO: Clean this up.
-  const handleFileChange = async () => {
-    if (fileField.getValue() == null) {
-      resetData();
-      return;
-    }
-    if (fileField.getValue()!.type !== "text/csv") {
-      resetData();
-      return;
-    }
-
-    const text = await fileField.getValue()!.text();
-
-    const parsed = Papa.parse(text, {
-      header: true,
-      skipEmptyLines: true,
-      dynamicTyping: true,
-      delimiter: delimiterField.getValue(),
-    });
-
-    if (parsed.errors.length > 0) {
-      console.error("Error parsing CSV:", parsed.errors);
-      return;
-    }
-    if (parsed.data.length === 0) {
-      console.error("No data found in CSV");
-      return;
-    }
-    if (parsed.meta.fields) {
-      setHeaders(parsed.meta.fields);
-    } else {
-      console.error("No headers found in CSV");
-      return;
-    }
-
-    setCsvData(parsed.data);
-    setImportedData([]);
-
-    dateField.setValue(
-      parsed.meta.fields?.find((header) =>
-        areStringsEqual(header.toLowerCase(), "date")
-      ) ?? null
-    );
-    descriptionField.setValue(
-      parsed.meta.fields?.find((header) =>
-        areStringsEqual(header.toLowerCase(), "description")
-      ) ?? null
-    );
-    categoryField.setValue(
-      parsed.meta.fields?.find((header) =>
-        areStringsEqual(header.toLowerCase(), "category")
-      ) ?? null
-    );
-    amountField.setValue(
-      parsed.meta.fields?.find((header) =>
-        areStringsEqual(header.toLowerCase(), "amount")
-      ) ?? null
-    );
-    accountField.setValue(
-      parsed.meta.fields?.find((header) =>
-        areStringsEqual(header.toLowerCase(), "account")
-      ) ?? null
-    );
-
-    if (
-      dateField.getValue() ||
-      descriptionField.getValue() ||
-      categoryField.getValue() ||
-      amountField.getValue() ||
-      accountField.getValue()
-    ) {
-      const importedTransactions: ITransactionImport[] = parsed.data.map(
-        (row: any) => ({
-          date: dateField.getValue()
-            ? new Date(row[dateField.getValue()!])
-            : null,
-          description: descriptionField.getValue()
-            ? row[descriptionField.getValue()!]
-            : null,
-          category: categoryField.getValue()
-            ? row[categoryField.getValue()!]
-            : null,
-          amount: amountField.getValue() ? row[amountField.getValue()!] : null,
-          account: accountField.getValue()
-            ? row[accountField.getValue()!]
-            : null,
-        })
-      );
-
-      setImportedData(importedTransactions);
-
-      if (accountField.getValue()) {
-        const accountNameToAccountIdMap = new Map<string, string>();
-        importedTransactions.forEach((transaction) => {
-          if (
-            transaction.account &&
-            !accountNameToAccountIdMap.has(transaction.account)
-          ) {
-            accountNameToAccountIdMap.set(transaction.account, "");
-          }
-        });
-        setAccountNameToAccountIdMap(accountNameToAccountIdMap);
-      }
-    }
+    parseFileData();
   };
 
   const { request } = React.useContext<any>(AuthContext);
@@ -337,13 +404,18 @@ const ImportTransactionsModal = () => {
   });
 
   const onSubmit = async () => {
+    // TODO: Some of these should be required fields.
+    // TODO: Fix category and subcategory.
     const transactionImportRequest: ITransactionImportRequest = {
       transactions: importedData.map((transaction) => ({
-        date: transaction.date,
-        description: transaction.description,
-        category: transaction.category,
-        amount: transaction.amount,
-        account: transaction.account,
+        syncID: null,
+        amount: transaction.amount ?? 0,
+        date: transaction.date ?? new Date(),
+        category: null,
+        subcategory: null,
+        merchantName: transaction.description,
+        source: null,
+        accountID: transaction.account ?? "",
       })),
       accountNameToIDMap: Array.from(accountNameToAccountIdMap.entries()).map(
         ([accountName, accountID]) => ({
@@ -381,13 +453,14 @@ const ImportTransactionsModal = () => {
           },
         }}
       >
+        <LoadingOverlay visible={isLoading} />
         <Stack>
           <CsvOptions
             fileField={fileField.getValue()}
             setFileField={fileField.setValue}
             delimiterField={delimiterField.getValue()}
             setDelimiterField={delimiterField.setValue}
-            handleFileChange={handleFileChange}
+            handleFileChange={processFile}
           />
           {importedData.length > 0 && (
             <TransactionsTable
@@ -419,6 +492,7 @@ const ImportTransactionsModal = () => {
               expensesColumnValues={expensesColumnValues}
               expensesColumnValue={expensesColumnValueField.getValue()}
               setExpensesColumnValue={expensesColumnValueField.setValue}
+              handleAmountChange={parseFileData}
             />
           )}
           {accountNameToAccountIdMap.size > 0 && (
