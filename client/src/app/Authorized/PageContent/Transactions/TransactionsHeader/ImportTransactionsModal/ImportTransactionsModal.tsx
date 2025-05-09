@@ -144,10 +144,6 @@ const ImportTransactionsModal = () => {
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
 
-  React.useEffect(() => {
-    console.log("loading", isLoading);
-  }, [isLoading]);
-
   const processFile = async () => {
     try {
       setIsLoading(true);
