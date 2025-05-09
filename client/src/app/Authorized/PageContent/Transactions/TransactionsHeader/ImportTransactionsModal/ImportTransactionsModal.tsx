@@ -364,7 +364,7 @@ const ImportTransactionsModal = () => {
     }
   };
 
-  const setColumn = async (column: string, value: string) => {
+  const setColumn = (column: string, value: string) => {
     switch (column) {
       case "date":
         dateField.setValue(value);
