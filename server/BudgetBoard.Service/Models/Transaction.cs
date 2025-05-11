@@ -1,11 +1,14 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
 public class TransactionSource
 {
-    private TransactionSource(string value) { Value = value; }
+    private TransactionSource(string value)
+    {
+        Value = value;
+    }
 
     public string Value { get; set; }
 
@@ -157,6 +160,7 @@ public class TransactionImportRequest : ITransactionImportRequest
 {
     public IEnumerable<TransactionImport> Transactions { get; set; }
     public IEnumerable<AccountNameToIDKeyValuePair> AccountNameToIDMap { get; set; }
+
     [JsonConstructor]
     public TransactionImportRequest()
     {

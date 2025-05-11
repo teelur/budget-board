@@ -13,6 +13,8 @@ import { areStringsEqual } from "~/helpers/utils";
 import {
   ITransactionImport,
   ITransactionImportRequest,
+  ITransactionImportTableData,
+  TransactionImportTableData,
 } from "~/models/transaction";
 import CsvOptions from "./CsvOptions/CsvOptions";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
@@ -29,6 +31,8 @@ const ImportTransactionsModal = () => {
   const [importedData, setImportedData] = React.useState<ITransactionImport[]>(
     []
   );
+  const [importedTransactionsTableData, setImportedTransactionsTableData] =
+    React.useState<ITransactionImportTableData[]>([]);
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
     React.useState<Map<string, string>>(new Map<string, string>());
 
@@ -129,6 +133,7 @@ const ImportTransactionsModal = () => {
     setHeaders([]);
     setCsvData([]);
     setImportedData([]);
+    setImportedTransactionsTableData([]);
 
     dateField.reset();
     descriptionField.reset();
@@ -197,7 +202,6 @@ const ImportTransactionsModal = () => {
       }
 
       setCsvData(parsed.data);
-      setImportedData([]);
 
       // The headers will auto-populate if they match the default values
       dateField.setValue(
@@ -256,6 +260,11 @@ const ImportTransactionsModal = () => {
         );
 
         setImportedData(importedTransactions);
+        setImportedTransactionsTableData(
+          importedTransactions.map(
+            (i) => new TransactionImportTableData(i, null)
+          )
+        );
 
         // The user will need to map the imported account names to existing accounts in the app.
         if (accountField.getValue()) {
@@ -270,6 +279,10 @@ const ImportTransactionsModal = () => {
           });
           setAccountNameToAccountIdMap(accountNameToAccountIdMap);
         }
+      } else {
+        setImportedData([]);
+        setImportedTransactionsTableData([]);
+        setAccountNameToAccountIdMap(new Map<string, string>());
       }
     } finally {
       setIsLoading(false);
@@ -288,6 +301,7 @@ const ImportTransactionsModal = () => {
         !accountField.getValue()
       ) {
         setImportedData([]);
+        setImportedTransactionsTableData([]);
         setAccountNameToAccountIdMap(new Map<string, string>());
         return;
       }
@@ -295,7 +309,7 @@ const ImportTransactionsModal = () => {
       const includeExpensesColumn = includeExpensesColumnField.getValue();
       const expensesColumnName = expensesColumnField.getValue();
 
-      const importedTransactions: ITransactionImport[] = csvData.map(
+      const importedTransactions: ITransactionImportTableData[] = csvData.map(
         (row: any) => ({
           date: dateField.getValue()
             ? new Date(row[dateField.getValue()!])
@@ -342,6 +356,7 @@ const ImportTransactionsModal = () => {
       }
 
       setImportedData(importedTransactions);
+      setImportedTransactionsTableData(importedTransactions);
 
       if (accountField.getValue()) {
         const accountNameToAccountIdMap = new Map<string, string>();
@@ -354,6 +369,8 @@ const ImportTransactionsModal = () => {
           }
         });
         setAccountNameToAccountIdMap(accountNameToAccountIdMap);
+      } else {
+        setAccountNameToAccountIdMap(new Map<string, string>());
       }
     } finally {
       setIsLoading(false);
@@ -399,26 +416,41 @@ const ImportTransactionsModal = () => {
     },
   });
 
+  const filteredImportedData = React.useMemo(() => {
+    return importedData.filter(
+      (t) =>
+        !areStringsEqual(
+          accountNameToAccountIdMap.get(t.account ?? "") ?? "",
+          "exclude"
+        ) &&
+        !areStringsEqual(
+          accountNameToAccountIdMap.get(t.account ?? "") ?? "",
+          ""
+        )
+    );
+  }, [importedData, accountNameToAccountIdMap]);
+
   const onSubmit = async () => {
-    // TODO: Some of these should be required fields.
-    // TODO: Fix category and subcategory.
+    if (filteredImportedData.length === 0) {
+      notifications.show({
+        color: "red",
+        message: "No transactions to import",
+      });
+      return;
+    }
+
+    const accountNameToAccountArray = Array.from(
+      accountNameToAccountIdMap.entries()
+    )
+      .filter(([_, accountID]) => !!accountID)
+      .map(([accountName, accountID]) => ({
+        accountName,
+        accountID,
+      }));
+
     const transactionImportRequest: ITransactionImportRequest = {
-      transactions: importedData.map((transaction) => ({
-        syncID: null,
-        amount: transaction.amount ?? 0,
-        date: transaction.date ?? new Date(),
-        category: null,
-        subcategory: null,
-        merchantName: transaction.description,
-        source: null,
-        accountID: transaction.account ?? "",
-      })),
-      accountNameToIDMap: Array.from(accountNameToAccountIdMap.entries()).map(
-        ([accountName, accountID]) => ({
-          accountName,
-          accountID,
-        })
-      ),
+      transactions: filteredImportedData,
+      accountNameToIDMap: accountNameToAccountArray,
     };
 
     doImportMutation.mutate(transactionImportRequest);
@@ -458,11 +490,12 @@ const ImportTransactionsModal = () => {
             setDelimiterField={delimiterField.setValue}
             handleFileChange={processFile}
           />
-          {importedData.length > 0 && (
+          {importedTransactionsTableData.length > 0 && (
             <TransactionsTable
-              tableData={importedData}
-              setTableData={setImportedData}
+              tableData={importedTransactionsTableData}
+              setTableData={setImportedTransactionsTableData}
               setCsvData={setCsvData}
+              setImportedData={setImportedData}
             />
           )}
           {headers.length > 0 && (
@@ -497,8 +530,14 @@ const ImportTransactionsModal = () => {
               setAccountNameToAccountIdMap={setAccountNameToAccountIdMap}
             />
           )}
-          <Button onClick={onSubmit} loading={doImportMutation.isPending}>
-            Import
+          <Button
+            onClick={onSubmit}
+            loading={doImportMutation.isPending}
+            disabled={
+              doImportMutation.isPending || filteredImportedData.length === 0
+            }
+          >
+            Import {filteredImportedData.length} Transactions
           </Button>
         </Stack>
       </Modal>

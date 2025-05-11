@@ -2,12 +2,18 @@ import { ActionIcon, Divider, Flex, Stack, Table } from "@mantine/core";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { ITransactionImport } from "~/models/transaction";
+import {
+  ITransactionImport,
+  ITransactionImportTableData,
+} from "~/models/transaction";
 
 interface TransactionsTableProps {
   tableData: ITransactionImport[];
-  setTableData: React.Dispatch<React.SetStateAction<ITransactionImport[]>>;
+  setTableData: React.Dispatch<
+    React.SetStateAction<ITransactionImportTableData[]>
+  >;
   setCsvData: React.Dispatch<React.SetStateAction<unknown[]>>;
+  setImportedData: React.Dispatch<React.SetStateAction<ITransactionImport[]>>;
 }
 
 const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
@@ -40,6 +46,9 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                           prev.filter((_, i) => i !== index)
                         );
                         props.setCsvData((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        );
+                        props.setImportedData((prev) =>
                           prev.filter((_, i) => i !== index)
                         );
                       }}

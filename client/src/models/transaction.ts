@@ -6,7 +6,28 @@ export interface ITransactionImport {
   category: string | null;
   amount: number | null;
   account: string | null;
+}
+
+export interface ITransactionImportTableData extends ITransactionImport {
   type: string | null;
+}
+
+export class TransactionImportTableData implements ITransactionImportTableData {
+  date: Date | null;
+  description: string | null;
+  category: string | null;
+  amount: number | null;
+  account: string | null;
+  type: string | null;
+
+  constructor(transactionImport: ITransactionImport, type: string | null) {
+    this.date = transactionImport.date;
+    this.description = transactionImport.description;
+    this.category = transactionImport.category;
+    this.amount = transactionImport.amount;
+    this.account = transactionImport.account;
+    this.type = type;
+  }
 }
 
 export interface IAccountNameToIDKeyValuePair {
@@ -15,7 +36,7 @@ export interface IAccountNameToIDKeyValuePair {
 }
 
 export interface ITransactionImportRequest {
-  transactions: ITransactionCreateRequest[];
+  transactions: ITransactionImport[];
   accountNameToIDMap: IAccountNameToIDKeyValuePair[];
 }
 

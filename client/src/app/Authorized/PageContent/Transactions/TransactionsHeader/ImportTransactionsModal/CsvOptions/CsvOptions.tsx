@@ -32,8 +32,8 @@ const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
           label="Delimiter"
           onChange={(event) => {
             props.setDelimiterField(event.currentTarget.value);
-            props.handleFileChange();
           }}
+          onBlur={props.handleFileChange}
           maw={70}
         />
       </Group>
