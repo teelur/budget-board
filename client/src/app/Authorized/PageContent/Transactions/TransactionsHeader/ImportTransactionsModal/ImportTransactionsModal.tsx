@@ -299,7 +299,7 @@ const ImportTransactionsModal = () => {
     }
   };
 
-  const parseFileData = () => {
+  const parseFileData = (doParseAccounts?: boolean) => {
     try {
       setIsLoading(true);
       // We don't want the table to show a bunch of empty rows if none of the columns are set.
@@ -368,7 +368,7 @@ const ImportTransactionsModal = () => {
       setImportedData(importedTransactions);
       setImportedTransactionsTableData(importedTransactions);
 
-      if (accountField.getValue()) {
+      if (doParseAccounts) {
         const accountNameToAccountIdMap = new Map<string, string>();
         importedTransactions.forEach((transaction) => {
           if (
@@ -379,8 +379,6 @@ const ImportTransactionsModal = () => {
           }
         });
         setAccountNameToAccountIdMap(accountNameToAccountIdMap);
-      } else {
-        setAccountNameToAccountIdMap(new Map<string, string>());
       }
     } finally {
       setIsLoading(false);
@@ -391,21 +389,25 @@ const ImportTransactionsModal = () => {
     switch (column) {
       case "date":
         dateField.setValue(value);
+        parseFileData();
         break;
       case "description":
         descriptionField.setValue(value);
+        parseFileData();
         break;
       case "category":
         categoryField.setValue(value);
+        parseFileData();
         break;
       case "amount":
         amountField.setValue(value);
+        parseFileData();
         break;
       case "account":
         accountField.setValue(value);
+        parseFileData(true);
         break;
     }
-    parseFileData();
   };
 
   const { request } = React.useContext<any>(AuthContext);
