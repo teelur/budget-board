@@ -330,8 +330,8 @@ public class TransactionService(
             var newTransaction = new TransactionCreateRequest
             {
                 SyncID = string.Empty,
-                Amount = transaction.Amount,
-                Date = transaction.Date,
+                Amount = transaction.Amount ?? 0,
+                Date = transaction.Date ?? DateTime.Now.ToUniversalTime(),
                 Category = parentCategory,
                 Subcategory = childCategory,
                 MerchantName = transaction.Description,
