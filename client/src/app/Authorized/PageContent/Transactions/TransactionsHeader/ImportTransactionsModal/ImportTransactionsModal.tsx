@@ -22,6 +22,8 @@ import ColumnsSelect from "./ColumnsSelect/ColumnsSelect";
 import ColumnsOptions from "./ColumnsOptions/ColumnsOptions";
 import AccountMapping from "./AccountMapping/AccountMapping";
 
+// TODO: There is probably some optimization that can be done here.
+
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -128,7 +130,6 @@ const ImportTransactionsModal = () => {
 
   const resetData = () => {
     fileField.reset();
-    delimiterField.reset();
 
     setHeaders([]);
     setCsvData([]);
@@ -154,13 +155,14 @@ const ImportTransactionsModal = () => {
       setIsLoading(true);
       const file = fileField.getValue();
       const delimiter = delimiterField.getValue();
+
+      // We don't want to parse the file if the user hasn't defined the file or delimiter.
       if (
         !file ||
         file.type !== "text/csv" ||
         !delimiter ||
         delimiter.length !== 1
       ) {
-        resetData();
         return;
       }
 
@@ -172,16 +174,23 @@ const ImportTransactionsModal = () => {
         delimiter,
       });
 
+      // Display any errors that occurred during parsing.
       if (parsed.errors.length > 0) {
-        parsed.errors.forEach((error) => {
+        const uniqueErrorMessages = Array.from(
+          new Set(parsed.errors.map((error) => error.message))
+        );
+
+        uniqueErrorMessages.forEach((errorMessage) => {
           notifications.show({
             color: "red",
-            message: `Error parsing CSV: ${error.message}`,
+            message: `Error parsing CSV: ${errorMessage}`,
           });
         });
+
         resetData();
         return;
       }
+
       if (parsed.data.length === 0) {
         notifications.show({
           color: "red",
@@ -190,6 +199,7 @@ const ImportTransactionsModal = () => {
         resetData();
         return;
       }
+
       if (parsed.meta.fields) {
         setHeaders(parsed.meta.fields);
       } else {
@@ -473,6 +483,7 @@ const ImportTransactionsModal = () => {
         }}
         title="Import Transactions"
         size="auto"
+        p="0.5rem"
         styles={{
           inner: {
             left: "0",
@@ -489,6 +500,7 @@ const ImportTransactionsModal = () => {
             delimiterField={delimiterField.getValue()}
             setDelimiterField={delimiterField.setValue}
             handleFileChange={processFile}
+            resetData={resetData}
           />
           {importedTransactionsTableData.length > 0 && (
             <TransactionsTable

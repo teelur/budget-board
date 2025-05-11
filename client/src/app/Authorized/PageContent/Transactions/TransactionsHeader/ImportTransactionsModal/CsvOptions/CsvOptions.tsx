@@ -7,6 +7,7 @@ interface CsvOptionsProps {
   delimiterField: string;
   setDelimiterField: (delimiter: string) => void;
   handleFileChange: () => void;
+  resetData: () => void;
 }
 
 const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
@@ -21,6 +22,9 @@ const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
           placeholder="Upload .csv"
           label="CSV File"
           onChange={(value) => {
+            if (value == null) {
+              props.resetData();
+            }
             props.setFileField(value);
             props.handleFileChange();
           }}
@@ -34,6 +38,8 @@ const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
             props.setDelimiterField(event.currentTarget.value);
           }}
           onBlur={props.handleFileChange}
+          maxLength={1}
+          minLength={1}
           maw={70}
         />
       </Group>
