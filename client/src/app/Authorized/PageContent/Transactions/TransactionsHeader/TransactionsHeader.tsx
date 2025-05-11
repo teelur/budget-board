@@ -12,6 +12,7 @@ import { useDisclosure } from "@mantine/hooks";
 import TransactionsSettings from "./TransactionsSettings/TransactionsSettings";
 import { ICategory } from "~/models/category";
 import CreateTransactionModal from "./CreateTransactionModal/CreateTransactionModal";
+import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransactionsModal";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
@@ -39,6 +40,7 @@ const TransactionsHeader = (
           setSortDirection={props.setSortDirection}
         />
         <Group className={classes.buttonGroup}>
+          <ImportTransactionsModal />
           <Button
             size="sm"
             rightSection={<FilterIcon size="1rem" />}

@@ -10,4 +10,5 @@ public interface ITransactionService
     Task DeleteTransactionAsync(Guid userGuid, Guid transactionID);
     Task RestoreTransactionAsync(Guid userGuid, Guid transactionID);
     Task SplitTransactionAsync(Guid userGuid, ITransactionSplitRequest transaction);
+    Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest transactionImportRequest);
 }
