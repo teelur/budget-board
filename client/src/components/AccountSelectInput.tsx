@@ -19,7 +19,7 @@ const AccountSelectInput = ({
   selectedAccountIds,
   setSelectedAccountIds,
   hideHidden = false,
-  filterTypes,
+  filterTypes = [],
   manualOnly = false,
   maxSelectedValues = undefined,
   ...props
@@ -51,7 +51,7 @@ const AccountSelectInput = ({
       filteredAccounts = filteredAccounts.filter((a) => !a.hideAccount);
     }
 
-    if (filterTypes && filterTypes.length > 0) {
+    if (filterTypes.length > 0) {
       filteredAccounts = filteredAccounts.filter((a) =>
         filterTypes?.includes(a.type)
       );
