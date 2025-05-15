@@ -186,8 +186,6 @@ const CreateTransactionModal = (): React.ReactNode => {
                   form.setFieldValue("accountIds", val)
                 }
                 key={form.key("accountIds")}
-                hideHidden={false}
-                manualOnly
                 maxSelectedValues={1}
               />
             </Stack>

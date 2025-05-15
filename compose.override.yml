@@ -6,6 +6,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: superSecretPassword
       AUTO_UPDATE_DB: true
+      DISABLE_NEW_USERS: false
 
       # Email confirmation is optional. See the README for more details.
       # EMAIL_SENDER: example@gmail.com

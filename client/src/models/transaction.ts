@@ -1,5 +1,45 @@
 import { ICategory } from "./category";
 
+export interface ITransactionImport {
+  date: Date | null;
+  description: string | null;
+  category: string | null;
+  amount: number | null;
+  account: string | null;
+}
+
+export interface ITransactionImportTableData extends ITransactionImport {
+  type: string | null;
+}
+
+export class TransactionImportTableData implements ITransactionImportTableData {
+  date: Date | null;
+  description: string | null;
+  category: string | null;
+  amount: number | null;
+  account: string | null;
+  type: string | null;
+
+  constructor(transactionImport: ITransactionImport, type: string | null) {
+    this.date = transactionImport.date;
+    this.description = transactionImport.description;
+    this.category = transactionImport.category;
+    this.amount = transactionImport.amount;
+    this.account = transactionImport.account;
+    this.type = type;
+  }
+}
+
+export interface IAccountNameToIDKeyValuePair {
+  accountName: string;
+  accountID: string;
+}
+
+export interface ITransactionImportRequest {
+  transactions: ITransactionImport[];
+  accountNameToIDMap: IAccountNameToIDKeyValuePair[];
+}
+
 export interface ITransactionCreateRequest {
   syncID: string | null;
   amount: number;
