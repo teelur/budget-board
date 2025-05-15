@@ -1,26 +1,31 @@
-name: Run Tests
+name: Run Dotnet Unit Tests
 
 on:
   pull_request:
 
 jobs:
-  build:
+  test-dotnet:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.0.x"
+
       - name: Install dependencies
         working-directory: ./server
         run: dotnet restore
+
       - name: Build
         working-directory: ./server
-        run: dotnet build
+        run: dotnet build --no-restore
+
       - name: Test with the dotnet CLI
         working-directory: ./server
-        run: dotnet test
+        run: dotnet test --no-build
