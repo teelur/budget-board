@@ -4,7 +4,7 @@ COPY . ./app
 WORKDIR /app
 RUN dotnet restore "BudgetBoard.WebAPI/BudgetBoard.WebAPI.csproj"
 ARG configuration=Release
-RUN dotnet publish "BudgetBoard.WebAPI/BudgetBoard.WebAPI.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "BudgetBoard.WebAPI/BudgetBoard.WebAPI.csproj" -c $configuration -o /app/publish /p:UseAppHost=false --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
