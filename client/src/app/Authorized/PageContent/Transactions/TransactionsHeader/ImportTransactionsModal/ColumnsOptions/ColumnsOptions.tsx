@@ -13,13 +13,15 @@ interface ColumnsOptionsProps {
   expensesColumnValue: string | null;
   setExpensesColumnValue: (value: string | null) => void;
   handleAmountChange: () => void;
+  filterDuplicates: boolean;
+  setFilterDuplicates: (filter: boolean) => void;
+  handleFilterDuplicates: () => void;
 }
 
 const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
   return (
     <Stack>
       <Divider label="Columns Options" labelPosition="center" />
-      <Group w="100%">
         <Stack>
           <Checkbox
             checked={props.invertAmount}
@@ -29,6 +31,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             }}
             label="Invert amount"
           />
+        <Group justify="flex-start" align="center" w="100%">
           <Checkbox
             checked={props.includeExpensesColumn}
             onChange={(event) => {
@@ -37,7 +40,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             }}
             label="Include income/expenses column"
           />
-        </Stack>
         {props.includeExpensesColumn && (
           <Select
             label="Expenses column"
@@ -63,6 +65,15 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
           />
         )}
       </Group>
+        <Checkbox
+          checked={props.filterDuplicates}
+          onChange={(event) => {
+            props.setFilterDuplicates(event.currentTarget.checked);
+            props.handleFilterDuplicates();
+          }}
+          label="Filter duplicates"
+        />
+      </Stack>
     </Stack>
   );
 };
