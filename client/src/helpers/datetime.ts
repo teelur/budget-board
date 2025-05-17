@@ -130,3 +130,28 @@ export const getUniqueDates = (dates: Date[]): Date[] =>
     (date, index, array) =>
       array.findIndex((d) => d.getTime() === date.getTime()) === index
   );
+
+/**
+ * Determines whether two Date objects represent the same calendar day.
+ *
+ * Compares the year, month, and day components of both dates.
+ *
+ * @param date1 - The first date to compare.
+ * @param date2 - The second date to compare.
+ * @returns `true` if both dates are on the same year, month, and day; otherwise, `false`.
+ */
+export const areDatesEqual = (
+  date1: Date | null,
+  date2: Date | null
+): boolean => {
+  if (!date1 || !date2) {
+    return false;
+  }
+  const formattedDate1 = new Date(date1);
+  const formattedDate2 = new Date(date2);
+  return (
+    formattedDate1.getFullYear() === formattedDate2.getFullYear() &&
+    formattedDate1.getMonth() === formattedDate2.getMonth() &&
+    formattedDate1.getDate() === formattedDate2.getDate()
+  );
+};
