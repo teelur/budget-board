@@ -2,8 +2,8 @@ import { Button, LoadingOverlay, Modal, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { ImportIcon } from "lucide-react";
 import Papa from "papaparse";
 import React from "react";
@@ -11,6 +11,7 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import {
+  ITransaction,
   ITransactionImport,
   ITransactionImportRequest,
   ITransactionImportTableData,
@@ -21,6 +22,8 @@ import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import ColumnsSelect from "./ColumnsSelect/ColumnsSelect";
 import ColumnsOptions from "./ColumnsOptions/ColumnsOptions";
 import AccountMapping from "./AccountMapping/AccountMapping";
+import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
+import { areDatesEqual } from "~/helpers/datetime";
 
 // TODO: There is probably some optimization that can be done here.
 
@@ -37,6 +40,10 @@ const ImportTransactionsModal = () => {
     React.useState<ITransactionImportTableData[]>([]);
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
     React.useState<Map<string, string>>(new Map<string, string>());
+  const [
+    importedTransactionToExistingTransactionMap,
+    setImportedTransactionToExistingTransactionMap,
+  ] = React.useState<Map<ITransactionImportTableData, ITransaction>>(new Map());
 
   const fileField = useField<File | null>({
     initialValue: null,
@@ -105,6 +112,9 @@ const ImportTransactionsModal = () => {
       return null;
     },
   });
+  const filterDuplicatesField = useField<boolean>({
+    initialValue: false,
+  });
 
   const expensesColumnValues: string[] = React.useMemo(() => {
     const columnValues = csvData.map((row: any) => {
@@ -127,6 +137,23 @@ const ImportTransactionsModal = () => {
     expensesColumnField.getValue(),
     expensesColumnValueField.getValue(),
   ]);
+
+  const { request } = React.useContext<any>(AuthContext);
+  const transactionsQuery = useQuery({
+    queryKey: ["transactions", { getHidden: false }],
+    queryFn: async (): Promise<ITransaction[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/transaction",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as ITransaction[];
+      }
+
+      return [];
+    },
+  });
 
   const resetColumnsOptions = () => {
     invertAmountField.reset();
@@ -395,6 +422,67 @@ const ImportTransactionsModal = () => {
       setIsLoading(false);
     }
   };
+  const filterDuplicateTransactions = () => {
+    if (!filterDuplicatesField.getValue()) {
+      setImportedTransactionToExistingTransactionMap(new Map());
+
+      return;
+    }
+    const tempImportedTransactionsToExistingTransactionsMap = new Map<
+      ITransactionImportTableData,
+      ITransaction
+    >();
+
+    const sortedTableData = importedTransactionsTableData.sort(
+      (a, b) =>
+        new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime()
+    );
+
+    const transactionsInDateRange = transactionsQuery.data?.filter(
+      (transaction) => {
+        const transactionDate = new Date(transaction.date);
+        const startDate = new Date(sortedTableData[0]?.date ?? 0);
+        const endDate = new Date(
+          sortedTableData[sortedTableData.length - 1]?.date ?? 0
+        );
+
+        return transactionDate >= startDate && transactionDate <= endDate;
+      }
+    );
+
+    if (!transactionsInDateRange) {
+      return;
+    }
+
+    const filteredImportedTransactions = importedTransactionsTableData.filter(
+      (transaction) => {
+        const existingTransaction = transactionsInDateRange.find(
+          (t) =>
+            areDatesEqual(t.date, transaction.date) &&
+            areStringsEqual(
+              t.merchantName ?? "",
+              transaction.description ?? ""
+            ) &&
+            t.amount === transaction.amount
+        );
+
+        if (existingTransaction) {
+          tempImportedTransactionsToExistingTransactionsMap.set(
+            transaction,
+            existingTransaction
+          );
+          return false;
+        }
+        return true;
+      }
+    );
+    // setImportedTransactionsTableData(filteredImportedTransactions);
+    setImportedTransactionToExistingTransactionMap(
+      tempImportedTransactionsToExistingTransactionsMap
+    );
+
+    console.log(tempImportedTransactionsToExistingTransactionsMap);
+  };
 
   const setColumn = (column: string, value: string) => {
     switch (column) {
@@ -522,6 +610,11 @@ const ImportTransactionsModal = () => {
               setImportedData={setImportedData}
             />
           )}
+          {filterDuplicatesField.getValue() && (
+            <DuplicateTransactionTable
+              tableDataMap={importedTransactionToExistingTransactionMap}
+            />
+          )}
           {headers.length > 0 && (
             <ColumnsSelect
               columns={headers}
@@ -546,6 +639,9 @@ const ImportTransactionsModal = () => {
               expensesColumnValue={expensesColumnValueField.getValue()}
               setExpensesColumnValue={expensesColumnValueField.setValue}
               handleAmountChange={parseFileData}
+              filterDuplicates={filterDuplicatesField.getValue()}
+              setFilterDuplicates={filterDuplicatesField.setValue}
+              handleFilterDuplicates={filterDuplicateTransactions}
             />
           )}
           {accountNameToAccountIdMap.size > 0 && (
