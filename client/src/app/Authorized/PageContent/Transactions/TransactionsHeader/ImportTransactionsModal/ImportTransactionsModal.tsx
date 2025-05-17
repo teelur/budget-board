@@ -128,6 +128,18 @@ const ImportTransactionsModal = () => {
     expensesColumnValueField.getValue(),
   ]);
 
+  const resetColumnsOptions = () => {
+    invertAmountField.reset();
+    includeExpensesColumnField.reset();
+    expensesColumnField.reset();
+    expensesColumnValueField.reset();
+    filterDuplicatesField.reset();
+
+    setImportedTransactionToExistingTransactionMap(
+      new Map<ITransactionImportTableData, ITransaction>()
+    );
+  };
+
   const resetData = () => {
     fileField.reset();
 
@@ -142,15 +154,12 @@ const ImportTransactionsModal = () => {
     amountField.reset();
     accountField.reset();
 
-    invertAmountField.reset();
-    includeExpensesColumnField.reset();
-    expensesColumnField.reset();
-    expensesColumnValueField.reset();
+    resetColumnsOptions();
 
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
 
-  const processFile = async () => {
+  const importCsvFile = async () => {
     try {
       setIsLoading(true);
       const file = fileField.getValue();
@@ -212,6 +221,7 @@ const ImportTransactionsModal = () => {
       }
 
       setCsvData(parsed.data);
+      resetColumnsOptions();
 
       // The headers will auto-populate if they match the default values
       dateField.setValue(
@@ -239,16 +249,17 @@ const ImportTransactionsModal = () => {
           areStringsEqual(header.toLowerCase(), "account")
         ) ?? null
       );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-      // The table will auto-populate if any of the headers are defined.
-      if (
-        dateField.getValue() ||
-        descriptionField.getValue() ||
-        categoryField.getValue() ||
-        amountField.getValue() ||
-        accountField.getValue()
-      ) {
-        const importedTransactions: ITransactionImport[] = parsed.data.map(
+  React.useEffect(() => {
+    const runImport = async () => {
+      await importCsvFile();
+    };
+    runImport();
+  }, [fileField.getValue(), delimiterField.getValue()]);
           (row: any) => ({
             date: dateField.getValue()
               ? new Date(row[dateField.getValue()!])
@@ -501,7 +512,6 @@ const ImportTransactionsModal = () => {
             setFileField={fileField.setValue}
             delimiterField={delimiterField.getValue()}
             setDelimiterField={delimiterField.setValue}
-            handleFileChange={processFile}
             resetData={resetData}
           />
           {importedTransactionsTableData.length > 0 && (
