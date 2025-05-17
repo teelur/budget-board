@@ -15,7 +15,6 @@ import {
   ITransactionImport,
   ITransactionImportRequest,
   ITransactionImportTableData,
-  TransactionImportTableData,
 } from "~/models/transaction";
 import CsvOptions from "./CsvOptions/CsvOptions";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
@@ -287,60 +286,10 @@ const ImportTransactionsModal = () => {
     };
     runImport();
   }, [fileField.getValue(), delimiterField.getValue()]);
-          (row: any) => ({
-            date: dateField.getValue()
-              ? new Date(row[dateField.getValue()!])
-              : null,
-            description: descriptionField.getValue()
-              ? row[descriptionField.getValue()!]
-              : null,
-            category: categoryField.getValue()
-              ? row[categoryField.getValue()!]
-              : null,
-            amount: amountField.getValue()
-              ? row[amountField.getValue()!]
-              : null,
-            account: accountField.getValue()
-              ? row[accountField.getValue()!]
-              : null,
-            type: null,
-          })
-        );
 
-        setImportedData(importedTransactions);
-        setImportedTransactionsTableData(
-          importedTransactions.map(
-            (i) => new TransactionImportTableData(i, null)
-          )
-        );
-
-        // The user will need to map the imported account names to existing accounts in the app.
-        if (accountField.getValue()) {
-          const accountNameToAccountIdMap = new Map<string, string>();
-          importedTransactions.forEach((transaction) => {
-            if (
-              transaction.account &&
-              !accountNameToAccountIdMap.has(transaction.account)
-            ) {
-              accountNameToAccountIdMap.set(transaction.account, "");
-            }
-          });
-          setAccountNameToAccountIdMap(accountNameToAccountIdMap);
-        }
-      } else {
-        setImportedData([]);
-        setImportedTransactionsTableData([]);
-        setAccountNameToAccountIdMap(new Map<string, string>());
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const parseFileData = (doParseAccounts?: boolean) => {
+  const buildTableData = () => {
     try {
       setIsLoading(true);
-      // We don't want the table to show a bunch of empty rows if none of the columns are set.
       if (
         !dateField.getValue() &&
         !descriptionField.getValue() &&
@@ -351,7 +300,15 @@ const ImportTransactionsModal = () => {
         setImportedData([]);
         setImportedTransactionsTableData([]);
         setAccountNameToAccountIdMap(new Map<string, string>());
+        setImportedTransactionToExistingTransactionMap(
+          new Map<ITransactionImportTableData, ITransaction>()
+        );
         return;
+      }
+
+      if (!includeExpensesColumnField.getValue()) {
+        expensesColumnField.reset();
+        expensesColumnValueField.reset();
       }
 
       const includeExpensesColumn = includeExpensesColumnField.getValue();
@@ -381,47 +338,63 @@ const ImportTransactionsModal = () => {
         })
       );
 
-      const expensesColumnValue = expensesColumnValueField.getValue();
-
-      if (includeExpensesColumn && expensesColumnName && expensesColumnValue) {
-        importedTransactions.forEach((transaction) => {
-          if (areStringsEqual(transaction.type ?? "", expensesColumnValue)) {
-            transaction.amount = transaction.amount
-              ? transaction.amount * -1
-              : null;
-          }
-        });
-      }
+      setImportedData(importedTransactions);
 
       if (invertAmountField.getValue()) {
         importedTransactions.forEach((transaction) => {
           if (transaction.amount) {
-            transaction.amount = transaction.amount
-              ? transaction.amount * -1
-              : null;
+            transaction.amount *= -1;
           }
         });
       }
 
-      setImportedData(importedTransactions);
-      setImportedTransactionsTableData(importedTransactions);
+      const expensesColumnValue = expensesColumnValueField.getValue();
 
-      if (doParseAccounts) {
-        const accountNameToAccountIdMap = new Map<string, string>();
+      if (includeExpensesColumn && expensesColumnName && expensesColumnValue) {
         importedTransactions.forEach((transaction) => {
           if (
-            transaction.account &&
-            !accountNameToAccountIdMap.has(transaction.account)
+            transaction.type &&
+            transaction.type.toString() === expensesColumnValue &&
+            transaction.amount
           ) {
-            accountNameToAccountIdMap.set(transaction.account, "");
+            transaction.amount *= -1;
           }
         });
-        setAccountNameToAccountIdMap(accountNameToAccountIdMap);
       }
+
+      setImportedTransactionsTableData(importedTransactions);
+
+      const accountNameToAccountIdMap = new Map<string, string>();
+
+      importedTransactions.forEach((transaction) => {
+        if (
+          transaction.account &&
+          !accountNameToAccountIdMap.has(transaction.account)
+        ) {
+          accountNameToAccountIdMap.set(transaction.account, "");
+        }
+      });
+      setAccountNameToAccountIdMap(accountNameToAccountIdMap);
     } finally {
       setIsLoading(false);
     }
   };
+
+  React.useEffect(
+    () => buildTableData(),
+    [
+      dateField.getValue(),
+      descriptionField.getValue(),
+      categoryField.getValue(),
+      amountField.getValue(),
+      accountField.getValue(),
+      invertAmountField.getValue(),
+      includeExpensesColumnField.getValue(),
+      expensesColumnField.getValue(),
+      expensesColumnValueField.getValue(),
+    ]
+  );
+
   const filterDuplicateTransactions = () => {
     if (!filterDuplicatesField.getValue()) {
       setImportedTransactionToExistingTransactionMap(new Map());
@@ -488,23 +461,18 @@ const ImportTransactionsModal = () => {
     switch (column) {
       case "date":
         dateField.setValue(value);
-        parseFileData();
         break;
       case "description":
         descriptionField.setValue(value);
-        parseFileData();
         break;
       case "category":
         categoryField.setValue(value);
-        parseFileData();
         break;
       case "amount":
         amountField.setValue(value);
-        parseFileData();
         break;
       case "account":
         accountField.setValue(value);
-        parseFileData(true);
         break;
     }
   };
@@ -636,7 +604,6 @@ const ImportTransactionsModal = () => {
               expensesColumnValues={expensesColumnValues}
               expensesColumnValue={expensesColumnValueField.getValue()}
               setExpensesColumnValue={expensesColumnValueField.setValue}
-              handleAmountChange={parseFileData}
               filterDuplicates={filterDuplicatesField.getValue()}
               setFilterDuplicates={filterDuplicatesField.setValue}
               handleFilterDuplicates={filterDuplicateTransactions}
