@@ -509,8 +509,6 @@ const ImportTransactionsModal = () => {
     }
   };
 
-  const { request } = React.useContext<any>(AuthContext);
-
   const queryClient = useQueryClient();
   const doImportMutation = useMutation({
     mutationFn: async (importedTransactions: ITransactionImportRequest) =>
