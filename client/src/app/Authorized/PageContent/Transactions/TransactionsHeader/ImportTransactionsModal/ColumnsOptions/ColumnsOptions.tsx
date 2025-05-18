@@ -14,7 +14,6 @@ interface ColumnsOptionsProps {
   setExpensesColumnValue: (value: string | null) => void;
   filterDuplicates: boolean;
   setFilterDuplicates: (filter: boolean) => void;
-  handleFilterDuplicates: () => void;
 }
 
 const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
@@ -64,7 +63,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
           checked={props.filterDuplicates}
           onChange={(event) => {
             props.setFilterDuplicates(event.currentTarget.checked);
-            props.handleFilterDuplicates();
           }}
           label="Filter duplicates"
         />

@@ -56,17 +56,8 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                         size="sm"
                         color="red"
                         variant="subtle"
-                        onClick={() => {
-                          props.setTableData((prev) =>
-                            prev.filter((_, i) => i !== index)
-                          );
-                          props.setCsvData((prev) =>
-                            prev.filter((_, i) => i !== index)
-                          );
-                          props.setImportedData((prev) =>
-                            prev.filter((_, i) => i !== index)
-                          );
-                        }}
+                        // TODO: Implement delete action
+                        onClick={() => {}}
                       >
                         <SquareXIcon />
                       </ActionIcon>
@@ -84,7 +75,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
           </Table.Tbody>
         </Table>
       </Table.ScrollContainer>
-      {props.tableData.length > 10 && (
+      {props.tableData.length > itemsPerPage && (
         <Flex w="100%" justify="center">
           <Pagination
             total={Math.ceil(props.tableData.length / itemsPerPage)}

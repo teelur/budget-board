@@ -39,10 +39,9 @@ const ImportTransactionsModal = () => {
     React.useState<ITransactionImportTableData[]>([]);
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
     React.useState<Map<string, string>>(new Map<string, string>());
-  const [
-    importedTransactionToExistingTransactionMap,
-    setImportedTransactionToExistingTransactionMap,
-  ] = React.useState<Map<ITransactionImportTableData, ITransaction>>(new Map());
+  const [duplicateTransactions, setDuplicateTransactions] = React.useState<
+    ITransactionImportTableData[]
+  >([]);
 
   const fileField = useField<File | null>({
     initialValue: null,
@@ -161,9 +160,7 @@ const ImportTransactionsModal = () => {
     expensesColumnValueField.reset();
     filterDuplicatesField.reset();
 
-    setImportedTransactionToExistingTransactionMap(
-      new Map<ITransactionImportTableData, ITransaction>()
-    );
+    setDuplicateTransactions([]);
   };
 
   const resetData = () => {
@@ -300,9 +297,7 @@ const ImportTransactionsModal = () => {
         setImportedData([]);
         setImportedTransactionsTableData([]);
         setAccountNameToAccountIdMap(new Map<string, string>());
-        setImportedTransactionToExistingTransactionMap(
-          new Map<ITransactionImportTableData, ITransaction>()
-        );
+        setDuplicateTransactions([]);
         return;
       }
 
@@ -362,11 +357,58 @@ const ImportTransactionsModal = () => {
         });
       }
 
-      setImportedTransactionsTableData(importedTransactions);
+      let filteredImportedTransactions;
+      if (filterDuplicatesField.getValue()) {
+        const sortedTableData = importedTransactions.toSorted(
+          (a, b) =>
+            new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime()
+        );
+
+        const transactionsInDateRange =
+          transactionsQuery.data?.filter((transaction) => {
+            const transactionDate = new Date(transaction.date);
+            const startDate = new Date(sortedTableData[0]?.date ?? 0);
+            const endDate = new Date(
+              sortedTableData[sortedTableData.length - 1]?.date ?? 0
+            );
+
+            return transactionDate >= startDate && transactionDate <= endDate;
+          }) ?? [];
+
+        const tempDuplicateTransactions: ITransactionImportTableData[] = [];
+
+        filteredImportedTransactions = importedTransactions.filter(
+          (transaction) => {
+            const existingTransaction = transactionsInDateRange.find(
+              (t) =>
+                areDatesEqual(t.date, transaction.date) &&
+                areStringsEqual(
+                  t.merchantName ?? "",
+                  transaction.description ?? ""
+                ) &&
+                t.amount === transaction.amount
+            );
+
+            if (existingTransaction) {
+              tempDuplicateTransactions.push(transaction);
+              return false;
+            }
+            return true;
+          }
+        );
+
+        setDuplicateTransactions(tempDuplicateTransactions);
+      } else {
+        filteredImportedTransactions = importedTransactions;
+
+        setDuplicateTransactions([]);
+      }
+
+      setImportedTransactionsTableData(filteredImportedTransactions);
 
       const accountNameToAccountIdMap = new Map<string, string>();
 
-      importedTransactions.forEach((transaction) => {
+      filteredImportedTransactions.forEach((transaction) => {
         if (
           transaction.account &&
           !accountNameToAccountIdMap.has(transaction.account)
@@ -392,70 +434,9 @@ const ImportTransactionsModal = () => {
       includeExpensesColumnField.getValue(),
       expensesColumnField.getValue(),
       expensesColumnValueField.getValue(),
+      filterDuplicatesField.getValue(),
     ]
   );
-
-  const filterDuplicateTransactions = () => {
-    if (!filterDuplicatesField.getValue()) {
-      setImportedTransactionToExistingTransactionMap(new Map());
-
-      return;
-    }
-    const tempImportedTransactionsToExistingTransactionsMap = new Map<
-      ITransactionImportTableData,
-      ITransaction
-    >();
-
-    const sortedTableData = importedTransactionsTableData.sort(
-      (a, b) =>
-        new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime()
-    );
-
-    const transactionsInDateRange = transactionsQuery.data?.filter(
-      (transaction) => {
-        const transactionDate = new Date(transaction.date);
-        const startDate = new Date(sortedTableData[0]?.date ?? 0);
-        const endDate = new Date(
-          sortedTableData[sortedTableData.length - 1]?.date ?? 0
-        );
-
-        return transactionDate >= startDate && transactionDate <= endDate;
-      }
-    );
-
-    if (!transactionsInDateRange) {
-      return;
-    }
-
-    const filteredImportedTransactions = importedTransactionsTableData.filter(
-      (transaction) => {
-        const existingTransaction = transactionsInDateRange.find(
-          (t) =>
-            areDatesEqual(t.date, transaction.date) &&
-            areStringsEqual(
-              t.merchantName ?? "",
-              transaction.description ?? ""
-            ) &&
-            t.amount === transaction.amount
-        );
-
-        if (existingTransaction) {
-          tempImportedTransactionsToExistingTransactionsMap.set(
-            transaction,
-            existingTransaction
-          );
-          return false;
-        }
-        return true;
-      }
-    );
-    // setImportedTransactionsTableData(filteredImportedTransactions);
-    setImportedTransactionToExistingTransactionMap(
-      tempImportedTransactionsToExistingTransactionsMap
-    );
-
-    console.log(tempImportedTransactionsToExistingTransactionsMap);
-  };
 
   const setColumn = (column: string, value: string) => {
     switch (column) {
@@ -577,9 +558,7 @@ const ImportTransactionsModal = () => {
             />
           )}
           {filterDuplicatesField.getValue() && (
-            <DuplicateTransactionTable
-              tableDataMap={importedTransactionToExistingTransactionMap}
-            />
+            <DuplicateTransactionTable tableData={duplicateTransactions} />
           )}
           {headers.length > 0 && (
             <ColumnsSelect
@@ -606,7 +585,6 @@ const ImportTransactionsModal = () => {
               setExpensesColumnValue={expensesColumnValueField.setValue}
               filterDuplicates={filterDuplicatesField.getValue()}
               setFilterDuplicates={filterDuplicatesField.setValue}
-              handleFilterDuplicates={filterDuplicateTransactions}
             />
           )}
           {accountNameToAccountIdMap.size > 0 && (
