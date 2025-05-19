@@ -13,7 +13,6 @@ import { areStringsEqual } from "~/helpers/utils";
 import {
   defaultTransactionCategories,
   ITransaction,
-  ITransactionImport,
   ITransactionImportRequest,
   ITransactionImportTableData,
 } from "~/models/transaction";
@@ -36,9 +35,6 @@ const ImportTransactionsModal = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [headers, setHeaders] = React.useState<string[]>([]);
   const [csvData, setCsvData] = React.useState<unknown[]>([]);
-  const [importedData, setImportedData] = React.useState<ITransactionImport[]>(
-    []
-  );
   const [importedTransactionsTableData, setImportedTransactionsTableData] =
     React.useState<ITransactionImportTableData[]>([]);
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
@@ -231,7 +227,6 @@ const ImportTransactionsModal = () => {
 
     setHeaders([]);
     setCsvData([]);
-    setImportedData([]);
     setImportedTransactionsTableData([]);
 
     dateField.reset();
@@ -306,7 +301,9 @@ const ImportTransactionsModal = () => {
         return;
       }
 
-      setCsvData(parsed.data);
+      setCsvData(
+        parsed.data.map((row: any, idx: number) => ({ ...row, uid: idx }))
+      );
       resetColumnsOptions();
 
       // The headers will auto-populate if they match the default values
@@ -357,7 +354,6 @@ const ImportTransactionsModal = () => {
         !amountField.getValue() &&
         !accountField.getValue()
       ) {
-        setImportedData([]);
         setImportedTransactionsTableData([]);
         setAccountNameToAccountIdMap(new Map<string, string>());
         setDuplicateTransactions(
@@ -376,6 +372,7 @@ const ImportTransactionsModal = () => {
 
       const importedTransactions: ITransactionImportTableData[] = csvData.map(
         (row: any) => ({
+          uid: row.uid,
           date: dateField.getValue()
             ? new Date(row[dateField.getValue()!])
             : null,
@@ -397,8 +394,6 @@ const ImportTransactionsModal = () => {
               : null,
         })
       );
-
-      setImportedData(importedTransactions);
 
       if (invertAmountField.getValue()) {
         importedTransactions.forEach((transaction) => {
@@ -558,6 +553,17 @@ const ImportTransactionsModal = () => {
     ]
   );
 
+  const deleteImportedTransaction = (
+    transaction: ITransactionImportTableData
+  ) => {
+    setCsvData((prev) =>
+      prev.filter((row: any) => row.uid !== transaction.uid)
+    );
+    setImportedTransactionsTableData((prev) =>
+      prev.filter((row) => row.uid !== transaction.uid)
+    );
+  };
+
   const setColumn = (column: string, value: string) => {
     switch (column) {
       case "date":
@@ -595,7 +601,7 @@ const ImportTransactionsModal = () => {
   });
 
   const filteredImportedData = React.useMemo(() => {
-    return importedData.filter(
+    return importedTransactionsTableData.filter(
       (t) =>
         !areStringsEqual(
           accountNameToAccountIdMap.get(t.account ?? "") ?? "",
@@ -606,7 +612,7 @@ const ImportTransactionsModal = () => {
           ""
         )
     );
-  }, [importedData, accountNameToAccountIdMap]);
+  }, [importedTransactionsTableData, accountNameToAccountIdMap]);
 
   const onSubmit = async () => {
     if (filteredImportedData.length === 0) {
@@ -672,9 +678,7 @@ const ImportTransactionsModal = () => {
           {importedTransactionsTableData.length > 0 && (
             <TransactionsTable
               tableData={importedTransactionsTableData}
-              setTableData={setImportedTransactionsTableData}
-              setCsvData={setCsvData}
-              setImportedData={setImportedData}
+              delete={deleteImportedTransaction}
             />
           )}
           {filterDuplicatesField.getValue() && (

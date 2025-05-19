@@ -9,18 +9,11 @@ import {
 import { SquareXIcon } from "lucide-react";
 import React from "react";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import {
-  ITransactionImport,
-  ITransactionImportTableData,
-} from "~/models/transaction";
+import { ITransactionImportTableData } from "~/models/transaction";
 
 interface TransactionsTableProps {
-  tableData: ITransactionImport[];
-  setTableData: React.Dispatch<
-    React.SetStateAction<ITransactionImportTableData[]>
-  >;
-  setCsvData: React.Dispatch<React.SetStateAction<unknown[]>>;
-  setImportedData: React.Dispatch<React.SetStateAction<ITransactionImport[]>>;
+  tableData: ITransactionImportTableData[];
+  delete: (transaction: ITransactionImportTableData) => void;
 }
 
 const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
@@ -56,8 +49,9 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                         size="sm"
                         color="red"
                         variant="subtle"
-                        // TODO: Implement delete action
-                        onClick={() => {}}
+                        onClick={() => {
+                          props.delete(row);
+                        }}
                       >
                         <SquareXIcon />
                       </ActionIcon>
