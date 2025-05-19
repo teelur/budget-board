@@ -1,4 +1,12 @@
-import { Checkbox, Divider, Group, Select, Stack } from "@mantine/core";
+import {
+  Card,
+  Checkbox,
+  Divider,
+  Group,
+  Select,
+  Stack,
+  Text,
+} from "@mantine/core";
 import React from "react";
 
 interface ColumnsOptionsProps {
@@ -14,6 +22,16 @@ interface ColumnsOptionsProps {
   setExpensesColumnValue: (value: string | null) => void;
   filterDuplicates: boolean;
   setFilterDuplicates: (filter: boolean) => void;
+  filterByDate: boolean;
+  setFilterByDate: (filter: boolean) => void;
+  filterByDescription: boolean;
+  setFilterByDescription: (filter: boolean) => void;
+  filterByCategory: boolean;
+  setFilterByCategory: (filter: boolean) => void;
+  filterByAmount: boolean;
+  setFilterByAmount: (filter: boolean) => void;
+  filterByAccount: boolean;
+  setFilterByAccount: (filter: boolean) => void;
 }
 
 const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
@@ -59,13 +77,61 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             />
           )}
         </Group>
-        <Checkbox
-          checked={props.filterDuplicates}
-          onChange={(event) => {
-            props.setFilterDuplicates(event.currentTarget.checked);
-          }}
-          label="Filter duplicates"
-        />
+        <Group>
+          <Checkbox
+            checked={props.filterDuplicates}
+            onChange={(event) => {
+              props.setFilterDuplicates(event.currentTarget.checked);
+            }}
+            label="Filter duplicates"
+          />
+          {props.filterDuplicates && (
+            <Card p="0.5rem" radius="md" withBorder>
+              <Stack justify="center">
+                <Text size="sm" fw={600}>
+                  Columns to Match
+                </Text>
+                <Group>
+                  <Checkbox
+                    checked={props.filterByDate}
+                    onChange={(event) =>
+                      props.setFilterByDate(event.currentTarget.checked)
+                    }
+                    label="Date"
+                  />
+                  <Checkbox
+                    checked={props.filterByDescription}
+                    onChange={(event) =>
+                      props.setFilterByDescription(event.currentTarget.checked)
+                    }
+                    label="Description"
+                  />
+                  <Checkbox
+                    checked={props.filterByCategory}
+                    onChange={(event) =>
+                      props.setFilterByCategory(event.currentTarget.checked)
+                    }
+                    label="Category"
+                  />
+                  <Checkbox
+                    checked={props.filterByAmount}
+                    onChange={(event) =>
+                      props.setFilterByAmount(event.currentTarget.checked)
+                    }
+                    label="Amount"
+                  />
+                  <Checkbox
+                    checked={props.filterByAccount}
+                    onChange={(event) =>
+                      props.setFilterByAccount(event.currentTarget.checked)
+                    }
+                    label="Account"
+                  />
+                </Group>
+              </Stack>
+            </Card>
+          )}
+        </Group>
       </Stack>
     </Stack>
   );

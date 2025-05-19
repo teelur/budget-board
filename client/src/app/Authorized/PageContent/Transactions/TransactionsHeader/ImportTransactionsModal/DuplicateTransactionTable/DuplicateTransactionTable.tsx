@@ -6,13 +6,20 @@ import {
   Stack,
   Table,
 } from "@mantine/core";
-import { Undo2Icon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
+import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { ITransactionImportTableData } from "~/models/transaction";
+import { IAccount } from "~/models/account";
+import {
+  ITransaction,
+  ITransactionImportTableData,
+} from "~/models/transaction";
 
 interface DuplicateTransactionTableProps {
-  tableData: ITransactionImportTableData[];
+  tableData: Map<ITransactionImportTableData, ITransaction>;
 }
 
 const DuplicateTransactionTable = (
@@ -21,7 +28,39 @@ const DuplicateTransactionTable = (
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 5;
 
-  if (props.tableData.length === 0) {
+  const { request } = React.useContext<any>(AuthContext);
+
+  const accountsQuery = useQuery({
+    queryKey: ["accounts"],
+    queryFn: async (): Promise<IAccount[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/account",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IAccount[];
+      }
+
+      return [];
+    },
+  });
+
+  const accountIDToNameMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    props.tableData.values().forEach((value) => {
+      const account = accountsQuery.data?.find(
+        (account) => account.id === value.accountID
+      );
+      if (!account) {
+        return;
+      }
+      map.set(value.accountID, account.name);
+    });
+    return map;
+  }, [props.tableData, accountsQuery.data]);
+
+  if (props.tableData.size === 0) {
     return null;
   }
 
@@ -40,7 +79,13 @@ const DuplicateTransactionTable = (
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {props.tableData
+            {Array.from(props.tableData)
+              .map(([importedTransaction, existingTransaction]) => {
+                return {
+                  importedTransaction,
+                  existingTransaction,
+                };
+              })
               .slice(
                 (page - 1) * itemsPerPage,
                 (page - 1) * itemsPerPage + itemsPerPage
@@ -60,22 +105,51 @@ const DuplicateTransactionTable = (
                         </ActionIcon>
                       </Flex>
                     </Table.Td>
-                    <Table.Td>{row.date?.toLocaleDateString()}</Table.Td>
-                    <Table.Td>{row.description}</Table.Td>
                     <Table.Td>
-                      {convertNumberToCurrency(row.amount ?? 0, true)}
+                      {row.importedTransaction.date?.toLocaleDateString()}
                     </Table.Td>
-                    <Table.Td>{row.account}</Table.Td>
+                    <Table.Td>{row.importedTransaction.description}</Table.Td>
+                    <Table.Td>
+                      {convertNumberToCurrency(
+                        row.importedTransaction.amount ?? 0,
+                        true
+                      )}
+                    </Table.Td>
+                    <Table.Td>{row.importedTransaction.account}</Table.Td>
+                  </Table.Tr>
+                  <Table.Tr key={index + props.tableData.size}>
+                    <Table.Td>
+                      <Flex justify="center" align="center">
+                        <CornerDownRightIcon size="1rem" />
+                      </Flex>
+                    </Table.Td>
+                    <Table.Td>
+                      {new Date(
+                        row.existingTransaction.date
+                      ).toLocaleDateString()}
+                    </Table.Td>
+                    <Table.Td>{row.existingTransaction.merchantName}</Table.Td>
+                    <Table.Td>
+                      {convertNumberToCurrency(
+                        row.existingTransaction.amount ?? 0,
+                        true
+                      )}
+                    </Table.Td>
+                    <Table.Td>
+                      {accountIDToNameMap.get(
+                        row.existingTransaction.accountID
+                      )}
+                    </Table.Td>
                   </Table.Tr>
                 </>
               ))}
           </Table.Tbody>
         </Table>
       </Table.ScrollContainer>
-      {props.tableData.length > itemsPerPage && (
+      {props.tableData.size > itemsPerPage && (
         <Flex w="100%" justify="center">
           <Pagination
-            total={Math.ceil(props.tableData.length / itemsPerPage)}
+            total={Math.ceil(props.tableData.size / itemsPerPage)}
             value={page}
             onChange={setPage}
             mt="sm"

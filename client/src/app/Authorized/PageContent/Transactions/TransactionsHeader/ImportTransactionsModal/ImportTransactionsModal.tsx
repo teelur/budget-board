@@ -11,6 +11,7 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import {
+  defaultTransactionCategories,
   ITransaction,
   ITransactionImport,
   ITransactionImportRequest,
@@ -23,6 +24,9 @@ import ColumnsOptions from "./ColumnsOptions/ColumnsOptions";
 import AccountMapping from "./AccountMapping/AccountMapping";
 import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
 import { areDatesEqual } from "~/helpers/datetime";
+import { IAccount } from "~/models/account";
+import { ICategoryResponse } from "~/models/category";
+import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 
 // TODO: There is probably some optimization that can be done here.
 
@@ -40,9 +44,10 @@ const ImportTransactionsModal = () => {
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
     React.useState<Map<string, string>>(new Map<string, string>());
   const [duplicateTransactions, setDuplicateTransactions] = React.useState<
-    ITransactionImportTableData[]
-  >([]);
+    Map<ITransactionImportTableData, ITransaction>
+  >(new Map<ITransactionImportTableData, ITransaction>());
 
+  // CSV Options
   const fileField = useField<File | null>({
     initialValue: null,
     validateOnBlur: true,
@@ -69,6 +74,8 @@ const ImportTransactionsModal = () => {
       return null;
     },
   });
+
+  // Columns Fields
   const dateField = useField<string | null>({
     initialValue: null,
   });
@@ -84,6 +91,8 @@ const ImportTransactionsModal = () => {
   const accountField = useField<string | null>({
     initialValue: null,
   });
+
+  // Columns Options
   const includeExpensesColumnField = useField<boolean>({
     initialValue: false,
   });
@@ -110,7 +119,23 @@ const ImportTransactionsModal = () => {
       return null;
     },
   });
+
   const filterDuplicatesField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByDateField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByDescriptionField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByCategoryField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByAmountField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByAccountField = useField<boolean>({
     initialValue: false,
   });
 
@@ -153,6 +178,42 @@ const ImportTransactionsModal = () => {
     },
   });
 
+  const accountsQuery = useQuery({
+    queryKey: ["accounts"],
+    queryFn: async (): Promise<IAccount[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/account",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IAccount[];
+      }
+
+      return [];
+    },
+  });
+
+  const transactionCategoriesQuery = useQuery({
+    queryKey: ["transactionCategories"],
+    queryFn: async () => {
+      const res = await request({
+        url: "/api/transactionCategory",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as ICategoryResponse[];
+      }
+
+      return undefined;
+    },
+  });
+
+  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
+    transactionCategoriesQuery.data ?? []
+  );
+
   const resetColumnsOptions = () => {
     invertAmountField.reset();
     includeExpensesColumnField.reset();
@@ -160,7 +221,9 @@ const ImportTransactionsModal = () => {
     expensesColumnValueField.reset();
     filterDuplicatesField.reset();
 
-    setDuplicateTransactions([]);
+    setDuplicateTransactions(
+      new Map<ITransactionImportTableData, ITransaction>()
+    );
   };
 
   const resetData = () => {
@@ -297,7 +360,9 @@ const ImportTransactionsModal = () => {
         setImportedData([]);
         setImportedTransactionsTableData([]);
         setAccountNameToAccountIdMap(new Map<string, string>());
-        setDuplicateTransactions([]);
+        setDuplicateTransactions(
+          new Map<ITransactionImportTableData, ITransaction>()
+        );
         return;
       }
 
@@ -375,22 +440,70 @@ const ImportTransactionsModal = () => {
             return transactionDate >= startDate && transactionDate <= endDate;
           }) ?? [];
 
-        const tempDuplicateTransactions: ITransactionImportTableData[] = [];
+        const tempDuplicateTransactions: Map<
+          ITransactionImportTableData,
+          ITransaction
+        > = new Map<ITransactionImportTableData, ITransaction>();
 
         filteredImportedTransactions = importedTransactions.filter(
           (transaction) => {
-            const existingTransaction = transactionsInDateRange.find(
-              (t) =>
-                areDatesEqual(t.date, transaction.date) &&
-                areStringsEqual(
-                  t.merchantName ?? "",
-                  transaction.description ?? ""
-                ) &&
-                t.amount === transaction.amount
-            );
+            const existingTransaction = transactionsInDateRange.find((t) => {
+              let doesTransactionMatch =
+                filterByDateField.getValue() ||
+                filterByDescriptionField.getValue() ||
+                filterByCategoryField.getValue() ||
+                filterByAmountField.getValue() ||
+                filterByAccountField.getValue();
+
+              if (filterByDateField.getValue()) {
+                doesTransactionMatch =
+                  doesTransactionMatch &&
+                  areDatesEqual(t.date, transaction.date);
+              }
+              if (filterByDescriptionField.getValue()) {
+                doesTransactionMatch =
+                  doesTransactionMatch &&
+                  areStringsEqual(
+                    t.merchantName ?? "",
+                    transaction.description ?? ""
+                  );
+              }
+              if (filterByCategoryField.getValue()) {
+                const importedParentCategory = getParentCategory(
+                  transaction.category ?? "",
+                  transactionCategoriesWithCustom
+                );
+                const importedChildCategory = getIsParentCategory(
+                  transaction.category ?? "",
+                  transactionCategoriesWithCustom
+                )
+                  ? ""
+                  : transaction.category ?? "";
+                doesTransactionMatch =
+                  doesTransactionMatch &&
+                  areStringsEqual(t.category ?? "", importedParentCategory) &&
+                  areStringsEqual(t.subcategory ?? "", importedChildCategory);
+              }
+              if (filterByAmountField.getValue()) {
+                doesTransactionMatch =
+                  doesTransactionMatch && t.amount === transaction.amount;
+              }
+              if (filterByAccountField.getValue()) {
+                const importedAccountID = accountsQuery.data?.find((account) =>
+                  areStringsEqual(account.name, transaction.account ?? "")
+                )?.id;
+
+                doesTransactionMatch =
+                  doesTransactionMatch &&
+                  !!importedAccountID &&
+                  areStringsEqual(t.accountID ?? "", importedAccountID);
+              }
+
+              return doesTransactionMatch;
+            });
 
             if (existingTransaction) {
-              tempDuplicateTransactions.push(transaction);
+              tempDuplicateTransactions.set(transaction, existingTransaction);
               return false;
             }
             return true;
@@ -401,7 +514,9 @@ const ImportTransactionsModal = () => {
       } else {
         filteredImportedTransactions = importedTransactions;
 
-        setDuplicateTransactions([]);
+        setDuplicateTransactions(
+          new Map<ITransactionImportTableData, ITransaction>()
+        );
       }
 
       setImportedTransactionsTableData(filteredImportedTransactions);
@@ -435,6 +550,11 @@ const ImportTransactionsModal = () => {
       expensesColumnField.getValue(),
       expensesColumnValueField.getValue(),
       filterDuplicatesField.getValue(),
+      filterByDateField.getValue(),
+      filterByDescriptionField.getValue(),
+      filterByCategoryField.getValue(),
+      filterByAmountField.getValue(),
+      filterByAccountField.getValue(),
     ]
   );
 
@@ -585,6 +705,16 @@ const ImportTransactionsModal = () => {
               setExpensesColumnValue={expensesColumnValueField.setValue}
               filterDuplicates={filterDuplicatesField.getValue()}
               setFilterDuplicates={filterDuplicatesField.setValue}
+              filterByDate={filterByDateField.getValue()}
+              setFilterByDate={filterByDateField.setValue}
+              filterByDescription={filterByDescriptionField.getValue()}
+              setFilterByDescription={filterByDescriptionField.setValue}
+              filterByCategory={filterByCategoryField.getValue()}
+              setFilterByCategory={filterByCategoryField.setValue}
+              filterByAmount={filterByAmountField.getValue()}
+              setFilterByAmount={filterByAmountField.setValue}
+              filterByAccount={filterByAccountField.getValue()}
+              setFilterByAccount={filterByAccountField.setValue}
             />
           )}
           {accountNameToAccountIdMap.size > 0 && (
