@@ -20,6 +20,7 @@ import {
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
+  restoreTransaction: (uid: number) => void;
 }
 
 const DuplicateTransactionTable = (
@@ -27,6 +28,14 @@ const DuplicateTransactionTable = (
 ): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 5;
+
+  const numberOfPages = Math.ceil(props.tableData.size / itemsPerPage);
+
+  React.useEffect(() => {
+    if (page > numberOfPages) {
+      setPage(numberOfPages);
+    }
+  }, [props.tableData]);
 
   const { request } = React.useContext<any>(AuthContext);
 
@@ -98,8 +107,11 @@ const DuplicateTransactionTable = (
                         <ActionIcon
                           size="sm"
                           variant="subtle"
-                          // TODO: Implement undo action
-                          onClick={() => {}}
+                          onClick={() => {
+                            props.restoreTransaction(
+                              row.importedTransaction.uid
+                            );
+                          }}
                         >
                           <Undo2Icon />
                         </ActionIcon>
@@ -149,7 +161,7 @@ const DuplicateTransactionTable = (
       {props.tableData.size > itemsPerPage && (
         <Flex w="100%" justify="center">
           <Pagination
-            total={Math.ceil(props.tableData.size / itemsPerPage)}
+            total={numberOfPages}
             value={page}
             onChange={setPage}
             mt="sm"

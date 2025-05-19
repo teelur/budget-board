@@ -13,7 +13,7 @@ import { ITransactionImportTableData } from "~/models/transaction";
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
-  delete: (transaction: ITransactionImportTableData) => void;
+  delete: (uid: number) => void;
 }
 
 const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
@@ -50,7 +50,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                         color="red"
                         variant="subtle"
                         onClick={() => {
-                          props.delete(row);
+                          props.delete(row.uid);
                         }}
                       >
                         <SquareXIcon />

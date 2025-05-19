@@ -553,15 +553,29 @@ const ImportTransactionsModal = () => {
     ]
   );
 
-  const deleteImportedTransaction = (
-    transaction: ITransactionImportTableData
-  ) => {
-    setCsvData((prev) =>
-      prev.filter((row: any) => row.uid !== transaction.uid)
-    );
+  const deleteImportedTransaction = (uid: number) => {
+    setCsvData((prev) => prev.filter((row: any) => row.uid !== uid));
     setImportedTransactionsTableData((prev) =>
-      prev.filter((row) => row.uid !== transaction.uid)
+      prev.filter((row) => row.uid !== uid)
     );
+  };
+
+  const restoreFilteredTransactions = (uid: number) => {
+    const filteredTransaction = Array.from(duplicateTransactions.keys()).find(
+      (transaction) => transaction.uid === uid
+    );
+
+    if (!filteredTransaction) {
+      return;
+    }
+
+    setImportedTransactionsTableData((prev) => [...prev, filteredTransaction]);
+
+    setDuplicateTransactions((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(filteredTransaction);
+      return newMap;
+    });
   };
 
   const setColumn = (column: string, value: string) => {
@@ -593,6 +607,10 @@ const ImportTransactionsModal = () => {
         data: importedTransactions,
       }),
     onSuccess: async () => {
+      notifications.show({
+        color: "green",
+        message: "Transactions imported successfully",
+      });
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
     onError: (error: AxiosError) => {
@@ -682,7 +700,10 @@ const ImportTransactionsModal = () => {
             />
           )}
           {filterDuplicatesField.getValue() && (
-            <DuplicateTransactionTable tableData={duplicateTransactions} />
+            <DuplicateTransactionTable
+              tableData={duplicateTransactions}
+              restoreTransaction={restoreFilteredTransactions}
+            />
           )}
           {headers.length > 0 && (
             <ColumnsSelect
