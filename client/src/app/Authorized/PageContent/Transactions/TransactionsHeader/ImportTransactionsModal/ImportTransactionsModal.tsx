@@ -424,16 +424,27 @@ const ImportTransactionsModal = () => {
             new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime()
         );
 
-        const transactionsInDateRange =
-          transactionsQuery.data?.filter((transaction) => {
-            const transactionDate = new Date(transaction.date);
-            const startDate = new Date(sortedTableData[0]?.date ?? 0);
-            const endDate = new Date(
-              sortedTableData[sortedTableData.length - 1]?.date ?? 0
-            );
+        // Only filter if there are transactions to compare
+        let transactionsInDateRange: ITransaction[] = [];
+        if (sortedTableData.length > 0 && transactionsQuery.data?.length) {
+          const tableStartDate = new Date(sortedTableData[0]?.date ?? 0);
+          tableStartDate.setHours(0, 0, 0, 0);
 
-            return transactionDate >= startDate && transactionDate <= endDate;
-          }) ?? [];
+          const tableEndDate = new Date(
+            sortedTableData[sortedTableData.length - 1]?.date ?? 0
+          );
+          tableEndDate.setHours(23, 59, 59, 999);
+
+          transactionsInDateRange = transactionsQuery.data.filter(
+            (transaction) => {
+              const transactionDate = new Date(transaction.date);
+              return (
+                transactionDate >= tableStartDate &&
+                transactionDate <= tableEndDate
+              );
+            }
+          );
+        }
 
         const tempDuplicateTransactions: Map<
           ITransactionImportTableData,
