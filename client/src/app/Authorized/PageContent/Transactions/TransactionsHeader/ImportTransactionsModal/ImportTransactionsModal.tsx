@@ -27,8 +27,6 @@ import { IAccount } from "~/models/account";
 import { ICategoryResponse } from "~/models/category";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 
-// TODO: There is probably some optimization that can be done here.
-
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
