@@ -20,14 +20,17 @@ jobs:
 
     strategy:
       matrix:
+        dockerfile:
+          - ./client
+          - ./server
+        platform:
+          - linux/amd64
+          - linux/arm64
         include:
           - dockerfile: ./client
             image: ghcr.io/teelur/budget-board/client
           - dockerfile: ./server
             image: ghcr.io/teelur/budget-board/server
-        platform:
-          - linux/amd64
-          - linux/arm64
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
