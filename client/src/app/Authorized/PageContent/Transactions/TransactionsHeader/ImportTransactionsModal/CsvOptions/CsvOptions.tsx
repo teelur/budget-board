@@ -6,11 +6,18 @@ interface CsvOptionsProps {
   setFileField: (file: File | null) => void;
   delimiterField: string;
   setDelimiterField: (delimiter: string) => void;
-  handleFileChange: () => void;
   resetData: () => void;
 }
 
 const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
+  const [delimiterValue, setDelimiterValue] = React.useState<string>(
+    props.delimiterField
+  );
+
+  React.useEffect(() => {
+    setDelimiterValue(props.delimiterField);
+  }, [props.delimiterField]);
+
   return (
     <Stack gap={0}>
       <Divider label="CSV Options" labelPosition="center" />
@@ -26,18 +33,15 @@ const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
               props.resetData();
             }
             props.setFileField(value);
-            props.handleFileChange();
           }}
           w="100%"
           miw={180}
         />
         <TextInput
-          value={props.delimiterField}
+          value={delimiterValue}
           label="Delimiter"
-          onChange={(event) => {
-            props.setDelimiterField(event.currentTarget.value);
-          }}
-          onBlur={props.handleFileChange}
+          onChange={(event) => setDelimiterValue(event.currentTarget.value)}
+          onBlur={() => props.setDelimiterField(delimiterValue)}
           maxLength={1}
           minLength={1}
           maw={70}

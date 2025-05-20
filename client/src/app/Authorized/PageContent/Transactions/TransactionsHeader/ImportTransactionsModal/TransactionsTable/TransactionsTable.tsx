@@ -9,18 +9,11 @@ import {
 import { SquareXIcon } from "lucide-react";
 import React from "react";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import {
-  ITransactionImport,
-  ITransactionImportTableData,
-} from "~/models/transaction";
+import { ITransactionImportTableData } from "~/models/transaction";
 
 interface TransactionsTableProps {
-  tableData: ITransactionImport[];
-  setTableData: React.Dispatch<
-    React.SetStateAction<ITransactionImportTableData[]>
-  >;
-  setCsvData: React.Dispatch<React.SetStateAction<unknown[]>>;
-  setImportedData: React.Dispatch<React.SetStateAction<ITransactionImport[]>>;
+  tableData: ITransactionImportTableData[];
+  delete: (uid: number) => void;
 }
 
 const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
@@ -57,15 +50,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                         color="red"
                         variant="subtle"
                         onClick={() => {
-                          props.setTableData((prev) =>
-                            prev.filter((_, i) => i !== index)
-                          );
-                          props.setCsvData((prev) =>
-                            prev.filter((_, i) => i !== index)
-                          );
-                          props.setImportedData((prev) =>
-                            prev.filter((_, i) => i !== index)
-                          );
+                          props.delete(row.uid);
                         }}
                       >
                         <SquareXIcon />
@@ -84,7 +69,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
           </Table.Tbody>
         </Table>
       </Table.ScrollContainer>
-      {props.tableData.length > 10 && (
+      {props.tableData.length > itemsPerPage && (
         <Flex w="100%" justify="center">
           <Pagination
             total={Math.ceil(props.tableData.length / itemsPerPage)}

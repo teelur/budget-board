@@ -2,8 +2,8 @@ import { Button, LoadingOverlay, Modal, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { ImportIcon } from "lucide-react";
 import Papa from "papaparse";
 import React from "react";
@@ -11,18 +11,21 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import {
-  ITransactionImport,
+  defaultTransactionCategories,
+  ITransaction,
   ITransactionImportRequest,
   ITransactionImportTableData,
-  TransactionImportTableData,
 } from "~/models/transaction";
 import CsvOptions from "./CsvOptions/CsvOptions";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import ColumnsSelect from "./ColumnsSelect/ColumnsSelect";
 import ColumnsOptions from "./ColumnsOptions/ColumnsOptions";
 import AccountMapping from "./AccountMapping/AccountMapping";
-
-// TODO: There is probably some optimization that can be done here.
+import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
+import { areDatesEqual } from "~/helpers/datetime";
+import { IAccount } from "~/models/account";
+import { ICategoryResponse } from "~/models/category";
+import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -30,14 +33,15 @@ const ImportTransactionsModal = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [headers, setHeaders] = React.useState<string[]>([]);
   const [csvData, setCsvData] = React.useState<unknown[]>([]);
-  const [importedData, setImportedData] = React.useState<ITransactionImport[]>(
-    []
-  );
   const [importedTransactionsTableData, setImportedTransactionsTableData] =
     React.useState<ITransactionImportTableData[]>([]);
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
     React.useState<Map<string, string>>(new Map<string, string>());
+  const [duplicateTransactions, setDuplicateTransactions] = React.useState<
+    Map<ITransactionImportTableData, ITransaction>
+  >(new Map<ITransactionImportTableData, ITransaction>());
 
+  // CSV Options
   const fileField = useField<File | null>({
     initialValue: null,
     validateOnBlur: true,
@@ -64,6 +68,8 @@ const ImportTransactionsModal = () => {
       return null;
     },
   });
+
+  // Columns Fields
   const dateField = useField<string | null>({
     initialValue: null,
   });
@@ -79,6 +85,8 @@ const ImportTransactionsModal = () => {
   const accountField = useField<string | null>({
     initialValue: null,
   });
+
+  // Columns Options
   const includeExpensesColumnField = useField<boolean>({
     initialValue: false,
   });
@@ -106,6 +114,25 @@ const ImportTransactionsModal = () => {
     },
   });
 
+  const filterDuplicatesField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByDateField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByDescriptionField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByCategoryField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByAmountField = useField<boolean>({
+    initialValue: false,
+  });
+  const filterByAccountField = useField<boolean>({
+    initialValue: false,
+  });
+
   const expensesColumnValues: string[] = React.useMemo(() => {
     const columnValues = csvData.map((row: any) => {
       if (!expensesColumnField.getValue()) {
@@ -128,12 +155,76 @@ const ImportTransactionsModal = () => {
     expensesColumnValueField.getValue(),
   ]);
 
+  const { request } = React.useContext<any>(AuthContext);
+  const transactionsQuery = useQuery({
+    queryKey: ["transactions", { getHidden: false }],
+    queryFn: async (): Promise<ITransaction[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/transaction",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as ITransaction[];
+      }
+
+      return [];
+    },
+  });
+
+  const accountsQuery = useQuery({
+    queryKey: ["accounts"],
+    queryFn: async (): Promise<IAccount[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/account",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IAccount[];
+      }
+
+      return [];
+    },
+  });
+
+  const transactionCategoriesQuery = useQuery({
+    queryKey: ["transactionCategories"],
+    queryFn: async () => {
+      const res = await request({
+        url: "/api/transactionCategory",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as ICategoryResponse[];
+      }
+
+      return undefined;
+    },
+  });
+
+  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
+    transactionCategoriesQuery.data ?? []
+  );
+
+  const resetColumnsOptions = () => {
+    invertAmountField.reset();
+    includeExpensesColumnField.reset();
+    expensesColumnField.reset();
+    expensesColumnValueField.reset();
+    filterDuplicatesField.reset();
+
+    setDuplicateTransactions(
+      new Map<ITransactionImportTableData, ITransaction>()
+    );
+  };
+
   const resetData = () => {
     fileField.reset();
 
     setHeaders([]);
     setCsvData([]);
-    setImportedData([]);
     setImportedTransactionsTableData([]);
 
     dateField.reset();
@@ -142,15 +233,12 @@ const ImportTransactionsModal = () => {
     amountField.reset();
     accountField.reset();
 
-    invertAmountField.reset();
-    includeExpensesColumnField.reset();
-    expensesColumnField.reset();
-    expensesColumnValueField.reset();
+    resetColumnsOptions();
 
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
 
-  const processFile = async () => {
+  const importCsvFile = async () => {
     try {
       setIsLoading(true);
       const file = fileField.getValue();
@@ -211,7 +299,10 @@ const ImportTransactionsModal = () => {
         return;
       }
 
-      setCsvData(parsed.data);
+      setCsvData(
+        parsed.data.map((row: any, idx: number) => ({ ...row, uid: idx }))
+      );
+      resetColumnsOptions();
 
       // The headers will auto-populate if they match the default values
       dateField.setValue(
@@ -239,70 +330,21 @@ const ImportTransactionsModal = () => {
           areStringsEqual(header.toLowerCase(), "account")
         ) ?? null
       );
-
-      // The table will auto-populate if any of the headers are defined.
-      if (
-        dateField.getValue() ||
-        descriptionField.getValue() ||
-        categoryField.getValue() ||
-        amountField.getValue() ||
-        accountField.getValue()
-      ) {
-        const importedTransactions: ITransactionImport[] = parsed.data.map(
-          (row: any) => ({
-            date: dateField.getValue()
-              ? new Date(row[dateField.getValue()!])
-              : null,
-            description: descriptionField.getValue()
-              ? row[descriptionField.getValue()!]
-              : null,
-            category: categoryField.getValue()
-              ? row[categoryField.getValue()!]
-              : null,
-            amount: amountField.getValue()
-              ? row[amountField.getValue()!]
-              : null,
-            account: accountField.getValue()
-              ? row[accountField.getValue()!]
-              : null,
-            type: null,
-          })
-        );
-
-        setImportedData(importedTransactions);
-        setImportedTransactionsTableData(
-          importedTransactions.map(
-            (i) => new TransactionImportTableData(i, null)
-          )
-        );
-
-        // The user will need to map the imported account names to existing accounts in the app.
-        if (accountField.getValue()) {
-          const accountNameToAccountIdMap = new Map<string, string>();
-          importedTransactions.forEach((transaction) => {
-            if (
-              transaction.account &&
-              !accountNameToAccountIdMap.has(transaction.account)
-            ) {
-              accountNameToAccountIdMap.set(transaction.account, "");
-            }
-          });
-          setAccountNameToAccountIdMap(accountNameToAccountIdMap);
-        }
-      } else {
-        setImportedData([]);
-        setImportedTransactionsTableData([]);
-        setAccountNameToAccountIdMap(new Map<string, string>());
-      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const parseFileData = (doParseAccounts?: boolean) => {
+  React.useEffect(() => {
+    const runImport = async () => {
+      await importCsvFile();
+    };
+    runImport();
+  }, [fileField.getValue(), delimiterField.getValue()]);
+
+  const buildTableData = () => {
     try {
       setIsLoading(true);
-      // We don't want the table to show a bunch of empty rows if none of the columns are set.
       if (
         !dateField.getValue() &&
         !descriptionField.getValue() &&
@@ -310,10 +352,17 @@ const ImportTransactionsModal = () => {
         !amountField.getValue() &&
         !accountField.getValue()
       ) {
-        setImportedData([]);
         setImportedTransactionsTableData([]);
         setAccountNameToAccountIdMap(new Map<string, string>());
+        setDuplicateTransactions(
+          new Map<ITransactionImportTableData, ITransaction>()
+        );
         return;
+      }
+
+      if (!includeExpensesColumnField.getValue()) {
+        expensesColumnField.reset();
+        expensesColumnValueField.reset();
       }
 
       const includeExpensesColumn = includeExpensesColumnField.getValue();
@@ -321,6 +370,7 @@ const ImportTransactionsModal = () => {
 
       const importedTransactions: ITransactionImportTableData[] = csvData.map(
         (row: any) => ({
+          uid: row.uid,
           date: dateField.getValue()
             ? new Date(row[dateField.getValue()!])
             : null,
@@ -343,74 +393,219 @@ const ImportTransactionsModal = () => {
         })
       );
 
+      if (invertAmountField.getValue()) {
+        importedTransactions.forEach((transaction) => {
+          if (transaction.amount) {
+            transaction.amount *= -1;
+          }
+        });
+      }
+
       const expensesColumnValue = expensesColumnValueField.getValue();
 
       if (includeExpensesColumn && expensesColumnName && expensesColumnValue) {
         importedTransactions.forEach((transaction) => {
-          if (areStringsEqual(transaction.type ?? "", expensesColumnValue)) {
-            transaction.amount = transaction.amount
-              ? transaction.amount * -1
-              : null;
-          }
-        });
-      }
-
-      if (invertAmountField.getValue()) {
-        importedTransactions.forEach((transaction) => {
-          if (transaction.amount) {
-            transaction.amount = transaction.amount
-              ? transaction.amount * -1
-              : null;
-          }
-        });
-      }
-
-      setImportedData(importedTransactions);
-      setImportedTransactionsTableData(importedTransactions);
-
-      if (doParseAccounts) {
-        const accountNameToAccountIdMap = new Map<string, string>();
-        importedTransactions.forEach((transaction) => {
           if (
-            transaction.account &&
-            !accountNameToAccountIdMap.has(transaction.account)
+            transaction.type &&
+            transaction.type.toString() === expensesColumnValue &&
+            transaction.amount
           ) {
-            accountNameToAccountIdMap.set(transaction.account, "");
+            transaction.amount *= -1;
           }
         });
-        setAccountNameToAccountIdMap(accountNameToAccountIdMap);
       }
+
+      let filteredImportedTransactions;
+      if (filterDuplicatesField.getValue()) {
+        const sortedTableData = importedTransactions.toSorted(
+          (a, b) =>
+            new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime()
+        );
+
+        // Only filter if there are transactions to compare
+        let transactionsInDateRange: ITransaction[] = [];
+        if (sortedTableData.length > 0 && transactionsQuery.data?.length) {
+          const tableStartDate = new Date(sortedTableData[0]?.date ?? 0);
+          tableStartDate.setHours(0, 0, 0, 0);
+
+          const tableEndDate = new Date(
+            sortedTableData[sortedTableData.length - 1]?.date ?? 0
+          );
+          tableEndDate.setHours(23, 59, 59, 999);
+
+          transactionsInDateRange = transactionsQuery.data.filter(
+            (transaction) => {
+              const transactionDate = new Date(transaction.date);
+              return (
+                transactionDate >= tableStartDate &&
+                transactionDate <= tableEndDate
+              );
+            }
+          );
+        }
+
+        const tempDuplicateTransactions: Map<
+          ITransactionImportTableData,
+          ITransaction
+        > = new Map<ITransactionImportTableData, ITransaction>();
+
+        filteredImportedTransactions = importedTransactions.filter(
+          (transaction) => {
+            const existingTransaction = transactionsInDateRange.find((t) => {
+              let doesTransactionMatch =
+                filterByDateField.getValue() ||
+                filterByDescriptionField.getValue() ||
+                filterByCategoryField.getValue() ||
+                filterByAmountField.getValue() ||
+                filterByAccountField.getValue();
+
+              if (filterByDateField.getValue()) {
+                doesTransactionMatch =
+                  doesTransactionMatch &&
+                  areDatesEqual(t.date, transaction.date);
+              }
+              if (filterByDescriptionField.getValue()) {
+                doesTransactionMatch =
+                  doesTransactionMatch &&
+                  areStringsEqual(
+                    t.merchantName ?? "",
+                    transaction.description ?? ""
+                  );
+              }
+              if (filterByCategoryField.getValue()) {
+                const importedParentCategory = getParentCategory(
+                  transaction.category ?? "",
+                  transactionCategoriesWithCustom
+                );
+                const importedChildCategory = getIsParentCategory(
+                  transaction.category ?? "",
+                  transactionCategoriesWithCustom
+                )
+                  ? ""
+                  : transaction.category ?? "";
+                doesTransactionMatch =
+                  doesTransactionMatch &&
+                  areStringsEqual(t.category ?? "", importedParentCategory) &&
+                  areStringsEqual(t.subcategory ?? "", importedChildCategory);
+              }
+              if (filterByAmountField.getValue()) {
+                doesTransactionMatch =
+                  doesTransactionMatch && t.amount === transaction.amount;
+              }
+              if (filterByAccountField.getValue()) {
+                const importedAccountID = accountsQuery.data?.find((account) =>
+                  areStringsEqual(account.name, transaction.account ?? "")
+                )?.id;
+
+                doesTransactionMatch =
+                  doesTransactionMatch &&
+                  !!importedAccountID &&
+                  areStringsEqual(t.accountID ?? "", importedAccountID);
+              }
+
+              return doesTransactionMatch;
+            });
+
+            if (existingTransaction) {
+              tempDuplicateTransactions.set(transaction, existingTransaction);
+              return false;
+            }
+            return true;
+          }
+        );
+
+        setDuplicateTransactions(tempDuplicateTransactions);
+      } else {
+        filteredImportedTransactions = importedTransactions;
+
+        setDuplicateTransactions(
+          new Map<ITransactionImportTableData, ITransaction>()
+        );
+      }
+
+      setImportedTransactionsTableData(filteredImportedTransactions);
+
+      const accountNameToAccountIdMap = new Map<string, string>();
+
+      filteredImportedTransactions.forEach((transaction) => {
+        if (
+          transaction.account &&
+          !accountNameToAccountIdMap.has(transaction.account)
+        ) {
+          accountNameToAccountIdMap.set(transaction.account, "");
+        }
+      });
+      setAccountNameToAccountIdMap(accountNameToAccountIdMap);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  React.useEffect(
+    () => buildTableData(),
+    [
+      dateField.getValue(),
+      descriptionField.getValue(),
+      categoryField.getValue(),
+      amountField.getValue(),
+      accountField.getValue(),
+      invertAmountField.getValue(),
+      includeExpensesColumnField.getValue(),
+      expensesColumnField.getValue(),
+      expensesColumnValueField.getValue(),
+      filterDuplicatesField.getValue(),
+      filterByDateField.getValue(),
+      filterByDescriptionField.getValue(),
+      filterByCategoryField.getValue(),
+      filterByAmountField.getValue(),
+      filterByAccountField.getValue(),
+    ]
+  );
+
+  const deleteImportedTransaction = (uid: number) => {
+    setCsvData((prev) => prev.filter((row: any) => row.uid !== uid));
+    setImportedTransactionsTableData((prev) =>
+      prev.filter((row) => row.uid !== uid)
+    );
+  };
+
+  const restoreFilteredTransactions = (uid: number) => {
+    const filteredTransaction = Array.from(duplicateTransactions.keys()).find(
+      (transaction) => transaction.uid === uid
+    );
+
+    if (!filteredTransaction) {
+      return;
+    }
+
+    setImportedTransactionsTableData((prev) => [...prev, filteredTransaction]);
+
+    setDuplicateTransactions((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(filteredTransaction);
+      return newMap;
+    });
   };
 
   const setColumn = (column: string, value: string) => {
     switch (column) {
       case "date":
         dateField.setValue(value);
-        parseFileData();
         break;
       case "description":
         descriptionField.setValue(value);
-        parseFileData();
         break;
       case "category":
         categoryField.setValue(value);
-        parseFileData();
         break;
       case "amount":
         amountField.setValue(value);
-        parseFileData();
         break;
       case "account":
         accountField.setValue(value);
-        parseFileData(true);
         break;
     }
   };
-
-  const { request } = React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
   const doImportMutation = useMutation({
@@ -421,6 +616,10 @@ const ImportTransactionsModal = () => {
         data: importedTransactions,
       }),
     onSuccess: async () => {
+      notifications.show({
+        color: "green",
+        message: "Transactions imported successfully",
+      });
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
     onError: (error: AxiosError) => {
@@ -429,7 +628,7 @@ const ImportTransactionsModal = () => {
   });
 
   const filteredImportedData = React.useMemo(() => {
-    return importedData.filter(
+    return importedTransactionsTableData.filter(
       (t) =>
         !areStringsEqual(
           accountNameToAccountIdMap.get(t.account ?? "") ?? "",
@@ -440,7 +639,7 @@ const ImportTransactionsModal = () => {
           ""
         )
     );
-  }, [importedData, accountNameToAccountIdMap]);
+  }, [importedTransactionsTableData, accountNameToAccountIdMap]);
 
   const onSubmit = async () => {
     if (filteredImportedData.length === 0) {
@@ -501,15 +700,18 @@ const ImportTransactionsModal = () => {
             setFileField={fileField.setValue}
             delimiterField={delimiterField.getValue()}
             setDelimiterField={delimiterField.setValue}
-            handleFileChange={processFile}
             resetData={resetData}
           />
           {importedTransactionsTableData.length > 0 && (
             <TransactionsTable
               tableData={importedTransactionsTableData}
-              setTableData={setImportedTransactionsTableData}
-              setCsvData={setCsvData}
-              setImportedData={setImportedData}
+              delete={deleteImportedTransaction}
+            />
+          )}
+          {filterDuplicatesField.getValue() && (
+            <DuplicateTransactionTable
+              tableData={duplicateTransactions}
+              restoreTransaction={restoreFilteredTransactions}
             />
           )}
           {headers.length > 0 && (
@@ -535,7 +737,18 @@ const ImportTransactionsModal = () => {
               expensesColumnValues={expensesColumnValues}
               expensesColumnValue={expensesColumnValueField.getValue()}
               setExpensesColumnValue={expensesColumnValueField.setValue}
-              handleAmountChange={parseFileData}
+              filterDuplicates={filterDuplicatesField.getValue()}
+              setFilterDuplicates={filterDuplicatesField.setValue}
+              filterByDate={filterByDateField.getValue()}
+              setFilterByDate={filterByDateField.setValue}
+              filterByDescription={filterByDescriptionField.getValue()}
+              setFilterByDescription={filterByDescriptionField.setValue}
+              filterByCategory={filterByCategoryField.getValue()}
+              setFilterByCategory={filterByCategoryField.setValue}
+              filterByAmount={filterByAmountField.getValue()}
+              setFilterByAmount={filterByAmountField.setValue}
+              filterByAccount={filterByAccountField.getValue()}
+              setFilterByAccount={filterByAccountField.setValue}
             />
           )}
           {accountNameToAccountIdMap.size > 0 && (
