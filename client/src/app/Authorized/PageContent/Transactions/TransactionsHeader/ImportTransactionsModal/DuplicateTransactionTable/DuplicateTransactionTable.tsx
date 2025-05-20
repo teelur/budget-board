@@ -32,7 +32,7 @@ const DuplicateTransactionTable = (
   const numberOfPages = Math.ceil(props.tableData.size / itemsPerPage);
 
   React.useEffect(() => {
-    if (page > numberOfPages) {
+    if (props.tableData.size > 0 && page > numberOfPages) {
       setPage(numberOfPages);
     }
   }, [props.tableData]);
