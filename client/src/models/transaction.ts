@@ -354,7 +354,7 @@ export const defaultTransactionCategories: ICategory[] = [
     parent: "income",
   },
   {
-    value: "Reimburstments",
+    value: "Reimbursements",
     parent: "income",
   },
   {

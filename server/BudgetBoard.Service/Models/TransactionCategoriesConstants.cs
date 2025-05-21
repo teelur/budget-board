@@ -68,7 +68,7 @@ public static class TransactionCategoriesConstants
         new CategoryBase {Value = "Bonus", Parent = "Income"},
         new CategoryBase {Value = "Interest Income", Parent = "Income"},
         new CategoryBase {Value = "Paycheck", Parent = "Income"},
-        new CategoryBase {Value = "Reimburstments", Parent = "Income"},
+        new CategoryBase {Value = "Reimbursements", Parent = "Income"},
         new CategoryBase {Value = "Tax Return", Parent = "Income"},
         new CategoryBase {Value = "Investments", Parent = ""},
         new CategoryBase {Value = "Buy", Parent = "Investments"},
