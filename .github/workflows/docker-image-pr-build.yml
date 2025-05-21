@@ -12,9 +12,6 @@ jobs:
         dockerfile:
           - ./client
           - ./server
-        platform:
-          - linux/amd64
-          - linux/arm64
         include:
           - dockerfile: ./client
             image: ghcr.io/teelur/budget-board/client
@@ -39,10 +36,10 @@ jobs:
 
       - name: Build the Docker image
         id: push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.dockerfile }}
           push: false
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
