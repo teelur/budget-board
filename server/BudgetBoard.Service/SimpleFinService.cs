@@ -1,13 +1,13 @@
-﻿using BudgetBoard.Database.Data;
+﻿using System.Globalization;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 
 namespace BudgetBoard.Service;
 
@@ -20,7 +20,8 @@ public class SimpleFinService(
     ITransactionService transactionService,
     IBalanceService balanceService,
     IGoalService goalService,
-    IApplicationUserService applicationUserService) : ISimpleFinService
+    IApplicationUserService applicationUserService
+) : ISimpleFinService
 {
     public const long UNIX_MONTH = 2629743;
     public const long UNIX_WEEK = 604800;
@@ -31,28 +32,28 @@ public class SimpleFinService(
         TypeInfoResolver = new DefaultJsonTypeInfoResolver
         {
             Modifiers =
-           {
-                 static typeInfo =>
-                 {
-                       if (typeInfo.Type == typeof(ISimpleFinAccountData))
-                       {
-                             typeInfo.CreateObject = () => new SimpleFinAccountData();
-                       }
-                       else if (typeInfo.Type == typeof(ISimpleFinAccount))
-                       {
-                             typeInfo.CreateObject = () => new SimpleFinAccount();
-                       }
-                       else if (typeInfo.Type == typeof(ISimpleFinTransaction))
-                       {
-                         typeInfo.CreateObject = () => new SimpleFinTransaction();
-                       }
-                       else if (typeInfo.Type == typeof(ISimpleFinOrganization))
-                       {
-                         typeInfo.CreateObject = () => new SimpleFinOrganization();
-                       }
-                 }
-           }
-        }
+            {
+                static typeInfo =>
+                {
+                    if (typeInfo.Type == typeof(ISimpleFinAccountData))
+                    {
+                        typeInfo.CreateObject = () => new SimpleFinAccountData();
+                    }
+                    else if (typeInfo.Type == typeof(ISimpleFinAccount))
+                    {
+                        typeInfo.CreateObject = () => new SimpleFinAccount();
+                    }
+                    else if (typeInfo.Type == typeof(ISimpleFinTransaction))
+                    {
+                        typeInfo.CreateObject = () => new SimpleFinTransaction();
+                    }
+                    else if (typeInfo.Type == typeof(ISimpleFinOrganization))
+                    {
+                        typeInfo.CreateObject = () => new SimpleFinOrganization();
+                    }
+                },
+            },
+        },
     };
 
     private readonly IHttpClientFactory _clientFactory = clientFactory;
@@ -70,6 +71,11 @@ public class SimpleFinService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
+        if (string.IsNullOrEmpty(userData.AccessToken))
+        {
+            throw new BudgetBoardServiceException("SimpleFIN key is not configured for this user.");
+        }
+
         long startDate;
         if (userData.LastSync == DateTime.MinValue)
         {
@@ -79,7 +85,8 @@ public class SimpleFinService(
         else
         {
             var oneMonthAgo = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - UNIX_MONTH;
-            var lastSyncWithBuffer = ((DateTimeOffset)userData.LastSync).ToUnixTimeSeconds() - UNIX_WEEK;
+            var lastSyncWithBuffer =
+                ((DateTimeOffset)userData.LastSync).ToUnixTimeSeconds() - UNIX_WEEK;
 
             startDate = Math.Min(oneMonthAgo, lastSyncWithBuffer);
         }
@@ -96,10 +103,10 @@ public class SimpleFinService(
 
         await SyncGoalsAsync(userData);
 
-        await _applicationUserService.UpdateApplicationUserAsync(userData.Id, new ApplicationUserUpdateRequest
-        {
-            LastSync = DateTime.Now.ToUniversalTime(),
-        });
+        await _applicationUserService.UpdateApplicationUserAsync(
+            userData.Id,
+            new ApplicationUserUpdateRequest { LastSync = DateTime.Now.ToUniversalTime() }
+        );
 
         return simpleFinData.Errors;
     }
@@ -136,9 +143,7 @@ public class SimpleFinService(
         byte[] data = Convert.FromBase64String(setupToken);
         string decodedString = Encoding.UTF8.GetString(data);
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            decodedString);
+        var request = new HttpRequestMessage(HttpMethod.Post, decodedString);
         var client = _clientFactory.CreateClient();
         var response = await client.SendAsync(request);
 
@@ -151,22 +156,27 @@ public class SimpleFinService(
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext.ApplicationUsers
+            users = await _userDataContext
+                .ApplicationUsers.Include(u => u.Accounts)
+                .ThenInclude(a => a.Transactions)
                 .Include(u => u.Accounts)
-                    .ThenInclude(a => a.Transactions)
-                .Include(u => u.Accounts)
-                    .ThenInclude(a => a.Balances)
+                .ThenInclude(a => a.Balances)
                 .Include(u => u.Institutions)
                 .Include(u => u.Goals)
-                    .ThenInclude(g => g.Accounts)
+                .ThenInclude(g => g.Accounts)
                 .AsSplitQuery()
                 .ToListAsync();
             foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while retrieving the user data: {ExceptionMessage}", ex.Message);
-            throw new BudgetBoardServiceException("An error occurred while retrieving the user data.");
+            _logger.LogError(
+                "An error occurred while retrieving the user data: {ExceptionMessage}",
+                ex.Message
+            );
+            throw new BudgetBoardServiceException(
+                "An error occurred while retrieving the user data."
+            );
         }
 
         if (foundUser == null)
@@ -188,19 +198,26 @@ public class SimpleFinService(
         return new SimpleFinData(auth, baseUrl);
     }
 
-    private async Task<HttpResponseMessage> GetSimpleFinAccountData(string accessToken, long? startDate)
+    private async Task<HttpResponseMessage> GetSimpleFinAccountData(
+        string accessToken,
+        long? startDate
+    )
     {
         SimpleFinData data = GetUrlCredentials(accessToken);
 
-        var startArg = startDate.HasValue ? "?start-date=" + startDate.Value.ToString() : string.Empty;
+        var startArg = startDate.HasValue
+            ? "?start-date=" + startDate.Value.ToString()
+            : string.Empty;
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            data.BaseUrl + "/accounts" + startArg);
+        var request = new HttpRequestMessage(HttpMethod.Get, data.BaseUrl + "/accounts" + startArg);
 
         var client = _clientFactory.CreateClient();
         var byteArray = Encoding.ASCII.GetBytes(data.Auth);
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue(
+                "Basic",
+                Convert.ToBase64String(byteArray)
+            );
 
         return await client.SendAsync(request);
     }
@@ -210,18 +227,25 @@ public class SimpleFinService(
         var response = await GetSimpleFinAccountData(accessToken, startDate);
         var jsonString = await response.Content.ReadAsStringAsync();
 
-        return JsonSerializer.Deserialize<ISimpleFinAccountData>(jsonString, s_readOptions) ?? new SimpleFinAccountData();
+        return JsonSerializer.Deserialize<ISimpleFinAccountData>(jsonString, s_readOptions)
+            ?? new SimpleFinAccountData();
     }
 
-    private async Task<bool> IsAccessTokenValid(string accessToken) => (await GetSimpleFinAccountData(accessToken, null)).IsSuccessStatusCode;
+    private async Task<bool> IsAccessTokenValid(string accessToken) =>
+        (await GetSimpleFinAccountData(accessToken, null)).IsSuccessStatusCode;
 
-    private async Task SyncInstitutionsAsync(ApplicationUser userData, IEnumerable<ISimpleFinAccount> accountsData)
+    private async Task SyncInstitutionsAsync(
+        ApplicationUser userData,
+        IEnumerable<ISimpleFinAccount> accountsData
+    )
     {
         var institutions = accountsData.Select(a => a.Org).Distinct();
         foreach (var institution in institutions)
         {
-            if (institution == null) continue;
-            if (userData.Institutions.Any(i => i.Name == institution.Name)) continue;
+            if (institution == null)
+                continue;
+            if (userData.Institutions.Any(i => i.Name == institution.Name))
+                continue;
 
             var newInstitution = new InstitutionCreateRequest
             {
@@ -232,7 +256,10 @@ public class SimpleFinService(
         }
     }
 
-    private async Task SyncAccountsAsync(ApplicationUser userData, IEnumerable<ISimpleFinAccount> accountsData)
+    private async Task SyncAccountsAsync(
+        ApplicationUser userData,
+        IEnumerable<ISimpleFinAccount> accountsData
+    )
     {
         // This is a temporary fix for a bug that didn't assign account source for manual accounts.
         // I will remove this later once we can be sure this won't affect anyone.
@@ -240,12 +267,17 @@ public class SimpleFinService(
         {
             if (string.IsNullOrEmpty(account.Source))
             {
-                account.Source = account.SyncID != null ? AccountSource.SimpleFIN : AccountSource.Manual;
+                account.Source =
+                    account.SyncID != null ? AccountSource.SimpleFIN : AccountSource.Manual;
             }
         }
         foreach (var accountData in accountsData)
         {
-            var institutionId = userData.Institutions.FirstOrDefault(institution => institution.Name == accountData.Org.Name)?.ID;
+            var institutionId = userData
+                .Institutions.FirstOrDefault(institution =>
+                    institution.Name == accountData.Org.Name
+                )
+                ?.ID;
 
             var foundAccount = userData.Accounts.SingleOrDefault(a => a.SyncID == accountData.Id);
             if (foundAccount != null)
@@ -273,11 +305,18 @@ public class SimpleFinService(
         }
     }
 
-    private async Task SyncTransactionsAsync(ApplicationUser userData, string syncId, IEnumerable<ISimpleFinTransaction> transactionsData)
+    private async Task SyncTransactionsAsync(
+        ApplicationUser userData,
+        string syncId,
+        IEnumerable<ISimpleFinTransaction> transactionsData
+    )
     {
-        if (!transactionsData.Any()) return;
+        if (!transactionsData.Any())
+            return;
 
-        var userAccount = userData.Accounts.FirstOrDefault(a => (a.SyncID ?? string.Empty).Equals(syncId));
+        var userAccount = userData.Accounts.FirstOrDefault(a =>
+            (a.SyncID ?? string.Empty).Equals(syncId)
+        );
         var userTransactions = userAccount?.Transactions.OrderByDescending(t => t.Date).ToList();
 
         // User account should never be null here, but let's not make a bad problem worse.
@@ -285,7 +324,11 @@ public class SimpleFinService(
         {
             foreach (var transactionData in transactionsData)
             {
-                if ((userTransactions ?? []).Any(t => (t.SyncID ?? string.Empty).Equals(transactionData.Id)))
+                if (
+                    (userTransactions ?? []).Any(t =>
+                        (t.SyncID ?? string.Empty).Equals(transactionData.Id)
+                    )
+                )
                 {
                     // Transaction already exists.
                     continue;
@@ -296,7 +339,9 @@ public class SimpleFinService(
                     {
                         SyncID = transactionData.Id,
                         Amount = decimal.Parse(transactionData.Amount),
-                        Date = transactionData.Pending ? DateTime.UnixEpoch.AddSeconds(transactionData.TransactedAt) : DateTime.UnixEpoch.AddSeconds(transactionData.Posted),
+                        Date = transactionData.Pending
+                            ? DateTime.UnixEpoch.AddSeconds(transactionData.TransactedAt)
+                            : DateTime.UnixEpoch.AddSeconds(transactionData.Posted),
                         MerchantName = transactionData.Description,
                         Source = TransactionSource.SimpleFin.Value,
                         AccountID = userAccount.ID,
@@ -308,7 +353,11 @@ public class SimpleFinService(
         }
     }
 
-    private async Task SyncBalancesAsync(ApplicationUser userData, string syncId, ISimpleFinAccount accountData)
+    private async Task SyncBalancesAsync(
+        ApplicationUser userData,
+        string syncId,
+        ISimpleFinAccount accountData
+    )
     {
         var foundAccount = userData.Accounts.SingleOrDefault(a => a.SyncID == syncId);
 
@@ -320,12 +369,17 @@ public class SimpleFinService(
              * We should only update the balance if account has no balances or the
              * last balance is older than the last balance in the SimpleFin data.
              */
-            if (!balanceDates.Any() ||
-                balanceDates.Max() < DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate))
+            if (
+                !balanceDates.Any()
+                || balanceDates.Max() < DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate)
+            )
             {
                 var newBalance = new BalanceCreateRequest
                 {
-                    Amount = decimal.Parse(accountData.Balance, CultureInfo.InvariantCulture.NumberFormat),
+                    Amount = decimal.Parse(
+                        accountData.Balance,
+                        CultureInfo.InvariantCulture.NumberFormat
+                    ),
                     DateTime = DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate),
                     AccountID = foundAccount.ID,
                 };
@@ -347,15 +401,15 @@ public class SimpleFinService(
                 continue;
             }
 
-            var accountsTotalBalance = goal.Accounts
-                .Sum(a => a.Balances
-                    .OrderByDescending(b => b.DateTime)
-                    .FirstOrDefault()?.Amount ?? 0);
+            var accountsTotalBalance = goal.Accounts.Sum(a =>
+                a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+            );
 
-            var completeDate = goal.Accounts
-                .SelectMany(a => a.Balances)
+            var completeDate = goal
+                .Accounts.SelectMany(a => a.Balances)
                 .OrderByDescending(b => b.DateTime)
-                .FirstOrDefault()?.DateTime;
+                .FirstOrDefault()
+                ?.DateTime;
 
             if (!completeDate.HasValue)
             {

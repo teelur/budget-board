@@ -1,3 +1,5 @@
+import classes from "./PageContent.module.css";
+
 import { Flex } from "@mantine/core";
 import Budgets from "./Budgets/Budgets";
 import Dashboard from "./Dashboard/Dashboard";
@@ -38,7 +40,7 @@ const PageContent = (props: PageContentProps): React.ReactNode => {
   };
 
   return (
-    <Flex align="flex-start" justify="center" h="100%" w="100%">
+    <Flex className={classes.pageContentContainer}>
       {getPageContent(props.currentPage)}
     </Flex>
   );

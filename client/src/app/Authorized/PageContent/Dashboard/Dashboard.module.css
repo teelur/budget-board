@@ -1,6 +1,8 @@
-.root {
+.dashboardContainer {
   width: 100%;
   max-width: 1400px;
+  height: 100%;
+  flex: 1;
 }
 
 .mainContent {
@@ -8,9 +10,9 @@
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  flex-grow: 1;
   flex-wrap: nowrap;
   gap: 12px;
+  flex: 1;
 
   @media (max-width: $mantine-breakpoint-sm) {
     flex-direction: column;
