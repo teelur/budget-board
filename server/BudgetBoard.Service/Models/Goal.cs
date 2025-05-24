@@ -1,5 +1,5 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
@@ -12,6 +12,7 @@ public interface IGoalCreateRequest
     decimal? MonthlyContribution { get; set; }
     IEnumerable<Guid> AccountIds { get; set; }
 }
+
 public class GoalCreateRequest : IGoalCreateRequest
 {
     public required string Name { get; set; }
@@ -30,7 +31,6 @@ public class GoalCreateRequest : IGoalCreateRequest
         InitialAmount = null;
         MonthlyContribution = null;
         AccountIds = [];
-
     }
 }
 
@@ -44,6 +44,7 @@ public interface IGoalUpdateRequest
     decimal? MonthlyContribution { get; set; }
     bool IsMonthlyContributionEditable { get; set; }
 }
+
 public class GoalUpdateRequest : IGoalUpdateRequest
 {
     public Guid ID { get; set; }
@@ -74,11 +75,12 @@ public interface IGoalResponse
     decimal InitialAmount { get; set; }
     decimal MonthlyContribution { get; set; }
     bool IsMonthlyContributionEditable { get; set; }
-    decimal? EstimatedInterestRate { get; set; }
+    decimal? InterestRate { get; set; }
     DateTime? Completed { get; set; }
     IEnumerable<IAccountResponse> Accounts { get; set; }
     Guid UserID { get; set; }
 }
+
 public class GoalResponse : IGoalResponse
 {
     public Guid ID { get; set; }
@@ -89,7 +91,7 @@ public class GoalResponse : IGoalResponse
     public decimal InitialAmount { get; set; }
     public decimal MonthlyContribution { get; set; }
     public bool IsMonthlyContributionEditable { get; set; }
-    public decimal? EstimatedInterestRate { get; set; }
+    public decimal? InterestRate { get; set; }
     public DateTime? Completed { get; set; }
     public IEnumerable<IAccountResponse> Accounts { get; set; }
     public Guid UserID { get; set; }
@@ -105,7 +107,7 @@ public class GoalResponse : IGoalResponse
         InitialAmount = 0;
         MonthlyContribution = 0;
         IsMonthlyContributionEditable = false;
-        EstimatedInterestRate = null;
+        InterestRate = null;
         Completed = null;
         Accounts = [];
         UserID = Guid.NewGuid();
@@ -121,7 +123,7 @@ public class GoalResponse : IGoalResponse
         InitialAmount = goal.InitialAmount;
         MonthlyContribution = goal.MonthlyContribution ?? 0;
         IsMonthlyContributionEditable = goal.MonthlyContribution != null;
-        EstimatedInterestRate = null;
+        InterestRate = null;
         Completed = goal.Completed;
         Accounts = goal.Accounts.Select(a => new AccountResponse(a));
         UserID = goal.UserID;

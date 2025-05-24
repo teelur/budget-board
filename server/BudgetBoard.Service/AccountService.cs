@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class AccountService(ILogger<IAccountService> logger, UserDataContext userDataContext) : IAccountService
+public class AccountService(ILogger<IAccountService> logger, UserDataContext userDataContext)
+    : IAccountService
 {
     private readonly ILogger<IAccountService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
@@ -46,14 +47,17 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
             HideTransactions = account.HideTransactions,
             HideAccount = account.HideAccount,
             Source = account.Source ?? AccountSource.Manual,
-            UserID = userData.Id
+            UserID = userData.Id,
         };
 
         userData.Accounts.Add(newAccount);
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IAccountResponse>> ReadAccountsAsync(Guid userGuid, Guid accountGuid = default)
+    public async Task<IEnumerable<IAccountResponse>> ReadAccountsAsync(
+        Guid userGuid,
+        Guid accountGuid = default
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         if (accountGuid != default)
@@ -62,7 +66,9 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
             if (account == null)
             {
                 _logger.LogError("Attempt to access account that does not exist.");
-                throw new BudgetBoardServiceException("The account you are trying to access does not exist.");
+                throw new BudgetBoardServiceException(
+                    "The account you are trying to access does not exist."
+                );
             }
 
             return [new AccountResponse(account)];
@@ -78,7 +84,9 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
         if (account == null)
         {
             _logger.LogError("Attempt to edit account that does not exist.");
-            throw new BudgetBoardServiceException("The account you are trying to edit does not exist.");
+            throw new BudgetBoardServiceException(
+                "The account you are trying to edit does not exist."
+            );
         }
 
         account.Name = editedAccount.Name;
@@ -86,6 +94,7 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
         account.Subtype = editedAccount.Subtype;
         account.HideTransactions = editedAccount.HideTransactions;
         account.HideAccount = editedAccount.HideAccount;
+        account.InterestRate = editedAccount.InterestRate;
 
         await _userDataContext.SaveChangesAsync();
     }
@@ -97,7 +106,9 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
         if (account == null)
         {
             _logger.LogError("Attempt to delete account that does not exist.");
-            throw new BudgetBoardServiceException("The account you are trying to delete does not exist.");
+            throw new BudgetBoardServiceException(
+                "The account you are trying to delete does not exist."
+            );
         }
 
         account.Deleted = DateTime.Now.ToUniversalTime();
@@ -119,14 +130,20 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task RestoreAccountAsync(Guid userGuid, Guid guid, bool restoreTransactions = false)
+    public async Task RestoreAccountAsync(
+        Guid userGuid,
+        Guid guid,
+        bool restoreTransactions = false
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var account = userData.Accounts.FirstOrDefault(a => a.ID == guid);
         if (account == null)
         {
             _logger.LogError("Attempt to restore account that does not exist.");
-            throw new BudgetBoardServiceException("The account you are trying to restore does not exist.");
+            throw new BudgetBoardServiceException(
+                "The account you are trying to restore does not exist."
+            );
         }
 
         account.Deleted = null;
@@ -147,7 +164,10 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task OrderAccountsAsync(Guid userGuid, IEnumerable<IAccountIndexRequest> orderedAccounts)
+    public async Task OrderAccountsAsync(
+        Guid userGuid,
+        IEnumerable<IAccountIndexRequest> orderedAccounts
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         foreach (var orderedAccount in orderedAccounts)
@@ -156,7 +176,9 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
             if (account == null)
             {
                 _logger.LogError("Attempt to set index for account that does not exist.");
-                throw new BudgetBoardServiceException("The account you are trying to set the index for does not exist.");
+                throw new BudgetBoardServiceException(
+                    "The account you are trying to set the index for does not exist."
+                );
             }
 
             account.Index = orderedAccount.Index;
@@ -171,8 +193,8 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext.ApplicationUsers
-                .Include(u => u.Accounts)
+            users = await _userDataContext
+                .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
@@ -185,8 +207,13 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while retrieving the user data: {ExceptionMessage}", ex.Message);
-            throw new BudgetBoardServiceException("An error occurred while retrieving the user data.");
+            _logger.LogError(
+                "An error occurred while retrieving the user data: {ExceptionMessage}",
+                ex.Message
+            );
+            throw new BudgetBoardServiceException(
+                "An error occurred while retrieving the user data."
+            );
         }
 
         if (foundUser == null)

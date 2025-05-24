@@ -13,6 +13,7 @@ public class Account
     public bool HideAccount { get; set; } = false;
     public DateTime? Deleted { get; set; } = null;
     public int Index { get; set; } = 0;
+    public decimal? InterestRate { get; set; } = null;
     public string Source { get; set; } = string.Empty;
     public ICollection<Transaction> Transactions { get; set; } = [];
     public ICollection<Goal> Goals { get; set; } = [];
