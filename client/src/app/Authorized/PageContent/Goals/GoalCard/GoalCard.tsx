@@ -155,15 +155,17 @@ const GoalCard = (props: GoalCardProps): React.ReactNode => {
                 isSelected={isSelected}
                 editCell={doEditGoal.mutate}
               />
-              {props.includeInterest && props.goal.estimatedInterestRate && (
-                <Badge variant="light">
-                  {props.goal.estimatedInterestRate.toLocaleString(undefined, {
-                    style: "percent",
-                    minimumFractionDigits: 2,
-                  })}{" "}
-                  APR
-                </Badge>
-              )}
+              {props.includeInterest &&
+                props.goal.interestRate &&
+                props.goal.interestRate > 0 && (
+                  <Badge variant="light">
+                    {props.goal.interestRate.toLocaleString(undefined, {
+                      style: "percent",
+                      minimumFractionDigits: 2,
+                    })}{" "}
+                    APR
+                  </Badge>
+                )}
               {/* This is an escape hatch in case the sync does not catch it */}
               {isSelected && percentComplete >= 100 && (
                 <Button

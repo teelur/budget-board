@@ -23,6 +23,7 @@ export interface IAccountUpdateRequest {
   subtype: string;
   hideTransactions: boolean;
   hideAccount: boolean;
+  interestRate: number | null;
 }
 
 export interface IAccountIndexRequest {
@@ -43,6 +44,7 @@ export interface IAccount {
   hideAccount: boolean;
   deleted: Date | null;
   index: number;
+  interestRate: number | null;
   source: string;
   userID: string;
 }

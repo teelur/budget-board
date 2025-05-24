@@ -10,6 +10,7 @@ import {
   Flex,
   Group,
   LoadingOverlay,
+  NumberInput,
   TextInput,
   useCombobox,
 } from "@mantine/core";
@@ -27,6 +28,7 @@ import React from "react";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
+import { useField } from "@mantine/form";
 
 interface AccountSettingsCardProps {
   account: IAccount;
@@ -45,6 +47,17 @@ const AccountSettingsCard = (
   const [accountSubType, setAccountSubType] = React.useState(
     props.account.subtype
   );
+
+  const accountInterestRateField = useField<string | number | undefined>({
+    initialValue: (props.account.interestRate ?? 0) * 100,
+    validate: (value) => {
+      if (((value ?? 0) as number) < 0) {
+        return "Interest rate must be greater than or equal to 0";
+      }
+      return null;
+    },
+  });
+
   const [accountHideAccount, setAccountHideAccount] = React.useState(
     props.account.hideAccount
   );
@@ -65,6 +78,8 @@ const AccountSettingsCard = (
         subtype: accountSubType,
         hideTransactions: accountHideTransactions,
         hideAccount: accountHideAccount,
+        interestRate:
+          ((accountInterestRateField.getValue() ?? 0) as number) / 100,
       };
 
       return await request({
@@ -106,7 +121,7 @@ const AccountSettingsCard = (
             align="center"
             justify="space-between"
             w="100%"
-            gap={15}
+            gap="0.5rem"
           >
             <Flex
               display="flex"
@@ -114,7 +129,7 @@ const AccountSettingsCard = (
               align="center"
               justify="space-between"
               w="100%"
-              gap={10}
+              gap="0.5rem"
             >
               <TextInput
                 w={{ base: "100%", sm: "60%" }}
@@ -143,11 +158,20 @@ const AccountSettingsCard = (
               align="center"
               justify="space-between"
               w="100%"
-              gap={10}
+              gap="0.5rem"
             >
               {props.account.source?.length > 0 && (
                 <Badge>{props.account.source}</Badge>
               )}
+              <NumberInput
+                maw="85px"
+                {...accountInterestRateField.getInputProps()}
+                onBlur={() => {
+                  doUpdateAccount.mutate();
+                }}
+                suffix="%"
+                decimalScale={2}
+              />
               <Checkbox
                 label="Hide Account?"
                 checked={accountHideAccount}

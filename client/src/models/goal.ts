@@ -28,7 +28,7 @@ export interface IGoalResponse {
   initialAmount: number;
   monthlyContribution: number;
   isMonthlyContributionEditable: boolean;
-  estimatedInterestRate: number | null;
+  interestRate: number | null;
   completed: Date | null;
   accounts: IAccount[];
   userID: string;
