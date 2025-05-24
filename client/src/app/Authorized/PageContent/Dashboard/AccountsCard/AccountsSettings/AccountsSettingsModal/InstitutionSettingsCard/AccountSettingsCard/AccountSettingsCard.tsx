@@ -121,7 +121,7 @@ const AccountSettingsCard = (
             align="center"
             justify="space-between"
             w="100%"
-            gap={15}
+            gap="0.5rem"
           >
             <Flex
               display="flex"
@@ -129,7 +129,7 @@ const AccountSettingsCard = (
               align="center"
               justify="space-between"
               w="100%"
-              gap={10}
+              gap="0.5rem"
             >
               <TextInput
                 w={{ base: "100%", sm: "60%" }}
@@ -158,13 +158,13 @@ const AccountSettingsCard = (
               align="center"
               justify="space-between"
               w="100%"
-              gap={10}
+              gap="0.5rem"
             >
               {props.account.source?.length > 0 && (
                 <Badge>{props.account.source}</Badge>
               )}
               <NumberInput
-                maw="80px"
+                maw="85px"
                 {...accountInterestRateField.getInputProps()}
                 onBlur={() => {
                   doUpdateAccount.mutate();
