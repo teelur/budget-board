@@ -209,9 +209,14 @@ public class GoalServiceTests
 
     // This test is created with an APR of 48%. The expected values were validated with an online calculator.
     [Theory]
-    [InlineData(false, 19)]
-    [InlineData(true, 33)]
+    [InlineData(-54080, -60000, 0, false, 19)]
+    [InlineData(-54080, -60000, 0, true, 33)]
+    [InlineData(32000, 0, 600000, false, 190)]
+    [InlineData(32000, 0, 600000, true, 47)]
     public async Task ReadGoalsAsync_WhenNoCompleteDate_ShouldEstimateCompleteDate(
+        int balance,
+        int goalInitialAmount,
+        int goalTargetAmount,
         bool includeInterest,
         int monthsToPayoff
     )
@@ -229,24 +234,12 @@ public class GoalServiceTests
 
         var balance0 = balanceFaker.Generate();
         balance0.AccountID = account.ID;
-        balance0.Amount = -54080;
+        balance0.Amount = balance;
         balance0.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
-        var balance1 = balanceFaker.Generate();
-        balance1.AccountID = account.ID;
-        balance1.Amount = -52000;
-        balance1.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-1);
+        account.Balances = [balance0];
 
-        helper.UserDataContext.Balances.Add(balance1);
-
-        var balance2 = balanceFaker.Generate();
-        balance2.AccountID = account.ID;
-        balance2.Amount = -50000;
-        balance2.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-2);
-
-        account.Balances = [balance0, balance1, balance2];
-
-        helper.UserDataContext.Balances.AddRange([balance0, balance1, balance2]);
+        helper.UserDataContext.Balances.Add(balance0);
         helper.UserDataContext.Accounts.Add(account);
 
         var goalFaker = new GoalFaker();
@@ -255,8 +248,8 @@ public class GoalServiceTests
 
         goal.Accounts = [account];
         goal.CompleteDate = null;
-        goal.Amount = 0;
-        goal.InitialAmount = -60000;
+        goal.Amount = goalTargetAmount;
+        goal.InitialAmount = goalInitialAmount;
         goal.MonthlyContribution = 3000;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -280,9 +273,14 @@ public class GoalServiceTests
 
     // This test is created with an APR of 48%. The expected values were validated with an online calculator.
     [Theory]
-    [InlineData(false, 901)]
-    [InlineData(true, 2390)]
+    [InlineData(-54080, -60000, 0, false, 901)]
+    [InlineData(-54080, -60000, 0, true, 2390)]
+    [InlineData(32000, 0, 600000, false, 9466)]
+    [InlineData(32000, 0, 600000, true, 1106)]
     public async Task ReadGoalsAsync_WhenNoMonthlyContribution_ShouldEstimateMonthlyContribution(
+        int balance,
+        int goalInitialAmount,
+        int goalTargetAmount,
         bool includeInterest,
         decimal monthlyContribution
     )
@@ -300,24 +298,12 @@ public class GoalServiceTests
 
         var balance0 = balanceFaker.Generate();
         balance0.AccountID = account.ID;
-        balance0.Amount = -54080;
+        balance0.Amount = balance;
         balance0.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
-        var balance1 = balanceFaker.Generate();
-        balance1.AccountID = account.ID;
-        balance1.Amount = -52000;
-        balance1.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-1);
+        account.Balances = [balance0];
 
-        helper.UserDataContext.Balances.Add(balance1);
-
-        var balance2 = balanceFaker.Generate();
-        balance2.AccountID = account.ID;
-        balance2.Amount = -50000;
-        balance2.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-2);
-
-        account.Balances = [balance0, balance1, balance2];
-
-        helper.UserDataContext.Balances.AddRange([balance0, balance1, balance2]);
+        helper.UserDataContext.Balances.Add(balance0);
         helper.UserDataContext.Accounts.Add(account);
 
         var goalFaker = new GoalFaker();
@@ -326,8 +312,8 @@ public class GoalServiceTests
 
         goal.Accounts = [account];
         goal.CompleteDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddYears(5);
-        goal.Amount = 0;
-        goal.InitialAmount = -60000;
+        goal.Amount = goalTargetAmount;
+        goal.InitialAmount = goalInitialAmount;
         goal.MonthlyContribution = null;
 
         helper.UserDataContext.Goals.Add(goal);

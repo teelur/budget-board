@@ -293,7 +293,20 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
                 }
                 else
                 {
-                    // TODO: Figure out this calculation
+                    numberOfMonthsLeftWithInterest = Math.Ceiling(
+                        Math.Log(
+                            (double)(
+                                (
+                                    (goal.MonthlyContribution ?? 0)
+                                    + monthlyInterestRate * goal.Amount
+                                )
+                                / (
+                                    (goal.MonthlyContribution ?? 0)
+                                    + monthlyInterestRate * totalBalance
+                                )
+                            )
+                        ) / Math.Log(1 + (double)monthlyInterestRate)
+                    );
                 }
             }
 
@@ -349,7 +362,7 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
         var monthlyPaymentsWithoutInterest = amountLeft / numberOfMonthsLeft;
 
         // For now, we will just apply this to loans.
-        if (includeInterest && goal.Amount == 0)
+        if (includeInterest)
         {
             var monthlyInterestRate = CalculateAverageInterestRate(goal) / 12;
             decimal monthlyPaymentsWithInterest = monthlyPaymentsWithoutInterest;
@@ -376,7 +389,23 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
                 }
                 else
                 {
-                    // TODO: Figure out this calculation.
+                    monthlyPaymentsWithInterest =
+                        (
+                            monthlyInterestRate
+                            * (
+                                goal.Amount
+                                - totalBalance
+                                    * (decimal)
+                                        Math.Pow(
+                                            (double)(1 + monthlyInterestRate),
+                                            numberOfMonthsLeft
+                                        )
+                            )
+                        )
+                        / (
+                            (decimal)Math.Pow((double)(1 + monthlyInterestRate), numberOfMonthsLeft)
+                            - 1
+                        );
                 }
             }
 
