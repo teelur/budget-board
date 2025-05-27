@@ -2,8 +2,8 @@
 
 public class UserSettings()
 {
-    public Guid ID { get; set; } = Guid.NewGuid();
+    public Guid ID { get; set; }
     public char Currency { get; set; } = '$';
-    public Guid UserID { get; set; } = Guid.Empty;
-    public ApplicationUser? User { get; set; }
+    public Guid UserID { get; set; }
+    public ApplicationUser User { get; set; } = null!;
 }

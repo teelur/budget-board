@@ -28,7 +28,8 @@ namespace BudgetBoard.Database.Data
 
                 u.HasOne(e => e.UserSettings)
                     .WithOne(e => e.User)
-                    .HasForeignKey<UserSettings>(e => e.UserID);
+                    .HasForeignKey<UserSettings>(e => e.UserID)
+                    .IsRequired();
 
                 u.ToTable("User");
             });

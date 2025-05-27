@@ -670,8 +670,7 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Navigation("TransactionCategories");
 
-                    b.Navigation("UserSettings")
-                        .IsRequired();
+                    b.Navigation("UserSettings");
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Institution", b =>

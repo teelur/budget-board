@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    [Migration("20250525225811_AddUserSettings")]
+    [Migration("20250527035142_AddUserSettings")]
     partial class AddUserSettings
     {
         /// <inheritdoc />
@@ -673,8 +673,7 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Navigation("TransactionCategories");
 
-                    b.Navigation("UserSettings")
-                        .IsRequired();
+                    b.Navigation("UserSettings");
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Institution", b =>
