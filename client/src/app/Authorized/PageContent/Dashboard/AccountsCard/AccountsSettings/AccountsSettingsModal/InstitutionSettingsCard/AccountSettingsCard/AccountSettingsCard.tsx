@@ -164,12 +164,12 @@ const AccountSettingsCard = (
                 <Badge>{props.account.source}</Badge>
               )}
               <NumberInput
-                maw="85px"
+                maw="110px"
                 {...accountInterestRateField.getInputProps()}
                 onBlur={() => {
                   doUpdateAccount.mutate();
                 }}
-                suffix="%"
+                suffix="% APR"
                 decimalScale={2}
               />
               <Checkbox
