@@ -1,40 +1,41 @@
 ﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
 public interface IUserSettingsResponse
 {
-    char Currency { get; set; }
+    string Currency { get; set; }
 }
 
 public class UserSettingsResponse : IUserSettingsResponse
 {
-    public char Currency { get; set; }
+    public string Currency { get; set; }
 
     [JsonConstructor]
     public UserSettingsResponse()
     {
-        Currency = '$';
+        Currency = Database.Models.Currency.USD.ToString();
     }
 
-    public UserSettingsResponse(Database.Models.UserSettings userSettings)
+    public UserSettingsResponse(UserSettings userSettings)
     {
-        Currency = userSettings.Currency;
+        Currency = userSettings.Currency.ToString();
     }
 }
 
 public interface IUserSettingsUpdateRequest
 {
-    public char Currency { get; set; }
+    public string Currency { get; set; }
 }
 
 public class UserSettingsUpdateRequest : IUserSettingsUpdateRequest
 {
-    public char Currency { get; set; }
+    public string Currency { get; set; }
 
     [JsonConstructor]
     public UserSettingsUpdateRequest()
     {
-        Currency = '$';
+        Currency = Database.Models.Currency.USD.ToString();
     }
 }

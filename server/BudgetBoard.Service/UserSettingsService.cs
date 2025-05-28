@@ -18,10 +18,24 @@ public class UserSettingsService(
     public async Task<IUserSettingsResponse> ReadUserSettingsAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        // Ensure that the user has settings initialized
+        if (userData.UserSettings == null)
+        {
+            var userSettings = new UserSettings { UserID = userData.Id };
+
+            userData.UserSettings = userSettings;
+            _userDataContext.UserSettings.Add(userSettings);
+            await _userDataContext.SaveChangesAsync();
+        }
+
         return new UserSettingsResponse(userData.UserSettings);
     }
 
-    public async Task UpdateUserSettingsAsync(Guid userGuid, IUserSettingsUpdateRequest user)
+    public async Task UpdateUserSettingsAsync(
+        Guid userGuid,
+        IUserSettingsUpdateRequest userSettingsUpdateRequest
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
@@ -33,7 +47,19 @@ public class UserSettingsService(
             throw new BudgetBoardServiceException("User settings not found.");
         }
 
-        userSettings.Currency = user.Currency;
+        if (Enum.TryParse(userSettingsUpdateRequest.Currency, true, out Currency currencyEnum))
+        {
+            userSettings.Currency = currencyEnum;
+        }
+        else
+        {
+            _logger.LogError(
+                "Invalid currency provided: {Currency} for user with ID {UserId}",
+                userSettingsUpdateRequest.Currency,
+                userGuid
+            );
+            throw new BudgetBoardServiceException("Invalid currency provided.");
+        }
 
         await _userDataContext.SaveChangesAsync();
     }

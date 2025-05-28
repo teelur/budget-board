@@ -1,4 +1,5 @@
 using Bogus;
+using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
@@ -9,11 +10,15 @@ using Moq;
 
 namespace BudgetBoard.IntegrationTests;
 
+[Collection("IntegrationTests")]
 public class UserSettingsServiceTests
 {
     private readonly Mock<ILogger<IApplicationUserService>> _loggerMock;
     private readonly Faker<UserSettingsUpdateRequest> _userSettingsUpdateRequestFaker =
-        new Faker<UserSettingsUpdateRequest>().RuleFor(s => s.Currency, f => f.Random.Char());
+        new Faker<UserSettingsUpdateRequest>().RuleFor(
+            s => s.Currency,
+            f => f.Random.Enum<Currency>().ToString()
+        );
 
     public UserSettingsServiceTests()
     {
@@ -44,7 +49,7 @@ public class UserSettingsServiceTests
 
         // Assert
         result.Should().BeOfType<UserSettingsResponse>();
-        result.Currency.Should().Be(userSettings.Currency);
+        result.Currency.Should().Be(userSettings.Currency.ToString());
     }
 
     [Fact]
@@ -71,6 +76,26 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
+    public async Task ReadUserSettingsAsync_WhenNoSettings_ShouldCreateDefault()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var userSettingsService = new UserSettingsService(
+            _loggerMock.Object,
+            helper.UserDataContext
+        );
+
+        helper.demoUser.UserSettings = null;
+
+        // Act
+        var result = await userSettingsService.ReadUserSettingsAsync(helper.demoUser.Id);
+
+        // Assert
+        result.Should().BeOfType<UserSettingsResponse>();
+        result.Currency.Should().Be(Currency.USD.ToString()); // Default currency
+    }
+
+    [Fact]
     public async Task UpdateUserSettingsAsync_UpdatesCurrency_WhenUserExists()
     {
         // Arrange
@@ -79,6 +104,10 @@ public class UserSettingsServiceTests
             _loggerMock.Object,
             helper.UserDataContext
         );
+
+        helper.demoUser.UserSettings ??= new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
 
         var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
 
@@ -89,7 +118,9 @@ public class UserSettingsServiceTests
         );
 
         // Assert
-        helper.demoUser.UserSettings.Should().BeEquivalentTo(userSettingsUpdateRequest);
+        helper
+            .demoUser.UserSettings.Currency.Should()
+            .Be(Enum.Parse<Currency>(userSettingsUpdateRequest.Currency));
     }
 
     [Fact]

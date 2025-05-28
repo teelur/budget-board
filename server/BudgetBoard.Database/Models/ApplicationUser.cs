@@ -24,5 +24,5 @@ public class ApplicationUser : IdentityUser<Guid>, IApplicationUser
     public ICollection<Goal> Goals { get; set; } = [];
     public ICollection<Category> TransactionCategories { get; set; } = [];
     public ICollection<Institution> Institutions { get; set; } = [];
-    public UserSettings? UserSettings { get; set; } = new();
+    public UserSettings? UserSettings { get; set; } = null!;
 }

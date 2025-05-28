@@ -1,4 +1,5 @@
 ﻿using System;
+using BudgetBoard.Database.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,12 +12,15 @@ namespace BudgetBoard.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:currency", "aud,cad,chf,cny,eur,gbp,inr,jpy,nzd,sek,usd");
+
             migrationBuilder.CreateTable(
                 name: "UserSettings",
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uuid", nullable: false),
-                    Currency = table.Column<char>(type: "character(1)", nullable: false),
+                    Currency = table.Column<Currency>(type: "currency", nullable: false),
                     UserID = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -42,6 +46,9 @@ namespace BudgetBoard.Database.Migrations
         {
             migrationBuilder.DropTable(
                 name: "UserSettings");
+
+            migrationBuilder.AlterDatabase()
+                .OldAnnotation("Npgsql:Enum:currency", "aud,cad,chf,cny,eur,gbp,inr,jpy,nzd,sek,usd");
         }
     }
 }
