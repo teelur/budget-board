@@ -21,6 +21,8 @@ interface SpendingChartProps {
 }
 
 const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
+  const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
+
   const { request } = React.useContext<any>(AuthContext);
 
   const userSettingsQuery = useQuery({
@@ -39,7 +41,10 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
     },
   });
 
-  const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
+  const chartData = React.useMemo(
+    () => buildTransactionChartData(sortedMonths, props.transactions),
+    [sortedMonths, props.transactions]
+  );
 
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
@@ -52,11 +57,6 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
       </Group>
     );
   }
-
-  const chartData = React.useMemo(
-    () => buildTransactionChartData(sortedMonths, props.transactions),
-    [sortedMonths, props.transactions]
-  );
 
   return (
     <AreaChart
