@@ -17,6 +17,7 @@ import {
   ITransaction,
   ITransactionImportTableData,
 } from "~/models/transaction";
+import { IUserSettings } from "~/models/userSettings";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -38,6 +39,22 @@ const DuplicateTransactionTable = (
   }, [props.tableData]);
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
@@ -122,10 +139,13 @@ const DuplicateTransactionTable = (
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.description}</Table.Td>
                     <Table.Td>
-                      {convertNumberToCurrency(
-                        row.importedTransaction.amount ?? 0,
-                        true
-                      )}
+                      {userSettingsQuery.isPending
+                        ? null
+                        : convertNumberToCurrency(
+                            row.importedTransaction.amount ?? 0,
+                            true,
+                            userSettingsQuery.data?.currency ?? "USD"
+                          )}
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.account}</Table.Td>
                   </Table.Tr>
@@ -142,10 +162,13 @@ const DuplicateTransactionTable = (
                     </Table.Td>
                     <Table.Td>{row.existingTransaction.merchantName}</Table.Td>
                     <Table.Td>
-                      {convertNumberToCurrency(
-                        row.existingTransaction.amount ?? 0,
-                        true
-                      )}
+                      {userSettingsQuery.isPending
+                        ? null
+                        : convertNumberToCurrency(
+                            row.existingTransaction.amount ?? 0,
+                            true,
+                            userSettingsQuery.data?.currency ?? "USD"
+                          )}
                     </Table.Td>
                     <Table.Td>
                       {accountIDToNameMap.get(

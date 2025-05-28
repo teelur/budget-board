@@ -6,6 +6,10 @@ import React from "react";
 import { ICategory } from "~/models/category";
 import { getFormattedCategoryValue } from "~/helpers/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useQuery } from "@tanstack/react-query";
+import { IUserSettings } from "~/models/userSettings";
+import { AxiosResponse } from "axios";
 
 interface TransactionCardProps {
   transaction: ITransaction;
@@ -15,6 +19,24 @@ interface TransactionCardProps {
 const UnselectedTransactionCard = (
   props: TransactionCardProps
 ): React.ReactNode => {
+  const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const categoryValue =
     (props.transaction.subcategory ?? "").length > 0
       ? props.transaction.subcategory ?? ""
@@ -63,17 +85,23 @@ const UnselectedTransactionCard = (
           className={classes.amountContainer}
           w={{ base: "100%", xs: "120px" }}
         >
-          <Text
-            style={{
-              color:
-                props.transaction.amount < 0
-                  ? "var(--mantine-color-red-6)"
-                  : "var(--mantine-color-green-6)",
-              fontWeight: 600,
-            }}
-          >
-            {convertNumberToCurrency(props.transaction.amount, true)}
-          </Text>
+          {userSettingsQuery.isPending ? null : (
+            <Text
+              style={{
+                color:
+                  props.transaction.amount < 0
+                    ? "var(--mantine-color-red-6)"
+                    : "var(--mantine-color-green-6)",
+                fontWeight: 600,
+              }}
+            >
+              {convertNumberToCurrency(
+                props.transaction.amount,
+                true,
+                userSettingsQuery.data?.currency ?? "USD"
+              )}
+            </Text>
+          )}
         </Flex>
       </Flex>
     </Flex>

@@ -11,13 +11,51 @@
  */
 export const convertNumberToCurrency = (
   number: number,
-  shouldIncludeCents?: boolean
+  shouldIncludeCents: boolean,
+  currency: string
 ) => {
   // Adding 0 to avoid -0 for the output.
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency,
     maximumFractionDigits: shouldIncludeCents ? 2 : 0,
     minimumFractionDigits: shouldIncludeCents ? 2 : 0,
   }).format(number + 0);
+};
+
+/**
+ * Returns the currency symbol for a given currency code.
+ *
+ * @param currency - The ISO 4217 currency code (e.g., "USD", "EUR").
+ * @returns The corresponding currency symbol if defined, otherwise returns the currency code itself.
+ *
+ * @example
+ * getCurrencySymbol("USD"); // Returns "$"
+ * getCurrencySymbol("EUR"); // Returns "€"
+ * getCurrencySymbol("INR"); // Returns "INR"
+ */
+export const getCurrencySymbol = (currency?: string): string => {
+  switch (currency) {
+    case "USD":
+      return "$";
+    case "EUR":
+      return "€";
+    case "GBP":
+      return "£";
+    case "JPY":
+      return "¥";
+    case "AUD":
+      return "A$";
+    case "CAD":
+      return "C$";
+    case "CHF":
+      return "CHF";
+    case "CNY":
+      return "¥"; // Chinese Yuan uses the same symbol as JPY
+    case null:
+    case undefined:
+      return ""; // Return an empty string if no currency is provided
+    default:
+      return currency; // Return the currency code if no symbol is defined
+  }
 };

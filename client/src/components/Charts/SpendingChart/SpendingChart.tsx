@@ -7,6 +7,10 @@ import {
 } from "~/helpers/charts";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Group, Skeleton, Text } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { IUserSettings } from "~/models/userSettings";
+import { AxiosResponse } from "axios";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -17,6 +21,24 @@ interface SpendingChartProps {
 }
 
 const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
+  const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
 
   if (props.isPending) {
@@ -43,7 +65,15 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
       series={buildTransactionChartSeries(sortedMonths)}
       data={chartData}
       dataKey="day"
-      valueFormatter={(value) => convertNumberToCurrency(value, true)}
+      valueFormatter={(value) =>
+        userSettingsQuery.isPending
+          ? ""
+          : convertNumberToCurrency(
+              value,
+              true,
+              userSettingsQuery.data?.currency ?? "USD"
+            )
+      }
       withLegend
       tooltipAnimationDuration={200}
       curveType="monotone"

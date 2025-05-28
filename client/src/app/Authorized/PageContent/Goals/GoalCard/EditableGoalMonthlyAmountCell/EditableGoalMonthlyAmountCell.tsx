@@ -1,7 +1,7 @@
 import { sumTransactionsForGoalForMonth } from "~/helpers/goals";
 import classes from "./EditableGoalMonthlyAmountCell.module.css";
 
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import { Flex, NumberInput, Text } from "@mantine/core";
 import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
 import React from "react";
@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { IUserSettings } from "~/models/userSettings";
 
 interface EditableGoalMonthlyAmountCellProps {
   goal: IGoalResponse;
@@ -25,6 +26,22 @@ const EditableGoalMonthlyAmountCell = (
   );
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   const transactionsForMonthQuery = useQuery({
     queryKey: [
@@ -77,33 +94,43 @@ const EditableGoalMonthlyAmountCell = (
 
   return (
     <Flex className={classes.container}>
-      <Text
-        style={{
-          color:
-            goalMonthlyContributionAmount < props.goal.monthlyContribution
-              ? "var(--mantine-color-red-6)"
-              : "var(--mantine-color-green-6)",
-          fontWeight: 600,
-        }}
-      >
-        {convertNumberToCurrency(goalMonthlyContributionAmount)}
-      </Text>
+      {userSettingsQuery.isPending ? null : (
+        <Text
+          style={{
+            color:
+              goalMonthlyContributionAmount < props.goal.monthlyContribution
+                ? "var(--mantine-color-red-6)"
+                : "var(--mantine-color-green-6)",
+            fontWeight: 600,
+          }}
+        >
+          {convertNumberToCurrency(
+            goalMonthlyContributionAmount,
+            false,
+            userSettingsQuery.data?.currency ?? "USD"
+          )}
+        </Text>
+      )}
       <Text>of</Text>
       {props.isSelected && props.goal.isMonthlyContributionEditable ? (
         <Flex onClick={(e) => e.stopPropagation()}>
           <NumberInput
             maw={100}
             min={0}
-            prefix="$"
+            prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
             thousandSeparator=","
             onChange={setGoalAmountValue}
             onBlur={onInputBlur}
             value={goalAmountValue}
           />
         </Flex>
-      ) : (
+      ) : userSettingsQuery.isPending ? null : (
         <Text fw={600}>
-          {convertNumberToCurrency(props.goal.monthlyContribution)}
+          {convertNumberToCurrency(
+            props.goal.monthlyContribution,
+            false,
+            userSettingsQuery.data?.currency ?? "USD"
+          )}
         </Text>
       )}
       <Text>this month</Text>

@@ -4,13 +4,14 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { ActionIcon, Card, Group, LoadingOverlay, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { CornerDownRight, PlusIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { roundAwayFromZero } from "~/helpers/utils";
+import { IUserSettings } from "~/models/userSettings";
 
 interface UnbudgetChildCardProps {
   selectedDate?: Date;
@@ -21,6 +22,22 @@ interface UnbudgetChildCardProps {
 
 const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   const queryClient = useQueryClient();
   const doAddBudget = useMutation({
@@ -56,12 +73,15 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
             {props.category}
           </Text>
           <Group gap="sm">
-            <Text className={classes.text} fw={600}>
-              {convertNumberToCurrency(
-                props.amount * (props.isIncome ? 1 : -1),
-                false
-              )}
-            </Text>
+            {userSettingsQuery.isPending ? null : (
+              <Text className={classes.text} fw={600}>
+                {convertNumberToCurrency(
+                  props.amount * (props.isIncome ? 1 : -1),
+                  false,
+                  userSettingsQuery.data?.currency ?? "USD"
+                )}
+              </Text>
+            )}
             {props.selectedDate && props.category !== "Uncategorized" && (
               <ActionIcon
                 size="sm"

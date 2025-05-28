@@ -11,10 +11,10 @@ import {
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { TrashIcon } from "lucide-react";
 import { ICategory } from "~/models/category";
 import SplitTransaction from "../SplitTransaction/SplitTransaction";
@@ -22,6 +22,8 @@ import { useForm } from "@mantine/form";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { DatePickerInput } from "@mantine/dates";
 import CategorySelect from "~/components/CategorySelect";
+import { getCurrencySymbol } from "~/helpers/currency";
+import { IUserSettings } from "~/models/userSettings";
 
 interface TransactionCardProps {
   transaction: ITransaction;
@@ -59,6 +61,22 @@ const SelectedTransactionCard = (
   });
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   const queryClient = useQueryClient();
   const doEditTransaction = useMutation({
@@ -251,7 +269,7 @@ const SelectedTransactionCard = (
                         });
                       }
                     }}
-                    prefix="$"
+                    prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
                     decimalScale={2}
                     fixedDecimalScale
                   />

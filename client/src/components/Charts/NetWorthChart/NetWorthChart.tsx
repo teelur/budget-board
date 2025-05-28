@@ -8,6 +8,10 @@ import { DateValue } from "@mantine/dates";
 import { IAccount } from "~/models/account";
 import { IBalance } from "~/models/balance";
 import React from "react";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useQuery } from "@tanstack/react-query";
+import { IUserSettings } from "~/models/userSettings";
+import { AxiosResponse } from "axios";
 
 interface NetWorthChartProps {
   accounts: IAccount[];
@@ -18,6 +22,24 @@ interface NetWorthChartProps {
 }
 
 const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
+  const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
   }
@@ -62,7 +84,15 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
       }}
       lineProps={{ type: "linear" }}
       tooltipAnimationDuration={200}
-      valueFormatter={(value) => convertNumberToCurrency(value, true)}
+      valueFormatter={(value) =>
+        userSettingsQuery.isPending
+          ? ""
+          : convertNumberToCurrency(
+              value,
+              true,
+              userSettingsQuery.data?.currency ?? "USD"
+            )
+      }
     />
   );
 };

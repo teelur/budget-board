@@ -15,10 +15,12 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
 import { ICategory } from "~/models/category";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
+import { IUserSettings } from "~/models/userSettings";
+import { getCurrencySymbol } from "~/helpers/currency";
 
 interface AddBudgetProps {
   date: Date;
@@ -43,6 +45,23 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   });
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const queryClient = useQueryClient();
   const doCreateBudget = useMutation({
     mutationFn: async (newBudget: IBudgetCreateRequest[]) =>
@@ -102,7 +121,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
               key={form.key("limit")}
               placeholder="Limit"
               w="100%"
-              prefix="$"
+              prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               min={0}
               decimalScale={2}
               thousandSeparator=","
