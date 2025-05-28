@@ -7,10 +7,8 @@ namespace BudgetBoard.Database.Data
 {
     public class UserDataContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
-        public UserDataContext(DbContextOptions<UserDataContext> options) :
-            base(options)
-        {
-        }
+        public UserDataContext(DbContextOptions<UserDataContext> options)
+            : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,55 +16,58 @@ namespace BudgetBoard.Database.Data
 
             modelBuilder.Entity<ApplicationUser>(u =>
             {
-                u.HasMany(e => e.Accounts)
-                .WithOne(e => e.User)
-                .HasForeignKey(e => e.UserID);
+                u.HasMany(e => e.Accounts).WithOne(e => e.User).HasForeignKey(e => e.UserID);
 
-                u.HasMany(e => e.Budgets)
-                .WithOne(e => e.User)
-                .HasForeignKey(e => e.UserID);
+                u.HasMany(e => e.Budgets).WithOne(e => e.User).HasForeignKey(e => e.UserID);
 
-                u.HasMany(e => e.Goals)
-                .WithOne(e => e.User)
-                .HasForeignKey(e => e.UserID);
+                u.HasMany(e => e.Goals).WithOne(e => e.User).HasForeignKey(e => e.UserID);
 
                 u.HasMany(e => e.TransactionCategories)
-                .WithOne(e => e.User)
-                .HasForeignKey(e => e.UserID);
+                    .WithOne(e => e.User)
+                    .HasForeignKey(e => e.UserID);
+
+                u.HasOne(e => e.UserSettings)
+                    .WithOne(e => e.User)
+                    .HasForeignKey<UserSettings>(e => e.UserID)
+                    .IsRequired();
 
                 u.ToTable("User");
             });
 
+            modelBuilder.Entity<Account>(
+                (a) =>
+                {
+                    a.HasMany(e => e.Transactions)
+                        .WithOne(e => e.Account)
+                        .HasForeignKey(e => e.AccountID);
 
-            modelBuilder.Entity<Account>((a) =>
-            {
-                a.HasMany(e => e.Transactions)
-                .WithOne(e => e.Account)
-                .HasForeignKey(e => e.AccountID);
+                    a.HasMany(e => e.Balances)
+                        .WithOne(e => e.Account)
+                        .HasForeignKey(e => e.AccountID);
 
-                a.HasMany(e => e.Balances)
-                .WithOne(e => e.Account)
-                .HasForeignKey(e => e.AccountID);
+                    a.ToTable("Account");
+                }
+            );
 
-                a.ToTable("Account");
-            });
+            modelBuilder.Entity<Institution>(
+                (i) =>
+                {
+                    i.HasMany(e => e.Accounts)
+                        .WithOne(e => e.Institution)
+                        .HasForeignKey(e => e.InstitutionID);
 
-            modelBuilder.Entity<Institution>((i) =>
-            {
-                i.HasMany(e => e.Accounts)
-                .WithOne(e => e.Institution)
-                .HasForeignKey(e => e.InstitutionID);
+                    i.ToTable("Institution");
+                }
+            );
 
-                i.ToTable("Institution");
-            });
+            modelBuilder.Entity<Goal>(
+                (g) =>
+                {
+                    g.HasMany(e => e.Accounts).WithMany(e => e.Goals);
 
-            modelBuilder.Entity<Goal>((g) =>
-            {
-                g.HasMany(e => e.Accounts)
-                .WithMany(e => e.Goals);
-
-                g.ToTable("Goal");
-            });
+                    g.ToTable("Goal");
+                }
+            );
 
             modelBuilder.Entity<Transaction>().ToTable("Transaction");
 
@@ -75,6 +76,8 @@ namespace BudgetBoard.Database.Data
             modelBuilder.Entity<Balance>().ToTable("Balance");
 
             modelBuilder.Entity<Category>().ToTable("TransactionCategory");
+
+            modelBuilder.Entity<UserSettings>().ToTable("UserSettings");
 
             modelBuilder.UseIdentityColumns();
         }
@@ -87,5 +90,6 @@ namespace BudgetBoard.Database.Data
         public DbSet<Balance> Balances { get; set; }
         public DbSet<Category> TransactionCategories { get; set; }
         public DbSet<Institution> Institutions { get; set; }
+        public DbSet<UserSettings> UserSettings { get; set; }
     }
 }

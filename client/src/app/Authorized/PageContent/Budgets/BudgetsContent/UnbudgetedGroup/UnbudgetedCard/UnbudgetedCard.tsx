@@ -12,8 +12,8 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -21,6 +21,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { ICategoryNode } from "~/models/category";
 import UnbudgetedChildCard from "./UnbudgetedChildCard/UnbudgetedChildCard";
 import { roundAwayFromZero } from "~/helpers/utils";
+import { IUserSettings } from "~/models/userSettings";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -30,6 +31,22 @@ interface UnbudgetedCardProps {
 
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   const queryClient = useQueryClient();
   const doAddBudget = useMutation({
@@ -68,14 +85,17 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
               : props.categoryTree.value}
           </Text>
           <Group gap="sm">
-            <Text size="1rem" fw={600}>
-              {convertNumberToCurrency(
-                props.categoryToTransactionsTotalMap.get(
-                  props.categoryTree.value.toLocaleLowerCase()
-                ) ?? 0,
-                false
-              )}
-            </Text>
+            {userSettingsQuery.isPending ? null : (
+              <Text size="1rem" fw={600}>
+                {convertNumberToCurrency(
+                  props.categoryToTransactionsTotalMap.get(
+                    props.categoryTree.value.toLocaleLowerCase()
+                  ) ?? 0,
+                  false,
+                  userSettingsQuery.data?.currency ?? "USD"
+                )}
+              </Text>
+            )}
             {props.selectedDate &&
             props.categoryTree.value !== "Uncategorized" ? (
               <ActionIcon

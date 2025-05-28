@@ -10,14 +10,32 @@ import {
 } from "~/helpers/transactions";
 import { Card, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
+import { IUserSettings } from "~/models/userSettings";
 
 const SpendingTrendsCard = (): React.ReactNode => {
   const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const transactionsQueries = useQueries({
     queries: months.map((date) => ({
       queryKey: [
@@ -99,14 +117,22 @@ const SpendingTrendsCard = (): React.ReactNode => {
       Math.round((getSpendingComparison() + Number.EPSILON) * 100) / 100;
 
     if (spendingComparisonNumber < 0) {
+      if (userSettingsQuery.isPending) {
+        return "loading...";
+      }
       return `${convertNumberToCurrency(
         Math.abs(spendingComparisonNumber),
-        true
+        true,
+        userSettingsQuery.data?.currency ?? "USD"
       )} less than`;
     } else if (spendingComparisonNumber > 0) {
+      if (userSettingsQuery.isPending) {
+        return "loading...";
+      }
       return `${convertNumberToCurrency(
         Math.abs(spendingComparisonNumber),
-        true
+        true,
+        userSettingsQuery.data?.currency ?? "USD"
       )} more than`;
     }
 

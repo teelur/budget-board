@@ -4,14 +4,15 @@ import { Card, Flex, LoadingOverlay, Text } from "@mantine/core";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import EditableCategoryCell from "~/app/Authorized/PageContent/Transactions/TransactionCards.tsx/TransactionCard/EditableCategoryCell/EditableCategoryCell";
 import { ICategory } from "~/models/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { useDisclosure } from "@mantine/hooks";
+import { IUserSettings } from "~/models/userSettings";
 
 interface TransactionCardProps {
   transaction: ITransaction;
@@ -24,6 +25,22 @@ const UncategorizedTransaction = (
   const [opened, { toggle }] = useDisclosure(false);
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   const queryClient = useQueryClient();
   const doEditTransaction = useMutation({
@@ -112,17 +129,23 @@ const UncategorizedTransaction = (
             editCell={doEditTransaction.mutate}
           />
           <Flex w={{ base: "100%", xs: "90px" }}>
-            <Text
-              style={{
-                color:
-                  props.transaction.amount < 0
-                    ? "var(--mantine-color-red-6)"
-                    : "var(--mantine-color-green-6)",
-                fontWeight: 600,
-              }}
-            >
-              {convertNumberToCurrency(props.transaction.amount, true)}
-            </Text>
+            {userSettingsQuery.isPending ? null : (
+              <Text
+                style={{
+                  color:
+                    props.transaction.amount < 0
+                      ? "var(--mantine-color-red-6)"
+                      : "var(--mantine-color-green-6)",
+                  fontWeight: 600,
+                }}
+              >
+                {convertNumberToCurrency(
+                  props.transaction.amount,
+                  true,
+                  userSettingsQuery.data?.currency ?? "USD"
+                )}
+              </Text>
+            )}
           </Flex>
         </Flex>
       </Flex>

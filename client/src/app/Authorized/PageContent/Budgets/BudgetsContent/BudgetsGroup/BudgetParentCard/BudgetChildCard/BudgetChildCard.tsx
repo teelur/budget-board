@@ -1,6 +1,6 @@
 import classes from "./BudgetChildCard.module.css";
 
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import {
   ActionIcon,
   Card,
@@ -20,10 +20,11 @@ import { getBudgetValueColor } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
+import { IUserSettings } from "~/models/userSettings";
 
 interface BudgetChildCardProps {
   id: string;
@@ -42,6 +43,23 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   });
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const queryClient = useQueryClient();
   const doEditBudget = useMutation({
     mutationFn: async (newBudget: IBudgetUpdateRequest) =>
@@ -132,12 +150,15 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 {props.categoryValue}
               </Text>
               <Group gap={5} justify="flex-end" align="center">
-                <Text className={classes.text} fw={700}>
-                  {convertNumberToCurrency(
-                    props.amount * (props.isIncome ? 1 : -1),
-                    false
-                  )}
-                </Text>
+                {userSettingsQuery.isPending ? null : (
+                  <Text className={classes.text} fw={700}>
+                    {convertNumberToCurrency(
+                      props.amount * (props.isIncome ? 1 : -1),
+                      false,
+                      userSettingsQuery.data?.currency ?? "USD"
+                    )}
+                  </Text>
+                )}
                 <Text className={classes.textSmall}> of </Text>
                 {isSelected ? (
                   <Flex onClick={(e) => e.stopPropagation()}>
@@ -147,7 +168,9 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       min={0}
                       max={999999}
                       step={1}
-                      prefix="$"
+                      prefix={getCurrencySymbol(
+                        userSettingsQuery.data?.currency
+                      )}
                       placeholder="Limit"
                       radius="md"
                       size="xs"
@@ -162,9 +185,13 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       }}
                     />
                   </Flex>
-                ) : (
+                ) : userSettingsQuery.isPending ? null : (
                   <Text className={classes.text} fw={700}>
-                    {convertNumberToCurrency(props.limit, false)}
+                    {convertNumberToCurrency(
+                      props.limit,
+                      false,
+                      userSettingsQuery.data?.currency ?? "USD"
+                    )}
                   </Text>
                 )}
               </Group>
@@ -191,22 +218,25 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   </Progress.Section>
                 </Progress.Root>
               </Flex>
-              <Text
-                size="0.9rem"
-                fw={700}
-                c={getBudgetValueColor(
-                  roundAwayFromZero(props.amount),
-                  props.limit,
-                  props.isIncome
-                )}
-              >
-                {convertNumberToCurrency(
-                  roundAwayFromZero(
-                    props.limit - props.amount * (props.isIncome ? 1 : -1)
-                  ),
-                  false
-                )}
-              </Text>
+              {userSettingsQuery.isPending ? null : (
+                <Text
+                  size="0.9rem"
+                  fw={700}
+                  c={getBudgetValueColor(
+                    roundAwayFromZero(props.amount),
+                    props.limit,
+                    props.isIncome
+                  )}
+                >
+                  {convertNumberToCurrency(
+                    roundAwayFromZero(
+                      props.limit - props.amount * (props.isIncome ? 1 : -1)
+                    ),
+                    false,
+                    userSettingsQuery.data?.currency ?? "USD"
+                  )}
+                </Text>
+              )}
               <Text size="md"> left</Text>
             </Group>
           </Stack>

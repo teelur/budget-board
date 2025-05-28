@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
 namespace BudgetBoard.Database.Models;
+
 public interface IApplicationUser
 {
     Guid Id { get; set; }
@@ -11,7 +12,9 @@ public interface IApplicationUser
     ICollection<Goal> Goals { get; set; }
     ICollection<Category> TransactionCategories { get; set; }
     ICollection<Institution> Institutions { get; set; }
+    UserSettings? UserSettings { get; set; }
 }
+
 public class ApplicationUser : IdentityUser<Guid>, IApplicationUser
 {
     public string AccessToken { get; set; } = string.Empty;
@@ -21,4 +24,5 @@ public class ApplicationUser : IdentityUser<Guid>, IApplicationUser
     public ICollection<Goal> Goals { get; set; } = [];
     public ICollection<Category> TransactionCategories { get; set; } = [];
     public ICollection<Institution> Institutions { get; set; } = [];
+    public UserSettings? UserSettings { get; set; } = null!;
 }

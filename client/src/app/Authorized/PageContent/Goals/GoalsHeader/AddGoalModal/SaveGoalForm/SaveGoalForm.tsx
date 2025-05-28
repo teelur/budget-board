@@ -15,8 +15,11 @@ import { DatePickerInput, DateValue } from "@mantine/dates";
 import { hasLength, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IGoalCreateRequest } from "~/models/goal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { IUserSettings } from "~/models/userSettings";
+import { AxiosResponse } from "axios";
+import { getCurrencySymbol } from "~/helpers/currency";
 
 interface FormValues {
   goalName: string;
@@ -45,6 +48,22 @@ const SaveGoalForm = (): React.ReactNode => {
   });
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   const queryClient = useQueryClient();
   const doAddGoal = useMutation({
@@ -103,7 +122,7 @@ const SaveGoalForm = (): React.ReactNode => {
           label="Target Amount"
           placeholder="Enter target amount"
           required
-          prefix="$"
+          prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
           min={0}
           decimalScale={2}
           thousandSeparator=","
@@ -137,7 +156,7 @@ const SaveGoalForm = (): React.ReactNode => {
               <NumberInput
                 label="Monthly Contribution"
                 placeholder="Enter monthly contribution"
-                prefix="$"
+                prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
                 min={0}
                 decimalScale={2}
                 thousandSeparator=","

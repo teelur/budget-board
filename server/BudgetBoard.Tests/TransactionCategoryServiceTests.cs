@@ -13,28 +13,39 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class TransactionCategoryServiceTests
 {
-    private readonly Faker<CategoryCreateRequest> _categoryCreateRequestFaker = new Faker<CategoryCreateRequest>()
-        .RuleFor(c => c.Value, f => f.Random.String(20))
-        .RuleFor(c => c.Parent, f => f.Random.String(20));
+    private readonly Faker<CategoryCreateRequest> _categoryCreateRequestFaker =
+        new Faker<CategoryCreateRequest>()
+            .RuleFor(c => c.Value, f => f.Random.String(20))
+            .RuleFor(c => c.Parent, f => f.Random.String(20));
 
-    private readonly Faker<CategoryUpdateRequest> _categoryUpdateRequestFaker = new Faker<CategoryUpdateRequest>()
-        .RuleFor(c => c.Value, f => f.Random.String(20))
-        .RuleFor(c => c.Parent, f => f.Random.String(20));
+    private readonly Faker<CategoryUpdateRequest> _categoryUpdateRequestFaker =
+        new Faker<CategoryUpdateRequest>()
+            .RuleFor(c => c.Value, f => f.Random.String(20))
+            .RuleFor(c => c.Parent, f => f.Random.String(20));
 
     [Fact]
     public async Task CreateTransactionCategoryAsync_InvalidUserId_ThrowsError()
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.CreateTransactionCategoryAsync(Guid.NewGuid(), categoryCreateRequest);
+        Func<Task> act = async () =>
+            await transactionCategoryService.CreateTransactionCategoryAsync(
+                Guid.NewGuid(),
+                categoryCreateRequest
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Provided user not found.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Provided user not found.");
     }
 
     [Fact]
@@ -42,7 +53,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var parentCategory = transactionCategoryFaker.Generate();
@@ -55,7 +69,10 @@ public class TransactionCategoryServiceTests
         categoryCreateRequest.Parent = parentCategory.Value;
 
         // Act
-        await transactionCategoryService.CreateTransactionCategoryAsync(helper.demoUser.Id, categoryCreateRequest);
+        await transactionCategoryService.CreateTransactionCategoryAsync(
+            helper.demoUser.Id,
+            categoryCreateRequest
+        );
 
         // Assert
         helper.UserDataContext.TransactionCategories.Should().HaveCount(2);
@@ -66,22 +83,33 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
-        helper.UserDataContext.TransactionCategories.Add(new Category
-        {
-            Value = categoryCreateRequest.Value,
-            Parent = categoryCreateRequest.Parent,
-            UserID = helper.demoUser.Id
-        });
+        helper.UserDataContext.TransactionCategories.Add(
+            new Category
+            {
+                Value = categoryCreateRequest.Value,
+                Parent = categoryCreateRequest.Parent,
+                UserID = helper.demoUser.Id,
+            }
+        );
         helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.CreateTransactionCategoryAsync(helper.demoUser.Id, categoryCreateRequest);
+        Func<Task> act = async () =>
+            await transactionCategoryService.CreateTransactionCategoryAsync(
+                helper.demoUser.Id,
+                categoryCreateRequest
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Transaction category already exists.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Transaction category already exists.");
     }
 
     [Fact]
@@ -89,35 +117,55 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
         categoryCreateRequest.Parent = categoryCreateRequest.Value;
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.CreateTransactionCategoryAsync(helper.demoUser.Id, categoryCreateRequest);
+        Func<Task> act = async () =>
+            await transactionCategoryService.CreateTransactionCategoryAsync(
+                helper.demoUser.Id,
+                categoryCreateRequest
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Transaction category cannot have the same name as its parent category.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Transaction category cannot have the same name as its parent category.");
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public async Task CreateTransactionCategoryAsync_WhenValueNullOrEmpty_ShouldThrowError(string value)
+    public async Task CreateTransactionCategoryAsync_WhenValueNullOrEmpty_ShouldThrowError(
+        string? value
+    )
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
         categoryCreateRequest.Value = value;
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.CreateTransactionCategoryAsync(helper.demoUser.Id, categoryCreateRequest);
+        Func<Task> act = async () =>
+            await transactionCategoryService.CreateTransactionCategoryAsync(
+                helper.demoUser.Id,
+                categoryCreateRequest
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Transaction category must have a name.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Transaction category must have a name.");
     }
 
     [Fact]
@@ -125,17 +173,29 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
-        categoryCreateRequest.Parent = TransactionCategoriesConstants.DefaultTransactionCategories.Where(tc => tc.Parent.Length == 0).First().Value;
+        categoryCreateRequest.Parent = TransactionCategoriesConstants
+            .DefaultTransactionCategories.Where(tc => tc.Parent.Length == 0)
+            .First()
+            .Value;
 
         // Act
-        await transactionCategoryService.CreateTransactionCategoryAsync(helper.demoUser.Id, categoryCreateRequest);
+        await transactionCategoryService.CreateTransactionCategoryAsync(
+            helper.demoUser.Id,
+            categoryCreateRequest
+        );
 
         // Assert
         helper.UserDataContext.TransactionCategories.Should().HaveCount(1);
-        helper.UserDataContext.TransactionCategories.Single().Parent.Should().Be(categoryCreateRequest.Parent);
+        helper
+            .UserDataContext.TransactionCategories.Single()
+            .Parent.Should()
+            .Be(categoryCreateRequest.Parent);
     }
 
     [Fact]
@@ -143,7 +203,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -153,7 +216,9 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        var result = await transactionCategoryService.ReadTransactionCategoriesAsync(helper.demoUser.Id);
+        var result = await transactionCategoryService.ReadTransactionCategoriesAsync(
+            helper.demoUser.Id
+        );
 
         // Assert
         result.Should().BeEquivalentTo(transactionCategories.Select(t => new CategoryResponse(t)));
@@ -164,7 +229,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -174,7 +242,10 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        var result = await transactionCategoryService.ReadTransactionCategoriesAsync(helper.demoUser.Id, transactionCategories.First().ID);
+        var result = await transactionCategoryService.ReadTransactionCategoriesAsync(
+            helper.demoUser.Id,
+            transactionCategories.First().ID
+        );
 
         // Assert
         result.Should().BeEquivalentTo([new CategoryResponse(transactionCategories.First())]);
@@ -185,7 +256,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -195,10 +269,16 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.ReadTransactionCategoriesAsync(helper.demoUser.Id, Guid.NewGuid());
+        Func<Task> act = async () =>
+            await transactionCategoryService.ReadTransactionCategoriesAsync(
+                helper.demoUser.Id,
+                Guid.NewGuid()
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The transaction category you are trying to access does not exist.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("The transaction category you are trying to access does not exist.");
     }
 
     [Fact]
@@ -206,7 +286,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -219,10 +302,16 @@ public class TransactionCategoryServiceTests
         categoryUpdateRequest.ID = transactionCategories.First().ID;
 
         // Act
-        await transactionCategoryService.UpdateTransactionCategoryAsync(helper.demoUser.Id, categoryUpdateRequest);
+        await transactionCategoryService.UpdateTransactionCategoryAsync(
+            helper.demoUser.Id,
+            categoryUpdateRequest
+        );
 
         // Assert
-        helper.UserDataContext.TransactionCategories.First().Value.Should().Be(categoryUpdateRequest.Value);
+        helper
+            .UserDataContext.TransactionCategories.First()
+            .Value.Should()
+            .Be(categoryUpdateRequest.Value);
     }
 
     [Fact]
@@ -230,7 +319,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -243,10 +335,16 @@ public class TransactionCategoryServiceTests
         categoryUpdateRequest.ID = Guid.NewGuid();
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.UpdateTransactionCategoryAsync(helper.demoUser.Id, categoryUpdateRequest);
+        Func<Task> act = async () =>
+            await transactionCategoryService.UpdateTransactionCategoryAsync(
+                helper.demoUser.Id,
+                categoryUpdateRequest
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The transaction category you are trying to access does not exist.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("The transaction category you are trying to access does not exist.");
     }
 
     [Fact]
@@ -254,7 +352,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -268,10 +369,15 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        await transactionCategoryService.DeleteTransactionCategoryAsync(helper.demoUser.Id, transactionCategories.Last().ID);
+        await transactionCategoryService.DeleteTransactionCategoryAsync(
+            helper.demoUser.Id,
+            transactionCategories.Last().ID
+        );
 
         // Assert
-        helper.UserDataContext.TransactionCategories.Should().NotContainEquivalentOf(transactionCategories.Last());
+        helper
+            .UserDataContext.TransactionCategories.Should()
+            .NotContainEquivalentOf(transactionCategories.Last());
     }
 
     [Fact]
@@ -279,7 +385,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -289,10 +398,16 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.DeleteTransactionCategoryAsync(helper.demoUser.Id, Guid.NewGuid());
+        Func<Task> act = async () =>
+            await transactionCategoryService.DeleteTransactionCategoryAsync(
+                helper.demoUser.Id,
+                Guid.NewGuid()
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The transaction category you are trying to delete does not exist.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("The transaction category you are trying to delete does not exist.");
     }
 
     [Fact]
@@ -300,7 +415,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -322,10 +440,16 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.DeleteTransactionCategoryAsync(helper.demoUser.Id, transactionCategories.First().ID);
+        Func<Task> act = async () =>
+            await transactionCategoryService.DeleteTransactionCategoryAsync(
+                helper.demoUser.Id,
+                transactionCategories.First().ID
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Category is in use by transaction(s) and cannot be deleted.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Category is in use by transaction(s) and cannot be deleted.");
     }
 
     [Fact]
@@ -333,7 +457,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -355,10 +482,16 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.DeleteTransactionCategoryAsync(helper.demoUser.Id, transactionCategories.First().ID);
+        Func<Task> act = async () =>
+            await transactionCategoryService.DeleteTransactionCategoryAsync(
+                helper.demoUser.Id,
+                transactionCategories.First().ID
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Category is in use by transaction(s) and cannot be deleted.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Category is in use by transaction(s) and cannot be deleted.");
     }
 
     [Fact]
@@ -366,7 +499,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -382,10 +518,16 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () => await transactionCategoryService.DeleteTransactionCategoryAsync(helper.demoUser.Id, transactionCategories.First().ID);
+        Func<Task> act = async () =>
+            await transactionCategoryService.DeleteTransactionCategoryAsync(
+                helper.demoUser.Id,
+                transactionCategories.First().ID
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Category is in use by budget(s) and cannot be deleted.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Category is in use by budget(s) and cannot be deleted.");
     }
 
     [Fact]
@@ -393,7 +535,10 @@ public class TransactionCategoryServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var transactionCategoryService = new TransactionCategoryService(Mock.Of<ILogger<ITransactionCategoryService>>(), helper.UserDataContext);
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext
+        );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
         var transactionCategories = transactionCategoryFaker.Generate(5);
@@ -404,9 +549,17 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
         // Act
-        Func<Task> act = async () => await transactionCategoryService.DeleteTransactionCategoryAsync(helper.demoUser.Id, transactionCategories.First().ID);
+        Func<Task> act = async () =>
+            await transactionCategoryService.DeleteTransactionCategoryAsync(
+                helper.demoUser.Id,
+                transactionCategories.First().ID
+            );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Transaction category has subcategories associated with it and cannot be deleted.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage(
+                "Transaction category has subcategories associated with it and cannot be deleted."
+            );
     }
 }

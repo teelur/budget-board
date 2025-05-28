@@ -8,16 +8,18 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { SplitIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
+import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { ICategory } from "~/models/category";
 import { ITransactionSplitRequest } from "~/models/transaction";
+import { IUserSettings } from "~/models/userSettings";
 
 interface SplitTransactionProps {
   id: string;
@@ -53,6 +55,23 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
   });
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const queryClient = useQueryClient();
   const doSplitTransaction = useMutation({
     mutationFn: async (splitTransaction: ITransactionSplitRequest) =>
@@ -100,7 +119,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
             <Text fw={600}>Split Transaction</Text>
             <NumberInput
               {...form.getInputProps("amount")}
-              prefix="$"
+              prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               decimalScale={2}
               thousandSeparator=","
               label="Amount"

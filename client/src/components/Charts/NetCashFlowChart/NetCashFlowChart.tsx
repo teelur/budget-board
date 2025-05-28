@@ -6,6 +6,10 @@ import { CompositeChart } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { IUserSettings } from "~/models/userSettings";
+import { AxiosResponse } from "axios";
 
 interface ChartDatum {
   month: string;
@@ -23,6 +27,24 @@ interface NetCashFlowChartProps {
 }
 
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
+  const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const sortedMonths = props.months.sort(
     (a, b) => new Date(a).getTime() - new Date(b).getTime()
   );
@@ -94,7 +116,15 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
       }}
       lineProps={{ type: "linear" }}
       tooltipAnimationDuration={200}
-      valueFormatter={(value) => convertNumberToCurrency(value, true)}
+      valueFormatter={(value) =>
+        userSettingsQuery.isPending
+          ? ""
+          : convertNumberToCurrency(
+              value,
+              true,
+              userSettingsQuery.data?.currency ?? "USD"
+            )
+      }
     />
   );
 };

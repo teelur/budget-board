@@ -5,6 +5,10 @@ import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useQuery } from "@tanstack/react-query";
+import { IUserSettings } from "~/models/userSettings";
+import { AxiosResponse } from "axios";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -14,6 +18,24 @@ interface UnbudgetedGroupProps {
 }
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
+  const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const total =
     props.categoryTree.reduce((acc, category) => {
       const categoryTotal = props.categoryToTransactionsTotalMap.get(
@@ -34,9 +56,15 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
             <Text size="1.2rem" fw={600}>
               Unbudgeted
             </Text>
-            <Text size="1.2rem" fw={600}>
-              {convertNumberToCurrency(total)}
-            </Text>
+            {userSettingsQuery.isPending ? null : (
+              <Text size="1.2rem" fw={600}>
+                {convertNumberToCurrency(
+                  total,
+                  false,
+                  userSettingsQuery.data?.currency ?? "USD"
+                )}
+              </Text>
+            )}
           </Group>
         </Accordion.Control>
         <Accordion.Panel p={0}>

@@ -12,13 +12,14 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import AccountSelectInput from "~/components/AccountSelectInput";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
+import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { AccountSource } from "~/models/account";
 import { ICategoryResponse } from "~/models/category";
@@ -26,6 +27,7 @@ import {
   defaultTransactionCategories,
   ITransactionCreateRequest,
 } from "~/models/transaction";
+import { IUserSettings } from "~/models/userSettings";
 
 interface formValues {
   date: Date | null;
@@ -56,6 +58,22 @@ const CreateTransactionModal = (): React.ReactNode => {
   });
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   const transactionCategoriesQuery = useQuery({
     queryKey: ["transactionCategories"],
@@ -172,7 +190,7 @@ const CreateTransactionModal = (): React.ReactNode => {
             <NumberInput
               label="Amount"
               placeholder="Enter amount"
-              prefix="$"
+              prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               decimalScale={2}
               thousandSeparator=","
               {...form.getInputProps("amount")}
