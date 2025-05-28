@@ -44,14 +44,14 @@ export const getCurrencySymbol = (currency?: string): string => {
       return "£";
     case "JPY":
       return "¥";
+    case "CNY":
+      return "CN¥";
     case "AUD":
       return "A$";
     case "CAD":
-      return "C$";
-    case "CHF":
-      return "CHF";
-    case "CNY":
-      return "¥"; // Chinese Yuan uses the same symbol as JPY
+      return "CA$";
+    case "NZD":
+      return "NZ$";
     case null:
     case undefined:
       return ""; // Return an empty string if no currency is provided
