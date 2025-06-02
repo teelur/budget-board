@@ -2,20 +2,7 @@
 
 namespace BudgetBoard.Database.Models;
 
-public interface IApplicationUser
-{
-    Guid Id { get; set; }
-    string AccessToken { get; set; }
-    DateTime LastSync { get; set; }
-    ICollection<Account> Accounts { get; set; }
-    ICollection<Budget> Budgets { get; set; }
-    ICollection<Goal> Goals { get; set; }
-    ICollection<Category> TransactionCategories { get; set; }
-    ICollection<Institution> Institutions { get; set; }
-    UserSettings? UserSettings { get; set; }
-}
-
-public class ApplicationUser : IdentityUser<Guid>, IApplicationUser
+public class ApplicationUser : IdentityUser<Guid>
 {
     public string AccessToken { get; set; } = string.Empty;
     public DateTime LastSync { get; set; } = DateTime.MinValue;

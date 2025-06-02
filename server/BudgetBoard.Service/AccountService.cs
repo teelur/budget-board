@@ -187,7 +187,7 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
         await _userDataContext.SaveChangesAsync();
     }
 
-    private async Task<IApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         List<ApplicationUser> users;
         ApplicationUser? foundUser;
