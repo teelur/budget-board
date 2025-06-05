@@ -2,19 +2,18 @@ import {
   Button,
   LoadingOverlay,
   Stack,
+  TextInput,
   Text,
-  PinInput,
-  Group,
   Title,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
+import { LoginCardState } from "./Welcome";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
-import { LoginCardState } from "./Welcome";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -22,14 +21,14 @@ interface LoginProps {
   userPassword: string;
 }
 
-const LoginWith2fa = (props: LoginProps): React.ReactNode => {
+const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
 
-  const authenticationCodeField = useField<string>({
+  const recoveryCodeField = useField<string>({
     initialValue: "",
     validate: (value) => {
       if (!value) {
-        return "Authentication code is required";
+        return "Recovery code is required";
       }
       return null;
     },
@@ -42,10 +41,10 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
   const submitUserLogin = async (): Promise<void> => {
     setLoading(true);
 
-    if (!authenticationCodeField.getValue()) {
+    if (!recoveryCodeField.getValue()) {
       notifications.show({
         color: "red",
-        message: "Please enter the authentication code.",
+        message: "Please enter the recovery code.",
       });
       setLoading(false);
       return;
@@ -57,7 +56,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
       data: {
         email: props.userEmail,
         password: props.userPassword,
-        twoFactorCode: authenticationCodeField.getValue(),
+        recoveryCode: recoveryCodeField.getValue(),
       },
     })
       .then((res: AxiosResponse) => {
@@ -87,7 +86,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center" w="100%">
+    <Stack gap="md" align="center">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}
@@ -95,31 +94,17 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
       />
       <Stack align="center" gap={5} w="100%">
         <Title order={3} ta="center">
-          2-Factor Authentication
+          Use a Recovery Code
         </Title>
         <Text size="sm" ta="center">
-          Enter the 6-digit security code from your authenticator app.
+          Enter one of your recovery codes for a one-time password
+          authentication.
         </Text>
       </Stack>
-      <PinInput
-        length={6}
-        type="number"
-        autoFocus
-        value={authenticationCodeField.getValue()}
-        onChange={(value) => authenticationCodeField.setValue(value)}
-      />
-      <Button variant="filled" fullWidth onClick={submitUserLogin}>
-        Submit
-      </Button>
-      <Group wrap="nowrap" gap="md" w="100%">
-        <Button
-          variant="default"
-          fullWidth
-          onClick={() =>
-            props.setLoginCardState(LoginCardState.LoginWithRecovery)
-          }
-        >
-          Use Recovery Code
+      <TextInput {...recoveryCodeField.getInputProps()} w="100%" />
+      <Stack gap="0.5rem" w="100%">
+        <Button variant="filled" fullWidth onClick={submitUserLogin}>
+          Submit
         </Button>
         <Button
           variant="default"
@@ -128,9 +113,9 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         >
           Return to Login
         </Button>
-      </Group>
+      </Stack>
     </Stack>
   );
 };
 
-export default LoginWith2fa;
+export default LoginWithRecovery;

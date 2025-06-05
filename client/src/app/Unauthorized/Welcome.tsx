@@ -13,10 +13,12 @@ import Register from "./Register";
 import Login from "./Login";
 import ResetPassword from "./ResetPassword";
 import LoginWith2fa from "./LoginWith2fa";
+import LoginWithRecovery from "./LoginWithRecovery";
 
 export enum LoginCardState {
   Login,
   LoginWith2fa,
+  LoginWithRecovery,
   ResetPassword,
   Register,
 }
@@ -43,6 +45,14 @@ const Welcome = (): React.ReactNode => {
       case LoginCardState.LoginWith2fa:
         return (
           <LoginWith2fa
+            setLoginCardState={setLoginCardState}
+            userEmail={userEmail}
+            userPassword={userPassword}
+          />
+        );
+      case LoginCardState.LoginWithRecovery:
+        return (
+          <LoginWithRecovery
             setLoginCardState={setLoginCardState}
             userEmail={userEmail}
             userPassword={userPassword}
