@@ -10,6 +10,7 @@ public class IdentityApiEndpointRouteBuilderOptions
     public bool ExcludeForgotPasswordPost { get; set; }
     public bool ExcludeResetPasswordPost { get; set; }
     public bool ExcludeManageGroup { get; set; }
+    public bool Exclude2faGet { get; set; }
     public bool Exclude2faPost { get; set; }
     public bool ExcludegInfoGet { get; set; }
     public bool ExcludeInfoPost { get; set; }

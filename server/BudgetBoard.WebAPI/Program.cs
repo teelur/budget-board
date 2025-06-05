@@ -75,13 +75,18 @@ builder.Services.AddDbContext<UserDataContext>(o =>
 );
 
 // Configure Identity
+builder
+    .Services.AddAuthentication(IdentityConstants.BearerScheme)
+    .AddBearerToken(IdentityConstants.BearerScheme)
+    .AddIdentityCookies();
+
 builder.Services.AddAuthorization();
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
 var emailSender = builder.Configuration.GetValue<string>("EMAIL_SENDER");
 
 builder
-    .Services.AddIdentityApiEndpoints<ApplicationUser>(opt =>
+    .Services.AddIdentityCore<ApplicationUser>(opt =>
     {
         opt.Password.RequiredLength = 3;
         opt.Password.RequiredUniqueChars = 0;
@@ -92,7 +97,8 @@ builder
         opt.User.RequireUniqueEmail = true;
         opt.SignIn.RequireConfirmedEmail = !string.IsNullOrEmpty(emailSender);
     })
-    .AddEntityFrameworkStores<UserDataContext>();
+    .AddEntityFrameworkStores<UserDataContext>()
+    .AddApiEndpoints();
 
 if (!string.IsNullOrEmpty(emailSender))
 {
@@ -220,9 +226,9 @@ if (autoUpdateDb)
 {
     System.Diagnostics.Debug.WriteLine("Updating Db with latest migration...");
     using var serviceScope = app.Services.CreateScope();
-        var dbContext = serviceScope.ServiceProvider.GetRequiredService<UserDataContext>();
-        dbContext.Database.Migrate();
-    }
+    var dbContext = serviceScope.ServiceProvider.GetRequiredService<UserDataContext>();
+    dbContext.Database.Migrate();
+}
 else
 {
     System.Diagnostics.Debug.WriteLine("Automatic Db updates not enabled.");
