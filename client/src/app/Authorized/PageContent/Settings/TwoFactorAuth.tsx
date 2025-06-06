@@ -165,7 +165,7 @@ const TwoFactorAuth = (): React.ReactNode => {
                   Keep these codes safe. They can be used to access your account
                   if you lose access to your authenticator app.
                 </Text>
-                <Group gap="0.5rem" align="center">
+                <Group gap="0.5rem" align="center" justify="center">
                   {recoveryCodes.map((code, index) => (
                     <Code key={index}>{code}</Code>
                   ))}
