@@ -138,7 +138,8 @@ const TwoFactorAuth = (): React.ReactNode => {
 
   return (
     <Card className={classes.card} withBorder radius="md" shadow="sm">
-      <CardSection>
+      <LoadingOverlay visible={doSetTwoFactorAuth.isPending} />
+      <CardSection className={classes.cardSection}>
         <Group>
           <Title order={3}>Two Factor Authentication</Title>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
@@ -153,7 +154,6 @@ const TwoFactorAuth = (): React.ReactNode => {
         </Group>
       </CardSection>
       <CardSection className={classes.cardSection}>
-        <LoadingOverlay visible={doSetTwoFactorAuth.isPending} />
         {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
           <Stack gap="1rem">
             {recoveryCodes.length > 0 && (

@@ -1,9 +1,11 @@
+import classes from "./Settings.module.css";
+
 import {
   Card,
+  CardSection,
   LoadingOverlay,
   Select,
   Skeleton,
-  Stack,
   Title,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
@@ -67,11 +69,17 @@ const UserSettings = (): React.ReactNode => {
     }
   }, [userSettingsQuery.data]);
 
+  if (userSettingsQuery.isPending) {
+    return <Skeleton h={141} radius="md" className={classes.skeleton} />;
+  }
+
   return (
-    <Card>
+    <Card className={classes.card} withBorder radius="md" shadow="sm">
       <LoadingOverlay visible={doUpdateUserSettings.isPending} />
-      <Stack>
+      <CardSection className={classes.cardSection}>
         <Title order={3}>User Settings</Title>
+      </CardSection>
+      <CardSection className={classes.cardSection}>
         {userSettingsQuery.isPending ? (
           <Skeleton h={60} />
         ) : (
@@ -92,7 +100,7 @@ const UserSettings = (): React.ReactNode => {
             }}
           />
         )}
-      </Stack>
+      </CardSection>
     </Card>
   );
 };
