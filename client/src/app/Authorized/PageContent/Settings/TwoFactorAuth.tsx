@@ -12,6 +12,7 @@ import {
   Button,
   Stack,
   PinInput,
+  CopyButton,
 } from "@mantine/core";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -164,6 +165,23 @@ const TwoFactorAuth = (): React.ReactNode => {
                     <Code key={index}>{code}</Code>
                   ))}
                 </Group>
+                <CopyButton value={recoveryCodes.join("\n")}>
+                  {({ copied, copy }) => (
+                    <Button
+                      size="compact-sm"
+                      color={copied ? "teal" : "blue"}
+                      onClick={() => {
+                        copy();
+                        notifications.show({
+                          color: "teal",
+                          message: "Recovery codes copied to clipboard",
+                        });
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  )}
+                </CopyButton>
               </Stack>
             )}
             <Stack gap="0.5rem">
@@ -200,7 +218,30 @@ const TwoFactorAuth = (): React.ReactNode => {
               <Text size="sm">
                 Enter this code into your authenticator app.
               </Text>
-              <Code>{formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}</Code>
+              <Group>
+                <Code>
+                  {formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
+                </Code>
+                <CopyButton
+                  value={formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
+                >
+                  {({ copied, copy }) => (
+                    <Button
+                      size="compact-sm"
+                      color={copied ? "teal" : "blue"}
+                      onClick={() => {
+                        copy();
+                        notifications.show({
+                          color: "teal",
+                          message: "Code copied to clipboard",
+                        });
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  )}
+                </CopyButton>
+              </Group>
             </Stack>
 
             <Stack justify="center" align="center" gap="0.5rem">
