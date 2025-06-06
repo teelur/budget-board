@@ -13,6 +13,7 @@ import {
   Stack,
   PinInput,
   CopyButton,
+  Skeleton,
 } from "@mantine/core";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -130,6 +131,10 @@ const TwoFactorAuth = (): React.ReactNode => {
       .trim()
       .toLowerCase();
   };
+
+  if (twoFactorAuthQuery.isPending) {
+    return <Skeleton height={300} radius="md" className={classes.skeleton} />;
+  }
 
   return (
     <Card className={classes.card} withBorder radius="md" shadow="sm">
