@@ -14,12 +14,13 @@ using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Serilog;
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
+// Setup CORS for the frontend
 var clientUrl = builder.Configuration.GetValue<string>("CLIENT_URL");
 if (string.IsNullOrEmpty(clientUrl))
 {
@@ -46,13 +47,11 @@ if (string.IsNullOrEmpty(postgresHost))
 {
     throw new ArgumentNullException(nameof(postgresHost));
 }
-
 var postgresDatabase = builder.Configuration.GetValue<string>("POSTGRES_DATABASE");
 if (string.IsNullOrEmpty(postgresDatabase))
 {
     throw new ArgumentNullException(nameof(postgresDatabase));
 }
-
 var postgresUser = builder.Configuration.GetValue<string>("POSTGRES_USER");
 if (string.IsNullOrEmpty(postgresUser))
 {
@@ -75,13 +74,19 @@ builder.Services.AddDbContext<UserDataContext>(o =>
     o.UseNpgsql(connectionString, op => op.MapEnum<Currency>("currency"))
 );
 
+// Configure Identity
+builder
+    .Services.AddAuthentication(IdentityConstants.BearerScheme)
+    .AddBearerToken(IdentityConstants.BearerScheme)
+    .AddIdentityCookies();
+
 builder.Services.AddAuthorization();
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
 var emailSender = builder.Configuration.GetValue<string>("EMAIL_SENDER");
 
 builder
-    .Services.AddIdentityApiEndpoints<ApplicationUser>(opt =>
+    .Services.AddIdentityCore<ApplicationUser>(opt =>
     {
         opt.Password.RequiredLength = 3;
         opt.Password.RequiredUniqueChars = 0;
@@ -92,7 +97,8 @@ builder
         opt.User.RequireUniqueEmail = true;
         opt.SignIn.RequireConfirmedEmail = !string.IsNullOrEmpty(emailSender);
     })
-    .AddEntityFrameworkStores<UserDataContext>();
+    .AddEntityFrameworkStores<UserDataContext>()
+    .AddApiEndpoints();
 
 if (!string.IsNullOrEmpty(emailSender))
 {
@@ -124,6 +130,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// This is needed for reverse proxy
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -218,11 +225,9 @@ app.MapControllers();
 if (autoUpdateDb)
 {
     System.Diagnostics.Debug.WriteLine("Updating Db with latest migration...");
-    using (var serviceScope = app.Services.CreateScope())
-    {
-        var dbContext = serviceScope.ServiceProvider.GetRequiredService<UserDataContext>();
-        dbContext.Database.Migrate();
-    }
+    using var serviceScope = app.Services.CreateScope();
+    var dbContext = serviceScope.ServiceProvider.GetRequiredService<UserDataContext>();
+    dbContext.Database.Migrate();
 }
 else
 {

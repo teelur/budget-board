@@ -7,7 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class InstitutionService(ILogger<IInstitutionService> logger, UserDataContext userDataContext) : IInstitutionService
+public class InstitutionService(
+    ILogger<IInstitutionService> logger,
+    UserDataContext userDataContext
+) : IInstitutionService
 {
     private readonly ILogger<IInstitutionService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
@@ -15,17 +18,16 @@ public class InstitutionService(ILogger<IInstitutionService> logger, UserDataCon
     public async Task CreateInstitutionAsync(Guid userGuid, IInstitutionCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var institution = new Institution
-        {
-            Name = request.Name,
-            UserID = userGuid
-        };
+        var institution = new Institution { Name = request.Name, UserID = userGuid };
 
         userData.Institutions.Add(institution);
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IInstitutionResponse>> ReadInstitutionsAsync(Guid userGuid, Guid guid = default)
+    public async Task<IEnumerable<IInstitutionResponse>> ReadInstitutionsAsync(
+        Guid userGuid,
+        Guid guid = default
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         if (guid != default)
@@ -34,7 +36,9 @@ public class InstitutionService(ILogger<IInstitutionService> logger, UserDataCon
             if (insitution == null)
             {
                 _logger.LogError("Attempt to access non-existent institution.");
-                throw new BudgetBoardServiceException("The institution you are trying to access does not exist.");
+                throw new BudgetBoardServiceException(
+                    "The institution you are trying to access does not exist."
+                );
             }
 
             return [new InstitutionResponse(insitution)];
@@ -50,7 +54,9 @@ public class InstitutionService(ILogger<IInstitutionService> logger, UserDataCon
         if (institution == null)
         {
             _logger.LogError("Attempt to update non-existent institution.");
-            throw new BudgetBoardServiceException("The institution you are trying to update does not exist.");
+            throw new BudgetBoardServiceException(
+                "The institution you are trying to update does not exist."
+            );
         }
 
         institution.Name = request.Name;
@@ -67,7 +73,9 @@ public class InstitutionService(ILogger<IInstitutionService> logger, UserDataCon
         if (institution == null)
         {
             _logger.LogError("Attempt to delete non-existent institution.");
-            throw new BudgetBoardServiceException("The institution you are trying to delete does not exist.");
+            throw new BudgetBoardServiceException(
+                "The institution you are trying to delete does not exist."
+            );
         }
 
         if (deleteTransactions)
@@ -82,7 +90,10 @@ public class InstitutionService(ILogger<IInstitutionService> logger, UserDataCon
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task OrderInstitutionsAsync(Guid userGuid, IEnumerable<IInstitutionIndexRequest> orderedInstitutions)
+    public async Task OrderInstitutionsAsync(
+        Guid userGuid,
+        IEnumerable<IInstitutionIndexRequest> orderedInstitutions
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         foreach (var institution in orderedInstitutions)
@@ -91,7 +102,9 @@ public class InstitutionService(ILogger<IInstitutionService> logger, UserDataCon
             if (insitution == null)
             {
                 _logger.LogError("Attempt to order non-existent institution.");
-                throw new BudgetBoardServiceException("The institution you are trying to order does not exist.");
+                throw new BudgetBoardServiceException(
+                    "The institution you are trying to order does not exist."
+                );
             }
 
             insitution.Index = institution.Index;
@@ -106,17 +119,22 @@ public class InstitutionService(ILogger<IInstitutionService> logger, UserDataCon
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext.ApplicationUsers
-                .Include(u => u.Institutions)
+            foundUser = await _userDataContext
+                .ApplicationUsers.Include(u => u.Institutions)
                 .ThenInclude(i => i.Accounts)
                 .ThenInclude(a => a.Balances)
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while retrieving the user data: {ExceptionMessage}", ex.Message);
-            throw new BudgetBoardServiceException("An error occurred while retrieving the user data.");
+            _logger.LogError(
+                "An error occurred while retrieving the user data: {ExceptionMessage}",
+                ex.Message
+            );
+            throw new BudgetBoardServiceException(
+                "An error occurred while retrieving the user data."
+            );
         }
 
         if (foundUser == null)

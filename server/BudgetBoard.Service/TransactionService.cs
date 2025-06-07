@@ -343,7 +343,7 @@ public class TransactionService(
         }
     }
 
-    private async Task<IApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         List<ApplicationUser> users;
         ApplicationUser? foundUser;

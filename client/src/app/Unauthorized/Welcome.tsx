@@ -12,9 +12,13 @@ import {
 import Register from "./Register";
 import Login from "./Login";
 import ResetPassword from "./ResetPassword";
+import LoginWith2fa from "./LoginWith2fa";
+import LoginWithRecovery from "./LoginWithRecovery";
 
 export enum LoginCardState {
   Login,
+  LoginWith2fa,
+  LoginWithRecovery,
   ResetPassword,
   Register,
 }
@@ -24,6 +28,8 @@ const Welcome = (): React.ReactNode => {
     LoginCardState.Login
   );
   const [userEmail, setUserEmail] = React.useState<string>("");
+  const [userPassword, setUserPassword] = React.useState<string>("");
+
   const computedColorScheme = useComputedColorScheme();
 
   const getCardState = (): React.ReactNode => {
@@ -33,6 +39,23 @@ const Welcome = (): React.ReactNode => {
           <Login
             setLoginCardState={setLoginCardState}
             setUserEmail={setUserEmail}
+            setUserPassword={setUserPassword}
+          />
+        );
+      case LoginCardState.LoginWith2fa:
+        return (
+          <LoginWith2fa
+            setLoginCardState={setLoginCardState}
+            userEmail={userEmail}
+            userPassword={userPassword}
+          />
+        );
+      case LoginCardState.LoginWithRecovery:
+        return (
+          <LoginWithRecovery
+            setLoginCardState={setLoginCardState}
+            userEmail={userEmail}
+            userPassword={userPassword}
           />
         );
       case LoginCardState.ResetPassword:

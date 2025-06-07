@@ -19,6 +19,7 @@ import { notifications } from "@mantine/notifications";
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
   setUserEmail: React.Dispatch<React.SetStateAction<string>>;
+  setUserPassword: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const Login = (props: LoginProps): React.ReactNode => {
@@ -70,6 +71,12 @@ const Login = (props: LoginProps): React.ReactNode => {
             color: "red",
             message: "Login failed. Check your credentials and try again.",
           });
+        } else if (
+          (error.response?.data as any)?.detail === "RequiresTwoFactor"
+        ) {
+          props.setLoginCardState(LoginCardState.LoginWith2fa);
+          props.setUserEmail(values.email);
+          props.setUserPassword(values.password);
         } else {
           notifications.show({
             color: "red",

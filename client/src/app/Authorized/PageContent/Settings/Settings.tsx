@@ -6,6 +6,7 @@ import LinkSimpleFin from "./LinkSimpleFin";
 import React from "react";
 import ResetPassword from "./ResetPassword";
 import UserSettings from "./UserSettings";
+import TwoFactorAuth from "./TwoFactorAuth";
 
 const Settings = (): React.ReactNode => {
   return (
@@ -14,6 +15,7 @@ const Settings = (): React.ReactNode => {
       <DarkModeToggle />
       <UserSettings />
       <LinkSimpleFin />
+      <TwoFactorAuth />
       <ResetPassword />
     </Stack>
   );
