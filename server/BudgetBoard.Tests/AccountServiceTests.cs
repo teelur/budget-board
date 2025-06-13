@@ -564,17 +564,22 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_ExistingAccount_HappyPath()
     {
         // Arrange
+        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
-        account.Deleted = DateTime.Now.ToUniversalTime();
+        account.Deleted = fakeDate;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -590,17 +595,22 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_InvalidAccount_ThrowsError()
     {
         // Arrange
+        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
-        account.Deleted = DateTime.Now.ToUniversalTime();
+        account.Deleted = fakeDate;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -622,23 +632,28 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_RestoreTransactions_HappyPath()
     {
         // Arrange
+        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
-        account.Deleted = DateTime.Now.ToUniversalTime();
+        account.Deleted = fakeDate;
 
         var transactionFaker = new TransactionFaker();
         transactionFaker.AccountIds.Add(account.ID);
         var transaction = transactionFaker.Generate();
 
-        transaction.Deleted = DateTime.Now.ToUniversalTime();
+        transaction.Deleted = fakeDate;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.Transactions.Add(transaction);
@@ -660,17 +675,22 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_RestoreAccount_ShouldRestoreInstitution()
     {
         // Arrange
+        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            nowProviderMock.Object
         );
 
         var institutionFaker = new InstitutionFaker();
         var institution = institutionFaker.Generate();
         institution.UserID = helper.demoUser.Id;
-        institution.Deleted = DateTime.Now.ToUniversalTime();
+        institution.Deleted = fakeDate;
 
         var accountFaker = new AccountFaker();
         var account = accountFaker.Generate();
