@@ -1,5 +1,6 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +8,15 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class AccountService(ILogger<IAccountService> logger, UserDataContext userDataContext)
-    : IAccountService
+public class AccountService(
+    ILogger<IAccountService> logger,
+    UserDataContext userDataContext,
+    INowProvider nowProvider
+) : IAccountService
 {
     private readonly ILogger<IAccountService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly INowProvider _nowProvider = nowProvider;
 
     public async Task CreateAccountAsync(Guid userGuid, IAccountCreateRequest account)
     {
@@ -111,19 +116,19 @@ public class AccountService(ILogger<IAccountService> logger, UserDataContext use
             );
         }
 
-        account.Deleted = DateTime.Now.ToUniversalTime();
+        account.Deleted = _nowProvider.UtcNow;
 
         if (deleteTransactions)
         {
             foreach (var transaction in account.Transactions)
             {
-                transaction.Deleted = DateTime.Now.ToUniversalTime();
+                transaction.Deleted = _nowProvider.UtcNow;
             }
         }
 
         if (account.Institution?.Accounts.All(a => a.Deleted != null) ?? false)
         {
-            account.Institution.Deleted = DateTime.Now.ToUniversalTime();
+            account.Institution.Deleted = _nowProvider.UtcNow;
             account.Institution.Index = 0;
         }
 
