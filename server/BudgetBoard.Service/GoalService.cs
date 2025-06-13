@@ -1,5 +1,6 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +8,15 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataContext)
-    : IGoalService
+public class GoalService(
+    ILogger<IGoalService> logger,
+    UserDataContext userDataContext,
+    INowProvider nowProvider
+) : IGoalService
 {
     private readonly ILogger<IGoalService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly INowProvider _nowProvider = nowProvider;
 
     public async Task CreateGoalAsync(Guid userGuid, IGoalCreateRequest createdGoal)
     {
@@ -30,7 +35,10 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
             );
         }
 
-        if (createdGoal.CompleteDate.HasValue && createdGoal.CompleteDate.Value < DateTime.Now)
+        if (
+            createdGoal.CompleteDate.HasValue
+            && createdGoal.CompleteDate.Value < _nowProvider.UtcNow
+        )
         {
             _logger.LogError("Attempt to create goal with a target date in the past.");
             throw new BudgetBoardServiceException("A goal cannot have a target date in the past.");
@@ -132,7 +140,7 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
         if (
             updatedGoal.CompleteDate.HasValue
             && updatedGoal.IsCompleteDateEditable
-            && updatedGoal.CompleteDate.Value < DateTime.Now
+            && updatedGoal.CompleteDate.Value < _nowProvider.UtcNow
         )
         {
             _logger.LogError("Attempt to update goal with a target date in the past.");
@@ -310,12 +318,12 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
                 }
             }
 
-            return new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(
+            return new DateTime(_nowProvider.UtcNow.Year, _nowProvider.UtcNow.Month, 1).AddMonths(
                 (int)numberOfMonthsLeftWithInterest
             );
         }
 
-        return new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(
+        return new DateTime(_nowProvider.UtcNow.Year, _nowProvider.UtcNow.Month, 1).AddMonths(
             (int)numberOfMonthsLeftWithoutInterest
         );
     }
@@ -350,8 +358,8 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
         }
 
         var numberOfMonthsLeft =
-            (goal.CompleteDate.Value.Year - DateTime.Now.Year) * 12
-            + (goal.CompleteDate.Value.Month - DateTime.Now.Month);
+            (goal.CompleteDate.Value.Year - _nowProvider.UtcNow.Year) * 12
+            + (goal.CompleteDate.Value.Month - _nowProvider.UtcNow.Month);
 
         if (numberOfMonthsLeft <= 0)
         {

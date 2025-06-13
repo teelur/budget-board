@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using FluentAssertions;
@@ -33,7 +34,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var goal = _goalCreateRequestFaker.Generate();
 
@@ -51,7 +56,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -80,7 +89,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var goal = _goalCreateRequestFaker.Generate();
         goal.AccountIds = [Guid.NewGuid()];
@@ -99,7 +112,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -138,7 +155,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -165,8 +186,17 @@ public class GoalServiceTests
     public async Task CreateGoalAsync_WhenCompleteDateIsInPast_ShouldThrowError()
     {
         // Arrange
+        var fakeDate = new DateTime(2023, 1, 1);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -177,7 +207,7 @@ public class GoalServiceTests
 
         var goal = _goalCreateRequestFaker.Generate();
         goal.AccountIds = [.. accounts.Select(a => a.ID)];
-        goal.CompleteDate = DateTime.Now.AddMonths(-1);
+        goal.CompleteDate = fakeDate.AddMonths(-1);
 
         // Act
         Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
@@ -193,7 +223,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var goal = _goalCreateRequestFaker.Generate();
         goal.AccountIds = [];
@@ -222,8 +256,17 @@ public class GoalServiceTests
     )
     {
         // Arrange
+        var fakeDate = new DateTime(2023, 1, 1);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object
+        );
 
         var accountFaker = new AccountFaker();
         var account = accountFaker.Generate();
@@ -235,7 +278,7 @@ public class GoalServiceTests
         var balance0 = balanceFaker.Generate();
         balance0.AccountID = account.ID;
         balance0.Amount = balance;
-        balance0.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
 
         account.Balances = [balance0];
 
@@ -264,8 +307,8 @@ public class GoalServiceTests
             .CompleteDate.Should()
             .Be(
                 new DateTime(
-                    DateTime.Now.AddMonths(monthsToPayoff).Year,
-                    DateTime.Now.AddMonths(monthsToPayoff).Month,
+                    fakeDate.AddMonths(monthsToPayoff).Year,
+                    fakeDate.AddMonths(monthsToPayoff).Month,
                     1
                 )
             );
@@ -286,8 +329,17 @@ public class GoalServiceTests
     )
     {
         // Arrange
+        var fakeDate = new DateTime(2023, 1, 1);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object
+        );
 
         var accountFaker = new AccountFaker();
         var account = accountFaker.Generate();
@@ -299,7 +351,7 @@ public class GoalServiceTests
         var balance0 = balanceFaker.Generate();
         balance0.AccountID = account.ID;
         balance0.Amount = balance;
-        balance0.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
 
         account.Balances = [balance0];
 
@@ -311,7 +363,7 @@ public class GoalServiceTests
         goal.UserID = helper.demoUser.Id;
 
         goal.Accounts = [account];
-        goal.CompleteDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddYears(5);
+        goal.CompleteDate = new DateTime(fakeDate.Year, fakeDate.Month, 1).AddYears(5);
         goal.Amount = goalTargetAmount;
         goal.InitialAmount = goalInitialAmount;
         goal.MonthlyContribution = null;
@@ -331,7 +383,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -372,7 +428,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var updatedGoal = _goalUpdateRequestFaker.Generate();
 
@@ -391,7 +451,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -427,7 +491,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -459,8 +527,17 @@ public class GoalServiceTests
     public async Task UpdateGoalAsync_WhenCompleteDateSetToPast_ShouldThrowError()
     {
         // Arrange
+        var fakeDate = new DateTime(2023, 1, 1);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -478,7 +555,7 @@ public class GoalServiceTests
 
         var updatedGoal = _goalUpdateRequestFaker.Generate();
         updatedGoal.ID = goal.ID;
-        updatedGoal.CompleteDate = DateTime.Now.AddMonths(-1);
+        updatedGoal.CompleteDate = fakeDate.AddMonths(-1);
         updatedGoal.IsCompleteDateEditable = true;
 
         // Act
@@ -501,7 +578,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -537,7 +618,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -564,7 +649,11 @@ public class GoalServiceTests
     public async Task DeleteGoalAsync_WhenInvalidGoal_ShouldThrowError()
     { // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
 
         // Act
         Func<Task> act = async () =>
@@ -580,8 +669,17 @@ public class GoalServiceTests
     public async Task CompleteGoalAsync_WhenIncomplete_ShouldMarkComplete()
     {
         // Arrange
+        var fakeDate = new DateTime(2023, 1, 1);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -598,7 +696,7 @@ public class GoalServiceTests
         helper.UserDataContext.Goals.Add(goal);
         helper.UserDataContext.SaveChanges();
 
-        var completedDate = DateTime.Now.AddDays(-1);
+        var completedDate = fakeDate.AddDays(-1);
 
         // Act
         await goalService.CompleteGoalAsync(helper.demoUser.Id, goal.ID, completedDate);
@@ -612,8 +710,17 @@ public class GoalServiceTests
     public async Task CompleteGoalAsync_WhenAlreadyComplete_ShouldThrowError()
     {
         // Arrange
+        var fakeDate = new DateTime(2023, 1, 1);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object
+        );
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
@@ -626,12 +733,12 @@ public class GoalServiceTests
         var goal = goalFaker.Generate();
         goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
-        goal.Completed = DateTime.Now;
+        goal.Completed = fakeDate;
 
         helper.UserDataContext.Goals.Add(goal);
         helper.UserDataContext.SaveChanges();
 
-        var completedDate = DateTime.Now.AddDays(-1);
+        var completedDate = fakeDate.AddDays(-1);
 
         // Act
         Func<Task> act = async () =>
@@ -647,10 +754,19 @@ public class GoalServiceTests
     public async Task CompleteGoalAsync_WhenInvalidGoal_ShouldThrowError()
     {
         // Arrange
-        var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var fakeDate = new DateTime(2023, 1, 1);
 
-        var completedDate = DateTime.Now.AddDays(-1);
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object
+        );
+
+        var completedDate = fakeDate.AddDays(-1);
 
         // Act
         Func<Task> act = async () =>
