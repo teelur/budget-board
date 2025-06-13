@@ -388,7 +388,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task DeleteAccountAsync_ExistingAccount_HappyPath()
     {
         // Arrange
-        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -448,7 +448,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task DeleteAccountAsync_DeleteTransactions_HappyPath()
     {
         // Arrange
-        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -489,7 +489,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task DeleteAccountAsync_DeleteLastAccount_ShouldDeleteInstitution()
     {
         // Arrange
-        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -564,7 +564,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_ExistingAccount_HappyPath()
     {
         // Arrange
-        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -595,7 +595,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_InvalidAccount_ThrowsError()
     {
         // Arrange
-        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -632,7 +632,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_RestoreTransactions_HappyPath()
     {
         // Arrange
-        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -675,7 +675,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_RestoreAccount_ShouldRestoreInstitution()
     {
         // Arrange
-        var fakeDate = new DateTime(2025, 01, 01).ToUniversalTime();
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);

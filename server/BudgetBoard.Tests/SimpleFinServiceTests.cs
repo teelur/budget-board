@@ -1,4 +1,5 @@
-﻿using BudgetBoard.Service;
+﻿using Bogus;
+using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using FluentAssertions;
@@ -82,7 +83,8 @@ public class SimpleFinServiceTests
         );
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
@@ -98,7 +100,7 @@ public class SimpleFinServiceTests
             helper.UserDataContext
         );
 
-        var fakeDate = new DateTime(2023, 5, 12);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProvider = Mock.Of<INowProvider>();
         Mock.Get(nowProvider).Setup(_ => _.UtcNow).Returns(fakeDate);

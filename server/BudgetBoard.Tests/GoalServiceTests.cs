@@ -186,7 +186,7 @@ public class GoalServiceTests
     public async Task CreateGoalAsync_WhenCompleteDateIsInPast_ShouldThrowError()
     {
         // Arrange
-        var fakeDate = new DateTime(2023, 1, 1);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -256,7 +256,7 @@ public class GoalServiceTests
     )
     {
         // Arrange
-        var fakeDate = new DateTime(2023, 1, 1);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -329,7 +329,7 @@ public class GoalServiceTests
     )
     {
         // Arrange
-        var fakeDate = new DateTime(2023, 1, 1);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -527,7 +527,7 @@ public class GoalServiceTests
     public async Task UpdateGoalAsync_WhenCompleteDateSetToPast_ShouldThrowError()
     {
         // Arrange
-        var fakeDate = new DateTime(2023, 1, 1);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -669,7 +669,7 @@ public class GoalServiceTests
     public async Task CompleteGoalAsync_WhenIncomplete_ShouldMarkComplete()
     {
         // Arrange
-        var fakeDate = new DateTime(2023, 1, 1);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -710,7 +710,7 @@ public class GoalServiceTests
     public async Task CompleteGoalAsync_WhenAlreadyComplete_ShouldThrowError()
     {
         // Arrange
-        var fakeDate = new DateTime(2023, 1, 1);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
@@ -754,7 +754,7 @@ public class GoalServiceTests
     public async Task CompleteGoalAsync_WhenInvalidGoal_ShouldThrowError()
     {
         // Arrange
-        var fakeDate = new DateTime(2023, 1, 1);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
