@@ -36,7 +36,8 @@ public class SimpleFinServiceTests
             Mock.Of<ITransactionService>(),
             Mock.Of<IBalanceService>(),
             Mock.Of<IGoalService>(),
-            Mock.Of<IApplicationUserService>()
+            Mock.Of<IApplicationUserService>(),
+            Mock.Of<INowProvider>()
         );
 
         // This is a demo token provided by SimpleFIN for dev.
@@ -97,6 +98,11 @@ public class SimpleFinServiceTests
             helper.UserDataContext
         );
 
+        var fakeDate = new DateTime(2023, 5, 12);
+
+        var nowProvider = Mock.Of<INowProvider>();
+        Mock.Get(nowProvider).Setup(_ => _.UtcNow).Returns(fakeDate);
+
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             Mock.Of<ILogger<ISimpleFinService>>(),
@@ -106,7 +112,8 @@ public class SimpleFinServiceTests
             transactionService,
             balanceService,
             goalService,
-            applicationUserService
+            applicationUserService,
+            nowProvider
         );
 
         // This is a demo token provided by SimpleFIN for dev.
@@ -121,9 +128,6 @@ public class SimpleFinServiceTests
         helper.UserDataContext.Accounts.Should().NotBeEmpty();
         helper.UserDataContext.Transactions.Should().NotBeEmpty();
         helper.UserDataContext.Balances.Should().NotBeEmpty();
-        helper
-            .UserDataContext.Users.Single()
-            .LastSync.Should()
-            .BeCloseTo(DateTime.Now.ToUniversalTime(), TimeSpan.FromMilliseconds(1000));
+        helper.UserDataContext.Users.Single().LastSync.Should().Be(fakeDate);
     }
 }

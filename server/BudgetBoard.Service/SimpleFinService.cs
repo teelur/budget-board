@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,8 @@ public class SimpleFinService(
     ITransactionService transactionService,
     IBalanceService balanceService,
     IGoalService goalService,
-    IApplicationUserService applicationUserService
+    IApplicationUserService applicationUserService,
+    INowProvider nowProvider
 ) : ISimpleFinService
 {
     public const long UNIX_MONTH = 2629743;
@@ -59,6 +61,7 @@ public class SimpleFinService(
     private readonly IHttpClientFactory _clientFactory = clientFactory;
     private readonly ILogger<ISimpleFinService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly INowProvider _nowProvider = nowProvider;
 
     private readonly IAccountService _accountService = accountService;
     private readonly IInstitutionService _institutionService = institutionService;
@@ -105,7 +108,7 @@ public class SimpleFinService(
 
         await _applicationUserService.UpdateApplicationUserAsync(
             userData.Id,
-            new ApplicationUserUpdateRequest { LastSync = DateTime.Now.ToUniversalTime() }
+            new ApplicationUserUpdateRequest { LastSync = _nowProvider.UtcNow }
         );
 
         return simpleFinData.Errors;
