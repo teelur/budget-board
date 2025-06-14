@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using FluentAssertions;
@@ -29,7 +30,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var transaction = _transactionCreateRequestFaker.Generate();
@@ -51,7 +53,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -79,7 +82,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var transaction = _transactionCreateRequestFaker.Generate();
@@ -101,7 +105,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -127,10 +132,16 @@ public class TransactionServiceTests
     public async Task CreateTransactionAsync_WhenNewTransactionIsNotLatest_ShouldUpdateAllSubsequentBalances()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
@@ -141,11 +152,11 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
         var balances = balanceFaker.Generate(5);
 
-        balances[0].DateTime = DateTime.Now.AddDays(-10);
-        balances[1].DateTime = DateTime.Now.AddDays(-5);
-        balances[2].DateTime = DateTime.Now.AddDays(-3);
-        balances[3].DateTime = DateTime.Now.AddDays(-1);
-        balances[4].DateTime = DateTime.Now;
+        balances[0].DateTime = fakeDate.AddDays(-10);
+        balances[1].DateTime = fakeDate.AddDays(-5);
+        balances[2].DateTime = fakeDate.AddDays(-3);
+        balances[3].DateTime = fakeDate.AddDays(-1);
+        balances[4].DateTime = fakeDate;
 
         account.Balances = balances;
 
@@ -154,7 +165,7 @@ public class TransactionServiceTests
 
         var transaction = _transactionCreateRequestFaker.Generate();
         transaction.AccountID = account.ID;
-        transaction.Date = DateTime.Now.AddDays(-2);
+        transaction.Date = fakeDate.AddDays(-2);
 
         var oldBalance = balances[4].Amount;
 
@@ -183,7 +194,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -218,7 +230,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         // Act
@@ -241,10 +254,16 @@ public class TransactionServiceTests
     public async Task ReadTransactionsAsync_WhenYearIsProvided_ShouldReturnTransactionsForYear()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
@@ -259,22 +278,22 @@ public class TransactionServiceTests
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
 
-        var year = DateTime.Now.Year;
-
         // Act
         var result = await transactionService.ReadTransactionsAsync(
             helper.demoUser.Id,
-            year,
+            fakeDate.Year,
             null,
             false
         );
 
         // Assert
-        result.Should().HaveCount(transactions.Where(t => t.Date.Year == year).Count());
+        result.Should().HaveCount(transactions.Where(t => t.Date.Year == fakeDate.Year).Count());
         result
             .Should()
             .BeEquivalentTo(
-                transactions.Where(t => t.Date.Year == year).Select(t => new TransactionResponse(t))
+                transactions
+                    .Where(t => t.Date.Year == fakeDate.Year)
+                    .Select(t => new TransactionResponse(t))
             );
     }
 
@@ -282,10 +301,16 @@ public class TransactionServiceTests
     public async Task ReadTransactionsAsync_WhenMonthIsProvided_ShouldReturnTransactionsForMonth()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
@@ -300,23 +325,21 @@ public class TransactionServiceTests
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
 
-        var month = DateTime.Now.Month;
-
         // Act
         var result = await transactionService.ReadTransactionsAsync(
             helper.demoUser.Id,
             null,
-            month,
+            fakeDate.Month,
             false
         );
 
         // Assert
-        result.Should().HaveCount(transactions.Where(t => t.Date.Month == month).Count());
+        result.Should().HaveCount(transactions.Where(t => t.Date.Month == fakeDate.Month).Count());
         result
             .Should()
             .BeEquivalentTo(
                 transactions
-                    .Where(t => t.Date.Month == month)
+                    .Where(t => t.Date.Month == fakeDate.Month)
                     .Select(t => new TransactionResponse(t))
             );
     }
@@ -328,7 +351,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -363,7 +387,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -398,7 +423,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -417,7 +443,7 @@ public class TransactionServiceTests
         {
             ID = transactions.First().ID,
             Amount = 100.0M,
-            Date = DateTime.Now,
+            Date = new Faker().Date.Past(),
             Category = "newCategory",
             Subcategory = "newSubcategory",
             MerchantName = "newMerchantName",
@@ -441,14 +467,15 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var editedTransaction = new TransactionUpdateRequest
         {
             ID = Guid.NewGuid(),
             Amount = 100.0M,
-            Date = DateTime.Now,
+            Date = new Faker().Date.Past(),
             Category = "newCategory",
             Subcategory = "newSubcategory",
             MerchantName = "newMerchantName",
@@ -468,10 +495,16 @@ public class TransactionServiceTests
     public async Task UpdateTransactionAsync_WhenAmountUpdated_ShouldUpdateBalance()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
@@ -482,11 +515,11 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
         var balances = balanceFaker.Generate(5);
 
-        balances[0].DateTime = DateTime.Now.AddDays(-10);
-        balances[1].DateTime = DateTime.Now.AddDays(-5);
-        balances[2].DateTime = DateTime.Now.AddDays(-3);
-        balances[3].DateTime = DateTime.Now.AddDays(-1);
-        balances[4].DateTime = DateTime.Now;
+        balances[0].DateTime = fakeDate.AddDays(-10);
+        balances[1].DateTime = fakeDate.AddDays(-5);
+        balances[2].DateTime = fakeDate.AddDays(-3);
+        balances[3].DateTime = fakeDate.AddDays(-1);
+        balances[4].DateTime = fakeDate;
 
         account.Balances = balances;
 
@@ -538,7 +571,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -572,7 +606,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         // Act
@@ -589,10 +624,16 @@ public class TransactionServiceTests
     public async Task DeleteTransactionAsync_WhenDeleteTransaction_ShouldUpdateBalance()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
@@ -603,11 +644,11 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
         var balances = balanceFaker.Generate(5);
 
-        balances[0].DateTime = DateTime.Now.AddDays(-10);
-        balances[1].DateTime = DateTime.Now.AddDays(-5);
-        balances[2].DateTime = DateTime.Now.AddDays(-3);
-        balances[3].DateTime = DateTime.Now.AddDays(-1);
-        balances[4].DateTime = DateTime.Now;
+        balances[0].DateTime = fakeDate.AddDays(-10);
+        balances[1].DateTime = fakeDate.AddDays(-5);
+        balances[2].DateTime = fakeDate.AddDays(-3);
+        balances[3].DateTime = fakeDate.AddDays(-1);
+        balances[4].DateTime = fakeDate;
 
         account.Balances = balances;
 
@@ -645,10 +686,16 @@ public class TransactionServiceTests
     public async Task RestoreTransactionAsync_WhenTransactionIsDeleted_ShouldRestoreTransaction()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            nowProviderMock.Object
         );
 
         var accountFaker = new AccountFaker();
@@ -664,7 +711,7 @@ public class TransactionServiceTests
         helper.UserDataContext.SaveChanges();
 
         var transactionToRestore = transactions.First();
-        transactionToRestore.Deleted = DateTime.Now.ToUniversalTime();
+        transactionToRestore.Deleted = fakeDate;
 
         // Act
         await transactionService.RestoreTransactionAsync(
@@ -686,7 +733,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         // Act
@@ -706,7 +754,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -743,7 +792,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -803,7 +853,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var splitTransactionRequest = new TransactionSplitRequest
@@ -839,7 +890,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();
@@ -885,7 +937,8 @@ public class TransactionServiceTests
         var helper = new TestHelper();
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
 
         var accountFaker = new AccountFaker();

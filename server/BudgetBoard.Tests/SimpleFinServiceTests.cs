@@ -1,4 +1,6 @@
-﻿using BudgetBoard.Service;
+﻿using Bogus;
+using BudgetBoard.Service;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -21,8 +23,10 @@ public class SimpleFinServiceTests
         var httpClient = new HttpClient();
 
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        httpClientFactoryMock.Setup(_ => _.CreateClient(string.Empty))
-        .Returns(httpClient).Verifiable();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
 
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
@@ -33,16 +37,22 @@ public class SimpleFinServiceTests
             Mock.Of<ITransactionService>(),
             Mock.Of<IBalanceService>(),
             Mock.Of<IGoalService>(),
-            Mock.Of<IApplicationUserService>());
+            Mock.Of<IApplicationUserService>(),
+            Mock.Of<INowProvider>()
+        );
 
         // This is a demo token provided by SimpleFIN for dev.
-        var accessToken = "aHR0cHM6Ly9iZXRhLWJyaWRnZS5zaW1wbGVmaW4ub3JnL3NpbXBsZWZpbi9jbGFpbS9ERU1P";
+        var accessToken =
+            "aHR0cHM6Ly9iZXRhLWJyaWRnZS5zaW1wbGVmaW4ub3JnL3NpbXBsZWZpbi9jbGFpbS9ERU1P";
 
         // Act
         await simpleFinService.UpdateAccessTokenFromSetupToken(helper.demoUser.Id, accessToken);
 
         // Assert
-        helper.UserDataContext.Users.Single().AccessToken.Should().Be("https://demo:demo@beta-bridge.simplefin.org/simplefin");
+        helper
+            .UserDataContext.Users.Single()
+            .AccessToken.Should()
+            .Be("https://demo:demo@beta-bridge.simplefin.org/simplefin");
     }
 
     // This test is a quick and dirty check that values from the SimpleFIN demo get added to the database.
@@ -56,15 +66,44 @@ public class SimpleFinServiceTests
         var httpClient = new HttpClient();
 
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        httpClientFactoryMock.Setup(_ => _.CreateClient(string.Empty))
-        .Returns(httpClient).Verifiable();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
 
-        var institutionService = new InstitutionService(Mock.Of<ILogger<IInstitutionService>>(), helper.UserDataContext);
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
-        var transactionService = new TransactionService(Mock.Of<ILogger<ITransactionService>>(), helper.UserDataContext);
-        var balanceService = new BalanceService(Mock.Of<ILogger<IBalanceService>>(), helper.UserDataContext);
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
-        var applicationUserService = new ApplicationUserService(Mock.Of<ILogger<IApplicationUserService>>(), helper.UserDataContext);
+        var institutionService = new InstitutionService(
+            Mock.Of<ILogger<IInstitutionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
+        var balanceService = new BalanceService(
+            Mock.Of<ILogger<IBalanceService>>(),
+            helper.UserDataContext
+        );
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
+        );
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext
+        );
+
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProvider = Mock.Of<INowProvider>();
+        Mock.Get(nowProvider).Setup(_ => _.UtcNow).Returns(fakeDate);
 
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
@@ -75,7 +114,9 @@ public class SimpleFinServiceTests
             transactionService,
             balanceService,
             goalService,
-            applicationUserService);
+            applicationUserService,
+            nowProvider
+        );
 
         // This is a demo token provided by SimpleFIN for dev.
         helper.demoUser.AccessToken = "https://demo:demo@beta-bridge.simplefin.org/simplefin";
@@ -89,6 +130,6 @@ public class SimpleFinServiceTests
         helper.UserDataContext.Accounts.Should().NotBeEmpty();
         helper.UserDataContext.Transactions.Should().NotBeEmpty();
         helper.UserDataContext.Balances.Should().NotBeEmpty();
-        helper.UserDataContext.Users.Single().LastSync.Should().BeCloseTo(DateTime.Now.ToUniversalTime(), TimeSpan.FromMilliseconds(1000));
+        helper.UserDataContext.Users.Single().LastSync.Should().Be(fakeDate);
     }
 }

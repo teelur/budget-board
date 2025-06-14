@@ -1,5 +1,6 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using Microsoft.EntityFrameworkCore;
@@ -9,11 +10,13 @@ namespace BudgetBoard.Service;
 
 public class InstitutionService(
     ILogger<IInstitutionService> logger,
-    UserDataContext userDataContext
+    UserDataContext userDataContext,
+    INowProvider nowProvider
 ) : IInstitutionService
 {
     private readonly ILogger<IInstitutionService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly INowProvider _nowProvider = nowProvider;
 
     public async Task CreateInstitutionAsync(Guid userGuid, IInstitutionCreateRequest request)
     {
@@ -82,7 +85,7 @@ public class InstitutionService(
         {
             foreach (var transaction in institution.Accounts.SelectMany(a => a.Transactions))
             {
-                transaction.Deleted = DateTime.Now.ToUniversalTime();
+                transaction.Deleted = _nowProvider.UtcNow;
             }
         }
 
@@ -115,7 +118,6 @@ public class InstitutionService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {

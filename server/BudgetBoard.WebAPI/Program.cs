@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.WebAPI.Jobs;
 using BudgetBoard.WebAPI.Utils;
@@ -161,6 +162,9 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
         options.WaitForJobsToComplete = true;
     });
 }
+
+// Used to abstract datetime
+builder.Services.AddSingleton<INowProvider, NowProvider>();
 
 // Add the services
 builder.Services.AddScoped<IAccountService, AccountService>();

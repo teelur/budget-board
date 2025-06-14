@@ -10,11 +10,13 @@ namespace BudgetBoard.Service;
 
 public class TransactionService(
     ILogger<ITransactionService> logger,
-    UserDataContext userDataContext
+    UserDataContext userDataContext,
+    INowProvider nowProvider
 ) : ITransactionService
 {
     private readonly ILogger<ITransactionService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly INowProvider _nowProvider = nowProvider;
 
     public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest transaction)
     {
@@ -169,7 +171,7 @@ public class TransactionService(
             );
         }
 
-        transaction.Deleted = DateTime.Now.ToUniversalTime();
+        transaction.Deleted = _nowProvider.UtcNow;
 
         var account = userData.Accounts.FirstOrDefault(a => a.ID == transaction.AccountID);
         if (account == null)
@@ -331,7 +333,7 @@ public class TransactionService(
             {
                 SyncID = string.Empty,
                 Amount = transaction.Amount ?? 0,
-                Date = transaction.Date ?? DateTime.Now.ToUniversalTime(),
+                Date = transaction.Date ?? _nowProvider.UtcNow,
                 Category = parentCategory,
                 Subcategory = childCategory,
                 MerchantName = transaction.Description,
