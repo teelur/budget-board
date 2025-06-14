@@ -83,11 +83,13 @@ public class SimpleFinService(
         if (userData.LastSync == DateTime.MinValue)
         {
             // If we haven't synced before, sync the full 90 days of history
-            startDate = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - (UNIX_MONTH * 3);
+            startDate =
+                ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - (UNIX_MONTH * 3);
         }
         else
         {
-            var oneMonthAgo = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - UNIX_MONTH;
+            var oneMonthAgo =
+                ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - UNIX_MONTH;
             var lastSyncWithBuffer =
                 ((DateTimeOffset)userData.LastSync).ToUnixTimeSeconds() - UNIX_WEEK;
 
