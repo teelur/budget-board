@@ -6,7 +6,7 @@ public interface INowProvider
     DateTime UtcNow { get; }
 }
 
-internal class NowProvider : INowProvider
+public class NowProvider : INowProvider
 {
     private static readonly Lazy<NowProvider> _instance = new(() => new NowProvider());
     public static NowProvider Instance => _instance.Value;
