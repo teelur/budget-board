@@ -10,7 +10,11 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class BudgetController(ILogger<BudgetController> logger, UserManager<ApplicationUser> userManager, IBudgetService budgetService) : ControllerBase
+public class BudgetController(
+    ILogger<BudgetController> logger,
+    UserManager<ApplicationUser> userManager,
+    IBudgetService budgetService
+) : ControllerBase
 {
     private readonly ILogger<BudgetController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -18,11 +22,18 @@ public class BudgetController(ILogger<BudgetController> logger, UserManager<Appl
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] BudgetCreateRequest[] budgets)
+    public async Task<IActionResult> Create(
+        [FromBody] BudgetCreateRequest[] budgets,
+        [FromQuery] bool? isCopy
+    )
     {
         try
         {
-            await _budgetService.CreateBudgetsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), budgets);
+            await _budgetService.CreateBudgetsAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                budgets,
+                isCopy ?? false
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
@@ -41,7 +52,12 @@ public class BudgetController(ILogger<BudgetController> logger, UserManager<Appl
     {
         try
         {
-            return Ok(await _budgetService.ReadBudgetsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), date));
+            return Ok(
+                await _budgetService.ReadBudgetsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    date
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
@@ -59,7 +75,10 @@ public class BudgetController(ILogger<BudgetController> logger, UserManager<Appl
     {
         try
         {
-            await _budgetService.UpdateBudgetAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), editBudget);
+            await _budgetService.UpdateBudgetAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                editBudget
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
@@ -78,7 +97,10 @@ public class BudgetController(ILogger<BudgetController> logger, UserManager<Appl
     {
         try
         {
-            await _budgetService.DeleteBudgetAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid);
+            await _budgetService.DeleteBudgetAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
