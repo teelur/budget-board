@@ -52,6 +52,17 @@ const AccountsCard = (): React.ReactNode => {
     [institutionQuery.data]
   );
 
+  const sortedFilteredInstitutionsForDisplay = React.useMemo(
+    () =>
+      sortedFilteredInstitutions.filter(
+        (i) =>
+          i.accounts.filter(
+            (a) => a.deleted === null && a.hideAccount === false
+          ).length > 0
+      ),
+    [sortedFilteredInstitutions]
+  );
+
   return (
     <Card
       className={classes.card}
@@ -70,8 +81,8 @@ const AccountsCard = (): React.ReactNode => {
       <Stack className={classes.accountsContainer}>
         {institutionQuery.isPending || accountsQuery.isPending ? (
           <Skeleton height={600} radius="lg" />
-        ) : (sortedFilteredInstitutions ?? []).length > 0 ? (
-          (sortedFilteredInstitutions ?? []).map(
+        ) : (sortedFilteredInstitutionsForDisplay ?? []).length > 0 ? (
+          (sortedFilteredInstitutionsForDisplay ?? []).map(
             (institution: IInstitution) => (
               <InstitutionItem key={institution.id} institution={institution} />
             )
