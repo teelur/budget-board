@@ -33,6 +33,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         url: "/api/budget",
         method: "POST",
         data: newBudgets,
+        params: { isCopy: true },
       }),
     onSuccess: async (_, variables: IBudgetCreateRequest[]) =>
       await queryClient.invalidateQueries({
