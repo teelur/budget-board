@@ -18,7 +18,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
     public async Task CreateBudgetsAsync(
         Guid userGuid,
         IEnumerable<IBudgetCreateRequest> budgets,
-        bool isCopy
+        bool isCopy = false
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
