@@ -222,7 +222,9 @@ const ImportTransactionsModal = () => {
   );
 
   const resetColumnsOptions = () => {
+    dateFormatField.reset();
     invertAmountField.reset();
+    splitIntoSeparateColumnsField.reset();
     includeExpensesColumnField.reset();
     expensesColumnField.reset();
     expensesColumnValueField.reset();
