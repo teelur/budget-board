@@ -7,6 +7,9 @@ interface ColumnsSelectProps {
   category: string | null;
   amount: string | null;
   account: string | null;
+  incomeAmount: string | null;
+  expenseAmount: string | null;
+  splitAmount: boolean;
   setColumn: (column: string, value: string) => void;
 }
 
@@ -36,13 +39,35 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
           value={props.category}
           onChange={(value) => props.setColumn("category", value ?? "")}
         />
-        <Select
-          label="Amount"
-          data={props.columns}
-          clearable
-          value={props.amount}
-          onChange={(value) => props.setColumn("amount", value ?? "")}
-        />
+        {!props.splitAmount && (
+          <Select
+            label="Amount"
+            data={props.columns}
+            clearable
+            value={props.amount}
+            onChange={(value) => props.setColumn("amount", value ?? "")}
+          />
+        )}
+        {props.splitAmount && (
+          <>
+            <Select
+              label="Income Amount"
+              data={props.columns}
+              clearable
+              value={props.incomeAmount}
+              onChange={(value) => props.setColumn("incomeAmount", value ?? "")}
+            />
+            <Select
+              label="Expense Amount"
+              data={props.columns}
+              clearable
+              value={props.expenseAmount}
+              onChange={(value) =>
+                props.setColumn("expenseAmount", value ?? "")
+              }
+            />
+          </>
+        )}
         <Select
           label="Account"
           data={props.columns}
