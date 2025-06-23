@@ -26,6 +26,7 @@ import { areDatesEqual } from "~/helpers/datetime";
 import { IAccount } from "~/models/account";
 import { ICategoryResponse } from "~/models/category";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
+import dayjs from "dayjs";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -82,15 +83,27 @@ const ImportTransactionsModal = () => {
   const amountField = useField<string | null>({
     initialValue: null,
   });
+  const incomeField = useField<string | null>({
+    initialValue: null,
+  });
+  const expenseField = useField<string | null>({
+    initialValue: null,
+  });
   const accountField = useField<string | null>({
     initialValue: null,
   });
 
   // Columns Options
-  const includeExpensesColumnField = useField<boolean>({
-    initialValue: false,
+  const dateFormatField = useField<string | null>({
+    initialValue: "MM/DD/YYYY",
   });
   const invertAmountField = useField<boolean>({
+    initialValue: false,
+  });
+  const splitIntoSeparateColumnsField = useField<boolean>({
+    initialValue: false,
+  });
+  const includeExpensesColumnField = useField<boolean>({
     initialValue: false,
   });
   const expensesColumnField = useField<string | null>({
@@ -231,6 +244,8 @@ const ImportTransactionsModal = () => {
     descriptionField.reset();
     categoryField.reset();
     amountField.reset();
+    incomeField.reset();
+    expenseField.reset();
     accountField.reset();
 
     resetColumnsOptions();
@@ -350,6 +365,8 @@ const ImportTransactionsModal = () => {
         !descriptionField.getValue() &&
         !categoryField.getValue() &&
         !amountField.getValue() &&
+        !incomeField.getValue() &&
+        !expenseField.getValue() &&
         !accountField.getValue()
       ) {
         setImportedTransactionsTableData([]);
@@ -369,28 +386,51 @@ const ImportTransactionsModal = () => {
       const expensesColumnName = expensesColumnField.getValue();
 
       const importedTransactions: ITransactionImportTableData[] = csvData.map(
-        (row: any) => ({
-          uid: row.uid,
-          date: dateField.getValue()
-            ? new Date(row[dateField.getValue()!])
-            : null,
-          description: descriptionField.getValue()
-            ? row[descriptionField.getValue()!]
-            : null,
-          category: categoryField.getValue()
-            ? row[categoryField.getValue()!]
-            : null,
-          amount: amountField.getValue() ? row[amountField.getValue()!] : null,
-          account: accountField.getValue()
-            ? row[accountField.getValue()!]
-            : null,
-          type:
-            includeExpensesColumn &&
-            expensesColumnName &&
-            expensesColumnName.length > 0
-              ? row[expensesColumnName]
+        (row: any) => {
+          let amount: number | null = null;
+          if (splitIntoSeparateColumnsField.getValue()) {
+            const incomeValue: string | null = row[incomeField.getValue()!];
+            const expenseValue: string | null = row[expenseField.getValue()!];
+
+            if (incomeValue) {
+              amount = parseFloat(incomeValue);
+            }
+            if (expenseValue) {
+              amount = parseFloat(expenseValue) * -1;
+            }
+          } else {
+            const amountValue: string | null = row[amountField.getValue()!];
+            if (amountValue) {
+              amount = parseFloat(amountValue);
+            }
+          }
+
+          return {
+            uid: row.uid,
+            date: dateField.getValue()
+              ? dayjs(
+                  row[dateField.getValue()!],
+                  dateFormatField.getValue() ?? "MM/DD/YYYY"
+                ).toDate()
               : null,
-        })
+            description: descriptionField.getValue()
+              ? row[descriptionField.getValue()!]
+              : null,
+            category: categoryField.getValue()
+              ? row[categoryField.getValue()!]
+              : null,
+            amount,
+            account: accountField.getValue()
+              ? row[accountField.getValue()!]
+              : null,
+            type:
+              includeExpensesColumn &&
+              expensesColumnName &&
+              expensesColumnName.length > 0
+                ? row[expensesColumnName]
+                : null,
+          } as ITransactionImportTableData;
+        }
       );
 
       if (invertAmountField.getValue()) {
@@ -549,7 +589,11 @@ const ImportTransactionsModal = () => {
       categoryField.getValue(),
       amountField.getValue(),
       accountField.getValue(),
+      incomeField.getValue(),
+      expenseField.getValue(),
+      dateFormatField.getValue(),
       invertAmountField.getValue(),
+      splitIntoSeparateColumnsField.getValue(),
       includeExpensesColumnField.getValue(),
       expensesColumnField.getValue(),
       expensesColumnValueField.getValue(),
@@ -603,6 +647,19 @@ const ImportTransactionsModal = () => {
         break;
       case "account":
         accountField.setValue(value);
+        break;
+      case "incomeAmount":
+        incomeField.setValue(value);
+        break;
+      case "expenseAmount":
+        expenseField.setValue(value);
+        break;
+      default:
+        // This really should be a debug assert.
+        notifications.show({
+          color: "red",
+          message: `Unknown column: ${column}`,
+        });
         break;
     }
   };
@@ -722,6 +779,9 @@ const ImportTransactionsModal = () => {
               category={categoryField.getValue()}
               amount={amountField.getValue()}
               account={accountField.getValue()}
+              splitAmount={splitIntoSeparateColumnsField.getValue()}
+              incomeAmount={incomeField.getValue()}
+              expenseAmount={expenseField.getValue()}
               setColumn={setColumn}
             />
           )}
@@ -749,6 +809,10 @@ const ImportTransactionsModal = () => {
               setFilterByAmount={filterByAmountField.setValue}
               filterByAccount={filterByAccountField.getValue()}
               setFilterByAccount={filterByAccountField.setValue}
+              dateFormat={dateFormatField.getValue() ?? ""}
+              setDateFormat={dateFormatField.setValue}
+              splitAmountColumn={splitIntoSeparateColumnsField.getValue()}
+              setSplitAmountColumn={splitIntoSeparateColumnsField.setValue}
             />
           )}
           {accountNameToAccountIdMap.size > 0 && (
