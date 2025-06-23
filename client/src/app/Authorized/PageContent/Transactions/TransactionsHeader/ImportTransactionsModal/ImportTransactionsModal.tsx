@@ -575,6 +575,7 @@ const ImportTransactionsModal = () => {
           accountNameToAccountIdMap.set(transaction.account, "");
         }
       });
+
       setAccountNameToAccountIdMap(accountNameToAccountIdMap);
     } finally {
       setIsLoading(false);
