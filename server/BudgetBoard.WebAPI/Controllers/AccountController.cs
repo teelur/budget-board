@@ -38,7 +38,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            _logger.LogError(ex, "An unexpected error occurred.");
             return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
@@ -61,7 +61,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            _logger.LogError(ex, "An unexpected error occurred.");
             return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
@@ -85,7 +85,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            _logger.LogError(ex, "An unexpected error occurred.");
             return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
@@ -108,7 +108,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            _logger.LogError(ex, "An unexpected error occurred.");
             return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
@@ -132,7 +132,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            _logger.LogError(ex, "An unexpected error occurred.");
             return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
@@ -156,7 +156,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            _logger.LogError(ex, "An unexpected error occurred.");
             return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
@@ -180,7 +180,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            _logger.LogError(ex, "An unexpected error occurred.");
             return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
