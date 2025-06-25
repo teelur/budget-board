@@ -18,10 +18,15 @@ export interface ValidationError {
  * - If the error occurred during request setup, a setup error message is returned.
  */
 export const translateAxiosError = (error: AxiosError): string => {
-  if (error.response?.data && typeof error.response.data === "string") {
-    // The request was made and the server responded with a status code
-    // that falls out of the range of 2xx
-    return error.response.data;
+  if (error.response?.data) {
+    if (typeof error.response.data === "string") {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      return error.response.data;
+    } else if (typeof error.response.data === "object" && error.response.data.message) {
+      // The server responded with a JSON-style error containing a `message` property
+      return error.response.data.message;
+    }
   } else if (error.request) {
     // The request was made but no response was received
     return "No response received from the server.";
