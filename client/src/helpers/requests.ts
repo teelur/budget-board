@@ -23,10 +23,8 @@ export const translateAxiosError = (error: AxiosError): string => {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
       return error.response.data;
-    } else if (typeof error.response.data === "object" && error.response.data.message) {
-      // The server responded with a JSON-style error containing a `message` property
-      return error.response.data.message;
     }
+    return "An error occurred with an unexpected response format.";
   } else if (error.request) {
     // The request was made but no response was received
     return "No response received from the server.";
