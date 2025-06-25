@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 
 export interface ValidationError {
   title: string;
@@ -8,39 +8,24 @@ export interface ValidationError {
 }
 
 /**
- * Retrieves a string error message from the provided Axios response.
+ * Translates an Axios error object into a human-readable error message.
  *
- * @param {AxiosResponse | undefined} error - The Axios response from which to extract the error message.
- * @returns {string} A string error message if available, or a default error message.
- */
-const getErrorString = (error: AxiosResponse | undefined): string => {
-  if (typeof error?.data === "string" && error?.data.length > 0) {
-    return error.data;
-  }
-  return "There was an error with your request.";
-};
-
-/**
- * Translates an AxiosError object into a human-readable error message.
+ * @param error - The AxiosError object to translate.
+ * @returns A string describing the error, based on the error's response, request, or setup.
  *
- * @param {AxiosError} error - The error object from an Axios request.
- * @returns {string} A human-readable error message.
- *
- * The function handles specific Axios error codes:
- * - "ERR_BAD_REQUEST"
- * - "ERR_NETWORK"
- * - "ERR_BAD_RESPONSE"
- *
- * For these error types, it extracts a detailed error message from the response data using getErrorString.
- * If none of these specific error codes are matched, it returns a generic unspecified error message.
+ * - If the server responded with an error message (as a string), that message is returned.
+ * - If the request was made but no response was received, a generic message is returned.
+ * - If the error occurred during request setup, a setup error message is returned.
  */
 export const translateAxiosError = (error: AxiosError): string => {
-  if (error.code === "ERR_BAD_REQUEST") {
-    return getErrorString(error.response);
-  } else if (error.code === "ERR_NETWORK") {
-    return getErrorString(error.response);
-  } else if (error.code === "ERR_BAD_RESPONSE") {
-    return getErrorString(error.response);
+  if (error.response?.data && typeof error.response.data === "string") {
+    // The request was made and the server responded with a status code
+    // that falls out of the range of 2xx
+    return error.response.data;
+  } else if (error.request) {
+    // The request was made but no response was received
+    return "No response received from the server.";
   }
-  return "An unspecified error occurred.";
+  // Something happened in setting up the request that triggered an Error
+  return "An error occurred while setting up the request.";
 };
