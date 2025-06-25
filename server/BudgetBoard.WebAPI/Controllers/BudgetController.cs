@@ -40,9 +40,10 @@ public class BudgetController(
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -63,9 +64,10 @@ public class BudgetController(
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -85,9 +87,10 @@ public class BudgetController(
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -107,9 +110,10 @@ public class BudgetController(
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 }

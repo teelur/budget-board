@@ -10,7 +10,11 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class GoalController(ILogger<GoalController> logger, UserManager<ApplicationUser> userManager, IGoalService goalService) : ControllerBase
+public class GoalController(
+    ILogger<GoalController> logger,
+    UserManager<ApplicationUser> userManager,
+    IGoalService goalService
+) : ControllerBase
 {
     private readonly ILogger<GoalController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -22,16 +26,20 @@ public class GoalController(ILogger<GoalController> logger, UserManager<Applicat
     {
         try
         {
-            await _goalService.CreateGoalAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), newGoal);
+            await _goalService.CreateGoalAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                newGoal
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -41,15 +49,21 @@ public class GoalController(ILogger<GoalController> logger, UserManager<Applicat
     {
         try
         {
-            return Ok(await _goalService.ReadGoalsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), includeInterest));
+            return Ok(
+                await _goalService.ReadGoalsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    includeInterest
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -59,16 +73,20 @@ public class GoalController(ILogger<GoalController> logger, UserManager<Applicat
     {
         try
         {
-            await _goalService.UpdateGoalAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), editedGoal);
+            await _goalService.UpdateGoalAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                editedGoal
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -78,16 +96,20 @@ public class GoalController(ILogger<GoalController> logger, UserManager<Applicat
     {
         try
         {
-            await _goalService.DeleteGoalAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid);
+            await _goalService.DeleteGoalAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -98,16 +120,21 @@ public class GoalController(ILogger<GoalController> logger, UserManager<Applicat
     {
         try
         {
-            await _goalService.CompleteGoalAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), goalID, DateTime.UtcNow);
+            await _goalService.CompleteGoalAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                goalID,
+                DateTime.UtcNow
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 }

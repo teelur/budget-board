@@ -10,7 +10,11 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class BalanceController(ILogger<BalanceController> logger, UserManager<ApplicationUser> userManager, IBalanceService balanceService) : ControllerBase
+public class BalanceController(
+    ILogger<BalanceController> logger,
+    UserManager<ApplicationUser> userManager,
+    IBalanceService balanceService
+) : ControllerBase
 {
     private readonly ILogger<BalanceController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -22,16 +26,20 @@ public class BalanceController(ILogger<BalanceController> logger, UserManager<Ap
     {
         try
         {
-            await _balanceService.CreateBalancesAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), balance);
+            await _balanceService.CreateBalancesAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                balance
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -41,15 +49,21 @@ public class BalanceController(ILogger<BalanceController> logger, UserManager<Ap
     {
         try
         {
-            return Ok(await _balanceService.ReadBalancesAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), accountId));
+            return Ok(
+                await _balanceService.ReadBalancesAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    accountId
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -59,16 +73,20 @@ public class BalanceController(ILogger<BalanceController> logger, UserManager<Ap
     {
         try
         {
-            await _balanceService.UpdateBalanceAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), updatedBalance);
+            await _balanceService.UpdateBalanceAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                updatedBalance
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -78,16 +96,20 @@ public class BalanceController(ILogger<BalanceController> logger, UserManager<Ap
     {
         try
         {
-            await _balanceService.DeleteBalanceAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), id);
+            await _balanceService.DeleteBalanceAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                id
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 }

@@ -10,7 +10,11 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
-public class SimpleFinController(ILogger<SimpleFinController> logger, UserManager<ApplicationUser> userManager, ISimpleFinService simpleFinService) : ControllerBase
+public class SimpleFinController(
+    ILogger<SimpleFinController> logger,
+    UserManager<ApplicationUser> userManager,
+    ISimpleFinService simpleFinService
+) : ControllerBase
 {
     private readonly ILogger<SimpleFinController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -22,15 +26,20 @@ public class SimpleFinController(ILogger<SimpleFinController> logger, UserManage
     {
         try
         {
-            return Ok(await _simpleFinService.SyncAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty)));
+            return Ok(
+                await _simpleFinService.SyncAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -40,16 +49,20 @@ public class SimpleFinController(ILogger<SimpleFinController> logger, UserManage
     {
         try
         {
-            await _simpleFinService.UpdateAccessTokenFromSetupToken(new Guid(_userManager.GetUserId(User) ?? string.Empty), setupToken);
+            await _simpleFinService.UpdateAccessTokenFromSetupToken(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                setupToken
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 }

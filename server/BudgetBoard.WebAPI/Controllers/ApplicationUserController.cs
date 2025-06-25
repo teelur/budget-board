@@ -11,12 +11,19 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 public class ApplicationUserConstants
 {
-    public const string UserType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+    public const string UserType =
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 }
 
 [Route("api/[controller]")]
 [ApiController]
-public class ApplicationUserController(ILogger<ApplicationUserController> logger, UserManager<ApplicationUser> userManager, UserDataContext context, IApplicationUserService applicationUserService, ISimpleFinService simpleFinService) : ControllerBase
+public class ApplicationUserController(
+    ILogger<ApplicationUserController> logger,
+    UserManager<ApplicationUser> userManager,
+    UserDataContext context,
+    IApplicationUserService applicationUserService,
+    ISimpleFinService simpleFinService
+) : ControllerBase
 {
     private readonly ILogger<ApplicationUserController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -30,15 +37,20 @@ public class ApplicationUserController(ILogger<ApplicationUserController> logger
     {
         try
         {
-            return Ok(await _applicationUserService.ReadApplicationUserAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty)));
+            return Ok(
+                await _applicationUserService.ReadApplicationUserAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -48,16 +60,20 @@ public class ApplicationUserController(ILogger<ApplicationUserController> logger
     {
         try
         {
-            await _applicationUserService.UpdateApplicationUserAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), newUser);
+            await _applicationUserService.UpdateApplicationUserAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                newUser
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.WebAPI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -33,19 +34,12 @@ public class UserSettingsController(
         }
         catch (BudgetBoardServiceException bbex)
         {
-            var errorObjectResult = new ObjectResult(bbex.Message)
-            {
-                StatusCode = StatusCodes.Status500InternalServerError,
-            };
-            return errorObjectResult;
+            return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            var errorObjectResult = new ObjectResult("There was an internal server error.")
-            {
-                StatusCode = StatusCodes.Status500InternalServerError,
-            };
-            return errorObjectResult;
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -65,19 +59,12 @@ public class UserSettingsController(
         }
         catch (BudgetBoardServiceException bbex)
         {
-            var errorObjectResult = new ObjectResult(bbex.Message)
-            {
-                StatusCode = StatusCodes.Status500InternalServerError,
-            };
-            return errorObjectResult;
+            return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            var errorObjectResult = new ObjectResult("There was an internal server error.")
-            {
-                StatusCode = StatusCodes.Status500InternalServerError,
-            };
-            return errorObjectResult;
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 }

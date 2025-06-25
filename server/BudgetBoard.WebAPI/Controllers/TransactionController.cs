@@ -10,7 +10,11 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TransactionController(ILogger<TransactionController> logger, UserManager<ApplicationUser> userManager, ITransactionService transactionService) : ControllerBase
+public class TransactionController(
+    ILogger<TransactionController> logger,
+    UserManager<ApplicationUser> userManager,
+    ITransactionService transactionService
+) : ControllerBase
 {
     private readonly ILogger<TransactionController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -22,16 +26,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.CreateTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), transaction);
+            await _transactionService.CreateTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                transaction
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -39,18 +47,25 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     [Authorize]
     public async Task<IActionResult> Read(int? year, int? month, bool getHidden = false)
     {
-
         try
         {
-            return Ok(await _transactionService.ReadTransactionsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), year, month, getHidden));
+            return Ok(
+                await _transactionService.ReadTransactionsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    year,
+                    month,
+                    getHidden
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -60,15 +75,24 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            return Ok(await _transactionService.ReadTransactionsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), null, null, false, guid));
+            return Ok(
+                await _transactionService.ReadTransactionsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    null,
+                    null,
+                    false,
+                    guid
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -78,16 +102,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.UpdateTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), newTransaction);
+            await _transactionService.UpdateTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                newTransaction
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -97,16 +125,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.DeleteTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid);
+            await _transactionService.DeleteTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -117,16 +149,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.RestoreTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid);
+            await _transactionService.RestoreTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -137,16 +173,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.SplitTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), splitTransaction);
+            await _transactionService.SplitTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                splitTransaction
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -157,16 +197,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.ImportTransactionsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), importTransaction);
+            await _transactionService.ImportTransactionsAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                importTransaction
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex);
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 }
