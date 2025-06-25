@@ -10,7 +10,11 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AccountController(ILogger<AccountController> logger, UserManager<ApplicationUser> userManager, IAccountService accountService) : ControllerBase
+public class AccountController(
+    ILogger<AccountController> logger,
+    UserManager<ApplicationUser> userManager,
+    IAccountService accountService
+) : ControllerBase
 {
     private readonly ILogger<AccountController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -22,24 +26,20 @@ public class AccountController(ILogger<AccountController> logger, UserManager<Ap
     {
         try
         {
-            await _accountService.CreateAccountAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), account);
+            await _accountService.CreateAccountAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                account
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
-            var errorObjectResult = new ObjectResult(bbex.Message)
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
-            return errorObjectResult;
+            return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            var errorObjectResult = new ObjectResult("There was an internal server error.")
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
-            return errorObjectResult;
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -49,23 +49,20 @@ public class AccountController(ILogger<AccountController> logger, UserManager<Ap
     {
         try
         {
-            return Ok(await _accountService.ReadAccountsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty)));
+            return Ok(
+                await _accountService.ReadAccountsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
-            var errorObjectResult = new ObjectResult(bbex.Message)
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
-            return errorObjectResult;
+            return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            var errorObjectResult = new ObjectResult("There was an internal server error.")
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
-            return errorObjectResult;
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -75,23 +72,21 @@ public class AccountController(ILogger<AccountController> logger, UserManager<Ap
     {
         try
         {
-            return Ok(await _accountService.ReadAccountsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid));
+            return Ok(
+                await _accountService.ReadAccountsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    guid
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
-            var errorObjectResult = new ObjectResult(bbex.Message)
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
-            return errorObjectResult;
+            return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            var errorObjectResult = new ObjectResult("There was an internal server error.")
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
-            return errorObjectResult;
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -101,16 +96,20 @@ public class AccountController(ILogger<AccountController> logger, UserManager<Ap
     {
         try
         {
-            await _accountService.UpdateAccountAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), editedAccount);
+            await _accountService.UpdateAccountAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                editedAccount
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -120,16 +119,21 @@ public class AccountController(ILogger<AccountController> logger, UserManager<Ap
     {
         try
         {
-            await _accountService.DeleteAccountAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid, deleteTransactions);
+            await _accountService.DeleteAccountAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid,
+                deleteTransactions
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -140,16 +144,20 @@ public class AccountController(ILogger<AccountController> logger, UserManager<Ap
     {
         try
         {
-            await _accountService.RestoreAccountAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid);
+            await _accountService.RestoreAccountAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 
@@ -160,16 +168,20 @@ public class AccountController(ILogger<AccountController> logger, UserManager<Ap
     {
         try
         {
-            await _accountService.OrderAccountsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), accounts);
+            await _accountService.OrderAccountsAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                accounts
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
 }
