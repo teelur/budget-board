@@ -119,6 +119,7 @@ builder
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.Converters.Add(new FlexibleStringConverter());
     });
 
 //Add support to logging with SERILOG
