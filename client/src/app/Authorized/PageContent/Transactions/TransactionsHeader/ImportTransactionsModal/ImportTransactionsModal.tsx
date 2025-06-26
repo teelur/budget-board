@@ -12,7 +12,9 @@ import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import {
   defaultTransactionCategories,
+  IAccountNameToIDKeyValuePair,
   ITransaction,
+  ITransactionImport,
   ITransactionImportRequest,
   ITransactionImportTableData,
 } from "~/models/transaction";
@@ -710,17 +712,19 @@ const ImportTransactionsModal = () => {
       return;
     }
 
-    const accountNameToAccountArray = Array.from(
-      accountNameToAccountIdMap.entries()
-    )
-      .filter(([_, accountID]) => !!accountID)
-      .map(([accountName, accountID]) => ({
-        accountName,
-        accountID,
-      }));
+    const accountNameToAccountArray: IAccountNameToIDKeyValuePair[] =
+      Array.from(accountNameToAccountIdMap.entries())
+        .filter(([_, accountID]) => !!accountID)
+        .map(
+          ([accountName, accountID]) =>
+            ({
+              accountName,
+              accountID,
+            } as IAccountNameToIDKeyValuePair)
+        );
 
     const transactionImportRequest: ITransactionImportRequest = {
-      transactions: filteredImportedData,
+      transactions: filteredImportedData as ITransactionImport[],
       accountNameToIDMap: accountNameToAccountArray,
     };
 
