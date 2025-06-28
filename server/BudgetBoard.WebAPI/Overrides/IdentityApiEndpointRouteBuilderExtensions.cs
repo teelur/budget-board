@@ -113,9 +113,11 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
         if (!configureOptions.ExcludeLoginPost)
         {
-            routeGroup.MapPost(
+            _ = routeGroup.MapPost(
                 "/login",
-                async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>> (
+                async Task<
+                    Results<Ok<AccessTokenResponse>, Ok<string>, EmptyHttpResult, ProblemHttpResult>
+                > (
                     [FromBody] LoginRequest login,
                     [FromQuery] bool? useCookies,
                     [FromQuery] bool? useSessionCookies,
@@ -152,6 +154,10 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             result = await signInManager.TwoFactorRecoveryCodeSignInAsync(
                                 login.TwoFactorRecoveryCode
                             );
+                        }
+                        else
+                        {
+                            return TypedResults.Ok(result.ToString());
                         }
                     }
 

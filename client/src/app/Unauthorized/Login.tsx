@@ -54,6 +54,13 @@ const Login = (props: LoginProps): React.ReactNode => {
       },
     })
       .then((res: AxiosResponse) => {
+        if (res.data === "RequiresTwoFactor") {
+          props.setLoginCardState(LoginCardState.LoginWith2fa);
+          props.setUserEmail(values.email);
+          props.setUserPassword(values.password);
+          return;
+        }
+
         setAccessToken(res.data.accessToken);
         localStorage.setItem("refresh-token", res.data.refreshToken);
       })
@@ -71,12 +78,6 @@ const Login = (props: LoginProps): React.ReactNode => {
             color: "red",
             message: "Login failed. Check your credentials and try again.",
           });
-        } else if (
-          (error.response?.data as any)?.detail === "RequiresTwoFactor"
-        ) {
-          props.setLoginCardState(LoginCardState.LoginWith2fa);
-          props.setUserEmail(values.email);
-          props.setUserPassword(values.password);
         } else {
           notifications.show({
             color: "red",
