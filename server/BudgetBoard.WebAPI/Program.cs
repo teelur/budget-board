@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Serilog;
@@ -76,10 +75,7 @@ builder.Services.AddDbContext<UserDataContext>(o =>
 );
 
 // Configure Identity
-builder
-    .Services.AddAuthentication(IdentityConstants.BearerScheme)
-    .AddBearerToken(IdentityConstants.BearerScheme)
-    .AddIdentityCookies();
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
 
 builder.Services.AddAuthorization();
 
@@ -209,20 +205,6 @@ app.UseCors(MyAllowSpecificOrigins);
 // to set the appropriate headers.
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapPost(
-        "/api/logout",
-        async (SignInManager<ApplicationUser> signInManager, [FromBody] object empty) =>
-        {
-            if (empty != null)
-            {
-                await signInManager.SignOutAsync();
-                return Results.Ok();
-            }
-            return Results.Unauthorized();
-        }
-    )
-    .RequireAuthorization(); // So that only authorized users can use this endpoint
 
 app.MapControllers();
 

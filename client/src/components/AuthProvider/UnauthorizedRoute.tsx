@@ -8,7 +8,7 @@ interface UnauthorizedRouteProps {
 }
 
 const UnauthorizedRoute = (props: UnauthorizedRouteProps): React.ReactNode => {
-  const { accessToken, loading } = useContext<any>(AuthContext);
+  const { isUserAuthenticated, loading } = useContext<any>(AuthContext);
 
   if (loading) {
     return (
@@ -18,7 +18,7 @@ const UnauthorizedRoute = (props: UnauthorizedRouteProps): React.ReactNode => {
     );
   }
 
-  if (!accessToken) {
+  if (!isUserAuthenticated) {
     return props.children;
   }
 

@@ -11,7 +11,7 @@ import { useField } from "@mantine/form";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { LoginCardState } from "./Welcome";
@@ -35,7 +35,8 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
     },
   });
 
-  const { request, setAccessToken } = React.useContext<any>(AuthContext);
+  const { request, setIsUserAuthenticated } =
+    React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
 
@@ -60,9 +61,8 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         twoFactorCode: authenticationCodeField.getValue(),
       },
     })
-      .then((res: AxiosResponse) => {
-        setAccessToken(res.data.accessToken);
-        localStorage.setItem("refresh-token", res.data.refreshToken);
+      .then(() => {
+        setIsUserAuthenticated(true);
       })
       .catch((error: AxiosError) => {
         // These error response values are specific to ASP.NET Identity,

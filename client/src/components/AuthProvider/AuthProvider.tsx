@@ -1,33 +1,23 @@
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
+import { notifications } from "@mantine/notifications";
 
 export const AuthContext = createContext({});
 
 export interface AuthContextValue {
-  accessToken: string;
-  setAccessToken: (isLoggedIn: string) => void;
+  isUserAuthenticated: boolean;
+  setIsUserAuthenticated: (isLoggedIn: boolean) => void;
   loading: boolean;
   request: ({ ...options }) => Promise<AxiosResponse>;
 }
 
 const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
-  const [accessToken, setAccessToken] = useState<string>("");
-  const [accessTokenExpirationDate, setAccessTokenExpirationDate] = useState(
-    new Date(0)
-  );
+  const [isUserAuthenticated, setIsUserAuthenticated] =
+    useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const { envVariables } = getProjectEnvVariables();
-
-  // The access token will refresh when there are less than this amount of seconds left before it expires.
-  const accessTokenRefreshTime = 30;
-
-  const getDateXSecondsFromNow = (seconds: number): Date => {
-    const now = new Date();
-    now.setSeconds(now.getSeconds() + seconds);
-    return now;
-  };
 
   // base url is sourced from environment variables
   const client = axios.create({
@@ -41,64 +31,32 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
       throw error;
     };
 
-    // If the access token is expiring soon, refresh before the request
-    if (
-      (accessTokenExpirationDate.getTime() - new Date().getTime()) / 1000 <
-      accessTokenRefreshTime
-    ) {
-      const refreshToken = localStorage.getItem("refresh-token");
-      if (refreshToken) {
-        const res: AxiosResponse = await client({
-          url: "/api/refresh",
-          method: "POST",
-          data: { refreshToken },
-        });
-        localStorage.setItem("refresh-token", res.data.refreshToken);
-        setAccessToken(res.data.accessToken);
-        setAccessTokenExpirationDate(
-          getDateXSecondsFromNow(res.data.expiresIn)
-        );
-      }
-    }
-
-    client.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-
     return await client(options).then(onSuccess).catch(onError);
   };
 
   React.useEffect(() => {
     setLoading(true);
-    const refreshToken = localStorage.getItem("refresh-token");
-    if (refreshToken) {
-      request({
-        url: "/api/refresh",
-        method: "POST",
-        data: { refreshToken },
+    request({
+      url: "/api/isAuthenticated",
+      method: "GET",
+    })
+      .then((res: AxiosResponse) => {
+        setIsUserAuthenticated(res.data?.isAuthenticated ?? false);
       })
-        .then((res) => {
-          localStorage.setItem("refresh-token", res.data.refreshToken);
-          setAccessToken(res.data.accessToken);
-          setAccessTokenExpirationDate(
-            getDateXSecondsFromNow(res.data.expiresIn)
-          );
-        })
-        .catch((error: AxiosError) => {
-          if (error.response?.status === 401) {
-            // refresh-token is invalid, logout.
-            localStorage.removeItem("refresh-token");
-          }
-        })
-        .finally(() => {
-          setLoading(false);
+      .catch(() => {
+        notifications.show({
+          message: "Failed to check authentication status",
+          color: "red",
         });
-    } else {
-      setLoading(false);
-    }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const authValue: AuthContextValue = {
-    accessToken,
-    setAccessToken,
+    isUserAuthenticated,
+    setIsUserAuthenticated,
     loading,
     request,
   };

@@ -34,7 +34,8 @@ const Login = (props: LoginProps): React.ReactNode => {
     },
   });
 
-  const { request, setAccessToken } = React.useContext<any>(AuthContext);
+  const { request, setIsUserAuthenticated } =
+    React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
 
@@ -61,8 +62,7 @@ const Login = (props: LoginProps): React.ReactNode => {
           return;
         }
 
-        setAccessToken(res.data.accessToken);
-        localStorage.setItem("refresh-token", res.data.refreshToken);
+        setIsUserAuthenticated(true);
       })
       .catch((error: AxiosError) => {
         // These error response values are specific to ASP.NET Identity,

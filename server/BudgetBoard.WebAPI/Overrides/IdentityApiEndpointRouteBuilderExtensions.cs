@@ -126,11 +126,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 {
                     var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
 
-                    var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
-                    var isPersistent = (useCookies == true) && (useSessionCookies != true);
-                    signInManager.AuthenticationScheme = useCookieScheme
-                        ? IdentityConstants.ApplicationScheme
-                        : IdentityConstants.BearerScheme;
+                    // TODO: Probably should add a Remember Me? option to login.
+                    var isPersistent = true;
 
                     var result = await signInManager.PasswordSignInAsync(
                         login.Email,
@@ -175,6 +172,48 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             );
         }
 
+        if (!configureOptions.ExcludeLogoutPost)
+        {
+            routeGroup
+                .MapPost(
+                    "/logout",
+                    async Task<Results<Ok, UnauthorizedHttpResult>> (
+                        [FromBody] object? empty,
+                        [FromServices] IServiceProvider sp
+                    ) =>
+                    {
+                        if (empty is not null)
+                        {
+                            var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
+                            await signInManager.SignOutAsync();
+                            return TypedResults.Ok();
+                        }
+                        return TypedResults.Unauthorized();
+                    }
+                )
+                .RequireAuthorization();
+        }
+
+        if (!configureOptions.ExcludeIsAuthenticatedGet)
+        {
+            routeGroup.MapGet(
+                "/isAuthenticated",
+                Ok<IsAuthenticatedResponse> (
+                    [FromServices] IServiceProvider sp,
+                    HttpContext context
+                ) =>
+                {
+                    // Check if the user is authenticated by checking the cookie.
+
+                    var isAuthenticated = context.User?.Identity?.IsAuthenticated ?? false;
+                    return TypedResults.Ok(
+                        new IsAuthenticatedResponse { IsAuthenticated = isAuthenticated }
+                    );
+                }
+            );
+        }
+
+        // TODO: This might not be needed anymore.
         if (!configureOptions.ExcludeRefreshPost)
         {
             routeGroup.MapPost(
