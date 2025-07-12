@@ -6,7 +6,7 @@ using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.WebAPI.Jobs;
 using BudgetBoard.WebAPI.Utils;
-using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -74,9 +74,52 @@ builder.Services.AddDbContext<UserDataContext>(o =>
     o.UseNpgsql(connectionString, op => op.MapEnum<Currency>("currency"))
 );
 
-// Configure Identity
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
+var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 
+if (oidcEnabled)
+{
+    var oidcAuthority = builder.Configuration.GetValue<string>("OIDC_AUTHORITY");
+    if (string.IsNullOrEmpty(oidcAuthority))
+    {
+        throw new ArgumentNullException(nameof(oidcAuthority));
+    }
+    var oidcClientId = builder.Configuration.GetValue<string>("OIDC_CLIENT_ID");
+    if (string.IsNullOrEmpty(oidcClientId))
+    {
+        throw new ArgumentNullException(nameof(oidcClientId));
+    }
+    var oidcClientSecret = builder.Configuration.GetValue<string>("OIDC_CLIENT_SECRET");
+    if (string.IsNullOrEmpty(oidcClientSecret))
+    {
+        throw new ArgumentNullException(nameof(oidcClientSecret));
+    }
+
+    // Configure Identity
+    builder
+        .Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+        .AddCookie(IdentityConstants.ApplicationScheme)
+        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddOpenIdConnect(
+            IdentityConstants.ExternalScheme,
+            options =>
+            {
+                options.Authority = oidcAuthority;
+                options.ClientId = oidcClientId;
+                options.ClientSecret = oidcClientSecret;
+                options.ResponseType = "code";
+                options.GetClaimsFromUserInfoEndpoint = true;
+            }
+        );
+}
+else
+{
+    // Configure Identity
+    builder
+        .Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+        .AddCookie(IdentityConstants.ApplicationScheme)
+        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
+    builder.Services.AddAuthorization();
+}
 builder.Services.AddAuthorization();
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
@@ -101,14 +144,6 @@ if (!string.IsNullOrEmpty(emailSender))
 {
     builder.Services.AddTransient<IEmailSender, EmailSender>();
 }
-
-builder
-    .Services.AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme)
-    .Configure(options =>
-    {
-        options.BearerTokenExpiration = TimeSpan.FromHours(1);
-        options.RefreshTokenExpiration = TimeSpan.FromDays(14);
-    });
 
 builder
     .Services.AddControllers()
