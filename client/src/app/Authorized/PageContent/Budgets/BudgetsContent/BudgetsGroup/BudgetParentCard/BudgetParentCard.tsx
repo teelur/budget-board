@@ -229,7 +229,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
           bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
           shadow="md"
           onClick={() => {
-            props.openDetails(props.categoryTree.value, props.selectedDate);
+            if (id.length > 0) {
+              props.openDetails(props.categoryTree.value, props.selectedDate);
+            }
           }}
         >
           <LoadingOverlay
