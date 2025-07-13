@@ -46,7 +46,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
         props.transactions,
         props.invertData ?? false
       ),
-    [sortedMonths, props.transactions]
+    [sortedMonths, props.transactions, props.invertData]
   );
 
   const average = React.useMemo(() => {

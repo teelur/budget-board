@@ -229,12 +229,17 @@ export const BuildNetWorthChartData = (
   return chartData;
 };
 
+interface MonthlySpendingData {
+  month: string;
+  total: number;
+}
+
 export const buildMonthlySpendingChartData = (
   months: Date[],
   transactions: ITransaction[],
   invertData: boolean
-): any[] => {
-  const monthlySpendingChartData: any[] = [];
+): MonthlySpendingData[] => {
+  const monthlySpendingChartData: MonthlySpendingData[] = [];
   months.forEach((month) => {
     const transactionsForMonth = getTransactionsForMonth(transactions, month);
 
