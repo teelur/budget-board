@@ -19,7 +19,7 @@ interface BudgetsContentProps {
   budgets: IBudget[];
   categories: ICategory[];
   transactions: ITransaction[];
-  selectedDate?: Date;
+  selectedDate: Date | null;
   isPending?: boolean;
 }
 
@@ -71,7 +71,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
       categoryToTransactionsTotalMap.has(category.value.toLocaleLowerCase())
   );
 
-  const openBudgetDetails = (category: string, month: Date) => {
+  const openBudgetDetails = (category: string, month: Date | null) => {
     open();
     setSelectedCategory(category);
     setSelectedMonth(month);

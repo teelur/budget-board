@@ -14,7 +14,7 @@ interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
   categoryToTransactionsTotalMap: Map<string, number>;
   categories: ICategory[];
-  selectedDate?: Date;
+  selectedDate: Date | null;
 }
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
@@ -79,6 +79,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
               categoryToTransactionsTotalMap={
                 props.categoryToTransactionsTotalMap
               }
+              selectedDate={props.selectedDate}
             />
             {props.categoryTree.length > 0 ? (
               props.categoryTree.map((categoryTree) => (

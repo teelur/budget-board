@@ -36,8 +36,8 @@ export interface BudgetParentCardProps {
   categoryToBudgetsMap: Map<string, IBudget[]>;
   categoryToLimitsMap: Map<string, number>;
   categoryToTransactionsTotalMap: Map<string, number>;
-  selectedDate?: Date;
-  openDetails: (category: string, month: Date) => void;
+  selectedDate: Date | null;
+  openDetails: (category: string, month: Date | null) => void;
 }
 
 const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
@@ -189,6 +189,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               0
             }
             isIncome={isIncome}
+            selectedDate={props.selectedDate ?? new Date()}
             openDetails={props.openDetails}
           />
         );
@@ -228,7 +229,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
           bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
           shadow="md"
           onClick={() => {
-            props.openDetails(props.categoryTree.value, new Date());
+            props.openDetails(props.categoryTree.value, props.selectedDate);
           }}
         >
           <LoadingOverlay

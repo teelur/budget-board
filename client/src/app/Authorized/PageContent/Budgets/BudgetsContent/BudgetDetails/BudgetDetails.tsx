@@ -113,7 +113,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
         </Text>
       }
     >
-      {transactionsQuery.isPending || transactionCategoriesQuery.isPending ? (
+      {transactionsQuery.isPending ||
+      transactionCategoriesQuery.isPending ||
+      props.month === null ||
+      props.category === null ? (
         <Skeleton height={425} radius="lg" />
       ) : (
         <Stack gap="1rem">

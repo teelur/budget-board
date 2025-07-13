@@ -14,7 +14,7 @@ import { roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 
 interface UnbudgetChildCardProps {
-  selectedDate?: Date;
+  selectedDate: Date | null;
   category: string;
   amount: number;
   isIncome: boolean;

@@ -16,7 +16,7 @@ import { IUserSettings } from "~/models/userSettings";
 interface UnbudgetedChildCardProps {
   category: string;
   amount: number;
-  selectedDate?: Date;
+  selectedDate: Date | null;
 }
 
 const UnbudgetedChildCard = (

@@ -32,6 +32,7 @@ interface BudgetChildCardProps {
   amount: number;
   limit: number;
   isIncome: boolean;
+  selectedDate: Date;
   openDetails: (category: string, month: Date) => void;
 }
 
@@ -131,7 +132,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
         bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
         shadow="md"
         onClick={() => {
-          props.openDetails(props.categoryValue, new Date());
+          props.openDetails(props.categoryValue, props.selectedDate);
         }}
       >
         <LoadingOverlay

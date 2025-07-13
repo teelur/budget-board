@@ -26,7 +26,7 @@ import { IUserSettings } from "~/models/userSettings";
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
   categoryToTransactionsTotalMap: Map<string, number>;
-  selectedDate?: Date;
+  selectedDate: Date | null;
 }
 
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
