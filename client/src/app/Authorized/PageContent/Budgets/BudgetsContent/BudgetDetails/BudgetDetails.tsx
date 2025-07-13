@@ -77,7 +77,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
         !props.category ||
         getIsParentCategory(props.category, transactionCategoriesWithCustom)
       ) {
-        return areStringsEqual(transaction.category ?? "", props.category!);
+        return areStringsEqual(
+          transaction.category ?? "",
+          props.category ?? ""
+        );
       }
       return areStringsEqual(
         transaction.subcategory ?? "",
