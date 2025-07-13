@@ -228,3 +228,32 @@ export const BuildNetWorthChartData = (
 
   return chartData;
 };
+
+interface MonthlySpendingData {
+  month: string;
+  total: number;
+}
+
+export const buildMonthlySpendingChartData = (
+  months: Date[],
+  transactions: ITransaction[],
+  invertData: boolean
+): MonthlySpendingData[] => {
+  const monthlySpendingChartData: MonthlySpendingData[] = [];
+  months.forEach((month) => {
+    const transactionsForMonth = getTransactionsForMonth(transactions, month);
+
+    monthlySpendingChartData.push({
+      month: month.toLocaleString("default", {
+        month: "numeric",
+        year: "2-digit",
+      }),
+      total:
+        transactionsForMonth.reduce(
+          (acc, transaction) => acc + transaction.amount,
+          0
+        ) * (invertData ? -1 : 1),
+    });
+  });
+  return monthlySpendingChartData;
+};

@@ -15,7 +15,8 @@ interface BudgetsGroupProps {
   categoryToTransactionsTotalMap: Map<string, number>;
   categoryTree: ICategoryNode[];
   categories: ICategory[];
-  selectedDate?: Date;
+  selectedDate: Date | null;
+  openDetails: (category: string, month: Date | null) => void;
 }
 
 const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
@@ -45,6 +46,7 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
                   props.categoryToTransactionsTotalMap
                 }
                 selectedDate={props.selectedDate}
+                openDetails={props.openDetails}
               />
             );
           }

@@ -5,3 +5,9 @@
     font-size: 0.9rem;
   }
 }
+
+.unbudgetCard {
+  &:hover {
+    outline: 1px solid var(--mantine-primary-color-filled);
+  }
+}

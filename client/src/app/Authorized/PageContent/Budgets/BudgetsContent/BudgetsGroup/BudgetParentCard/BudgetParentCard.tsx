@@ -18,7 +18,7 @@ import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
-import { TrashIcon } from "lucide-react";
+import { PencilIcon, TrashIcon } from "lucide-react";
 import { getBudgetValueColor } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
@@ -36,7 +36,8 @@ export interface BudgetParentCardProps {
   categoryToBudgetsMap: Map<string, IBudget[]>;
   categoryToLimitsMap: Map<string, number>;
   categoryToTransactionsTotalMap: Map<string, number>;
-  selectedDate?: Date;
+  selectedDate: Date | null;
+  openDetails: (category: string, month: Date | null) => void;
 }
 
 const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
@@ -188,6 +189,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               0
             }
             isIncome={isIncome}
+            selectedDate={props.selectedDate ?? new Date()}
+            openDetails={props.openDetails}
           />
         );
       } else if (
@@ -206,6 +209,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
             }
             selectedDate={props.selectedDate}
             isIncome={isIncome}
+            openDetails={props.openDetails}
           />
         );
       }
@@ -224,13 +228,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
           p="0.25rem 0.5rem"
           radius="md"
           bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
+          shadow="md"
           onClick={() => {
             if (id.length > 0) {
-              newLimitField.setValue(limit);
-              toggle();
+              props.openDetails(props.categoryTree.value, props.selectedDate);
             }
           }}
-          shadow="md"
         >
           <LoadingOverlay
             visible={doEditBudget.isPending || doDeleteBudget.isPending}
@@ -242,9 +245,24 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 align="center"
                 style={{ containerType: "inline-size" }}
               >
-                <Text className={classes.title} fw={600}>
-                  {props.categoryTree.value}
-                </Text>
+                <Group gap={5} align="center">
+                  <Text className={classes.title} fw={600}>
+                    {props.categoryTree.value}
+                  </Text>
+                  <ActionIcon
+                    variant="transparent"
+                    size="md"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (id.length > 0) {
+                        newLimitField.setValue(limit);
+                        toggle();
+                      }
+                    }}
+                  >
+                    <PencilIcon size={16} />
+                  </ActionIcon>
+                </Group>
                 <Group gap={5} justify="flex-end" align="center">
                   {userSettingsQuery.isPending ? null : (
                     <Text className={classes.text} fw={700}>
