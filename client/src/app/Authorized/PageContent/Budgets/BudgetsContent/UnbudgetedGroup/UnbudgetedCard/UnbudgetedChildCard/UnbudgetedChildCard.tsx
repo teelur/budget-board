@@ -17,6 +17,7 @@ interface UnbudgetedChildCardProps {
   category: string;
   amount: number;
   selectedDate: Date | null;
+  openDetails: (category: string, month: Date | null) => void;
 }
 
 const UnbudgetedChildCard = (
@@ -63,7 +64,17 @@ const UnbudgetedChildCard = (
   return (
     <Group w="100%" align="center" wrap="nowrap" gap="0.5rem">
       <CornerDownRightIcon size={20} />
-      <Card className={classes.root} radius="md" p="0.5rem" w="100%">
+      <Card
+        className={classes.root}
+        radius="md"
+        p="0.5rem"
+        w="100%"
+        onClick={() => {
+          if (props.selectedDate) {
+            props.openDetails(props.category, props.selectedDate);
+          }
+        }}
+      >
         <LoadingOverlay visible={doAddBudget.isPending} />
         <Group w="100%" justify="space-between">
           <Text className={classes.text} fw={600}>

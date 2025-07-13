@@ -209,6 +209,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
             }
             selectedDate={props.selectedDate}
             isIncome={isIncome}
+            openDetails={props.openDetails}
           />
         );
       }

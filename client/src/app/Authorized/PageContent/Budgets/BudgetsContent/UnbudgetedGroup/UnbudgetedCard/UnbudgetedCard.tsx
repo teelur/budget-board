@@ -3,7 +3,6 @@ import classes from "./UnbudgetedCard.module.css";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import {
   ActionIcon,
-  Box,
   Card,
   Group,
   LoadingOverlay,
@@ -27,6 +26,7 @@ interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
   categoryToTransactionsTotalMap: Map<string, number>;
   selectedDate: Date | null;
+  openDetails: (category: string, month: Date | null) => void;
 }
 
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
@@ -76,7 +76,16 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem" w="100%">
-      <Card className={classes.root} radius="md" p="0.5rem">
+      <Card
+        className={classes.root}
+        radius="md"
+        p="0.5rem"
+        onClick={() => {
+          if (props.selectedDate) {
+            props.openDetails(props.categoryTree.value, props.selectedDate);
+          }
+        }}
+      >
         <LoadingOverlay visible={doAddBudget.isPending} />
         <Group w="100%" justify="space-between">
           <Text size="1rem" fw={600}>
@@ -97,30 +106,28 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
               </Text>
             )}
             {props.selectedDate &&
-            props.categoryTree.value !== "Uncategorized" ? (
-              <ActionIcon
-                size="sm"
-                onClick={() =>
-                  doAddBudget.mutate([
-                    {
-                      date: props.selectedDate!,
-                      category: props.categoryTree.value,
-                      limit: Math.round(
-                        Math.abs(
-                          props.categoryToTransactionsTotalMap.get(
-                            props.categoryTree.value.toLocaleLowerCase()
-                          ) ?? 0
-                        )
-                      ),
-                    },
-                  ])
-                }
-              >
-                <PlusIcon />
-              </ActionIcon>
-            ) : (
-              <Box h={22} w={22} />
-            )}
+              props.categoryTree.value !== "Uncategorized" && (
+                <ActionIcon
+                  size="sm"
+                  onClick={() =>
+                    doAddBudget.mutate([
+                      {
+                        date: props.selectedDate!,
+                        category: props.categoryTree.value,
+                        limit: Math.round(
+                          Math.abs(
+                            props.categoryToTransactionsTotalMap.get(
+                              props.categoryTree.value.toLocaleLowerCase()
+                            ) ?? 0
+                          )
+                        ),
+                      },
+                    ])
+                  }
+                >
+                  <PlusIcon />
+                </ActionIcon>
+              )}
           </Group>
         </Group>
       </Card>
@@ -144,6 +151,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
                   )!
                 }
                 selectedDate={props.selectedDate}
+                openDetails={props.openDetails}
               />
             );
           })}

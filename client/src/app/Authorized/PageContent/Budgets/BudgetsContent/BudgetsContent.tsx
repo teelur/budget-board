@@ -124,6 +124,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
             categories={props.categories}
             selectedDate={props.selectedDate}
+            openDetails={openBudgetDetails}
           />
         )}
       </Stack>
