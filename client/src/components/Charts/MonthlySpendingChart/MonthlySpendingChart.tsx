@@ -3,7 +3,7 @@ import { BarChart } from "@mantine/charts";
 import React from "react";
 import { buildMonthlySpendingChartData } from "~/helpers/charts";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { Group, Skeleton, Text } from "@mantine/core";
+import { Group, Skeleton, Stack, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
@@ -83,41 +83,57 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   }
 
   return (
-    <BarChart
-      h={400}
-      w="100%"
-      series={[
-        {
-          name: "total",
-          color: "blue.6",
-        },
-      ]}
-      data={chartData}
-      dataKey="month"
-      valueFormatter={(value) =>
-        userSettingsQuery.isPending
-          ? ""
-          : convertNumberToCurrency(
-              value,
-              false,
-              userSettingsQuery.data?.currency ?? "USD"
-            )
-      }
-      referenceLines={[
-        {
-          y: average,
-          color: "red.5",
-          label: "Average",
-          labelPosition: "insideTopRight",
-        },
-      ]}
-      withTooltip={false}
-      tooltipAnimationDuration={200}
-      xAxisProps={{ angle: -20 }}
-      withBarValueLabel
-      withYAxis={props.includeYAxis}
-      gridAxis={props.includeGrid ? "xy" : "none"}
-    />
+    <Stack gap={0}>
+      <Group justify="space-between" align="center">
+        <Text size="sm" fw={500}>
+          {props.invertData ? "Average Spending" : "Average Income"}
+        </Text>
+        <Text size="sm" fw={600}>
+          {userSettingsQuery.isPending
+            ? ""
+            : convertNumberToCurrency(
+                average,
+                false,
+                userSettingsQuery.data?.currency ?? "USD"
+              )}
+        </Text>
+      </Group>
+      <BarChart
+        h={400}
+        w="100%"
+        series={[
+          {
+            name: "total",
+            color: "blue.6",
+          },
+        ]}
+        data={chartData}
+        dataKey="month"
+        valueFormatter={(value) =>
+          userSettingsQuery.isPending
+            ? ""
+            : convertNumberToCurrency(
+                value,
+                false,
+                userSettingsQuery.data?.currency ?? "USD"
+              )
+        }
+        referenceLines={[
+          {
+            y: average,
+            color: "red.5",
+            label: "Average",
+            labelPosition: "insideTopRight",
+          },
+        ]}
+        withTooltip={false}
+        tooltipAnimationDuration={200}
+        xAxisProps={{ angle: -20 }}
+        withBarValueLabel
+        withYAxis={props.includeYAxis}
+        gridAxis={props.includeGrid ? "xy" : "none"}
+      />
+    </Stack>
   );
 };
 

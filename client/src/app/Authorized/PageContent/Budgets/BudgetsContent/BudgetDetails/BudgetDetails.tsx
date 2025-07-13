@@ -1,4 +1,4 @@
-import { Accordion, Drawer, Group, Stack, Text } from "@mantine/core";
+import { Accordion, Drawer, Group, Skeleton, Stack, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -13,6 +13,7 @@ import {
   ITransaction,
 } from "~/models/transaction";
 import TransactionCards from "./TransactionCards/TransactionCards";
+import dayjs from "dayjs";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -22,6 +23,8 @@ interface BudgetDetailsProps {
 }
 
 const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
+  const chartLookbackMonths = 6;
+
   const { request } = React.useContext<any>(AuthContext);
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],
@@ -59,14 +62,12 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     transactionCategoriesQuery.data ?? []
   );
 
-  const chartLookbackMonths = 6;
-
-  // TODO: Figure out the date filtering logic here.
   const transactionsForCategory = transactionsQuery.data
-    ?.filter(
-      (transaction) =>
-        new Date(transaction.date) >
-        getDateFromMonthsAgo(chartLookbackMonths, props.month ?? new Date())
+    ?.filter((transaction) =>
+      dayjs(transaction.date).isAfter(
+        getDateFromMonthsAgo(chartLookbackMonths, props.month ?? new Date()),
+        "month"
+      )
     )
     .filter((transaction) => {
       if (
@@ -87,16 +88,11 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     });
 
   const transactionsForCategoryForCurrentMonth =
-    transactionsForCategory?.filter(
-      (transaction) =>
-        new Date(transaction.date).getMonth() ===
-          (props.month ?? new Date()).getMonth() &&
-        new Date(transaction.date).getFullYear() ===
-          (props.month ?? new Date()).getFullYear()
+    transactionsForCategory?.filter((transaction) =>
+      dayjs(transaction.date).isSame(props.month, "month")
     );
 
-  // Create an array of Date objects for the last chartLookbackMonths months
-  const months = Array.from({ length: chartLookbackMonths }, (_, i) =>
+  const chartMonths = Array.from({ length: chartLookbackMonths }, (_, i) =>
     getDateFromMonthsAgo(i, props.month ?? new Date())
   );
 
@@ -104,10 +100,6 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     getParentCategory(props.category ?? "", transactionCategoriesWithCustom),
     "income"
   );
-
-  if (!props.isOpen || !props.category || !props.month) {
-    return null;
-  }
 
   return (
     <Drawer
@@ -121,57 +113,61 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
         </Text>
       }
     >
-      <Stack gap="1rem">
-        <Group justify="space-between" align="center">
-          <Stack gap={0}>
-            <Text size="xs" fw={500} c="dimmed">
-              Category
-            </Text>
-            <Text size="lg" fw={600}>
-              {props.category ?? "No Category"}
-            </Text>
-          </Stack>
-          <Stack gap={0}>
-            <Text size="xs" fw={500} c="dimmed">
-              Month
-            </Text>
-            <Text size="lg" fw={600}>
-              {props.month.toLocaleString("default", {
-                month: "long",
-                year: "numeric",
-              })}
-            </Text>
-          </Stack>
-        </Group>
-        <Accordion
-          variant="separated"
-          defaultValue={["chart", "transactions"]}
-          multiple
-        >
-          <Accordion.Item value="chart">
-            <Accordion.Control>
-              <Text>{isExpenseCategory ? "Expense" : "Income"} Trends</Text>
-            </Accordion.Control>
-            <Accordion.Panel>
-              <MonthlySpendingChart
-                transactions={transactionsForCategory ?? []}
-                months={months}
-                includeYAxis={false}
-                invertData={isExpenseCategory}
-              />
-            </Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item value="transactions">
-            <Accordion.Control>Recent Transactions</Accordion.Control>
-            <Accordion.Panel>
-              <TransactionCards
-                transactions={transactionsForCategoryForCurrentMonth ?? []}
-                categories={transactionCategoriesWithCustom}
-              />
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
-      </Stack>
+      {transactionsQuery.isPending || transactionCategoriesQuery.isPending ? (
+        <Skeleton height={425} radius="lg" />
+      ) : (
+        <Stack gap="1rem">
+          <Group justify="space-between" align="center">
+            <Stack gap={0}>
+              <Text size="xs" fw={500} c="dimmed">
+                Category
+              </Text>
+              <Text size="lg" fw={600}>
+                {props.category ?? "No Category"}
+              </Text>
+            </Stack>
+            <Stack gap={0}>
+              <Text size="xs" fw={500} c="dimmed">
+                Month
+              </Text>
+              <Text size="lg" fw={600}>
+                {props.month?.toLocaleString("default", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </Text>
+            </Stack>
+          </Group>
+          <Accordion
+            variant="separated"
+            defaultValue={["chart", "transactions"]}
+            multiple
+          >
+            <Accordion.Item value="chart">
+              <Accordion.Control>
+                <Text>{isExpenseCategory ? "Expense" : "Income"} Trends</Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <MonthlySpendingChart
+                  transactions={transactionsForCategory ?? []}
+                  months={chartMonths}
+                  includeYAxis={false}
+                  invertData={isExpenseCategory}
+                />
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item value="transactions">
+              <Accordion.Control>Recent Transactions</Accordion.Control>
+              <Accordion.Panel>
+                <TransactionCards
+                  transactions={transactionsForCategoryForCurrentMonth ?? []}
+                  categories={transactionCategoriesWithCustom}
+                />
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        </Stack>
+      )}
     </Drawer>
   );
 };
