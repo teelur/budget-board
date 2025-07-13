@@ -14,6 +14,7 @@ import {
 } from "~/models/transaction";
 import TransactionCards from "./TransactionCards/TransactionCards";
 import dayjs from "dayjs";
+import { filterHiddenTransactions } from "~/helpers/transactions";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -62,7 +63,9 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     transactionCategoriesQuery.data ?? []
   );
 
-  const transactionsForCategory = transactionsQuery.data
+  const transactionsForCategory = filterHiddenTransactions(
+    transactionsQuery.data ?? []
+  )
     ?.filter((transaction) =>
       dayjs(transaction.date).isAfter(
         getDateFromMonthsAgo(chartLookbackMonths, props.month ?? new Date()),
