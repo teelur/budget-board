@@ -19,7 +19,7 @@ interface SpendingChartProps {
 }
 
 const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
-  const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
+  const sortedMonths = [...props.months].sort((a, b) => a.getTime() - b.getTime());
 
   const { request } = React.useContext<any>(AuthContext);
 
