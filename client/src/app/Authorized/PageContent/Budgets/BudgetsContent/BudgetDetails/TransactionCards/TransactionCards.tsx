@@ -19,7 +19,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   );
 
   return (
-    <Stack>
+    <Stack gap="0.5rem">
       {paginatedItems.map((transaction) => (
         <TransactionCard
           key={transaction.id}
