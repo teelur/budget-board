@@ -1,7 +1,12 @@
 import { Card, Group, Stack, Text } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
+import React from "react";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { getFormattedCategoryValue } from "~/helpers/category";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
+import { IUserSettings } from "~/models/userSettings";
 
 interface TransactionCardProps {
   transaction: ITransaction;
@@ -13,6 +18,24 @@ const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
     (props.transaction.subcategory ?? "").length > 0
       ? props.transaction.subcategory ?? ""
       : props.transaction.category ?? "";
+
+  const { request } = React.useContext<any>(AuthContext);
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
 
   return (
     <Card radius="md" shadow="md">
@@ -38,7 +61,7 @@ const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
           >
             {props.transaction.amount.toLocaleString("en-US", {
               style: "currency",
-              currency: "USD",
+              currency: userSettingsQuery.data?.currency ?? "USD",
             })}
           </Text>
         </Group>
