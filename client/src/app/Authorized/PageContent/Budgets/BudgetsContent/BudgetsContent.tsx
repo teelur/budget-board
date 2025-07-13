@@ -11,6 +11,9 @@ import BudgetsGroup from "./BudgetsGroup/BudgetsGroup";
 import UnbudgetedGroup from "./UnbudgetedGroup/UnbudgetedGroup";
 import { areStringsEqual } from "~/helpers/utils";
 import FixParentBudgetButton from "./FixParentBudgetButton/FixParentBudgetButton";
+import BudgetDetails from "./BudgetDetails/BudgetDetails";
+import React from "react";
+import { useDisclosure } from "@mantine/hooks";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
@@ -21,6 +24,12 @@ interface BudgetsContentProps {
 }
 
 const BudgetsContent = (props: BudgetsContentProps) => {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
+    null
+  );
+  const [selectedMonth, setSelectedMonth] = React.useState<Date | null>(null);
+
   const categoryToTransactionsTotalMap: Map<string, number> =
     buildCategoryToTransactionsTotalMap(props.transactions);
 
@@ -62,8 +71,20 @@ const BudgetsContent = (props: BudgetsContentProps) => {
       categoryToTransactionsTotalMap.has(category.value.toLocaleLowerCase())
   );
 
+  const openBudgetDetails = (category: string, month: Date) => {
+    open();
+    setSelectedCategory(category);
+    setSelectedMonth(month);
+  };
+
   return (
     <Group gap="0.5rem" align="flex-start">
+      <BudgetDetails
+        isOpen={opened}
+        close={close}
+        category={selectedCategory ?? null}
+        month={selectedMonth}
+      />
       <Stack w={{ base: "100%", md: "70%" }}>
         <Stack gap="0.5rem">
           <BudgetsGroupHeader groupName="Income" />
@@ -76,6 +97,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
               selectedDate={props.selectedDate}
+              openDetails={openBudgetDetails}
             />
           )}
         </Stack>
@@ -90,6 +112,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categories={props.categories}
               selectedDate={props.selectedDate}
+              openDetails={openBudgetDetails}
             />
           )}
         </Stack>

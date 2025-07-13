@@ -15,7 +15,7 @@ import {
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
 import { useField } from "@mantine/form";
-import { CornerDownRight, TrashIcon } from "lucide-react";
+import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import { getBudgetValueColor } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
@@ -32,6 +32,7 @@ interface BudgetChildCardProps {
   amount: number;
   limit: number;
   isIncome: boolean;
+  openDetails: (category: string, month: Date) => void;
 }
 
 const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
@@ -130,10 +131,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
         bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
         shadow="md"
         onClick={() => {
-          if (props.id.length > 0) {
-            newLimitField.setValue(props.limit);
-            toggle();
-          }
+          props.openDetails(props.categoryValue, new Date());
         }}
       >
         <LoadingOverlay
@@ -146,9 +144,24 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               align="center"
               style={{ containerType: "inline-size" }}
             >
-              <Text className={classes.title} fw={600}>
-                {props.categoryValue}
-              </Text>
+              <Group gap={5} align="center">
+                <Text className={classes.title} fw={600}>
+                  {props.categoryValue}
+                </Text>
+                <ActionIcon
+                  variant="transparent"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (props.id.length > 0) {
+                      newLimitField.setValue(props.limit);
+                      toggle();
+                    }
+                  }}
+                >
+                  <PencilIcon size={16} />
+                </ActionIcon>
+              </Group>
               <Group gap={5} justify="flex-end" align="center">
                 {userSettingsQuery.isPending ? null : (
                   <Text className={classes.text} fw={700}>
