@@ -1,5 +1,18 @@
-import { Drawer, Text } from "@mantine/core";
+import { Accordion, Drawer, Group, Stack, Text } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import React from "react";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
+import { getIsParentCategory, getParentCategory } from "~/helpers/category";
+import { getDateFromMonthsAgo } from "~/helpers/datetime";
+import { areStringsEqual } from "~/helpers/utils";
+import { ICategoryResponse } from "~/models/category";
+import {
+  defaultTransactionCategories,
+  ITransaction,
+} from "~/models/transaction";
+import TransactionCards from "./TransactionCards/TransactionCards";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -9,6 +22,93 @@ interface BudgetDetailsProps {
 }
 
 const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
+  const { request } = React.useContext<any>(AuthContext);
+  const transactionsQuery = useQuery({
+    queryKey: ["transactions", { getHidden: false }],
+    queryFn: async (): Promise<ITransaction[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/transaction",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as ITransaction[];
+      }
+
+      return [];
+    },
+  });
+
+  const transactionCategoriesQuery = useQuery({
+    queryKey: ["transactionCategories"],
+    queryFn: async () => {
+      const res = await request({
+        url: "/api/transactionCategory",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as ICategoryResponse[];
+      }
+
+      return undefined;
+    },
+  });
+
+  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
+    transactionCategoriesQuery.data ?? []
+  );
+
+  const chartLookbackMonths = 6;
+
+  // TODO: Figure out the date filtering logic here.
+  const transactionsForCategory = transactionsQuery.data
+    ?.filter(
+      (transaction) =>
+        new Date(transaction.date) >
+        getDateFromMonthsAgo(chartLookbackMonths, props.month ?? new Date())
+    )
+    .filter((transaction) => {
+      if (
+        getIsParentCategory(
+          props.category ?? "",
+          transactionCategoriesWithCustom
+        )
+      ) {
+        return areStringsEqual(
+          transaction.category ?? "",
+          props.category ?? ""
+        );
+      }
+      return areStringsEqual(
+        transaction.subcategory ?? "",
+        props.category ?? ""
+      );
+    });
+
+  const transactionsForCategoryForCurrentMonth =
+    transactionsForCategory?.filter(
+      (transaction) =>
+        new Date(transaction.date).getMonth() ===
+          (props.month ?? new Date()).getMonth() &&
+        new Date(transaction.date).getFullYear() ===
+          (props.month ?? new Date()).getFullYear()
+    );
+
+  // Create an array of Date objects for the last chartLookbackMonths months
+  const months = Array.from({ length: chartLookbackMonths }, (_, i) =>
+    getDateFromMonthsAgo(i, props.month ?? new Date())
+  );
+
+  const isExpenseCategory = !areStringsEqual(
+    getParentCategory(props.category ?? "", transactionCategoriesWithCustom),
+    "income"
+  );
+
+  if (!props.isOpen || !props.category || !props.month) {
+    return null;
+  }
+
   return (
     <Drawer
       opened={props.isOpen}
@@ -21,7 +121,57 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
         </Text>
       }
     >
-      <p>{props.category ?? "No Category"}</p>
+      <Stack gap="1rem">
+        <Group justify="space-between" align="center">
+          <Stack gap={0}>
+            <Text size="xs" fw={500} c="dimmed">
+              Category
+            </Text>
+            <Text size="lg" fw={600}>
+              {props.category ?? "No Category"}
+            </Text>
+          </Stack>
+          <Stack gap={0}>
+            <Text size="xs" fw={500} c="dimmed">
+              Month
+            </Text>
+            <Text size="lg" fw={600}>
+              {props.month.toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+              })}
+            </Text>
+          </Stack>
+        </Group>
+        <Accordion
+          variant="separated"
+          defaultValue={["chart", "transactions"]}
+          multiple
+        >
+          <Accordion.Item value="chart">
+            <Accordion.Control>
+              <Text>{isExpenseCategory ? "Expense" : "Income"} Trends</Text>
+            </Accordion.Control>
+            <Accordion.Panel>
+              <MonthlySpendingChart
+                transactions={transactionsForCategory ?? []}
+                months={months}
+                includeYAxis={false}
+                invertData={isExpenseCategory}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value="transactions">
+            <Accordion.Control>Recent Transactions</Accordion.Control>
+            <Accordion.Panel>
+              <TransactionCards
+                transactions={transactionsForCategoryForCurrentMonth ?? []}
+                categories={transactionCategoriesWithCustom}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      </Stack>
     </Drawer>
   );
 };
