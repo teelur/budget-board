@@ -66,7 +66,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const transactionsForCategory = filterHiddenTransactions(
     transactionsQuery.data ?? []
   )
-    ?.filter((transaction) =>
+    .filter((transaction) =>
       dayjs(transaction.date).isAfter(
         getDateFromMonthsAgo(chartLookbackMonths, props.month ?? new Date()),
         "month"
@@ -74,15 +74,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     )
     .filter((transaction) => {
       if (
-        getIsParentCategory(
-          props.category ?? "",
-          transactionCategoriesWithCustom
-        )
+        !props.category ||
+        getIsParentCategory(props.category, transactionCategoriesWithCustom)
       ) {
-        return areStringsEqual(
-          transaction.category ?? "",
-          props.category ?? ""
-        );
+        return areStringsEqual(transaction.category ?? "", props.category!);
       }
       return areStringsEqual(
         transaction.subcategory ?? "",
