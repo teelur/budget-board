@@ -1,9 +1,10 @@
 import classes from "./EditableGoalTargetDateCell.module.css";
 
 import { Flex, Text } from "@mantine/core";
-import { DatePickerInput, DateValue } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
 import React from "react";
+import dayjs from "dayjs";
 
 interface EditableGoalTargetDateCellProps {
   goal: IGoalResponse;
@@ -18,14 +19,18 @@ const EditableGoalTargetDateCell = (
     new Date(props.goal.completeDate)
   );
 
-  const onDatePick = (date: DateValue): void => {
+  const onDatePick = (date: string | null): void => {
     if (date === null) {
       return;
     }
-    setGoalTargetDateValue(date);
+    const parsedDate = dayjs(date);
+    if (!parsedDate.isValid()) {
+      return;
+    }
+    setGoalTargetDateValue(parsedDate.toDate());
     const newGoal: IGoalUpdateRequest = {
       ...props.goal,
-      completeDate: date,
+      completeDate: parsedDate.toDate(),
     };
     if (props.editCell != null) {
       props.editCell(newGoal);

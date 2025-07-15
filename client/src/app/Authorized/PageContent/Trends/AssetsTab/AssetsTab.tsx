@@ -2,8 +2,7 @@ import classes from "./AssetsTab.module.css";
 
 import { Stack } from "@mantine/core";
 import React from "react";
-import { DateValue } from "@mantine/dates";
-import { getDateFromMonthsAgo } from "~/helpers/datetime";
+import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import BalanceChart from "~/components/Charts/BalanceChart/BalanceChart";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -11,14 +10,16 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalance } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccount } from "~/models/account";
+import { DatesRangeValue } from "@mantine/dates";
+import dayjs from "dayjs";
 
 const AssetsTab = (): React.ReactNode => {
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
     []
   );
-  const [dateRange, setDateRange] = React.useState<[DateValue, DateValue]>([
-    getDateFromMonthsAgo(1),
-    new Date(),
+  const [dateRange, setDateRange] = React.useState<DatesRangeValue<string>>([
+    dayjs(getDateFromMonthsAgo(1)).format(mantineDateFormat),
+    dayjs().format(mantineDateFormat),
   ]);
 
   const { request } = React.useContext<any>(AuthContext);

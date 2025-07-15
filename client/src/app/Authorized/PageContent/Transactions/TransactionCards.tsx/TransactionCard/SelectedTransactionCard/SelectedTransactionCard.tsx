@@ -24,6 +24,7 @@ import { DatePickerInput } from "@mantine/dates";
 import CategorySelect from "~/components/CategorySelect";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IUserSettings } from "~/models/userSettings";
+import dayjs from "dayjs";
 
 interface TransactionCardProps {
   transaction: ITransaction;
@@ -180,8 +181,16 @@ const SelectedTransactionCard = (
                     w="100%"
                     key={form.key("date")}
                     value={form.getValues().date}
-                    onChange={(val) => {
-                      form.setFieldValue("date", val ?? new Date());
+                    onChange={(val: string | null) => {
+                      const parsedDate = dayjs(val);
+                      if (!parsedDate.isValid()) {
+                        notifications.show({
+                          color: "red",
+                          message: "Invalid date.",
+                        });
+                        return;
+                      }
+                      form.setFieldValue("date", parsedDate.toDate());
                       form.validateField("date");
                       if (form.isValid()) {
                         handleSubmit(form.getValues());
