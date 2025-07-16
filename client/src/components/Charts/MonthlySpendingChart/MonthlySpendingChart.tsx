@@ -92,7 +92,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   }
 
   return (
-    <Stack gap={0}>
+    <Stack gap="1rem">
       <Group justify="space-between" align="center">
         <Text size="sm" fw={500}>
           {props.invertData ? "Average Spending" : "Average Income"}
