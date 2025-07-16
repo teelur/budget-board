@@ -16,15 +16,22 @@ public static class TransactionCategoriesHelpers
     /// <returns>
     /// The name of the parent category if found; otherwise, an empty string.
     /// </returns>
-    public static string GetParentCategory(
-        string category,
-        IEnumerable<ICategory> customCategories
-    ) =>
-        GetAllCategories(customCategories)
-            .FirstOrDefault(c =>
-                c.Value.Equals(category, StringComparison.CurrentCultureIgnoreCase)
-            )
-            ?.Parent ?? string.Empty;
+    public static string GetParentCategory(string category, IEnumerable<ICategory> customCategories)
+    {
+        var allCategories = GetAllCategories(customCategories);
+        var foundCategory = allCategories.FirstOrDefault(c =>
+            c.Value.Equals(category, StringComparison.CurrentCultureIgnoreCase)
+        );
+
+        if (foundCategory != null)
+        {
+            return string.IsNullOrEmpty(foundCategory.Parent)
+                ? foundCategory.Value
+                : foundCategory.Parent;
+        }
+
+        return string.Empty;
+    }
 
     /// <summary>
     /// Determines whether the specified category is a parent category.
@@ -35,12 +42,20 @@ public static class TransactionCategoriesHelpers
     /// <returns>
     /// True if the specified category is a parent category; otherwise, false.
     /// </returns>
-    public static bool GetIsParentCategory(
-        string category,
-        IEnumerable<ICategory> customCategories
-    ) =>
-        GetAllCategories(customCategories)
-            .Any(c => c.Parent.Equals(category, StringComparison.CurrentCultureIgnoreCase));
+    public static bool GetIsParentCategory(string category, IEnumerable<ICategory> customCategories)
+    {
+        var allCategories = GetAllCategories(customCategories);
+        var foundCategory = allCategories.FirstOrDefault(c =>
+            c.Value.Equals(category, StringComparison.CurrentCultureIgnoreCase)
+        );
+        if (foundCategory != null)
+        {
+            return allCategories.Any(c =>
+                c.Parent.Equals(foundCategory.Value, StringComparison.CurrentCultureIgnoreCase)
+            );
+        }
+        return false;
+    }
 
     private static IList<ICategory> GetAllCategories(IEnumerable<ICategory> customCategories) =>
         [.. TransactionCategoriesConstants.DefaultTransactionCategories, .. customCategories];
