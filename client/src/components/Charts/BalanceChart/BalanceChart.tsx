@@ -7,7 +7,6 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { BarChart } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
-import { DateValue } from "@mantine/dates";
 import { IAccount } from "~/models/account";
 import { IBalance } from "~/models/balance";
 import React from "react";
@@ -15,11 +14,13 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import { DatesRangeValue } from "@mantine/dates";
+import dayjs from "dayjs";
 
 interface BalanceChartProps {
   accounts: IAccount[];
   balances: IBalance[];
-  dateRange: [DateValue, DateValue];
+  dateRange: DatesRangeValue<string>;
   isPending?: boolean;
   invertYAxis?: boolean;
 }
@@ -62,8 +63,10 @@ const BalanceChart = (props: BalanceChartProps): React.ReactNode => {
       data={buildAccountBalanceChartData(
         filterBalancesByDateRange(
           props.balances,
-          props.dateRange[0] ?? getDateFromMonthsAgo(1),
-          props.dateRange[1] ?? new Date()
+          props.dateRange[0]
+            ? dayjs(props.dateRange[0]).toDate()
+            : getDateFromMonthsAgo(1),
+          props.dateRange[1] ? dayjs(props.dateRange[1]).toDate() : new Date()
         ),
         props.invertYAxis
       )}

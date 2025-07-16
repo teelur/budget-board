@@ -10,7 +10,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { DatePickerInput, DateValue } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import { hasLength, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IGoalCreateRequest } from "~/models/goal";
@@ -19,11 +19,12 @@ import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import dayjs from "dayjs";
 
 interface FormValues {
   goalName: string;
   goalAccounts: string[];
-  goalCompleteDate: DateValue;
+  goalCompleteDate: string | null;
   goalMonthlyContribution: string | number;
 }
 
@@ -80,9 +81,12 @@ const PayGoalForm = (): React.ReactNode => {
   });
 
   const submitGoal = (values: FormValues): any => {
+    const parsedCompleteDate = dayjs(values.goalCompleteDate);
     const newGoal: IGoalCreateRequest = {
       name: values.goalName,
-      completeDate: values.goalCompleteDate,
+      completeDate: parsedCompleteDate.isValid()
+        ? parsedCompleteDate.toDate()
+        : null,
       amount: 0,
       initialAmount: null,
       monthlyContribution:
