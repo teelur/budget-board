@@ -96,15 +96,16 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
             {props.selectedDate && props.category !== "Uncategorized" && (
               <ActionIcon
                 size="sm"
-                onClick={() =>
+                onClick={(event) => {
+                  event.stopPropagation();
                   doAddBudget.mutate([
                     {
                       date: props.selectedDate!,
                       category: props.category,
                       limit: Math.round(Math.abs(props.amount)),
                     },
-                  ])
-                }
+                  ]);
+                }}
               >
                 <PlusIcon />
               </ActionIcon>

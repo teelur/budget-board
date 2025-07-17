@@ -109,7 +109,8 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
               props.categoryTree.value !== "Uncategorized" && (
                 <ActionIcon
                   size="sm"
-                  onClick={() =>
+                  onClick={(event) => {
+                    event.stopPropagation();
                     doAddBudget.mutate([
                       {
                         date: props.selectedDate!,
@@ -122,8 +123,8 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
                           )
                         ),
                       },
-                    ])
-                  }
+                    ]);
+                  }}
                 >
                   <PlusIcon />
                 </ActionIcon>
