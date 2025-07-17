@@ -93,15 +93,16 @@ const UnbudgetedChildCard = (
             {props.selectedDate && (
               <ActionIcon
                 size="sm"
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation();
                   doAddBudget.mutate([
                     {
                       date: props.selectedDate!,
                       category: props.category,
                       limit: Math.round(Math.abs(props.amount)),
                     },
-                  ])
-                }
+                  ]);
+                }}
               >
                 <PlusIcon />
               </ActionIcon>
