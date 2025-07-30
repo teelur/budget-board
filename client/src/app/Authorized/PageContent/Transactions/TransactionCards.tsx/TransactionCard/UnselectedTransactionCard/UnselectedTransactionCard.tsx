@@ -1,6 +1,6 @@
 import classes from "../TransactionCard.module.css";
 
-import { Flex, Text } from "@mantine/core";
+import { Badge, Flex, Text } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
@@ -51,9 +51,9 @@ const UnselectedTransactionCard = (
       >
         <Flex
           className={classes.dateContainer}
-          w={{ base: "100%", xs: "160px" }}
+          w={{ base: "100%", xs: "135px" }}
         >
-          <Text>
+          <Text c="dimmed" size="sm" fw={600}>
             {new Date(props.transaction.date ?? 0).toLocaleDateString([], {
               year: "numeric",
               month: "long",
@@ -65,7 +65,7 @@ const UnselectedTransactionCard = (
           className={classes.merchantContainer}
           w={{ base: "100%", xs: "200px" }}
         >
-          <Text>{props.transaction.merchantName}</Text>
+          <Text fw={600}>{props.transaction.merchantName}</Text>
         </Flex>
       </Flex>
       <Flex
@@ -75,15 +75,15 @@ const UnselectedTransactionCard = (
       >
         <Flex
           className={classes.categoryContainer}
-          w={{ base: "100%", xs: "180px" }}
+          w={{ base: "100%", xs: "160px" }}
         >
-          <Text>
+          <Badge size="md">
             {getFormattedCategoryValue(categoryValue, props.categories)}
-          </Text>
+          </Badge>
         </Flex>
         <Flex
           className={classes.amountContainer}
-          w={{ base: "100%", xs: "120px" }}
+          w={{ base: "100%", xs: "140px" }}
         >
           {userSettingsQuery.isPending ? null : (
             <Text
