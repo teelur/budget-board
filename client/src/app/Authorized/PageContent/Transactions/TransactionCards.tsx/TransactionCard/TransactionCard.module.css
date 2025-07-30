@@ -14,7 +14,7 @@
   align-items: center;
   flex-direction: row;
 
-  @container (max-width: 830px) {
+  @container (max-width: 700px) {
     flex-direction: column;
   }
 }
@@ -23,7 +23,7 @@
   gap: 0.5rem;
   align-items: center;
 
-  @container (max-width: 830px) {
+  @container (max-width: 700px) {
     width: 100%;
   }
 }

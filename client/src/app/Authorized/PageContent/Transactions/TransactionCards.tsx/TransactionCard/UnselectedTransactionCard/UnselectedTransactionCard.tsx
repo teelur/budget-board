@@ -43,39 +43,38 @@ const UnselectedTransactionCard = (
       : props.transaction.category ?? "";
 
   return (
-    <Flex className={classes.container}>
+    <Flex
+      className={classes.container}
+      direction={{ base: "column", transactionBreakpoint: "row" }}
+    >
       <Flex
-        className={classes.subcontainer}
-        direction={{ base: "column", xs: "row" }}
-        style={{ flexGrow: 1 }}
+        className={classes.dateContainer}
+        w={{ base: "100%", transactionBreakpoint: "135px" }}
       >
-        <Flex
-          className={classes.dateContainer}
-          w={{ base: "100%", xs: "135px" }}
-        >
-          <Text c="dimmed" size="sm" fw={600}>
-            {new Date(props.transaction.date ?? 0).toLocaleDateString([], {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </Text>
-        </Flex>
-        <Flex
-          className={classes.merchantContainer}
-          w={{ base: "100%", xs: "200px" }}
-        >
-          <Text fw={600}>{props.transaction.merchantName}</Text>
-        </Flex>
+        <Text c="dimmed" size="sm" fw={600}>
+          {new Date(props.transaction.date ?? 0).toLocaleDateString([], {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </Text>
+      </Flex>
+      <Flex
+        className={classes.merchantContainer}
+        w={{ base: "100%", transactionBreakpoint: "200px" }}
+      >
+        <Text fw={600}>{props.transaction.merchantName}</Text>
       </Flex>
       <Flex
         className={classes.subcontainer}
-        direction={{ base: "column", xs: "row" }}
+        direction={{ base: "row" }}
         style={{ flexShrink: 1 }}
+        justify="space-between"
       >
         <Flex
           className={classes.categoryContainer}
-          w={{ base: "100%", xs: "160px" }}
+          w={{ base: "100%", transactionBreakpoint: "160px" }}
+          justify={{ base: "flex-start", transactionBreakpoint: "flex-end" }}
         >
           <Badge size="md">
             {getFormattedCategoryValue(categoryValue, props.categories)}
@@ -83,7 +82,8 @@ const UnselectedTransactionCard = (
         </Flex>
         <Flex
           className={classes.amountContainer}
-          w={{ base: "100%", xs: "140px" }}
+          w={{ base: "100%", transactionBreakpoint: "140px" }}
+          justify={{ base: "flex-end", transactionBreakpoint: "flex-start" }}
         >
           {userSettingsQuery.isPending ? null : (
             <Text
