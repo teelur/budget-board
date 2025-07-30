@@ -20,6 +20,14 @@ import Authorized from "~/app/Authorized/Authorized";
 const theme = createTheme({
   defaultRadius: "xs",
   primaryColor: "indigo",
+  breakpoints: {
+    xs: "30em", // 480px
+    sm: "48em", // 768px
+    md: "62em", // 992px
+    lg: "75em", // 1200px
+    xl: "90em", // 1440px
+    transactionBreakpoint: "700px", // Custom breakpoint for transactions
+  },
 });
 
 const queryClient = new QueryClient({
