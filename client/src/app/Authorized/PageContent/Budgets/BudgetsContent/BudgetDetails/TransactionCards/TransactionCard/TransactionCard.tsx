@@ -38,13 +38,13 @@ const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
   });
 
   return (
-    <Card radius="md" shadow="md">
+    <Card radius="md" shadow="md" p="0.5rem">
       <Stack gap={0}>
         <Text size="xs" fw={500} c="dimmed">
           {new Date(props.transaction.date).toLocaleDateString()}
         </Text>
         <Text size="sm">{props.transaction.merchantName}</Text>
-        <Group justify="space-between" align="center">
+        <Group justify="space-between" align="center" p={0}>
           <Text size="sm" fw={600}>
             {getFormattedCategoryValue(categoryValue, props.categories)}
           </Text>
