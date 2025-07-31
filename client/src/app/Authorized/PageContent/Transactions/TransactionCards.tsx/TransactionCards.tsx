@@ -15,7 +15,7 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { ICategoryResponse } from "~/models/category";
-import TransactionCardContent from "./TransactionCard/TransactionCard";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   filters: Filters;
@@ -92,7 +92,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                 (page - 1) * itemsPerPage + itemsPerPage
               )
               .map((transaction) => (
-                <TransactionCardContent
+                <TransactionCard
                   key={transaction.id}
                   transaction={transaction}
                   categories={transactionCategoriesWithCustom}
