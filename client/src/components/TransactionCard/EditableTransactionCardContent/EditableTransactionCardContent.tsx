@@ -1,3 +1,5 @@
+import classes from "./EditableTransactionCardContent.module.css";
+
 import {
   ActionIcon,
   Flex,
@@ -179,14 +181,9 @@ const EditableTransactionCardContent = (
         visible={doEditTransaction.isPending || doDeleteTransaction.isPending}
       />
       <Group wrap="nowrap" gap="2rem">
-        <Flex
-          w="100%"
-          gap="0.5rem"
-          align="center"
-          direction={{ base: "column", editTransactionBreakpoint: "row" }}
-        >
+        <Flex className={classes.content} w="100%" gap="0.5rem" align="center">
           <Stack
-            w={{ base: "100%", editTransactionBreakpoint: "160px" }}
+            className={classes.dateContainer}
             flex="1 0 auto"
             align="start"
             onClick={(e) => e.stopPropagation()}
@@ -206,7 +203,7 @@ const EditableTransactionCardContent = (
             onClick={(e) => e.stopPropagation()}
           />
           <Group
-            w={{ base: "100%", editTransactionBreakpoint: "180px" }}
+            className={classes.categoryContainer}
             flex="1 0 auto"
             onClick={(e) => e.stopPropagation()}
           >
@@ -219,7 +216,7 @@ const EditableTransactionCardContent = (
             />
           </Group>
           <Group
-            w={{ base: "100%", editTransactionBreakpoint: "100px" }}
+            className={classes.amountContainer}
             flex="1 0 auto"
             onClick={(e) => e.stopPropagation()}
           >
