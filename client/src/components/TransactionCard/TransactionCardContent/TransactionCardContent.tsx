@@ -1,3 +1,5 @@
+import classes from "./TransactionCardContent.module.css";
+
 import { Badge, Flex, Text } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
@@ -41,14 +43,9 @@ const TransactionCardContent = (
       : props.transaction.category ?? "";
 
   return (
-    <Flex
-      w="100%"
-      gap="0.5rem"
-      align="center"
-      direction={{ base: "column", transactionBreakpoint: "row" }}
-    >
+    <Flex className={classes.content} w="100%" gap="0.5rem" align="center">
       <Text
-        w={{ base: "100%", transactionBreakpoint: "135px" }}
+        className={classes.dateText}
         flex="1 0 auto"
         c="dimmed"
         size="sm"
@@ -60,26 +57,22 @@ const TransactionCardContent = (
           day: "numeric",
         })}
       </Text>
-      <Text w="100%" fw={600}>
+      <Text className={classes.merchantNameText} w="100%" fw={600}>
         {props.transaction.merchantName}
       </Text>
       <Flex
-        w={{ base: "100%", transactionBreakpoint: "auto" }}
+        className={classes.contentSubcontainer}
         gap="0.5rem"
         align="center"
-        direction={{ base: "row" }}
-        style={{ flexShrink: 1 }}
+        direction="row"
         justify="space-between"
       >
-        <Flex w={{ base: "100%", transactionBreakpoint: "160px" }}>
+        <Flex className={classes.categoryContainer}>
           <Badge size="md">
             {getFormattedCategoryValue(categoryValue, props.categories)}
           </Badge>
         </Flex>
-        <Flex
-          w={{ base: "100%", transactionBreakpoint: "100px" }}
-          justify={{ base: "flex-end", transactionBreakpoint: "flex-start" }}
-        >
+        <Flex className={classes.amountContainer}>
           {userSettingsQuery.isPending ? null : (
             <Text c={props.transaction.amount < 0 ? "red" : "green"} fw={600}>
               {convertNumberToCurrency(

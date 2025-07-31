@@ -11,6 +11,7 @@ import TransactionCardContent from "./TransactionCardContent/TransactionCardCont
 interface TransactionCardProps {
   transaction: ITransaction;
   categories: ICategory[];
+  disableEdit?: boolean; // Optional prop to determine if the card is editable
 }
 
 const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
@@ -25,7 +26,7 @@ const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
       bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
       shadow="md"
     >
-      {isSelected ? (
+      {isSelected && !(props.disableEdit ?? false) ? (
         <EditableTransactionCardContent
           transaction={props.transaction}
           categories={props.categories}
