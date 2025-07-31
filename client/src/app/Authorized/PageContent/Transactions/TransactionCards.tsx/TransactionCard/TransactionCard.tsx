@@ -5,8 +5,8 @@ import { useDisclosure } from "@mantine/hooks";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
-import UnselectedTransactionCard from "./UnselectedTransactionCard/UnselectedTransactionCard";
-import SelectedTransactionCard from "./SelectedTransactionCard/SelectedTransactionCard";
+import EditableTransactionCardContent from "./EditableTransactionCardContent/EditableTransactionCardContent";
+import TransactionCardContent from "./TransactionCardContent/TransactionCardContent";
 
 interface TransactionCardProps {
   transaction: ITransaction;
@@ -26,12 +26,12 @@ const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
       shadow="md"
     >
       {isSelected ? (
-        <SelectedTransactionCard
+        <EditableTransactionCardContent
           transaction={props.transaction}
           categories={props.categories}
         />
       ) : (
-        <UnselectedTransactionCard
+        <TransactionCardContent
           transaction={props.transaction}
           categories={props.categories}
         />

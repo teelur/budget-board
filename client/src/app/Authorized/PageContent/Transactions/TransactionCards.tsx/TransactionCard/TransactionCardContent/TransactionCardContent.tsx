@@ -1,5 +1,3 @@
-import classes from "../TransactionCard.module.css";
-
 import { Badge, Flex, Text } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
@@ -11,13 +9,13 @@ import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 
-interface TransactionCardProps {
+interface TransactionCardContentProps {
   transaction: ITransaction;
   categories: ICategory[];
 }
 
-const UnselectedTransactionCard = (
-  props: TransactionCardProps
+const TransactionCardContent = (
+  props: TransactionCardContentProps
 ): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
 
@@ -44,57 +42,46 @@ const UnselectedTransactionCard = (
 
   return (
     <Flex
-      className={classes.container}
+      w="100%"
+      gap="0.5rem"
+      align="center"
       direction={{ base: "column", transactionBreakpoint: "row" }}
     >
-      <Flex
-        className={classes.dateContainer}
+      <Text
         w={{ base: "100%", transactionBreakpoint: "135px" }}
+        flex="1 0 auto"
+        c="dimmed"
+        size="sm"
+        fw={600}
       >
-        <Text c="dimmed" size="sm" fw={600}>
-          {new Date(props.transaction.date ?? 0).toLocaleDateString([], {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </Text>
-      </Flex>
+        {new Date(props.transaction.date ?? 0).toLocaleDateString([], {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </Text>
+      <Text w="100%" fw={600}>
+        {props.transaction.merchantName}
+      </Text>
       <Flex
-        className={classes.merchantContainer}
-        w={{ base: "100%", transactionBreakpoint: "200px" }}
-      >
-        <Text fw={600}>{props.transaction.merchantName}</Text>
-      </Flex>
-      <Flex
-        className={classes.subcontainer}
+        w={{ base: "100%", transactionBreakpoint: "auto" }}
+        gap="0.5rem"
+        align="center"
         direction={{ base: "row" }}
         style={{ flexShrink: 1 }}
         justify="space-between"
       >
-        <Flex
-          className={classes.categoryContainer}
-          w={{ base: "100%", transactionBreakpoint: "160px" }}
-          justify={{ base: "flex-start", transactionBreakpoint: "flex-end" }}
-        >
+        <Flex w={{ base: "100%", transactionBreakpoint: "160px" }}>
           <Badge size="md">
             {getFormattedCategoryValue(categoryValue, props.categories)}
           </Badge>
         </Flex>
         <Flex
-          className={classes.amountContainer}
-          w={{ base: "100%", transactionBreakpoint: "140px" }}
+          w={{ base: "100%", transactionBreakpoint: "100px" }}
           justify={{ base: "flex-end", transactionBreakpoint: "flex-start" }}
         >
           {userSettingsQuery.isPending ? null : (
-            <Text
-              style={{
-                color:
-                  props.transaction.amount < 0
-                    ? "var(--mantine-color-red-6)"
-                    : "var(--mantine-color-green-6)",
-                fontWeight: 600,
-              }}
-            >
+            <Text c={props.transaction.amount < 0 ? "red" : "green"} fw={600}>
               {convertNumberToCurrency(
                 props.transaction.amount,
                 true,
@@ -108,4 +95,4 @@ const UnselectedTransactionCard = (
   );
 };
 
-export default UnselectedTransactionCard;
+export default TransactionCardContent;

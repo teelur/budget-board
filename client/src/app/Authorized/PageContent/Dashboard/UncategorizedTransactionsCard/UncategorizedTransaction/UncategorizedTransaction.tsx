@@ -8,11 +8,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { AxiosError, AxiosResponse } from "axios";
-import EditableCategoryCell from "~/app/Authorized/PageContent/Transactions/TransactionCards.tsx/TransactionCard/EditableCategoryCell/EditableCategoryCell";
 import { ICategory } from "~/models/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { useDisclosure } from "@mantine/hooks";
 import { IUserSettings } from "~/models/userSettings";
+import EditableCategoryCell from "~/components/EditableCategoryCell/EditableCategoryCell";
 
 interface TransactionCardProps {
   transaction: ITransaction;
