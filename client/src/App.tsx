@@ -26,7 +26,8 @@ const theme = createTheme({
     md: "62em", // 992px
     lg: "75em", // 1200px
     xl: "90em", // 1440px
-    transactionBreakpoint: "700px", // Custom breakpoint for transactions
+    transactionBreakpoint: "750px", // Custom breakpoint for transactions
+    editTransactionBreakpoint: "850px", // Custom breakpoint for edit transactions
   },
 });
 
