@@ -6,7 +6,11 @@ import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
 
 import { BrowserRouter, Route, Routes } from "react-router";
-import { createTheme, MantineProvider } from "@mantine/core";
+import {
+  createTheme,
+  CSSVariablesResolver,
+  MantineProvider,
+} from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Notifications } from "@mantine/notifications";
 
@@ -31,6 +35,22 @@ const theme = createTheme({
   },
 });
 
+const resolver: CSSVariablesResolver = (theme) => ({
+  variables: {},
+  light: {
+    "--mantine-color-header-background": theme.colors.gray[0],
+    "--mantine-color-content-background": theme.colors.gray[1],
+    "--mantine-color-sidebar-background": theme.colors.gray[4],
+    "--mantine-color-card-alternate": theme.colors.gray[2],
+  },
+  dark: {
+    "--mantine-color-header-background": theme.colors.dark[8],
+    "--mantine-color-content-background": theme.colors.dark[7],
+    "--mantine-color-sidebar-background": theme.colors.dark[6],
+    "--mantine-color-card-alternate": theme.colors.dark[7],
+  },
+});
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -41,7 +61,11 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <MantineProvider theme={theme} defaultColorScheme="dark">
+    <MantineProvider
+      theme={theme}
+      cssVariablesResolver={resolver}
+      defaultColorScheme="dark"
+    >
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <Notifications />
