@@ -1,5 +1,3 @@
-import classes from "./Authorized.module.css";
-
 import {
   AppShell,
   AppShellHeader,
@@ -35,10 +33,10 @@ const Authorized = (): React.ReactNode => {
       }}
       padding={12}
     >
-      <AppShellHeader className={classes.header}>
+      <AppShellHeader bg="var(--mantine-color-header-background)">
         <Header isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
       </AppShellHeader>
-      <AppShellNavbar className={classes.navbar}>
+      <AppShellNavbar bg="var(--mantine-color-sidebar-background)">
         <Navbar
           currentPage={currentPage}
           setCurrentPage={onPageSelect}
@@ -46,7 +44,10 @@ const Authorized = (): React.ReactNode => {
           toggleNavbar={toggle}
         />
       </AppShellNavbar>
-      <AppShellMain className={classes.main}>
+      <AppShellMain
+        bg="var(--mantine-color-content-background)"
+        flex={{ direction: "column" }}
+      >
         <PageContent currentPage={currentPage} />
       </AppShellMain>
     </AppShell>

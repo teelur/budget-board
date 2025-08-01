@@ -1,8 +1,8 @@
 import { Group, Pagination, Stack } from "@mantine/core";
-import TransactionCard from "./TransactionCard/TransactionCard";
 import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
 import React from "react";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];

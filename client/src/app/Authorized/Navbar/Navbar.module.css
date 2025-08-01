@@ -27,12 +27,8 @@
     &,
     &:hover {
       background-color: light-dark(
-        var(--mantine-primary-color-4),
-        var(--mantine-color-dark-6)
-      );
-      color: light-dark(
-        var(--mantine-color-gray-3),
-        var(--mantine-color-dark-0)
+        var(--mantine-primary-color-5),
+        var(--mantine-primary-color-8)
       );
     }
   }
