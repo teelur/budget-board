@@ -147,7 +147,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             defaultValue={["chart", "transactions"]}
             multiple
           >
-            <Accordion.Item value="chart">
+            <Accordion.Item
+              value="chart"
+              bg="var(--mantine-color-content-background)"
+            >
               <Accordion.Control>
                 <Text>{isExpenseCategory ? "Expense" : "Income"} Trends</Text>
               </Accordion.Control>
@@ -160,7 +163,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                 />
               </Accordion.Panel>
             </Accordion.Item>
-            <Accordion.Item value="transactions">
+            <Accordion.Item
+              value="transactions"
+              bg="var(--mantine-color-content-background)"
+            >
               <Accordion.Control>Recent Transactions</Accordion.Control>
               <Accordion.Panel>
                 <TransactionCards

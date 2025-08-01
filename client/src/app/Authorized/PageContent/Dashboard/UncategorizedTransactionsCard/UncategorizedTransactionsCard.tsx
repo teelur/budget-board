@@ -21,8 +21,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import UncategorizedTransaction from "./UncategorizedTransaction/UncategorizedTransaction";
 import { ICategoryResponse } from "~/models/category";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;
@@ -104,10 +104,11 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
                   (activePage - 1) * itemsPerPage + itemsPerPage
                 )
                 .map((transaction: ITransaction) => (
-                  <UncategorizedTransaction
+                  <TransactionCard
                     key={transaction.id}
                     transaction={transaction}
                     categories={transactionCategoriesWithCustom}
+                    alternateColor
                   />
                 ))}
             </Stack>

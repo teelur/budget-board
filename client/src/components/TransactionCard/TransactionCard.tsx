@@ -12,6 +12,7 @@ interface TransactionCardProps {
   transaction: ITransaction;
   categories: ICategory[];
   disableEdit?: boolean; // Optional prop to determine if the card is editable
+  alternateColor?: boolean; // Optional prop to apply alternate color
 }
 
 const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
@@ -23,8 +24,14 @@ const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
       onClick={toggle}
       radius="md"
       withBorder={isSelected}
-      bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
-      shadow="md"
+      bg={
+        isSelected
+          ? "var(--mantine-primary-color-light)"
+          : props.alternateColor
+          ? "var(--mantine-color-card-alternate)"
+          : ""
+      }
+      shadow="sm"
     >
       {isSelected && !(props.disableEdit ?? false) ? (
         <EditableTransactionCardContent
