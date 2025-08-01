@@ -34,7 +34,7 @@ public class TransactionService(
         {
             SyncID = transaction.SyncID,
             Amount = transaction.Amount,
-            Date = transaction.Date,
+            Date = transaction.Date.ToUniversalTime(),
             Category = transaction.Category,
             Subcategory = transaction.Subcategory,
             MerchantName = transaction.MerchantName,
@@ -49,7 +49,7 @@ public class TransactionService(
         {
             var currentBalance =
                 account
-                    .Balances.Where(b => b.DateTime <= transaction.Date)
+                    .Balances.Where(b => b.DateTime <= transaction.Date.ToUniversalTime())
                     .OrderByDescending(b => b.DateTime)
                     .FirstOrDefault()
                     ?.Amount ?? 0;
@@ -58,7 +58,7 @@ public class TransactionService(
             var newBalance = new Balance
             {
                 Amount = transaction.Amount + currentBalance,
-                DateTime = transaction.Date,
+                DateTime = transaction.Date.ToUniversalTime(),
                 AccountID = account.ID,
             };
 
@@ -66,7 +66,7 @@ public class TransactionService(
 
             // Then, update all following balances to include the new transaction.
             var balancesAfterNew = account
-                .Balances.Where(b => b.DateTime > transaction.Date)
+                .Balances.Where(b => b.DateTime > transaction.Date.ToUniversalTime())
                 .ToList();
             foreach (var balance in balancesAfterNew)
             {
@@ -137,7 +137,7 @@ public class TransactionService(
         var amountDifference = editedTransaction.Amount - transaction.Amount;
 
         transaction.Amount = editedTransaction.Amount;
-        transaction.Date = editedTransaction.Date;
+        transaction.Date = editedTransaction.Date.ToUniversalTime();
         transaction.Category = editedTransaction.Category;
         transaction.Subcategory = editedTransaction.Subcategory;
         transaction.MerchantName = editedTransaction.MerchantName;
@@ -247,7 +247,7 @@ public class TransactionService(
         {
             SyncID = transaction.SyncID,
             Amount = transactionSplitRequest.Amount,
-            Date = transaction.Date,
+            Date = transaction.Date.ToUniversalTime(),
             Category = transactionSplitRequest.Category,
             Subcategory = transactionSplitRequest.Subcategory,
             MerchantName = transaction.MerchantName,
