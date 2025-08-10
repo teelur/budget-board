@@ -14,7 +14,10 @@ const DeletedAccounts = (props: DeletedAccountsProps): React.ReactNode => {
   );
   return (
     <Accordion variant="filled">
-      <Accordion.Item value="deleted-account">
+      <Accordion.Item
+        value="deleted-account"
+        bg="var(--mantine-color-accordion-alternate)"
+      >
         <Accordion.Control>Deleted Accounts</Accordion.Control>
         <Accordion.Panel>
           <Stack>

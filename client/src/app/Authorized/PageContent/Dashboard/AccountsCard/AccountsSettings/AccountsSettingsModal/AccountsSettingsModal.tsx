@@ -1,6 +1,6 @@
 import classes from "./AccountsSettingsModal.module.css";
 
-import { Button, Flex, Group, Modal, Stack } from "@mantine/core";
+import { Button, Flex, Group, Modal, Stack, Text } from "@mantine/core";
 import React from "react";
 import DeletedAccounts from "./DeletedAccounts/DeletedAccounts";
 import { IAccount } from "~/models/account";
@@ -68,13 +68,11 @@ const AccountsSettingsModal = <T extends string>(
   };
 
   return (
-    <Modal
-      size="100rem"
-      centered
+    <Modal.Root
       opened={props.opened}
       onClose={props.onClose}
-      stackId={props.stackId}
-      title="Accounts Settings"
+      size="100rem"
+      centered
       styles={{
         inner: {
           left: "0",
@@ -83,53 +81,66 @@ const AccountsSettingsModal = <T extends string>(
         },
       }}
     >
-      <Stack gap={20}>
-        <Group w="100%" gap={10} justify="space-between">
-          <Flex className={classes.button}>
-            <Button w="100%" onClick={props.onCreateAccountClick}>
-              Create Account
-            </Button>
-          </Flex>
-          <Flex className={classes.button}>
-            <Button
-              w="100%"
-              onClick={onReorderClick}
-              color={isSortable ? "green" : ""}
-              loading={doIndexInstitutions.isPending}
-            >
-              {isSortable ? "Save Changes" : "Reorder"}
-            </Button>
-          </Flex>
-        </Group>
-        <Stack gap={10}>
-          <Sortable
-            values={sortedInstitutions}
-            onMove={({ activeIndex: from, overIndex: to }) => {
-              const newInstitutions = [...sortedInstitutions];
-              const [movedInstitution] = newInstitutions.splice(from, 1);
-              if (movedInstitution === undefined) {
-                return;
-              }
-              newInstitutions.splice(to, 0, movedInstitution);
-              setSortedInstitutions(newInstitutions);
-            }}
-          >
-            {sortedInstitutions.map((institution) => (
-              <InstitutionSettingsCard
-                key={institution.id}
-                institution={institution}
-                isSortable={isSortable}
-              />
-            ))}
-          </Sortable>
-        </Stack>
-        <DeletedAccounts
-          deletedAccounts={props.accounts.filter(
-            (a: IAccount) => a.deleted !== null
-          )}
-        />
-      </Stack>
-    </Modal>
+      <Modal.Overlay />
+      <Modal.Content bg="var(--mantine-color-content-background)">
+        <Modal.Header bg="var(--mantine-color-content-background)">
+          <Modal.Title>
+            <Text fw={600} size="md">
+              Accounts Settings
+            </Text>
+          </Modal.Title>
+          <Modal.CloseButton />
+        </Modal.Header>
+        <Modal.Body>
+          <Stack gap={20}>
+            <Group w="100%" gap={10} justify="space-between">
+              <Flex className={classes.button}>
+                <Button w="100%" onClick={props.onCreateAccountClick}>
+                  Create Account
+                </Button>
+              </Flex>
+              <Flex className={classes.button}>
+                <Button
+                  w="100%"
+                  onClick={onReorderClick}
+                  color={isSortable ? "green" : ""}
+                  loading={doIndexInstitutions.isPending}
+                >
+                  {isSortable ? "Save Changes" : "Reorder"}
+                </Button>
+              </Flex>
+            </Group>
+            <Stack gap={10}>
+              <Sortable
+                values={sortedInstitutions}
+                onMove={({ activeIndex: from, overIndex: to }) => {
+                  const newInstitutions = [...sortedInstitutions];
+                  const [movedInstitution] = newInstitutions.splice(from, 1);
+                  if (movedInstitution === undefined) {
+                    return;
+                  }
+                  newInstitutions.splice(to, 0, movedInstitution);
+                  setSortedInstitutions(newInstitutions);
+                }}
+              >
+                {sortedInstitutions.map((institution) => (
+                  <InstitutionSettingsCard
+                    key={institution.id}
+                    institution={institution}
+                    isSortable={isSortable}
+                  />
+                ))}
+              </Sortable>
+            </Stack>
+            <DeletedAccounts
+              deletedAccounts={props.accounts.filter(
+                (a: IAccount) => a.deleted !== null
+              )}
+            />
+          </Stack>
+        </Modal.Body>
+      </Modal.Content>
+    </Modal.Root>
   );
 };
 

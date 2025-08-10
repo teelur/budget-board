@@ -13,6 +13,7 @@ import {
   NumberInput,
   TextInput,
   useCombobox,
+  Text,
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -105,7 +106,7 @@ const AccountSettingsCard = (
 
   return (
     <SortableItem value={props.account.id}>
-      <Card radius="lg">
+      <Card bg="var(--mantine-color-card-alternate)" radius="md">
         <LoadingOverlay visible={doUpdateAccount.isPending} />
         <Group justify="space-between" align="center" wrap="nowrap">
           {props.isSortable && (
@@ -173,14 +174,22 @@ const AccountSettingsCard = (
                 decimalScale={2}
               />
               <Checkbox
-                label="Hide Account?"
+                label={
+                  <Text fw={600} size="sm">
+                    Hide Account?
+                  </Text>
+                }
                 checked={accountHideAccount}
                 onChange={(e) => {
                   setAccountHideAccount(e.currentTarget.checked);
                 }}
               />
               <Checkbox
-                label="Hide Transactions?"
+                label={
+                  <Text fw={600} size="sm">
+                    Hide Transactions?
+                  </Text>
+                }
                 checked={accountHideTransactions}
                 onChange={(e) =>
                   setAccountHideTransactions(e.currentTarget.checked)
