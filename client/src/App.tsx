@@ -38,6 +38,7 @@ const theme = createTheme({
 const resolver: CSSVariablesResolver = (theme) => ({
   variables: {},
   light: {
+    "--mantine-color-text": theme.colors.dark[7],
     "--mantine-color-header-background": theme.colors.gray[0],
     "--mantine-color-content-background": theme.colors.gray[1],
     "--mantine-color-sidebar-background": theme.colors.gray[4],
