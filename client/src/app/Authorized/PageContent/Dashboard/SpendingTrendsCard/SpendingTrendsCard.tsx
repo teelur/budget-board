@@ -142,8 +142,10 @@ const SpendingTrendsCard = (): React.ReactNode => {
   return (
     <Card className={classes.root} withBorder radius="md">
       <Stack className={classes.header}>
-        <Title>Spending Trends</Title>
-        <Text>You have spent {getSpendingComparisonString()} last month.</Text>
+        <Title order={2}>Spending Trends</Title>
+        <Text c="dimmed" fw={600} size="sm">
+          You have spent {getSpendingComparisonString()} last month.
+        </Text>
       </Stack>
       <SpendingChart
         months={months}
