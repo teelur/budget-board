@@ -69,7 +69,7 @@ const AddCategory = (props: AddCategoryProps): React.ReactNode => {
   };
 
   return (
-    <Card withBorder shadow="xs">
+    <Card withBorder>
       <LoadingOverlay visible={doAddCategory.isPending} />
       <form style={{ width: "100%" }} onSubmit={form.onSubmit(handleSubmit)}>
         <Stack>
@@ -80,9 +80,13 @@ const AddCategory = (props: AddCategoryProps): React.ReactNode => {
             w="100%"
           />
           <Stack gap="0.5rem">
-            <Text size="0.875rem">Category Type</Text>
+            <Text fw={500} size="sm">
+              Category Type
+            </Text>
             <Group gap="0.5rem">
-              <Text size="0.875rem">Parent</Text>
+              <Text fw={600} size="sm">
+                Parent
+              </Text>
               <Switch
                 checked={isChildCategory}
                 onChange={(event) =>
@@ -90,7 +94,9 @@ const AddCategory = (props: AddCategoryProps): React.ReactNode => {
                 }
                 size="md"
               />
-              <Text size="0.875rem">Child</Text>
+              <Text fw={600} size="sm">
+                Child
+              </Text>
             </Group>
           </Stack>
           {isChildCategory && (

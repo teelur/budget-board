@@ -53,7 +53,9 @@ const CustomCategories = (): React.ReactNode => {
             )
           )
         ) : (
-          <Text>No custom categories.</Text>
+          <Text fw={600} size="sm">
+            No custom categories.
+          </Text>
         )}
       </Stack>
     </Stack>
