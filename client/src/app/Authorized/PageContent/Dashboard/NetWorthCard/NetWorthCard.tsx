@@ -48,7 +48,12 @@ const NetWorthCard = (): React.ReactNode => {
           </Stack>
         ) : (
           <Stack gap="0.5rem">
-            <Card className={classes.group} radius="lg" shadow="none">
+            <Card
+              className={classes.group}
+              bg="var(--mantine-color-card-alternate)"
+              radius="lg"
+              shadow="none"
+            >
               <NetWorthItem
                 accounts={validAccounts}
                 types={["Checking", "Credit Card"]}
@@ -65,7 +70,12 @@ const NetWorthCard = (): React.ReactNode => {
                 title="Savings"
               />
             </Card>
-            <Card className={classes.group} radius="lg" shadow="none">
+            <Card
+              className={classes.group}
+              bg="var(--mantine-color-card-alternate)"
+              radius="lg"
+              shadow="none"
+            >
               <NetWorthItem
                 accounts={validAccounts}
                 types={["Checking", "Credit Card", "Loan", "Savings"]}
@@ -77,7 +87,12 @@ const NetWorthCard = (): React.ReactNode => {
                 title="Investments"
               />
             </Card>
-            <Card className={classes.group} radius="lg" shadow="none">
+            <Card
+              className={classes.group}
+              bg="var(--mantine-color-card-alternate)"
+              radius="lg"
+              shadow="none"
+            >
               <NetWorthItem accounts={validAccounts} title="Total" />
             </Card>
           </Stack>
