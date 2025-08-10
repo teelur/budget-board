@@ -31,7 +31,7 @@ const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
           ? "var(--mantine-color-card-alternate)"
           : ""
       }
-      shadow="sm"
+      shadow={props.alternateColor ? "none" : "sm"}
     >
       {isSelected && !(props.disableEdit ?? false) ? (
         <EditableTransactionCardContent
