@@ -30,7 +30,9 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
       direction={{ base: "column", sm: "row" }}
       align={{ base: "start", sm: "center" }}
     >
-      <Text>Sort By</Text>
+      <Text c="dimmed" fw={600} size="sm">
+        Sort By
+      </Text>
       <Group className={classes.sortButtons}>
         {SortOptions.map((sortOption: SortOption) => (
           <SortButton
