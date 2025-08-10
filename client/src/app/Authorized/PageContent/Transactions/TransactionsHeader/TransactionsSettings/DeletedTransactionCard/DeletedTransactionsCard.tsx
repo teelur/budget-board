@@ -45,17 +45,14 @@ const DeletedTransactionsCard = (
   });
 
   return (
-    <Card className={classes.card} shadow="xs" padding="md" radius="md">
+    <Card padding="0.5rem" radius="md">
       <LoadingOverlay visible={doRestoreTransaction.isPending} />
-      <Group className={classes.container}>
-        <Stack className={classes.transactionDetails}>
-          <Text className={classes.merchantName}>
+      <Group justify="space-between" wrap="nowrap">
+        <Stack gap={0}>
+          <Text fw={600} size="md">
             {props.deletedTransaction.merchantName}
           </Text>
-          <Text
-            className={classes.daysSinceDeleted}
-            size="sm"
-          >{`${getDaysSinceDate(
+          <Text c="dimmed" fw={600} size="sm">{`${getDaysSinceDate(
             props.deletedTransaction.deleted!
           )} days since deleted`}</Text>
         </Stack>

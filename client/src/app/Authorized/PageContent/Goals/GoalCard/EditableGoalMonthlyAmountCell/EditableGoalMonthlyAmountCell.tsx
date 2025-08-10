@@ -96,13 +96,13 @@ const EditableGoalMonthlyAmountCell = (
     <Flex className={classes.container}>
       {userSettingsQuery.isPending ? null : (
         <Text
-          style={{
-            color:
-              goalMonthlyContributionAmount < props.goal.monthlyContribution
-                ? "var(--mantine-color-red-6)"
-                : "var(--mantine-color-green-6)",
-            fontWeight: 600,
-          }}
+          c={
+            goalMonthlyContributionAmount < props.goal.monthlyContribution
+              ? "red"
+              : "green"
+          }
+          size="md"
+          fw={600}
         >
           {convertNumberToCurrency(
             goalMonthlyContributionAmount,
@@ -111,7 +111,9 @@ const EditableGoalMonthlyAmountCell = (
           )}
         </Text>
       )}
-      <Text>of</Text>
+      <Text size="sm" fw={600}>
+        of
+      </Text>
       {props.isSelected && props.goal.isMonthlyContributionEditable ? (
         <Flex onClick={(e) => e.stopPropagation()}>
           <NumberInput
@@ -125,7 +127,7 @@ const EditableGoalMonthlyAmountCell = (
           />
         </Flex>
       ) : userSettingsQuery.isPending ? null : (
-        <Text fw={600}>
+        <Text size="md" fw={600}>
           {convertNumberToCurrency(
             props.goal.monthlyContribution,
             false,
@@ -133,7 +135,9 @@ const EditableGoalMonthlyAmountCell = (
           )}
         </Text>
       )}
-      <Text>this month</Text>
+      <Text size="sm" fw={600}>
+        this month
+      </Text>
     </Flex>
   );
 };

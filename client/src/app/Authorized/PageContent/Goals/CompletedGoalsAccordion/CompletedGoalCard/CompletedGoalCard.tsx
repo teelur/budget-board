@@ -48,7 +48,9 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
           w={{ base: "100%", xs: "auto" }}
         >
           <Group gap={5}>
-            <Text>Total:</Text>
+            <Text c="dimmed" size="sm" fw={600}>
+              Total:
+            </Text>
             {userSettingsQuery.isPending ? null : (
               <Text fw={600}>
                 {convertNumberToCurrency(
@@ -63,7 +65,9 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
             )}
           </Group>
           <Group gap={5}>
-            <Text>Completed:</Text>
+            <Text c="dimmed" size="sm" fw={600}>
+              Completed:
+            </Text>
             <Text fw={600}>
               {new Date(props.goal.completed ?? 0).toLocaleDateString()}
             </Text>

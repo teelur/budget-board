@@ -68,7 +68,9 @@ const EditableGoalTargetAmountCell = (
           )}
         </Text>
       )}
-      <Text size="lg">of</Text>
+      <Text size="md" fw={600}>
+        of
+      </Text>
       {props.isSelected && props.goal.amount !== 0 ? (
         <Flex
           onClick={(e) => {

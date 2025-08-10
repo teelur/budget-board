@@ -97,13 +97,6 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
 
   return (
     <Stack>
-      <Button
-        onClick={toggleSelectMultiple}
-        variant="outline"
-        color={canSelectMultiple ? "green" : "gray"}
-      >
-        Select Multiple
-      </Button>
       <MonthToolcards
         selectedDates={props.selectedDates}
         setSelectedDates={props.setSelectedDates}
@@ -111,18 +104,27 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         isPending={props.isPending}
         allowSelectMultiple={canSelectMultiple}
       />
-      <Group justify="flex-end">
-        {props.showCopy && (
-          <Button onClick={onCopyBudgets} loading={doCopyBudget.isPending}>
-            Copy Previous Month
-          </Button>
-        )}
-        {props.selectedDates.length === 1 && (
-          <AddBudget
-            date={props.selectedDates[0]!}
-            categories={props.categories}
-          />
-        )}
+      <Group justify="space-between">
+        <Button
+          onClick={toggleSelectMultiple}
+          variant="outline"
+          color={canSelectMultiple ? "green" : "gray"}
+        >
+          Select Multiple
+        </Button>
+        <Group gap="0.5rem">
+          {props.showCopy && (
+            <Button onClick={onCopyBudgets} loading={doCopyBudget.isPending}>
+              Copy Previous Month
+            </Button>
+          )}
+          {props.selectedDates.length === 1 && (
+            <AddBudget
+              date={props.selectedDates[0]!}
+              categories={props.categories}
+            />
+          )}
+        </Group>
       </Group>
     </Stack>
   );

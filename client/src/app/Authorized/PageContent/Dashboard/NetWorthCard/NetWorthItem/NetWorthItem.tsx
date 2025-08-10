@@ -46,17 +46,9 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
 
   return (
     <Group className={classes.root} justify="space-between" wrap="nowrap">
-      <Text fw={500}>{props.title}</Text>
+      <Text fw={600}>{props.title}</Text>
       {userSettingsQuery.isPending ? null : (
-        <Text
-          style={{
-            color:
-              summedAccountsTotalBalance < 0
-                ? "var(--mantine-color-red-6)"
-                : "var(--mantine-color-green-6)",
-            fontWeight: 600,
-          }}
-        >
+        <Text c={summedAccountsTotalBalance < 0 ? "red" : "green"} fw={600}>
           {convertNumberToCurrency(
             summedAccountsTotalBalance,
             true,

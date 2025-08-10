@@ -39,7 +39,9 @@ const EditableGoalTargetDateCell = (
 
   return (
     <Flex className={classes.container}>
-      <Text>Projected: </Text>
+      <Text size="sm" fw={600} c="dimmed">
+        Projected:{" "}
+      </Text>
       {props.isSelected && props.goal.isCompleteDateEditable ? (
         <Flex
           onClick={(e) => {
@@ -53,7 +55,7 @@ const EditableGoalTargetDateCell = (
           />
         </Flex>
       ) : (
-        <Text>
+        <Text size="sm" fw={600} c="dimmed">
           {new Date(props.goal.completeDate).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",

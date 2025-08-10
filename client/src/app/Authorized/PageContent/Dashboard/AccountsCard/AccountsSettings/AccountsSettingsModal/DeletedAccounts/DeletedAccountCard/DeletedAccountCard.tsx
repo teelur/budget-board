@@ -1,6 +1,4 @@
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
-import classes from "./DeletedAccountCard.module.css";
-
 import { getDaysSinceDate } from "~/helpers/datetime";
 import { Button, Card, Group, Text } from "@mantine/core";
 import { IAccount } from "~/models/account";
@@ -39,20 +37,23 @@ const DeletedAccountCard = (
   });
 
   return (
-    <Card className={classes.card} shadow="xs" radius="lg">
-      <Text className={classes.column}>{props.deletedAccount.name}</Text>
-      <Text className={classes.column} size="sm">
-        {`${getDaysSinceDate(
-          props.deletedAccount.deleted!
-        )} days since deleted`}
-      </Text>
-      <Group className={classes.button}>
-        <Button
-          loading={doRestoreAccount.isPending}
-          onClick={() => doRestoreAccount.mutate(props.deletedAccount.id)}
-        >
-          <Undo2Icon size={16} />
-        </Button>
+    <Card radius="md" p="0.5rem">
+      <Group justify="space-between" align="center" wrap="nowrap">
+        <Text fw={600}>{props.deletedAccount.name}</Text>
+        <Group>
+          <Text c="dimmed" size="sm" fw={600}>
+            {`${getDaysSinceDate(
+              props.deletedAccount.deleted!
+            )} days since deleted`}
+          </Text>
+          <Button
+            size="compact-sm"
+            loading={doRestoreAccount.isPending}
+            onClick={() => doRestoreAccount.mutate(props.deletedAccount.id)}
+          >
+            <Undo2Icon size={16} />
+          </Button>
+        </Group>
       </Group>
     </Card>
   );

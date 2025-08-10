@@ -1,7 +1,5 @@
-import classes from "./InstitutionItem.module.css";
-
 import { filterVisibleAccounts } from "~/helpers/accounts";
-import { Card, Divider, Stack, Title } from "@mantine/core";
+import { Card, Divider, Stack, Text } from "@mantine/core";
 import { IAccount } from "~/models/account";
 import { IInstitution } from "~/models/institution";
 import { DndContext } from "@dnd-kit/core";
@@ -20,9 +18,17 @@ const InstitutionItem = (props: InstitutionItemProps): React.ReactNode => {
   ).sort((a, b) => a.index - b.index);
 
   return (
-    <Card className={classes.card} radius="lg" padding="sm" shadow="none">
+    <Card
+      w="100%"
+      bg="var(--mantine-color-card-alternate)"
+      radius="lg"
+      padding="sm"
+      shadow="none"
+    >
       <Stack gap={0.5}>
-        <Title order={4}>{props.institution.name}</Title>
+        <Text fw={600} size="md">
+          {props.institution.name}
+        </Text>
         <Divider mb="xs" size="sm" />
       </Stack>
       <Stack gap={1}>

@@ -83,11 +83,6 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
         <Group justify="center">
           <Title order={2}>Uncategorized Transactions</Title>
         </Group>
-        <Pagination
-          value={activePage}
-          onChange={setPage}
-          total={Math.ceil(sortedFilteredTransactions.length / itemsPerPage)}
-        />
         {transactionsQuery.isPending || transactionCategoriesQuery.isPending ? (
           <Skeleton height={350} radius="lg" />
         ) : (
@@ -114,6 +109,11 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
             </Stack>
           </ScrollArea.Autosize>
         )}
+        <Pagination
+          value={activePage}
+          onChange={setPage}
+          total={Math.ceil(sortedFilteredTransactions.length / itemsPerPage)}
+        />
       </Stack>
     </Card>
   );
