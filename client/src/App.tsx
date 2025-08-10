@@ -42,8 +42,9 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--mantine-color-header-background": theme.colors.gray[0],
     "--mantine-color-content-background": theme.colors.gray[1],
     "--mantine-color-sidebar-background": theme.colors.gray[4],
-    "--mantine-color-card-alternate": theme.colors.gray[1],
+    "--mantine-color-card-alternate": theme.colors.gray[2],
     "--mantine-color-light-off": theme.colors.gray[4],
+    "--mantine-color-accordion-alternate": theme.colors.gray[3],
   },
   dark: {
     "--mantine-color-header-background": theme.colors.dark[8],
@@ -51,6 +52,7 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--mantine-color-sidebar-background": theme.colors.dark[6],
     "--mantine-color-card-alternate": theme.colors.dark[7],
     "--mantine-color-light-off": theme.colors.dark[4],
+    "--mantine-color-accordion-alternate": theme.colors.dark[8],
   },
 });
 
