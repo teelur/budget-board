@@ -221,7 +221,13 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { budgetChildCards, unbudgetChildCards } = buildChildren();
 
   return (
-    <Card className={classes.root} p="0.25rem" w="100%" radius="md">
+    <Card
+      className={classes.root}
+      bg="var(--mantine-color-content-background)"
+      p="0.25rem"
+      w="100%"
+      radius="md"
+    >
       <Stack gap={5}>
         <Card
           className={classes.budgetCard}
@@ -273,7 +279,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       )}
                     </Text>
                   )}
-                  <Text className={classes.textSmall}> of </Text>
+                  <Text className={classes.textSmall} fw={600}>
+                    {" "}
+                    of{" "}
+                  </Text>
                   {isSelected ? (
                     <Flex onClick={(e) => e.stopPropagation()}>
                       <NumberInput
@@ -349,7 +358,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     )}
                   </Text>
                 )}
-                <Text size="md"> left</Text>
+                <Text size="sm" fw={600}>
+                  {" "}
+                  left
+                </Text>
               </Group>
             </Stack>
             {isSelected && (

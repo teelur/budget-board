@@ -20,19 +20,19 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
   ): string => {
     if (isSelected) {
       if (isPending) {
-        return "var(--mantine-color-dimmed)";
+        return "var(--mantine-color-light-off)";
       }
 
       switch (cashFlowValue) {
         case CashFlowValue.Positive:
           return "green";
         case CashFlowValue.Neutral:
-          return "var(--mantine-color-dimmed)";
+          return "var(--mantine-color-light-off)";
         case CashFlowValue.Negative:
           return "red";
       }
     }
-    return "var(--mantine-color-dimmed)";
+    return "var(--mantine-color-light-off)";
   };
 
   return (
@@ -48,10 +48,10 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
           radius="md"
           bg={getLightColor(props.cashFlowValue, props.isSelected)}
         />
-        <Text size="sm">
+        <Text size="sm" fw={600}>
           {months.at(props.date.getMonth())?.substring(0, 3)}
         </Text>
-        <Text size="xs" c="var(--mantine-color-dimmed)">
+        <Text size="xs" c="dimmed" fw={600}>
           {props.date.getFullYear()}
         </Text>
       </Stack>
