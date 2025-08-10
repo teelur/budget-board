@@ -54,11 +54,11 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
       >
         <Accordion.Control>
           <Group justify="space-between" align="center" w="100%" pr="1rem">
-            <Text size="1.2rem" fw={600}>
+            <Text size="lg" fw={600}>
               Unbudgeted
             </Text>
             {userSettingsQuery.isPending ? null : (
-              <Text size="1.2rem" fw={600}>
+              <Text size="lg" fw={600}>
                 {convertNumberToCurrency(
                   total,
                   false,
