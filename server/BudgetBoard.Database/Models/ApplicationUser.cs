@@ -12,4 +12,5 @@ public class ApplicationUser : IdentityUser<Guid>
     public ICollection<Category> TransactionCategories { get; set; } = [];
     public ICollection<Institution> Institutions { get; set; } = [];
     public UserSettings? UserSettings { get; set; } = null!;
+    public ICollection<AutomaticCategorizationRule> AutomaticCategorizationRules { get; set; } = [];
 }

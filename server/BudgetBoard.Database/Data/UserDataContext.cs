@@ -29,6 +29,10 @@ namespace BudgetBoard.Database.Data
                     .HasForeignKey<UserSettings>(e => e.UserID)
                     .IsRequired();
 
+                u.HasMany(e => e.AutomaticCategorizationRules)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(e => e.UserID);
+
                 u.ToTable("User");
             });
 
