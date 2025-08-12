@@ -450,15 +450,16 @@ public class SimpleFinService(
     private async Task ApplyAutomaticCategorizationRules(ApplicationUser userData)
     {
         // Query uncategorized transactions directly from the database for efficiency
-        var uncategorizedTransactions = await _dbContext.Transactions
+        var uncategorizedTransactions = userData
+            .Accounts.SelectMany(a => a.Transactions)
             .Where(t =>
-                t.Account.UserId == userData.Id &&
-                string.IsNullOrEmpty(t.Category) &&
-                string.IsNullOrEmpty(t.Subcategory) &&
-                t.Deleted == null &&
-                (t.Account.HideTransactions == false || t.Account.HideTransactions == null)
+                t.Account?.UserID == userData.Id
+                && string.IsNullOrEmpty(t.Category)
+                && string.IsNullOrEmpty(t.Subcategory)
+                && t.Deleted == null
+                && (t.Account.HideTransactions == false)
             )
-            .ToListAsync();
+            .ToList();
 
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
         {
@@ -474,7 +475,11 @@ public class SimpleFinService(
 
         // Compile regexes for all rules once
         var compiledRuleRegexes = rules
-            .Select(r => new { Rule = r, Regex = new Regex(r.CategorizationRule, RegexOptions.Compiled) })
+            .Select(r => new
+            {
+                Rule = r,
+                Regex = new Regex(r.CategorizationRule, RegexOptions.Compiled),
+            })
             .ToList();
 
         foreach (var ruleRegex in compiledRuleRegexes)
@@ -493,15 +498,15 @@ public class SimpleFinService(
                         Amount = transaction.Amount,
                         Date = transaction.Date,
                         Category = TransactionCategoriesHelpers.GetParentCategory(
-                            rule.Category,
+                            ruleRegex.Rule.Category,
                             []
                         ),
                         Subcategory = TransactionCategoriesHelpers.GetIsParentCategory(
-                            rule.Category,
+                            ruleRegex.Rule.Category,
                             customCategories
                         )
                             ? string.Empty
-                            : rule.Category,
+                            : ruleRegex.Rule.Category,
                         MerchantName = transaction.MerchantName,
                         Deleted = transaction.Deleted,
                     }
