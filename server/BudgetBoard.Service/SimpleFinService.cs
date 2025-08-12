@@ -498,7 +498,7 @@ public class SimpleFinService(
                 );
 
                 // Transaction has been updated, so we can remove it from the uncategorized list.
-                matchingTransactions.ToList().Remove(transaction);
+                uncategorizedTransactions.Remove(transaction);
 
                 categorizedCount++;
             }
