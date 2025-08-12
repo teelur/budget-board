@@ -484,9 +484,9 @@ public class SimpleFinService(
 
         foreach (var ruleRegex in compiledRuleRegexes)
         {
-            var matchingTransactions = uncategorizedTransactions.Where(t =>
-                ruleRegex.Regex.IsMatch(t.MerchantName ?? string.Empty)
-            );
+            var matchingTransactions = uncategorizedTransactions
+                .Where(t => ruleRegex.Regex.IsMatch(t.MerchantName ?? string.Empty))
+                .ToList();
 
             foreach (var transaction in matchingTransactions)
             {
