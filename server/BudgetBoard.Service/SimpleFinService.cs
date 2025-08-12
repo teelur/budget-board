@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using System.Text.RegularExpressions;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
@@ -22,6 +23,7 @@ public class SimpleFinService(
     IBalanceService balanceService,
     IGoalService goalService,
     IApplicationUserService applicationUserService,
+    IAutomaticCategorizationRuleService automaticCategorizationRuleService,
     INowProvider nowProvider
 ) : ISimpleFinService
 {
@@ -69,6 +71,8 @@ public class SimpleFinService(
     private readonly IBalanceService _balanceService = balanceService;
     private readonly IGoalService _goalService = goalService;
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
+    private readonly IAutomaticCategorizationRuleService _automaticCategorizationRuleService =
+        automaticCategorizationRuleService;
 
     public async Task<IEnumerable<string>> SyncAsync(Guid userGuid)
     {
@@ -107,6 +111,8 @@ public class SimpleFinService(
         await SyncAccountsAsync(userData, simpleFinData.Accounts);
 
         await SyncGoalsAsync(userData);
+
+        await ApplyAutomaticCategorizationRules(userData);
 
         await _applicationUserService.UpdateApplicationUserAsync(
             userData.Id,
@@ -439,5 +445,69 @@ public class SimpleFinService(
                 }
             }
         }
+    }
+
+    private async Task ApplyAutomaticCategorizationRules(ApplicationUser userData)
+    {
+        var uncategorizedTransactions = userData
+            .Accounts.SelectMany(a => a.Transactions)
+            .Where(t => string.IsNullOrEmpty(t.Category) && string.IsNullOrEmpty(t.Subcategory))
+            .Where(t => t.Deleted == null && (!t.Account?.HideTransactions ?? false))
+            .ToList();
+
+        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
+        {
+            Value = tc.Value,
+            Parent = tc.Parent,
+        });
+
+        var rules = await _automaticCategorizationRuleService.ReadAutomaticCategorizationRulesAsync(
+            userData.Id
+        );
+
+        int categorizedCount = 0;
+
+        foreach (var rule in rules)
+        {
+            var matchingTransactions = uncategorizedTransactions.Where(t =>
+                Regex.Matches(t.MerchantName ?? string.Empty, rule.CategorizationRule).Count > 0
+            );
+
+            foreach (var transaction in matchingTransactions)
+            {
+                await _transactionService.UpdateTransactionAsync(
+                    userData.Id,
+                    new TransactionUpdateRequest()
+                    {
+                        ID = transaction.ID,
+                        Amount = transaction.Amount,
+                        Date = transaction.Date,
+                        Category = TransactionCategoriesHelpers.GetParentCategory(
+                            rule.Category,
+                            []
+                        ),
+                        Subcategory = TransactionCategoriesHelpers.GetIsParentCategory(
+                            rule.Category,
+                            customCategories
+                        )
+                            ? string.Empty
+                            : rule.Category,
+                        MerchantName = transaction.MerchantName,
+                        Deleted = transaction.Deleted,
+                    }
+                );
+
+                // Transaction has been updated, so we can remove it from the uncategorized list.
+                matchingTransactions.ToList().Remove(transaction);
+
+                categorizedCount++;
+            }
+        }
+
+        _logger.LogInformation(
+            "Applied {Count} automatic categorization rules, categorized {CategorizedCount} transactions.",
+            rules.Count(),
+            categorizedCount
+        );
     }
 }
