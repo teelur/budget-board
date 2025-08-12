@@ -22,6 +22,22 @@ public class AutomaticCategorizationRuleService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
+        if (string.IsNullOrWhiteSpace(rule.CategorizationRule))
+        {
+            _logger.LogError(
+                "Attempt to create an automatic categorization rule with an empty rule."
+            );
+            throw new BudgetBoardServiceException("Rule cannot be empty.");
+        }
+
+        if (string.IsNullOrWhiteSpace(rule.Category))
+        {
+            _logger.LogError(
+                "Attempt to create an automatic categorization rule with an empty category."
+            );
+            throw new BudgetBoardServiceException("Category cannot be empty.");
+        }
+
         try
         {
             _ = new System.Text.RegularExpressions.Regex(rule.CategorizationRule);

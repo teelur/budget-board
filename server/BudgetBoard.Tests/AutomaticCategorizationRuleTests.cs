@@ -133,6 +133,64 @@ public class AutomaticCategorizationRuleTests
     }
 
     [Fact]
+    public async Task CreateAutomaticCategorizationRuleAsync_WhenCategoryIsEmpty_ThrowsException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
+            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+            helper.UserDataContext
+        );
+
+        var rule = new AutomaticCategorizationRuleRequest
+        {
+            CategorizationRule = ".*test.*",
+            Category = string.Empty,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
+                helper.demoUser.Id,
+                rule
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Category cannot be empty.");
+    }
+
+    [Fact]
+    public async Task CreateAutomaticCategorizationRuleAsync_WhenRuleIsEmpty_ThrowsException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
+            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+            helper.UserDataContext
+        );
+
+        var rule = new AutomaticCategorizationRuleRequest
+        {
+            CategorizationRule = string.Empty,
+            Category = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
+                helper.demoUser.Id,
+                rule
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Rule cannot be empty.");
+    }
+
+    [Fact]
     public async Task ReadAutomaticCategorizationRulesAsync_WhenCalled_ReturnsRules()
     {
         // Arrange
