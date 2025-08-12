@@ -449,11 +449,16 @@ public class SimpleFinService(
 
     private async Task ApplyAutomaticCategorizationRules(ApplicationUser userData)
     {
-        var uncategorizedTransactions = userData
-            .Accounts.SelectMany(a => a.Transactions)
-            .Where(t => string.IsNullOrEmpty(t.Category) && string.IsNullOrEmpty(t.Subcategory))
-            .Where(t => t.Deleted == null && (!t.Account?.HideTransactions ?? false))
-            .ToList();
+        // Query uncategorized transactions directly from the database for efficiency
+        var uncategorizedTransactions = await _dbContext.Transactions
+            .Where(t =>
+                t.Account.UserId == userData.Id &&
+                string.IsNullOrEmpty(t.Category) &&
+                string.IsNullOrEmpty(t.Subcategory) &&
+                t.Deleted == null &&
+                (t.Account.HideTransactions == false || t.Account.HideTransactions == null)
+            )
+            .ToListAsync();
 
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
         {
