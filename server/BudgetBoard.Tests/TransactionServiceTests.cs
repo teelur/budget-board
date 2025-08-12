@@ -66,6 +66,7 @@ public class TransactionServiceTests
 
         var transaction = _transactionCreateRequestFaker.Generate();
         transaction.AccountID = account.ID;
+        transaction.Date = transaction.Date.ToUniversalTime();
 
         // Act
         await transactionService.CreateTransactionAsync(helper.demoUser.Id, transaction);
@@ -124,7 +125,10 @@ public class TransactionServiceTests
         await transactionService.CreateTransactionAsync(helper.demoUser.Id, transaction);
         // Assert
         helper.UserDataContext.Balances.Should().ContainSingle();
-        helper.UserDataContext.Balances.Single().DateTime.Should().Be(transaction.Date);
+        helper
+            .UserDataContext.Balances.Single()
+            .DateTime.Should()
+            .Be(transaction.Date.ToUniversalTime());
         helper.UserDataContext.Balances.Single().Amount.Should().Be(transaction.Amount);
     }
 
@@ -443,7 +447,7 @@ public class TransactionServiceTests
         {
             ID = transactions.First().ID,
             Amount = 100.0M,
-            Date = new Faker().Date.Past(),
+            Date = new Faker().Date.Past().ToUniversalTime(),
             Category = "newCategory",
             Subcategory = "newSubcategory",
             MerchantName = "newMerchantName",
