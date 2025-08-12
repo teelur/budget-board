@@ -4,6 +4,7 @@ using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    partial class UserDataContextModelSnapshot : ModelSnapshot
+    [Migration("20250811015947_AddAutomaticCategorization")]
+    partial class AddAutomaticCategorization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,8 +187,6 @@ namespace BudgetBoard.Database.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("UserID");
 
                     b.ToTable("AutomaticCategorizationRule", (string)null);
                 });
@@ -549,17 +550,6 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticCategorizationRule", b =>
-                {
-                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
-                        .WithMany("AutomaticCategorizationRules")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("BudgetBoard.Database.Models.Balance", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.Account", "Account")
@@ -698,8 +688,6 @@ namespace BudgetBoard.Database.Migrations
             modelBuilder.Entity("BudgetBoard.Database.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Accounts");
-
-                    b.Navigation("AutomaticCategorizationRules");
 
                     b.Navigation("Budgets");
 

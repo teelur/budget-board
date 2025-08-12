@@ -7,6 +7,7 @@ import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { getDeletedTransactions } from "~/helpers/transactions";
 import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
+import AutomaticCategorization from "./AutomaticCategorization/AutomaticCategorization";
 
 interface TransactionsSettingsProps {
   modalOpened: boolean;
@@ -84,6 +85,19 @@ const TransactionsSettings = (
               </Accordion.Panel>
             </Accordion.Item>
             <Accordion.Item
+              value="automatic categorization"
+              bg="var(--mantine-color-accordion-alternate)"
+            >
+              <Accordion.Control>
+                <Text size="md" fw={600}>
+                  Automatic Categorization
+                </Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <AutomaticCategorization />
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item
               value="deleted transactions"
               bg="var(--mantine-color-accordion-alternate)"
             >
@@ -94,6 +108,9 @@ const TransactionsSettings = (
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack gap="0.5rem">
+                  <Text c="dimmed" size="sm" fw={600}>
+                    View and restore deleted transactions.
+                  </Text>
                   {deletedTransactions.length !== 0 ? (
                     deletedTransactions.map(
                       (deletedTransaction: ITransaction) => (
