@@ -69,7 +69,7 @@ public class AutomaticCategorizationRuleService(
 
         if (
             !TransactionCategoriesConstants.DefaultTransactionCategories.Any(c =>
-                c.Value == rule.Category
+                c.Value.Equals(rule.Category, StringComparison.InvariantCultureIgnoreCase)
             )
             && !userData.TransactionCategories.Any(c =>
                 c.Value.Equals(rule.Category, StringComparison.InvariantCultureIgnoreCase)

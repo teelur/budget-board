@@ -29,8 +29,13 @@ public class AutomaticCategorizationRuleController(
     {
         try
         {
+            var userIdString = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return Unauthorized("User ID not found.");
+            }
             await _automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                new Guid(userIdString),
                 automaticCategorizationRule
             );
             return Ok();

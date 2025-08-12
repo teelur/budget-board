@@ -449,11 +449,16 @@ public class SimpleFinService(
 
     private async Task ApplyAutomaticCategorizationRules(ApplicationUser userData)
     {
-        var uncategorizedTransactions = userData
-            .Accounts.SelectMany(a => a.Transactions)
-            .Where(t => string.IsNullOrEmpty(t.Category) && string.IsNullOrEmpty(t.Subcategory))
-            .Where(t => t.Deleted == null && (!t.Account?.HideTransactions ?? false))
-            .ToList();
+        // Query uncategorized transactions directly from the database for efficiency
+        var uncategorizedTransactions = await _dbContext.Transactions
+            .Where(t =>
+                t.Account.UserId == userData.Id &&
+                string.IsNullOrEmpty(t.Category) &&
+                string.IsNullOrEmpty(t.Subcategory) &&
+                t.Deleted == null &&
+                (t.Account.HideTransactions == false || t.Account.HideTransactions == null)
+            )
+            .ToListAsync();
 
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
         {
@@ -467,10 +472,15 @@ public class SimpleFinService(
 
         int categorizedCount = 0;
 
-        foreach (var rule in rules)
+        // Compile regexes for all rules once
+        var compiledRuleRegexes = rules
+            .Select(r => new { Rule = r, Regex = new Regex(r.CategorizationRule, RegexOptions.Compiled) })
+            .ToList();
+
+        foreach (var ruleRegex in compiledRuleRegexes)
         {
             var matchingTransactions = uncategorizedTransactions.Where(t =>
-                Regex.Matches(t.MerchantName ?? string.Empty, rule.CategorizationRule).Count > 0
+                ruleRegex.Regex.IsMatch(t.MerchantName ?? string.Empty)
             );
 
             foreach (var transaction in matchingTransactions)
@@ -498,7 +508,7 @@ public class SimpleFinService(
                 );
 
                 // Transaction has been updated, so we can remove it from the uncategorized list.
-                matchingTransactions.ToList().Remove(transaction);
+                uncategorizedTransactions.Remove(transaction);
 
                 categorizedCount++;
             }
