@@ -472,10 +472,15 @@ public class SimpleFinService(
 
         int categorizedCount = 0;
 
-        foreach (var rule in rules)
+        // Compile regexes for all rules once
+        var compiledRuleRegexes = rules
+            .Select(r => new { Rule = r, Regex = new Regex(r.CategorizationRule, RegexOptions.Compiled) })
+            .ToList();
+
+        foreach (var ruleRegex in compiledRuleRegexes)
         {
             var matchingTransactions = uncategorizedTransactions.Where(t =>
-                Regex.Matches(t.MerchantName ?? string.Empty, rule.CategorizationRule).Count > 0
+                ruleRegex.Regex.IsMatch(t.MerchantName ?? string.Empty)
             );
 
             foreach (var transaction in matchingTransactions)
