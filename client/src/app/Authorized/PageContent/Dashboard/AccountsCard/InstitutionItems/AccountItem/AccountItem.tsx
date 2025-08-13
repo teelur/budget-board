@@ -33,17 +33,9 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
   return (
     <Stack gap={0.5}>
       <Group justify="space-between" wrap="nowrap">
-        <Text fw={500}>{props.account.name}</Text>
+        <Text fw={600}>{props.account.name}</Text>
         {userSettingsQuery.isPending ? null : (
-          <Text
-            style={{
-              color:
-                props.account.currentBalance < 0
-                  ? "var(--mantine-color-red-6)"
-                  : "var(--mantine-color-green-6)",
-              fontWeight: 600,
-            }}
-          >
+          <Text c={props.account.currentBalance < 0 ? "red" : "green"} fw={600}>
             {convertNumberToCurrency(
               props.account.currentBalance,
               true,
@@ -53,10 +45,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
         )}
       </Group>
       {props.account.source !== AccountSource.Manual && (
-        <Text
-          style={{ fontWeight: 400, color: "var(--mantine-color-dimmed)" }}
-          size="sm"
-        >
+        <Text c="dimmed" fw={600} size="sm">
           {"Last updated: "}
           {props.account.balanceDate
             ? new Date(props.account.balanceDate).toLocaleString()

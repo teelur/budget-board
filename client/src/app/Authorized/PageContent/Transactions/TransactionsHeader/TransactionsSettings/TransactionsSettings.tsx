@@ -1,4 +1,4 @@
-import { Accordion, Modal, Stack } from "@mantine/core";
+import { Accordion, Modal, Stack, Text } from "@mantine/core";
 import React from "react";
 import CustomCategories from "./CustomCategories/CustomCategories";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -7,6 +7,7 @@ import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { getDeletedTransactions } from "~/helpers/transactions";
 import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
+import AutomaticCategorization from "./AutomaticCategorization/AutomaticCategorization";
 
 interface TransactionsSettingsProps {
   modalOpened: boolean;
@@ -42,13 +43,12 @@ const TransactionsSettings = (
   );
 
   return (
-    <Modal
+    <Modal.Root
       size="40rem"
       centered
       padding="0.5rem"
       opened={props.modalOpened}
       onClose={props.closeModal}
-      title="Transactions Settings"
       styles={{
         inner: {
           left: "0",
@@ -57,32 +57,79 @@ const TransactionsSettings = (
         },
       }}
     >
-      <Accordion variant="filled" multiple defaultValue={["custom categories"]}>
-        <Accordion.Item value="custom categories">
-          <Accordion.Control>Custom Categories</Accordion.Control>
-          <Accordion.Panel>
-            <CustomCategories />
-          </Accordion.Panel>
-        </Accordion.Item>
-        <Accordion.Item value="deleted transactions">
-          <Accordion.Control>Deleted Transactions</Accordion.Control>
-          <Accordion.Panel>
-            <Stack gap="0.5rem">
-              {deletedTransactions.length !== 0 ? (
-                deletedTransactions.map((deletedTransaction: ITransaction) => (
-                  <DeletedTransactionsCard
-                    key={deletedTransaction.id}
-                    deletedTransaction={deletedTransaction}
-                  />
-                ))
-              ) : (
-                <span>No deleted transactions.</span>
-              )}
-            </Stack>
-          </Accordion.Panel>
-        </Accordion.Item>
-      </Accordion>
-    </Modal>
+      <Modal.Overlay />
+      <Modal.Content bg="var(--mantine-color-content-background)">
+        <Modal.Header bg="var(--mantine-color-content-background)">
+          <Modal.Title>
+            <Text fw={600}>Transactions Settings</Text>
+          </Modal.Title>
+          <Modal.CloseButton />
+        </Modal.Header>
+        <Modal.Body>
+          <Accordion
+            variant="separated"
+            multiple
+            defaultValue={["custom categories"]}
+          >
+            <Accordion.Item
+              value="custom categories"
+              bg="var(--mantine-color-accordion-alternate)"
+            >
+              <Accordion.Control>
+                <Text size="md" fw={600}>
+                  Custom Categories
+                </Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <CustomCategories />
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item
+              value="automatic categorization"
+              bg="var(--mantine-color-accordion-alternate)"
+            >
+              <Accordion.Control>
+                <Text size="md" fw={600}>
+                  Automatic Categorization
+                </Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <AutomaticCategorization />
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item
+              value="deleted transactions"
+              bg="var(--mantine-color-accordion-alternate)"
+            >
+              <Accordion.Control>
+                <Text size="md" fw={600}>
+                  Deleted Transactions
+                </Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Stack gap="0.5rem">
+                  <Text c="dimmed" size="sm" fw={600}>
+                    View and restore deleted transactions.
+                  </Text>
+                  {deletedTransactions.length !== 0 ? (
+                    deletedTransactions.map(
+                      (deletedTransaction: ITransaction) => (
+                        <DeletedTransactionsCard
+                          key={deletedTransaction.id}
+                          deletedTransaction={deletedTransaction}
+                        />
+                      )
+                    )
+                  ) : (
+                    <span>No deleted transactions.</span>
+                  )}
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        </Modal.Body>
+      </Modal.Content>
+    </Modal.Root>
   );
 };
 

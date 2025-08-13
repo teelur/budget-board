@@ -1,26 +1,3 @@
-.navbar {
-  background-color: light-dark(
-    var(--mantine-primary-color-3),
-    var(--mantine-color-dark-9)
-  );
-}
-
-.header {
-  background-color: light-dark(
-    var(--mantine-color-gray-2),
-    var(--mantine-color-dark-8)
-  );
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  background-color: light-dark(
-    var(--mantine-color-gray-1),
-    var(--mantine-color-dark-8)
-  );
-}
-
 .burger {
   &:hover {
     background-color: light-dark(

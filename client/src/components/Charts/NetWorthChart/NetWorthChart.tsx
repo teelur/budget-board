@@ -4,7 +4,6 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
-import { DateValue } from "@mantine/dates";
 import { IAccount } from "~/models/account";
 import { IBalance } from "~/models/balance";
 import React from "react";
@@ -12,11 +11,13 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import { DatesRangeValue } from "@mantine/dates";
+import dayjs from "dayjs";
 
 interface NetWorthChartProps {
   accounts: IAccount[];
   balances: IBalance[];
-  dateRange: [DateValue, DateValue];
+  dateRange: DatesRangeValue<string>;
   isPending?: boolean;
   invertYAxis?: boolean;
 }
@@ -59,8 +60,10 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
       data={BuildNetWorthChartData(
         filterBalancesByDateRange(
           props.balances,
-          props.dateRange[0] ?? getDateFromMonthsAgo(1),
-          props.dateRange[1] ?? new Date()
+          props.dateRange[0]
+            ? dayjs(props.dateRange[0]).toDate()
+            : getDateFromMonthsAgo(1),
+          props.dateRange[1] ? dayjs(props.dateRange[1]).toDate() : new Date()
         ),
         props.accounts
       )}

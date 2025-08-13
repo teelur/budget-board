@@ -32,7 +32,10 @@ const CustomCategories = (): React.ReactNode => {
   );
 
   return (
-    <Stack>
+    <Stack gap="0.5rem">
+      <Text c="dimmed" size="sm" fw={600}>
+        Create custom categories to organize your transactions.
+      </Text>
       <AddCategory categories={transactionCategoriesWithCustom} />
       <Stack>
         <Group px="0.5rem" justify="space-between">
@@ -53,7 +56,9 @@ const CustomCategories = (): React.ReactNode => {
             )
           )
         ) : (
-          <Text>No custom categories.</Text>
+          <Text fw={600} size="sm">
+            No custom categories.
+          </Text>
         )}
       </Stack>
     </Stack>

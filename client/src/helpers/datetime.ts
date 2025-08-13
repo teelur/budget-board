@@ -4,6 +4,10 @@ const MINUTES = 0;
 const SECONDS = 0;
 const MILLISECONDS = 0;
 
+// Mantine uses formatted date strings.
+export const mantineDateFormat = "YYYY-MM-DD";
+export const mantineDateTimeFormat = "YYYY-MM-DD HH:mm:ss";
+
 /**
  * Returns the number of days elapsed since the specified date, as a string.
  *

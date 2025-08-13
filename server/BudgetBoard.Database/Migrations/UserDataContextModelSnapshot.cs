@@ -18,7 +18,7 @@ namespace BudgetBoard.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "currency", new[] { "aud", "cad", "chf", "cny", "eur", "gbp", "inr", "jpy", "nzd", "sek", "usd" });
@@ -164,6 +164,30 @@ namespace BudgetBoard.Database.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticCategorizationRule", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CategorizationRule")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("AutomaticCategorizationRule", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Balance", b =>
@@ -525,6 +549,17 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticCategorizationRule", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("AutomaticCategorizationRules")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.Balance", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.Account", "Account")
@@ -663,6 +698,8 @@ namespace BudgetBoard.Database.Migrations
             modelBuilder.Entity("BudgetBoard.Database.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Accounts");
+
+                    b.Navigation("AutomaticCategorizationRules");
 
                     b.Navigation("Budgets");
 

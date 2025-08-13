@@ -1,6 +1,6 @@
 import classes from "./BudgetTotalCard.module.css";
 
-import { Card, Skeleton, Title } from "@mantine/core";
+import { Card, Skeleton, Stack, Text } from "@mantine/core";
 import React from "react";
 import BudgetTotalItem from "./BudgetTotalItem/BudgetTotalItem";
 import { IBudget } from "~/models/budget";
@@ -62,46 +62,55 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
   const totalTransactionsTotal = sumTransactionAmounts(props.transactions);
 
   return (
-    <Card className={classes.root} radius="md" shadow="md">
-      <Title order={3}>Your Budget</Title>
-      {props.isPending ? (
-        <Skeleton h={105} radius="md" />
-      ) : (
-        <Card className={classes.group} radius="md">
-          <BudgetTotalItem
-            label="Income"
-            amount={incomeTransactionsTotal}
-            total={incomeBudgetsTotal}
-            isIncome
-          />
-          <BudgetTotalItem
-            label="Expenses"
-            amount={expenseTransactionsTotal}
-            total={expenseBudgetsTotal}
-            isIncome={false}
-          />
-          <BudgetTotalItem
-            label="Unbudgeted"
-            amount={unbudgetedTransactionsTotal}
-            total={incomeBudgetsTotal - expenseBudgetsTotal}
-            isIncome
-            hideProgress
-          />
-        </Card>
-      )}
-      {props.isPending ? (
-        <Skeleton h={56} radius="md" />
-      ) : (
-        <Card className={classes.group} radius="md">
-          <BudgetTotalItem
-            label="Net Cash Flow"
-            amount={totalTransactionsTotal}
-            isIncome
-            hideProgress
-          />
-        </Card>
-      )}
-    </Card>
+    <Stack gap="0.5rem">
+      <Text fw={600} px="0.5rem">
+        Your Budget
+      </Text>
+      <Card
+        className={classes.root}
+        bg="var(--mantine-color-content)"
+        radius="md"
+        withBorder
+      >
+        {props.isPending ? (
+          <Skeleton h={105} radius="md" />
+        ) : (
+          <Card className={classes.group} radius="md">
+            <BudgetTotalItem
+              label="Income"
+              amount={incomeTransactionsTotal}
+              total={incomeBudgetsTotal}
+              isIncome
+            />
+            <BudgetTotalItem
+              label="Expenses"
+              amount={expenseTransactionsTotal}
+              total={expenseBudgetsTotal}
+              isIncome={false}
+            />
+            <BudgetTotalItem
+              label="Unbudgeted"
+              amount={unbudgetedTransactionsTotal}
+              total={incomeBudgetsTotal - expenseBudgetsTotal}
+              isIncome
+              hideProgress
+            />
+          </Card>
+        )}
+        {props.isPending ? (
+          <Skeleton h={56} radius="md" />
+        ) : (
+          <Card className={classes.group} radius="md">
+            <BudgetTotalItem
+              label="Net Cash Flow"
+              amount={totalTransactionsTotal}
+              isIncome
+              hideProgress
+            />
+          </Card>
+        )}
+      </Card>
+    </Stack>
   );
 };
 

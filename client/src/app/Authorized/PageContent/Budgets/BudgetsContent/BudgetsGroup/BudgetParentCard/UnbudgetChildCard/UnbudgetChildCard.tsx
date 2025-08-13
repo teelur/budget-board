@@ -14,10 +14,11 @@ import { roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 
 interface UnbudgetChildCardProps {
-  selectedDate?: Date;
+  selectedDate: Date | null;
   category: string;
   amount: number;
   isIncome: boolean;
+  openDetails: (category: string, month: Date | null) => void;
 }
 
 const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
@@ -62,7 +63,17 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
   return (
     <Group wrap="nowrap">
       <CornerDownRight />
-      <Card p="0.5rem" radius="md" w="100%">
+      <Card
+        className={classes.unbudgetCard}
+        p="0.5rem"
+        radius="md"
+        w="100%"
+        onClick={() => {
+          if (props.selectedDate) {
+            props.openDetails(props.category, props.selectedDate);
+          }
+        }}
+      >
         <LoadingOverlay visible={doAddBudget.isPending} />
         <Group
           justify="space-between"
@@ -85,15 +96,16 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
             {props.selectedDate && props.category !== "Uncategorized" && (
               <ActionIcon
                 size="sm"
-                onClick={() =>
+                onClick={(event) => {
+                  event.stopPropagation();
                   doAddBudget.mutate([
                     {
                       date: props.selectedDate!,
                       category: props.category,
                       limit: Math.round(Math.abs(props.amount)),
                     },
-                  ])
-                }
+                  ]);
+                }}
               >
                 <PlusIcon />
               </ActionIcon>

@@ -5,7 +5,6 @@ import {
   Text,
   PinInput,
   Group,
-  Title,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
@@ -94,16 +93,17 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <Stack align="center" gap={5} w="100%">
-        <Title order={3} ta="center">
+        <Text size="lg" fw={700} ta="center">
           2-Factor Authentication
-        </Title>
-        <Text size="sm" ta="center">
+        </Text>
+        <Text c="dimmed" size="sm" fw={600} ta="center">
           Enter the 6-digit security code from your authenticator app.
         </Text>
       </Stack>
       <PinInput
         length={6}
         type="number"
+        oneTimeCode
         autoFocus
         value={authenticationCodeField.getValue()}
         onChange={(value) => authenticationCodeField.setValue(value)}

@@ -434,7 +434,7 @@ public class BudgetServiceTests
         var updatedParentBudget = helper.UserDataContext.Budgets.Single(b =>
             b.Category == parentBudget.Category
         );
-        updatedParentBudget.Limit.Should().Be(budget.Limit);
+        updatedParentBudget.Limit.Should().Be(budget.Limit + parentOldLimit);
     }
 
     [Fact]
@@ -490,13 +490,6 @@ public class BudgetServiceTests
         );
 
         var budgetFaker = new BudgetFaker();
-        var parentBudget = budgetFaker.Generate();
-        parentBudget.UserID = helper.demoUser.Id;
-        parentBudget.Category = "Income";
-        parentBudget.Limit = 1000;
-        parentBudget.Date = DateTime.Today;
-
-        helper.UserDataContext.Budgets.Add(parentBudget);
 
         var childBudget = budgetFaker.Generate();
         childBudget.UserID = helper.demoUser.Id;
@@ -515,10 +508,11 @@ public class BudgetServiceTests
         await budgetService.UpdateBudgetAsync(helper.demoUser.Id, budget);
 
         // Assert
-        var updatedParentBudget = helper.UserDataContext.Budgets.Single(b =>
-            b.Category == parentBudget.Category
-        );
-        updatedParentBudget.Limit.Should().Be(budget.Limit);
+        helper.UserDataContext.Budgets.Any((b) => b.Category == "Income").Should().BeTrue();
+        helper
+            .UserDataContext.Budgets.Single((b) => b.Category == "Income")
+            .Limit.Should()
+            .Be(budget.Limit);
     }
 
     [Fact]

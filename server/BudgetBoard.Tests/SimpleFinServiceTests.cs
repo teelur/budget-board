@@ -38,6 +38,7 @@ public class SimpleFinServiceTests
             Mock.Of<IBalanceService>(),
             Mock.Of<IGoalService>(),
             Mock.Of<IApplicationUserService>(),
+            Mock.Of<IAutomaticCategorizationRuleService>(),
             Mock.Of<INowProvider>()
         );
 
@@ -99,6 +100,10 @@ public class SimpleFinServiceTests
             Mock.Of<ILogger<IApplicationUserService>>(),
             helper.UserDataContext
         );
+        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
+            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+            helper.UserDataContext
+        );
 
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
@@ -115,6 +120,7 @@ public class SimpleFinServiceTests
             balanceService,
             goalService,
             applicationUserService,
+            automaticCategorizationRuleService,
             nowProvider
         );
 

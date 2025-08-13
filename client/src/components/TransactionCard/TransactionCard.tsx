@@ -5,12 +5,14 @@ import { useDisclosure } from "@mantine/hooks";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
-import UnselectedTransactionCard from "./UnselectedTransactionCard/UnselectedTransactionCard";
-import SelectedTransactionCard from "./SelectedTransactionCard/SelectedTransactionCard";
+import EditableTransactionCardContent from "./EditableTransactionCardContent/EditableTransactionCardContent";
+import TransactionCardContent from "./TransactionCardContent/TransactionCardContent";
 
 interface TransactionCardProps {
   transaction: ITransaction;
   categories: ICategory[];
+  disableEdit?: boolean; // Optional prop to determine if the card is editable
+  alternateColor?: boolean; // Optional prop to apply alternate color
 }
 
 const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
@@ -22,16 +24,22 @@ const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
       onClick={toggle}
       radius="md"
       withBorder={isSelected}
-      bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
-      shadow="md"
+      bg={
+        isSelected
+          ? "var(--mantine-primary-color-light)"
+          : props.alternateColor
+          ? "var(--mantine-color-card-alternate)"
+          : ""
+      }
+      shadow={props.alternateColor ? "none" : "sm"}
     >
-      {isSelected ? (
-        <SelectedTransactionCard
+      {isSelected && !(props.disableEdit ?? false) ? (
+        <EditableTransactionCardContent
           transaction={props.transaction}
           categories={props.categories}
         />
       ) : (
-        <UnselectedTransactionCard
+        <TransactionCardContent
           transaction={props.transaction}
           categories={props.categories}
         />

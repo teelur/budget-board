@@ -158,6 +158,7 @@ const Login = (props: LoginProps): React.ReactNode => {
       </form>
       <Anchor
         size="sm"
+        fw={600}
         onClick={submitPasswordReset.bind(null, form.values.email)}
       >
         Reset Password

@@ -43,14 +43,18 @@ const CustomCategoryCard = (
   });
 
   return (
-    <Card className={classes.card} shadow="xs" padding="md" radius="md">
+    <Card className={classes.card} padding="md" radius="md">
       <LoadingOverlay visible={doDeleteCategory.isPending} />
       <Group className={classes.group}>
         <Flex className={parentClasses.nameContainer}>
-          <Text>{props.category.value}</Text>
+          <Text fw={600} size="sm">
+            {props.category.value}
+          </Text>
         </Flex>
         <Flex className={parentClasses.parentContainer}>
-          <Text>{props.category.parent}</Text>
+          <Text fw={600} size="sm">
+            {props.category.parent}
+          </Text>
         </Flex>
         <Flex className={parentClasses.deleteContainer}>
           <ActionIcon

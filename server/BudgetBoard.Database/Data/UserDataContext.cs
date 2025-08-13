@@ -5,11 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BudgetBoard.Database.Data
 {
-    public class UserDataContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class UserDataContext(DbContextOptions<UserDataContext> options)
+        : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
     {
-        public UserDataContext(DbContextOptions<UserDataContext> options)
-            : base(options) { }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -30,6 +28,10 @@ namespace BudgetBoard.Database.Data
                     .WithOne(e => e.User)
                     .HasForeignKey<UserSettings>(e => e.UserID)
                     .IsRequired();
+
+                u.HasMany(e => e.AutomaticCategorizationRules)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(e => e.UserID);
 
                 u.ToTable("User");
             });
@@ -79,6 +81,10 @@ namespace BudgetBoard.Database.Data
 
             modelBuilder.Entity<UserSettings>().ToTable("UserSettings");
 
+            modelBuilder
+                .Entity<AutomaticCategorizationRule>()
+                .ToTable("AutomaticCategorizationRule");
+
             modelBuilder.UseIdentityColumns();
         }
 
@@ -91,5 +97,6 @@ namespace BudgetBoard.Database.Data
         public DbSet<Category> TransactionCategories { get; set; }
         public DbSet<Institution> Institutions { get; set; }
         public DbSet<UserSettings> UserSettings { get; set; }
+        public DbSet<AutomaticCategorizationRule> AutomaticCategorizationRules { get; set; }
     }
 }

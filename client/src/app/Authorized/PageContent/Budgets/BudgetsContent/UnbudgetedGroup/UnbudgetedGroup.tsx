@@ -14,7 +14,8 @@ interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
   categoryToTransactionsTotalMap: Map<string, number>;
   categories: ICategory[];
-  selectedDate?: Date;
+  selectedDate: Date | null;
+  openDetails: (category: string, month: Date | null) => void;
 }
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
@@ -53,11 +54,11 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
       >
         <Accordion.Control>
           <Group justify="space-between" align="center" w="100%" pr="1rem">
-            <Text size="1.2rem" fw={600}>
+            <Text size="lg" fw={600}>
               Unbudgeted
             </Text>
             {userSettingsQuery.isPending ? null : (
-              <Text size="1.2rem" fw={600}>
+              <Text size="lg" fw={600}>
                 {convertNumberToCurrency(
                   total,
                   false,
@@ -79,6 +80,8 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
               categoryToTransactionsTotalMap={
                 props.categoryToTransactionsTotalMap
               }
+              selectedDate={props.selectedDate}
+              openDetails={props.openDetails}
             />
             {props.categoryTree.length > 0 ? (
               props.categoryTree.map((categoryTree) => (
@@ -89,6 +92,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
                     props.categoryToTransactionsTotalMap
                   }
                   selectedDate={props.selectedDate}
+                  openDetails={props.openDetails}
                 />
               ))
             ) : (

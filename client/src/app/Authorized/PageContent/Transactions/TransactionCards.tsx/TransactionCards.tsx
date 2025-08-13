@@ -1,5 +1,4 @@
 import React from "react";
-import TransactionCard from "./TransactionCard/TransactionCard";
 import {
   defaultTransactionCategories,
   Filters,
@@ -16,6 +15,7 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { ICategoryResponse } from "~/models/category";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   filters: Filters;

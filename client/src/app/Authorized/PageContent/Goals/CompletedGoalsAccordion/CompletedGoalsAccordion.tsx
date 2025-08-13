@@ -1,4 +1,4 @@
-import { Accordion, Stack } from "@mantine/core";
+import { Accordion, Stack, Text } from "@mantine/core";
 import React from "react";
 import { IGoalResponse } from "~/models/goal";
 import CompletedGoalCard from "./CompletedGoalCard/CompletedGoalCard";
@@ -12,8 +12,13 @@ const CompletedGoalsAccordion = (
 ): React.ReactNode => {
   return (
     <Accordion variant="separated">
-      <Accordion.Item value="completed-goals">
-        <Accordion.Control>Completed Goals</Accordion.Control>
+      <Accordion.Item
+        value="completed-goals"
+        bg="var(--mantine-color-accordion-alternate)"
+      >
+        <Accordion.Control>
+          <Text fw={600}>Completed Goals</Text>
+        </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="0.5rem">
             {props.compeltedGoals.map((completedGoal) => (

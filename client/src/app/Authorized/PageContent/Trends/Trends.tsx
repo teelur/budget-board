@@ -1,6 +1,6 @@
 import classes from "./Trends.module.css";
 
-import { Stack, Tabs } from "@mantine/core";
+import { Stack, Tabs, Text } from "@mantine/core";
 import React from "react";
 import SpendingTab from "./SpendingTab/SpendingTab";
 import NetCashFlowTab from "./NetCashFlowTab/NetCashFlowTab";
@@ -13,11 +13,31 @@ const Trends = (): React.ReactNode => {
     <Stack className={classes.root}>
       <Tabs variant="outline" defaultValue="spending" keepMounted={false}>
         <Tabs.List grow>
-          <Tabs.Tab value="spending">Spending</Tabs.Tab>
-          <Tabs.Tab value="netCashFlow">Net Cash Flow</Tabs.Tab>
-          <Tabs.Tab value="assets">Assets</Tabs.Tab>
-          <Tabs.Tab value="liabilities">Liabilities</Tabs.Tab>
-          <Tabs.Tab value="netWorth">Net Worth</Tabs.Tab>
+          <Tabs.Tab value="spending">
+            <Text fw={600} size="sm">
+              Spending
+            </Text>
+          </Tabs.Tab>
+          <Tabs.Tab value="netCashFlow">
+            <Text fw={600} size="sm">
+              Net Cash Flow
+            </Text>
+          </Tabs.Tab>
+          <Tabs.Tab value="assets">
+            <Text fw={600} size="sm">
+              Assets
+            </Text>
+          </Tabs.Tab>
+          <Tabs.Tab value="liabilities">
+            <Text fw={600} size="sm">
+              Liabilities
+            </Text>
+          </Tabs.Tab>
+          <Tabs.Tab value="netWorth">
+            <Text fw={600} size="sm">
+              Net Worth
+            </Text>
+          </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="spending">
           <SpendingTab />

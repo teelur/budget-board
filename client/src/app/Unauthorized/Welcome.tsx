@@ -8,6 +8,7 @@ import {
   Anchor,
   useComputedColorScheme,
   Card,
+  Flex,
 } from "@mantine/core";
 import Register from "./Register";
 import Login from "./Login";
@@ -73,30 +74,39 @@ const Welcome = (): React.ReactNode => {
   };
 
   return (
-    <Container size="lg" w="500px" maw="100%">
-      <Stack align="center" gap={10}>
-        <Text size="xl">Welcome to</Text>
-        <BudgetBoardLogo
-          width={340}
-          darkMode={computedColorScheme === "dark"}
-        />
-        <Text size="md">A simple app for managing monthly budgets.</Text>
-      </Stack>
-      <Card shadow="sm" withBorder mt="2em" w="100%" maw="500px" p={20}>
-        {getCardState()}
-      </Card>
-      {loginCardState !== LoginCardState.Register && (
-        <Group mt="xl" justify="center">
-          <Text size="sm">Don't have an account?</Text>
-          <Anchor
-            size="sm"
-            onClick={() => setLoginCardState(LoginCardState.Register)}
-          >
-            Register here
-          </Anchor>
-        </Group>
-      )}
-    </Container>
+    <Flex bg="var(--mantine-color-content-background)" w="100%" h="100vh">
+      <Container size="lg" w="500px" maw="100%">
+        <Stack align="center" gap={5}>
+          <Text size="lg" fw={600}>
+            Welcome to
+          </Text>
+          <BudgetBoardLogo
+            width={340}
+            darkMode={computedColorScheme === "dark"}
+          />
+          <Text c="dimmed" size="md" fw={600}>
+            A simple app for managing monthly budgets.
+          </Text>
+        </Stack>
+        <Card shadow="sm" withBorder mt="2em" w="100%" maw="500px" p={20}>
+          {getCardState()}
+        </Card>
+        {loginCardState !== LoginCardState.Register && (
+          <Group mt="xl" justify="center">
+            <Text size="sm" fw={600}>
+              Don't have an account?
+            </Text>
+            <Anchor
+              size="sm"
+              fw={600}
+              onClick={() => setLoginCardState(LoginCardState.Register)}
+            >
+              Register here
+            </Anchor>
+          </Group>
+        )}
+      </Container>
+    </Flex>
   );
 };
 

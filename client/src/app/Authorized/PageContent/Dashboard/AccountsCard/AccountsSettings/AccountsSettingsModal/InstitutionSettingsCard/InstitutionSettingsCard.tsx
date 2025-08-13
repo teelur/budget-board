@@ -1,12 +1,10 @@
-import classes from "./InstitutionSettingsCard.module.css";
-
 import {
   Button,
   Card,
   Group,
   LoadingOverlay,
   Stack,
-  Title,
+  Text,
 } from "@mantine/core";
 import { IInstitution } from "~/models/institution";
 
@@ -77,7 +75,7 @@ const InstitutionSettingsCard = (
 
   return (
     <SortableItem value={props.institution.id}>
-      <Card className={classes.card} radius="md" withBorder>
+      <Card radius="md" withBorder>
         <LoadingOverlay visible={doIndexAccounts.isPending} />
         <Group wrap="nowrap">
           {props.isSortable && (
@@ -87,8 +85,8 @@ const InstitutionSettingsCard = (
               </Button>
             </SortableHandle>
           )}
-          <Stack w="100%">
-            <Title order={4}>{props.institution.name}</Title>
+          <Stack w="100%" gap="0.5rem">
+            <Text fw={600}>{props.institution.name}</Text>
             <Stack gap={10}>
               <Sortable
                 values={sortedAccounts}

@@ -5,9 +5,11 @@ import {
   Button,
   Card,
   LoadingOverlay,
+  Switch,
   Stack,
   Text,
   TextInput,
+  Group,
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -26,6 +28,8 @@ interface FormValues {
 }
 
 const AddCategory = (props: AddCategoryProps): React.ReactNode => {
+  const [isChildCategory, setIsChildCategory] = React.useState(false);
+
   const { request } = React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
@@ -65,7 +69,7 @@ const AddCategory = (props: AddCategoryProps): React.ReactNode => {
   };
 
   return (
-    <Card withBorder shadow="xs">
+    <Card withBorder>
       <LoadingOverlay visible={doAddCategory.isPending} />
       <form style={{ width: "100%" }} onSubmit={form.onSubmit(handleSubmit)}>
         <Stack>
@@ -75,16 +79,38 @@ const AddCategory = (props: AddCategoryProps): React.ReactNode => {
             label="Category Name"
             w="100%"
           />
-          <Stack gap="0.25rem">
-            <Text size="0.875rem">Parent Category</Text>
-            <CategorySelect
-              w="100%"
-              categories={parentCategories}
-              value={form.getValues().parent}
-              onChange={(value) => form.setFieldValue("parent", value)}
-              withinPortal
-            />
+          <Stack gap="0.5rem">
+            <Text fw={500} size="sm">
+              Category Type
+            </Text>
+            <Group gap="0.5rem">
+              <Text fw={600} size="sm">
+                Parent
+              </Text>
+              <Switch
+                checked={isChildCategory}
+                onChange={(event) =>
+                  setIsChildCategory(event.currentTarget.checked)
+                }
+                size="md"
+              />
+              <Text fw={600} size="sm">
+                Child
+              </Text>
+            </Group>
           </Stack>
+          {isChildCategory && (
+            <Stack gap="0.25rem">
+              <Text size="0.875rem">Parent Category</Text>
+              <CategorySelect
+                w="100%"
+                categories={parentCategories}
+                value={form.getValues().parent}
+                onChange={(value) => form.setFieldValue("parent", value)}
+                withinPortal
+              />
+            </Stack>
+          )}
           <Button w="100%" type="submit">
             Add Category
           </Button>
