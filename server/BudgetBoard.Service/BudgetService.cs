@@ -162,7 +162,8 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         {
             var childBudgets = userData
                 .Budgets.Where(b =>
-                    TransactionCategoriesHelpers
+                    !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, customCategories)
+                    && TransactionCategoriesHelpers
                         .GetParentCategory(b.Category, customCategories)
                         .Equals(budget.Category, StringComparison.CurrentCultureIgnoreCase)
                     && b.Date.Month == budget.Date.Month
@@ -197,7 +198,8 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
                 );
 
                 var childBudgets = userData.Budgets.Where(b =>
-                    TransactionCategoriesHelpers
+                    !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, customCategories)
+                    && TransactionCategoriesHelpers
                         .GetParentCategory(b.Category, customCategories)
                         .Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
                     && b.Date.Month == budget.Date.Month
