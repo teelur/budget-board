@@ -11,7 +11,6 @@ public class TransactionFaker : Faker<Transaction>
     {
         AccountIds = [];
 
-        AccountIds = [];
         RuleFor(t => t.ID, f => Guid.NewGuid())
             .RuleFor(t => t.SyncID, f => f.Random.String(20))
             .RuleFor(t => t.Amount, f => f.Finance.Amount())

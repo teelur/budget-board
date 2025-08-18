@@ -1,13 +1,10 @@
-import { sumTransactionsForGoalForMonth } from "~/helpers/goals";
 import classes from "./EditableGoalMonthlyAmountCell.module.css";
 
 import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import { Flex, NumberInput, Text } from "@mantine/core";
 import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
 import React from "react";
-import { getVisibleTransactions } from "~/helpers/transactions";
 import { useQuery } from "@tanstack/react-query";
-import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
@@ -43,34 +40,6 @@ const EditableGoalMonthlyAmountCell = (
     },
   });
 
-  const transactionsForMonthQuery = useQuery({
-    queryKey: [
-      "transactions",
-      {
-        month: new Date().getMonth(),
-        year: new Date().getFullYear(),
-        includeHidden: true,
-      },
-    ],
-    queryFn: async (): Promise<ITransaction[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/transaction",
-        method: "GET",
-        params: {
-          year: new Date().getFullYear(),
-          month: new Date().getMonth() + 1,
-          getHidden: true,
-        },
-      });
-
-      if (res.status === 200) {
-        return res.data as ITransaction[];
-      }
-
-      return [];
-    },
-  });
-
   const onInputBlur = (): void => {
     if (props.goal.monthlyContribution) {
       if (goalAmountValue && goalAmountValue.toString().length > 0) {
@@ -87,17 +56,13 @@ const EditableGoalMonthlyAmountCell = (
     }
   };
 
-  const goalMonthlyContributionAmount = sumTransactionsForGoalForMonth(
-    props.goal,
-    getVisibleTransactions(transactionsForMonthQuery.data ?? [])
-  );
-
   return (
     <Flex className={classes.container}>
       {userSettingsQuery.isPending ? null : (
         <Text
           c={
-            goalMonthlyContributionAmount < props.goal.monthlyContribution
+            props.goal.monthlyContributionProgress <
+            props.goal.monthlyContribution
               ? "red"
               : "green"
           }
@@ -105,7 +70,7 @@ const EditableGoalMonthlyAmountCell = (
           fw={600}
         >
           {convertNumberToCurrency(
-            goalMonthlyContributionAmount,
+            props.goal.monthlyContributionProgress,
             false,
             userSettingsQuery.data?.currency ?? "USD"
           )}
