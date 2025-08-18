@@ -75,6 +75,7 @@ public interface IGoalResponse
     decimal InitialAmount { get; set; }
     decimal MonthlyContribution { get; set; }
     bool IsMonthlyContributionEditable { get; set; }
+    decimal MonthlyContributionProgress { get; set; }
     decimal? InterestRate { get; set; }
     DateTime? Completed { get; set; }
     IEnumerable<IAccountResponse> Accounts { get; set; }
@@ -91,6 +92,7 @@ public class GoalResponse : IGoalResponse
     public decimal InitialAmount { get; set; }
     public decimal MonthlyContribution { get; set; }
     public bool IsMonthlyContributionEditable { get; set; }
+    public decimal MonthlyContributionProgress { get; set; }
     public decimal? InterestRate { get; set; }
     public DateTime? Completed { get; set; }
     public IEnumerable<IAccountResponse> Accounts { get; set; }
@@ -107,6 +109,7 @@ public class GoalResponse : IGoalResponse
         InitialAmount = 0;
         MonthlyContribution = 0;
         IsMonthlyContributionEditable = false;
+        MonthlyContributionProgress = 0;
         InterestRate = null;
         Completed = null;
         Accounts = [];
@@ -123,6 +126,7 @@ public class GoalResponse : IGoalResponse
         InitialAmount = goal.InitialAmount;
         MonthlyContribution = goal.MonthlyContribution ?? 0;
         IsMonthlyContributionEditable = goal.MonthlyContribution != null;
+        MonthlyContributionProgress = 0;
         InterestRate = null;
         Completed = goal.Completed;
         Accounts = goal.Accounts.Select(a => new AccountResponse(a));

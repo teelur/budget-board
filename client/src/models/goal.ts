@@ -28,6 +28,7 @@ export interface IGoalResponse {
   initialAmount: number;
   monthlyContribution: number;
   isMonthlyContributionEditable: boolean;
+  monthlyContributionProgress: number;
   interestRate: number | null;
   completed: Date | null;
   accounts: IAccount[];
