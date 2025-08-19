@@ -152,7 +152,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   {props.categoryValue}
                 </Text>
                 <ActionIcon
-                  variant="transparent"
+                  variant={isSelected ? "outline" : "transparent"}
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
