@@ -118,6 +118,7 @@ public class GoalService(
                         goal.Accounts.SelectMany(a => a.Transactions)
                     ),
                     InterestRate = CalculateAverageInterestRate(goal),
+                    PercentComplete = CalculatePercentComplete(goal),
                 }
             );
         }
@@ -435,6 +436,31 @@ public class GoalService(
             .Sum(t => t.Amount);
 
         return monthlyContribution;
+    }
+
+    private static decimal CalculatePercentComplete(Goal goal)
+    {
+        var accountsTotalBalance = goal.Accounts.Sum(a =>
+            a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+        );
+
+        var totalProgress = accountsTotalBalance - goal.InitialAmount;
+
+        decimal adjustedAmount;
+
+        // An initial amount less than zero indicates a debt.
+        if (goal.InitialAmount < 0)
+        {
+            adjustedAmount = Math.Abs(goal.InitialAmount);
+        }
+        else
+        {
+            adjustedAmount = goal.Amount;
+        }
+
+        var percentComplete = ((totalProgress) / adjustedAmount) * 100.0M;
+
+        return percentComplete > 100.0M ? 100.0M : percentComplete;
     }
 
     private static decimal CalculateAverageInterestRate(Goal goal)

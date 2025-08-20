@@ -78,6 +78,7 @@ public interface IGoalResponse
     decimal MonthlyContributionProgress { get; set; }
     decimal? InterestRate { get; set; }
     DateTime? Completed { get; set; }
+    decimal PercentComplete { get; set; }
     IEnumerable<IAccountResponse> Accounts { get; set; }
     Guid UserID { get; set; }
 }
@@ -95,6 +96,7 @@ public class GoalResponse : IGoalResponse
     public decimal MonthlyContributionProgress { get; set; }
     public decimal? InterestRate { get; set; }
     public DateTime? Completed { get; set; }
+    public decimal PercentComplete { get; set; }
     public IEnumerable<IAccountResponse> Accounts { get; set; }
     public Guid UserID { get; set; }
 
@@ -112,6 +114,7 @@ public class GoalResponse : IGoalResponse
         MonthlyContributionProgress = 0;
         InterestRate = null;
         Completed = null;
+        PercentComplete = 0.0M;
         Accounts = [];
         UserID = Guid.NewGuid();
     }
@@ -129,6 +132,7 @@ public class GoalResponse : IGoalResponse
         MonthlyContributionProgress = 0;
         InterestRate = null;
         Completed = goal.Completed;
+        PercentComplete = 0.0M;
         Accounts = goal.Accounts.Select(a => new AccountResponse(a));
         UserID = goal.UserID;
     }

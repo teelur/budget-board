@@ -129,11 +129,6 @@ const GoalCard = (props: GoalCardProps): React.ReactNode => {
     },
   });
 
-  const percentComplete = getProgress(
-    sumAccountsTotalBalance(props.goal.accounts) - props.goal.initialAmount,
-    getGoalTargetAmount(props.goal.amount, props.goal.initialAmount)
-  );
-
   return (
     <Card
       className={classes.card}
@@ -167,7 +162,7 @@ const GoalCard = (props: GoalCardProps): React.ReactNode => {
                   </Badge>
                 )}
               {/* This is an escape hatch in case the sync does not catch it */}
-              {isSelected && percentComplete >= 100 && (
+              {isSelected && props.goal.percentComplete >= 100 && (
                 <Button
                   size="compact-xs"
                   bg="green"
@@ -188,8 +183,10 @@ const GoalCard = (props: GoalCardProps): React.ReactNode => {
             />
           </Flex>
           <Progress.Root size={18} radius="xl">
-            <Progress.Section value={percentComplete}>
-              <Progress.Label>{percentComplete.toFixed(0)}%</Progress.Label>
+            <Progress.Section value={props.goal.percentComplete}>
+              <Progress.Label>
+                {props.goal.percentComplete.toFixed(0)}%
+              </Progress.Label>
             </Progress.Section>
           </Progress.Root>
           <Flex className={classes.bottomFlex}>

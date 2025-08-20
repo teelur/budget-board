@@ -444,6 +444,7 @@ public class GoalServiceTests
 
         // Assert
         result.Single().MonthlyContributionProgress.Should().BeApproximately(3000, 1);
+        result.Single().PercentComplete.Should().BeApproximately(20.0M, 0.01M);
     }
 
     [Fact]
