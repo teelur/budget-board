@@ -22,7 +22,7 @@ import { IUserSettings } from "~/models/userSettings";
 import GoalDetails from "../GoalDetails/GoalDetails";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
-import { TrashIcon } from "lucide-react";
+import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DatePickerInput, DateValue } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -30,6 +30,7 @@ import dayjs from "dayjs";
 interface GoalCardContentProps {
   goal: IGoalResponse;
   includeInterest: boolean;
+  toggleIsSelected: () => void;
 }
 
 const EditableGoalCardContent = (
@@ -241,6 +242,16 @@ const EditableGoalCardContent = (
                   Complete Goal
                 </Button>
               )}
+              <ActionIcon
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.toggleIsSelected();
+                }}
+              >
+                <PencilIcon size={16} />
+              </ActionIcon>
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
               {userSettingsQuery.isPending ? null : (

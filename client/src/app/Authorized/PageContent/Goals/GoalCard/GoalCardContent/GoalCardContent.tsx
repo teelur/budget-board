@@ -1,4 +1,12 @@
-import { Badge, Flex, Group, Progress, Stack, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Flex,
+  Group,
+  Progress,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -9,10 +17,12 @@ import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
 import GoalDetails from "../GoalDetails/GoalDetails";
+import { PencilIcon } from "lucide-react";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
   includeInterest: boolean;
+  toggleIsSelected: () => void;
 }
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
@@ -51,6 +61,16 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                 APR
               </Badge>
             )}
+            <ActionIcon
+              variant="transparent"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                props.toggleIsSelected();
+              }}
+            >
+              <PencilIcon size={16} />
+            </ActionIcon>
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             {userSettingsQuery.isPending ? null : (

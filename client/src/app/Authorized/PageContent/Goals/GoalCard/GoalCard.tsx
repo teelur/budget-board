@@ -21,18 +21,19 @@ const GoalCard = (props: GoalCardProps): React.ReactNode => {
       radius="sm"
       withBorder
       shadow="sm"
-      onClick={toggle}
       bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
     >
       {isSelected ? (
         <EditableGoalCardContent
           goal={props.goal}
           includeInterest={props.includeInterest}
+          toggleIsSelected={toggle}
         />
       ) : (
         <GoalCardContent
           goal={props.goal}
           includeInterest={props.includeInterest}
+          toggleIsSelected={toggle}
         />
       )}
     </Card>
