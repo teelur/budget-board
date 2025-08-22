@@ -12,7 +12,7 @@ import GoalsHeader from "./GoalsHeader/GoalsHeader";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import CompletedGoalsAccordion from "./CompletedGoalsAccordion/CompletedGoalsAccordion";
-import GoalDetails from "./GoalCard/GoalDetails/GoalDetails";
+import GoalDetails from "./GoalDetails/GoalDetails";
 
 const Goals = (): React.ReactNode => {
   const [includeInterest, { toggle: toggleIncludeInterest }] = useDisclosure();
