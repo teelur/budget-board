@@ -173,14 +173,29 @@ const EditableGoalCardContent = (
 
     if (goalNameField.getValue().length > 0) {
       newGoal.name = goalNameField.getValue();
+    } else {
+      notifications.show({
+        color: "red",
+        message: "Invalid goal name",
+      });
     }
 
     if (goalTargetAmountField.getValue() > 0) {
       newGoal.amount = goalTargetAmountField.getValue();
+    } else {
+      notifications.show({
+        color: "red",
+        message: "Invalid target amount",
+      });
     }
 
     if (goalMonthlyContributionField.getValue() > 0) {
       newGoal.monthlyContribution = goalMonthlyContributionField.getValue();
+    } else {
+      notifications.show({
+        color: "red",
+        message: "Invalid monthly contribution",
+      });
     }
 
     doEditGoal.mutate(newGoal);
@@ -199,6 +214,11 @@ const EditableGoalCardContent = (
       };
 
       doEditGoal.mutate(newGoal);
+    } else {
+      notifications.show({
+        color: "red",
+        message: "Invalid target date",
+      });
     }
   };
 
