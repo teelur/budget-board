@@ -1,4 +1,4 @@
-import { Card, Drawer, Skeleton, Stack, Text } from "@mantine/core";
+import { Accordion, Card, Drawer, Skeleton, Stack, Text } from "@mantine/core";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
@@ -26,14 +26,25 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       {props.goal === null ? (
         <Skeleton height={425} radius="lg" />
       ) : (
-        <Stack gap="0.5rem">
-          <Text fw={600}>Accounts</Text>
-          {props.goal.accounts.map((account: IAccount) => (
-            <Card key={account.id} radius="md">
-              <AccountItem account={account} />
-            </Card>
-          ))}
-        </Stack>
+        <Accordion variant="separated" defaultValue={["accounts"]} multiple>
+          <Accordion.Item
+            value="accounts"
+            bg="var(--mantine-color-content-background)"
+          >
+            <Accordion.Control>
+              <Text fw={600}>Accounts</Text>
+            </Accordion.Control>
+            <Accordion.Panel>
+              <Stack gap="0.5rem">
+                {props.goal.accounts.map((account: IAccount) => (
+                  <Card key={account.id} radius="md">
+                    <AccountItem account={account} />
+                  </Card>
+                ))}
+              </Stack>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
       )}
     </Drawer>
   );
