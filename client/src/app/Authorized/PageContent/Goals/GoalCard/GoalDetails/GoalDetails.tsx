@@ -1,37 +1,32 @@
-import { Button, Flex, Popover, Stack, Text } from "@mantine/core";
-import { IAccount } from "~/models/account";
+import { Drawer, Skeleton, Text } from "@mantine/core";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 
 interface GoalDetailsProps {
-  goal: IGoalResponse;
+  goal: IGoalResponse | null;
+  isOpen: boolean;
+  doClose: () => void;
 }
 
 const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
   return (
-    <Flex onClick={(e) => e.stopPropagation()}>
-      <Popover>
-        <Popover.Target>
-          <Button size="compact-xs" variant="transparent">
-            View Details
-          </Button>
-        </Popover.Target>
-        <Popover.Dropdown>
-          <Stack gap={5}>
-            <Text size="sm" fw={600}>
-              Accounts
-            </Text>
-            <Stack>
-              {props.goal.accounts.map((account: IAccount) => (
-                <Text key={account.id} size="sm">
-                  {account.name}
-                </Text>
-              ))}
-            </Stack>
-          </Stack>
-        </Popover.Dropdown>
-      </Popover>
-    </Flex>
+    <Drawer
+      opened={props.isOpen}
+      onClose={props.doClose}
+      position="right"
+      size="md"
+      title={
+        <Text size="lg" fw={600}>
+          Goal Details
+        </Text>
+      }
+    >
+      {props.goal === null ? (
+        <Skeleton height={425} radius="lg" />
+      ) : (
+        <Text>Test</Text>
+      )}
+    </Drawer>
   );
 };
 

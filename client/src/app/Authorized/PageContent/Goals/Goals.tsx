@@ -12,9 +12,17 @@ import GoalsHeader from "./GoalsHeader/GoalsHeader";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import CompletedGoalsAccordion from "./CompletedGoalsAccordion/CompletedGoalsAccordion";
+import GoalDetails from "./GoalCard/GoalDetails/GoalDetails";
 
 const Goals = (): React.ReactNode => {
-  const [includeInterest, { toggle }] = useDisclosure();
+  const [includeInterest, { toggle: toggleIncludeInterest }] = useDisclosure();
+  const [isDetailsOpen, { open: openDetails, close: closeDetails }] =
+    useDisclosure();
+
+  const [selectedGoal, setSelectedGoal] = React.useState<IGoalResponse | null>(
+    null
+  );
+
   const { request } = React.useContext<any>(AuthContext);
 
   const goalsQuery = useQuery({
@@ -57,11 +65,21 @@ const Goals = (): React.ReactNode => {
     [goalsQuery.data]
   );
 
+  const openGoalDetails = (goal: IGoalResponse) => {
+    setSelectedGoal(goal);
+    openDetails();
+  };
+
   return (
     <Stack className={classes.root}>
+      <GoalDetails
+        goal={selectedGoal}
+        isOpen={isDetailsOpen}
+        doClose={closeDetails}
+      />
       <GoalsHeader
         includeInterest={includeInterest}
-        toggleIncludeInterest={toggle}
+        toggleIncludeInterest={toggleIncludeInterest}
       />
       <Stack className={classes.goals}>
         {goalsQuery.isPending ? (
@@ -72,6 +90,7 @@ const Goals = (): React.ReactNode => {
               key={goal.id}
               goal={goal}
               includeInterest={includeInterest}
+              openGoalDetails={openGoalDetails}
             />
           ))
         )}

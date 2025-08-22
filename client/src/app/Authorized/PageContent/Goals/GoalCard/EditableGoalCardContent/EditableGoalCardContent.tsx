@@ -19,7 +19,6 @@ import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
-import GoalDetails from "../GoalDetails/GoalDetails";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import { PencilIcon, TrashIcon } from "lucide-react";
@@ -341,7 +340,6 @@ const EditableGoalCardContent = (
                   </Text>
                 )}
               </Flex>
-              <GoalDetails goal={props.goal} />
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
               {userSettingsQuery.isPending ? null : (

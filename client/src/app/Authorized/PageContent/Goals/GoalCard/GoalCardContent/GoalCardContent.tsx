@@ -16,7 +16,6 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
-import GoalDetails from "../GoalDetails/GoalDetails";
 import { PencilIcon } from "lucide-react";
 
 interface GoalCardContentProps {
@@ -118,7 +117,6 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                 })}
               </Text>
             </Flex>
-            <GoalDetails goal={props.goal} />
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             {userSettingsQuery.isPending ? null : (

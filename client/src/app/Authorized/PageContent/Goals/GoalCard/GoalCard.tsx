@@ -10,10 +10,11 @@ import GoalCardContent from "./GoalCardContent/GoalCardContent";
 interface GoalCardProps {
   goal: IGoalResponse;
   includeInterest: boolean;
+  openGoalDetails: (goal: IGoalResponse) => void;
 }
 
 const GoalCard = (props: GoalCardProps): React.ReactNode => {
-  const [isSelected, { toggle }] = useDisclosure();
+  const [isEditing, { toggle: toggleEdit }] = useDisclosure();
 
   return (
     <Card
@@ -21,19 +22,25 @@ const GoalCard = (props: GoalCardProps): React.ReactNode => {
       radius="sm"
       withBorder
       shadow="sm"
-      bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
+      bg={isEditing ? "var(--mantine-primary-color-light)" : ""}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!isEditing) {
+          props.openGoalDetails(props.goal);
+        }
+      }}
     >
-      {isSelected ? (
+      {isEditing ? (
         <EditableGoalCardContent
           goal={props.goal}
           includeInterest={props.includeInterest}
-          toggleIsSelected={toggle}
+          toggleIsSelected={toggleEdit}
         />
       ) : (
         <GoalCardContent
           goal={props.goal}
           includeInterest={props.includeInterest}
-          toggleIsSelected={toggle}
+          toggleIsSelected={toggleEdit}
         />
       )}
     </Card>
