@@ -169,20 +169,21 @@ const EditableGoalCardContent = (
   });
 
   const submitChanges = (): void => {
-    if (
-      goalNameField.getValue().length > 0 &&
-      goalTargetAmountField.getValue() > 0 &&
-      goalMonthlyContributionField.getValue() > 0
-    ) {
-      const newGoal: IGoalUpdateRequest = {
-        ...props.goal,
-        name: goalNameField.getValue(),
-        amount: goalTargetAmountField.getValue(),
-        monthlyContribution: goalMonthlyContributionField.getValue(),
-      };
+    const newGoal: IGoalUpdateRequest = { ...props.goal };
 
-      doEditGoal.mutate(newGoal);
+    if (goalNameField.getValue().length > 0) {
+      newGoal.name = goalNameField.getValue();
     }
+
+    if (goalTargetAmountField.getValue() > 0) {
+      newGoal.amount = goalTargetAmountField.getValue();
+    }
+
+    if (goalMonthlyContributionField.getValue() > 0) {
+      newGoal.monthlyContribution = goalMonthlyContributionField.getValue();
+    }
+
+    doEditGoal.mutate(newGoal);
   };
 
   // The DateInput doesn't have an onBlur property, so we need to handle this manually.
