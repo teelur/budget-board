@@ -418,7 +418,7 @@ public class GoalServiceTests
         var balanceFaker = new BalanceFaker();
         var balance0 = balanceFaker.Generate();
         balance0.AccountID = account.ID;
-        balance0.Amount = 10000;
+        balance0.Amount = 30000;
         balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
 
         account.Balances = [balance0];
@@ -444,7 +444,7 @@ public class GoalServiceTests
 
         // Assert
         result.Single().MonthlyContributionProgress.Should().BeApproximately(3000, 1);
-        result.Single().PercentComplete.Should().BeApproximately(20.0M, 0.01M);
+        result.Single().PercentComplete.Should().BeApproximately(40.0M, 0.01M);
     }
 
     [Fact]

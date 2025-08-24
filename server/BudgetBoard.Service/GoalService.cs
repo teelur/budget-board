@@ -444,7 +444,7 @@ public class GoalService(
             a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
         );
 
-        var totalProgress = accountsTotalBalance - goal.InitialAmount;
+        decimal totalProgress = accountsTotalBalance - goal.InitialAmount;
 
         decimal adjustedAmount;
 
@@ -458,7 +458,7 @@ public class GoalService(
             adjustedAmount = goal.Amount;
         }
 
-        var percentComplete = ((totalProgress) / adjustedAmount) * 100.0M;
+        decimal percentComplete = (totalProgress / adjustedAmount) * 100.0M;
 
         return percentComplete > 100.0M ? 100.0M : percentComplete;
     }
