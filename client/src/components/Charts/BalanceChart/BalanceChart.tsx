@@ -80,7 +80,7 @@ const BalanceChart = (props: BalanceChartProps): React.ReactNode => {
           ? ""
           : convertNumberToCurrency(
               value,
-              true,
+              false,
               userSettingsQuery.data?.currency ?? "USD"
             )
       }

@@ -70,7 +70,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
           ? ""
           : convertNumberToCurrency(
               value,
-              true,
+              false,
               userSettingsQuery.data?.currency ?? "USD"
             )
       }

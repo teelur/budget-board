@@ -121,7 +121,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
           ? ""
           : convertNumberToCurrency(
               value,
-              true,
+              false,
               userSettingsQuery.data?.currency ?? "USD"
             )
       }

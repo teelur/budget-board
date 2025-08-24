@@ -92,7 +92,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
           ? ""
           : convertNumberToCurrency(
               value,
-              true,
+              false,
               userSettingsQuery.data?.currency ?? "USD"
             )
       }
