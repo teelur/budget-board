@@ -19,6 +19,8 @@ const GoalCard = (props: GoalCardProps): React.ReactNode => {
   return (
     <Card
       className={classes.card}
+      w="100%"
+      p="0.5rem"
       radius="sm"
       withBorder
       shadow="sm"
