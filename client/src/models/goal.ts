@@ -31,6 +31,7 @@ export interface IGoalResponse {
   monthlyContributionProgress: number;
   interestRate: number | null;
   completed: Date | null;
+  percentComplete: number;
   accounts: IAccount[];
   userID: string;
 }

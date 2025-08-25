@@ -4,9 +4,8 @@ import { IAccount } from "~/models/account";
 import { IInstitution } from "~/models/institution";
 import { DndContext } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
-
 import React from "react";
-import AccountItem from "./AccountItem/AccountItem";
+import AccountItem from "~/components/AccountItem/AccountItem";
 
 interface InstitutionItemProps {
   institution: IInstitution;

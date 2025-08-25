@@ -1,27 +1,5 @@
 .card {
-  width: 100%;
-  padding: 0.5rem;
-
   &:hover {
     outline: 1px solid var(--mantine-primary-color-filled);
   }
-}
-
-.stack {
-  gap: 0.1rem;
-  width: 100%;
-}
-
-.topFlex {
-  display: flex;
-  direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.bottomFlex {
-  display: flex;
-  direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
 }
