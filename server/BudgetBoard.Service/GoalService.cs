@@ -458,6 +458,11 @@ public class GoalService(
             adjustedAmount = goal.Amount;
         }
 
+        if (adjustedAmount == 0)
+        {
+            return 0.0M;
+        }
+
         decimal percentComplete = (totalProgress / adjustedAmount) * 100.0M;
 
         return percentComplete > 100.0M ? 100.0M : percentComplete;

@@ -202,23 +202,23 @@ const EditableGoalCardContent = (
 
   // The DateInput doesn't have an onBlur property, so we need to handle this manually.
   const submitTargetDateChanges = (date: DateValue): void => {
-    if (date) {
-      goalTargetDateField.setValue(date);
+    const parsedDate = dayjs(date);
 
-      const parsedDate = dayjs(date);
-
-      const newGoal: IGoalUpdateRequest = {
-        ...props.goal,
-        completeDate: parsedDate.toDate(),
-      };
-
-      doEditGoal.mutate(newGoal);
+    if (parsedDate.isValid()) {
+      goalTargetDateField.setValue(parsedDate.toDate());
     } else {
       notifications.show({
         color: "red",
         message: "Invalid target date",
       });
     }
+
+    const newGoal: IGoalUpdateRequest = {
+      ...props.goal,
+      completeDate: parsedDate.toDate(),
+    };
+
+    doEditGoal.mutate(newGoal);
   };
 
   return (
