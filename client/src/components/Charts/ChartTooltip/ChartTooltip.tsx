@@ -75,9 +75,9 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
             <Text fw={600} size="sm">
               {typeof props.valueFormatter === "function"
                 ? props.valueFormatter(
-                    props.payload.reduce((acc, item) => acc + item.value, 0)
+                    getFilteredChartTooltipPayload(props.payload).reduce((acc, item) => acc + item.value, 0)
                   )
-                : props.payload.reduce((acc, item) => acc + item.value, 0)}
+                : getFilteredChartTooltipPayload(props.payload).reduce((acc, item) => acc + item.value, 0)}
             </Text>
           </Group>
         )}
