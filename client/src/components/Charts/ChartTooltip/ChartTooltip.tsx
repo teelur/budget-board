@@ -29,7 +29,7 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
   }
 
   return (
-    <Card withBorder radius="md">
+    <Card p="0.75rem" withBorder radius="md">
       <Stack gap="1rem">
         <Text fw={600}>{props.label}</Text>
         <Stack gap="0.25rem">
@@ -48,7 +48,7 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
                   height={18}
                 />
                 <Text fw={600} size="sm" c="dimmed">
-                  {labels[item.name]}
+                  {labels[item.name] ?? item.name}
                 </Text>
               </Group>
               <Text fw={600} size="sm">
