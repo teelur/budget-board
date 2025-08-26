@@ -24,7 +24,9 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
 
   const labels = getSeriesLabels(props.series);
 
-  if (!props.payload) {
+  const filteredPayload = getFilteredChartTooltipPayload(props.payload ?? []);
+
+  if (filteredPayload.length === 0) {
     return null;
   }
 
@@ -33,7 +35,7 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
       <Stack gap="1rem">
         <Text fw={600}>{props.label}</Text>
         <Stack gap="0.25rem">
-          {getFilteredChartTooltipPayload(props.payload).map((item: any) => (
+          {filteredPayload.map((item: any) => (
             <Group
               key={item.name}
               gap="2rem"
@@ -75,9 +77,9 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
             <Text fw={600} size="sm">
               {typeof props.valueFormatter === "function"
                 ? props.valueFormatter(
-                    getFilteredChartTooltipPayload(props.payload).reduce((acc, item) => acc + item.value, 0)
+                    filteredPayload.reduce((acc, item) => acc + item.value, 0)
                   )
-                : getFilteredChartTooltipPayload(props.payload).reduce((acc, item) => acc + item.value, 0)}
+                : filteredPayload.reduce((acc, item) => acc + item.value, 0)}
             </Text>
           </Group>
         )}
