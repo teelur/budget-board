@@ -22,8 +22,29 @@ public class AutomaticCategorizationRuleTests
 
         var rule = new AutomaticCategorizationRuleRequest
         {
-            CategorizationRule = ".*test.*",
-            Category = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value,
+            Conditions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Description",
+                    Operator = "matches",
+                    Value = ".*test.*",
+                    Type = "string",
+                },
+            ],
+
+            Actions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Category",
+                    Operator = "set",
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.First()
+                        .Value,
+                    Type = "string",
+                },
+            ],
         };
 
         // Act
@@ -34,14 +55,17 @@ public class AutomaticCategorizationRuleTests
 
         // Assert
         helper.demoUser.AutomaticCategorizationRules.Should().HaveCount(1);
+        helper.demoUser.AutomaticCategorizationRules.First().Conditions.Should().HaveCount(1);
+        helper.demoUser.AutomaticCategorizationRules.First().Actions.Should().HaveCount(1);
         helper
             .demoUser.AutomaticCategorizationRules.First()
-            .CategorizationRule.Should()
-            .Be(rule.CategorizationRule);
+            .Conditions.First()
+            .Field.Should()
+            .Be("Description");
     }
 
     [Fact]
-    public async Task CreateAutomaticCategorizationRuleAsync_WhenRuleIsInvalid_ThrowsException()
+    public async Task CreateAutomaticCategorizationRuleAsync_WhenConditionsAreEmpty_ThrowsException()
     {
         // Arrange
         var helper = new TestHelper();
@@ -49,11 +73,56 @@ public class AutomaticCategorizationRuleTests
             Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
             helper.UserDataContext
         );
-
         var rule = new AutomaticCategorizationRuleRequest
         {
-            CategorizationRule = "invalid regex[",
-            Category = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value,
+            Conditions = [],
+            Actions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Category",
+                    Operator = "set",
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.First()
+                        .Value,
+                    Type = "string",
+                },
+            ],
+        };
+        // Act
+        Func<Task> act = async () =>
+            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
+                helper.demoUser.Id,
+                rule
+            );
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("At least one condition must be provided for the rule.");
+    }
+
+    [Fact]
+    public async Task CreateAutomaticCategorizationRuleAsync_WhenActionsAreEmpty_ThrowsException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
+            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+            helper.UserDataContext
+        );
+        var rule = new AutomaticCategorizationRuleRequest
+        {
+            Conditions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Description",
+                    Operator = "matches",
+                    Value = ".*test.*",
+                    Type = "string",
+                },
+            ],
+            Actions = [],
         };
 
         // Act
@@ -66,128 +135,7 @@ public class AutomaticCategorizationRuleTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Invalid regex in automatic categorization rule.");
-    }
-
-    [Fact]
-    public async Task CreateAutomaticCategorizationRuleAsync_WhenRuleAlreadyExists_ThrowsException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
-            helper.UserDataContext
-        );
-
-        var rule = new AutomaticCategorizationRuleRequest
-        {
-            CategorizationRule = ".*test.*",
-            Category = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value,
-        };
-
-        await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-            helper.demoUser.Id,
-            rule
-        );
-
-        // Act
-        Func<Task> act = async () =>
-            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-                helper.demoUser.Id,
-                rule
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("An automatic categorization rule with this regex already exists.");
-    }
-
-    [Fact]
-    public async Task CreateAutomaticCategorizationRuleAsync_WhenCategoryIsInvalid_ThrowsException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
-            helper.UserDataContext
-        );
-
-        var rule = new AutomaticCategorizationRuleRequest
-        {
-            CategorizationRule = ".*test.*",
-            Category = "InvalidCategory",
-        };
-
-        // Act
-        Func<Task> act = async () =>
-            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-                helper.demoUser.Id,
-                rule
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Invalid category provided.");
-    }
-
-    [Fact]
-    public async Task CreateAutomaticCategorizationRuleAsync_WhenCategoryIsEmpty_ThrowsException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
-            helper.UserDataContext
-        );
-
-        var rule = new AutomaticCategorizationRuleRequest
-        {
-            CategorizationRule = ".*test.*",
-            Category = string.Empty,
-        };
-
-        // Act
-        Func<Task> act = async () =>
-            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-                helper.demoUser.Id,
-                rule
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Category cannot be empty.");
-    }
-
-    [Fact]
-    public async Task CreateAutomaticCategorizationRuleAsync_WhenRuleIsEmpty_ThrowsException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
-            helper.UserDataContext
-        );
-
-        var rule = new AutomaticCategorizationRuleRequest
-        {
-            CategorizationRule = string.Empty,
-            Category = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value,
-        };
-
-        // Act
-        Func<Task> act = async () =>
-            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-                helper.demoUser.Id,
-                rule
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Rule cannot be empty.");
+            .WithMessage("At least one action must be provided for the rule.");
     }
 
     [Fact]
@@ -202,8 +150,28 @@ public class AutomaticCategorizationRuleTests
 
         var rule = new AutomaticCategorizationRuleRequest
         {
-            CategorizationRule = ".*test.*",
-            Category = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value,
+            Conditions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Description",
+                    Operator = "matches",
+                    Value = ".*test.*",
+                    Type = "string",
+                },
+            ],
+            Actions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Category",
+                    Operator = "set",
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.First()
+                        .Value,
+                    Type = "string",
+                },
+            ],
         };
 
         await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
@@ -218,7 +186,178 @@ public class AutomaticCategorizationRuleTests
 
         // Assert
         rules.Should().HaveCount(1);
-        rules.First().CategorizationRule.Should().Be(rule.CategorizationRule);
+        rules.First().Conditions.Should().HaveCount(1);
+        rules.First().Actions.Should().HaveCount(1);
+        rules.First().Conditions.First().Field.Should().Be("Description");
+    }
+
+    [Fact]
+    public async Task ReadAutomaticCategorizationRulesAsync_WhenNoRulesExist_ReturnsEmptyList()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
+            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+            helper.UserDataContext
+        );
+
+        // Act
+        var rules = await automaticCategorizationRuleService.ReadAutomaticCategorizationRulesAsync(
+            helper.demoUser.Id
+        );
+
+        // Assert
+        rules.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task UpdateAutomaticCategorizationRuleAsync_WhenValidData_ShouldUpdateRule()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
+            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+            helper.UserDataContext
+        );
+
+        var initialRule = new AutomaticCategorizationRuleRequest
+        {
+            Conditions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Description",
+                    Operator = "matches",
+                    Value = ".*test.*",
+                    Type = "string",
+                },
+            ],
+            Actions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Category",
+                    Operator = "set",
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.First()
+                        .Value,
+                    Type = "string",
+                },
+            ],
+        };
+
+        await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
+            helper.demoUser.Id,
+            initialRule
+        );
+
+        var createdRuleId = helper.demoUser.AutomaticCategorizationRules.First().ID;
+        var createdConditionId = helper
+            .demoUser.AutomaticCategorizationRules.First()
+            .Conditions.First()
+            .ID;
+        var createdActionId = helper
+            .demoUser.AutomaticCategorizationRules.First()
+            .Actions.First()
+            .ID;
+        var updatedRule = new AutomaticCategorizationRuleUpdateRequest
+        {
+            ID = createdRuleId,
+            Conditions =
+            [
+                new RuleParameterUpdateRequest
+                {
+                    ID = createdConditionId,
+                    Field = "Amount",
+                    Operator = "greater_than",
+                    Value = "100",
+                    Type = "number",
+                },
+            ],
+            Actions =
+            [
+                new RuleParameterUpdateRequest
+                {
+                    ID = createdActionId,
+                    Field = "Category",
+                    Operator = "set",
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.Last()
+                        .Value,
+                    Type = "string",
+                },
+            ],
+        };
+
+        // Act
+        await automaticCategorizationRuleService.UpdateAutomaticCategorizationRuleAsync(
+            helper.demoUser.Id,
+            updatedRule
+        );
+
+        // Assert
+        var updatedRuleFromDb = helper.demoUser.AutomaticCategorizationRules.First(r =>
+            r.ID == createdRuleId
+        );
+        updatedRuleFromDb.Conditions.Should().HaveCount(1);
+        updatedRuleFromDb.Conditions.First().Field.Should().Be("Amount");
+        updatedRuleFromDb.Actions.Should().HaveCount(1);
+        updatedRuleFromDb
+            .Actions.First()
+            .Value.Should()
+            .Be(TransactionCategoriesConstants.DefaultTransactionCategories.Last().Value);
+    }
+
+    [Fact]
+    public async Task UpdateAutomaticCategorizationRuleAsync_WhenRuleDoesNotExist_ThrowsException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
+            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+            helper.UserDataContext
+        );
+
+        var updatedRule = new AutomaticCategorizationRuleUpdateRequest
+        {
+            ID = Guid.NewGuid(), // Non-existent rule ID
+            Conditions =
+            [
+                new RuleParameterUpdateRequest
+                {
+                    ID = Guid.NewGuid(),
+                    Field = "Amount",
+                    Operator = "greater_than",
+                    Value = "100",
+                    Type = "number",
+                },
+            ],
+            Actions =
+            [
+                new RuleParameterUpdateRequest
+                {
+                    ID = Guid.NewGuid(),
+                    Field = "Category",
+                    Operator = "set",
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.Last()
+                        .Value,
+                    Type = "string",
+                },
+            ],
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await automaticCategorizationRuleService.UpdateAutomaticCategorizationRuleAsync(
+                helper.demoUser.Id,
+                updatedRule
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("Automatic categorization rule not found.");
     }
 
     [Fact]
@@ -233,8 +372,28 @@ public class AutomaticCategorizationRuleTests
 
         var rule = new AutomaticCategorizationRuleRequest
         {
-            CategorizationRule = ".*test.*",
-            Category = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value,
+            Conditions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Description",
+                    Operator = "matches",
+                    Value = ".*test.*",
+                    Type = "string",
+                },
+            ],
+            Actions =
+            [
+                new RuleParameterRequest
+                {
+                    Field = "Category",
+                    Operator = "set",
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.First()
+                        .Value,
+                    Type = "string",
+                },
+            ],
         };
 
         await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(

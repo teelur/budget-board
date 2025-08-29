@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using System.Text.RegularExpressions;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
@@ -473,51 +472,7 @@ public class SimpleFinService(
 
         int categorizedCount = 0;
 
-        // Compile regexes for all rules once
-        var compiledRuleRegexes = rules
-            .Select(r => new
-            {
-                Rule = r,
-                Regex = new Regex(r.CategorizationRule, RegexOptions.Compiled),
-            })
-            .ToList();
-
-        foreach (var ruleRegex in compiledRuleRegexes)
-        {
-            var matchingTransactions = uncategorizedTransactions
-                .Where(t => ruleRegex.Regex.IsMatch(t.MerchantName ?? string.Empty))
-                .ToList();
-
-            foreach (var transaction in matchingTransactions)
-            {
-                await _transactionService.UpdateTransactionAsync(
-                    userData.Id,
-                    new TransactionUpdateRequest()
-                    {
-                        ID = transaction.ID,
-                        Amount = transaction.Amount,
-                        Date = transaction.Date,
-                        Category = TransactionCategoriesHelpers.GetParentCategory(
-                            ruleRegex.Rule.Category,
-                            []
-                        ),
-                        Subcategory = TransactionCategoriesHelpers.GetIsParentCategory(
-                            ruleRegex.Rule.Category,
-                            customCategories
-                        )
-                            ? string.Empty
-                            : ruleRegex.Rule.Category,
-                        MerchantName = transaction.MerchantName,
-                        Deleted = transaction.Deleted,
-                    }
-                );
-
-                // Transaction has been updated, so we can remove it from the uncategorized list.
-                uncategorizedTransactions.Remove(transaction);
-
-                categorizedCount++;
-            }
-        }
+        // TODO: Apply the rules.
 
         _logger.LogInformation(
             "Applied {Count} automatic categorization rules, categorized {CategorizedCount} transactions.",

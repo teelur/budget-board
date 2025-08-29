@@ -81,9 +81,37 @@ namespace BudgetBoard.Database.Data
 
             modelBuilder.Entity<UserSettings>().ToTable("UserSettings");
 
-            modelBuilder
-                .Entity<AutomaticCategorizationRule>()
-                .ToTable("AutomaticCategorizationRule");
+            // Base RuleParameter mapping (TPH)
+            modelBuilder.Entity<RuleParameterBase>(p =>
+            {
+                p.ToTable("RuleParameter");
+                p.HasDiscriminator<string>("ParameterKind")
+                    .HasValue<RuleCondition>("Condition")
+                    .HasValue<RuleAction>("Action");
+            });
+
+            // Conditions relationship
+            modelBuilder.Entity<RuleCondition>(c =>
+            {
+                c.HasOne(e => e.Rule)
+                    .WithMany(r => r.Conditions)
+                    .HasForeignKey(e => e.RuleID)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Actions relationship
+            modelBuilder.Entity<RuleAction>(a =>
+            {
+                a.HasOne(e => e.Rule)
+                    .WithMany(r => r.Actions)
+                    .HasForeignKey(e => e.RuleID)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<AutomaticCategorizationRule>(r =>
+            {
+                r.ToTable("AutomaticCategorizationRule");
+            });
 
             modelBuilder.UseIdentityColumns();
         }
@@ -98,5 +126,8 @@ namespace BudgetBoard.Database.Data
         public DbSet<Institution> Institutions { get; set; }
         public DbSet<UserSettings> UserSettings { get; set; }
         public DbSet<AutomaticCategorizationRule> AutomaticCategorizationRules { get; set; }
+        public DbSet<RuleParameterBase> RuleParameters { get; set; }
+        public DbSet<RuleCondition> RuleConditions { get; set; }
+        public DbSet<RuleAction> RuleActions { get; set; }
     }
 }
