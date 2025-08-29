@@ -1,6 +1,6 @@
 ﻿namespace BudgetBoard.Service.Models;
 
-public interface IRuleParameterRequest
+public interface IRuleParameterCreateRequest
 {
     string Field { get; }
     string Operator { get; }
@@ -8,7 +8,7 @@ public interface IRuleParameterRequest
     string Type { get; }
 }
 
-public class RuleParameterRequest() : IRuleParameterRequest
+public class RuleParameterCreateRequest() : IRuleParameterCreateRequest
 {
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
@@ -16,16 +16,16 @@ public class RuleParameterRequest() : IRuleParameterRequest
     public string Type { get; set; } = string.Empty;
 }
 
-public interface IAutomaticCategorizationRuleRequest
+public interface IAutomaticCategorizationRuleCreateRequest
 {
-    ICollection<IRuleParameterRequest> Conditions { get; }
-    ICollection<IRuleParameterRequest> Actions { get; }
+    ICollection<IRuleParameterCreateRequest> Conditions { get; }
+    ICollection<IRuleParameterCreateRequest> Actions { get; }
 }
 
-public class AutomaticCategorizationRuleRequest() : IAutomaticCategorizationRuleRequest
+public class AutomaticCategorizationRuleCreateRequest() : IAutomaticCategorizationRuleCreateRequest
 {
-    public ICollection<IRuleParameterRequest> Conditions { get; set; } = [];
-    public ICollection<IRuleParameterRequest> Actions { get; set; } = [];
+    public ICollection<IRuleParameterCreateRequest> Conditions { get; set; } = [];
+    public ICollection<IRuleParameterCreateRequest> Actions { get; set; } = [];
 }
 
 public interface IRuleParameterResponse

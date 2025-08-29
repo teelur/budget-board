@@ -20,11 +20,11 @@ public class AutomaticCategorizationRuleTests
             helper.UserDataContext
         );
 
-        var rule = new AutomaticCategorizationRuleRequest
+        var rule = new AutomaticCategorizationRuleCreateRequest
         {
             Conditions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Description",
                     Operator = "matches",
@@ -35,7 +35,7 @@ public class AutomaticCategorizationRuleTests
 
             Actions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Category",
                     Operator = "set",
@@ -73,12 +73,12 @@ public class AutomaticCategorizationRuleTests
             Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
             helper.UserDataContext
         );
-        var rule = new AutomaticCategorizationRuleRequest
+        var rule = new AutomaticCategorizationRuleCreateRequest
         {
             Conditions = [],
             Actions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Category",
                     Operator = "set",
@@ -110,11 +110,11 @@ public class AutomaticCategorizationRuleTests
             Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
             helper.UserDataContext
         );
-        var rule = new AutomaticCategorizationRuleRequest
+        var rule = new AutomaticCategorizationRuleCreateRequest
         {
             Conditions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Description",
                     Operator = "matches",
@@ -148,11 +148,11 @@ public class AutomaticCategorizationRuleTests
             helper.UserDataContext
         );
 
-        var rule = new AutomaticCategorizationRuleRequest
+        var rule = new AutomaticCategorizationRuleCreateRequest
         {
             Conditions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Description",
                     Operator = "matches",
@@ -162,7 +162,7 @@ public class AutomaticCategorizationRuleTests
             ],
             Actions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Category",
                     Operator = "set",
@@ -220,11 +220,11 @@ public class AutomaticCategorizationRuleTests
             helper.UserDataContext
         );
 
-        var initialRule = new AutomaticCategorizationRuleRequest
+        var initialRule = new AutomaticCategorizationRuleCreateRequest
         {
             Conditions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Description",
                     Operator = "matches",
@@ -234,7 +234,7 @@ public class AutomaticCategorizationRuleTests
             ],
             Actions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Category",
                     Operator = "set",
@@ -370,11 +370,11 @@ public class AutomaticCategorizationRuleTests
             helper.UserDataContext
         );
 
-        var rule = new AutomaticCategorizationRuleRequest
+        var rule = new AutomaticCategorizationRuleCreateRequest
         {
             Conditions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Description",
                     Operator = "matches",
@@ -384,7 +384,7 @@ public class AutomaticCategorizationRuleTests
             ],
             Actions =
             [
-                new RuleParameterRequest
+                new RuleParameterCreateRequest
                 {
                     Field = "Category",
                     Operator = "set",

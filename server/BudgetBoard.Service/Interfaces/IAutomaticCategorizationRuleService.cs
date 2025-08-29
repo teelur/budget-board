@@ -6,7 +6,7 @@ public interface IAutomaticCategorizationRuleService
 {
     Task CreateAutomaticCategorizationRuleAsync(
         Guid userGuid,
-        IAutomaticCategorizationRuleRequest rule
+        IAutomaticCategorizationRuleCreateRequest rule
     );
     Task<IEnumerable<IAutomaticCategorizationRuleResponse>> ReadAutomaticCategorizationRulesAsync(
         Guid userGuid

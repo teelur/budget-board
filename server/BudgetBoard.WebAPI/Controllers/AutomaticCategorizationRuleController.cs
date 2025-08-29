@@ -24,7 +24,7 @@ public class AutomaticCategorizationRuleController(
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create(
-        [FromBody] AutomaticCategorizationRuleRequest automaticCategorizationRule
+        [FromBody] AutomaticCategorizationRuleCreateRequest automaticCategorizationRule
     )
     {
         try
