@@ -83,10 +83,15 @@ const AddAutomaticRule = (): React.ReactNode => {
         method: "POST",
         data: automaticCategorizationRule,
       }),
-    onSuccess: async () =>
+    onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["automaticCategorizationRule"],
-      }),
+      });
+      notifications.show({
+        message: "Rule added successfully",
+        color: "green",
+      });
+    },
     onError: (error: AxiosError) => {
       notifications.show({ message: translateAxiosError(error), color: "red" });
     },
@@ -193,9 +198,37 @@ const AddAutomaticRule = (): React.ReactNode => {
         ))}
       </Stack>
       <Button
-        onClick={() =>
-          doAddRule.mutate({ conditions: conditionItems, actions: actionItems })
-        }
+        loading={doAddRule.isPending}
+        onClick={() => {
+          doAddRule.mutate({
+            conditions: conditionItems,
+            actions: actionItems,
+          });
+          setConditionItems([
+            {
+              field: defaultField,
+              operator:
+                Operators.filter(
+                  (op) => op.type === FieldToOperatorType.get(defaultField)
+                )
+                  .map((op) => op.value)
+                  .at(0) ?? "",
+              value: "",
+              type: "",
+            },
+          ]);
+          setActionItems([
+            {
+              field: defaultField,
+              operator:
+                Operators.find(
+                  (op) => op.type === FieldToOperatorType.get(defaultField)
+                )?.value ?? "",
+              value: "",
+              type: "",
+            },
+          ]);
+        }}
       >
         Add Rule
       </Button>

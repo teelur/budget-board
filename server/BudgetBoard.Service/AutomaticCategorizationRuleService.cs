@@ -240,6 +240,9 @@ public class AutomaticCategorizationRuleService(
         {
             users = await _userDataContext
                 .ApplicationUsers.Include(u => u.AutomaticCategorizationRules)
+                .ThenInclude(r => r.Conditions)
+                .Include(u => u.AutomaticCategorizationRules)
+                .ThenInclude(r => r.Actions)
                 .Include(u => u.TransactionCategories)
                 .AsSplitQuery()
                 .ToListAsync();

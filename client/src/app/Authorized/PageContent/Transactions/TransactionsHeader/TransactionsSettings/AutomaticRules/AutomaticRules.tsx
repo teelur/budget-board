@@ -34,12 +34,7 @@ const AutomaticRules = (): React.ReactNode => {
       <AddAutomaticRule />
       {AutomaticCategorizationQuery.data?.map(
         (rule: IAutomaticCategorizationRuleResponse) => (
-          <AutomaticRuleCard
-            key={rule.id}
-            id={rule.id}
-            rule="rule.categorizationRule"
-            category=""
-          />
+          <AutomaticRuleCard key={rule.id} rule={rule} />
         )
       )}
     </Stack>

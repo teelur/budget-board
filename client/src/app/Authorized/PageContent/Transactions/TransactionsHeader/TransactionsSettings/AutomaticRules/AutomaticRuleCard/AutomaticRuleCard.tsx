@@ -3,11 +3,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { IAutomaticCategorizationRuleResponse } from "~/models/automaticCategorizationRule";
+import ConditionItem from "./ConditionItem/ConditionItem";
+import ActionItem from "./ActionItem/ActionItem";
 
 interface CategorizationRuleCardProps {
-  id: string;
-  rule: string;
-  category: string;
+  rule: IAutomaticCategorizationRuleResponse;
 }
 
 const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
@@ -33,17 +34,25 @@ const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
     <Card p="0.5rem" radius="md">
       <Group justify="space-between">
         <Stack>
-          <Group>
+          <Group gap="0.5rem">
             <Text c="dimmed" fw={600} size="sm">
-              Rule
+              If
             </Text>
-            <Text fw={600}>{props.rule}</Text>
+            <Group gap="0.25rem">
+              {(props.rule.conditions ?? []).map((condition) => (
+                <ConditionItem key={condition.id} condition={condition} />
+              ))}
+            </Group>
           </Group>
-          <Group>
+          <Group gap="0.5rem">
             <Text c="dimmed" fw={600} size="sm">
-              Category
+              Then
             </Text>
-            <Text fw={600}>{props.category}</Text>
+            <Group gap="0.25rem">
+              {(props.rule.actions ?? []).map((action) => (
+                <ActionItem key={action.id} action={action} />
+              ))}
+            </Group>
           </Group>
         </Stack>
         <Group style={{ alignSelf: "stretch" }}>
@@ -51,7 +60,7 @@ const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
             color="red"
             onClick={(e) => {
               e.stopPropagation();
-              doDeleteCategorizationRule.mutate(props.id);
+              doDeleteCategorizationRule.mutate(props.rule.id);
             }}
             h="100%"
             loading={doDeleteCategorizationRule.isPending}

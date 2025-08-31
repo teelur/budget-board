@@ -36,7 +36,7 @@ namespace BudgetBoard.Database.Migrations
 
                     b.HasIndex("GoalsID");
 
-                    b.ToTable("AccountGoal");
+                    b.ToTable("AccountGoal", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Account", b =>
