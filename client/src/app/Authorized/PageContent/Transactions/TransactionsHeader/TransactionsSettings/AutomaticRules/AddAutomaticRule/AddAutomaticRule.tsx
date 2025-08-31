@@ -41,7 +41,7 @@ const AddAutomaticRule = (): React.ReactNode => {
     IRuleParameterCreateRequest[]
   >([
     {
-      field: TransactionFields.at(0)?.value ?? "",
+      field: defaultField,
       operator:
         Operators.find(
           (op) => op.type === FieldToOperatorType.get(defaultField)
@@ -188,10 +188,17 @@ const AddAutomaticRule = (): React.ReactNode => {
             allowDelete={actionItems.length > 1}
             doDelete={removeAction}
             index={index}
+            categories={transactionCategoriesWithCustom}
           />
         ))}
       </Stack>
-      <Button>Add Rule</Button>
+      <Button
+        onClick={() =>
+          doAddRule.mutate({ conditions: conditionItems, actions: actionItems })
+        }
+      >
+        Add Rule
+      </Button>
     </Stack>
   );
 };

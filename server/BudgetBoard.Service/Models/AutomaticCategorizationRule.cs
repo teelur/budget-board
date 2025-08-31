@@ -1,14 +1,9 @@
-﻿namespace BudgetBoard.Service.Models;
+﻿using System.Text.Json.Serialization;
 
-public interface IRuleParameterCreateRequest
-{
-    string Field { get; }
-    string Operator { get; }
-    string Value { get; }
-    string Type { get; }
-}
+namespace BudgetBoard.Service.Models;
 
-public class RuleParameterCreateRequest() : IRuleParameterCreateRequest
+[method: JsonConstructor]
+public class RuleParameterCreateRequest()
 {
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
@@ -16,16 +11,10 @@ public class RuleParameterCreateRequest() : IRuleParameterCreateRequest
     public string Type { get; set; } = string.Empty;
 }
 
-public interface IAutomaticCategorizationRuleCreateRequest
+public class AutomaticCategorizationRuleCreateRequest()
 {
-    ICollection<IRuleParameterCreateRequest> Conditions { get; }
-    ICollection<IRuleParameterCreateRequest> Actions { get; }
-}
-
-public class AutomaticCategorizationRuleCreateRequest() : IAutomaticCategorizationRuleCreateRequest
-{
-    public ICollection<IRuleParameterCreateRequest> Conditions { get; set; } = [];
-    public ICollection<IRuleParameterCreateRequest> Actions { get; set; } = [];
+    public ICollection<RuleParameterCreateRequest> Conditions { get; set; } = [];
+    public ICollection<RuleParameterCreateRequest> Actions { get; set; } = [];
 }
 
 public interface IRuleParameterResponse

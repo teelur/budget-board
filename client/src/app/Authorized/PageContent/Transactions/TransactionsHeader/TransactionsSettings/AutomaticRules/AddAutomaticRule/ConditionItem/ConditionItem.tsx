@@ -56,6 +56,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
       return (
         <TextInput
           flex="1 1 auto"
+          placeholder="Enter merchant"
           value={props.ruleParameter.value}
           onChange={(event) =>
             props.setRuleParameter({
@@ -69,6 +70,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
       return (
         <NumberInput
           flex="1 1 auto"
+          placeholder="Enter amount"
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({
@@ -85,6 +87,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
       return (
         <DateInput
           flex="1 1 auto"
+          placeholder="Select date"
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({

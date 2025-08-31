@@ -17,7 +17,7 @@ public class AutomaticCategorizationRuleService(
 
     public async Task CreateAutomaticCategorizationRuleAsync(
         Guid userGuid,
-        IAutomaticCategorizationRuleCreateRequest rule
+        AutomaticCategorizationRuleCreateRequest rule
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
