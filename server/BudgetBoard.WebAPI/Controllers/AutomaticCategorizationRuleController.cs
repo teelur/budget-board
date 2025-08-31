@@ -74,6 +74,31 @@ public class AutomaticCategorizationRuleController(
         }
     }
 
+    [HttpPut]
+    [Authorize]
+    public async Task<IActionResult> Update(
+        [FromBody] AutomaticCategorizationRuleUpdateRequest automaticCategorizationRule
+    )
+    {
+        try
+        {
+            await _automaticCategorizationRuleService.UpdateAutomaticCategorizationRuleAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                automaticCategorizationRule
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+        }
+    }
+
     [HttpDelete]
     [Authorize]
     public async Task<IActionResult> Delete(Guid guid)

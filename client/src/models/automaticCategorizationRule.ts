@@ -32,7 +32,6 @@ export interface IAutomaticCategorizationRuleResponse {
 }
 
 export interface IRuleParameterUpdateRequest {
-  id: string;
   field: string;
   operator: string;
   value: string;

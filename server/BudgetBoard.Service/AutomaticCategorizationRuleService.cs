@@ -122,7 +122,7 @@ public class AutomaticCategorizationRuleService(
 
     public async Task UpdateAutomaticCategorizationRuleAsync(
         Guid userGuid,
-        IAutomaticCategorizationRuleUpdateRequest updatedRule
+        AutomaticCategorizationRuleUpdateRequest updatedRule
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

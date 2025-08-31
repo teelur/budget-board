@@ -11,5 +11,9 @@ public interface IAutomaticCategorizationRuleService
     Task<IEnumerable<IAutomaticCategorizationRuleResponse>> ReadAutomaticCategorizationRulesAsync(
         Guid userGuid
     );
+    Task UpdateAutomaticCategorizationRuleAsync(
+        Guid userGuid,
+        AutomaticCategorizationRuleUpdateRequest rule
+    );
     Task DeleteAutomaticCategorizationRuleAsync(Guid userGuid, Guid ruleGuid);
 }

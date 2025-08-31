@@ -1,8 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace BudgetBoard.Service.Models;
 
-namespace BudgetBoard.Service.Models;
-
-[method: JsonConstructor]
 public class RuleParameterCreateRequest()
 {
     public string Field { get; set; } = string.Empty;
@@ -49,34 +46,17 @@ public class AutomaticCategorizationRuleResponse() : IAutomaticCategorizationRul
     public ICollection<IRuleParameterResponse> Actions { get; set; } = [];
 }
 
-public interface IRuleParameterUpdateRequest
+public class RuleParameterUpdateRequest()
 {
-    Guid ID { get; }
-    string Field { get; }
-    string Operator { get; }
-    string Value { get; }
-    string Type { get; }
-}
-
-public class RuleParameterUpdateRequest() : IRuleParameterUpdateRequest
-{
-    public required Guid ID { get; set; }
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
 }
 
-public interface IAutomaticCategorizationRuleUpdateRequest
-{
-    Guid ID { get; }
-    ICollection<IRuleParameterUpdateRequest> Conditions { get; }
-    ICollection<IRuleParameterUpdateRequest> Actions { get; }
-}
-
-public class AutomaticCategorizationRuleUpdateRequest() : IAutomaticCategorizationRuleUpdateRequest
+public class AutomaticCategorizationRuleUpdateRequest()
 {
     public required Guid ID { get; set; }
-    public ICollection<IRuleParameterUpdateRequest> Conditions { get; set; } = [];
-    public ICollection<IRuleParameterUpdateRequest> Actions { get; set; } = [];
+    public ICollection<RuleParameterUpdateRequest> Conditions { get; set; } = [];
+    public ICollection<RuleParameterUpdateRequest> Actions { get; set; } = [];
 }
