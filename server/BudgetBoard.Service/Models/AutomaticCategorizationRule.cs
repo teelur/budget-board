@@ -8,7 +8,7 @@ public class RuleParameterCreateRequest()
     public string Type { get; set; } = string.Empty;
 }
 
-public class AutomaticCategorizationRuleCreateRequest()
+public class AutomaticRuleCreateRequest()
 {
     public ICollection<RuleParameterCreateRequest> Conditions { get; set; } = [];
     public ICollection<RuleParameterCreateRequest> Actions { get; set; } = [];
@@ -32,14 +32,14 @@ public class RuleParameterResponse() : IRuleParameterResponse
     public string Type { get; set; } = string.Empty;
 }
 
-public interface IAutomaticCategorizationRuleResponse
+public interface IAutomaticRuleResponse
 {
     Guid ID { get; }
     ICollection<IRuleParameterResponse> Conditions { get; }
     ICollection<IRuleParameterResponse> Actions { get; }
 }
 
-public class AutomaticCategorizationRuleResponse() : IAutomaticCategorizationRuleResponse
+public class AutomaticRuleResponse() : IAutomaticRuleResponse
 {
     public Guid ID { get; set; }
     public ICollection<IRuleParameterResponse> Conditions { get; set; } = [];
@@ -54,7 +54,7 @@ public class RuleParameterUpdateRequest()
     public string Type { get; set; } = string.Empty;
 }
 
-public class AutomaticCategorizationRuleUpdateRequest()
+public class AutomaticRuleUpdateRequest()
 {
     public required Guid ID { get; set; }
     public ICollection<RuleParameterUpdateRequest> Conditions { get; set; } = [];

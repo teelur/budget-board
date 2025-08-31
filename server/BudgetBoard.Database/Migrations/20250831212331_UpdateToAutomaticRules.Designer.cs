@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    [Migration("20250829010726_UpdateRules")]
-    partial class UpdateRules
+    [Migration("20250831212331_UpdateToAutomaticRules")]
+    partial class UpdateToAutomaticRules
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -169,7 +169,7 @@ namespace BudgetBoard.Database.Migrations
                     b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticCategorizationRule", b =>
+            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -182,7 +182,7 @@ namespace BudgetBoard.Database.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("AutomaticCategorizationRule", (string)null);
+                    b.ToTable("AutomaticRule", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Balance", b =>
@@ -339,10 +339,6 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<Guid>("RuleID")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -601,10 +597,10 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticCategorizationRule", b =>
+            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
-                        .WithMany("AutomaticCategorizationRules")
+                        .WithMany("AutomaticRules")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -742,7 +738,7 @@ namespace BudgetBoard.Database.Migrations
 
             modelBuilder.Entity("BudgetBoard.Database.Models.RuleAction", b =>
                 {
-                    b.HasOne("BudgetBoard.Database.Models.AutomaticCategorizationRule", "Rule")
+                    b.HasOne("BudgetBoard.Database.Models.AutomaticRule", "Rule")
                         .WithMany("Actions")
                         .HasForeignKey("RuleID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -753,7 +749,7 @@ namespace BudgetBoard.Database.Migrations
 
             modelBuilder.Entity("BudgetBoard.Database.Models.RuleCondition", b =>
                 {
-                    b.HasOne("BudgetBoard.Database.Models.AutomaticCategorizationRule", "Rule")
+                    b.HasOne("BudgetBoard.Database.Models.AutomaticRule", "Rule")
                         .WithMany("Conditions")
                         .HasForeignKey("RuleID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -773,7 +769,7 @@ namespace BudgetBoard.Database.Migrations
                 {
                     b.Navigation("Accounts");
 
-                    b.Navigation("AutomaticCategorizationRules");
+                    b.Navigation("AutomaticRules");
 
                     b.Navigation("Budgets");
 
@@ -786,7 +782,7 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("UserSettings");
                 });
 
-            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticCategorizationRule", b =>
+            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
                 {
                     b.Navigation("Actions");
 

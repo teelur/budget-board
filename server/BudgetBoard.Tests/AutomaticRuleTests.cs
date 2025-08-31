@@ -8,19 +8,19 @@ using Moq;
 namespace BudgetBoard.IntegrationTests;
 
 [Collection("IntegrationTests")]
-public class AutomaticCategorizationRuleTests
+public class AutomaticRuleTests
 {
     [Fact]
-    public async Task CreateAutomaticCategorizationRuleAsync_WhenRuleIsValid_CreatesRule()
+    public async Task CreateAutomaticRuleAsync_WhenRuleIsValid_CreatesRule()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
 
-        var rule = new AutomaticCategorizationRuleCreateRequest
+        var rule = new AutomaticRuleCreateRequest
         {
             Conditions =
             [
@@ -48,32 +48,25 @@ public class AutomaticCategorizationRuleTests
         };
 
         // Act
-        await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-            helper.demoUser.Id,
-            rule
-        );
+        await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Assert
-        helper.demoUser.AutomaticCategorizationRules.Should().HaveCount(1);
-        helper.demoUser.AutomaticCategorizationRules.First().Conditions.Should().HaveCount(1);
-        helper.demoUser.AutomaticCategorizationRules.First().Actions.Should().HaveCount(1);
-        helper
-            .demoUser.AutomaticCategorizationRules.First()
-            .Conditions.First()
-            .Field.Should()
-            .Be("Description");
+        helper.demoUser.AutomaticRules.Should().HaveCount(1);
+        helper.demoUser.AutomaticRules.First().Conditions.Should().HaveCount(1);
+        helper.demoUser.AutomaticRules.First().Actions.Should().HaveCount(1);
+        helper.demoUser.AutomaticRules.First().Conditions.First().Field.Should().Be("Description");
     }
 
     [Fact]
-    public async Task CreateAutomaticCategorizationRuleAsync_WhenConditionsAreEmpty_ThrowsException()
+    public async Task CreateAutomaticRuleAsync_WhenConditionsAreEmpty_ThrowsException()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
-        var rule = new AutomaticCategorizationRuleCreateRequest
+        var rule = new AutomaticRuleCreateRequest
         {
             Conditions = [],
             Actions =
@@ -91,10 +84,7 @@ public class AutomaticCategorizationRuleTests
         };
         // Act
         Func<Task> act = async () =>
-            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-                helper.demoUser.Id,
-                rule
-            );
+            await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
@@ -102,15 +92,15 @@ public class AutomaticCategorizationRuleTests
     }
 
     [Fact]
-    public async Task CreateAutomaticCategorizationRuleAsync_WhenActionsAreEmpty_ThrowsException()
+    public async Task CreateAutomaticRuleAsync_WhenActionsAreEmpty_ThrowsException()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
-        var rule = new AutomaticCategorizationRuleCreateRequest
+        var rule = new AutomaticRuleCreateRequest
         {
             Conditions =
             [
@@ -127,10 +117,7 @@ public class AutomaticCategorizationRuleTests
 
         // Act
         Func<Task> act = async () =>
-            await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-                helper.demoUser.Id,
-                rule
-            );
+            await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Assert
         await act.Should()
@@ -139,16 +126,16 @@ public class AutomaticCategorizationRuleTests
     }
 
     [Fact]
-    public async Task ReadAutomaticCategorizationRulesAsync_WhenCalled_ReturnsRules()
+    public async Task ReadAutomaticRulesAsync_WhenCalled_ReturnsRules()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
 
-        var rule = new AutomaticCategorizationRuleCreateRequest
+        var rule = new AutomaticRuleCreateRequest
         {
             Conditions =
             [
@@ -174,15 +161,10 @@ public class AutomaticCategorizationRuleTests
             ],
         };
 
-        await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-            helper.demoUser.Id,
-            rule
-        );
+        await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Act
-        var rules = await automaticCategorizationRuleService.ReadAutomaticCategorizationRulesAsync(
-            helper.demoUser.Id
-        );
+        var rules = await automaticRuleService.ReadAutomaticRulesAsync(helper.demoUser.Id);
 
         // Assert
         rules.Should().HaveCount(1);
@@ -192,35 +174,33 @@ public class AutomaticCategorizationRuleTests
     }
 
     [Fact]
-    public async Task ReadAutomaticCategorizationRulesAsync_WhenNoRulesExist_ReturnsEmptyList()
+    public async Task ReadAutomaticRulesAsync_WhenNoRulesExist_ReturnsEmptyList()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
 
         // Act
-        var rules = await automaticCategorizationRuleService.ReadAutomaticCategorizationRulesAsync(
-            helper.demoUser.Id
-        );
+        var rules = await automaticRuleService.ReadAutomaticRulesAsync(helper.demoUser.Id);
 
         // Assert
         rules.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task UpdateAutomaticCategorizationRuleAsync_WhenValidData_ShouldUpdateRule()
+    public async Task UpdateAutomaticRuleAsync_WhenValidData_ShouldUpdateRule()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
 
-        var initialRule = new AutomaticCategorizationRuleCreateRequest
+        var initialRule = new AutomaticRuleCreateRequest
         {
             Conditions =
             [
@@ -246,28 +226,18 @@ public class AutomaticCategorizationRuleTests
             ],
         };
 
-        await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-            helper.demoUser.Id,
-            initialRule
-        );
+        await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, initialRule);
 
-        var createdRuleId = helper.demoUser.AutomaticCategorizationRules.First().ID;
-        var createdConditionId = helper
-            .demoUser.AutomaticCategorizationRules.First()
-            .Conditions.First()
-            .ID;
-        var createdActionId = helper
-            .demoUser.AutomaticCategorizationRules.First()
-            .Actions.First()
-            .ID;
-        var updatedRule = new AutomaticCategorizationRuleUpdateRequest
+        var createdRuleId = helper.demoUser.AutomaticRules.First().ID;
+        var createdConditionId = helper.demoUser.AutomaticRules.First().Conditions.First().ID;
+        var createdActionId = helper.demoUser.AutomaticRules.First().Actions.First().ID;
+        var updatedRule = new AutomaticRuleUpdateRequest
         {
             ID = createdRuleId,
             Conditions =
             [
                 new RuleParameterUpdateRequest
                 {
-                    ID = createdConditionId,
                     Field = "Amount",
                     Operator = "greater_than",
                     Value = "100",
@@ -278,7 +248,6 @@ public class AutomaticCategorizationRuleTests
             [
                 new RuleParameterUpdateRequest
                 {
-                    ID = createdActionId,
                     Field = "Category",
                     Operator = "set",
                     Value = TransactionCategoriesConstants
@@ -290,15 +259,10 @@ public class AutomaticCategorizationRuleTests
         };
 
         // Act
-        await automaticCategorizationRuleService.UpdateAutomaticCategorizationRuleAsync(
-            helper.demoUser.Id,
-            updatedRule
-        );
+        await automaticRuleService.UpdateAutomaticRuleAsync(helper.demoUser.Id, updatedRule);
 
         // Assert
-        var updatedRuleFromDb = helper.demoUser.AutomaticCategorizationRules.First(r =>
-            r.ID == createdRuleId
-        );
+        var updatedRuleFromDb = helper.demoUser.AutomaticRules.First(r => r.ID == createdRuleId);
         updatedRuleFromDb.Conditions.Should().HaveCount(1);
         updatedRuleFromDb.Conditions.First().Field.Should().Be("Amount");
         updatedRuleFromDb.Actions.Should().HaveCount(1);
@@ -309,23 +273,22 @@ public class AutomaticCategorizationRuleTests
     }
 
     [Fact]
-    public async Task UpdateAutomaticCategorizationRuleAsync_WhenRuleDoesNotExist_ThrowsException()
+    public async Task UpdateAutomaticRuleAsync_WhenRuleDoesNotExist_ThrowsException()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
 
-        var updatedRule = new AutomaticCategorizationRuleUpdateRequest
+        var updatedRule = new AutomaticRuleUpdateRequest
         {
             ID = Guid.NewGuid(), // Non-existent rule ID
             Conditions =
             [
                 new RuleParameterUpdateRequest
                 {
-                    ID = Guid.NewGuid(),
                     Field = "Amount",
                     Operator = "greater_than",
                     Value = "100",
@@ -336,7 +299,6 @@ public class AutomaticCategorizationRuleTests
             [
                 new RuleParameterUpdateRequest
                 {
-                    ID = Guid.NewGuid(),
                     Field = "Category",
                     Operator = "set",
                     Value = TransactionCategoriesConstants
@@ -349,28 +311,25 @@ public class AutomaticCategorizationRuleTests
 
         // Act
         Func<Task> act = async () =>
-            await automaticCategorizationRuleService.UpdateAutomaticCategorizationRuleAsync(
-                helper.demoUser.Id,
-                updatedRule
-            );
+            await automaticRuleService.UpdateAutomaticRuleAsync(helper.demoUser.Id, updatedRule);
 
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Automatic categorization rule not found.");
+            .WithMessage("Automatic  rule not found.");
     }
 
     [Fact]
-    public async Task DeleteAutomaticCategorizationRuleAsync_WhenRuleExists_DeletesRule()
+    public async Task DeleteAutomaticRuleAsync_WhenRuleExists_DeletesRule()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
 
-        var rule = new AutomaticCategorizationRuleCreateRequest
+        var rule = new AutomaticRuleCreateRequest
         {
             Conditions =
             [
@@ -396,34 +355,31 @@ public class AutomaticCategorizationRuleTests
             ],
         };
 
-        await automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
-            helper.demoUser.Id,
-            rule
-        );
+        await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Act
-        await automaticCategorizationRuleService.DeleteAutomaticCategorizationRuleAsync(
+        await automaticRuleService.DeleteAutomaticRuleAsync(
             helper.demoUser.Id,
-            helper.demoUser.AutomaticCategorizationRules.First().ID
+            helper.demoUser.AutomaticRules.First().ID
         );
 
         // Assert
-        helper.demoUser.AutomaticCategorizationRules.Should().BeEmpty();
+        helper.demoUser.AutomaticRules.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task DeleteAutomaticCategorizationRuleAsync_WhenRuleDoesNotExist_ThrowsException()
+    public async Task DeleteAutomaticRuleAsync_WhenRuleDoesNotExist_ThrowsException()
     {
         // Arrange
         var helper = new TestHelper();
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
 
         // Act
         Func<Task> act = async () =>
-            await automaticCategorizationRuleService.DeleteAutomaticCategorizationRuleAsync(
+            await automaticRuleService.DeleteAutomaticRuleAsync(
                 helper.demoUser.Id,
                 Guid.NewGuid() // Non-existent rule ID
             );
@@ -431,6 +387,6 @@ public class AutomaticCategorizationRuleTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Automatic categorization rule not found.");
+            .WithMessage("Automatic  rule not found.");
     }
 }

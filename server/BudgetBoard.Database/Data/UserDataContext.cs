@@ -29,9 +29,7 @@ namespace BudgetBoard.Database.Data
                     .HasForeignKey<UserSettings>(e => e.UserID)
                     .IsRequired();
 
-                u.HasMany(e => e.AutomaticCategorizationRules)
-                    .WithOne(e => e.User)
-                    .HasForeignKey(e => e.UserID);
+                u.HasMany(e => e.AutomaticRules).WithOne(e => e.User).HasForeignKey(e => e.UserID);
 
                 u.ToTable("User");
             });
@@ -108,9 +106,9 @@ namespace BudgetBoard.Database.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<AutomaticCategorizationRule>(r =>
+            modelBuilder.Entity<AutomaticRule>(r =>
             {
-                r.ToTable("AutomaticCategorizationRule");
+                r.ToTable("AutomaticRule");
             });
 
             modelBuilder.UseIdentityColumns();
@@ -125,7 +123,7 @@ namespace BudgetBoard.Database.Data
         public DbSet<Category> TransactionCategories { get; set; }
         public DbSet<Institution> Institutions { get; set; }
         public DbSet<UserSettings> UserSettings { get; set; }
-        public DbSet<AutomaticCategorizationRule> AutomaticCategorizationRules { get; set; }
+        public DbSet<AutomaticRule> AutomaticRules { get; set; }
         public DbSet<RuleParameterBase> RuleParameters { get; set; }
         public DbSet<RuleCondition> RuleConditions { get; set; }
         public DbSet<RuleAction> RuleActions { get; set; }

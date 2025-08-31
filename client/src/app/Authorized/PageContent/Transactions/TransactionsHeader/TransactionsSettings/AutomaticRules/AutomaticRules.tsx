@@ -2,18 +2,18 @@ import { Stack, Text } from "@mantine/core";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { IAutomaticCategorizationRuleResponse } from "~/models/automaticCategorizationRule";
+import { IAutomaticRuleResponse } from "~/models/automaticRule";
 import AddAutomaticRule from "./AddAutomaticRule/AddAutomaticRule";
 import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
 
 const AutomaticRules = (): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
 
-  const AutomaticCategorizationQuery = useQuery({
-    queryKey: ["automaticCategorizationRule"],
+  const AutomaticRuleQuery = useQuery({
+    queryKey: ["automaticRule"],
     queryFn: async () => {
       const res = await request({
-        url: "/api/automaticCategorizationRule",
+        url: "/api/automaticRule",
         method: "GET",
       });
 
@@ -32,11 +32,9 @@ const AutomaticRules = (): React.ReactNode => {
         specified conditions are met.
       </Text>
       <AddAutomaticRule />
-      {AutomaticCategorizationQuery.data?.map(
-        (rule: IAutomaticCategorizationRuleResponse) => (
-          <AutomaticRuleCard key={rule.id} rule={rule} />
-        )
-      )}
+      {AutomaticRuleQuery.data?.map((rule: IAutomaticRuleResponse) => (
+        <AutomaticRuleCard key={rule.id} rule={rule} />
+      ))}
     </Stack>
   );
 };

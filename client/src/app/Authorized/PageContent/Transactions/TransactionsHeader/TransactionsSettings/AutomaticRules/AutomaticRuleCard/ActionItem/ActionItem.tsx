@@ -2,7 +2,7 @@ import { Card, Group, Text } from "@mantine/core";
 import {
   IRuleParameterResponse,
   TransactionFields,
-} from "~/models/automaticCategorizationRule";
+} from "~/models/automaticRule";
 
 interface ActionItemProps {
   action: IRuleParameterResponse;

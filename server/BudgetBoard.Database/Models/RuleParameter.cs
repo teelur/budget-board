@@ -7,10 +7,9 @@ public abstract class RuleParameterBase
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty;
 
     public Guid RuleID { get; set; }
-    public AutomaticCategorizationRule Rule { get; set; } = null!;
+    public AutomaticRule Rule { get; set; } = null!;
 }
 
 // Derived entity for conditions

@@ -7,26 +7,21 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class AutomaticCategorizationRuleService(
-    ILogger<IAutomaticCategorizationRuleService> logger,
+public class AutomaticRuleService(
+    ILogger<IAutomaticRuleService> logger,
     UserDataContext userDataContext
-) : IAutomaticCategorizationRuleService
+) : IAutomaticRuleService
 {
-    private readonly ILogger<IAutomaticCategorizationRuleService> _logger = logger;
+    private readonly ILogger<IAutomaticRuleService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
 
-    public async Task CreateAutomaticCategorizationRuleAsync(
-        Guid userGuid,
-        AutomaticCategorizationRuleCreateRequest rule
-    )
+    public async Task CreateAutomaticRuleAsync(Guid userGuid, AutomaticRuleCreateRequest rule)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         if (rule.Conditions.Count == 0)
         {
-            _logger.LogError(
-                "Attempt to create an automatic categorization rule with no conditions."
-            );
+            _logger.LogError("Attempt to create an automatic rule with no conditions.");
             throw new BudgetBoardServiceException(
                 "At least one condition must be provided for the rule."
             );
@@ -34,13 +29,13 @@ public class AutomaticCategorizationRuleService(
 
         if (rule.Actions.Count == 0)
         {
-            _logger.LogError("Attempt to create an automatic categorization rule with no actions.");
+            _logger.LogError("Attempt to create an automatic rule with no actions.");
             throw new BudgetBoardServiceException(
                 "At least one action must be provided for the rule."
             );
         }
 
-        var newRule = new AutomaticCategorizationRule
+        var newRule = new AutomaticRule
         {
             ID = Guid.NewGuid(),
             UserID = userData.Id,
@@ -52,7 +47,6 @@ public class AutomaticCategorizationRuleService(
                     Field = c.Field,
                     Operator = c.Operator,
                     Value = c.Value,
-                    Type = c.Type,
                 }),
             ],
             Actions =
@@ -63,12 +57,11 @@ public class AutomaticCategorizationRuleService(
                     Field = a.Field,
                     Operator = a.Operator,
                     Value = a.Value,
-                    Type = a.Type,
                 }),
             ],
         };
 
-        _userDataContext.AutomaticCategorizationRules.Add(newRule);
+        _userDataContext.AutomaticRules.Add(newRule);
         try
         {
             await _userDataContext.SaveChangesAsync();
@@ -76,22 +69,20 @@ public class AutomaticCategorizationRuleService(
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while saving the automatic categorization rule: {ExceptionMessage}",
+                "An error occurred while saving the automatic rule: {ExceptionMessage}",
                 ex.Message
             );
             throw new BudgetBoardServiceException(
-                "An error occurred while saving the automatic categorization rule."
+                "An error occurred while saving the automatic rule."
             );
         }
     }
 
-    public async Task<
-        IEnumerable<IAutomaticCategorizationRuleResponse>
-    > ReadAutomaticCategorizationRulesAsync(Guid userGuid)
+    public async Task<IEnumerable<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         return userData
-            .AutomaticCategorizationRules.Select(r => new AutomaticCategorizationRuleResponse
+            .AutomaticRules.Select(r => new AutomaticRuleResponse
             {
                 ID = r.ID,
                 Conditions =
@@ -102,7 +93,6 @@ public class AutomaticCategorizationRuleService(
                         Field = c.Field,
                         Operator = c.Operator,
                         Value = c.Value,
-                        Type = c.Type,
                     }),
                 ],
                 Actions =
@@ -113,36 +103,29 @@ public class AutomaticCategorizationRuleService(
                         Field = a.Field,
                         Operator = a.Operator,
                         Value = a.Value,
-                        Type = a.Type,
                     }),
                 ],
             })
             .ToList();
     }
 
-    public async Task UpdateAutomaticCategorizationRuleAsync(
+    public async Task UpdateAutomaticRuleAsync(
         Guid userGuid,
-        AutomaticCategorizationRuleUpdateRequest updatedRule
+        AutomaticRuleUpdateRequest updatedRule
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var existingRule = userData.AutomaticCategorizationRules.FirstOrDefault(r =>
-            r.ID == updatedRule.ID
-        );
+        var existingRule = userData.AutomaticRules.FirstOrDefault(r => r.ID == updatedRule.ID);
 
         if (existingRule == null)
         {
-            _logger.LogError(
-                "Attempt to update an automatic categorization rule that does not exist."
-            );
-            throw new BudgetBoardServiceException("Automatic categorization rule not found.");
+            _logger.LogError("Attempt to update an automatic rule that does not exist.");
+            throw new BudgetBoardServiceException("Automatic rule not found.");
         }
 
         if (updatedRule.Conditions.Count == 0)
         {
-            _logger.LogError(
-                "Attempt to update an automatic categorization rule with no conditions."
-            );
+            _logger.LogError("Attempt to update an automatic rule with no conditions.");
             throw new BudgetBoardServiceException(
                 "At least one condition must be provided for the rule."
             );
@@ -150,7 +133,7 @@ public class AutomaticCategorizationRuleService(
 
         if (updatedRule.Actions.Count == 0)
         {
-            _logger.LogError("Attempt to update an automatic categorization rule with no actions.");
+            _logger.LogError("Attempt to update an automatic rule with no actions.");
             throw new BudgetBoardServiceException(
                 "At least one action must be provided for the rule."
             );
@@ -165,7 +148,6 @@ public class AutomaticCategorizationRuleService(
                     Field = condition.Field,
                     Operator = condition.Operator,
                     Value = condition.Value,
-                    Type = condition.Type,
                     RuleID = existingRule.ID,
                 }
             );
@@ -180,7 +162,6 @@ public class AutomaticCategorizationRuleService(
                     Field = action.Field,
                     Operator = action.Operator,
                     Value = action.Value,
-                    Type = action.Type,
                     RuleID = existingRule.ID,
                 }
             );
@@ -193,29 +174,27 @@ public class AutomaticCategorizationRuleService(
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while updating the automatic categorization rule: {ExceptionMessage}",
+                "An error occurred while updating the automatic rule: {ExceptionMessage}",
                 ex.Message
             );
             throw new BudgetBoardServiceException(
-                "An error occurred while updating the automatic categorization rule."
+                "An error occurred while updating the automatic rule."
             );
         }
     }
 
-    public async Task DeleteAutomaticCategorizationRuleAsync(Guid userGuid, Guid ruleGuid)
+    public async Task DeleteAutomaticRuleAsync(Guid userGuid, Guid ruleGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var rule = userData.AutomaticCategorizationRules.FirstOrDefault(r => r.ID == ruleGuid);
+        var rule = userData.AutomaticRules.FirstOrDefault(r => r.ID == ruleGuid);
         if (rule == null)
         {
-            _logger.LogError(
-                "Attempt to delete an automatic categorization rule that does not exist."
-            );
-            throw new BudgetBoardServiceException("Automatic categorization rule not found.");
+            _logger.LogError("Attempt to delete an automatic rule that does not exist.");
+            throw new BudgetBoardServiceException("Automatic rule not found.");
         }
 
-        userData.AutomaticCategorizationRules.Remove(rule);
+        userData.AutomaticRules.Remove(rule);
         try
         {
             await _userDataContext.SaveChangesAsync();
@@ -223,11 +202,11 @@ public class AutomaticCategorizationRuleService(
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while deleting the automatic categorization rule: {ExceptionMessage}",
+                "An error occurred while deleting the automatic rule: {ExceptionMessage}",
                 ex.Message
             );
             throw new BudgetBoardServiceException(
-                "An error occurred while deleting the automatic categorization rule."
+                "An error occurred while deleting the automatic rule."
             );
         }
     }
@@ -239,9 +218,9 @@ public class AutomaticCategorizationRuleService(
         try
         {
             users = await _userDataContext
-                .ApplicationUsers.Include(u => u.AutomaticCategorizationRules)
+                .ApplicationUsers.Include(u => u.AutomaticRules)
                 .ThenInclude(r => r.Conditions)
-                .Include(u => u.AutomaticCategorizationRules)
+                .Include(u => u.AutomaticRules)
                 .ThenInclude(r => r.Actions)
                 .Include(u => u.TransactionCategories)
                 .AsSplitQuery()

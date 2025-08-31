@@ -178,10 +178,7 @@ builder.Services.AddScoped<IInstitutionService, InstitutionService>();
 builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
-builder.Services.AddScoped<
-    IAutomaticCategorizationRuleService,
-    AutomaticCategorizationRuleService
->();
+builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();
 
 var app = builder.Build();
 

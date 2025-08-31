@@ -12,7 +12,7 @@ export interface IRuleParameterCreateRequest {
   type: string;
 }
 
-export interface IAutomaticCategorizationRuleRequest {
+export interface IAutomaticRuleRequest {
   conditions: IRuleParameterCreateRequest[];
   actions: IRuleParameterCreateRequest[];
 }
@@ -25,7 +25,7 @@ export interface IRuleParameterResponse {
   type: string;
 }
 
-export interface IAutomaticCategorizationRuleResponse {
+export interface IAutomaticRuleResponse {
   id: string;
   conditions: IRuleParameterResponse[];
   actions: IRuleParameterResponse[];
@@ -38,7 +38,7 @@ export interface IRuleParameterUpdateRequest {
   type: string;
 }
 
-export interface IAutomaticCategorizationRuleUpdateRequest {
+export interface IAutomaticRuleUpdateRequest {
   id: string;
   conditions: IRuleParameterUpdateRequest[];
   actions: IRuleParameterUpdateRequest[];

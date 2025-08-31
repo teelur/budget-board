@@ -69,7 +69,7 @@ const TransactionsSettings = (
           <Accordion
             variant="separated"
             multiple
-            defaultValue={["custom categories"]}
+            defaultValue={["custom categories", "automatic rule"]}
           >
             <Accordion.Item
               value="custom categories"
@@ -85,7 +85,7 @@ const TransactionsSettings = (
               </Accordion.Panel>
             </Accordion.Item>
             <Accordion.Item
-              value="automatic categorization"
+              value="automatic rule"
               bg="var(--mantine-color-accordion-alternate)"
             >
               <Accordion.Control>

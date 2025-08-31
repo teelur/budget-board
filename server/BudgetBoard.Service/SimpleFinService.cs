@@ -22,7 +22,7 @@ public class SimpleFinService(
     IBalanceService balanceService,
     IGoalService goalService,
     IApplicationUserService applicationUserService,
-    IAutomaticCategorizationRuleService automaticCategorizationRuleService,
+    IAutomaticRuleService automaticRuleService,
     INowProvider nowProvider
 ) : ISimpleFinService
 {
@@ -70,8 +70,7 @@ public class SimpleFinService(
     private readonly IBalanceService _balanceService = balanceService;
     private readonly IGoalService _goalService = goalService;
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
-    private readonly IAutomaticCategorizationRuleService _automaticCategorizationRuleService =
-        automaticCategorizationRuleService;
+    private readonly IAutomaticRuleService _automaticRuleService = automaticRuleService;
 
     public async Task<IEnumerable<string>> SyncAsync(Guid userGuid)
     {
@@ -111,7 +110,7 @@ public class SimpleFinService(
 
         await SyncGoalsAsync(userData);
 
-        await ApplyAutomaticCategorizationRules(userData);
+        await ApplyAutomaticRules(userData);
 
         await _applicationUserService.UpdateApplicationUserAsync(
             userData.Id,
@@ -446,7 +445,7 @@ public class SimpleFinService(
         }
     }
 
-    private async Task ApplyAutomaticCategorizationRules(ApplicationUser userData)
+    private async Task ApplyAutomaticRules(ApplicationUser userData)
     {
         // Query uncategorized transactions directly from the database for efficiency
         var uncategorizedTransactions = userData
@@ -466,18 +465,16 @@ public class SimpleFinService(
             Parent = tc.Parent,
         });
 
-        var rules = await _automaticCategorizationRuleService.ReadAutomaticCategorizationRulesAsync(
-            userData.Id
-        );
+        var rules = await _automaticRuleService.ReadAutomaticRulesAsync(userData.Id);
 
-        int categorizedCount = 0;
+        int updatedCount = 0;
 
         // TODO: Apply the rules.
 
         _logger.LogInformation(
-            "Applied {Count} automatic categorization rules, categorized {CategorizedCount} transactions.",
+            "Applied {Count} automatic rules, updated {UpdatedCount} transactions.",
             rules.Count(),
-            categorizedCount
+            updatedCount
         );
     }
 }

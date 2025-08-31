@@ -7,11 +7,11 @@ import React from "react";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   FieldToOperatorType,
-  IAutomaticCategorizationRuleRequest,
+  IAutomaticRuleRequest,
   IRuleParameterEdit,
   Operators,
   TransactionFields,
-} from "~/models/automaticCategorizationRule";
+} from "~/models/automaticRule";
 
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -49,17 +49,15 @@ const AddAutomaticRule = (): React.ReactNode => {
 
   const queryClient = useQueryClient();
   const doAddRule = useMutation({
-    mutationFn: async (
-      automaticCategorizationRule: IAutomaticCategorizationRuleRequest
-    ) =>
+    mutationFn: async (automaticRule: IAutomaticRuleRequest) =>
       await request({
-        url: "/api/automaticCategorizationRule",
+        url: "/api/automaticRule",
         method: "POST",
-        data: automaticCategorizationRule,
+        data: automaticRule,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["automaticCategorizationRule"],
+        queryKey: ["automaticRule"],
       });
       notifications.show({
         message: "Rule added successfully",

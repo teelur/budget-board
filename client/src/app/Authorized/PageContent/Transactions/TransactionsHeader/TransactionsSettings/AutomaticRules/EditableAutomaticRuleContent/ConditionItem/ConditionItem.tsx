@@ -19,7 +19,7 @@ import {
   IRuleParameterEdit,
   Operators,
   TransactionFields,
-} from "~/models/automaticCategorizationRule";
+} from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
 

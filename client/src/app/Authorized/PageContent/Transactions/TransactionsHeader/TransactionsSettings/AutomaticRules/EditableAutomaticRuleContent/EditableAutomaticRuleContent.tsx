@@ -8,7 +8,7 @@ import {
   IRuleParameterEdit,
   Operators,
   TransactionFields,
-} from "~/models/automaticCategorizationRule";
+} from "~/models/automaticRule";
 import { ICategoryResponse } from "~/models/category";
 import { defaultTransactionCategories } from "~/models/transaction";
 import ActionItem from "./ActionItem/ActionItem";

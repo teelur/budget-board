@@ -38,7 +38,7 @@ public class SimpleFinServiceTests
             Mock.Of<IBalanceService>(),
             Mock.Of<IGoalService>(),
             Mock.Of<IApplicationUserService>(),
-            Mock.Of<IAutomaticCategorizationRuleService>(),
+            Mock.Of<IAutomaticRuleService>(),
             Mock.Of<INowProvider>()
         );
 
@@ -100,8 +100,8 @@ public class SimpleFinServiceTests
             Mock.Of<ILogger<IApplicationUserService>>(),
             helper.UserDataContext
         );
-        var automaticCategorizationRuleService = new AutomaticCategorizationRuleService(
-            Mock.Of<ILogger<IAutomaticCategorizationRuleService>>(),
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext
         );
 
@@ -120,7 +120,7 @@ public class SimpleFinServiceTests
             balanceService,
             goalService,
             applicationUserService,
-            automaticCategorizationRuleService,
+            automaticRuleService,
             nowProvider
         );
 

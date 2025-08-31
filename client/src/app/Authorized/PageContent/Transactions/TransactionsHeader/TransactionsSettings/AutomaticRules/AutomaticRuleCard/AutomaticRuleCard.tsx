@@ -4,19 +4,19 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import {
-  IAutomaticCategorizationRuleResponse,
-  IAutomaticCategorizationRuleUpdateRequest,
+  IAutomaticRuleResponse,
+  IAutomaticRuleUpdateRequest,
   IRuleParameterEdit,
-} from "~/models/automaticCategorizationRule";
+} from "~/models/automaticRule";
 import ConditionItem from "./ConditionItem/ConditionItem";
 import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 
-interface CategorizationRuleCardProps {
-  rule: IAutomaticCategorizationRuleResponse;
+interface AutomaticRuleCardProps {
+  rule: IAutomaticRuleResponse;
 }
 
-const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
+const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   const [isSelected, setIsSelected] = React.useState(false);
 
   const [conditionItems, setConditionItems] = React.useState<
@@ -29,32 +29,32 @@ const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
   const { request } = React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
-  const doDeleteCategorizationRule = useMutation({
+  const doDeleteAutomaticRule = useMutation({
     mutationFn: async (guid: string) => {
       await request({
-        url: `/api/automaticCategorizationRule`,
+        url: `/api/automaticRule`,
         method: "DELETE",
         params: { guid },
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["automaticCategorizationRule"],
+        queryKey: ["automaticRule"],
       });
     },
   });
 
-  const doUpdateCategorizationRule = useMutation({
-    mutationFn: async (data: IAutomaticCategorizationRuleUpdateRequest) => {
+  const doUpdateAutomaticRule = useMutation({
+    mutationFn: async (data: IAutomaticRuleUpdateRequest) => {
       await request({
-        url: `/api/automaticCategorizationRule`,
+        url: `/api/automaticRule`,
         method: "PUT",
         data,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["automaticCategorizationRule"],
+        queryKey: ["automaticRule"],
       });
       setIsSelected(false);
       setConditionItems(props.rule.conditions ?? []);
@@ -76,7 +76,7 @@ const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
             <Button
               flex="1 1 auto"
               onClick={() => {
-                doUpdateCategorizationRule.mutate({
+                doUpdateAutomaticRule.mutate({
                   id: props.rule.id,
                   conditions: conditionItems.map((item) => ({
                     id: item.id ?? "",
@@ -94,7 +94,7 @@ const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
                   })),
                 });
               }}
-              loading={doUpdateCategorizationRule.isPending}
+              loading={doUpdateAutomaticRule.isPending}
             >
               Save
             </Button>
@@ -140,10 +140,10 @@ const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
             color="red"
             onClick={(e) => {
               e.stopPropagation();
-              doDeleteCategorizationRule.mutate(props.rule.id);
+              doDeleteAutomaticRule.mutate(props.rule.id);
             }}
             h="100%"
-            loading={doDeleteCategorizationRule.isPending}
+            loading={doDeleteAutomaticRule.isPending}
           >
             <TrashIcon size="1rem" />
           </ActionIcon>

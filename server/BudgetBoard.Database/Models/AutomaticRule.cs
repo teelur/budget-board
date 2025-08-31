@@ -1,6 +1,6 @@
 ﻿namespace BudgetBoard.Database.Models;
 
-public class AutomaticCategorizationRule()
+public class AutomaticRule()
 {
     public Guid ID { get; set; }
     public ICollection<RuleCondition> Conditions { get; set; } = [];

@@ -15,10 +15,7 @@ import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getCurrencySymbol } from "~/helpers/currency";
-import {
-  IRuleParameterEdit,
-  TransactionFields,
-} from "~/models/automaticCategorizationRule";
+import { IRuleParameterEdit, TransactionFields } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
 
