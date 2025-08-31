@@ -113,6 +113,25 @@ const AddAutomaticRule = (): React.ReactNode => {
     setConditionItems((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const addNewAction = () => {
+    setActionItems((prev) => [
+      ...prev,
+      {
+        field: TransactionFields.at(0)?.value ?? "",
+        operator:
+          Operators.find(
+            (op) => op.type === FieldToOperatorType.get(defaultField)
+          )?.value ?? "",
+        value: "",
+        type: "",
+      },
+    ]);
+  };
+
+  const removeAction = (index: number) => {
+    setActionItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <Stack gap="0.5rem">
       <Stack gap="0.5rem">
@@ -140,14 +159,20 @@ const AddAutomaticRule = (): React.ReactNode => {
               allowDelete={conditionItems.length > 1}
               doDelete={removeCondition}
               index={index}
+              categories={transactionCategoriesWithCustom}
             />
           )
         )}
       </Stack>
       <Stack gap="0.5rem">
-        <Text size="sm" fw={600}>
-          Then
-        </Text>
+        <Group align="center" justify="space-between">
+          <Text size="sm" fw={600}>
+            Then
+          </Text>
+          <ActionIcon size="sm" onClick={addNewAction}>
+            <PlusIcon size={16} />
+          </ActionIcon>
+        </Group>
         {actionItems.map((item: IRuleParameterCreateRequest, index: number) => (
           <ActionItem
             key={index}
@@ -160,6 +185,9 @@ const AddAutomaticRule = (): React.ReactNode => {
                   prev.map((param, i) => (i === index ? newParameter : param))
               )
             }
+            allowDelete={actionItems.length > 1}
+            doDelete={removeAction}
+            index={index}
           />
         ))}
       </Stack>

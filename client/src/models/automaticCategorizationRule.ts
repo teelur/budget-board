@@ -54,13 +54,14 @@ export enum OperatorTypes {
   STRING = "string",
   NUMBER = "number",
   DATE = "date",
+  CATEGORY = "category",
 }
 
 export const FieldToOperatorType = new Map<string, OperatorTypes>([
   ["merchant", OperatorTypes.STRING],
   ["date", OperatorTypes.DATE],
   ["amount", OperatorTypes.NUMBER],
-  ["category", OperatorTypes.STRING],
+  ["category", OperatorTypes.CATEGORY],
 ]);
 
 export interface Operator {
@@ -78,4 +79,5 @@ export const Operators: Operator[] = [
   { label: "Less Than", value: "lessThan", type: OperatorTypes.NUMBER },
   { label: "Before", value: "before", type: OperatorTypes.DATE },
   { label: "After", value: "after", type: OperatorTypes.DATE },
+  { label: "Is", value: "is", type: OperatorTypes.CATEGORY },
 ];

@@ -1,4 +1,12 @@
-import { Card, Group, Select, Text, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Card,
+  Group,
+  Select,
+  Text,
+  TextInput,
+} from "@mantine/core";
+import { Trash2Icon } from "lucide-react";
 import {
   IRuleParameterCreateRequest,
   TransactionFields,
@@ -7,6 +15,9 @@ import {
 export interface ActionItemProps {
   ruleParameter: IRuleParameterCreateRequest;
   setRuleParameter: (newParameter: IRuleParameterCreateRequest) => void;
+  allowDelete: boolean;
+  doDelete: (index: number) => void;
+  index: number;
 }
 
 const ActionItem = (props: ActionItemProps) => {
@@ -40,6 +51,18 @@ const ActionItem = (props: ActionItemProps) => {
             })
           }
         />
+        {props.allowDelete && (
+          <Group style={{ alignSelf: "stretch" }}>
+            <ActionIcon
+              h="100%"
+              size="sm"
+              color="red"
+              onClick={() => props.doDelete(props.index)}
+            >
+              <Trash2Icon size={16} />
+            </ActionIcon>
+          </Group>
+        )}
       </Group>
     </Card>
   );
