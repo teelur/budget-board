@@ -7,7 +7,7 @@ import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { getDeletedTransactions } from "~/helpers/transactions";
 import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
-import AutomaticCategorization from "./AutomaticCategorization/AutomaticCategorization";
+import AutomaticRules from "./AutomaticRules/AutomaticRules";
 
 interface TransactionsSettingsProps {
   modalOpened: boolean;
@@ -90,11 +90,11 @@ const TransactionsSettings = (
             >
               <Accordion.Control>
                 <Text size="md" fw={600}>
-                  Automatic Categorization
+                  Automatic Rules
                 </Text>
               </Accordion.Control>
               <Accordion.Panel>
-                <AutomaticCategorization />
+                <AutomaticRules />
               </Accordion.Panel>
             </Accordion.Item>
             <Accordion.Item

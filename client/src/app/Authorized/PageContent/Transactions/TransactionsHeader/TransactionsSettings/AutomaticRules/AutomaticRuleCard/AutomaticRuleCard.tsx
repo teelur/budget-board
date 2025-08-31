@@ -10,7 +10,7 @@ interface CategorizationRuleCardProps {
   category: string;
 }
 
-const CategorizationRuleCard = (props: CategorizationRuleCardProps) => {
+const AutomaticRuleCard = (props: CategorizationRuleCardProps) => {
   const { request } = React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
@@ -64,4 +64,4 @@ const CategorizationRuleCard = (props: CategorizationRuleCardProps) => {
   );
 };
 
-export default CategorizationRuleCard;
+export default AutomaticRuleCard;
