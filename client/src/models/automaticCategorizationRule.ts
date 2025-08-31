@@ -1,3 +1,10 @@
+export interface IRuleParameterEdit {
+  id?: string;
+  field: string;
+  operator: string;
+  value: string;
+}
+
 export interface IRuleParameterCreateRequest {
   field: string;
   operator: string;

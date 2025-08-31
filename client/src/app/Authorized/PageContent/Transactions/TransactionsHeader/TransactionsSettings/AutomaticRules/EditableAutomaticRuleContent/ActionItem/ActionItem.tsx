@@ -4,6 +4,7 @@ import {
   Group,
   NumberInput,
   Select,
+  Text,
   TextInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
@@ -15,24 +16,22 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
-  FieldToOperatorType,
-  IRuleParameterCreateRequest,
-  Operators,
+  IRuleParameterEdit,
   TransactionFields,
 } from "~/models/automaticCategorizationRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
 
-export interface ConditionItemProps {
-  ruleParameter: IRuleParameterCreateRequest;
-  setRuleParameter: (newParameter: IRuleParameterCreateRequest) => void;
-  allowDelete?: boolean;
-  doDelete?: (index: number) => void;
+export interface ActionItemProps {
+  ruleParameter: IRuleParameterEdit;
+  setRuleParameter: (newParameter: IRuleParameterEdit) => void;
+  allowDelete: boolean;
+  doDelete: (index: number) => void;
   index: number;
   categories: ICategory[];
 }
 
-const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
+const ActionItem = (props: ActionItemProps): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
 
   const userSettingsQuery = useQuery({
@@ -120,6 +119,9 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   return (
     <Card p="0.5rem" radius="md">
       <Group gap="0.5rem">
+        <Text size="sm" fw={600}>
+          Set
+        </Text>
         <Select
           w="110px"
           data={TransactionFields.map((field) => field.label)}
@@ -134,51 +136,20 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               field:
                 TransactionFields.find((field) => field.label === value)
                   ?.value ?? "",
-              operator:
-                Operators.filter(
-                  (op) =>
-                    op.type ===
-                    FieldToOperatorType.get(
-                      TransactionFields.find((field) => field.label === value)
-                        ?.value ?? ""
-                    )
-                ).at(0)?.value ?? "",
-              value: "",
-              type:
-                FieldToOperatorType.get(
-                  TransactionFields.find((field) => field.label === value)
-                    ?.value ?? ""
-                ) ?? "",
             })
           }
-          allowDeselect={false}
         />
-        <Select
-          w="130px"
-          data={Operators.filter(
-            (op) =>
-              op.type === FieldToOperatorType.get(props.ruleParameter.field)
-          ).map((op) => op.label)}
-          value={
-            Operators.find((op) => op.value === props.ruleParameter.operator)
-              ?.label ?? ""
-          }
-          onChange={(value) =>
-            props.setRuleParameter({
-              ...props.ruleParameter,
-              operator: Operators.find((op) => op.label === value)?.value ?? "",
-            })
-          }
-          allowDeselect={false}
-        />
+        <Text size="sm" fw={600}>
+          to
+        </Text>
         {getValueInput()}
         {props.allowDelete && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon
-              color="red"
-              size="sm"
               h="100%"
-              onClick={() => props.doDelete?.(props.index)}
+              size="sm"
+              color="red"
+              onClick={() => props.doDelete(props.index)}
             >
               <Trash2Icon size={16} />
             </ActionIcon>
@@ -189,4 +160,4 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   );
 };
 
-export default ConditionItem;
+export default ActionItem;
