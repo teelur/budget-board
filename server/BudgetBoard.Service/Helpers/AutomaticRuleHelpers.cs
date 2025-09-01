@@ -587,8 +587,7 @@ public static class AutomaticRuleHelpers
             }
             return updatedTransactions;
         }
-        throw new BudgetBoardServiceException(
-            $"Unsupported field '{action.Field}' in rule action."
+            $"Unsupported operator '{action.Operator}' in rule action."
         );
     }
 }
