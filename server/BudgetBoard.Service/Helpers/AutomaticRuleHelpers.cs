@@ -477,17 +477,6 @@ public static class AutomaticRuleHelpers
             int updatedTransactions = 0;
             foreach (var transaction in transactions)
             {
-                transaction.Category = TransactionCategoriesHelpers.GetParentCategory(
-                    newCategory,
-                    allCategories
-                );
-                transaction.Subcategory = TransactionCategoriesHelpers.GetIsParentCategory(
-                    newCategory,
-                    allCategories
-                )
-                    ? ""
-                    : action.Value;
-
                 await transactionService.UpdateTransactionAsync(
                     userGuid,
                     new TransactionUpdateRequest(transaction)
@@ -587,7 +576,7 @@ public static class AutomaticRuleHelpers
             }
             return updatedTransactions;
         }
-            $"Unsupported operator '{action.Operator}' in rule action."
+        $"Unsupported operator '{action.Operator}' in rule action."
         );
     }
 }
