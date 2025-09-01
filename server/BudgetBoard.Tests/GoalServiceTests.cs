@@ -398,8 +398,7 @@ public class GoalServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
 
         var transaction = transactionFaker.Generate();
         transaction.AccountID = account.ID;

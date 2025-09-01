@@ -236,8 +236,16 @@ public class SimpleFinService(
         var response = await GetSimpleFinAccountData(accessToken, startDate);
         var jsonString = await response.Content.ReadAsStringAsync();
 
-        return JsonSerializer.Deserialize<ISimpleFinAccountData>(jsonString, s_readOptions)
-            ?? new SimpleFinAccountData();
+        try
+        {
+            return JsonSerializer.Deserialize<ISimpleFinAccountData>(jsonString, s_readOptions)
+                ?? new SimpleFinAccountData();
+        }
+        catch (JsonException jex)
+        {
+            _logger.LogError(jex, "Error deserializing SimpleFin data: {Message}", jex.Message);
+            return new SimpleFinAccountData();
+        }
     }
 
     private async Task<bool> IsAccessTokenValid(string accessToken) =>
