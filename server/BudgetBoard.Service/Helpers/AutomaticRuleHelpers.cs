@@ -490,7 +490,7 @@ public static class AutomaticRuleHelpers
                             allCategories
                         )
                             ? ""
-                            : action.Value,
+                            : newCategory,
                     }
                 );
 
