@@ -243,8 +243,8 @@ public class SimpleFinServiceTests
             [
                 new RuleCondition()
                 {
-                    Field = "MerchantName",
-                    Operator = "Contains",
+                    Field = "merchant",
+                    Operator = "contains",
                     Value = "Starbucks",
                 },
             ],
@@ -252,8 +252,8 @@ public class SimpleFinServiceTests
             [
                 new RuleAction()
                 {
-                    Field = "Category",
-                    Operator = "Set",
+                    Field = "category",
+                    Operator = "set",
                     Value = "Coffee Shops",
                 },
             ],
