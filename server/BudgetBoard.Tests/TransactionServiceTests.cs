@@ -206,7 +206,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -274,7 +274,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -321,7 +321,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -363,7 +363,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -399,7 +399,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -435,7 +435,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -527,7 +527,7 @@ public class TransactionServiceTests
 
         account.Balances = balances;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(2);
 
         transactions.First().Date = balances.First().DateTime;
@@ -583,7 +583,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -656,7 +656,7 @@ public class TransactionServiceTests
 
         account.Balances = balances;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(2);
         transactions[0].Date = balances[0].DateTime;
 
@@ -706,7 +706,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -766,7 +766,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         account.Transactions = transactions;
@@ -805,7 +805,7 @@ public class TransactionServiceTests
 
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         transactions.First().Amount = 100.0M;
@@ -903,7 +903,7 @@ public class TransactionServiceTests
 
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         transactions.First().Amount = originalAmount;
@@ -949,7 +949,7 @@ public class TransactionServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker() { AccountIds = [account.ID] };
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         helper.UserDataContext.Accounts.Add(account);

@@ -1,10 +1,10 @@
 ﻿namespace BudgetBoard.Database.Models;
 
-public class AutomaticCategorizationRule()
+public class AutomaticRule()
 {
     public Guid ID { get; set; }
-    public string CategorizationRule { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public ICollection<RuleCondition> Conditions { get; set; } = [];
+    public ICollection<RuleAction> Actions { get; set; } = [];
     public ApplicationUser? User { get; set; } = null!;
     public Guid UserID { get; set; }
 }

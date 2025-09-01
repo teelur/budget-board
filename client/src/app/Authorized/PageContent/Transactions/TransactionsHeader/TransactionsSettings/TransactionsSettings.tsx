@@ -7,7 +7,7 @@ import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { getDeletedTransactions } from "~/helpers/transactions";
 import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
-import AutomaticCategorization from "./AutomaticCategorization/AutomaticCategorization";
+import AutomaticRules from "./AutomaticRules/AutomaticRules";
 
 interface TransactionsSettingsProps {
   modalOpened: boolean;
@@ -69,7 +69,7 @@ const TransactionsSettings = (
           <Accordion
             variant="separated"
             multiple
-            defaultValue={["custom categories"]}
+            defaultValue={["custom categories", "automatic rule"]}
           >
             <Accordion.Item
               value="custom categories"
@@ -85,16 +85,16 @@ const TransactionsSettings = (
               </Accordion.Panel>
             </Accordion.Item>
             <Accordion.Item
-              value="automatic categorization"
+              value="automatic rule"
               bg="var(--mantine-color-accordion-alternate)"
             >
               <Accordion.Control>
                 <Text size="md" fw={600}>
-                  Automatic Categorization
+                  Automatic Rules
                 </Text>
               </Accordion.Control>
               <Accordion.Panel>
-                <AutomaticCategorization />
+                <AutomaticRules />
               </Accordion.Panel>
             </Accordion.Item>
             <Accordion.Item

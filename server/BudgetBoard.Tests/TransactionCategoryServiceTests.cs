@@ -428,8 +428,7 @@ public class TransactionCategoryServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         transactions.ForEach(t => t.Category = transactionCategories.First().Value);
@@ -470,8 +469,7 @@ public class TransactionCategoryServiceTests
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
 
         transactions.ForEach(t => t.Subcategory = transactionCategories.First().Value);

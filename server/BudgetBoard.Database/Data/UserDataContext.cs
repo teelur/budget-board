@@ -29,9 +29,7 @@ namespace BudgetBoard.Database.Data
                     .HasForeignKey<UserSettings>(e => e.UserID)
                     .IsRequired();
 
-                u.HasMany(e => e.AutomaticCategorizationRules)
-                    .WithOne(e => e.User)
-                    .HasForeignKey(e => e.UserID);
+                u.HasMany(e => e.AutomaticRules).WithOne(e => e.User).HasForeignKey(e => e.UserID);
 
                 u.ToTable("User");
             });
@@ -81,9 +79,37 @@ namespace BudgetBoard.Database.Data
 
             modelBuilder.Entity<UserSettings>().ToTable("UserSettings");
 
-            modelBuilder
-                .Entity<AutomaticCategorizationRule>()
-                .ToTable("AutomaticCategorizationRule");
+            // Base RuleParameter mapping (TPH)
+            modelBuilder.Entity<RuleParameterBase>(p =>
+            {
+                p.ToTable("RuleParameter");
+                p.HasDiscriminator<string>("ParameterKind")
+                    .HasValue<RuleCondition>("Condition")
+                    .HasValue<RuleAction>("Action");
+            });
+
+            // Conditions relationship
+            modelBuilder.Entity<RuleCondition>(c =>
+            {
+                c.HasOne(e => e.Rule)
+                    .WithMany(r => r.Conditions)
+                    .HasForeignKey(e => e.RuleID)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Actions relationship
+            modelBuilder.Entity<RuleAction>(a =>
+            {
+                a.HasOne(e => e.Rule)
+                    .WithMany(r => r.Actions)
+                    .HasForeignKey(e => e.RuleID)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<AutomaticRule>(r =>
+            {
+                r.ToTable("AutomaticRule");
+            });
 
             modelBuilder.UseIdentityColumns();
         }
@@ -97,6 +123,9 @@ namespace BudgetBoard.Database.Data
         public DbSet<Category> TransactionCategories { get; set; }
         public DbSet<Institution> Institutions { get; set; }
         public DbSet<UserSettings> UserSettings { get; set; }
-        public DbSet<AutomaticCategorizationRule> AutomaticCategorizationRules { get; set; }
+        public DbSet<AutomaticRule> AutomaticRules { get; set; }
+        public DbSet<RuleParameterBase> RuleParameters { get; set; }
+        public DbSet<RuleCondition> RuleConditions { get; set; }
+        public DbSet<RuleAction> RuleActions { get; set; }
     }
 }

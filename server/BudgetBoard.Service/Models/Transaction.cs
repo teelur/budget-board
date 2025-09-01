@@ -91,6 +91,17 @@ public class TransactionUpdateRequest : ITransactionUpdateRequest
         MerchantName = null;
         Deleted = null;
     }
+
+    public TransactionUpdateRequest(Transaction transaction)
+    {
+        ID = transaction.ID;
+        Amount = transaction.Amount;
+        Date = transaction.Date;
+        Category = transaction.Category;
+        Subcategory = transaction.Subcategory;
+        MerchantName = transaction.MerchantName;
+        Deleted = transaction.Deleted;
+    }
 }
 
 public interface ITransactionSplitRequest

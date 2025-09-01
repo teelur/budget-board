@@ -111,6 +111,7 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
     >
       <Combobox.Target>
         <InputBase
+          flex={props.flex}
           w={props.w}
           miw="max-content"
           component="button"

@@ -10,22 +10,19 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AutomaticCategorizationRuleController(
-    ILogger<AutomaticCategorizationRuleController> logger,
+public class AutomaticRuleController(
+    ILogger<AutomaticRuleController> logger,
     UserManager<ApplicationUser> userManager,
-    IAutomaticCategorizationRuleService automaticCategorizationRuleService
+    IAutomaticRuleService automaticRuleService
 ) : ControllerBase
 {
-    private readonly ILogger<AutomaticCategorizationRuleController> _logger = logger;
+    private readonly ILogger<AutomaticRuleController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IAutomaticCategorizationRuleService _automaticCategorizationRuleService =
-        automaticCategorizationRuleService;
+    private readonly IAutomaticRuleService _automaticRuleService = automaticRuleService;
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create(
-        [FromBody] AutomaticCategorizationRuleRequest automaticCategorizationRule
-    )
+    public async Task<IActionResult> Create([FromBody] AutomaticRuleCreateRequest automaticRule)
     {
         try
         {
@@ -34,9 +31,9 @@ public class AutomaticCategorizationRuleController(
             {
                 return Unauthorized("User ID not found.");
             }
-            await _automaticCategorizationRuleService.CreateAutomaticCategorizationRuleAsync(
+            await _automaticRuleService.CreateAutomaticRuleAsync(
                 new Guid(userIdString),
-                automaticCategorizationRule
+                automaticRule
             );
             return Ok();
         }
@@ -58,10 +55,33 @@ public class AutomaticCategorizationRuleController(
         try
         {
             return Ok(
-                await _automaticCategorizationRuleService.ReadAutomaticCategorizationRulesAsync(
+                await _automaticRuleService.ReadAutomaticRulesAsync(
                     new Guid(_userManager.GetUserId(User) ?? string.Empty)
                 )
             );
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+        }
+    }
+
+    [HttpPut]
+    [Authorize]
+    public async Task<IActionResult> Update([FromBody] AutomaticRuleUpdateRequest automaticRule)
+    {
+        try
+        {
+            await _automaticRuleService.UpdateAutomaticRuleAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                automaticRule
+            );
+            return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
@@ -80,7 +100,7 @@ public class AutomaticCategorizationRuleController(
     {
         try
         {
-            await _automaticCategorizationRuleService.DeleteAutomaticCategorizationRuleAsync(
+            await _automaticRuleService.DeleteAutomaticRuleAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
                 guid
             );

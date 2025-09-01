@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using System.Text.RegularExpressions;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
@@ -23,7 +22,7 @@ public class SimpleFinService(
     IBalanceService balanceService,
     IGoalService goalService,
     IApplicationUserService applicationUserService,
-    IAutomaticCategorizationRuleService automaticCategorizationRuleService,
+    IAutomaticRuleService automaticRuleService,
     INowProvider nowProvider
 ) : ISimpleFinService
 {
@@ -71,8 +70,7 @@ public class SimpleFinService(
     private readonly IBalanceService _balanceService = balanceService;
     private readonly IGoalService _goalService = goalService;
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
-    private readonly IAutomaticCategorizationRuleService _automaticCategorizationRuleService =
-        automaticCategorizationRuleService;
+    private readonly IAutomaticRuleService _automaticRuleService = automaticRuleService;
 
     public async Task<IEnumerable<string>> SyncAsync(Guid userGuid)
     {
@@ -112,7 +110,7 @@ public class SimpleFinService(
 
         await SyncGoalsAsync(userData);
 
-        await ApplyAutomaticCategorizationRules(userData);
+        await ApplyAutomaticRules(userData);
 
         await _applicationUserService.UpdateApplicationUserAsync(
             userData.Id,
@@ -238,8 +236,16 @@ public class SimpleFinService(
         var response = await GetSimpleFinAccountData(accessToken, startDate);
         var jsonString = await response.Content.ReadAsStringAsync();
 
-        return JsonSerializer.Deserialize<ISimpleFinAccountData>(jsonString, s_readOptions)
-            ?? new SimpleFinAccountData();
+        try
+        {
+            return JsonSerializer.Deserialize<ISimpleFinAccountData>(jsonString, s_readOptions)
+                ?? new SimpleFinAccountData();
+        }
+        catch (JsonException jex)
+        {
+            _logger.LogError(jex, "Error deserializing SimpleFin data: {Message}", jex.Message);
+            return new SimpleFinAccountData();
+        }
     }
 
     private async Task<bool> IsAccessTokenValid(string accessToken) =>
@@ -447,82 +453,98 @@ public class SimpleFinService(
         }
     }
 
-    private async Task ApplyAutomaticCategorizationRules(ApplicationUser userData)
+    private async Task ApplyAutomaticRules(ApplicationUser userData)
     {
-        // Query uncategorized transactions directly from the database for efficiency
-        var uncategorizedTransactions = userData
-            .Accounts.SelectMany(a => a.Transactions)
-            .Where(t =>
-                t.Account?.UserID == userData.Id
-                && string.IsNullOrEmpty(t.Category)
-                && string.IsNullOrEmpty(t.Subcategory)
-                && t.Deleted == null
-                && (t.Account.HideTransactions == false)
-            )
-            .ToList();
-
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
         {
             Value = tc.Value,
             Parent = tc.Parent,
         });
 
-        var rules = await _automaticCategorizationRuleService.ReadAutomaticCategorizationRulesAsync(
-            userData.Id
+        var allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+            customCategories
         );
 
-        int categorizedCount = 0;
+        var rules = await _automaticRuleService.ReadAutomaticRulesAsync(userData.Id);
 
-        // Compile regexes for all rules once
-        var compiledRuleRegexes = rules
-            .Select(r => new
-            {
-                Rule = r,
-                Regex = new Regex(r.CategorizationRule, RegexOptions.Compiled),
-            })
-            .ToList();
-
-        foreach (var ruleRegex in compiledRuleRegexes)
+        foreach (var rule in rules)
         {
-            var matchingTransactions = uncategorizedTransactions
-                .Where(t => ruleRegex.Regex.IsMatch(t.MerchantName ?? string.Empty))
-                .ToList();
+            bool invalidCondition = false;
 
-            foreach (var transaction in matchingTransactions)
+            var matchedTransactions = userData
+                .Accounts.SelectMany(a => a.Transactions)
+                .Where(t => t.Deleted == null && !(t.Account?.HideTransactions ?? false));
+            foreach (var condition in rule.Conditions)
             {
-                await _transactionService.UpdateTransactionAsync(
-                    userData.Id,
-                    new TransactionUpdateRequest()
-                    {
-                        ID = transaction.ID,
-                        Amount = transaction.Amount,
-                        Date = transaction.Date,
-                        Category = TransactionCategoriesHelpers.GetParentCategory(
-                            ruleRegex.Rule.Category,
-                            []
-                        ),
-                        Subcategory = TransactionCategoriesHelpers.GetIsParentCategory(
-                            ruleRegex.Rule.Category,
-                            customCategories
-                        )
-                            ? string.Empty
-                            : ruleRegex.Rule.Category,
-                        MerchantName = transaction.MerchantName,
-                        Deleted = transaction.Deleted,
-                    }
-                );
+                try
+                {
+                    matchedTransactions = AutomaticRuleHelpers.FilterOnCondition(
+                        condition,
+                        matchedTransactions,
+                        allCategories
+                    );
+                }
+                catch (BudgetBoardServiceException bbex)
+                {
+                    _logger.LogError(
+                        bbex,
+                        "Error applying condition {ConditionId} of rule {RuleId}: {Message}",
+                        condition.ID,
+                        rule.ID,
+                        bbex.Message
+                    );
 
-                // Transaction has been updated, so we can remove it from the uncategorized list.
-                uncategorizedTransactions.Remove(transaction);
-
-                categorizedCount++;
+                    invalidCondition = true;
+                    break;
+                }
             }
-        }
 
-        _logger.LogInformation(
-            "Applied {Count} automatic categorization rules, categorized {CategorizedCount} transactions.",
-            rules.Count(),
-            categorizedCount
-        );
+            if (invalidCondition)
+            {
+                _logger.LogInformation(
+                    "An error occurred in one of the conditions. Rule actions will not be applied."
+                );
+                continue;
+            }
+
+            _logger.LogInformation(
+                "Rule {RuleId} matched {matchedTransactionsCount} transactions.",
+                rule.ID,
+                matchedTransactions.Count()
+            );
+
+            int updatedCount = 0;
+
+            foreach (var action in rule.Actions)
+            {
+                try
+                {
+                    updatedCount += await AutomaticRuleHelpers.ApplyActionToTransactions(
+                        action,
+                        matchedTransactions,
+                        allCategories,
+                        _transactionService,
+                        userData.Id
+                    );
+                }
+                catch (BudgetBoardServiceException bbex)
+                {
+                    _logger.LogError(
+                        bbex,
+                        "Error applying action {ActionId} of rule {RuleId}: {Message}",
+                        action.ID,
+                        rule.ID,
+                        bbex.Message
+                    );
+                    continue;
+                }
+            }
+
+            _logger.LogInformation(
+                "Applied automatic rule {RuleId}, updated {UpdatedCount} transactions.",
+                rule.ID,
+                updatedCount
+            );
+        }
     }
 }
