@@ -207,6 +207,26 @@ public static class AutomaticRuleHelpers
                 )
             );
         }
+        // Matches regex
+        else if (
+            condition.Operator.Equals(
+                AutomaticRuleConstants.ConditionalOperators.MatchesRegex,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            try
+            {
+                var regex = new System.Text.RegularExpressions.Regex(condition.Value);
+                return transactions.Where(t => regex.IsMatch(t.MerchantName ?? ""));
+            }
+            catch (ArgumentException)
+            {
+                throw new BudgetBoardServiceException(
+                    $"The regex pattern '{condition.Value}' is not valid."
+                );
+            }
+        }
 
         throw new BudgetBoardServiceException(
             $"Unsupported operator '{condition.Operator}' for Merchant field."
@@ -221,7 +241,7 @@ public static class AutomaticRuleHelpers
     {
         if (
             condition.Value != string.Empty
-            && allCategories.Any(c => c.Value.Equals(condition.Value))
+            && !allCategories.Any(c => c.Value.Equals(condition.Value))
         )
         {
             throw new BudgetBoardServiceException(

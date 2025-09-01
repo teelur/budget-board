@@ -19,6 +19,7 @@ import {
   FieldToOperatorType,
   IRuleParameterEdit,
   Operators,
+  OperatorTypes,
   TransactionFields,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
@@ -136,13 +137,13 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
                 TransactionFields.find((field) => field.label === value)
                   ?.value ?? "",
               operator:
-                Operators.filter(
-                  (op) =>
-                    op.type ===
+                Operators.filter((op) =>
+                  op.type.includes(
                     FieldToOperatorType.get(
                       TransactionFields.find((field) => field.label === value)
                         ?.value ?? ""
-                    )
+                    ) ?? OperatorTypes.STRING
+                  )
                 ).at(0)?.value ?? "",
               value: getDefaultValue(
                 TransactionFields.find((field) => field.label === value)
@@ -153,10 +154,12 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           allowDeselect={false}
         />
         <Select
-          w="130px"
-          data={Operators.filter(
-            (op) =>
-              op.type === FieldToOperatorType.get(props.ruleParameter.field)
+          w="160px"
+          data={Operators.filter((op) =>
+            op.type.includes(
+              FieldToOperatorType.get(props.ruleParameter.field) ??
+                OperatorTypes.STRING
+            )
           ).map((op) => op.label)}
           value={
             Operators.find((op) => op.value === props.ruleParameter.operator)

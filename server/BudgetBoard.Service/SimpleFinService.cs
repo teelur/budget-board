@@ -469,6 +469,8 @@ public class SimpleFinService(
 
         foreach (var rule in rules)
         {
+            bool invalidConidition = false;
+
             var matchedTransactions = userData
                 .Accounts.SelectMany(a => a.Transactions)
                 .Where(t => t.Deleted == null && !(t.Account?.HideTransactions ?? false));
@@ -491,8 +493,18 @@ public class SimpleFinService(
                         rule.ID,
                         bbex.Message
                     );
-                    continue;
+
+                    invalidConidition = true;
+                    break;
                 }
+            }
+
+            if (invalidConidition)
+            {
+                _logger.LogInformation(
+                    "An error occurred in one of the conditions. Rule actions will not be applied."
+                );
+                continue;
             }
 
             _logger.LogInformation(

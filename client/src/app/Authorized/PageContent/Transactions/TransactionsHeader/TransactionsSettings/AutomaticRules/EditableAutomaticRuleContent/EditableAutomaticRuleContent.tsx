@@ -7,6 +7,7 @@ import {
   FieldToOperatorType,
   IRuleParameterEdit,
   Operators,
+  OperatorTypes,
   TransactionFields,
 } from "~/models/automaticRule";
 import { ICategoryResponse } from "~/models/category";
@@ -55,8 +56,10 @@ const EditableAutomaticRuleContent = (
       {
         field: defaultField,
         operator:
-          Operators.filter(
-            (op) => op.type === FieldToOperatorType.get(defaultField)
+          Operators.filter((op) =>
+            op.type.includes(
+              FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING
+            )
           )
             .map((op) => op.value)
             .at(0) ?? "",
@@ -76,8 +79,10 @@ const EditableAutomaticRuleContent = (
       {
         field: TransactionFields.at(0)?.value ?? "",
         operator:
-          Operators.find(
-            (op) => op.type === FieldToOperatorType.get(defaultField)
+          Operators.find((op) =>
+            op.type.includes(
+              FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING
+            )
           )?.value ?? "",
         value: "",
         type: "",

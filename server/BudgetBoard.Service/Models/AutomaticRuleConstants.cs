@@ -13,13 +13,14 @@ public class AutomaticRuleConstants
     public readonly struct ConditionalOperators
     {
         public static readonly string EqualsString = "equals";
-        public static readonly string NotEquals = "not_equals";
+        public static readonly string NotEquals = "notEquals";
         public static readonly string Contains = "contains";
         public static readonly string NotContains = "doesNotContain";
         public static readonly string StartsWith = "startsWith";
         public static readonly string EndsWith = "endsWith";
         public static readonly string GreaterThan = "greaterThan";
         public static readonly string LessThan = "lessThan";
+        public static readonly string MatchesRegex = "matchesRegex";
         public static readonly string On = "on";
         public static readonly string Before = "before";
         public static readonly string After = "after";
