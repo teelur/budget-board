@@ -1,11 +1,15 @@
 import { Card, Group, Text } from "@mantine/core";
+import { getFormattedValue } from "~/helpers/automaticRules";
 import {
   IRuleParameterResponse,
   TransactionFields,
 } from "~/models/automaticRule";
+import { ICategory } from "~/models/category";
 
 interface ActionItemProps {
   action: IRuleParameterResponse;
+  categories: ICategory[];
+  currency: string;
 }
 
 const ActionItem = (props: ActionItemProps) => {
@@ -28,7 +32,12 @@ const ActionItem = (props: ActionItemProps) => {
           to
         </Text>
         <Text fw={600} size="sm">
-          {props.action.value}
+          {getFormattedValue(
+            props.action.field,
+            props.action.value,
+            props.currency,
+            props.categories
+          )}
         </Text>
       </Group>
     </Card>

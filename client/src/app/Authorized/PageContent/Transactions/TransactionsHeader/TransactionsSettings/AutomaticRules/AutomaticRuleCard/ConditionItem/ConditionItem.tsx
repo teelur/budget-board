@@ -1,11 +1,16 @@
 import { Card, Group, Text } from "@mantine/core";
+import { getFormattedValue } from "~/helpers/automaticRules";
 import {
   IRuleParameterResponse,
+  Operators,
   TransactionFields,
 } from "~/models/automaticRule";
+import { ICategory } from "~/models/category";
 
 interface ConditionItemProps {
   condition: IRuleParameterResponse;
+  categories: ICategory[];
+  currency: string;
 }
 
 const ConditionItem = (props: ConditionItemProps) => {
@@ -23,10 +28,16 @@ const ConditionItem = (props: ConditionItemProps) => {
           )?.label ?? props.condition.field}
         </Text>
         <Text fw={600} size="sm">
-          {props.condition.operator}
+          {Operators.find((op) => op.value === props.condition.operator)
+            ?.label ?? props.condition.operator}
         </Text>
         <Text fw={600} size="sm">
-          {props.condition.value}
+          {getFormattedValue(
+            props.condition.field,
+            props.condition.value,
+            props.currency,
+            props.categories
+          )}
         </Text>
       </Group>
     </Card>

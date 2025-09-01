@@ -14,8 +14,13 @@ import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
+import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { IRuleParameterEdit, TransactionFields } from "~/models/automaticRule";
+import {
+  ActionOperation,
+  IRuleParameterEdit,
+  TransactionFields,
+} from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
 
@@ -133,6 +138,11 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
               field:
                 TransactionFields.find((field) => field.label === value)
                   ?.value ?? "",
+              operator: ActionOperation,
+              value: getDefaultValue(
+                TransactionFields.find((field) => field.label === value)
+                  ?.value ?? ""
+              ),
             })
           }
         />

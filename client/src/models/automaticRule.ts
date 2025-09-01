@@ -70,6 +70,8 @@ export const FieldToOperatorType = new Map<string, OperatorTypes>([
   ["category", OperatorTypes.CATEGORY],
 ]);
 
+export const ActionOperation: string = "set";
+
 export interface Operator {
   label: string;
   value: string;
@@ -77,13 +79,13 @@ export interface Operator {
 }
 
 export const Operators: Operator[] = [
-  { label: "Equals", value: "equals", type: OperatorTypes.STRING },
-  { label: "Contains", value: "contains", type: OperatorTypes.STRING },
-  { label: "Starts With", value: "startsWith", type: OperatorTypes.STRING },
-  { label: "Ends With", value: "endsWith", type: OperatorTypes.STRING },
-  { label: "Greater Than", value: "greaterThan", type: OperatorTypes.NUMBER },
-  { label: "Less Than", value: "lessThan", type: OperatorTypes.NUMBER },
-  { label: "Before", value: "before", type: OperatorTypes.DATE },
-  { label: "After", value: "after", type: OperatorTypes.DATE },
-  { label: "Is", value: "is", type: OperatorTypes.CATEGORY },
+  { label: "equals", value: "equals", type: OperatorTypes.STRING },
+  { label: "contains", value: "contains", type: OperatorTypes.STRING },
+  { label: "starts with", value: "startsWith", type: OperatorTypes.STRING },
+  { label: "ends with", value: "endsWith", type: OperatorTypes.STRING },
+  { label: "greater than", value: "greaterThan", type: OperatorTypes.NUMBER },
+  { label: "less than", value: "lessThan", type: OperatorTypes.NUMBER },
+  { label: "before", value: "before", type: OperatorTypes.DATE },
+  { label: "after", value: "after", type: OperatorTypes.DATE },
+  { label: "is", value: "is", type: OperatorTypes.CATEGORY },
 ];

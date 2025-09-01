@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Card, Group, Stack, Text } from "@mantine/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -11,6 +11,8 @@ import {
 import ConditionItem from "./ConditionItem/ConditionItem";
 import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
+import { ICategoryResponse } from "~/models/category";
+import { defaultTransactionCategories } from "~/models/transaction";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -27,6 +29,42 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   );
 
   const { request } = React.useContext<any>(AuthContext);
+
+  const transactionCategoriesQuery = useQuery({
+    queryKey: ["transactionCategories"],
+    queryFn: async () => {
+      const res = await request({
+        url: "/api/transactionCategory",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as ICategoryResponse[];
+      }
+
+      return undefined;
+    },
+  });
+
+  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
+    transactionCategoriesQuery.data ?? []
+  );
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async () => {
+      const res = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data;
+      }
+
+      return undefined;
+    },
+  });
 
   const queryClient = useQueryClient();
   const doDeleteAutomaticRule = useMutation({
@@ -53,12 +91,10 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ["automaticRule"],
       });
       setIsSelected(false);
-      setConditionItems(props.rule.conditions ?? []);
-      setActionItems(props.rule.actions ?? []);
     },
   });
 
@@ -120,7 +156,12 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
               If
             </Text>
             {(props.rule.conditions ?? []).map((condition) => (
-              <ConditionItem key={condition.id} condition={condition} />
+              <ConditionItem
+                key={condition.id}
+                condition={condition}
+                categories={transactionCategoriesWithCustom}
+                currency={userSettingsQuery.data?.currency ?? ""}
+              />
             ))}
           </Group>
           <Group gap="0.25rem">
@@ -128,12 +169,24 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
               Then
             </Text>
             {(props.rule.actions ?? []).map((action) => (
-              <ActionItem key={action.id} action={action} />
+              <ActionItem
+                key={action.id}
+                action={action}
+                categories={transactionCategoriesWithCustom}
+                currency={userSettingsQuery.data?.currency ?? ""}
+              />
             ))}
           </Group>
         </Stack>
         <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
-          <ActionIcon onClick={() => setIsSelected(true)} h="100%">
+          <ActionIcon
+            onClick={() => {
+              setConditionItems(props.rule.conditions ?? []);
+              setActionItems(props.rule.actions ?? []);
+              setIsSelected(true);
+            }}
+            h="100%"
+          >
             <PencilIcon size="1rem" />
           </ActionIcon>
           <ActionIcon

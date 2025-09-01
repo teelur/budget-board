@@ -13,6 +13,7 @@ import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
+import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
   FieldToOperatorType,
@@ -143,7 +144,10 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
                         ?.value ?? ""
                     )
                 ).at(0)?.value ?? "",
-              value: "",
+              value: getDefaultValue(
+                TransactionFields.find((field) => field.label === value)
+                  ?.value ?? ""
+              ),
             })
           }
           allowDeselect={false}
