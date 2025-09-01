@@ -51,7 +51,7 @@ jobs:
         if: github.event_name == 'release'
 
       - name: Write Version to File
-        uses: brettdorrans/write-version-to-file@v1.1.0
+        uses: eball/write-tag-to-version-file@latest
         with:
           filename: "client/.env"
           placeholder: "PLACEHOLDER"
