@@ -80,12 +80,24 @@ export interface Operator {
 
 export const Operators: Operator[] = [
   { label: "equals", value: "equals", type: OperatorTypes.STRING },
+  {
+    label: "does not equal",
+    value: "notEquals",
+    type: OperatorTypes.STRING,
+  },
   { label: "contains", value: "contains", type: OperatorTypes.STRING },
+  {
+    label: "does not contain",
+    value: "doesNotContain",
+    type: OperatorTypes.STRING,
+  },
   { label: "starts with", value: "startsWith", type: OperatorTypes.STRING },
   { label: "ends with", value: "endsWith", type: OperatorTypes.STRING },
   { label: "greater than", value: "greaterThan", type: OperatorTypes.NUMBER },
   { label: "less than", value: "lessThan", type: OperatorTypes.NUMBER },
+  { label: "on", value: "on", type: OperatorTypes.DATE },
   { label: "before", value: "before", type: OperatorTypes.DATE },
   { label: "after", value: "after", type: OperatorTypes.DATE },
   { label: "is", value: "is", type: OperatorTypes.CATEGORY },
+  { label: "is not", value: "isNot", type: OperatorTypes.CATEGORY },
 ];

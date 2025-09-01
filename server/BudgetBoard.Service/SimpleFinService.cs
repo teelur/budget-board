@@ -447,34 +447,84 @@ public class SimpleFinService(
 
     private async Task ApplyAutomaticRules(ApplicationUser userData)
     {
-        // Query uncategorized transactions directly from the database for efficiency
-        var uncategorizedTransactions = userData
-            .Accounts.SelectMany(a => a.Transactions)
-            .Where(t =>
-                t.Account?.UserID == userData.Id
-                && string.IsNullOrEmpty(t.Category)
-                && string.IsNullOrEmpty(t.Subcategory)
-                && t.Deleted == null
-                && (t.Account.HideTransactions == false)
-            )
-            .ToList();
-
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
         {
             Value = tc.Value,
             Parent = tc.Parent,
         });
 
+        var allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+            customCategories
+        );
+
         var rules = await _automaticRuleService.ReadAutomaticRulesAsync(userData.Id);
 
-        int updatedCount = 0;
+        foreach (var rule in rules)
+        {
+            var matchedTransactions = userData
+                .Accounts.SelectMany(a => a.Transactions)
+                .Where(t => t.Deleted == null && !(t.Account?.HideTransactions ?? false));
+            foreach (var condition in rule.Conditions)
+            {
+                try
+                {
+                    matchedTransactions = AutomaticRuleHelpers.FilterOnCondition(
+                        condition,
+                        matchedTransactions,
+                        allCategories
+                    );
+                }
+                catch (BudgetBoardServiceException bbex)
+                {
+                    _logger.LogError(
+                        bbex,
+                        "Error applying condition {ConditionId} of rule {RuleId}: {Message}",
+                        condition.ID,
+                        rule.ID,
+                        bbex.Message
+                    );
+                    continue;
+                }
+            }
 
-        // TODO: Apply the rules.
+            _logger.LogInformation(
+                "Rule {RuleId} matched {matchedTransactionsCount} transactions.",
+                rule.ID,
+                matchedTransactions.Count()
+            );
 
-        _logger.LogInformation(
-            "Applied {Count} automatic rules, updated {UpdatedCount} transactions.",
-            rules.Count(),
-            updatedCount
-        );
+            int updatedCount = 0;
+
+            foreach (var action in rule.Actions)
+            {
+                try
+                {
+                    updatedCount += await AutomaticRuleHelpers.ApplyActionToTransactions(
+                        action,
+                        matchedTransactions,
+                        allCategories,
+                        _transactionService,
+                        userData.Id
+                    );
+                }
+                catch (BudgetBoardServiceException bbex)
+                {
+                    _logger.LogError(
+                        bbex,
+                        "Error applying action {ActionId} of rule {RuleId}: {Message}",
+                        action.ID,
+                        rule.ID,
+                        bbex.Message
+                    );
+                    continue;
+                }
+            }
+
+            _logger.LogInformation(
+                "Applied automatic rule {RuleId}, updated {UpdatedCount} transactions.",
+                rule.ID,
+                updatedCount
+            );
+        }
     }
 }

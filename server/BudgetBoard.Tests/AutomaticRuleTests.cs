@@ -316,7 +316,7 @@ public class AutomaticRuleTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Automatic  rule not found.");
+            .WithMessage("Automatic rule not found.");
     }
 
     [Fact]
@@ -387,6 +387,6 @@ public class AutomaticRuleTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Automatic  rule not found.");
+            .WithMessage("Automatic rule not found.");
     }
 }
