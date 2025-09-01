@@ -44,6 +44,11 @@ public static class TransactionCategoriesHelpers
     /// </returns>
     public static bool GetIsParentCategory(string category, IEnumerable<ICategory> customCategories)
     {
+        if (string.IsNullOrEmpty(category))
+        {
+            // Empty category is Uncategorized, which should be counted as a parent.
+            return true;
+        }
         var allCategories = GetAllCategories(customCategories);
         var foundCategory = allCategories.FirstOrDefault(c =>
             c.Value.Equals(category, StringComparison.CurrentCultureIgnoreCase)
