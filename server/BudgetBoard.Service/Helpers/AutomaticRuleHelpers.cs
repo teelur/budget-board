@@ -576,7 +576,9 @@ public static class AutomaticRuleHelpers
             }
             return updatedTransactions;
         }
-        $"Unsupported operator '{action.Operator}' in rule action."
+
+        throw new BudgetBoardServiceException(
+            $"Unsupported operator '{action.Operator}' in rule action."
         );
     }
 }
