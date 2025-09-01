@@ -469,7 +469,7 @@ public class SimpleFinService(
 
         foreach (var rule in rules)
         {
-            bool invalidConidition = false;
+            bool invalidCondition = false;
 
             var matchedTransactions = userData
                 .Accounts.SelectMany(a => a.Transactions)
@@ -494,12 +494,12 @@ public class SimpleFinService(
                         bbex.Message
                     );
 
-                    invalidConidition = true;
+                    invalidCondition = true;
                     break;
                 }
             }
 
-            if (invalidConidition)
+            if (invalidCondition)
             {
                 _logger.LogInformation(
                     "An error occurred in one of the conditions. Rule actions will not be applied."
