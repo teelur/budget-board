@@ -1,3 +1,5 @@
+import classes from "./GoalCardContent.module.css";
+
 import {
   ActionIcon,
   Badge,
@@ -44,15 +46,15 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   });
 
   return (
-    <Group wrap="nowrap">
+    <Group wrap="nowrap" className={classes.root}>
       <Stack w="100%" gap="0.1rem">
-        <Flex direction="row" justify="space-between">
-          <Group align="center" gap={10}>
+        <Flex className={classes.header}>
+          <Group align="center" gap={10} wrap="nowrap">
             <Text size="lg" fw={600}>
               {props.goal.name}
             </Text>
             {props.includeInterest && props.goal.interestRate && (
-              <Badge variant="light">
+              <Badge variant="light" flex="0 0 auto">
                 {props.goal.interestRate.toLocaleString(undefined, {
                   style: "percent",
                   minimumFractionDigits: 2,
@@ -104,7 +106,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             </Progress.Label>
           </Progress.Section>
         </Progress.Root>
-        <Flex direction="row" justify="space-between">
+        <Flex className={classes.footer}>
           <Group align="center" gap="sm">
             <Flex align="center" gap="0.25rem">
               <Text size="sm" fw={600} c="dimmed">
