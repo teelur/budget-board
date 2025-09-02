@@ -36,6 +36,7 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 - Create monthly budgets for categories and subcategories.
 - View aggregated budgets for multiple months.
 - Calculate net cash flow for the month.
+- Click on a budget to view more details such as monthly trends and associated transactions.
 
 #### Goals View
 
@@ -43,6 +44,7 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 - Estimate completion date given a monthly contribution.
 - Estimate monthly contibution given a target completion date.
 - Option to include interest rate in the calculations.
+- Click on a budget to view more details such as monthly trends and associated accounts.
 
 #### Trends View
 
@@ -58,8 +60,11 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 
 ### Screenshots
 
-<img width="80%" alt="dash" src="img/budget-board-dashboard.png" />
-<img width="80%" alt="dash" src="img/budget-board-budgets.png" />
+<img width="45%" alt="dash" src="img/budget-board-dashboard.png" />
+<img width="45%" alt="dash" src="img/budget-board-transactions.png" />
+<img width="45%" alt="dash" src="img/budget-board-budgets.png" />
+<img width="45%" alt="dash" src="img/budget-board-goals.png" />
+<img width="45%" alt="dash" src="img/budget-board-charts.png" />
 
 ## Configuration
 
