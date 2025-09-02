@@ -1,3 +1,5 @@
+import classes from "./EditableGoalCardContent.module.css";
+
 import {
   ActionIcon,
   Badge,
@@ -230,9 +232,9 @@ const EditableGoalCardContent = (
           doCompleteGoal.isPending
         }
       />
-      <Group wrap="nowrap">
+      <Group wrap="nowrap" className={classes.root}>
         <Stack w="100%" gap="0.1rem">
-          <Flex direction="row" justify="space-between">
+          <Flex className={classes.header}>
             <Group align="center" gap={10}>
               <TextInput
                 {...goalNameField.getInputProps()}
@@ -310,7 +312,7 @@ const EditableGoalCardContent = (
               </Progress.Label>
             </Progress.Section>
           </Progress.Root>
-          <Flex direction="row" justify="space-between">
+          <Flex className={classes.footer}>
             <Group align="center" gap="sm">
               <Flex align="center" gap="0.25rem">
                 <Text size="sm" fw={600} c="dimmed">
