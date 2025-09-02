@@ -15,12 +15,39 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 
 ### Features
 
-- Automatically sync your bank account data with [SimpleFIN](https://www.simplefin.org/)
+#### Data Aggregation
+
+- Automatically sync your bank account data (accounts, transactions, balances) with [SimpleFIN](https://www.simplefin.org/).
+- Import transactions via CSV files.
+- Manually add accounts and transactions.
+
+#### Dashboard View
+
 - Dashboard to view account data at a glance
-- Organize transactions into categories and subcategories
-- Create monthly budgets for categories and subcategories
-- Create and track goals for savings/loan payoff
-- Graphs to view trends over time (Spending, Assets, Liabilities, Net Worth, and more)
+
+#### Transactions View
+
+- Organize transactions into categories and subcategories.
+- Create custom categories to organize your transactions.
+- Create rules that automatically update transaction fields during sync when the specified conditions are met.
+
+#### Budgets View
+
+- Create monthly budgets for categories and subcategories.
+- View aggregated budgets for multiple months.
+- Calculate net cash flow for the month.
+
+#### Goals View
+
+- Create goals to track savings or loan payoff.
+- Estimate completion date given a monthly contribution.
+- Estimate monthly contibution given a target completion date.
+- Option to include interest rate in the calculations.
+
+#### Trends View
+
+- Several charts to view different metrics over time.
+- View monthly spending trends, monthly net cash flow, total assets, total liabilities, and total net worth charts.
 
 ### Feedback
 
