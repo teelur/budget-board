@@ -36,10 +36,6 @@ export interface ActionItemProps {
 }
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
-  const actionOperationField = useField<Operator>({
-    initialValue: ActionOperators[0]!,
-  });
-
   const { request } = React.useContext<any>(AuthContext);
 
   const userSettingsQuery = useQuery({
