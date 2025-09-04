@@ -70,7 +70,10 @@ export const FieldToOperatorType = new Map<string, OperatorTypes>([
   ["category", OperatorTypes.CATEGORY],
 ]);
 
-export const ActionOperation: string = "set";
+export const ActionOperators: Operator[] = [
+  { label: "Set", value: "set", type: [] },
+  { label: "Delete", value: "delete", type: [] },
+];
 
 export interface Operator {
   label: string;
