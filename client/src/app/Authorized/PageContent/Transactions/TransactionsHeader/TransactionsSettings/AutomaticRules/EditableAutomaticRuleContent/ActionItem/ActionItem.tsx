@@ -8,7 +8,6 @@ import {
   TextInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { useField } from "@mantine/form";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { Trash2Icon } from "lucide-react";
@@ -20,7 +19,6 @@ import { getCurrencySymbol } from "~/helpers/currency";
 import {
   ActionOperators,
   IRuleParameterEdit,
-  Operator,
   TransactionFields,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
@@ -173,10 +171,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
             )?.label ?? ""
           }
           onChange={(value) => {
-            actionOperationField.setValue(
-              ActionOperators.find((op) => op.label === value) ??
-                ActionOperators[0]!
-            );
             props.setRuleParameter({
               ...props.ruleParameter,
               operator:
