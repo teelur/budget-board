@@ -74,50 +74,56 @@ public class SimpleFinService(
 
     public async Task<IEnumerable<string>> SyncAsync(Guid userGuid)
     {
+        var errors = new List<string>();
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (string.IsNullOrEmpty(userData.AccessToken))
+        if (!string.IsNullOrEmpty(userData.AccessToken))
         {
-            throw new BudgetBoardServiceException("SimpleFIN key is not configured for this user.");
-        }
+            _logger.LogInformation("SimpleFIN token is configured. Syncing bank data.");
 
-        long startDate;
-        if (userData.LastSync == DateTime.MinValue)
-        {
-            // If we haven't synced before, sync the full 90 days of history
-            startDate =
-                ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - (UNIX_MONTH * 3);
+            long startDate;
+            if (userData.LastSync == DateTime.MinValue)
+            {
+                // If we haven't synced before, sync the full 90 days of history
+                startDate =
+                    ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - (UNIX_MONTH * 3);
+            }
+            else
+            {
+                var oneMonthAgo =
+                    ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - UNIX_MONTH;
+                var lastSyncWithBuffer =
+                    ((DateTimeOffset)userData.LastSync).ToUnixTimeSeconds() - UNIX_WEEK;
+
+                startDate = Math.Min(oneMonthAgo, lastSyncWithBuffer);
+            }
+
+            var simpleFinData = await GetAccountData(userData.AccessToken, startDate);
+            if (simpleFinData == null)
+            {
+                _logger.LogError("SimpleFin data not found.");
+                throw new BudgetBoardServiceException("SimpleFin data not found.");
+            }
+
+            await SyncInstitutionsAsync(userData, simpleFinData.Accounts);
+            await SyncAccountsAsync(userData, simpleFinData.Accounts);
+
+            await _applicationUserService.UpdateApplicationUserAsync(
+                userData.Id,
+                new ApplicationUserUpdateRequest { LastSync = _nowProvider.UtcNow }
+            );
+
+            errors.AddRange(simpleFinData.Errors);
         }
         else
         {
-            var oneMonthAgo =
-                ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - UNIX_MONTH;
-            var lastSyncWithBuffer =
-                ((DateTimeOffset)userData.LastSync).ToUnixTimeSeconds() - UNIX_WEEK;
-
-            startDate = Math.Min(oneMonthAgo, lastSyncWithBuffer);
+            _logger.LogInformation("SimpleFIN token is not configured. Skipping bank sync.");
         }
-
-        var simpleFinData = await GetAccountData(userData.AccessToken, startDate);
-        if (simpleFinData == null)
-        {
-            _logger.LogError("SimpleFin data not found.");
-            throw new BudgetBoardServiceException("SimpleFin data not found.");
-        }
-
-        await SyncInstitutionsAsync(userData, simpleFinData.Accounts);
-        await SyncAccountsAsync(userData, simpleFinData.Accounts);
 
         await SyncGoalsAsync(userData);
-
         await ApplyAutomaticRules(userData);
 
-        await _applicationUserService.UpdateApplicationUserAsync(
-            userData.Id,
-            new ApplicationUserUpdateRequest { LastSync = _nowProvider.UtcNow }
-        );
-
-        return simpleFinData.Errors;
+        return errors;
     }
 
     public async Task UpdateAccessTokenFromSetupToken(Guid userGuid, string setupToken)

@@ -6,6 +6,7 @@ import React from "react";
 
 import { translateAxiosError } from "~/helpers/requests";
 import {
+  ActionOperators,
   FieldToOperatorType,
   IAutomaticRuleRequest,
   IRuleParameterEdit,
@@ -40,12 +41,7 @@ const AddAutomaticRule = (): React.ReactNode => {
   const [actionItems, setActionItems] = React.useState<IRuleParameterEdit[]>([
     {
       field: defaultField,
-      operator:
-        Operators.find((op) =>
-          op.type.includes(
-            FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING
-          )
-        )?.value ?? "",
+      operator: ActionOperators.at(0)!.value,
       value: "",
     },
   ]);

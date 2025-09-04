@@ -45,6 +45,7 @@ public class AutomaticRuleConstants
     public readonly struct ActionOperators
     {
         public static readonly string Set = "set";
-        public static readonly IEnumerable<string> AllOperators = [Set];
+        public static readonly string Delete = "delete";
+        public static readonly IEnumerable<string> AllOperators = [Set, Delete];
     }
 }

@@ -17,7 +17,7 @@ import CategorySelect from "~/components/CategorySelect";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
-  ActionOperation,
+  ActionOperators,
   IRuleParameterEdit,
   TransactionFields,
 } from "~/models/automaticRule";
@@ -118,38 +118,68 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
     return null;
   };
 
+  const getCardContent = (): React.ReactNode => {
+    if (props.ruleParameter.operator === "delete") {
+      return (
+        <Text fw={600} size="sm">
+          the transaction
+        </Text>
+      );
+    } else if (props.ruleParameter.operator === "set") {
+      return (
+        <>
+          <Select
+            w="110px"
+            data={TransactionFields.map((field) => field.label)}
+            value={
+              TransactionFields.find(
+                (field) => field.value === props.ruleParameter.field
+              )?.label ?? ""
+            }
+            onChange={(value) =>
+              props.setRuleParameter({
+                ...props.ruleParameter,
+                field:
+                  TransactionFields.find((field) => field.label === value)
+                    ?.value ?? "",
+                value: getDefaultValue(
+                  TransactionFields.find((field) => field.label === value)
+                    ?.value ?? ""
+                ),
+              })
+            }
+          />
+          <Text size="sm" fw={600}>
+            to
+          </Text>
+          {getValueInput()}
+        </>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card p="0.5rem" radius="md">
       <Group gap="0.5rem">
-        <Text size="sm" fw={600}>
-          Set
-        </Text>
         <Select
-          w="110px"
-          data={TransactionFields.map((field) => field.label)}
+          w="90px"
+          data={ActionOperators.map((op) => op.label)}
           value={
-            TransactionFields.find(
-              (field) => field.value === props.ruleParameter.field
+            ActionOperators.find(
+              (op) => op.value === props.ruleParameter.operator
             )?.label ?? ""
           }
-          onChange={(value) =>
+          onChange={(value) => {
             props.setRuleParameter({
               ...props.ruleParameter,
-              field:
-                TransactionFields.find((field) => field.label === value)
-                  ?.value ?? "",
-              operator: ActionOperation,
-              value: getDefaultValue(
-                TransactionFields.find((field) => field.label === value)
-                  ?.value ?? ""
-              ),
-            })
-          }
+              operator:
+                ActionOperators.find((op) => op.label === value)?.value ??
+                ActionOperators[0]!.value,
+            });
+          }}
         />
-        <Text size="sm" fw={600}>
-          to
-        </Text>
-        {getValueInput()}
+        {getCardContent()}
         {props.allowDelete && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon

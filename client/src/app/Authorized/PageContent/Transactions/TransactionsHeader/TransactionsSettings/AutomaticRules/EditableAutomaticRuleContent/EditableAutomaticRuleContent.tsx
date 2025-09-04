@@ -4,6 +4,7 @@ import { PlusIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import {
+  ActionOperators,
   FieldToOperatorType,
   IRuleParameterEdit,
   Operators,
@@ -77,13 +78,8 @@ const EditableAutomaticRuleContent = (
     props.setActionItems((prev) => [
       ...prev,
       {
-        field: TransactionFields.at(0)?.value ?? "",
-        operator:
-          Operators.find((op) =>
-            op.type.includes(
-              FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING
-            )
-          )?.value ?? "",
+        field: TransactionFields.at(0)!.value,
+        operator: ActionOperators.at(0)!.value,
         value: "",
         type: "",
       },
