@@ -63,52 +63,80 @@ public static class AutomaticRuleHelpers
     )
     {
         if (
-            action.Field.Equals(
-                AutomaticRuleConstants.TransactionFields.Merchant,
+            action.Operator.Equals(
+                AutomaticRuleConstants.ActionOperators.Delete,
                 StringComparison.CurrentCultureIgnoreCase
             )
         )
         {
-            return await ApplyActionForMerchant(action, transactions, transactionService, userGuid);
-        }
-        else if (
-            action.Field.Equals(
-                AutomaticRuleConstants.TransactionFields.Category,
-                StringComparison.CurrentCultureIgnoreCase
-            )
-        )
-        {
-            return await ApplyActionForCategory(
-                action,
-                transactions,
-                allCategories,
-                transactionService,
-                userGuid
-            );
-        }
-        else if (
-            action.Field.Equals(
-                AutomaticRuleConstants.TransactionFields.Amount,
-                StringComparison.CurrentCultureIgnoreCase
-            )
-        )
-        {
-            return await ApplyActionForAmount(action, transactions, transactionService, userGuid);
-        }
-        else if (
-            action.Field.Equals(
-                AutomaticRuleConstants.TransactionFields.Date,
-                StringComparison.CurrentCultureIgnoreCase
-            )
-        )
-        {
-            return await ApplyActionForDate(action, transactions, transactionService, userGuid);
+            int deletedTransactions = 0;
+            foreach (var transaction in transactions)
+            {
+                await transactionService.DeleteTransactionAsync(userGuid, transaction.ID);
+                deletedTransactions++;
+            }
+            return deletedTransactions;
         }
         else
         {
-            throw new BudgetBoardServiceException(
-                $"Unsupported field '{action.Field}' in rule action."
-            );
+            if (
+                action.Field.Equals(
+                    AutomaticRuleConstants.TransactionFields.Merchant,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
+            {
+                return await ApplyActionForMerchant(
+                    action,
+                    transactions,
+                    transactionService,
+                    userGuid
+                );
+            }
+            else if (
+                action.Field.Equals(
+                    AutomaticRuleConstants.TransactionFields.Category,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
+            {
+                return await ApplyActionForCategory(
+                    action,
+                    transactions,
+                    allCategories,
+                    transactionService,
+                    userGuid
+                );
+            }
+            else if (
+                action.Field.Equals(
+                    AutomaticRuleConstants.TransactionFields.Amount,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
+            {
+                return await ApplyActionForAmount(
+                    action,
+                    transactions,
+                    transactionService,
+                    userGuid
+                );
+            }
+            else if (
+                action.Field.Equals(
+                    AutomaticRuleConstants.TransactionFields.Date,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
+            {
+                return await ApplyActionForDate(action, transactions, transactionService, userGuid);
+            }
+            else
+            {
+                throw new BudgetBoardServiceException(
+                    $"Unsupported field '{action.Field}' in rule action."
+                );
+            }
         }
     }
 
