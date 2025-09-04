@@ -72,6 +72,7 @@ public static class AutomaticRuleHelpers
             int deletedTransactions = 0;
             foreach (var transaction in transactions)
             {
+                // TODO: Add batch delete
                 await transactionService.DeleteTransactionAsync(userGuid, transaction.ID);
                 deletedTransactions++;
             }
