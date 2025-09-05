@@ -71,6 +71,13 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
           Goal Details
         </Text>
       }
+      styles={{
+        inner: {
+          left: "0",
+          right: "0",
+          padding: "0 !important",
+        },
+      }}
     >
       {props.goal === null ? (
         <Skeleton height={425} radius="lg" />
