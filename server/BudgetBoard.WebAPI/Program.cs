@@ -61,13 +61,13 @@ if (string.IsNullOrEmpty(postgresUser))
 
 var postgresPassword = builder.Configuration.GetValue<string>("POSTGRES_PASSWORD");
 
-var postgresPort = builder.Configuration.GetValue<string>("POSTGRES_PORT") ?? "5432";
+var postgresPort = builder.Configuration.GetValue<int?>("POSTGRES_PORT") ?? 5432;
 
 var connectionString = new string(
     "Host={HOST};Port={PORT};Database={DATABASE};Username={USER};Password={PASSWORD}"
 )
     .Replace("{HOST}", postgresHost)
-    .Replace("{PORT}", postgresPort)
+    .Replace("{PORT}", postgresPort.ToString())
     .Replace("{DATABASE}", postgresDatabase)
     .Replace("{USER}", postgresUser)
     .Replace("{PASSWORD}", postgresPassword);
