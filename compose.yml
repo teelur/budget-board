@@ -15,7 +15,9 @@ services:
     networks:
       - budget-board-network
     depends_on:
-      - budget-board-db
+      budget-board-db:
+        condition: service_healthy
+
   budget-board-client:
     container_name: budget-board-client
     restart: unless-stopped
@@ -44,6 +46,11 @@ services:
       - db-data:/var/lib/postgresql/data
     networks:
       - budget-board-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d budgetboard"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db-data:
