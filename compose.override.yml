@@ -2,6 +2,7 @@ services:
   budget-board-server:
     environment:
       POSTGRES_HOST: budget-board-db
+      POSTGRES_PORT: 5432
       POSTGRES_DATABASE: budgetboard
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: superSecretPassword
