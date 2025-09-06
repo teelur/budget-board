@@ -1,5 +1,8 @@
 name: Run Dotnet Unit Tests
 
+permissions:
+  contents: read
+
 on:
   pull_request:
 
