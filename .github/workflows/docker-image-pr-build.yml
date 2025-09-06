@@ -1,4 +1,6 @@
 name: Build Docker Images
+permissions:
+  contents: read
 
 on:
   pull_request:
