@@ -60,9 +60,11 @@ jobs:
         run: echo "No build-relevant changes detected — skipping Docker build."
 
       - name: Set up Docker Buildx
+        if: ${{ env.BUILD_CHANGED == 'true' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Set up QEMU
+        if: ${{ env.BUILD_CHANGED == 'true' }}
         uses: docker/setup-qemu-action@v3
 
       - name: Extract metadata (tags, labels) for Docker
