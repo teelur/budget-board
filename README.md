@@ -9,6 +9,10 @@
 
 A simple app for tracking monthly spending and working towards financial goals.
 
+## Getting Started
+
+Check out the [wiki](https://budgetboard.net/) for instructions on how to setup Budget Board.
+
 ## About The Project
 
 I created this app to be a self-hosted alternative to the now-shut-down personal finance app Mint.
@@ -65,7 +69,3 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 <img width="45%" alt="dash" src="img/budget-board-budgets.png" />
 <img width="45%" alt="dash" src="img/budget-board-goals.png" />
 <img width="45%" alt="dash" src="img/budget-board-charts.png" />
-
-## Getting Started
-
-Check out the [wiki](https://budgetboard.net/) for instructions on how to setup Budget Board.
