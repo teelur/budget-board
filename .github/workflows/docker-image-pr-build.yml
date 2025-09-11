@@ -4,20 +4,6 @@ permissions:
 
 on:
   pull_request:
-    # Prevent the workflow from running when only documentation, images,
-    # or other non-code assets are changed. Update these patterns to
-    # match the files you want to exclude from push-triggered runs.
-    paths-ignore:
-      - "README.md"
-      - "img/**"
-      - "docs/**"
-      - ".github/**"
-      - ".gitignore"
-      - ".gitattributes"
-      - ".dockerignore"
-      - "compose.yml"
-      - "compose.override.yml"
-      - "LICENSE"
 
 jobs:
   build:
@@ -38,6 +24,41 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Determine changed paths
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            build:
+              - 'client/**'
+              - 'server/**'
+              - 'client/**/package.json'
+              - 'server/**/Dockerfile'
+              - 'compose.yml'
+              - 'compose.override.yml'
+            docs:
+              - 'README.md'
+              - 'img/**'
+              - 'docs/**'
+              - '.github/**'
+              - '.gitignore'
+              - '.gitattributes'
+              - '.dockerignore'
+              - 'LICENSE'
+
+      # Note: static YAML linters may report errors about accessing
+      # `steps.changes.outputs.build` or `env.BUILD_CHANGED`. These are
+      # false positives because the value is provided at runtime by
+      # `dorny/paths-filter`. GitHub Actions supports these expressions
+      # and the workflow will evaluate them correctly during execution.
+      - name: Export build flag
+        run: |
+          echo "BUILD_CHANGED=${{ steps.changes.outputs['build'] }}" >> $GITHUB_ENV
+
+      - name: Skip build (only docs/images changed)
+        if: ${{ env.BUILD_CHANGED == 'false' }}
+        run: echo "No build-relevant changes detected — skipping Docker build."
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -45,12 +66,14 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Extract metadata (tags, labels) for Docker
+        if: ${{ env.BUILD_CHANGED == 'true' }}
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ matrix.image }}
 
       - name: Build the Docker image
+        if: ${{ env.BUILD_CHANGED == 'true' }}
         id: push
         uses: docker/build-push-action@v6
         with:
