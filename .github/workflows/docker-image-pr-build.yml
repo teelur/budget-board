@@ -4,6 +4,20 @@ permissions:
 
 on:
   pull_request:
+    # Prevent the workflow from running when only documentation, images,
+    # or other non-code assets are changed. Update these patterns to
+    # match the files you want to exclude from push-triggered runs.
+    paths-ignore:
+      - "README.md"
+      - "img/**"
+      - "docs/**"
+      - ".github/**"
+      - ".gitignore"
+      - ".gitattributes"
+      - ".dockerignore"
+      - "compose.yml"
+      - "compose.override.yml"
+      - "LICENSE"
 
 jobs:
   build:
