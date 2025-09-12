@@ -69,7 +69,7 @@ export const getCurrencySymbol = (currency?: string): string => {
     }).formatToParts(1);
 
     const symbolPart = parts.find((p) => p.type === "currency");
-    if (symbolPart && symbolPart.value) {
+    if (symbolPart && symbolPart.value !== undefined) {
       return symbolPart.value;
     }
   } catch (e) {
