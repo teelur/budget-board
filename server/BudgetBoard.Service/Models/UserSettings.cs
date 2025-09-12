@@ -15,7 +15,7 @@ public class UserSettingsResponse : IUserSettingsResponse
     [JsonConstructor]
     public UserSettingsResponse()
     {
-        Currency = Database.Models.Currency.USD.ToString();
+        Currency = "USD";
     }
 
     public UserSettingsResponse(UserSettings userSettings)
@@ -36,6 +36,6 @@ public class UserSettingsUpdateRequest : IUserSettingsUpdateRequest
     [JsonConstructor]
     public UserSettingsUpdateRequest()
     {
-        Currency = Database.Models.Currency.USD.ToString();
+        Currency = "USD";
     }
 }
