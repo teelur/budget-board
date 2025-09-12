@@ -15,7 +15,7 @@ export const convertNumberToCurrency = (
   currency: string
 ) => {
   // Adding 0 to avoid -0 for the output.
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(undefined, {
     style: "currency",
     currency,
     maximumFractionDigits: shouldIncludeCents ? 2 : 0,
