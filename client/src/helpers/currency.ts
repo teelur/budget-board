@@ -73,6 +73,7 @@ export const getCurrencySymbol = (currency?: string): string => {
       return symbolPart.value;
     }
   } catch (e) {
+    console.error(`Error extracting currency symbol for "${currency}":`, e);
     return currency.toUpperCase();
   }
 
