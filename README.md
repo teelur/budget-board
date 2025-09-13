@@ -9,6 +9,10 @@
 
 A simple app for tracking monthly spending and working towards financial goals.
 
+## Getting Started
+
+Check out the [wiki](https://budgetboard.net/) for instructions on how to setup Budget Board.
+
 ## About The Project
 
 I created this app to be a self-hosted alternative to the now-shut-down personal finance app Mint.
@@ -65,26 +69,3 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 <img width="45%" alt="dash" src="img/budget-board-budgets.png" />
 <img width="45%" alt="dash" src="img/budget-board-goals.png" />
 <img width="45%" alt="dash" src="img/budget-board-charts.png" />
-
-## Configuration
-
-### Setting up Docker Compose
-
-This project is deployed using Docker Compose.
-
-The `compose.yml` and `compose.override.yml` files are used to deploy the app.
-Both files are able to deploy the app as is, but it is recommended to at least update the database password.
-
-See the [wiki](https://github.com/teelur/budget-board/wiki/Deploying-via-Docker-Compose) for more details about configuring the compose override file.
-
-### Deploy
-
-Deploy the app by running the following command:
-
-```
-docker compose up -d
-```
-
-You can now access the app at `localhost:6253`.
-
-Check out the [wiki](https://github.com/teelur/budget-board/wiki) for more details about configuration and using the app :)

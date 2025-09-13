@@ -118,9 +118,7 @@ public class UserSettingsServiceTests
         );
 
         // Assert
-        helper
-            .demoUser.UserSettings.Currency.Should()
-            .Be(Enum.Parse<Currency>(userSettingsUpdateRequest.Currency));
+        helper.demoUser.UserSettings.Currency.Should().Be(userSettingsUpdateRequest.Currency);
     }
 
     [Fact]

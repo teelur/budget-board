@@ -47,19 +47,7 @@ public class UserSettingsService(
             throw new BudgetBoardServiceException("User settings not found.");
         }
 
-        if (Enum.TryParse(userSettingsUpdateRequest.Currency, true, out Currency currencyEnum))
-        {
-            userSettings.Currency = currencyEnum;
-        }
-        else
-        {
-            _logger.LogError(
-                "Invalid currency provided: {Currency} for user with ID {UserId}",
-                userSettingsUpdateRequest.Currency,
-                userGuid
-            );
-            throw new BudgetBoardServiceException("Invalid currency provided.");
-        }
+        userSettings.Currency = userSettingsUpdateRequest.Currency;
 
         await _userDataContext.SaveChangesAsync();
     }
