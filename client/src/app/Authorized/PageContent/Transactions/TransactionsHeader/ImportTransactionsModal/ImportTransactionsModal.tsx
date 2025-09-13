@@ -44,34 +44,6 @@ const ImportTransactionsModal = () => {
     Map<ITransactionImportTableData, ITransaction>
   >(new Map<ITransactionImportTableData, ITransaction>());
 
-  // CSV Options
-  const fileField = useField<File | null>({
-    initialValue: null,
-    validateOnBlur: true,
-    validate: (value) => {
-      if (!value) {
-        return;
-      }
-      if (value.type !== "text/csv") {
-        return "File must be a CSV file";
-      }
-      return null;
-    },
-  });
-  const delimiterField = useField<string>({
-    initialValue: ",",
-    validateOnBlur: true,
-    validate: (value) => {
-      if (!value) {
-        return "Delimiter is required";
-      }
-      if (value.length > 1) {
-        return "Delimiter must be a single character";
-      }
-      return null;
-    },
-  });
-
   // Columns Fields
   const dateField = useField<string | null>({
     initialValue: null,
@@ -238,8 +210,6 @@ const ImportTransactionsModal = () => {
   };
 
   const resetData = () => {
-    fileField.reset();
-
     setHeaders([]);
     setCsvData([]);
     setImportedTransactionsTableData([]);
@@ -257,11 +227,9 @@ const ImportTransactionsModal = () => {
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
 
-  const importCsvFile = async () => {
+  const importCsvFile = async (file: File, delimiter: string) => {
     try {
       setIsLoading(true);
-      const file = fileField.getValue();
-      const delimiter = delimiterField.getValue();
 
       // We don't want to parse the file if the user hasn't defined the file or delimiter.
       if (
@@ -270,6 +238,11 @@ const ImportTransactionsModal = () => {
         !delimiter ||
         delimiter.length !== 1
       ) {
+        notifications.show({
+          color: "red",
+          message: "Please provide a valid CSV file and delimiter",
+        });
+        resetData();
         return;
       }
 
@@ -278,7 +251,15 @@ const ImportTransactionsModal = () => {
         header: true,
         skipEmptyLines: true,
         dynamicTyping: true,
-        delimiter,
+        delimitersToGuess: [
+          ",",
+          "\t",
+          "|",
+          ";",
+          Papa.RECORD_SEP,
+          Papa.UNIT_SEP,
+          delimiter,
+        ],
       });
 
       // Display any errors that occurred during parsing.
@@ -353,13 +334,6 @@ const ImportTransactionsModal = () => {
       setIsLoading(false);
     }
   };
-
-  React.useEffect(() => {
-    const runImport = async () => {
-      await importCsvFile();
-    };
-    runImport();
-  }, [fileField.getValue(), delimiterField.getValue()]);
 
   const buildTableData = () => {
     try {
@@ -759,13 +733,7 @@ const ImportTransactionsModal = () => {
       >
         <LoadingOverlay visible={isLoading} />
         <Stack>
-          <CsvOptions
-            fileField={fileField.getValue()}
-            setFileField={fileField.setValue}
-            delimiterField={delimiterField.getValue()}
-            setDelimiterField={delimiterField.setValue}
-            resetData={resetData}
-          />
+          <CsvOptions loadCsv={importCsvFile} />
           {importedTransactionsTableData.length > 0 && (
             <TransactionsTable
               tableData={importedTransactionsTableData}
@@ -828,15 +796,17 @@ const ImportTransactionsModal = () => {
               setAccountNameToAccountIdMap={setAccountNameToAccountIdMap}
             />
           )}
-          <Button
-            onClick={onSubmit}
-            loading={doImportMutation.isPending}
-            disabled={
-              doImportMutation.isPending || filteredImportedData.length === 0
-            }
-          >
-            Import {filteredImportedData.length} Transactions
-          </Button>
+          {importedTransactionsTableData.length > 0 && (
+            <Button
+              onClick={onSubmit}
+              loading={doImportMutation.isPending}
+              disabled={
+                doImportMutation.isPending || filteredImportedData.length === 0
+              }
+            >
+              Import {filteredImportedData.length} Transactions
+            </Button>
+          )}
         </Stack>
       </Modal>
     </>
