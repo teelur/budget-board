@@ -63,7 +63,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
         <Select
           label="Date format"
           data={dateFormatOptions}
-          clearable
           value={props.dateFormat}
           onChange={(value) => {
             props.setDateFormat(value ?? "");
