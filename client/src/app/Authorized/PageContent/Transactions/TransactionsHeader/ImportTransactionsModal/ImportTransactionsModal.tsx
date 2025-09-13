@@ -227,45 +227,34 @@ const ImportTransactionsModal = () => {
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
 
-  const importCsvFile = async (file: File, delimiter: string) => {
+  const importCsvFile = async (file: File, delimiter: string | null) => {
     try {
       setIsLoading(true);
 
-      // We don't want to parse the file if the user hasn't defined the file or delimiter.
-      if (
-        !file ||
-        file.type !== "text/csv" ||
-        !delimiter ||
-        delimiter.length !== 1
-      ) {
-        notifications.show({
-          color: "red",
-          message: "Please provide a valid CSV file and delimiter",
-        });
-        resetData();
-        return;
+      const delimitersToGuess = [
+        ",",
+        "\t",
+        "|",
+        ";",
+        Papa.RECORD_SEP,
+        Papa.UNIT_SEP,
+      ];
+      if (delimiter && delimiter.length > 0) {
+        delimitersToGuess.push(delimiter);
       }
 
       const text = await file.text();
-      const parsed = Papa.parse(text, {
+      const parsedText = Papa.parse(text, {
         header: true,
         skipEmptyLines: true,
         dynamicTyping: true,
-        delimitersToGuess: [
-          ",",
-          "\t",
-          "|",
-          ";",
-          Papa.RECORD_SEP,
-          Papa.UNIT_SEP,
-          delimiter,
-        ],
+        delimitersToGuess,
       });
 
       // Display any errors that occurred during parsing.
-      if (parsed.errors.length > 0) {
+      if (parsedText.errors.length > 0) {
         const uniqueErrorMessages = Array.from(
-          new Set(parsed.errors.map((error) => error.message))
+          new Set(parsedText.errors.map((error) => error.message))
         );
 
         uniqueErrorMessages.forEach((errorMessage) => {
@@ -279,7 +268,7 @@ const ImportTransactionsModal = () => {
         return;
       }
 
-      if (parsed.data.length === 0) {
+      if (parsedText.data.length === 0) {
         notifications.show({
           color: "red",
           message: "CSV file is empty",
@@ -288,48 +277,54 @@ const ImportTransactionsModal = () => {
         return;
       }
 
-      if (parsed.meta.fields) {
-        setHeaders(parsed.meta.fields);
+      if (parsedText.meta.fields) {
+        setHeaders(parsedText.meta.fields);
       } else {
         notifications.show({
           color: "red",
-          message: "CSV file has no headers",
+          message: "CSV file is missing a header row",
         });
         resetData();
         return;
       }
 
       setCsvData(
-        parsed.data.map((row: any, idx: number) => ({ ...row, uid: idx }))
+        parsedText.data.map((row: any, idx: number) => ({ ...row, uid: idx }))
       );
       resetColumnsOptions();
 
       // The headers will auto-populate if they match the default values
       dateField.setValue(
-        parsed.meta.fields?.find((header) =>
+        parsedText.meta.fields?.find((header) =>
           areStringsEqual(header.toLowerCase(), "date")
         ) ?? null
       );
       descriptionField.setValue(
-        parsed.meta.fields?.find((header) =>
+        parsedText.meta.fields?.find((header) =>
           areStringsEqual(header.toLowerCase(), "description")
         ) ?? null
       );
       categoryField.setValue(
-        parsed.meta.fields?.find((header) =>
+        parsedText.meta.fields?.find((header) =>
           areStringsEqual(header.toLowerCase(), "category")
         ) ?? null
       );
       amountField.setValue(
-        parsed.meta.fields?.find((header) =>
+        parsedText.meta.fields?.find((header) =>
           areStringsEqual(header.toLowerCase(), "amount")
         ) ?? null
       );
       accountField.setValue(
-        parsed.meta.fields?.find((header) =>
+        parsedText.meta.fields?.find((header) =>
           areStringsEqual(header.toLowerCase(), "account")
         ) ?? null
       );
+    } catch (error) {
+      notifications.show({
+        color: "red",
+        message: `Error reading file: ${error}`,
+      });
+      resetData();
     } finally {
       setIsLoading(false);
     }

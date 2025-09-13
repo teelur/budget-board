@@ -9,10 +9,11 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import React from "react";
 
 interface CsvOptionsProps {
-  loadCsv: (file: File, delimiter: string) => void;
+  loadCsv: (file: File, delimiter: string | null) => void;
 }
 
 const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
@@ -33,6 +34,9 @@ const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
     initialValue: ",",
     validateOnBlur: true,
     validate: (value) => {
+      if (useDelimiter.getValue() === false) {
+        return null;
+      }
       if (!value) {
         return "Delimiter is required";
       }
@@ -84,13 +88,27 @@ const CsvOptions = (props: CsvOptionsProps): React.ReactNode => {
         <Button
           onClick={() => {
             const file = fileField.getValue();
-            const delimiter = delimiterField.getValue();
-            if (
-              file &&
-              delimiter &&
-              !fileField.error &&
-              !delimiterField.error
-            ) {
+            const delimiter = useDelimiter.getValue()
+              ? delimiterField.getValue()
+              : null;
+
+            if (!file || fileField.error) {
+              notifications.show({
+                color: "red",
+                message: "Please provide a valid CSV file",
+              });
+              return;
+            }
+
+            if (useDelimiter.getValue() && delimiterField.error) {
+              notifications.show({
+                color: "red",
+                message: "Please provide a valid delimiter",
+              });
+              return;
+            }
+
+            if (file && !fileField.error) {
               props.loadCsv(file, delimiter);
             }
           }}
