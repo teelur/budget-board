@@ -67,7 +67,7 @@ const AccountMapping = (props: AccountMappingProps) => {
   );
 
   return (
-    <Stack gap="0.5rem" miw={400} maw="100%">
+    <Stack gap="0.5rem" w={800} maw="100%">
       <Divider label="Account Mapping" labelPosition="center" />
       {Array.from(props.accountNameToAccountIdMap.entries()).map(
         ([accountName, accountId]) => (

@@ -1,4 +1,4 @@
-import { Button, Modal, Text, useModalsStack } from "@mantine/core";
+import { Button, Modal, Stepper, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -15,8 +15,13 @@ import {
 import LoadCsv, { CsvRow } from "./LoadCsv/LoadCsv";
 import AccountMapping from "./AccountMapping/AccountMapping";
 import ConfigureTransactions from "./ConfigureTransactions/ConfigureTransactions";
+import { useDisclosure } from "@mantine/hooks";
+import ImportCompleted from "./ImportCompleted/ImportCompleted";
 
 const ImportTransactionsModal = () => {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [activeStep, setActiveStep] = React.useState(0);
+
   // Load CSV Dialog Data
   const [headers, setHeaders] = React.useState<string[]>([]);
   const [csvData, setCsvData] = React.useState<CsvRow[]>([]);
@@ -92,10 +97,7 @@ const ImportTransactionsModal = () => {
         data: importedTransactions,
       }),
     onSuccess: async () => {
-      notifications.show({
-        color: "green",
-        message: "Transactions imported successfully",
-      });
+      setActiveStep(3);
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
     onError: (error: AxiosError) => {
@@ -133,17 +135,11 @@ const ImportTransactionsModal = () => {
     doImportMutation.mutate(transactionImportRequest);
   };
 
-  const stack = useModalsStack([
-    "load-csv",
-    "configure-import",
-    "account-mapping",
-  ]);
-
   const advanceToAccountMappingDialog = (
     importData: ITransactionImportTableData[]
   ) => {
     setImportData(importData);
-    stack.open("account-mapping");
+    setActiveStep(2);
   };
 
   return (
@@ -151,54 +147,59 @@ const ImportTransactionsModal = () => {
       <Button
         size="sm"
         rightSection={<ImportIcon size="1rem" />}
-        onClick={() => stack.open("load-csv")}
+        onClick={() => {
+          resetData();
+          setActiveStep(0);
+          open();
+        }}
       >
         Import
       </Button>
-      <Modal.Stack>
-        <Modal
-          {...stack.register("load-csv")}
-          size="auto"
-          p="0.5rem"
-          title={<Text fw={600}>Load CSV</Text>}
-          onClose={() => stack.closeAll()}
+      <Modal
+        opened={opened}
+        onClose={close}
+        size="auto"
+        p="0.5rem"
+        title={<Text fw={600}>Import Transactions</Text>}
+      >
+        <Stepper
+          active={activeStep}
+          allowNextStepsSelect={false}
+          w="100%"
+          mb="1rem"
         >
-          <LoadCsv
-            loadCsv={importCsvData}
-            launchNextDialog={() => stack.open("configure-import")}
-          />
-        </Modal>
-        <Modal
-          {...stack.register("configure-import")}
-          size="auto"
-          p="0.5rem"
-          title={<Text fw={600}>Configure Transactions</Text>}
-          onClose={() => stack.closeAll()}
-        >
-          <ConfigureTransactions
-            csvData={csvData}
-            csvHeaders={headers}
-            advanceToNextDialog={advanceToAccountMappingDialog}
-            goBackToPreviousDialog={() => stack.close("configure-import")}
-          />
-        </Modal>
-        <Modal
-          {...stack.register("account-mapping")}
-          size="auto"
-          p="0.5rem"
-          title={<Text fw={600}>Account Mapping</Text>}
-          onClose={() => stack.closeAll()}
-        >
-          <AccountMapping
-            importedTransactions={importData}
-            accountNameToAccountIdMap={accountNameToAccountIdMap}
-            setAccountNameToAccountIdMap={setAccountNameToAccountIdMap}
-            goBackToPreviousDialog={() => stack.close("account-mapping")}
-            submitImport={onSubmit}
-            isSubmitting={doImportMutation.isPending}
-          />
-        </Modal>
-      </Modal.Stack>
+          <Stepper.Step label="Step 1" description="Load CSV">
+            <LoadCsv
+              loadCsv={importCsvData}
+              launchNextDialog={() => setActiveStep(1)}
+            />
+          </Stepper.Step>
+          <Stepper.Step label="Step 2" description="Configure Transactions">
+            <ConfigureTransactions
+              csvData={csvData}
+              csvHeaders={headers}
+              advanceToNextDialog={advanceToAccountMappingDialog}
+              goBackToPreviousDialog={() => setActiveStep(0)}
+            />
+          </Stepper.Step>
+          <Stepper.Step label="Step 3" description="Map Accounts">
+            <AccountMapping
+              importedTransactions={importData}
+              accountNameToAccountIdMap={accountNameToAccountIdMap}
+              setAccountNameToAccountIdMap={setAccountNameToAccountIdMap}
+              goBackToPreviousDialog={() => setActiveStep(1)}
+              submitImport={onSubmit}
+              isSubmitting={doImportMutation.isPending}
+            />
+          </Stepper.Step>
+          <Stepper.Completed>
+            <ImportCompleted
+              goBackToPreviousDialog={() => setActiveStep(2)}
+              closeModal={close}
+            />
+          </Stepper.Completed>
+        </Stepper>
+      </Modal>
     </>
   );
 };

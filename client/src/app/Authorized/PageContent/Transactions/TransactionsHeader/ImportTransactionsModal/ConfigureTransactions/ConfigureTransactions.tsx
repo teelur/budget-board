@@ -702,7 +702,7 @@ const ConfigureTransactions = (
   };
 
   return (
-    <Stack gap="0.5rem" miw={400} maw="100%">
+    <Stack gap="0.5rem" w="auto" maw="100%">
       {alertDetails && (
         <Alert
           variant="outline"

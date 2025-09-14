@@ -119,7 +119,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="0.5rem" w={400} maw="100%">
+    <Stack gap="0.5rem" w={600} maw="100%">
       <LoadingOverlay visible={isPending} />
       <FileInput
         {...fileField.getInputProps()}
@@ -130,7 +130,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
           </Text>
         }
       />
-      <Group align="center" w="100%" wrap="nowrap" gap="0.5rem">
+      <Group align="center" w="100%" wrap="wrap" gap="0.5rem">
         <Switch
           label={
             <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
