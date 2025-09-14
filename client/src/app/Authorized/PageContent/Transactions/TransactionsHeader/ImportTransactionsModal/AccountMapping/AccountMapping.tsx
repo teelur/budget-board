@@ -1,4 +1,4 @@
-import { Stack, Divider } from "@mantine/core";
+import { Stack, Divider, Group, Button } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -6,6 +6,9 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import { IAccount } from "~/models/account";
 import AccountMappingItem from "./AccountMappingItem/AccountMappingItem";
+import { ITransactionImportTableData } from "~/models/transaction";
+import { MoveLeftIcon } from "lucide-react";
+import { areStringsEqual } from "~/helpers/utils";
 
 export interface IAccountItem {
   value: string;
@@ -13,10 +16,13 @@ export interface IAccountItem {
 }
 
 interface AccountMappingProps {
+  importedTransactions: ITransactionImportTableData[];
   accountNameToAccountIdMap: Map<string, string>;
   setAccountNameToAccountIdMap: React.Dispatch<
     React.SetStateAction<Map<string, string>>
   >;
+  goBackToPreviousDialog: () => void;
+  submitImport: (filteredImportData: ITransactionImportTableData[]) => void;
 }
 
 const AccountMapping = (props: AccountMappingProps) => {
@@ -47,8 +53,20 @@ const AccountMapping = (props: AccountMappingProps) => {
       label: account.name,
     }));
 
+  const filteredImportData = props.importedTransactions.filter(
+    (t) =>
+      !areStringsEqual(
+        props.accountNameToAccountIdMap.get(t.account ?? "") ?? "",
+        "exclude"
+      ) &&
+      !areStringsEqual(
+        props.accountNameToAccountIdMap.get(t.account ?? "") ?? "",
+        ""
+      )
+  );
+
   return (
-    <Stack>
+    <Stack gap="0.5rem" miw={400} maw="100%">
       <Divider label="Account Mapping" labelPosition="center" />
       {Array.from(props.accountNameToAccountIdMap.entries()).map(
         ([accountName, accountId]) => (
@@ -67,6 +85,22 @@ const AccountMapping = (props: AccountMappingProps) => {
           />
         )
       )}
+      <Group w="100%">
+        <Button
+          flex="1 1 auto"
+          onClick={() => props.goBackToPreviousDialog()}
+          leftSection={<MoveLeftIcon size={16} />}
+        >
+          Back
+        </Button>
+        <Button
+          flex="1 1 auto"
+          onClick={() => props.submitImport(filteredImportData)}
+          disabled={filteredImportData.length === 0}
+        >
+          Import {filteredImportData.length} Transactions
+        </Button>
+      </Group>
     </Stack>
   );
 };
