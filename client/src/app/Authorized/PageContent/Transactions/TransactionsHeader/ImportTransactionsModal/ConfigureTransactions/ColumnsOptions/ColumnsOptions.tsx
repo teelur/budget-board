@@ -182,7 +182,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                 {...expensesColumnField.getInputProps()}
               />
             )}
-            {expensesColumnValueField.getValue() && (
+            {expensesColumnField.getValue() && (
               <Select
                 label="Expenses value"
                 data={
