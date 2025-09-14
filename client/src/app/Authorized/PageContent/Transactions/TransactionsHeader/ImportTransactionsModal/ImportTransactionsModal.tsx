@@ -333,6 +333,9 @@ const ImportTransactionsModal = () => {
   const buildTableData = () => {
     try {
       setIsLoading(true);
+
+      // When no columns are mapped, we want to clear out all data, so we can start
+      // fresh when the user maps new columns.
       if (
         !dateField.getValue() &&
         !descriptionField.getValue() &&
@@ -350,6 +353,8 @@ const ImportTransactionsModal = () => {
         return;
       }
 
+      // The include expenses column option has some additional configuration that
+      // we want to reset if the user disables it.
       if (!includeExpensesColumnField.getValue()) {
         expensesColumnField.reset();
         expensesColumnValueField.reset();
@@ -550,6 +555,12 @@ const ImportTransactionsModal = () => {
       });
 
       setAccountNameToAccountIdMap(accountNameToAccountIdMap);
+    } catch (error) {
+      notifications.show({
+        color: "red",
+        message: `Error processing CSV data: ${error}`,
+      });
+      resetData();
     } finally {
       setIsLoading(false);
     }
