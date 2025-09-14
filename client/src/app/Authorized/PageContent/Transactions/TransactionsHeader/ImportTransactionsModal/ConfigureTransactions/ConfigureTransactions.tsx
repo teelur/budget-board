@@ -395,13 +395,16 @@ const ConfigureTransactions = (
   const applyExpensesColumn = (transactions: ITransactionImportTableData[]) => {
     if (
       columnsOptions.includeExpensesColumn &&
-      columnsOptions.expensesColumn &&
-      columnsOptions.expensesColumn.length > 0
+      (columnsOptions.expensesColumn?.length ?? 0) > 0 &&
+      (columnsOptions.expensesColumnValue?.length ?? 0) > 0
     ) {
       transactions.forEach((transaction) => {
         if (
-          transaction.type &&
-          transaction.type.toString() === columnsOptions.expensesColumn &&
+          transaction.type != null &&
+          areStringsEqual(
+            transaction.type.toString(),
+            columnsOptions.expensesColumnValue!
+          ) &&
           transaction.amount
         ) {
           transaction.amount *= -1;

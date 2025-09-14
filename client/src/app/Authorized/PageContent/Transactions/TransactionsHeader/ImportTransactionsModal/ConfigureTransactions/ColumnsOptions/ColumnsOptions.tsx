@@ -88,9 +88,9 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
 
   React.useEffect(() => {
     if (splitAmountField.getValue()) {
-      includeExpensesColumnField.reset();
-      expensesColumnField.reset();
-      expensesColumnValueField.reset();
+      includeExpensesColumnField.setValue(false);
+      expensesColumnField.setValue(null);
+      expensesColumnValueField.setValue(null);
     }
   }, [splitAmountField.getValue()]);
 
@@ -127,8 +127,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
     dateFormatField.getValue(),
     invertAmountField.getValue(),
     splitAmountField.getValue(),
-    includeExpensesColumnField.getValue(),
-    expensesColumnField.getValue(),
     expensesColumnValueField.getValue(),
     filterDuplicatesField.getValue(),
     filterByDateField.getValue(),
@@ -137,6 +135,13 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
     filterByAmountField.getValue(),
     filterByAccountField.getValue(),
   ]);
+
+  React.useEffect(() => {
+    if (!includeExpensesColumnField.getValue()) {
+      expensesColumnField.setValue(null);
+      expensesColumnValueField.setValue(null);
+    }
+  }, [includeExpensesColumnField.getValue()]);
 
   return (
     <Stack>
@@ -182,18 +187,19 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                 {...expensesColumnField.getInputProps()}
               />
             )}
-            {expensesColumnField.getValue() && (
-              <Select
-                label="Expenses value"
-                data={
-                  props.getExpensesColumnValues(
-                    expensesColumnField.getValue() ?? ""
-                  ) ?? []
-                }
-                clearable
-                {...expensesColumnValueField.getInputProps()}
-              />
-            )}
+            {includeExpensesColumnField.getValue() &&
+              expensesColumnField.getValue() && (
+                <Select
+                  label="Expenses value"
+                  data={
+                    props.getExpensesColumnValues(
+                      expensesColumnField.getValue() ?? ""
+                    ) ?? []
+                  }
+                  clearable
+                  {...expensesColumnValueField.getInputProps()}
+                />
+              )}
           </Group>
         )}
         <Group>
