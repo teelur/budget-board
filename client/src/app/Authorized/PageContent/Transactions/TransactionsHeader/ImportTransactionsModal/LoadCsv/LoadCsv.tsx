@@ -2,6 +2,7 @@ import {
   Button,
   FileInput,
   Group,
+  LoadingOverlay,
   Stack,
   Switch,
   Text,
@@ -20,7 +21,7 @@ interface LoadCsvProps {
 }
 
 const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isPending, startTransition] = React.useTransition();
 
   const fileField = useField<File | null>({
     initialValue: null,
@@ -119,6 +120,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem" w={400} maw="100%">
+      <LoadingOverlay visible={isPending} />
       <FileInput
         {...fileField.getInputProps()}
         accept="text/csv"
@@ -149,40 +151,42 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
         )}
       </Group>
       <Button
-        loading={isLoading}
         onClick={async () => {
-          setIsLoading(true);
-          const file = fileField.getValue();
-          const delimiter = useDelimiter.getValue()
-            ? delimiterField.getValue()
-            : null;
+          startTransition(async () => {
+            const file = fileField.getValue();
+            const delimiter = useDelimiter.getValue()
+              ? delimiterField.getValue()
+              : null;
 
-          if (!file || fileField.error) {
-            notifications.show({
-              color: "red",
-              message: "Please provide a valid CSV file",
-            });
-            return;
-          }
-
-          if (useDelimiter.getValue() && delimiterField.error) {
-            notifications.show({
-              color: "red",
-              message: "Please provide a valid delimiter",
-            });
-            return;
-          }
-
-          if (file && !fileField.error) {
-            const isSuccess = await loadCsv(file, delimiter);
-            if (isSuccess) {
-              props.launchNextDialog();
+            if (!file || fileField.error) {
+              notifications.show({
+                color: "red",
+                message: "Please provide a valid CSV file",
+              });
+              return;
             }
-            setIsLoading(false);
-          }
+
+            if (useDelimiter.getValue() && delimiterField.error) {
+              notifications.show({
+                color: "red",
+                message: "Please provide a valid delimiter",
+              });
+              return;
+            }
+
+            if (file && !fileField.error) {
+              const isSuccess = await loadCsv(file, delimiter);
+              if (isSuccess) {
+                props.launchNextDialog();
+              }
+            }
+          });
         }}
         disabled={
-          !fileField.getValue() || !!fileField.error || !!delimiterField.error
+          !fileField.getValue() ||
+          !!fileField.error ||
+          !!delimiterField.error ||
+          isPending
         }
       >
         Load CSV

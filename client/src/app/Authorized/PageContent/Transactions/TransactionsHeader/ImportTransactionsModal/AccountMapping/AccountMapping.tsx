@@ -23,6 +23,7 @@ interface AccountMappingProps {
   >;
   goBackToPreviousDialog: () => void;
   submitImport: (filteredImportData: ITransactionImportTableData[]) => void;
+  isSubmitting?: boolean;
 }
 
 const AccountMapping = (props: AccountMappingProps) => {
@@ -96,6 +97,7 @@ const AccountMapping = (props: AccountMappingProps) => {
         <Button
           flex="1 1 auto"
           onClick={() => props.submitImport(filteredImportData)}
+          loading={props.isSubmitting}
           disabled={filteredImportData.length === 0}
         >
           Import {filteredImportData.length} Transactions

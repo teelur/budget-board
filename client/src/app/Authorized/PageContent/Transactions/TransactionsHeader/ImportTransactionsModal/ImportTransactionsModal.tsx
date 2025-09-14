@@ -195,6 +195,7 @@ const ImportTransactionsModal = () => {
             setAccountNameToAccountIdMap={setAccountNameToAccountIdMap}
             goBackToPreviousDialog={() => stack.close("account-mapping")}
             submitImport={onSubmit}
+            isSubmitting={doImportMutation.isPending}
           />
         </Modal>
       </Modal.Stack>
