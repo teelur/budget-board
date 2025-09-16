@@ -10,8 +10,9 @@ import { CornerDownRight, PlusIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
-import { roundAwayFromZero } from "~/helpers/utils";
+import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
+import { uncategorizedTransactionCategory } from "~/models/transaction";
 
 interface UnbudgetChildCardProps {
   selectedDate: Date | null;
@@ -93,23 +94,27 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
                 )}
               </Text>
             )}
-            {props.selectedDate && props.category !== "Uncategorized" && (
-              <ActionIcon
-                size="sm"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  doAddBudget.mutate([
-                    {
-                      date: props.selectedDate!,
-                      category: props.category,
-                      limit: Math.round(Math.abs(props.amount)),
-                    },
-                  ]);
-                }}
-              >
-                <PlusIcon />
-              </ActionIcon>
-            )}
+            {props.selectedDate &&
+              areStringsEqual(
+                props.category,
+                uncategorizedTransactionCategory
+              ) && (
+                <ActionIcon
+                  size="sm"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    doAddBudget.mutate([
+                      {
+                        date: props.selectedDate!,
+                        category: props.category,
+                        limit: Math.round(Math.abs(props.amount)),
+                      },
+                    ]);
+                  }}
+                >
+                  <PlusIcon />
+                </ActionIcon>
+              )}
           </Group>
         </Group>
       </Card>
