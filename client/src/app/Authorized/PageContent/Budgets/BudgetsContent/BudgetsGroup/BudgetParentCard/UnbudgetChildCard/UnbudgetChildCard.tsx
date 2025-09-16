@@ -95,7 +95,7 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
               </Text>
             )}
             {props.selectedDate &&
-              areStringsEqual(
+              !areStringsEqual(
                 props.category,
                 uncategorizedTransactionCategory
               ) && (
