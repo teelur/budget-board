@@ -129,7 +129,7 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
                 textWrap: "nowrap",
               }}
             >
-              Uncategorized
+              {uncategorizedTransactionCategory}
             </Text>
           </Group>
         </Combobox.Option>
