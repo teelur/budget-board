@@ -19,8 +19,9 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { ICategoryNode } from "~/models/category";
 import UnbudgetedChildCard from "./UnbudgetedChildCard/UnbudgetedChildCard";
-import { roundAwayFromZero } from "~/helpers/utils";
+import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
+import { uncategorizedTransactionCategory } from "~/models/transaction";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -90,7 +91,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
         <Group w="100%" justify="space-between">
           <Text size="1rem" fw={600}>
             {props.categoryTree.value.length === 0
-              ? "Uncategorized"
+              ? uncategorizedTransactionCategory
               : props.categoryTree.value}
           </Text>
           <Group gap="sm">
@@ -106,7 +107,10 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
               </Text>
             )}
             {props.selectedDate &&
-              props.categoryTree.value !== "Uncategorized" && (
+              !areStringsEqual(
+                props.categoryTree.value,
+                uncategorizedTransactionCategory
+              ) && (
                 <ActionIcon
                   size="sm"
                   onClick={(event) => {

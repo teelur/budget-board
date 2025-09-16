@@ -16,6 +16,7 @@ import {
 } from "@mantine/core";
 import { ICategory, ICategoryNode } from "~/models/category";
 import React from "react";
+import { uncategorizedTransactionCategory } from "~/models/transaction";
 
 interface CategorySelectProps {
   w?: StyleProp<React.CSSProperties["width"]>;
@@ -23,6 +24,7 @@ interface CategorySelectProps {
   value: string;
   onChange: (value: string) => void;
   withinPortal?: boolean;
+  includeUncategorized?: boolean;
   [key: string]: any;
 }
 
@@ -52,7 +54,7 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
           <Combobox.Option
             key={category.value}
             value={category.value}
-            active={category.value === props.value}
+            active={areStringsEqual(category.value, props.value)}
           >
             <Group gap="0.5rem">
               {areStringsEqual(category.value, props.value) ? (
@@ -93,6 +95,46 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
         );
       }
     });
+
+    return options;
+  };
+
+  const categoryOptions = (): React.ReactNode => {
+    const options = buildCategoriesOptions(categoriesTree);
+    if (
+      props.includeUncategorized &&
+      uncategorizedTransactionCategory
+        .toLowerCase()
+        .includes(search.toLowerCase().trim())
+    ) {
+      options.push(
+        <Combobox.Option
+          key={uncategorizedTransactionCategory}
+          value={uncategorizedTransactionCategory}
+          active={areStringsEqual(
+            uncategorizedTransactionCategory,
+            props.value
+          )}
+        >
+          <Group gap="0.5rem">
+            {areStringsEqual(uncategorizedTransactionCategory, props.value) ? (
+              <CheckIcon size={12} />
+            ) : (
+              <div style={{ width: 12 }} />
+            )}
+            <Text
+              fz="sm"
+              style={{
+                fontWeight: 700,
+                textWrap: "nowrap",
+              }}
+            >
+              {uncategorizedTransactionCategory}
+            </Text>
+          </Group>
+        </Combobox.Option>
+      );
+    }
     return options;
   };
 
@@ -139,7 +181,7 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
           size="sm"
         />
         <Combobox.Options mah={300} style={{ overflowY: "auto" }}>
-          {buildCategoriesOptions(categoriesTree)}
+          {categoryOptions()}
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>
