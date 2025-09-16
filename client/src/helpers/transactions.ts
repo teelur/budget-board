@@ -137,10 +137,14 @@ export const getFilteredTransactions = (
     );
   }
   if (filters.category && filters.category.length > 0) {
+    // Uncategorized is a special case since it is not in the categories list.
+    const filterCategory = areStringsEqual(filters.category, "Uncategorized")
+      ? ""
+      : filters.category;
     filteredTransactions = filteredTransactions.filter((t) =>
       getIsParentCategory(filters.category, transactionCategories)
-        ? areStringsEqual(t.category ?? "", filters.category)
-        : areStringsEqual(t.subcategory ?? "", filters.category)
+        ? areStringsEqual(t.category ?? "", filterCategory)
+        : areStringsEqual(t.subcategory ?? "", filterCategory)
     );
   }
   if (filters.dateRange?.at(0)) {

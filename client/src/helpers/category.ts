@@ -73,9 +73,17 @@ export const getFormattedCategoryValue = (
 export const getIsParentCategory = (
   categoryValue: string,
   categories: ICategory[]
-): boolean =>
-  categories.find((c) => areStringsEqual(c.value, categoryValue))?.parent
-    .length === 0;
+): boolean => {
+  // Handle the special case for "Uncategorized"
+  if (areStringsEqual(categoryValue, "Uncategorized")) {
+    return true;
+  }
+
+  return (
+    categories.find((c) => areStringsEqual(c.value, categoryValue))?.parent
+      .length === 0
+  );
+};
 
 /**
  * Retrieves the category's parent value, or returns the category's own value if it has no parent.
@@ -89,6 +97,11 @@ export const getParentCategory = (
   categoryValue: string,
   categories: ICategory[]
 ): string => {
+  // Handle the special case for "Uncategorized"
+  if (areStringsEqual(categoryValue, "Uncategorized")) {
+    return "Uncategorized";
+  }
+
   const category = categories.find((c) =>
     areStringsEqual(c.value, categoryValue)
   );

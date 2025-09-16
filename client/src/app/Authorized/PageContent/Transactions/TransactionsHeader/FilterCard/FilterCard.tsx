@@ -67,6 +67,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
             props.setFilters({ ...props.filters, category: val })
           }
           withinPortal
+          includeUncategorized
         />
         <Button
           w={{ base: "100%", sm: "130px" }}
