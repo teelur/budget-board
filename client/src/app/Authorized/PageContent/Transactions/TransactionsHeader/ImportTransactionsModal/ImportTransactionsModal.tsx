@@ -161,6 +161,13 @@ const ImportTransactionsModal = () => {
         size="auto"
         p="0.5rem"
         title={<Text fw={600}>Import Transactions</Text>}
+        styles={{
+          inner: {
+            left: "0",
+            right: "0",
+            padding: "0 !important",
+          },
+        }}
       >
         <Stepper
           active={activeStep}
