@@ -47,7 +47,30 @@ public class UserSettingsService(
             throw new BudgetBoardServiceException("User settings not found.");
         }
 
-        userSettings.Currency = userSettingsUpdateRequest.Currency;
+        if (
+            userSettingsUpdateRequest.BudgetWarningThreshold < 0
+            || userSettingsUpdateRequest.BudgetWarningThreshold > 100
+        )
+        {
+            _logger.LogError(
+                "Invalid budget warning threshold value: {ThresholdValue}",
+                userSettingsUpdateRequest.BudgetWarningThreshold
+            );
+            throw new BudgetBoardServiceException(
+                "Budget warning threshold must be between 0% and 100%."
+            );
+        }
+
+        if (userSettingsUpdateRequest.Currency != null)
+        {
+            userSettings.Currency = userSettingsUpdateRequest.Currency;
+        }
+
+        if (userSettingsUpdateRequest.BudgetWarningThreshold != null)
+        {
+            userSettings.BudgetWarningThreshold = (int)
+                userSettingsUpdateRequest.BudgetWarningThreshold;
+        }
 
         await _userDataContext.SaveChangesAsync();
     }
