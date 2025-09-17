@@ -42,7 +42,7 @@ public class UserSettingsUpdateRequest : IUserSettingsUpdateRequest
     [JsonConstructor]
     public UserSettingsUpdateRequest()
     {
-        Currency = "USD";
-        BudgetWarningThreshold = 80;
+        Currency = null;
+        BudgetWarningThreshold = null;
     }
 }
