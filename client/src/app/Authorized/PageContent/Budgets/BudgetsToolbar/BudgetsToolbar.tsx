@@ -105,7 +105,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         isPending={props.isPending}
         allowSelectMultiple={canSelectMultiple}
       />
-      <Group justify="space-between">
+      <Group justify="space-between" gap="0.5rem">
         <Button
           onClick={toggleSelectMultiple}
           variant="outline"
@@ -116,7 +116,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         <Group gap="0.5rem">
           {props.showCopy && (
             <Button onClick={onCopyBudgets} loading={doCopyBudget.isPending}>
-              Copy Previous Month
+              Copy Previous
             </Button>
           )}
           {props.selectedDates.length === 1 && (

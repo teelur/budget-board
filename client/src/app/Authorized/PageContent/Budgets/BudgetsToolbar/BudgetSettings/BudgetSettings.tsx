@@ -91,7 +91,7 @@ const BudgetSettings = (): React.ReactNode => {
         onClose={close}
         title={<Text fw={600}>Budget Settings</Text>}
       >
-        <Group gap="0.5rem">
+        <Group gap="0.5rem" wrap="nowrap">
           <NumberInput
             flex="1 1 auto"
             label="Budget Warning Threshold"
