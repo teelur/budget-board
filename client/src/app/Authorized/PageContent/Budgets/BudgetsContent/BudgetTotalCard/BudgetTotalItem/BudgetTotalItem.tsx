@@ -56,7 +56,8 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
               c={getBudgetValueColor(
                 props.amount,
                 props.total ?? 0,
-                props.budgetValueType
+                props.budgetValueType,
+                userSettingsQuery.data?.budgetWarningThreshold ?? 80
               )}
             >
               {convertNumberToCurrency(
@@ -86,7 +87,8 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
             color={getBudgetValueColor(
               props.amount,
               props.total ?? 0,
-              props.budgetValueType
+              props.budgetValueType,
+              userSettingsQuery.data?.budgetWarningThreshold ?? 80
             )}
           >
             <Progress.Label>{percentComplete.toFixed(0)}%</Progress.Label>

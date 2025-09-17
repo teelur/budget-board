@@ -138,7 +138,8 @@ export enum BudgetValueType {
 export const getBudgetValueColor = (
   amount: number,
   total: number,
-  type: BudgetValueType
+  type: BudgetValueType,
+  warningThreshold: number
 ): string => {
   if (type === BudgetValueType.Income) {
     if (amount < total) {
@@ -153,7 +154,7 @@ export const getBudgetValueColor = (
       if (invertedAmount >= total) {
         return "red";
       }
-      if (invertedAmount >= total * 0.8) {
+      if (invertedAmount >= total * (warningThreshold / 100)) {
         return "yellow";
       }
       return "green";

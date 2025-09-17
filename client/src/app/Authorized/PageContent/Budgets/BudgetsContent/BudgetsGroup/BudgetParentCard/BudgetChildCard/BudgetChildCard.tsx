@@ -230,7 +230,8 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       props.limit,
                       props.isIncome
                         ? BudgetValueType.Income
-                        : BudgetValueType.Expense
+                        : BudgetValueType.Expense,
+                      userSettingsQuery.data?.budgetWarningThreshold ?? 80
                     )}
                   >
                     <Progress.Label>
@@ -248,7 +249,8 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                     props.limit,
                     props.isIncome
                       ? BudgetValueType.Income
-                      : BudgetValueType.Expense
+                      : BudgetValueType.Expense,
+                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
                   )}
                 >
                   {convertNumberToCurrency(
