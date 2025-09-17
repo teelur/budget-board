@@ -164,7 +164,7 @@ export const getBudgetValueColor = (
   if (type === BudgetValueType.Total) {
     if (amount < 0) {
       return "red";
-    } else if (amount > 0) {
+    } else if (amount >= 0) {
       return "green";
     }
   }
