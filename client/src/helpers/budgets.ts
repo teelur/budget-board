@@ -151,7 +151,7 @@ export const getBudgetValueColor = (
   if (type === BudgetValueType.Expense) {
     {
       const invertedAmount = amount * -1;
-      if (invertedAmount >= total) {
+      if (invertedAmount > total) {
         return "red";
       }
       if (invertedAmount >= total * (warningThreshold / 100)) {
