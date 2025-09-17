@@ -19,7 +19,7 @@ import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
-import { getBudgetValueColor } from "~/helpers/budgets";
+import { getBudgetValueColor, BudgetValueType } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
@@ -333,6 +333,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         roundAwayFromZero(amount),
                         limit,
                         isIncome
+                          ? BudgetValueType.Income
+                          : BudgetValueType.Expense,
+                        userSettingsQuery.data?.budgetWarningThreshold ?? 80
                       )}
                     >
                       <Progress.Label>
@@ -349,6 +352,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       roundAwayFromZero(amount),
                       limit,
                       isIncome
+                        ? BudgetValueType.Income
+                        : BudgetValueType.Expense,
+                      userSettingsQuery.data?.budgetWarningThreshold ?? 80
                     )}
                   >
                     {convertNumberToCurrency(

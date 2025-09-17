@@ -8,6 +8,7 @@ import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
 import { areStringsEqual } from "~/helpers/utils";
 import { sumTransactionAmounts } from "~/helpers/transactions";
+import { BudgetValueType } from "~/helpers/budgets";
 
 interface BudgetTotalCardProps {
   incomeCategories: ICategory[];
@@ -80,19 +81,19 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
               label="Income"
               amount={incomeTransactionsTotal}
               total={incomeBudgetsTotal}
-              isIncome
+              budgetValueType={BudgetValueType.Income}
             />
             <BudgetTotalItem
               label="Expenses"
               amount={expenseTransactionsTotal}
               total={expenseBudgetsTotal}
-              isIncome={false}
+              budgetValueType={BudgetValueType.Expense}
             />
             <BudgetTotalItem
               label="Unbudgeted"
               amount={unbudgetedTransactionsTotal}
               total={incomeBudgetsTotal - expenseBudgetsTotal}
-              isIncome
+              budgetValueType={BudgetValueType.Total}
               hideProgress
             />
           </Card>
@@ -104,7 +105,7 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
             <BudgetTotalItem
               label="Net Cash Flow"
               amount={totalTransactionsTotal}
-              isIncome
+              budgetValueType={BudgetValueType.Total}
               hideProgress
             />
           </Card>
