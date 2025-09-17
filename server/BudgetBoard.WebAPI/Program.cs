@@ -216,14 +216,10 @@ app.UseAuthorization();
 
 app.MapPost(
         "/api/logout",
-        async (SignInManager<ApplicationUser> signInManager, [FromBody] object empty) =>
+        async (SignInManager<ApplicationUser> signInManager) =>
         {
-            if (empty != null)
-            {
-                await signInManager.SignOutAsync();
-                return Results.Ok();
-            }
-            return Results.Unauthorized();
+            await signInManager.SignOutAsync();
+            return Results.Ok();
         }
     )
     .RequireAuthorization(); // So that only authorized users can use this endpoint
