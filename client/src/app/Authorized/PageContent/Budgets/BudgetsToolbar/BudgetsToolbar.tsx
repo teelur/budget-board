@@ -11,6 +11,7 @@ import { IBudget, IBudgetCreateRequest } from "~/models/budget";
 import { AxiosError, AxiosResponse } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
+import BudgetSettings from "./BudgetSettings/BudgetSettings";
 
 interface BudgetsToolbarProps {
   categories: ICategory[];
@@ -124,6 +125,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
               categories={props.categories}
             />
           )}
+          <BudgetSettings />
         </Group>
       </Group>
     </Stack>
