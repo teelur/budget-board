@@ -14,7 +14,7 @@ import { GripVertical } from "lucide-react";
 import SortableItem from "~/components/Sortable/SortableItem";
 import SortableHandle from "~/components/Sortable/SortableHandle";
 import Sortable from "~/components/Sortable/Sortable";
-import { IAccount, IAccountIndexRequest } from "~/models/account";
+import { IAccountResponse, IAccountIndexRequest } from "~/models/account";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
@@ -30,7 +30,9 @@ interface InstitutionSettingsCardProps {
 const InstitutionSettingsCard = (
   props: InstitutionSettingsCardProps
 ): React.ReactNode => {
-  const [sortedAccounts, setSortedAccounts] = React.useState<IAccount[]>(
+  const [sortedAccounts, setSortedAccounts] = React.useState<
+    IAccountResponse[]
+  >(
     props.institution.accounts
       .filter((a) => a.deleted === null)
       .sort((a, b) => a.index - b.index)

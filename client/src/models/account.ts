@@ -31,7 +31,7 @@ export interface IAccountIndexRequest {
   index: number;
 }
 
-export interface IAccount {
+export interface IAccountResponse {
   id: string;
   syncID: string;
   name: string;

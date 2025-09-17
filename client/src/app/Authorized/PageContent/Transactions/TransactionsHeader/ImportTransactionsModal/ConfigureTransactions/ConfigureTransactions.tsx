@@ -21,7 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { ICategoryResponse } from "~/models/category";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 
 interface ConfigureTransactionsProps {
@@ -114,14 +114,14 @@ const ConfigureTransactions = (
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccount[]> => {
+    queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as IAccount[];
+        return res.data as IAccountResponse[];
       }
 
       return [];

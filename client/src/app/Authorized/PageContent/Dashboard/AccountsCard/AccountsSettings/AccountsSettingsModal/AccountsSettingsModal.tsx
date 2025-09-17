@@ -3,7 +3,7 @@ import classes from "./AccountsSettingsModal.module.css";
 import { Button, Flex, Group, Modal, Stack, Text } from "@mantine/core";
 import React from "react";
 import DeletedAccounts from "./DeletedAccounts/DeletedAccounts";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import InstitutionSettingsCard from "./InstitutionSettingsCard/InstitutionSettingsCard";
 import { IInstitution, InstitutionIndexRequest } from "~/models/institution";
 import { useDisclosure } from "@mantine/hooks";
@@ -20,7 +20,7 @@ interface AccountsSettingsProps<T extends string> {
   stackId: T;
   onCreateAccountClick: () => void;
   sortedFilteredInstitutions: IInstitution[];
-  accounts: IAccount[];
+  accounts: IAccountResponse[];
 }
 
 const AccountsSettingsModal = <T extends string>(
@@ -134,7 +134,7 @@ const AccountsSettingsModal = <T extends string>(
             </Stack>
             <DeletedAccounts
               deletedAccounts={props.accounts.filter(
-                (a: IAccount) => a.deleted !== null
+                (a: IAccountResponse) => a.deleted !== null
               )}
             />
           </Stack>

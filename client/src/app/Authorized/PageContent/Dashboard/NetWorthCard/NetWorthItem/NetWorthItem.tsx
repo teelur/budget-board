@@ -1,7 +1,7 @@
 import classes from "./NetWorthItem.module.css";
 
 import { Group, Text } from "@mantine/core";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import {
   getAccountsOfTypes,
@@ -16,7 +16,7 @@ import { AxiosResponse } from "axios";
 interface NetWorthItemProps {
   title: string;
   types?: string[];
-  accounts: IAccount[];
+  accounts: IAccountResponse[];
 }
 
 const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {

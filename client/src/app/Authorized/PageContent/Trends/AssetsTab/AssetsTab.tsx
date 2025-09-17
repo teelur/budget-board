@@ -9,7 +9,7 @@ import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalance } from "~/models/balance";
 import { AxiosResponse } from "axios";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
 
@@ -50,14 +50,14 @@ const AssetsTab = (): React.ReactNode => {
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccount[]> => {
+    queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as IAccount[];
+        return res.data as IAccountResponse[];
       }
 
       return [];

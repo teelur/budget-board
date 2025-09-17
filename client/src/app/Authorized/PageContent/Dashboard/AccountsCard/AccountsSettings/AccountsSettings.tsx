@@ -5,12 +5,12 @@ import { SettingsIcon } from "lucide-react";
 import React from "react";
 import AccountsSettingsModal from "./AccountsSettingsModal/AccountsSettingsModal";
 import { IInstitution } from "~/models/institution";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import CreateAccountModal from "./CreateAccountModal/CreateAccountModal";
 
 interface AccountsSettingsProps {
   sortedFilteredInstitutions: IInstitution[];
-  accounts: IAccount[];
+  accounts: IAccountResponse[];
 }
 
 const AccountsSettings = (props: AccountsSettingsProps): React.ReactNode => {

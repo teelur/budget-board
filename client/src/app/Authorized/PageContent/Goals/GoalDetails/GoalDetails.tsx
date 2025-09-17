@@ -11,7 +11,7 @@ import {
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import BalanceChart from "~/components/Charts/BalanceChart/BalanceChart";
 import { DatesRangeValue } from "@mantine/dates";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -36,7 +36,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
 
   const { request } = React.useContext<any>(AuthContext);
   const balancesQuery = useQueries({
-    queries: (props.goal?.accounts ?? []).map((account: IAccount) => ({
+    queries: (props.goal?.accounts ?? []).map((account: IAccountResponse) => ({
       queryKey: ["balances", account.id],
       queryFn: async (): Promise<IBalance[]> => {
         const res: AxiosResponse = await request({
@@ -96,7 +96,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
             </Accordion.Control>
             <Accordion.Panel>
               <Stack gap="0.5rem">
-                {props.goal.accounts.map((account: IAccount) => (
+                {props.goal.accounts.map((account: IAccountResponse) => (
                   <Card key={account.id} radius="md">
                     <AccountItem account={account} />
                   </Card>

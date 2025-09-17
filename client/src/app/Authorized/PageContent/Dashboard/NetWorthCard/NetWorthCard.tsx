@@ -6,21 +6,21 @@ import NetWorthItem from "./NetWorthItem/NetWorthItem";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
 
 const NetWorthCard = (): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccount[]> => {
+    queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as IAccount[];
+        return res.data as IAccountResponse[];
       }
 
       return [];

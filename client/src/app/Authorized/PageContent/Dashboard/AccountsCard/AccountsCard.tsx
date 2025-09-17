@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItems/InstitutionItem";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import AccountsSettings from "./AccountsSettings/AccountsSettings";
 
 const AccountsCard = (): React.ReactNode => {
@@ -30,14 +30,14 @@ const AccountsCard = (): React.ReactNode => {
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccount[]> => {
+    queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as IAccount[];
+        return res.data as IAccountResponse[];
       }
 
       return [];

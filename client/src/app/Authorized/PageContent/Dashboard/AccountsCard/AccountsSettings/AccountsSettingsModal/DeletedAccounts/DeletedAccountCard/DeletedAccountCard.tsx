@@ -1,7 +1,7 @@
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { getDaysSinceDate } from "~/helpers/datetime";
 import { Button, Card, Group, Text } from "@mantine/core";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,7 +10,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { AxiosError } from "axios";
 
 interface DeletedAccountCardProps {
-  deletedAccount: IAccount;
+  deletedAccount: IAccountResponse;
 }
 
 const DeletedAccountCard = (

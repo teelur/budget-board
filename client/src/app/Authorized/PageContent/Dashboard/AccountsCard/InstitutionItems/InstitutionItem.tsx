@@ -1,6 +1,6 @@
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import { Card, Divider, Stack, Text } from "@mantine/core";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { IInstitution } from "~/models/institution";
 import { DndContext } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
@@ -33,7 +33,7 @@ const InstitutionItem = (props: InstitutionItemProps): React.ReactNode => {
       <Stack gap={1}>
         <DndContext>
           <SortableContext items={sortedFilteredAccounts}>
-            {sortedFilteredAccounts.map((account: IAccount) => (
+            {sortedFilteredAccounts.map((account: IAccountResponse) => (
               <AccountItem key={account.id} account={account} />
             ))}
           </SortableContext>

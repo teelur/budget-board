@@ -19,7 +19,7 @@ import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
   accountCategories,
-  IAccount,
+  IAccountResponse,
   IAccountUpdateRequest,
 } from "~/models/account";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -32,7 +32,7 @@ import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { useField } from "@mantine/form";
 
 interface AccountSettingsCardProps {
-  account: IAccount;
+  account: IAccountResponse;
   isSortable: boolean;
 }
 

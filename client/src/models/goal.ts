@@ -1,4 +1,4 @@
-import { IAccount } from "./account";
+import { IAccountResponse } from "./account";
 
 export interface IGoalCreateRequest {
   name: string;
@@ -32,7 +32,7 @@ export interface IGoalResponse {
   interestRate: number | null;
   completed: Date | null;
   percentComplete: number;
-  accounts: IAccount[];
+  accounts: IAccountResponse[];
   userID: string;
 }
 
