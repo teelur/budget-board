@@ -4,30 +4,22 @@ import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
+import { DragDropProvider } from "@dnd-kit/react";
+import { arrayMove } from "@dnd-kit/helpers";
 
-const AccountsContent = () => {
+interface AccountsContentProps {
+  sortedInstitutions: IInstitution[];
+  setSortedInstitutions: React.Dispatch<React.SetStateAction<IInstitution[]>>;
+  isSortable: boolean;
+}
+
+const AccountsContent = (props: AccountsContentProps) => {
   const { request } = React.useContext<any>(AuthContext);
-  const institutionQuery = useQuery({
-    queryKey: ["institutions"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/institution",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IInstitution[];
-      }
-
-      return undefined;
-    },
-  });
-
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
     queryFn: async () => {
       const res = await request({
-        url: "/api/user/settings",
+        url: "/api/userSettings",
         method: "GET",
       });
 
@@ -38,15 +30,32 @@ const AccountsContent = () => {
       return undefined;
     },
   });
+
   return (
     <Stack>
-      {institutionQuery.data?.map((institution) => (
-        <InstitutionItem
-          key={institution.id}
-          institution={institution}
-          userCurrency={userSettingsQuery.data?.currency || "USD"}
-        />
-      ))}
+      <DragDropProvider
+        onDragEnd={(event) => {
+          const fromIndex = event.operation.source?.data.index;
+          const toIndex = event.operation.target?.data.index;
+
+          if (fromIndex === undefined || toIndex === undefined) {
+            return;
+          }
+
+          props.setSortedInstitutions((items) =>
+            arrayMove(items, fromIndex, toIndex)
+          );
+        }}
+      >
+        {props.sortedInstitutions.map((institution) => (
+          <InstitutionItem
+            key={institution.id}
+            institution={institution}
+            userCurrency={userSettingsQuery.data?.currency || "USD"}
+            isSortable={props.isSortable}
+          />
+        ))}
+      </DragDropProvider>
     </Stack>
   );
 };
