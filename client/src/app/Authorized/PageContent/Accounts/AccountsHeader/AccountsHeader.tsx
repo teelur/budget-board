@@ -1,14 +1,13 @@
 import { ActionIcon, Button, Group } from "@mantine/core";
-import { PlusIcon, SettingsIcon } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import React from "react";
+import CreateAccount from "./CreateAccount/CreateAccount";
 
 const AccountsHeader = (): React.ReactNode => {
   return (
     <Group w="100%" justify="flex-end" gap="0.5rem">
       <Button>Reorder</Button>
-      <ActionIcon size="input-sm">
-        <PlusIcon />
-      </ActionIcon>
+      <CreateAccount />
       <ActionIcon variant="subtle" size="input-sm">
         <SettingsIcon />
       </ActionIcon>

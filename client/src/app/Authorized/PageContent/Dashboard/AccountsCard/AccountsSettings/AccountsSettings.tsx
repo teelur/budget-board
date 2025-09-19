@@ -6,7 +6,6 @@ import React from "react";
 import AccountsSettingsModal from "./AccountsSettingsModal/AccountsSettingsModal";
 import { IInstitution } from "~/models/institution";
 import { IAccountResponse } from "~/models/account";
-import CreateAccountModal from "./CreateAccountModal/CreateAccountModal";
 
 interface AccountsSettingsProps {
   sortedFilteredInstitutions: IInstitution[];
@@ -24,7 +23,6 @@ const AccountsSettings = (props: AccountsSettingsProps): React.ReactNode => {
         onCreateAccountClick={() => stack.open("createAccount")}
         {...stack.register("settings")}
       />
-      <CreateAccountModal {...stack.register("createAccount")} />
       <ActionIcon
         className={classes.settingsIcon}
         variant="subtle"

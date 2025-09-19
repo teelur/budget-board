@@ -21,6 +21,13 @@ public class InstitutionService(
     public async Task CreateInstitutionAsync(Guid userGuid, IInstitutionCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        if (userData.Institutions.Any(i => i.Name == request.Name))
+        {
+            _logger.LogError("Attempted to create an institution with a duplicate name.");
+            throw new BudgetBoardServiceException("An institution with this name already exists.");
+        }
+
         var institution = new Institution { Name = request.Name, UserID = userGuid };
 
         userData.Institutions.Add(institution);
