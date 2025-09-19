@@ -32,7 +32,7 @@ const AccountsContent = (props: AccountsContentProps) => {
   });
 
   return (
-    <Stack>
+    <Stack id="institutions-stack" gap="1rem">
       <DragDropProvider
         onDragEnd={(event) => {
           const fromIndex = event.operation.source?.data.index;
@@ -53,6 +53,7 @@ const AccountsContent = (props: AccountsContentProps) => {
             institution={institution}
             userCurrency={userSettingsQuery.data?.currency || "USD"}
             isSortable={props.isSortable}
+            container={document.getElementById("institutions-stack") as Element}
           />
         ))}
       </DragDropProvider>

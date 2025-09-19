@@ -1,21 +1,38 @@
+import { useSortable } from "@dnd-kit/react/sortable";
 import { Badge, Button, Card, Flex, Group, Stack, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import { GripVertical } from "lucide-react";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAccountResponse } from "~/models/account";
+import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
+import { RestrictToElement } from "@dnd-kit/dom/modifiers";
+import { closestCenter } from "@dnd-kit/collision";
 
 interface IAccountItemProps {
   account: IAccountResponse;
   userCurrency: string;
   isSortable: boolean;
+  container: Element;
 }
 
 const AccountItem = (props: IAccountItemProps) => {
+  const { ref, handleRef } = useSortable({
+    id: props.account.id,
+    index: props.account.index,
+    modifiers: [
+      RestrictToElement.configure({
+        element: props.container,
+      }),
+      RestrictToVerticalAxis,
+    ],
+    collisionDetector: closestCenter,
+  });
+
   return (
-    <Card shadow="sm" padding="0.5rem" radius="md" withBorder>
+    <Card ref={ref} shadow="sm" padding="0.5rem" radius="md" withBorder>
       <Group>
         {props.isSortable && (
-          <Flex style={{ alignSelf: "stretch" }}>
+          <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
             <Button h="100%" px={0} w={30} radius="lg">
               <GripVertical size={25} />
             </Button>
