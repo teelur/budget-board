@@ -1,6 +1,6 @@
 import classes from "./AccountsCard.module.css";
 
-import { Card, Group, Skeleton, Stack, Title, Text } from "@mantine/core";
+import { Card, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +8,6 @@ import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItems/InstitutionItem";
 import { IAccountResponse } from "~/models/account";
-import AccountsSettings from "./AccountsSettings/AccountsSettings";
 
 const AccountsCard = (): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
@@ -73,10 +72,6 @@ const AccountsCard = (): React.ReactNode => {
     >
       <Group className={classes.headerContainer}>
         <Title order={2}>Accounts</Title>
-        <AccountsSettings
-          sortedFilteredInstitutions={sortedFilteredInstitutions}
-          accounts={accountsQuery.data ?? []}
-        />
       </Group>
       <Stack className={classes.accountsContainer}>
         {institutionQuery.isPending || accountsQuery.isPending ? (
