@@ -1,4 +1,12 @@
-import { Button, Card, Flex, Group, Stack, Text } from "@mantine/core";
+import {
+  Button,
+  Card,
+  Flex,
+  Group,
+  LoadingOverlay,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IInstitution } from "~/models/institution";
 import AccountItem from "./AccountItem/AccountItem";
@@ -6,8 +14,17 @@ import { GripVertical } from "lucide-react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { RestrictToElement } from "@dnd-kit/dom/modifiers";
-import { closestCenter } from "@dnd-kit/collision";
+import { closestCorners } from "@dnd-kit/collision";
 import { DragDropProvider } from "@dnd-kit/react";
+import { move } from "@dnd-kit/helpers";
+import { IAccountIndexRequest, IAccountResponse } from "~/models/account";
+import React from "react";
+import { useDidUpdate } from "@mantine/hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AxiosError } from "axios";
+import { translateAxiosError } from "~/helpers/requests";
+import { notifications } from "@mantine/notifications";
 
 interface IInstitutionItemProps {
   institution: IInstitution;
@@ -17,6 +34,10 @@ interface IInstitutionItemProps {
 }
 
 const InstitutionItem = (props: IInstitutionItemProps) => {
+  const [sortedAccounts, setSortedAccounts] = React.useState<
+    IAccountResponse[]
+  >(props.institution.accounts.sort((a, b) => a.index - b.index));
+
   const { ref, handleRef } = useSortable({
     id: props.institution.id,
     index: props.institution.index,
@@ -24,12 +45,47 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
       RestrictToElement.configure({ element: props.container }),
       RestrictToVerticalAxis,
     ],
-    collisionDetector: closestCenter,
+    collisionDetector: closestCorners,
+  });
+
+  const { request } = React.useContext<any>(AuthContext);
+  const queryClient = useQueryClient();
+  const doIndexAccounts = useMutation({
+    mutationFn: async (accounts: IAccountIndexRequest[]) =>
+      await request({
+        url: "/api/account/order",
+        method: "PUT",
+        data: accounts,
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    },
+    onError: (error: AxiosError) =>
+      notifications.show({ color: "red", message: translateAxiosError(error) }),
   });
 
   const totalBalance = props.institution.accounts
     .filter((a) => a.deleted === null)
     .reduce((acc, account) => acc + account.currentBalance, 0);
+
+  useDidUpdate(() => {
+    setSortedAccounts(
+      props.institution.accounts.sort((a, b) => a.index - b.index)
+    );
+  }, [props.institution.accounts]);
+
+  useDidUpdate(() => {
+    if (!props.isSortable) {
+      const indexedAccounts: IAccountIndexRequest[] = sortedAccounts.map(
+        (acc, index) => ({
+          id: acc.id,
+          index,
+        })
+      );
+      doIndexAccounts.mutate(indexedAccounts);
+    }
+  }, [props.isSortable]);
+
   return (
     <Card
       ref={ref}
@@ -38,6 +94,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
       radius="md"
       withBorder
     >
+      <LoadingOverlay visible={doIndexAccounts.isPending} />
       <Group w="100%">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
@@ -56,20 +113,28 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
             </Text>
           </Group>
           <Stack id={props.institution.id} gap="0.5rem">
-            <DragDropProvider>
-              {props.institution.accounts
-                .filter((a) => a.deleted === null)
-                .map((account) => (
-                  <AccountItem
-                    key={account.id}
-                    account={account}
-                    userCurrency={props.userCurrency}
-                    isSortable={props.isSortable}
-                    container={
-                      document.getElementById(props.institution.id) as Element
-                    }
-                  />
-                ))}
+            <DragDropProvider
+              onDragEnd={(event) => {
+                const updatedList = move(sortedAccounts, event).map(
+                  (acc, index) => ({
+                    ...acc,
+                    index,
+                  })
+                );
+                setSortedAccounts(updatedList);
+              }}
+            >
+              {sortedAccounts.map((account) => (
+                <AccountItem
+                  key={account.id}
+                  account={account}
+                  userCurrency={props.userCurrency}
+                  isSortable={props.isSortable}
+                  container={
+                    document.getElementById(props.institution.id) as Element
+                  }
+                />
+              ))}
             </DragDropProvider>
           </Stack>
         </Stack>

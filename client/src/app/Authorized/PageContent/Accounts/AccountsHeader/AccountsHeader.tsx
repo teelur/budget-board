@@ -15,7 +15,7 @@ const AccountsHeader = (props: AccountsHeaderProps): React.ReactNode => {
         onClick={props.toggleSort}
         variant={props.isSortable ? "outline" : "primary"}
       >
-        Reorder
+        {props.isSortable ? "Save" : "Reorder"}
       </Button>
       <CreateAccount />
       <ActionIcon variant="subtle" size="input-sm">
