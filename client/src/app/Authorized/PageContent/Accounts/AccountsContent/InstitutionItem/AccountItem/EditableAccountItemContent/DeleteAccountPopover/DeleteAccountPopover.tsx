@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { TrashIcon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import React from "react";
 
 interface DeleteAccountPopoverProps {
@@ -22,7 +22,7 @@ const DeleteAccountPopover = (
   const queryClient = useQueryClient();
 
   const doDeleteAccount = useMutation({
-    mutationFn: async (deleteTransactions: boolean) =>
+    mutationFn: async () =>
       await request({
         url: "/api/account",
         method: "DELETE",
@@ -40,12 +40,8 @@ const DeleteAccountPopover = (
   return (
     <Popover>
       <Popover.Target>
-        <ActionIcon
-          w={{ base: "100%", sm: "auto" }}
-          onClick={() => doDeleteAccount.mutate(deleteTransactions)}
-          color="red"
-        >
-          <TrashIcon size={20} />
+        <ActionIcon h="100%" size="sm" color="red">
+          <Trash2Icon size={16} />
         </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown>
@@ -58,7 +54,7 @@ const DeleteAccountPopover = (
           <Button
             color="red"
             loading={doDeleteAccount.isPending}
-            onClick={() => doDeleteAccount.mutate(deleteTransactions)}
+            onClick={() => doDeleteAccount.mutate()}
           >
             Delete
           </Button>

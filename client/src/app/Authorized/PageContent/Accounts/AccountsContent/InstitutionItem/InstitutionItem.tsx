@@ -95,7 +95,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
       withBorder
     >
       <LoadingOverlay visible={doIndexAccounts.isPending} />
-      <Group w="100%">
+      <Group w="100%" wrap="nowrap" gap="0.5rem" align="flex-start">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
             <Button h="100%" px={0} w={30} radius="lg">
