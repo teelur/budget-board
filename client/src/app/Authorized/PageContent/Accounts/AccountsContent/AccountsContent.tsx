@@ -55,8 +55,15 @@ const AccountsContent = (props: AccountsContentProps) => {
 
   React.useEffect(() => {
     if (institutionQuery.data) {
+      // Some institutions might have conflicting indices, so we need to re-index them here
+      // to ensure the drag-and-drop functionality works correctly
       setSortedInstitutions(
-        institutionQuery.data.sort((a, b) => a.index - b.index)
+        institutionQuery.data
+          .sort((a, b) => a.index - b.index)
+          .map((inst, index) => ({
+            ...inst,
+            index,
+          }))
       );
     }
   }, [institutionQuery.data]);
@@ -98,6 +105,7 @@ const AccountsContent = (props: AccountsContentProps) => {
               index,
             })
           );
+
           setSortedInstitutions(updatedList);
         }}
       >
