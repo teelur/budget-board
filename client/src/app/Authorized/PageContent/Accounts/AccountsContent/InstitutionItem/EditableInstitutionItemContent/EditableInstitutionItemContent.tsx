@@ -28,8 +28,6 @@ const EditableInstitutionItemContent = (
 ) => {
   const institutionNameField = useField({
     initialValue: props.institution.name,
-    validate: (value) =>
-      value.trim().length === 0 ? "Institution name is required" : null,
   });
 
   const { request } = React.useContext<any>(AuthContext);
@@ -50,9 +48,11 @@ const EditableInstitutionItemContent = (
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      notifications.show({ message: "Institution updated", color: "green" });
     },
     onError: (error: AxiosError) => {
       notifications.show({ color: "red", message: translateAxiosError(error) });
+      institutionNameField.setValue(props.institution.name);
     },
   });
 

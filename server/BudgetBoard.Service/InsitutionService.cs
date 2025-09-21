@@ -69,6 +69,12 @@ public class InstitutionService(
             );
         }
 
+        if (string.IsNullOrEmpty(request.Name))
+        {
+            _logger.LogError("Attempt to update institution with empty name.");
+            throw new BudgetBoardServiceException("Institution name cannot be empty.");
+        }
+
         institution.Name = request.Name;
 
         await _userDataContext.SaveChangesAsync();
