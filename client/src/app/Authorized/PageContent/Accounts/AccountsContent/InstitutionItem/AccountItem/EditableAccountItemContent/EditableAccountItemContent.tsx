@@ -102,7 +102,9 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       // Reset fields to original values on error
       accountNameField.setValue(props.account.name);
       interestRateField.setValue(
-        props.account.interestRate ? props.account.interestRate * 100 : 0
+        props.account.interestRate
+          ? props.account.interestRate * 100
+          : undefined
       );
       accountTypeField.setValue(props.account.type);
       accountSubTypeField.setValue(props.account.subtype ?? "");

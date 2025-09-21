@@ -22,7 +22,11 @@ public class InstitutionService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (userData.Institutions.Any(i => i.Name == request.Name))
+        if (
+            userData.Institutions.Any(i =>
+                i.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
+            )
+        )
         {
             _logger.LogError("Attempted to create an institution with a duplicate name.");
             throw new BudgetBoardServiceException("An institution with this name already exists.");

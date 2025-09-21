@@ -56,9 +56,10 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
         </Text>
         <Text fw={600} size="sm" c="dimmed">
           Last Updated:{" "}
-          {dayjs(props.account.balanceDate).isValid()
-            ? dayjs(props.account.balanceDate).format("L LT")
-            : "Never!"}
+          {(() => {
+            const parsedDate = dayjs(props.account.balanceDate);
+            return parsedDate.isValid() ? parsedDate.format("L LT") : "Never!";
+          })()}
         </Text>
       </Group>
     </Stack>

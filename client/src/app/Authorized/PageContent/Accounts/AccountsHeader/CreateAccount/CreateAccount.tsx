@@ -84,6 +84,9 @@ const CreateAccount = () => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
       notifications.show({ message: "Account created", color: "green" });
+
+      accountNameField.reset();
+      institutionField.reset();
     },
     onError: (error: AxiosError) => {
       notifications.show({ message: translateAxiosError(error), color: "red" });
@@ -120,11 +123,6 @@ const CreateAccount = () => {
       institutionID: institutionForAccount.id,
       source: AccountSource.Manual,
     } as IAccountCreateRequest);
-
-    if (doCreateAccount.isSuccess) {
-      accountNameField.reset();
-      institutionField.reset();
-    }
   };
 
   if (institutionQuery.isPending) {
