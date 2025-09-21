@@ -141,6 +141,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                   Name
                 </Text>
               }
+              onBlur={() => doUpdateAccount.mutate()}
             />
             <ActionIcon
               variant="outline"
@@ -164,6 +165,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               step={1}
               suffix="%"
               maw={90}
+              onBlur={() => doUpdateAccount.mutate()}
             />
             <Group gap="0.5rem">
               <Button
@@ -176,6 +178,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 Hide Account
               </Button>
               <Button
+                bg={hideTransactionsField.getValue() ? "purple" : undefined}
                 variant={
                   hideTransactionsField.getValue() ? "filled" : "outline"
                 }

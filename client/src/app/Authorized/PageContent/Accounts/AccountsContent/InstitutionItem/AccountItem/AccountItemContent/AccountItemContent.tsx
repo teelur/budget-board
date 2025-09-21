@@ -33,6 +33,9 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
             {((props.account.interestRate ?? 0) * 100).toFixed(2)}%
           </Badge>
           {props.account.hideAccount && <Badge bg="yellow">Hidden</Badge>}
+          {props.account.hideTransactions && (
+            <Badge bg="purple">Hidden Transactions</Badge>
+          )}
           {props.account.deleted && <Badge bg="red">Deleted</Badge>}
         </Group>
         <Text
