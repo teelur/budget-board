@@ -90,7 +90,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
 
   return (
     <Card
-      ref={ref}
+      ref={props.isSortable ? ref : undefined}
       bg="var(--mantine-color-bg)"
       padding="0.5rem"
       radius="md"

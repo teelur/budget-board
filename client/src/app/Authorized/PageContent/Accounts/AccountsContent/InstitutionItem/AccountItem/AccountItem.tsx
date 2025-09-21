@@ -32,11 +32,17 @@ const AccountItem = (props: IAccountItemProps) => {
   });
 
   return (
-    <Card ref={ref} shadow="sm" padding="0.5rem" radius="md" withBorder>
+    <Card
+      ref={props.isSortable ? ref : undefined}
+      shadow="sm"
+      padding="0.5rem"
+      radius="md"
+      withBorder
+    >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (
-          <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
-            <Button h="100%" px={0} w={30} radius="lg">
+          <Flex style={{ alignSelf: "stretch" }}>
+            <Button ref={handleRef} h="100%" px={0} w={30} radius="lg">
               <GripVertical size={25} />
             </Button>
           </Flex>
