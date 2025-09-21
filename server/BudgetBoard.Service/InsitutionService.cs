@@ -75,6 +75,17 @@ public class InstitutionService(
             throw new BudgetBoardServiceException("Institution name cannot be empty.");
         }
 
+        if (
+            !institution.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
+            && userData.Institutions.Any(i =>
+                i.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
+            )
+        )
+        {
+            _logger.LogError("Attempted to rename an institution to a duplicate name.");
+            throw new BudgetBoardServiceException("An institution with this name already exists.");
+        }
+
         institution.Name = request.Name;
 
         await _userDataContext.SaveChangesAsync();

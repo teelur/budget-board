@@ -93,9 +93,21 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+
+      notifications.show({ color: "green", message: "Account updated" });
     },
     onError: (error: AxiosError) => {
       notifications.show({ color: "red", message: translateAxiosError(error) });
+
+      // Reset fields to original values on error
+      accountNameField.setValue(props.account.name);
+      interestRateField.setValue(
+        props.account.interestRate ? props.account.interestRate * 100 : 0
+      );
+      accountTypeField.setValue(props.account.type);
+      accountSubTypeField.setValue(props.account.subtype ?? "");
+      hideAccountField.setValue(props.account.hideAccount ?? false);
+      hideTransactionsField.setValue(props.account.hideTransactions ?? false);
     },
   });
 

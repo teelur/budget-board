@@ -94,6 +94,12 @@ public class AccountService(
             );
         }
 
+        if (string.IsNullOrEmpty(editedAccount.Name))
+        {
+            _logger.LogError("Attempt to edit account with empty name.");
+            throw new BudgetBoardServiceException("Account name cannot be empty.");
+        }
+
         account.Name = editedAccount.Name;
         account.Type = editedAccount.Type;
         account.Subtype = editedAccount.Subtype;
