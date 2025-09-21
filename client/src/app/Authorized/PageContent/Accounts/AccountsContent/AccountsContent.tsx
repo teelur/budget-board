@@ -59,6 +59,7 @@ const AccountsContent = (props: AccountsContentProps) => {
       // to ensure the drag-and-drop functionality works correctly
       setSortedInstitutions(
         institutionQuery.data
+          .slice()
           .sort((a, b) => a.index - b.index)
           .map((inst, index) => ({
             ...inst,

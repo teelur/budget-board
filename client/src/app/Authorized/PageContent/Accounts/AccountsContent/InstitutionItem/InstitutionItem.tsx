@@ -42,6 +42,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
     IAccountResponse[]
   >(
     props.institution.accounts
+      .slice()
       .sort((a, b) => a.index - b.index)
       .map((a, index) => ({
         ...a,
@@ -82,6 +83,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
   useDidUpdate(() => {
     setSortedAccounts(
       props.institution.accounts
+        .slice()
         .sort((a, b) => a.index - b.index)
         .map((a, index) => ({
           ...a,
