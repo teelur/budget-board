@@ -36,9 +36,19 @@ interface IInstitutionItemProps {
 const InstitutionItem = (props: IInstitutionItemProps) => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
+  // Some accounts might have conflicting indices, so we need to re-index them here
+  // to ensure the drag-and-drop functionality works correctly
   const [sortedAccounts, setSortedAccounts] = React.useState<
     IAccountResponse[]
-  >(props.institution.accounts.sort((a, b) => a.index - b.index));
+  >(
+    props.institution.accounts
+      .slice()
+      .sort((a, b) => a.index - b.index)
+      .map((a, index) => ({
+        ...a,
+        index,
+      }))
+  );
 
   const { ref, handleRef } = useSortable({
     id: props.institution.id,
@@ -72,7 +82,13 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
 
   useDidUpdate(() => {
     setSortedAccounts(
-      props.institution.accounts.sort((a, b) => a.index - b.index)
+      props.institution.accounts
+        .slice()
+        .sort((a, b) => a.index - b.index)
+        .map((a, index) => ({
+          ...a,
+          index,
+        }))
     );
   }, [props.institution.accounts]);
 
@@ -131,6 +147,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
                     index,
                   })
                 );
+
                 setSortedAccounts(updatedList);
               }}
             >
