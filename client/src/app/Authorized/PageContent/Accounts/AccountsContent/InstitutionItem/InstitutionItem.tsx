@@ -5,9 +5,7 @@ import {
   Group,
   LoadingOverlay,
   Stack,
-  Text,
 } from "@mantine/core";
-import { convertNumberToCurrency } from "~/helpers/currency";
 import { IInstitution } from "~/models/institution";
 import AccountItem from "./AccountItem/AccountItem";
 import { GripVertical } from "lucide-react";
@@ -19,12 +17,14 @@ import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import { IAccountIndexRequest, IAccountResponse } from "~/models/account";
 import React from "react";
-import { useDidUpdate } from "@mantine/hooks";
+import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
+import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
+import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
 
 interface IInstitutionItemProps {
   institution: IInstitution;
@@ -34,6 +34,8 @@ interface IInstitutionItemProps {
 }
 
 const InstitutionItem = (props: IInstitutionItemProps) => {
+  const [isSelected, { toggle }] = useDisclosure(false);
+
   const [sortedAccounts, setSortedAccounts] = React.useState<
     IAccountResponse[]
   >(props.institution.accounts.sort((a, b) => a.index - b.index));
@@ -104,14 +106,22 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
           </Flex>
         )}
         <Stack gap="0.5rem" flex="1 1 auto">
-          <Group justify="space-between" align="center">
-            <Text fw={600} size="md">
-              {props.institution.name}
-            </Text>
-            <Text fw={600} size="md" c={totalBalance < 0 ? "red" : "green"}>
-              {convertNumberToCurrency(totalBalance, true, props.userCurrency)}
-            </Text>
-          </Group>
+          {isSelected ? (
+            <EditableInstitutionItemContent
+              institution={props.institution}
+              totalBalance={totalBalance}
+              userCurrency={props.userCurrency}
+              toggle={toggle}
+            />
+          ) : (
+            <InstitutionItemContent
+              institution={props.institution}
+              totalBalance={totalBalance}
+              userCurrency={props.userCurrency}
+              toggle={toggle}
+            />
+          )}
+
           <Stack id={props.institution.id} gap="0.5rem">
             <DragDropProvider
               onDragEnd={(event) => {

@@ -70,8 +70,6 @@ public class InstitutionService(
         }
 
         institution.Name = request.Name;
-        institution.Index = request.Index;
-        institution.UserID = request.UserID;
 
         await _userDataContext.SaveChangesAsync();
     }

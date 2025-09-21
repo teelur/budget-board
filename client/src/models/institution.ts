@@ -17,3 +17,8 @@ export interface InstitutionIndexRequest {
 export interface IInstitutionCreateRequest {
   name: string;
 }
+
+export interface IInstitutionUpdateRequest {
+  id: string;
+  name: string;
+}
