@@ -174,7 +174,6 @@ public class InstitutionServiceTests
         helper.UserDataContext.SaveChanges();
 
         var institutionUpdateRequest = _institutionUpdateRequestFaker.Generate();
-        institutionUpdateRequest.UserID = helper.demoUser.Id;
         institutionUpdateRequest.ID = institution.ID;
 
         // Act
@@ -203,7 +202,6 @@ public class InstitutionServiceTests
         );
 
         var institutionUpdateRequest = _institutionUpdateRequestFaker.Generate();
-        institutionUpdateRequest.UserID = helper.demoUser.Id;
 
         // Act
         Func<Task> act = async () =>
@@ -309,7 +307,6 @@ public class InstitutionServiceTests
         );
 
         var updateInstitutionRequest = _institutionUpdateRequestFaker.Generate();
-        updateInstitutionRequest.UserID = helper.demoUser.Id;
 
         // Act
         Func<Task> act = async () =>

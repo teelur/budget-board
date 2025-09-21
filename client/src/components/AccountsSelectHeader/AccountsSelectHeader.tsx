@@ -2,7 +2,7 @@ import AccountSelectInput from "~/components/AccountSelectInput";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
 import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -21,14 +21,14 @@ const AccountsSelectHeader = (
   const { request } = React.useContext<any>(AuthContext);
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccount[]> => {
+    queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as IAccount[];
+        return res.data as IAccountResponse[];
       }
 
       return [];
@@ -55,7 +55,7 @@ const AccountsSelectHeader = (
           props.setSelectedAccountIds(
             accountsQuery.data
               ?.filter(
-                (account: IAccount) =>
+                (account: IAccountResponse) =>
                   !account.hideAccount &&
                   !account.deleted &&
                   (props.filters ? props.filters?.includes(account.type) : true)

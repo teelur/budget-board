@@ -12,7 +12,7 @@ import {
 } from "./datetime";
 import { IBalance } from "~/models/balance";
 import { getSortedBalanceDates } from "./balances";
-import { IAccount, liabilityAccountTypes } from "~/models/account";
+import { IAccountResponse, liabilityAccountTypes } from "~/models/account";
 
 export const chartColors = [
   "indigo.6",
@@ -168,8 +168,8 @@ export const buildAccountBalanceChartData = (
  * @param accounts An array of IAccount objects representing accounts.
  * @returns An array of objects containing the name of the account and the color to use.
  */
-export const buildAccountBalanceChartSeries = (accounts: IAccount[]) =>
-  accounts.map((account: IAccount) => {
+export const buildAccountBalanceChartSeries = (accounts: IAccountResponse[]) =>
+  accounts.map((account: IAccountResponse) => {
     return {
       name: account.id,
       label: account.name,
@@ -198,7 +198,7 @@ export interface NetWorthChartData {
  */
 export const BuildNetWorthChartData = (
   balances: IBalance[],
-  accounts: IAccount[]
+  accounts: IAccountResponse[]
 ): NetWorthChartData[] => {
   // Use the account balance chart data to build the net worth chart data.
   const accountChartData = buildAccountBalanceChartData(balances);

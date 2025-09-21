@@ -4,7 +4,7 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { IBalance } from "~/models/balance";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 
 interface NetWorthChartProps {
-  accounts: IAccount[];
+  accounts: IAccountResponse[];
   balances: IBalance[];
   dateRange: DatesRangeValue<string>;
   isPending?: boolean;

@@ -1,6 +1,6 @@
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Group, Stack, Text } from "@mantine/core";
-import { AccountSource, IAccount } from "~/models/account";
+import { AccountSource, IAccountResponse } from "~/models/account";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +8,7 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 
 interface AccountItemProps {
-  account: IAccount;
+  account: IAccountResponse;
 }
 
 const AccountItem = (props: AccountItemProps): React.ReactNode => {

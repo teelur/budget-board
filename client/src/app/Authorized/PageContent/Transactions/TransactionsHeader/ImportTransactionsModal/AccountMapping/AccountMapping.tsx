@@ -4,7 +4,7 @@ import { AxiosResponse } from "axios";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { filterVisibleAccounts } from "~/helpers/accounts";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import AccountMappingItem from "./AccountMappingItem/AccountMappingItem";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { MoveLeftIcon } from "lucide-react";
@@ -31,14 +31,14 @@ const AccountMapping = (props: AccountMappingProps) => {
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccount[]> => {
+    queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as IAccount[];
+        return res.data as IAccountResponse[];
       }
 
       return [];

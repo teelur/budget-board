@@ -7,9 +7,11 @@ import Goals from "./Goals/Goals";
 import Settings from "./Settings/Settings";
 import Transactions from "./Transactions/Transactions";
 import Trends from "./Trends/Trends";
+import Accounts from "./Accounts/Accounts";
 
 export enum Pages {
   Dashboard,
+  Accounts,
   Transactions,
   Budgets,
   Goals,
@@ -26,6 +28,8 @@ const PageContent = (props: PageContentProps): React.ReactNode => {
     switch (page) {
       case Pages.Dashboard:
         return <Dashboard />;
+      case Pages.Accounts:
+        return <Accounts />;
       case Pages.Transactions:
         return <Transactions />;
       case Pages.Budgets:
