@@ -1,5 +1,4 @@
-import { ActionIcon, Button, Group } from "@mantine/core";
-import { SettingsIcon } from "lucide-react";
+import { Button, Group } from "@mantine/core";
 import React from "react";
 import CreateAccount from "./CreateAccount/CreateAccount";
 
@@ -18,9 +17,6 @@ const AccountsHeader = (props: AccountsHeaderProps): React.ReactNode => {
         {props.isSortable ? "Save" : "Reorder"}
       </Button>
       <CreateAccount />
-      <ActionIcon variant="subtle" size="input-sm">
-        <SettingsIcon />
-      </ActionIcon>
     </Group>
   );
 };
