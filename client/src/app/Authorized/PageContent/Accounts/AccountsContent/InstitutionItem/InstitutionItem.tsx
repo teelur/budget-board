@@ -31,6 +31,7 @@ interface IInstitutionItemProps {
   userCurrency: string;
   isSortable: boolean;
   container: Element;
+  openDetails: (account: IAccountResponse | undefined) => void;
 }
 
 const InstitutionItem = (props: IInstitutionItemProps) => {
@@ -160,6 +161,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
                   container={
                     document.getElementById(props.institution.id) as Element
                   }
+                  openDetails={props.openDetails}
                 />
               ))}
             </DragDropProvider>

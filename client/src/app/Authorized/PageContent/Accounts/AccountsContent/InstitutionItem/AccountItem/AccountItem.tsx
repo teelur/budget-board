@@ -16,6 +16,7 @@ interface IAccountItemProps {
   userCurrency: string;
   isSortable: boolean;
   container: Element;
+  openDetails: (account: IAccountResponse | undefined) => void;
 }
 
 const AccountItem = (props: IAccountItemProps) => {
@@ -41,6 +42,7 @@ const AccountItem = (props: IAccountItemProps) => {
       radius="md"
       className={classes.card}
       withBorder
+      onClick={() => props.openDetails(props.account)}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (

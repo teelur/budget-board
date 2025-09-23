@@ -9,13 +9,21 @@ import { move } from "@dnd-kit/helpers";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
-import { useDidUpdate } from "@mantine/hooks";
+import { useDidUpdate, useDisclosure } from "@mantine/hooks";
+import AccountDetails from "./AccountDetails/AccountDetails";
+import { IAccountResponse } from "~/models/account";
 
 interface AccountsContentProps {
   isSortable: boolean;
 }
 
 const AccountsContent = (props: AccountsContentProps) => {
+  const [isDetailsOpen, { open: openDetails, close: closeDetails }] =
+    useDisclosure(false);
+  const [selectedAccount, setSelectedAccount] = React.useState<
+    IAccountResponse | undefined
+  >(undefined);
+
   const [sortedInstitutions, setSortedInstitutions] = React.useState<
     IInstitution[]
   >([]);
@@ -98,6 +106,12 @@ const AccountsContent = (props: AccountsContentProps) => {
   return (
     <Stack id="institutions-stack" gap="1rem">
       <LoadingOverlay visible={doIndexInstitutions.isPending} />
+      <AccountDetails
+        isOpen={isDetailsOpen}
+        close={closeDetails}
+        account={selectedAccount}
+        currency={userSettingsQuery.data?.currency || "USD"}
+      />
       <DragDropProvider
         onDragEnd={(event) => {
           const updatedList = move(sortedInstitutions, event).map(
@@ -117,6 +131,10 @@ const AccountsContent = (props: AccountsContentProps) => {
             userCurrency={userSettingsQuery.data?.currency || "USD"}
             isSortable={props.isSortable}
             container={document.getElementById("institutions-stack") as Element}
+            openDetails={(account: IAccountResponse | undefined) => {
+              setSelectedAccount(account);
+              openDetails();
+            }}
           />
         ))}
       </DragDropProvider>
