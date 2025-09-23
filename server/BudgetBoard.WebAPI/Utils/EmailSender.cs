@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace BudgetBoard.WebAPI.Utils;
 
 public class EmailSender : IEmailSender
 {
+    private static readonly ILogger<EmailSender> _logger = LoggerFactory
+        .Create(builder => builder.AddConsole())
+        .CreateLogger<EmailSender>();
     public IConfiguration Configuration { get; }
+
     public EmailSender(IConfiguration configuration)
     {
         Configuration = configuration;
@@ -18,6 +22,14 @@ public class EmailSender : IEmailSender
         if (string.IsNullOrEmpty(sender))
         {
             throw new ArgumentNullException(nameof(sender));
+        }
+
+        // Some SMTP services have a separate username from the sender email address
+        var senderUserName = Configuration.GetValue<string>("EMAIL_SENDER_USERNAME");
+        if (string.IsNullOrEmpty(senderUserName))
+        {
+            _logger.LogInformation("EMAIL_SENDER_USERNAME not set, using EMAIL_SENDER as username");
+            senderUserName = sender;
         }
 
         var senderPassword = Configuration.GetValue<string>("EMAIL_SENDER_PASSWORD");
@@ -32,20 +44,21 @@ public class EmailSender : IEmailSender
             throw new ArgumentNullException(nameof(smtpHost));
         }
 
-        using (MailMessage mm = new MailMessage(sender, email))
+        using var mm = new MailMessage(sender, email)
         {
-            mm.Subject = subject;
-            string body = htmlMessage;
-            mm.Body = body;
-            mm.IsBodyHtml = true;
-            SmtpClient smtp = new SmtpClient();
-            smtp.Host = smtpHost;
-            smtp.EnableSsl = true;
-            NetworkCredential NetworkCred = new NetworkCredential(sender, senderPassword);
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = NetworkCred;
-            smtp.Port = 587;
-            await smtp.SendMailAsync(mm);
-        }
+            Subject = subject,
+            Body = htmlMessage,
+            IsBodyHtml = true,
+        };
+        var smtp = new SmtpClient
+        {
+            Host = smtpHost,
+            EnableSsl = true,
+            UseDefaultCredentials = false,
+            Credentials = new NetworkCredential(senderUserName, senderPassword),
+            Port = 587,
+        };
+
+        await smtp.SendMailAsync(mm);
     }
 }
