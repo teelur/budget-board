@@ -100,7 +100,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
           </Group>
           <Accordion
             variant="separated"
-            defaultValue={["chart", "add-balance"]}
+            defaultValue={["chart", "balances"]}
             multiple
           >
             <Accordion.Item
@@ -159,7 +159,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
               </Accordion.Panel>
             </Accordion.Item>
             <Accordion.Item
-              value="transactions"
+              value="balances"
               bg="var(--mantine-color-content-background)"
             >
               <Accordion.Control>Recent Balances</Accordion.Control>
