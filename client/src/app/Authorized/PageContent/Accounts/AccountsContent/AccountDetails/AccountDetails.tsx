@@ -100,7 +100,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
           </Group>
           <Accordion
             variant="separated"
-            defaultValue={["chart", "transactions"]}
+            defaultValue={["chart", "add-balance"]}
             multiple
           >
             <Accordion.Item
@@ -170,7 +170,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   )}
                   {balancesQuery.data && balancesQuery.data.length === 0 ? (
                     <Text size="sm" c="dimmed">
-                      No recent transactions
+                      No balance entries
                     </Text>
                   ) : (
                     <BalanceItems
