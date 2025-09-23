@@ -1,3 +1,5 @@
+import classes from "./AccountItem.module.css";
+
 import { useSortable } from "@dnd-kit/react/sortable";
 import { Button, Card, Flex, Group } from "@mantine/core";
 import { GripVertical } from "lucide-react";
@@ -37,6 +39,7 @@ const AccountItem = (props: IAccountItemProps) => {
       shadow="sm"
       padding="0.5rem"
       radius="md"
+      className={classes.card}
       withBorder
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
