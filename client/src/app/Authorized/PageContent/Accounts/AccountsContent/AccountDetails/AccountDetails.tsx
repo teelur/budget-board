@@ -170,7 +170,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   )}
                   {balancesQuery.data && balancesQuery.data.length === 0 ? (
                     <Text size="sm" c="dimmed">
-                      No recent transactions
+                      No balance entries
                     </Text>
                   ) : (
                     <BalanceItems
