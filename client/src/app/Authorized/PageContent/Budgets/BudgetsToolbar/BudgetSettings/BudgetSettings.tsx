@@ -90,6 +90,13 @@ const BudgetSettings = (): React.ReactNode => {
         opened={settingsOpen}
         onClose={close}
         title={<Text fw={600}>Budget Settings</Text>}
+        styles={{
+          inner: {
+            left: "0",
+            right: "0",
+            padding: "0 !important",
+          },
+        }}
       >
         <Group gap="0.5rem" wrap="nowrap">
           <NumberInput
