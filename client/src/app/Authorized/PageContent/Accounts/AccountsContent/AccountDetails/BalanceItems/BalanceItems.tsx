@@ -13,6 +13,10 @@ const BalanceItems = (props: BalanceItemsProps) => {
 
   const [page, setPage] = React.useState(1);
 
+  React.useEffect(() => {
+    setPage(1);
+  }, [props.balances]);
+
   return (
     <Stack gap="0.5rem">
       {props.balances

@@ -44,6 +44,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
 
       return [];
     },
+    enabled: !!props.account?.id && props.isOpen,
   });
 
   const sortedBalances =
