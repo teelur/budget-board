@@ -16,6 +16,7 @@ import BalanceChart from "~/components/Charts/BalanceChart/BalanceChart";
 import { IAccountResponse } from "~/models/account";
 import { IBalance } from "~/models/balance";
 import BalanceItems from "./BalanceItems/BalanceItems";
+import AddBalance from "./AddBalance/AddBalance";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -88,12 +89,34 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                 {props.account.name}
               </Text>
             </Stack>
+            <Stack gap={0}>
+              <Text size="xs" fw={500} c="dimmed">
+                Account Type
+              </Text>
+              <Text size="lg" fw={600}>
+                {props.account.subtype || props.account.type}
+              </Text>
+            </Stack>
           </Group>
           <Accordion
             variant="separated"
             defaultValue={["chart", "transactions"]}
             multiple
           >
+            <Accordion.Item
+              value="add-balance"
+              bg="var(--mantine-color-content-background)"
+            >
+              <Accordion.Control>
+                <Text>Add Balance</Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <AddBalance
+                  accountId={props.account.id}
+                  currency={props.currency}
+                />
+              </Accordion.Panel>
+            </Accordion.Item>
             <Accordion.Item
               value="chart"
               bg="var(--mantine-color-content-background)"
