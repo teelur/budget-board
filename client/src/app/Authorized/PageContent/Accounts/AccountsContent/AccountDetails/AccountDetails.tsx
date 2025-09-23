@@ -100,7 +100,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
           </Group>
           <Accordion
             variant="separated"
-            defaultValue={["chart", "transactions"]}
+            defaultValue={["chart", "add-balance"]}
             multiple
           >
             <Accordion.Item
