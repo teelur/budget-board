@@ -40,9 +40,9 @@ const AccountItem = (props: IAccountItemProps) => {
       shadow="sm"
       padding="0.5rem"
       radius="md"
-      className={classes.card}
+      className={isSelected ? undefined : classes.card}
       withBorder
-      onClick={() => props.openDetails(props.account)}
+      onClick={() => !isSelected && props.openDetails(props.account)}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (
