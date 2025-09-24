@@ -1,8 +1,4 @@
 .card {
-  padding: 0.5rem;
-  container-type: inline-size;
-  width: 100%;
-
   &:hover {
     outline: 1px solid var(--mantine-primary-color-filled);
   }
