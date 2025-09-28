@@ -2,7 +2,7 @@
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.WebAPI.Utils;
+using BudgetBoard.Utils;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 

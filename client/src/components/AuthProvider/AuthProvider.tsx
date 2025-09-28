@@ -10,6 +10,7 @@ export interface AuthContextValue {
   setIsUserAuthenticated: (isLoggedIn: boolean) => void;
   loading: boolean;
   request: ({ ...options }) => Promise<AxiosResponse>;
+  startOidcLogin?: () => void; // added
 }
 
 const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
@@ -54,11 +55,41 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
       });
   }, []);
 
+  const startOidcLogin = (): void => {
+    const authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
+    const clientId = envVariables.VITE_OIDC_CLIENT_ID;
+    const clientSecret = envVariables.VITE_OIDC_CLIENT_SECRET;
+    const redirectUri = `${window.location.origin}/oidc-callback`;
+
+    if (!authorizeUrl || !clientId || !clientSecret) {
+      notifications.show({
+        color: "red",
+        message:
+          "OIDC is not configured. Set VITE_OIDC_PROVIDER, VITE_OIDC_CLIENT_ID, and VITE_OIDC_CLIENT_SECRET.",
+      });
+      return;
+    }
+
+    const state = Math.random().toString(36).slice(2);
+    sessionStorage.setItem("oidc_state", state);
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: "openid profile email",
+      state,
+    });
+
+    window.location.href = `${authorizeUrl}/authorize?${params.toString()}`;
+  };
+
   const authValue: AuthContextValue = {
     isUserAuthenticated,
     setIsUserAuthenticated,
     loading,
     request,
+    startOidcLogin,
   };
 
   return (

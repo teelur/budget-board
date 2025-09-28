@@ -5,6 +5,7 @@ import {
   PasswordInput,
   Stack,
   TextInput,
+  Divider,
 } from "@mantine/core";
 import { hasLength, isEmail, useForm } from "@mantine/form";
 import React from "react";
@@ -34,7 +35,7 @@ const Login = (props: LoginProps): React.ReactNode => {
     },
   });
 
-  const { request, setIsUserAuthenticated } =
+  const { request, setIsUserAuthenticated, startOidcLogin } =
     React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
@@ -163,6 +164,14 @@ const Login = (props: LoginProps): React.ReactNode => {
       >
         Reset Password
       </Anchor>
+      <Divider w="100%" label="or" />
+      <Button
+        variant="outline"
+        fullWidth
+        onClick={() => startOidcLogin && startOidcLogin()}
+      >
+        Sign in with OIDC
+      </Button>
     </Stack>
   );
 };

@@ -1,16 +1,21 @@
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
+using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Jobs;
-using BudgetBoard.WebAPI.Utils;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Quartz;
 using Serilog;
 
@@ -81,7 +86,7 @@ var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 
 if (oidcEnabled)
 {
-    var oidcAuthority = builder.Configuration.GetValue<string>("OIDC_AUTHORITY");
+    var oidcAuthority = builder.Configuration.GetValue<string>("OIDC_ISSUER");
     if (string.IsNullOrEmpty(oidcAuthority))
     {
         throw new ArgumentNullException(nameof(oidcAuthority));
@@ -97,9 +102,16 @@ if (oidcEnabled)
         throw new ArgumentNullException(nameof(oidcClientSecret));
     }
 
-    // Configure Identity
+    // Configure Identity + OpenID Connect
     builder
-        .Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+        .Services.AddAuthentication(options =>
+        {
+            // Application uses cookie authentication as the default
+            options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+            options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+            // When a challenge occurs, use the OIDC external scheme to redirect to the provider
+            options.DefaultChallengeScheme = IdentityConstants.ExternalScheme;
+        })
         .AddCookie(IdentityConstants.ApplicationScheme)
         .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddOpenIdConnect(
@@ -109,14 +121,64 @@ if (oidcEnabled)
                 options.Authority = oidcAuthority;
                 options.ClientId = oidcClientId;
                 options.ClientSecret = oidcClientSecret;
+
+                // Standard OIDC opts for Authorization Code flow with PKCE
                 options.ResponseType = "code";
-                options.GetClaimsFromUserInfoEndpoint = true;
+                options.UsePkce = true;
+                options.SaveTokens = true;
+
+                // Set callback to controller endpoint implemented at /api/oidc/callback
+                options.CallbackPath = "/api/oidc/callback";
+
+                // Request the common scopes
+                options.Scope.Clear();
+                options.Scope.Add("openid");
+                options.Scope.Add("profile");
+                options.Scope.Add("email");
+
+                // Make sure name/role claim types are sensible for Identity
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    NameClaimType = ClaimTypes.Name,
+                    RoleClaimType = ClaimTypes.Role,
+                };
+
+                // Optional: map or keep inbound claims as-is
+                options.MapInboundClaims = false;
+
+                // Delegate provisioning to a testable service
+                options.Events = new OpenIdConnectEvents
+                {
+                    OnTokenValidated = async ctx =>
+                    {
+                        var provisioner =
+                            ctx.HttpContext.RequestServices.GetRequiredService<IExternalUserProvisioningService>();
+                        var success = await provisioner.ProvisionExternalUserAsync(
+                            ctx.Principal!,
+                            ctx.HttpContext,
+                            ctx.Scheme.Name
+                        );
+                        if (!success)
+                        {
+                            ctx.Response.StatusCode = 500;
+                            ctx.HandleResponse();
+                        }
+                    },
+
+                    OnRemoteFailure = ctx =>
+                    {
+                        // Handle failures from the provider, if necessary
+                        ctx.Response.StatusCode = 500;
+                        ctx.HandleResponse();
+                        return Task.CompletedTask;
+                    },
+                };
             }
         );
 }
 else
 {
-    // Configure Identity
+    // Configure Identity (no OIDC)
     builder
         .Services.AddAuthentication(IdentityConstants.ApplicationScheme)
         .AddCookie(IdentityConstants.ApplicationScheme)
@@ -173,6 +235,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 var autoUpdateDb = builder.Configuration.GetValue<bool>("AUTO_UPDATE_DB");
+
+// Register the new provisioning service after Identity is configured
+builder.Services.AddScoped<IExternalUserProvisioningService, ExternalUserProvisioningService>();
 
 if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 {

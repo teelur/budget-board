@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace BudgetBoard.WebAPI.Utils;
+namespace BudgetBoard.Utils;
 
 public static class Helpers
 {
@@ -13,7 +13,7 @@ public static class Helpers
     {
         var errorObjectResult = new ObjectResult(message)
         {
-            StatusCode = StatusCodes.Status500InternalServerError
+            StatusCode = StatusCodes.Status500InternalServerError,
         };
 
         return errorObjectResult;

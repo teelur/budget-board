@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
-namespace BudgetBoard.WebAPI.Utils;
+namespace BudgetBoard.Utils;
 
 public class EmailSender : IEmailSender
 {
     public IConfiguration Configuration { get; }
+
     public EmailSender(IConfiguration configuration)
     {
         Configuration = configuration;

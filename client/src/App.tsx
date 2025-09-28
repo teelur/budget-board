@@ -15,6 +15,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Notifications } from "@mantine/notifications";
 
 import Welcome from "~/app/Unauthorized/Welcome";
+import OidcCallback from "~/app/Unauthorized/OidcCallback";
 import AuthProvider from "~/components/AuthProvider/AuthProvider";
 import AuthorizedRoute from "~/components/AuthProvider/AuthorizedRoute";
 import UnauthorizedRoute from "~/components/AuthProvider/UnauthorizedRoute";
@@ -84,6 +85,7 @@ function App() {
                   </UnauthorizedRoute>
                 }
               />
+              <Route path="/oidc-callback" element={<OidcCallback />} />
               <Route
                 path="/dashboard"
                 element={
