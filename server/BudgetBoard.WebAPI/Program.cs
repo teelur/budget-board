@@ -60,10 +60,13 @@ if (string.IsNullOrEmpty(postgresUser))
 
 var postgresPassword = builder.Configuration.GetValue<string>("POSTGRES_PASSWORD");
 
+var postgresPort = builder.Configuration.GetValue<int?>("POSTGRES_PORT") ?? 5432;
+
 var connectionString = new string(
-    "Host={HOST};Port=5432;Database={DATABASE};Username={USER};Password={PASSWORD}"
+    "Host={HOST};Port={PORT};Database={DATABASE};Username={USER};Password={PASSWORD}"
 )
     .Replace("{HOST}", postgresHost)
+    .Replace("{PORT}", postgresPort.ToString())
     .Replace("{DATABASE}", postgresDatabase)
     .Replace("{USER}", postgresUser)
     .Replace("{PASSWORD}", postgresPassword);
@@ -209,10 +212,7 @@ builder.Services.AddScoped<IInstitutionService, InstitutionService>();
 builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
-builder.Services.AddScoped<
-    IAutomaticCategorizationRuleService,
-    AutomaticCategorizationRuleService
->();
+builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();
 
 var app = builder.Build();
 

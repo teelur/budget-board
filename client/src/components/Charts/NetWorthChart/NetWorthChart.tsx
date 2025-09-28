@@ -2,9 +2,9 @@ import { filterBalancesByDateRange } from "~/helpers/balances";
 import { BuildNetWorthChartData } from "~/helpers/charts";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
-import { CompositeChart } from "@mantine/charts";
+import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { IBalance } from "~/models/balance";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -13,9 +13,10 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
+import ChartTooltip from "../ChartTooltip/ChartTooltip";
 
 interface NetWorthChartProps {
-  accounts: IAccount[];
+  accounts: IAccountResponse[];
   balances: IBalance[];
   dateRange: DatesRangeValue<string>;
   isPending?: boolean;
@@ -40,6 +41,27 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
       return undefined;
     },
   });
+
+  const chartSeries: CompositeChartSeries[] = [
+    { name: "assets", label: "Assets", color: "green.6", type: "bar" },
+    {
+      name: "liabilities",
+      label: "Liabilities",
+      color: "red.6",
+      type: "bar",
+    },
+    { name: "net", label: "Net", color: "gray.0", type: "line" },
+  ];
+
+  const chartValueFormatter = (value: number): string => {
+    return userSettingsQuery.isPending
+      ? ""
+      : convertNumberToCurrency(
+          value,
+          false,
+          userSettingsQuery.data?.currency ?? "USD"
+        );
+  };
 
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
@@ -67,16 +89,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
         ),
         props.accounts
       )}
-      series={[
-        { name: "assets", label: "Assets", color: "green.6", type: "bar" },
-        {
-          name: "liabilities",
-          label: "Liabilities",
-          color: "red.6",
-          type: "bar",
-        },
-        { name: "net", label: "Net", color: "gray.0", type: "line" },
-      ]}
+      series={chartSeries}
       withLegend
       dataKey="dateString"
       composedChartProps={{ stackOffset: "sign" }}
@@ -87,15 +100,17 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
       }}
       lineProps={{ type: "linear" }}
       tooltipAnimationDuration={200}
-      valueFormatter={(value) =>
-        userSettingsQuery.isPending
-          ? ""
-          : convertNumberToCurrency(
-              value,
-              true,
-              userSettingsQuery.data?.currency ?? "USD"
-            )
-      }
+      tooltipProps={{
+        content: ({ label, payload }) => (
+          <ChartTooltip
+            label={label}
+            payload={payload}
+            series={chartSeries}
+            valueFormatter={chartValueFormatter}
+          />
+        ),
+      }}
+      valueFormatter={chartValueFormatter}
     />
   );
 };

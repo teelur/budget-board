@@ -6,6 +6,20 @@ on:
   push:
     branches:
       - main
+    # Prevent the workflow from running when only documentation, images,
+    # or other non-code assets are changed. Update these patterns to
+    # match the files you want to exclude from push-triggered runs.
+    paths-ignore:
+      - "README.md"
+      - "img/**"
+      - "docs/**"
+      - ".github/**"
+      - ".gitignore"
+      - ".gitattributes"
+      - ".dockerignore"
+      - "compose.yml"
+      - "compose.override.yml"
+      - "LICENSE"
 
 # Defines two custom environment variables for the workflow.
 # These are used for the Container registry domain, and a name for the
@@ -51,7 +65,7 @@ jobs:
         if: github.event_name == 'release'
 
       - name: Write Version to File
-        uses: brettdorrans/write-version-to-file@v1.1.0
+        uses: eball/write-tag-to-version-file@latest
         with:
           filename: "client/.env"
           placeholder: "PLACEHOLDER"

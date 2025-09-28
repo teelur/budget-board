@@ -89,6 +89,7 @@ export enum TransactionCardType {
 }
 
 export const hiddenTransactionCategory = "Hide from Budgets";
+export const uncategorizedTransactionCategory = "Uncategorized";
 
 export const defaultTransactionCategories: ICategory[] = [
   {

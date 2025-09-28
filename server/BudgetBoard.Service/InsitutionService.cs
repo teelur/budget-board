@@ -21,6 +21,17 @@ public class InstitutionService(
     public async Task CreateInstitutionAsync(Guid userGuid, IInstitutionCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        if (
+            userData.Institutions.Any(i =>
+                i.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
+            )
+        )
+        {
+            _logger.LogError("Attempted to create an institution with a duplicate name.");
+            throw new BudgetBoardServiceException("An institution with this name already exists.");
+        }
+
         var institution = new Institution { Name = request.Name, UserID = userGuid };
 
         userData.Institutions.Add(institution);
@@ -62,9 +73,24 @@ public class InstitutionService(
             );
         }
 
+        if (string.IsNullOrEmpty(request.Name))
+        {
+            _logger.LogError("Attempt to update institution with empty name.");
+            throw new BudgetBoardServiceException("Institution name cannot be empty.");
+        }
+
+        if (
+            !institution.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
+            && userData.Institutions.Any(i =>
+                i.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
+            )
+        )
+        {
+            _logger.LogError("Attempted to rename an institution to a duplicate name.");
+            throw new BudgetBoardServiceException("An institution with this name already exists.");
+        }
+
         institution.Name = request.Name;
-        institution.Index = request.Index;
-        institution.UserID = request.UserID;
 
         await _userDataContext.SaveChangesAsync();
     }

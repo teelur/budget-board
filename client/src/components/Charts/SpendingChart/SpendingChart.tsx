@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import ChartTooltip from "../ChartTooltip/ChartTooltip";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -46,6 +47,21 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
     [sortedMonths, props.transactions]
   );
 
+  const chartSeries = React.useMemo(
+    () => buildTransactionChartSeries(sortedMonths),
+    [sortedMonths]
+  );
+
+  const chartValueFormatter = (value: number): string => {
+    return userSettingsQuery.isPending
+      ? ""
+      : convertNumberToCurrency(
+          value,
+          false,
+          userSettingsQuery.data?.currency ?? "USD"
+        );
+  };
+
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
   }
@@ -62,20 +78,22 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
     <AreaChart
       h={400}
       w="100%"
-      series={buildTransactionChartSeries(sortedMonths)}
+      series={chartSeries}
       data={chartData}
       dataKey="day"
-      valueFormatter={(value) =>
-        userSettingsQuery.isPending
-          ? ""
-          : convertNumberToCurrency(
-              value,
-              true,
-              userSettingsQuery.data?.currency ?? "USD"
-            )
-      }
+      valueFormatter={chartValueFormatter}
       withLegend
       tooltipAnimationDuration={200}
+      tooltipProps={{
+        content: ({ label, payload }) => (
+          <ChartTooltip
+            label={label}
+            payload={payload}
+            series={chartSeries}
+            valueFormatter={chartValueFormatter}
+          />
+        ),
+      }}
       curveType="monotone"
       withYAxis={props.includeYAxis}
       gridAxis={props.includeGrid ? "xy" : "none"}

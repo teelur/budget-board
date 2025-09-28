@@ -2,7 +2,7 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { getMonthAndYearDateString } from "~/helpers/datetime";
 import { getTransactionsForMonth } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
-import { CompositeChart } from "@mantine/charts";
+import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import ChartTooltip from "../ChartTooltip/ChartTooltip";
 
 interface ChartDatum {
   month: string;
@@ -84,6 +85,22 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
     return spendingTrendsChartData;
   };
 
+  const chartSeries: CompositeChartSeries[] = [
+    { name: "Income", color: "green.6", type: "bar" },
+    { name: "Spending", color: "red.6", type: "bar" },
+    { name: "Net", color: "gray.0", type: "line" },
+  ];
+
+  const chartValueFormatter = (value: number): string => {
+    return userSettingsQuery.isPending
+      ? ""
+      : convertNumberToCurrency(
+          value,
+          false,
+          userSettingsQuery.data?.currency ?? "USD"
+        );
+  };
+
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
   }
@@ -101,11 +118,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
       h={400}
       w="100%"
       data={buildChartData()}
-      series={[
-        { name: "Income", color: "green.6", type: "bar" },
-        { name: "Spending", color: "red.6", type: "bar" },
-        { name: "Net", color: "gray.0", type: "line" },
-      ]}
+      series={chartSeries}
       withLegend
       dataKey="month"
       composedChartProps={{ stackOffset: "sign" }}
@@ -116,15 +129,17 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
       }}
       lineProps={{ type: "linear" }}
       tooltipAnimationDuration={200}
-      valueFormatter={(value) =>
-        userSettingsQuery.isPending
-          ? ""
-          : convertNumberToCurrency(
-              value,
-              true,
-              userSettingsQuery.data?.currency ?? "USD"
-            )
-      }
+      tooltipProps={{
+        content: ({ label, payload }) => (
+          <ChartTooltip
+            label={label}
+            payload={payload}
+            series={chartSeries}
+            valueFormatter={chartValueFormatter}
+          />
+        ),
+      }}
+      valueFormatter={chartValueFormatter}
     />
   );
 };

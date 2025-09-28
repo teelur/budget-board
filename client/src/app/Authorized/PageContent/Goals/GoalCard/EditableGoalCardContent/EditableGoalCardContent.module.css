@@ -1,0 +1,21 @@
+.root {
+  container-type: inline-size;
+}
+
+.header {
+  justify-content: space-between;
+  flex-direction: row;
+
+  @container (max-width: 475px) {
+    flex-direction: column;
+  }
+}
+
+.footer {
+  justify-content: space-between;
+  flex-direction: row;
+
+  @container (max-width: 450px) {
+    flex-direction: column;
+  }
+}

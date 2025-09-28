@@ -4,6 +4,7 @@ import {
   Filters,
   hiddenTransactionCategory,
   ITransaction,
+  uncategorizedTransactionCategory,
 } from "~/models/transaction";
 import { areStringsEqual } from "./utils";
 import { getIsParentCategory } from "./category";
@@ -51,27 +52,27 @@ export const sortTransactions = (
       return sortDirection === SortDirection.Decending
         ? transactions.sort((a, b) =>
             (b.subcategory === null || b.subcategory === ""
-              ? b.category ?? "Uncategorized"
-              : b.subcategory ?? "Uncategorized"
+              ? b.category ?? uncategorizedTransactionCategory
+              : b.subcategory ?? uncategorizedTransactionCategory
             )
               .toLocaleLowerCase()
               .localeCompare(
                 (a.subcategory === null || a.subcategory === ""
-                  ? a.category ?? "Uncategorized"
-                  : a.subcategory ?? "Uncategorized"
+                  ? a.category ?? uncategorizedTransactionCategory
+                  : a.subcategory ?? uncategorizedTransactionCategory
                 ).toLocaleLowerCase()
               )
           )
         : transactions.sort((a, b) =>
             (a.subcategory === null || a.subcategory === ""
-              ? a.category ?? "Uncategorized"
-              : a.subcategory ?? "Uncategorized"
+              ? a.category ?? uncategorizedTransactionCategory
+              : a.subcategory ?? uncategorizedTransactionCategory
             )
               .toLocaleLowerCase()
               .localeCompare(
                 (b.subcategory === null || b.subcategory === ""
-                  ? b.category ?? "Uncategorized"
-                  : b.subcategory ?? "Uncategorized"
+                  ? b.category ?? uncategorizedTransactionCategory
+                  : b.subcategory ?? uncategorizedTransactionCategory
                 ).toLocaleLowerCase()
               )
           );
@@ -137,10 +138,17 @@ export const getFilteredTransactions = (
     );
   }
   if (filters.category && filters.category.length > 0) {
+    // Uncategorized is a special case since it is not in the categories list.
+    const filterCategory = areStringsEqual(
+      filters.category,
+      uncategorizedTransactionCategory
+    )
+      ? ""
+      : filters.category;
     filteredTransactions = filteredTransactions.filter((t) =>
       getIsParentCategory(filters.category, transactionCategories)
-        ? areStringsEqual(t.category ?? "", filters.category)
-        : areStringsEqual(t.subcategory ?? "", filters.category)
+        ? areStringsEqual(t.category ?? "", filterCategory)
+        : areStringsEqual(t.subcategory ?? "", filterCategory)
     );
   }
   if (filters.dateRange?.at(0)) {

@@ -5,7 +5,6 @@ import CategorySelect from "~/components/CategorySelect";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   ActionIcon,
-  Button,
   LoadingOverlay,
   NumberInput,
   Popover,
@@ -98,9 +97,9 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   return (
     <Popover>
       <Popover.Target>
-        <Button>
+        <ActionIcon size="input-sm">
           <PlusIcon />
-        </Button>
+        </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown className={classes.root}>
         <LoadingOverlay visible={doCreateBudget.isPending} />

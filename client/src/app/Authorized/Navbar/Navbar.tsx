@@ -6,6 +6,7 @@ import {
   CalculatorIcon,
   ChartNoAxesColumnIncreasingIcon,
   GoalIcon,
+  LandmarkIcon,
   LayoutDashboardIcon,
   LogOutIcon,
   SettingsIcon,
@@ -21,6 +22,7 @@ import { notifications } from "@mantine/notifications";
 
 const sidebarItems = [
   { icon: <LayoutDashboardIcon />, page: Pages.Dashboard, label: "Dashboard" },
+  { icon: <LandmarkIcon />, page: Pages.Accounts, label: "Accounts" },
   { icon: <BanknoteIcon />, page: Pages.Transactions, label: "Transactions" },
   { icon: <CalculatorIcon />, page: Pages.Budgets, label: "Budgets" },
   { icon: <GoalIcon />, page: Pages.Goals, label: "Goals" },

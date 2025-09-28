@@ -42,6 +42,7 @@ const TransactionsHeader = (
         <Group className={classes.buttonGroup}>
           <ImportTransactionsModal />
           <Button
+            variant={isFilterCardOpen ? "outline" : "primary"}
             size="sm"
             rightSection={<FilterIcon size="1rem" />}
             onClick={toggle}
@@ -49,7 +50,7 @@ const TransactionsHeader = (
             Filter
           </Button>
           <CreateTransactionModal />
-          <ActionIcon size="input-sm" onClick={open}>
+          <ActionIcon variant="subtle" size="input-sm" onClick={open}>
             <SettingsIcon />
           </ActionIcon>
           <TransactionsSettings modalOpened={settingsOpen} closeModal={close} />

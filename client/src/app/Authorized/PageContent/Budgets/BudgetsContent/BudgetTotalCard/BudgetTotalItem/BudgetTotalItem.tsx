@@ -1,6 +1,6 @@
 import classes from "./BudgetTotalItem.module.css";
 
-import { getBudgetValueColor } from "~/helpers/budgets";
+import { BudgetValueType, getBudgetValueColor } from "~/helpers/budgets";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Flex, Group, Progress, Stack, Text } from "@mantine/core";
 import React from "react";
@@ -13,7 +13,7 @@ interface BudgetTotalItemProps {
   label: string;
   amount: number;
   total?: number;
-  isIncome: boolean;
+  budgetValueType: BudgetValueType;
   hideProgress?: boolean;
 }
 
@@ -37,7 +37,10 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
   });
 
   const percentComplete = Math.round(
-    ((props.amount * (props.isIncome ? 1 : -1)) / (props.total ?? 0)) * 100
+    ((props.amount *
+      (props.budgetValueType === BudgetValueType.Expense ? -1 : 1)) /
+      (props.total ?? 0)) *
+      100
   );
 
   return (
@@ -53,11 +56,13 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
               c={getBudgetValueColor(
                 props.amount,
                 props.total ?? 0,
-                props.isIncome
+                props.budgetValueType,
+                userSettingsQuery.data?.budgetWarningThreshold ?? 80
               )}
             >
               {convertNumberToCurrency(
-                props.amount * (props.isIncome ? 1 : -1),
+                props.amount *
+                  (props.budgetValueType === BudgetValueType.Expense ? -1 : 1),
                 false,
                 userSettingsQuery.data?.currency ?? "USD"
               )}
@@ -82,7 +87,8 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
             color={getBudgetValueColor(
               props.amount,
               props.total ?? 0,
-              props.isIncome
+              props.budgetValueType,
+              userSettingsQuery.data?.budgetWarningThreshold ?? 80
             )}
           >
             <Progress.Label>{percentComplete.toFixed(0)}%</Progress.Label>

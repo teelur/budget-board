@@ -18,7 +18,8 @@ public enum Currency
 public class UserSettings()
 {
     public Guid ID { get; set; }
-    public Currency Currency { get; set; } = Currency.USD;
+    public string Currency { get; set; } = "USD";
+    public int BudgetWarningThreshold { get; set; } = 80;
     public Guid UserID { get; set; }
     public ApplicationUser User { get; set; } = null!;
 }

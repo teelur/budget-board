@@ -174,7 +174,6 @@ public class InstitutionServiceTests
         helper.UserDataContext.SaveChanges();
 
         var institutionUpdateRequest = _institutionUpdateRequestFaker.Generate();
-        institutionUpdateRequest.UserID = helper.demoUser.Id;
         institutionUpdateRequest.ID = institution.ID;
 
         // Act
@@ -203,7 +202,6 @@ public class InstitutionServiceTests
         );
 
         var institutionUpdateRequest = _institutionUpdateRequestFaker.Generate();
-        institutionUpdateRequest.UserID = helper.demoUser.Id;
 
         // Act
         Func<Task> act = async () =>
@@ -238,8 +236,7 @@ public class InstitutionServiceTests
         account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(10);
 
         account.Transactions = transactions;
@@ -280,8 +277,7 @@ public class InstitutionServiceTests
         account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(10);
 
         account.Transactions = transactions;
@@ -311,7 +307,6 @@ public class InstitutionServiceTests
         );
 
         var updateInstitutionRequest = _institutionUpdateRequestFaker.Generate();
-        updateInstitutionRequest.UserID = helper.demoUser.Id;
 
         // Act
         Func<Task> act = async () =>

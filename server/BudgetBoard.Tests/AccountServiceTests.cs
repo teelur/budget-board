@@ -464,8 +464,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var account = accountFaker.Generate();
         account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate();
         transaction.AccountID = account.ID;
 
@@ -649,8 +648,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         account.UserID = helper.demoUser.Id;
         account.Deleted = fakeDate;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate();
 
         transaction.Deleted = fakeDate;

@@ -1,9 +1,11 @@
 export interface IUserSettings {
   currency: string;
+  budgetWarningThreshold: number;
 }
 
 export interface IUserSettingsUpdateRequest {
-  currency: string;
+  currency?: string;
+  budgetWarningThreshold?: number;
 }
 
 export enum Currency {

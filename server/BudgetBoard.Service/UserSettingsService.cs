@@ -47,18 +47,29 @@ public class UserSettingsService(
             throw new BudgetBoardServiceException("User settings not found.");
         }
 
-        if (Enum.TryParse(userSettingsUpdateRequest.Currency, true, out Currency currencyEnum))
+        if (userSettingsUpdateRequest.Currency != null)
         {
-            userSettings.Currency = currencyEnum;
+            userSettings.Currency = userSettingsUpdateRequest.Currency;
         }
-        else
+
+        if (userSettingsUpdateRequest.BudgetWarningThreshold != null)
         {
-            _logger.LogError(
-                "Invalid currency provided: {Currency} for user with ID {UserId}",
-                userSettingsUpdateRequest.Currency,
-                userGuid
-            );
-            throw new BudgetBoardServiceException("Invalid currency provided.");
+            if (
+                userSettingsUpdateRequest.BudgetWarningThreshold < 0
+                || userSettingsUpdateRequest.BudgetWarningThreshold > 100
+            )
+            {
+                _logger.LogError(
+                    "Invalid budget warning threshold value: {ThresholdValue}",
+                    userSettingsUpdateRequest.BudgetWarningThreshold
+                );
+                throw new BudgetBoardServiceException(
+                    "Budget warning threshold must be between 0% and 100%."
+                );
+            }
+
+            userSettings.BudgetWarningThreshold = (int)
+                userSettingsUpdateRequest.BudgetWarningThreshold;
         }
 
         await _userDataContext.SaveChangesAsync();

@@ -113,6 +113,13 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
           Budget Details
         </Text>
       }
+      styles={{
+        inner: {
+          left: "0",
+          right: "0",
+          padding: "0 !important",
+        },
+      }}
     >
       {transactionsQuery.isPending ||
       transactionCategoriesQuery.isPending ||

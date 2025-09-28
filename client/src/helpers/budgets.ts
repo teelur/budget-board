@@ -129,30 +129,47 @@ export const sumBudgetAmounts = (budgetData: IBudget[]): number => {
   return budgetData.reduce((n, { limit }) => n + limit, 0);
 };
 
-/**
- * Determines the color for a budget value based on the completion percentage
- * and whether it represents income.
- *
- * @param {number} percentComplete - The completion percentage of the budget.
- * @param {boolean} isIncome - Indicates if the budget is for income (true) or spending (false).
- * @returns {string} - The color ("red" or "green") to visually represent the budget status.
- */
+export enum BudgetValueType {
+  Expense,
+  Income,
+  Total,
+}
+
 export const getBudgetValueColor = (
   amount: number,
   total: number,
-  isIncome: boolean
+  type: BudgetValueType,
+  warningThreshold: number
 ): string => {
-  if (isIncome) {
+  if (type === BudgetValueType.Income) {
     if (amount < total) {
-      return "red";
+      return "var(--mantine-primary-color-light-color)";
     }
     return "green";
   }
 
-  if (amount * -1 <= total) {
-    return "green";
+  if (type === BudgetValueType.Expense) {
+    {
+      const invertedAmount = amount * -1;
+      if (invertedAmount > total) {
+        return "red";
+      }
+      if (invertedAmount >= total * (warningThreshold / 100)) {
+        return "yellow";
+      }
+      return "green";
+    }
   }
-  return "red";
+
+  if (type === BudgetValueType.Total) {
+    if (amount < 0) {
+      return "red";
+    } else if (amount >= 0) {
+      return "green";
+    }
+  }
+
+  return "var(--mantine-color-text)";
 };
 
 /**

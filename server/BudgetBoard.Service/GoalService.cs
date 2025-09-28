@@ -114,10 +114,11 @@ public class GoalService(
                     MonthlyContribution = EstimateGoalMonthlyContribution(goal, includeInterest),
                     // Have to manually set this, since we override the MonthlyContribution in the constructor.
                     IsMonthlyContributionEditable = goal.MonthlyContribution != null,
-                    // This is a very shakey calculation, so only include it if requested.
-                    // For now, we will just apply this to loans.
-                    // The interest rate is estimated by month, so need to calculate the APR.
+                    MonthlyContributionProgress = GetGoalMonthlyContributionProgress(
+                        goal.Accounts.SelectMany(a => a.Transactions)
+                    ),
                     InterestRate = CalculateAverageInterestRate(goal),
+                    PercentComplete = CalculatePercentComplete(goal),
                 }
             );
         }
@@ -421,6 +422,50 @@ public class GoalService(
         }
 
         return monthlyPaymentsWithoutInterest;
+    }
+
+    private decimal GetGoalMonthlyContributionProgress(IEnumerable<Transaction> transactions)
+    {
+        if (transactions == null || !transactions.Any())
+            return 0;
+
+        var monthlyContribution = transactions
+            .Where(t =>
+                t.Date.Year == _nowProvider.UtcNow.Year && t.Date.Month == _nowProvider.UtcNow.Month
+            )
+            .Sum(t => t.Amount);
+
+        return monthlyContribution;
+    }
+
+    private static decimal CalculatePercentComplete(Goal goal)
+    {
+        var accountsTotalBalance = goal.Accounts.Sum(a =>
+            a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+        );
+
+        decimal totalProgress = accountsTotalBalance - goal.InitialAmount;
+
+        decimal adjustedAmount;
+
+        // An initial amount less than zero indicates a debt.
+        if (goal.InitialAmount < 0)
+        {
+            adjustedAmount = Math.Abs(goal.InitialAmount);
+        }
+        else
+        {
+            adjustedAmount = goal.Amount;
+        }
+
+        if (adjustedAmount == 0)
+        {
+            return 0.0M;
+        }
+
+        decimal percentComplete = (totalProgress / adjustedAmount) * 100.0M;
+
+        return percentComplete > 100.0M ? 100.0M : percentComplete;
     }
 
     private static decimal CalculateAverageInterestRate(Goal goal)

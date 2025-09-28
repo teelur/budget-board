@@ -379,6 +379,74 @@ public class GoalServiceTests
     }
 
     [Fact]
+    public async Task ReadGoalsAsync_WhenTransactionData_ShouldReturnProgressForMonth()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object
+        );
+
+        var accountFaker = new AccountFaker();
+        var account = accountFaker.Generate();
+        account.UserID = helper.demoUser.Id;
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+
+        var transaction = transactionFaker.Generate();
+        transaction.AccountID = account.ID;
+        transaction.Date = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        transaction.Amount = 3000;
+
+        account.Transactions.Add(transaction);
+
+        var otherMonthTransaction = transactionFaker.Generate();
+        otherMonthTransaction.AccountID = account.ID;
+        otherMonthTransaction.Date = new DateTime(fakeDate.Year, fakeDate.Month, 2).AddMonths(-1);
+        otherMonthTransaction.Amount = 2000;
+
+        account.Transactions.Add(otherMonthTransaction);
+
+        var balanceFaker = new BalanceFaker();
+        var balance0 = balanceFaker.Generate();
+        balance0.AccountID = account.ID;
+        balance0.Amount = 30000;
+        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+
+        account.Balances = [balance0];
+
+        helper.UserDataContext.Balances.Add(balance0);
+        helper.UserDataContext.Accounts.Add(account);
+
+        var goalFaker = new GoalFaker();
+        var goal = goalFaker.Generate();
+        goal.UserID = helper.demoUser.Id;
+
+        goal.Accounts = [account];
+        goal.CompleteDate = null;
+        goal.Amount = 50000;
+        goal.InitialAmount = 10000;
+        goal.MonthlyContribution = 3000;
+
+        helper.UserDataContext.Goals.Add(goal);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var result = await goalService.ReadGoalsAsync(helper.demoUser.Id, false);
+
+        // Assert
+        result.Single().MonthlyContributionProgress.Should().BeApproximately(3000, 1);
+        result.Single().PercentComplete.Should().BeApproximately(40.0M, 0.01M);
+    }
+
+    [Fact]
     public async Task UpdateGoalAsync_WhenValidData_ShouldUpdateData()
     {
         // Arrange

@@ -86,10 +86,9 @@ const UserSettings = (): React.ReactNode => {
           <Select
             label="Currency"
             placeholder="Select currency"
-            data={Object.values(Currency).map((currency) => ({
-              value: currency,
-              label: currency,
-            }))}
+            searchable
+            nothingFoundMessage="No currencies found"
+            data={Intl.supportedValuesOf("currency")}
             {...currencyField.getInputProps()}
             onChange={(value) => {
               if (value) {

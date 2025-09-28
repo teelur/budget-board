@@ -7,7 +7,7 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { BarChart } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
-import { IAccount } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import { IBalance } from "~/models/balance";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -16,9 +16,10 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
+import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
 
 interface BalanceChartProps {
-  accounts: IAccount[];
+  accounts: IAccountResponse[];
   balances: IBalance[];
   dateRange: DatesRangeValue<string>;
   isPending?: boolean;
@@ -43,6 +44,18 @@ const BalanceChart = (props: BalanceChartProps): React.ReactNode => {
       return undefined;
     },
   });
+
+  const chartSeries = buildAccountBalanceChartSeries(props.accounts);
+
+  const chartValueFormatter = (value: number): string => {
+    return userSettingsQuery.isPending
+      ? ""
+      : convertNumberToCurrency(
+          value,
+          false,
+          userSettingsQuery.data?.currency ?? "USD"
+        );
+  };
 
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
@@ -70,20 +83,23 @@ const BalanceChart = (props: BalanceChartProps): React.ReactNode => {
         ),
         props.invertYAxis
       )}
-      series={buildAccountBalanceChartSeries(props.accounts)}
+      series={chartSeries}
       dataKey="dateString"
       type="stacked"
       withLegend
       tooltipAnimationDuration={200}
-      valueFormatter={(value) =>
-        userSettingsQuery.isPending
-          ? ""
-          : convertNumberToCurrency(
-              value,
-              true,
-              userSettingsQuery.data?.currency ?? "USD"
-            )
-      }
+      tooltipProps={{
+        content: ({ label, payload }) => (
+          <ChartTooltip
+            label={label}
+            payload={payload}
+            series={chartSeries}
+            valueFormatter={chartValueFormatter}
+            includeTotal
+          />
+        ),
+      }}
+      valueFormatter={chartValueFormatter}
     />
   );
 };

@@ -1,4 +1,4 @@
-import { IAccount } from "./account";
+import { IAccountResponse } from "./account";
 
 export interface IInstitution {
   id: string;
@@ -6,7 +6,7 @@ export interface IInstitution {
   index: number;
   deleted: Date | null;
   userID: string;
-  accounts: IAccount[];
+  accounts: IAccountResponse[];
 }
 
 export interface InstitutionIndexRequest {
@@ -15,5 +15,10 @@ export interface InstitutionIndexRequest {
 }
 
 export interface IInstitutionCreateRequest {
+  name: string;
+}
+
+export interface IInstitutionUpdateRequest {
+  id: string;
   name: string;
 }
