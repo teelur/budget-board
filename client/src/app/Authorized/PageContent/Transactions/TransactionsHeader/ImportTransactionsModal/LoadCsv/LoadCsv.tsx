@@ -30,9 +30,14 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       if (!value) {
         return;
       }
-      if (value.type !== "text/csv") {
-        return "File must be a CSV file";
+
+      const nameIsCsv = value.name?.toLowerCase().endsWith(".csv");
+      if (!nameIsCsv) {
+        return `File must be a CSV file. Found type: ${
+          value.type || "unknown"
+        }; filename: ${value.name}`;
       }
+
       return null;
     },
   });
