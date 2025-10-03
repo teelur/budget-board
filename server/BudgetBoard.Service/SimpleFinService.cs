@@ -115,6 +115,12 @@ public class SimpleFinService(
                 }
             }
 
+            _logger.LogInformation(
+                "Syncing transactions from {StartDate} (Unix time {StartDateUnix})",
+                DateTimeOffset.FromUnixTimeSeconds(startDate).UtcDateTime,
+                startDate
+            );
+
             var simpleFinData = await GetAccountData(userData.AccessToken, startDate);
             if (simpleFinData == null)
             {
