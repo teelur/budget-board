@@ -7,6 +7,7 @@ import React from "react";
 import ResetPassword from "./ResetPassword";
 import UserSettings from "./UserSettings";
 import TwoFactorAuth from "./TwoFactorAuth";
+import AdvancedSettings from "./AdvancedSettings/AdvancedSettings";
 
 const Settings = (): React.ReactNode => {
   return (
@@ -17,6 +18,7 @@ const Settings = (): React.ReactNode => {
       <LinkSimpleFin />
       <TwoFactorAuth />
       <ResetPassword />
+      <AdvancedSettings />
     </Stack>
   );
 };

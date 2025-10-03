@@ -1,11 +1,13 @@
 export interface IUserSettings {
   currency: string;
   budgetWarningThreshold: number;
+  forceSyncLookbackMonths: number;
 }
 
 export interface IUserSettingsUpdateRequest {
   currency?: string;
   budgetWarningThreshold?: number;
+  forceSyncLookbackMonths?: number;
 }
 
 export enum Currency {

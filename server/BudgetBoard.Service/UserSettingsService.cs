@@ -72,6 +72,25 @@ public class UserSettingsService(
                 userSettingsUpdateRequest.BudgetWarningThreshold;
         }
 
+        if (userSettingsUpdateRequest.ForceSyncLookbackMonths != null)
+        {
+            if (
+                userSettingsUpdateRequest.ForceSyncLookbackMonths < 0
+                || userSettingsUpdateRequest.ForceSyncLookbackMonths > 12
+            )
+            {
+                _logger.LogError(
+                    "Invalid force sync lookback months value: {LookbackValue}",
+                    userSettingsUpdateRequest.ForceSyncLookbackMonths
+                );
+                throw new BudgetBoardServiceException(
+                    "Force sync lookback months must be between 0 and 12 months."
+                );
+            }
+            userSettings.ForceSyncLookbackMonths = (int)
+                userSettingsUpdateRequest.ForceSyncLookbackMonths;
+        }
+
         await _userDataContext.SaveChangesAsync();
     }
 
