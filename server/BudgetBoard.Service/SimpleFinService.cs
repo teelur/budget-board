@@ -81,21 +81,38 @@ public class SimpleFinService(
         {
             _logger.LogInformation("SimpleFIN token is configured. Syncing bank data.");
 
-            long startDate;
-            if (userData.LastSync == DateTime.MinValue)
+            // Exclude deleted accounts
+            long lastSync = GetLastSyncTime(
+                userData.Accounts.Where(a => !string.IsNullOrEmpty(a.SyncID) && !a.Deleted.HasValue)
+            );
+
+            long startDate = 0;
+
+            // The user can optionally override the default lookback period (up to 12 months).
+            if (userData.UserSettings?.ForceSyncLookbackMonths > 0)
             {
-                // If we haven't synced before, sync the full 90 days of history
                 startDate =
-                    ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - (UNIX_MONTH * 3);
+                    ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds()
+                    - (UNIX_MONTH * userData.UserSettings.ForceSyncLookbackMonths);
             }
             else
             {
-                var oneMonthAgo =
-                    ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - UNIX_MONTH;
-                var lastSyncWithBuffer =
-                    ((DateTimeOffset)userData.LastSync).ToUnixTimeSeconds() - UNIX_WEEK;
+                // If we haven't synced before, get the full 12 months.
+                if (lastSync == DateTimeOffset.UnixEpoch.ToUnixTimeSeconds())
+                {
+                    startDate =
+                        ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds()
+                        - (UNIX_MONTH * 12);
+                }
+                else
+                {
+                    // Otherwise, get either one month ago or one week before the last sync, whichever is earlier.
+                    var oneMonthAgo =
+                        ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - UNIX_MONTH;
+                    var lastSyncWithBuffer = lastSync - UNIX_WEEK;
 
-                startDate = Math.Min(oneMonthAgo, lastSyncWithBuffer);
+                    startDate = Math.Min(oneMonthAgo, lastSyncWithBuffer);
+                }
             }
 
             var simpleFinData = await GetAccountData(userData.AccessToken, startDate);
@@ -150,6 +167,48 @@ public class SimpleFinService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    private static SimpleFinData GetUrlCredentials(string accessToken)
+    {
+        string[] url = accessToken.Split("//");
+        string[] data = url.Last().Split("@");
+        var auth = data.First();
+        var baseUrl = url.First() + "//" + data.Last();
+
+        return new SimpleFinData(auth, baseUrl);
+    }
+
+    /// <summary>
+    /// Determines the earliest balance timestamp (as Unix seconds) across a collection of accounts.
+    /// </summary>
+    /// <param name="accounts">A sequence of <see cref="Account"/> instances whose balances will be inspected. Each account's <see cref="Balance.DateTime"/> values are considered.</param>
+    /// <returns>
+    /// The Unix time (seconds since Unix epoch) corresponding to the earliest balance date found across all provided accounts.
+    /// If no balances are present on any account, this method returns <c>0</c> (the Unix epoch).
+    /// </returns>
+    private static long GetLastSyncTime(IEnumerable<Account> accounts)
+    {
+        long startDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+        foreach (var account in accounts)
+        {
+            var balances = account.Balances.Select(b => b.DateTime);
+            if (!balances.Any())
+            {
+                startDate = DateTimeOffset.UnixEpoch.ToUnixTimeSeconds();
+            }
+            else
+            {
+                var accountStartDate = balances.Min();
+                if (accountStartDate < DateTime.UnixEpoch.AddSeconds(startDate))
+                {
+                    startDate = ((DateTimeOffset)accountStartDate).ToUnixTimeSeconds();
+                }
+            }
+        }
+
+        return startDate;
+    }
+
     private async Task<HttpResponseMessage> DecodeAccessToken(string setupToken)
     {
         // SimpleFin tokens are Base64-encoded URLs on which a POST request will
@@ -179,6 +238,7 @@ public class SimpleFinService(
                 .Include(u => u.Institutions)
                 .Include(u => u.Goals)
                 .ThenInclude(g => g.Accounts)
+                .Include(u => u.UserSettings)
                 .AsSplitQuery()
                 .ToListAsync();
             foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
@@ -201,16 +261,6 @@ public class SimpleFinService(
         }
 
         return foundUser;
-    }
-
-    private static SimpleFinData GetUrlCredentials(string accessToken)
-    {
-        string[] url = accessToken.Split("//");
-        string[] data = url.Last().Split("@");
-        var auth = data.First();
-        var baseUrl = url.First() + "//" + data.Last();
-
-        return new SimpleFinData(auth, baseUrl);
     }
 
     private async Task<HttpResponseMessage> GetSimpleFinAccountData(
@@ -305,6 +355,12 @@ public class SimpleFinService(
             var foundAccount = userData.Accounts.SingleOrDefault(a => a.SyncID == accountData.Id);
             if (foundAccount != null)
             {
+                // Ignore deleted accounts.
+                if (foundAccount.Deleted.HasValue)
+                {
+                    continue;
+                }
+
                 foundAccount.InstitutionID = institutionId;
                 foundAccount.Source = AccountSource.SimpleFIN;
 
