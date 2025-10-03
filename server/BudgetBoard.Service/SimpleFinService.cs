@@ -194,12 +194,13 @@ public class SimpleFinService(
             var balances = account.Balances.Select(b => b.DateTime);
             if (!balances.Any())
             {
-                startDate = DateTimeOffset.UnixEpoch.ToUnixTimeSeconds();
+                // If an account has no balances, we need to sync everything.
+                return DateTimeOffset.UnixEpoch.ToUnixTimeSeconds();
             }
             else
             {
                 var accountStartDate = balances.Min();
-                if (accountStartDate < DateTime.UnixEpoch.AddSeconds(startDate))
+                if (((DateTimeOffset)accountStartDate).ToUnixTimeSeconds() < startDate)
                 {
                     startDate = ((DateTimeOffset)accountStartDate).ToUnixTimeSeconds();
                 }
