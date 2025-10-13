@@ -1,4 +1,4 @@
-import { Button, Stack } from "@mantine/core";
+import { Button, Group, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -70,6 +70,29 @@ const AddAutomaticRule = (): React.ReactNode => {
     },
   });
 
+  const doRunRule = useMutation({
+    mutationFn: async (automaticRule: IAutomaticRuleRequest) =>
+      await request({
+        url: "/api/automaticRule/run",
+        method: "POST",
+        data: automaticRule,
+      }),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["transactions"],
+      });
+
+      notifications.show({
+        title: "Rule Executed",
+        message: data?.data ?? "Rule run successfully",
+        color: "green",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({ message: translateAxiosError(error), color: "red" });
+    },
+  });
+
   return (
     <Stack gap="0.5rem">
       <EditableAutomaticRuleContent
@@ -78,55 +101,83 @@ const AddAutomaticRule = (): React.ReactNode => {
         setConditionItems={setConditionItems}
         setActionItems={setActionItems}
       />
-      <Button
-        loading={doAddRule.isPending}
-        onClick={() => {
-          doAddRule.mutate({
-            conditions: conditionItems.map((item) => ({
-              field: item.field,
-              operator: item.operator,
-              value: item.value,
-              type: "",
-            })),
-            actions: actionItems.map((item) => ({
-              field: item.field,
-              operator: item.operator,
-              value: item.value,
-              type: "",
-            })),
-          });
-          setConditionItems([
-            {
-              field: defaultField,
-              operator:
-                Operators.filter((op) =>
-                  op.type.includes(
-                    FieldToOperatorType.get(defaultField) ??
-                      OperatorTypes.STRING
+      <Group w="100%">
+        <Button
+          flex="1 1 auto"
+          loading={doAddRule.isPending}
+          onClick={() => {
+            doAddRule.mutate({
+              conditions: conditionItems.map((item) => ({
+                field: item.field,
+                operator: item.operator,
+                value: item.value,
+                type: "",
+              })),
+              actions: actionItems.map((item) => ({
+                field: item.field,
+                operator: item.operator,
+                value: item.value,
+                type: "",
+              })),
+            });
+
+            // Reset to default
+            setConditionItems([
+              {
+                field: defaultField,
+                operator:
+                  Operators.filter((op) =>
+                    op.type.includes(
+                      FieldToOperatorType.get(defaultField) ??
+                        OperatorTypes.STRING
+                    )
                   )
-                )
-                  .map((op) => op.value)
-                  .at(0) ?? "",
-              value: "",
-            },
-          ]);
-          setActionItems([
-            {
-              field: defaultField,
-              operator:
-                Operators.find((op) =>
-                  op.type.includes(
-                    FieldToOperatorType.get(defaultField) ??
-                      OperatorTypes.STRING
-                  )
-                )?.value ?? "",
-              value: "",
-            },
-          ]);
-        }}
-      >
-        Add Rule
-      </Button>
+                    .map((op) => op.value)
+                    .at(0) ?? "",
+                value: "",
+              },
+            ]);
+            setActionItems([
+              {
+                field: defaultField,
+                operator:
+                  Operators.find((op) =>
+                    op.type.includes(
+                      FieldToOperatorType.get(defaultField) ??
+                        OperatorTypes.STRING
+                    )
+                  )?.value ?? "",
+                value: "",
+              },
+            ]);
+          }}
+        >
+          Add Rule
+        </Button>
+        <Button
+          variant="outline"
+          flex="1 1 auto"
+          loading={doRunRule.isPending}
+          onClick={() => {
+            doRunRule.mutate({
+              conditions: conditionItems.map((item) => ({
+                field: item.field,
+                operator: item.operator,
+                value: item.value,
+                type: "",
+              })),
+              actions: actionItems.map((item) => ({
+                field: item.field,
+                operator: item.operator,
+                value: item.value,
+                type: "",
+              })),
+            });
+          }}
+        >
+          Run Rule
+        </Button>
+      </Group>
     </Stack>
   );
 };
