@@ -8,7 +8,13 @@ public class RuleParameterCreateRequest()
     public string Type { get; set; } = string.Empty;
 }
 
-public class AutomaticRuleCreateRequest()
+public interface IAutomaticRuleCreateRequest
+{
+    ICollection<RuleParameterCreateRequest> Conditions { get; }
+    ICollection<RuleParameterCreateRequest> Actions { get; }
+}
+
+public class AutomaticRuleCreateRequest() : IAutomaticRuleCreateRequest
 {
     public ICollection<RuleParameterCreateRequest> Conditions { get; set; } = [];
     public ICollection<RuleParameterCreateRequest> Actions { get; set; } = [];
@@ -54,7 +60,14 @@ public class RuleParameterUpdateRequest()
     public string Type { get; set; } = string.Empty;
 }
 
-public class AutomaticRuleUpdateRequest()
+public interface IAutomaticRuleUpdateRequest
+{
+    Guid ID { get; }
+    ICollection<RuleParameterUpdateRequest> Conditions { get; }
+    ICollection<RuleParameterUpdateRequest> Actions { get; }
+}
+
+public class AutomaticRuleUpdateRequest() : IAutomaticRuleUpdateRequest
 {
     public required Guid ID { get; set; }
     public ICollection<RuleParameterUpdateRequest> Conditions { get; set; } = [];
