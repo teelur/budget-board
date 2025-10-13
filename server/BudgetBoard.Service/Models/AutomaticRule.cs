@@ -1,6 +1,14 @@
 ﻿namespace BudgetBoard.Service.Models;
 
-public class RuleParameterCreateRequest()
+public interface IRuleParameterRequest
+{
+    string Field { get; }
+    string Operator { get; }
+    string Value { get; }
+    string Type { get; }
+}
+
+public class RuleParameterCreateRequest() : IRuleParameterRequest
 {
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
@@ -20,13 +28,9 @@ public class AutomaticRuleCreateRequest() : IAutomaticRuleCreateRequest
     public ICollection<RuleParameterCreateRequest> Actions { get; set; } = [];
 }
 
-public interface IRuleParameterResponse
+public interface IRuleParameterResponse : IRuleParameterRequest
 {
     Guid ID { get; }
-    string Field { get; }
-    string Operator { get; }
-    string Value { get; }
-    string Type { get; }
 }
 
 public class RuleParameterResponse() : IRuleParameterResponse
@@ -41,18 +45,18 @@ public class RuleParameterResponse() : IRuleParameterResponse
 public interface IAutomaticRuleResponse
 {
     Guid ID { get; }
-    ICollection<IRuleParameterResponse> Conditions { get; }
-    ICollection<IRuleParameterResponse> Actions { get; }
+    ICollection<RuleParameterResponse> Conditions { get; }
+    ICollection<RuleParameterResponse> Actions { get; }
 }
 
 public class AutomaticRuleResponse() : IAutomaticRuleResponse
 {
     public Guid ID { get; set; }
-    public ICollection<IRuleParameterResponse> Conditions { get; set; } = [];
-    public ICollection<IRuleParameterResponse> Actions { get; set; } = [];
+    public ICollection<RuleParameterResponse> Conditions { get; set; } = [];
+    public ICollection<RuleParameterResponse> Actions { get; set; } = [];
 }
 
-public class RuleParameterUpdateRequest()
+public class RuleParameterUpdateRequest() : IRuleParameterRequest
 {
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
@@ -63,13 +67,13 @@ public class RuleParameterUpdateRequest()
 public interface IAutomaticRuleUpdateRequest
 {
     Guid ID { get; }
-    ICollection<RuleParameterUpdateRequest> Conditions { get; }
-    ICollection<RuleParameterUpdateRequest> Actions { get; }
+    ICollection<IRuleParameterRequest> Conditions { get; }
+    ICollection<IRuleParameterRequest> Actions { get; }
 }
 
 public class AutomaticRuleUpdateRequest() : IAutomaticRuleUpdateRequest
 {
     public required Guid ID { get; set; }
-    public ICollection<RuleParameterUpdateRequest> Conditions { get; set; } = [];
-    public ICollection<RuleParameterUpdateRequest> Actions { get; set; } = [];
+    public ICollection<IRuleParameterRequest> Conditions { get; set; } = [];
+    public ICollection<IRuleParameterRequest> Actions { get; set; } = [];
 }

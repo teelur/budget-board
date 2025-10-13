@@ -7,7 +7,7 @@ namespace BudgetBoard.Service.Helpers;
 public static class AutomaticRuleHelpers
 {
     public static IEnumerable<Transaction> FilterOnCondition(
-        IRuleParameterResponse condition,
+        IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions,
         IEnumerable<ICategory> allCategories
     )
@@ -55,7 +55,7 @@ public static class AutomaticRuleHelpers
     }
 
     public static async Task<int> ApplyActionToTransactions(
-        IRuleParameterResponse action,
+        IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
         IEnumerable<ICategory> allCategories,
         ITransactionService transactionService,
@@ -142,7 +142,7 @@ public static class AutomaticRuleHelpers
     }
 
     private static IEnumerable<Transaction> FilterOnMerchantCondition(
-        IRuleParameterResponse condition,
+        IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions
     )
     {
@@ -263,7 +263,7 @@ public static class AutomaticRuleHelpers
     }
 
     private static IEnumerable<Transaction> FilterOnCategoryCondition(
-        IRuleParameterResponse condition,
+        IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions,
         IEnumerable<ICategory> allCategories
     )
@@ -329,7 +329,7 @@ public static class AutomaticRuleHelpers
     }
 
     private static IEnumerable<Transaction> FilterOnAmountCondition(
-        IRuleParameterResponse condition,
+        IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions
     )
     {
@@ -387,7 +387,7 @@ public static class AutomaticRuleHelpers
     }
 
     private static IEnumerable<Transaction> FilterOnDateCondition(
-        IRuleParameterResponse condition,
+        IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions
     )
     {
@@ -435,7 +435,7 @@ public static class AutomaticRuleHelpers
     }
 
     private static async Task<int> ApplyActionForMerchant(
-        IRuleParameterResponse action,
+        IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
         ITransactionService transactionService,
         Guid userGuid
@@ -467,7 +467,7 @@ public static class AutomaticRuleHelpers
     }
 
     private static async Task<int> ApplyActionForCategory(
-        IRuleParameterResponse action,
+        IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
         IEnumerable<ICategory> allCategories,
         ITransactionService transactionService,
@@ -534,7 +534,7 @@ public static class AutomaticRuleHelpers
     }
 
     private static async Task<int> ApplyActionForAmount(
-        IRuleParameterResponse action,
+        IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
         ITransactionService transactionService,
         Guid userGuid
@@ -573,7 +573,7 @@ public static class AutomaticRuleHelpers
     }
 
     private static async Task<int> ApplyActionForDate(
-        IRuleParameterResponse action,
+        IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
         ITransactionService transactionService,
         Guid userGuid

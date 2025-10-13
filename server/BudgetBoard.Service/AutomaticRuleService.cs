@@ -242,7 +242,7 @@ public class AutomaticRuleService(
             try
             {
                 matchedTransactions = AutomaticRuleHelpers.FilterOnCondition(
-                    (IRuleParameterResponse)condition,
+                    condition,
                     matchedTransactions,
                     allCategories
                 );
@@ -253,10 +253,10 @@ public class AutomaticRuleService(
                 throw;
             }
         }
-
+        var matchedTransactionsCount = matchedTransactions.Count();
         _logger.LogInformation(
             "Rule matched {matchedTransactionsCount} transactions.",
-            matchedTransactions.Count()
+            matchedTransactionsCount
         );
 
         int updatedCount = 0;
@@ -266,7 +266,7 @@ public class AutomaticRuleService(
             try
             {
                 updatedCount += await AutomaticRuleHelpers.ApplyActionToTransactions(
-                    (IRuleParameterResponse)action,
+                    action,
                     matchedTransactions,
                     allCategories,
                     _transactionService,
@@ -285,7 +285,7 @@ public class AutomaticRuleService(
             updatedCount
         );
 
-        return $"Rule matched {matchedTransactions.Count()} transactions and updated {updatedCount} transactions.";
+        return $"Rule matched {matchedTransactionsCount} transactions and applied {updatedCount} changes.";
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
