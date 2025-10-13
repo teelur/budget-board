@@ -105,7 +105,8 @@ public class SimpleFinServiceTests
         );
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
@@ -197,7 +198,8 @@ public class SimpleFinServiceTests
         );
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
