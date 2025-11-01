@@ -113,20 +113,20 @@ namespace BudgetBoard.Database.Data
 
             modelBuilder.Entity<Value>(v =>
             {
-                v.HasOne(e => e.Property)
+                v.HasOne(e => e.Asset)
                     .WithMany(e => e.Values)
-                    .HasForeignKey(e => e.PropertyID);
+                    .HasForeignKey(e => e.AssetID);
 
                 v.ToTable("Value");
             });
 
-            modelBuilder.Entity<Property>(v =>
+            modelBuilder.Entity<Asset>(a =>
             {
-                v.HasMany(e => e.Values)
-                    .WithOne(e => e.Property)
-                    .HasForeignKey(e => e.PropertyID);
+                a.HasMany(e => e.Values)
+                    .WithOne(e => e.Asset)
+                    .HasForeignKey(e => e.AssetID);
 
-                v.ToTable("Property");
+                a.ToTable("Asset");
             });
 
             modelBuilder.UseIdentityColumns();
@@ -145,7 +145,7 @@ namespace BudgetBoard.Database.Data
         public DbSet<RuleParameterBase> RuleParameters { get; set; }
         public DbSet<RuleCondition> RuleConditions { get; set; }
         public DbSet<RuleAction> RuleActions { get; set; }
-        public DbSet<Property> Properties { get; set; }
+        public DbSet<Asset> Assets { get; set; }
         public DbSet<Value> Values { get; set; }
     }
 }

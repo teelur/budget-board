@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BudgetBoard.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class AddProperty : Migration
+    public partial class AddAssets : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Property",
+                name: "Asset",
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uuid", nullable: false),
@@ -28,9 +28,9 @@ namespace BudgetBoard.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Property", x => x.ID);
+                    table.PrimaryKey("PK_Asset", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Property_User_UserID",
+                        name: "FK_Asset_User_UserID",
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "Id",
@@ -44,28 +44,28 @@ namespace BudgetBoard.Database.Migrations
                     ID = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PropertyID = table.Column<Guid>(type: "uuid", nullable: false)
+                    AssetID = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Value", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Value_Property_PropertyID",
-                        column: x => x.PropertyID,
-                        principalTable: "Property",
+                        name: "FK_Value_Asset_AssetID",
+                        column: x => x.AssetID,
+                        principalTable: "Asset",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Property_UserID",
-                table: "Property",
+                name: "IX_Asset_UserID",
+                table: "Asset",
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Value_PropertyID",
+                name: "IX_Value_AssetID",
                 table: "Value",
-                column: "PropertyID");
+                column: "AssetID");
         }
 
         /// <inheritdoc />
@@ -75,7 +75,7 @@ namespace BudgetBoard.Database.Migrations
                 name: "Value");
 
             migrationBuilder.DropTable(
-                name: "Property");
+                name: "Asset");
         }
     }
 }

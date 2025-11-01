@@ -1,6 +1,6 @@
 namespace BudgetBoard.Database.Models;
 
-public class Property
+public class Asset
 {
     public Guid ID { get; set; }
     public required string Name { get; set; }
