@@ -113,18 +113,14 @@ namespace BudgetBoard.Database.Data
 
             modelBuilder.Entity<Value>(v =>
             {
-                v.HasOne(e => e.Asset)
-                    .WithMany(e => e.Values)
-                    .HasForeignKey(e => e.AssetID);
+                v.HasOne(e => e.Asset).WithMany(e => e.Values).HasForeignKey(e => e.AssetID);
 
                 v.ToTable("Value");
             });
 
             modelBuilder.Entity<Asset>(a =>
             {
-                a.HasMany(e => e.Values)
-                    .WithOne(e => e.Asset)
-                    .HasForeignKey(e => e.AssetID);
+                a.HasMany(e => e.Values).WithOne(e => e.Asset).HasForeignKey(e => e.AssetID);
 
                 a.ToTable("Asset");
             });
