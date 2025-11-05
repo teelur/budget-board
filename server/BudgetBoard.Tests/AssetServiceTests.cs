@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Bogus;
-using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
@@ -10,7 +7,6 @@ using BudgetBoard.Service.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 
 namespace BudgetBoard.IntegrationTests;
 
