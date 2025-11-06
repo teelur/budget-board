@@ -111,12 +111,7 @@ namespace BudgetBoard.Database.Data
                 r.ToTable("AutomaticRule");
             });
 
-            modelBuilder.Entity<Value>(v =>
-            {
-                v.HasOne(e => e.Asset).WithMany(e => e.Values).HasForeignKey(e => e.AssetID);
-
-                v.ToTable("Value");
-            });
+            modelBuilder.Entity<Value>().ToTable("Value");
 
             modelBuilder.Entity<Asset>(a =>
             {

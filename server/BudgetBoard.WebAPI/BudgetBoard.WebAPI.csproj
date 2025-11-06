@@ -1,21 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BudgetBoard</RootNamespace>
     <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
-    <UserSecretsId>23b824e9-5a44-4fa5-b8f2-e84a19a59819</UserSecretsId>
+    <UserSecretsId>cdf192e4-cb37-4c48-9fa4-8973a74bbb8b</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="BudgetBoard-Database\**" />
     <Content Remove="BudgetBoard-Database\**" />
     <EmbeddedResource Remove="BudgetBoard-Database\**" />
     <None Remove="BudgetBoard-Database\**" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
@@ -40,10 +37,8 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.9" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\BudgetBoard.Database\BudgetBoard.Database.csproj" />
     <ProjectReference Include="..\BudgetBoard.Service\BudgetBoard.Service.csproj" />
   </ItemGroup>
-
 </Project>
