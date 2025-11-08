@@ -88,7 +88,6 @@ public class ValueService(
         }
 
         value.Deleted = _nowProvider.UtcNow;
-        Console.WriteLine(value.Deleted);
 
         await _userDataContext.SaveChangesAsync();
     }
