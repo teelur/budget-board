@@ -182,6 +182,8 @@ builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();
+builder.Services.AddScoped<IAssetService, AssetService>();
+builder.Services.AddScoped<IValueService, ValueService>();
 
 var app = builder.Build();
 

@@ -12,7 +12,7 @@ import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
-import BalanceChart from "~/components/Charts/BalanceChart/BalanceChart";
+import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
 import { IBalance } from "~/models/balance";
 import BalanceItems from "./BalanceItems/BalanceItems";
@@ -149,9 +149,17 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     12 months
                   </Button>
                 </Group>
-                <BalanceChart
-                  accounts={[props.account]}
-                  balances={balancesForChart}
+                <ValueChart
+                  items={[
+                    {
+                      id: props.account.id,
+                      name: props.account.name,
+                    },
+                  ]}
+                  values={balancesForChart.map((balance) => ({
+                    ...balance,
+                    parentId: balance.accountID || "",
+                  }))}
                   dateRange={[
                     dayjs().subtract(chartLookbackMonths, "months").toString(),
                     dayjs().toString(),

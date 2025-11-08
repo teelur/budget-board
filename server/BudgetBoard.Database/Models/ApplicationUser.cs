@@ -13,4 +13,5 @@ public class ApplicationUser : IdentityUser<Guid>
     public ICollection<Institution> Institutions { get; set; } = [];
     public UserSettings? UserSettings { get; set; } = null!;
     public ICollection<AutomaticRule> AutomaticRules { get; set; } = [];
+    public ICollection<Asset> Assets { get; set; } = [];
 }

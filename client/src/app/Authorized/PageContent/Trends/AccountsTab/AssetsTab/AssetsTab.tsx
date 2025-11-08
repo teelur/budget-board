@@ -1,19 +1,20 @@
-import classes from "./LiabilitiesTab.module.css";
+import classes from "./AssetsTab.module.css";
 
 import { Stack } from "@mantine/core";
 import React from "react";
-import { DatesRangeValue } from "@mantine/dates";
 import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
-import BalanceChart from "~/components/Charts/BalanceChart/BalanceChart";
+import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalance } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
+import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
+import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 
-const LiabilitiesTab = (): React.ReactNode => {
+const AssetsTab = (): React.ReactNode => {
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
     []
   );
@@ -71,19 +72,27 @@ const LiabilitiesTab = (): React.ReactNode => {
         setSelectedAccountIds={setSelectedAccountIds}
         dateRange={dateRange}
         setDateRange={setDateRange}
-        filters={["Loan", "Credit Card", "Mortgage"]}
+        filters={["Checking", "Savings", "Investment", "Cash"]}
       />
-      <BalanceChart
-        balances={balancesQuery.data ?? []}
-        accounts={(accountsQuery.data ?? []).filter((a) =>
-          selectedAccountIds.includes(a.id)
-        )}
+      <ValueChart
+        values={(balancesQuery.data ?? []).map((balance) => ({
+          ...balance,
+          parentId: balance.accountID || "",
+        }))}
+        items={(accountsQuery.data ?? [])
+          .filter((a) => selectedAccountIds.includes(a.id))
+          .map(
+            (account) =>
+              ({
+                id: account.id,
+                name: account.name,
+              } as IItem)
+          )}
         dateRange={dateRange}
         isPending={balancesQuery.isPending || accountsQuery.isPending}
-        invertYAxis
       />
     </Stack>
   );
 };
 
-export default LiabilitiesTab;
+export default AssetsTab;

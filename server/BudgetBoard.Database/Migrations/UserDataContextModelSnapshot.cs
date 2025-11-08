@@ -17,7 +17,7 @@ namespace BudgetBoard.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "currency", new[] { "aud", "cad", "chf", "cny", "eur", "gbp", "inr", "jpy", "nzd", "sek", "usd" });
@@ -163,6 +163,47 @@ namespace BudgetBoard.Database.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.Asset", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Index")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("PurchasePrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("SellDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("SellPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Asset", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
@@ -420,6 +461,31 @@ namespace BudgetBoard.Database.Migrations
                     b.ToTable("UserSettings", (string)null);
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.Value", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("AssetID")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("AssetID");
+
+                    b.ToTable("Value", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
@@ -600,6 +666,17 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.Asset", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("Assets")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
@@ -688,6 +765,17 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.Value", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.Asset", "Asset")
+                        .WithMany("Values")
+                        .HasForeignKey("AssetID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -772,6 +860,8 @@ namespace BudgetBoard.Database.Migrations
                 {
                     b.Navigation("Accounts");
 
+                    b.Navigation("Assets");
+
                     b.Navigation("AutomaticRules");
 
                     b.Navigation("Budgets");
@@ -783,6 +873,11 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("TransactionCategories");
 
                     b.Navigation("UserSettings");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.Asset", b =>
+                {
+                    b.Navigation("Values");
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
