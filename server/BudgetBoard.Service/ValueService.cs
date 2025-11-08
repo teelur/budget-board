@@ -42,18 +42,11 @@ public class ValueService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IValueResponse>> ReadValuesAsync(
-        Guid userGuid,
-        Guid valueGuid = default
-    )
+    public async Task<IEnumerable<IValueResponse>> ReadValuesAsync(Guid userGuid, Guid assetId)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var values = userData.Assets.SelectMany(a => a.Values);
-        if (valueGuid != default)
-        {
-            values = values.Where(v => v.ID == valueGuid);
-        }
+        var values = userData.Assets.SelectMany(a => a.Values).Where(v => v.AssetID == assetId);
 
         return values.Select(v => new ValueResponse(v));
     }

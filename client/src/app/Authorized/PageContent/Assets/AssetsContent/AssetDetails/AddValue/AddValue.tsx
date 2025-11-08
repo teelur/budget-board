@@ -1,0 +1,91 @@
+import { Button, NumberInput, Stack, Text } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
+import { useField } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import React from "react";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { getCurrencySymbol } from "~/helpers/currency";
+import { IValueCreateRequest, IValueResponse } from "~/models/value";
+
+interface AddValueProps {
+  assetId: string;
+  currency: string;
+}
+
+const AddValue = (props: AddValueProps): React.ReactNode => {
+  const amountField = useField<string | number>({
+    initialValue: 0,
+  });
+  const dateField = useField<string>({
+    initialValue: dayjs().toString(),
+  });
+
+  const { request } = React.useContext<any>(AuthContext);
+
+  const queryClient = useQueryClient();
+  const doAddValue = useMutation({
+    mutationFn: async (newValue: IValueCreateRequest) => {
+      const res = await request({
+        url: `/api/value`,
+        method: "POST",
+        data: newValue,
+      });
+
+      if (res.status === 200) {
+        return res.data as IValueResponse;
+      }
+
+      return undefined;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assets"] });
+      queryClient.invalidateQueries({ queryKey: ["values"] });
+
+      amountField.reset();
+      dateField.reset();
+
+      notifications.show({ color: "green", message: "Value added" });
+    },
+  });
+
+  return (
+    <Stack gap={10}>
+      <DatePickerInput
+        {...dateField.getInputProps()}
+        label={
+          <Text size="xs" fw={600} c="dimmed">
+            Date
+          </Text>
+        }
+        maw={400}
+      />
+      <NumberInput
+        {...amountField.getInputProps()}
+        label={
+          <Text size="xs" fw={600} c="dimmed">
+            Amount
+          </Text>
+        }
+        prefix={getCurrencySymbol(props.currency)}
+        decimalScale={2}
+        thousandSeparator=","
+      />
+      <Button
+        loading={doAddValue.isPending}
+        onClick={() =>
+          doAddValue.mutate({
+            amount: Number(amountField.getValue()),
+            dateTime: dayjs(dateField.getValue()).toDate(),
+            assetID: props.assetId,
+          })
+        }
+      >
+        Add Value
+      </Button>
+    </Stack>
+  );
+};
+
+export default AddValue;

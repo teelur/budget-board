@@ -10,6 +10,7 @@ import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
+import AssetDetails from "./AssetDetails/AssetDetails";
 
 interface AssetsContentProps {
   isSortable: boolean;
@@ -103,6 +104,12 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
   return (
     <Stack id="assets-stack" gap="1rem">
       <LoadingOverlay visible={doIndexAssets.isPending} />
+      <AssetDetails
+        isOpen={isDetailsOpen}
+        close={closeDetails}
+        asset={selectedAsset}
+        userCurrency={userSettingsQuery.data?.currency || "USD"}
+      />
       <DragDropProvider
         onDragEnd={(event) => {
           const updatedList = move(sortedAssets, event).map(

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BudgetBoard.WebAPI.Controllers;
 
+[Route("api/[controller]")]
+[ApiController]
 public class ValueController(
     ILogger<ValueController> logger,
     UserManager<ApplicationUser> userManager,
@@ -43,37 +45,14 @@ public class ValueController(
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> Read()
-    {
-        try
-        {
-            return Ok(
-                await _valueService.ReadValuesAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
-        }
-    }
-
-    [HttpGet("{guid}")]
-    [Authorize]
-    public async Task<IActionResult> Read(Guid guid)
+    public async Task<IActionResult> Read(Guid assetId)
     {
         try
         {
             return Ok(
                 await _valueService.ReadValuesAsync(
                     new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    guid
+                    assetId
                 )
             );
         }
