@@ -12,6 +12,7 @@ import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
+import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 
 const AssetsTab = (): React.ReactNode => {
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
@@ -80,11 +81,13 @@ const AssetsTab = (): React.ReactNode => {
         }))}
         items={(accountsQuery.data ?? [])
           .filter((a) => selectedAccountIds.includes(a.id))
-          .map((account) => ({
-            id: account.id,
-            name: account.name,
-            values: [],
-          }))}
+          .map(
+            (account) =>
+              ({
+                id: account.id,
+                name: account.name,
+              } as IItem)
+          )}
         dateRange={dateRange}
         isPending={balancesQuery.isPending || accountsQuery.isPending}
       />

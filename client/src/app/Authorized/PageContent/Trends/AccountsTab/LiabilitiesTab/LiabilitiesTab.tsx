@@ -12,6 +12,7 @@ import { IBalance } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import dayjs from "dayjs";
+import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 
 const LiabilitiesTab = (): React.ReactNode => {
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
@@ -80,11 +81,13 @@ const LiabilitiesTab = (): React.ReactNode => {
         }))}
         items={(accountsQuery.data ?? [])
           .filter((a) => selectedAccountIds.includes(a.id))
-          .map((account) => ({
-            id: account.id,
-            name: account.name,
-            values: [],
-          }))}
+          .map(
+            (account) =>
+              ({
+                id: account.id,
+                name: account.name,
+              } as IItem)
+          )}
         dateRange={dateRange}
         isPending={balancesQuery.isPending || accountsQuery.isPending}
         invertYAxis
