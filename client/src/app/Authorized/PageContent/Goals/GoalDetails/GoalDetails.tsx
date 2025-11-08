@@ -137,8 +137,13 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
                   </Button>
                 </Group>
                 <ValueChart
-                  accounts={props.goal.accounts}
-                  balances={balancesQuery.data ?? []}
+                  items={props.goal.accounts}
+                  values={
+                    balancesQuery.data?.map((balance: IBalance) => ({
+                      ...balance,
+                      parentId: balance.accountID || "",
+                    })) ?? []
+                  }
                   dateRange={dateRange}
                   invertYAxis={props.goal.amount === 0}
                 />
