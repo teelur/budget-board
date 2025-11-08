@@ -70,7 +70,9 @@ public class AssetService(
         }
 
         asset.Name = editedAsset.Name;
-        asset.PurchasedDate = editedAsset.PurchasedDate;
+        asset.PurchasedDate = editedAsset.PurchasedDate.HasValue
+            ? new DateTime(editedAsset.PurchasedDate.Value.Ticks).ToUniversalTime()
+            : (DateTime?)null;
         asset.PurchasePrice = editedAsset.PurchasePrice;
         asset.SoldDate = editedAsset.SoldDate;
         asset.SoldPrice = editedAsset.SoldPrice;
@@ -90,7 +92,7 @@ public class AssetService(
             throw new BudgetBoardServiceException("Asset not found.");
         }
 
-        asset.Deleted = _nowProvider.Now;
+        asset.Deleted = _nowProvider.UtcNow;
         await _userDataContext.SaveChangesAsync();
     }
 

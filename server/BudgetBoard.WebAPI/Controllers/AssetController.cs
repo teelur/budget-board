@@ -166,7 +166,7 @@ public class AssetController(
     [HttpPut]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Order([FromBody] List<IAssetIndexRequest> assets)
+    public async Task<IActionResult> Order([FromBody] List<AssetIndexRequest> assets)
     {
         try
         {

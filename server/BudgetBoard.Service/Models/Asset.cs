@@ -32,6 +32,7 @@ public class AssetResponse() : IAssetResponse
     public Guid ID { get; set; } = Guid.Empty;
     public string Name { get; set; } = string.Empty;
     public decimal? CurrentValue { get; set; } = null;
+    public DateTime? ValueDate { get; set; } = null;
     public DateTime? PurchasedDate { get; set; } = null;
     public decimal? PurchasePrice { get; set; } = null;
     public DateTime? SoldDate { get; set; } = null;
@@ -47,6 +48,7 @@ public class AssetResponse() : IAssetResponse
         ID = asset.ID;
         Name = asset.Name;
         CurrentValue = asset.Values.OrderByDescending(v => v.DateTime).FirstOrDefault()?.Amount;
+        ValueDate = asset.Values.OrderByDescending(v => v.DateTime).FirstOrDefault()?.DateTime;
         PurchasedDate = asset.PurchasedDate;
         PurchasePrice = asset.PurchasePrice;
         SoldDate = asset.SoldDate;
