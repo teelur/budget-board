@@ -1,7 +1,7 @@
 import { Group, Pagination, Stack } from "@mantine/core";
 import React from "react";
 import { IValueResponse } from "~/models/value";
-import ValueItem from "../ValueItem/ValueItem";
+import ValueItem from "./ValueItem/ValueItem";
 
 interface ValueItemsProps {
   values: IValueResponse[];

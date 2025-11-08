@@ -4,6 +4,12 @@ export interface IValueCreateRequest {
   assetID: string;
 }
 
+export interface IValueUpdateRequest {
+  id: string;
+  amount: number;
+  dateTime: Date;
+}
+
 export interface IValueResponse {
   id: string;
   amount: number;
