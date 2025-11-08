@@ -1,4 +1,4 @@
-import { ActionIcon, Group, NumberInput } from "@mantine/core";
+import { ActionIcon, Group, NumberInput, Stack } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
@@ -6,7 +6,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
@@ -68,15 +68,63 @@ const EditableValueItemContent = (
       notifications.show({ color: "red", message: translateAxiosError(error) }),
   });
 
+  const doDeleteValue = useMutation({
+    mutationFn: async () =>
+      await request({
+        url: `/api/value`,
+        method: "DELETE",
+        params: { guid: props.value.id },
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["values", props.value.assetID],
+      });
+
+      notifications.show({ color: "green", message: "Value deleted" });
+    },
+    onError: (error: AxiosError) =>
+      notifications.show({ color: "red", message: translateAxiosError(error) }),
+  });
+
+  const doRestoreValue = useMutation({
+    mutationFn: async () =>
+      await request({
+        url: `/api/value/restore`,
+        method: "POST",
+        params: { guid: props.value.id },
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["values", props.value.assetID],
+      });
+
+      notifications.show({ color: "green", message: "Value restored" });
+    },
+    onError: (error: AxiosError) =>
+      notifications.show({ color: "red", message: translateAxiosError(error) }),
+  });
+
   useDidUpdate(() => {
     doUpdateValue.mutate();
   }, [valueDateField.getValue()]);
 
   return (
-    <Group justify="space-between" align="center">
-      <Group gap="0.5rem">
-        <DatePickerInput {...valueDateField.getInputProps()} />
+    <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
+      <Stack w="100%">
+        <DatePickerInput {...valueDateField.getInputProps()} flex="1 1 auto" />
+        <NumberInput
+          {...valueAmountField.getInputProps()}
+          flex="1 1 auto"
+          prefix={getCurrencySymbol(props.userCurrency)}
+          thousandSeparator=","
+          decimalScale={2}
+          fixedDecimalScale
+          onBlur={() => doUpdateValue.mutate()}
+        />
+      </Stack>
+      <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
         <ActionIcon
+          h="100%"
           variant="outline"
           size="md"
           onClick={(e) => {
@@ -86,16 +134,25 @@ const EditableValueItemContent = (
         >
           <PencilIcon size={16} />
         </ActionIcon>
+        {props.value.deleted ? (
+          <ActionIcon
+            h="100%"
+            size="sm"
+            onClick={() => doRestoreValue.mutate()}
+          >
+            <Undo2Icon size={16} />
+          </ActionIcon>
+        ) : (
+          <ActionIcon
+            h="100%"
+            size="sm"
+            bg="red"
+            onClick={() => doDeleteValue.mutate()}
+          >
+            <Trash2Icon size={16} />
+          </ActionIcon>
+        )}
       </Group>
-      <NumberInput
-        {...valueAmountField.getInputProps()}
-        prefix={getCurrencySymbol(props.userCurrency)}
-        thousandSeparator=","
-        decimalScale={2}
-        fixedDecimalScale
-        onBlur={() => doUpdateValue.mutate()}
-        maw={145}
-      />
     </Group>
   );
 };

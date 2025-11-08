@@ -9,7 +9,7 @@ interface ValueItemsProps {
 }
 
 const ValueItems = (props: ValueItemsProps): React.ReactNode => {
-  const itemsPerPage = 20;
+  const itemsPerPage = 10;
 
   const [page, setPage] = React.useState(1);
 

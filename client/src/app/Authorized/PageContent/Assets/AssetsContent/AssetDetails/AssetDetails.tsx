@@ -39,9 +39,14 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   });
 
   const sortedValues =
-    valuesQuery.data?.sort((a, b) =>
-      dayjs(b.dateTime).diff(dayjs(a.dateTime))
-    ) ?? [];
+    valuesQuery.data
+      ?.filter((value) => !value.deleted)
+      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+
+  const sortedDeletedValues =
+    valuesQuery.data
+      ?.filter((value) => value.deleted)
+      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
 
   return (
     <Drawer
@@ -98,7 +103,28 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             {props.asset?.purchasedDate &&
               props.asset.purchasePrice &&
               props.asset.soldDate &&
-              props.asset.soldPrice && <MoveRightIcon size={32} />}
+              props.asset.soldPrice && (
+                <Stack gap={0} justify="center" align="center">
+                  <MoveRightIcon size={32} />
+                  <Text
+                    size="xs"
+                    c={
+                      props.asset.soldPrice - props.asset.purchasePrice >= 0
+                        ? "green"
+                        : "red"
+                    }
+                  >
+                    {props.asset.soldPrice - props.asset.purchasePrice >= 0
+                      ? "+"
+                      : ""}
+                    {convertNumberToCurrency(
+                      props.asset.soldPrice - props.asset.purchasePrice,
+                      true,
+                      props.userCurrency
+                    )}
+                  </Text>
+                </Stack>
+              )}
             {props.asset?.soldDate && props.asset.soldPrice && (
               <Stack gap={0} justify="center" align="center">
                 <Text size="xs" c="dimmed">
@@ -151,13 +177,38 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   {valuesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
                   )}
-                  {valuesQuery.data && valuesQuery.data.length === 0 ? (
+                  {sortedValues.length === 0 ? (
                     <Text size="sm" c="dimmed">
                       No value entries
                     </Text>
                   ) : (
                     <ValueItems
                       values={sortedValues}
+                      userCurrency={props.userCurrency}
+                    />
+                  )}
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item
+              value="deleted-values"
+              bg="var(--mantine-color-content-background)"
+            >
+              <Accordion.Control>
+                <Text>Deleted Values</Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Stack gap="0.5rem">
+                  {valuesQuery.isPending && (
+                    <Skeleton height={20} radius="lg" />
+                  )}
+                  {sortedDeletedValues.length === 0 ? (
+                    <Text size="sm" c="dimmed">
+                      No value entries
+                    </Text>
+                  ) : (
+                    <ValueItems
+                      values={sortedDeletedValues}
                       userCurrency={props.userCurrency}
                     />
                   )}

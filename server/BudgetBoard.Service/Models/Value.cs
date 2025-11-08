@@ -39,6 +39,7 @@ public class ValueResponse() : IValueResponse
         ID = value.ID;
         Amount = value.Amount;
         DateTime = value.DateTime;
+        Deleted = value.Deleted;
         AssetID = value.AssetID;
     }
 }

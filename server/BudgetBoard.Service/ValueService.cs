@@ -46,7 +46,7 @@ public class ValueService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var values = userData.Assets.SelectMany(a => a.Values).Where(v => v.AssetID == assetId);
+        var values = userData.Assets.Where(a => a.ID == assetId).SelectMany(a => a.Values);
 
         return values.Select(v => new ValueResponse(v));
     }
@@ -88,6 +88,7 @@ public class ValueService(
         }
 
         value.Deleted = _nowProvider.UtcNow;
+        Console.WriteLine(value.Deleted);
 
         await _userDataContext.SaveChangesAsync();
     }
