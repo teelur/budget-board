@@ -1,5 +1,4 @@
 import { filterBalancesByDateRange } from "~/helpers/balances";
-import { BuildNetWorthChartData } from "~/helpers/charts";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
@@ -14,6 +13,7 @@ import { AxiosResponse } from "axios";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
+import { BuildNetWorthChartData } from "./helpers/netWorthChart";
 
 interface NetWorthChartProps {
   accounts: IAccountResponse[];

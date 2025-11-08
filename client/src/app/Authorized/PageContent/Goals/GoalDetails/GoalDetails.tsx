@@ -12,7 +12,7 @@ import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
 import { IAccountResponse } from "~/models/account";
-import BalanceChart from "~/components/Charts/BalanceChart/BalanceChart";
+import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { DatesRangeValue } from "@mantine/dates";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQueries } from "@tanstack/react-query";
@@ -136,7 +136,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
                     12 months
                   </Button>
                 </Group>
-                <BalanceChart
+                <ValueChart
                   accounts={props.goal.accounts}
                   balances={balancesQuery.data ?? []}
                   dateRange={dateRange}
