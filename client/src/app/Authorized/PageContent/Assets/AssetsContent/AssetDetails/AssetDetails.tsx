@@ -1,4 +1,12 @@
-import { Accordion, Drawer, Group, Skeleton, Stack, Text } from "@mantine/core";
+import {
+  Accordion,
+  Button,
+  Drawer,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { MoveRightIcon } from "lucide-react";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
@@ -10,6 +18,7 @@ import { IValueResponse } from "~/models/value";
 import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import ValueItems from "./ValueItems/ValueItems";
+import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -19,6 +28,8 @@ interface AssetDetailsProps {
 }
 
 const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
+  const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
+
   const { request } = React.useContext<any>(AuthContext);
   const valuesQuery = useQuery({
     queryKey: ["values", props.asset?.id],
@@ -47,6 +58,12 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
     valuesQuery.data
       ?.filter((value) => value.deleted)
       .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+
+  const valuesForChart = sortedValues.filter((value) =>
+    dayjs(value.dateTime).isAfter(
+      dayjs().subtract(chartLookbackMonths, "months")
+    )
+  );
 
   return (
     <Drawer
@@ -148,7 +165,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
           </Group>
           <Accordion
             variant="separated"
-            defaultValue={["add-value", "values"]}
+            defaultValue={["add-value", "chart", "values"]}
             multiple
           >
             <Accordion.Item
@@ -162,6 +179,55 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 <AddValue
                   assetId={props.asset.id}
                   currency={props.userCurrency}
+                />
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item
+              value="chart"
+              bg="var(--mantine-color-content-background)"
+            >
+              <Accordion.Control>
+                <Text>Value Trends</Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Group>
+                  <Button
+                    variant={chartLookbackMonths === 3 ? "filled" : "outline"}
+                    size="xs"
+                    onClick={() => setChartLookbackMonths(3)}
+                  >
+                    3 months
+                  </Button>
+                  <Button
+                    variant={chartLookbackMonths === 6 ? "filled" : "outline"}
+                    size="xs"
+                    onClick={() => setChartLookbackMonths(6)}
+                  >
+                    6 months
+                  </Button>
+                  <Button
+                    variant={chartLookbackMonths === 12 ? "filled" : "outline"}
+                    size="xs"
+                    onClick={() => setChartLookbackMonths(12)}
+                  >
+                    12 months
+                  </Button>
+                </Group>
+                <ValueChart
+                  items={[
+                    {
+                      id: props.asset.id,
+                      name: props.asset.name,
+                    },
+                  ]}
+                  values={valuesForChart.map((value) => ({
+                    ...value,
+                    parentId: value.assetID || "",
+                  }))}
+                  dateRange={[
+                    dayjs().subtract(chartLookbackMonths, "months").toString(),
+                    dayjs().toString(),
+                  ]}
                 />
               </Accordion.Panel>
             </Accordion.Item>
