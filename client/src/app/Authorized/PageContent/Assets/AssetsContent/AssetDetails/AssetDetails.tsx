@@ -80,13 +80,13 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </Text>
           </Stack>
           <Group justify="space-between">
-            {props.asset?.purchasedDate && props.asset.purchasePrice && (
+            {props.asset?.purchaseDate && props.asset.purchasePrice && (
               <Stack gap={0} justify="center" align="center">
                 <Text size="xs" c="dimmed">
                   Purchased on
                 </Text>
                 <Text size="md" fw={600}>
-                  {new Date(props.asset.purchasedDate).toLocaleDateString()}
+                  {new Date(props.asset.purchaseDate).toLocaleDateString()}
                 </Text>
                 <Text size="xs" c="dimmed">
                   for
@@ -100,45 +100,45 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 </Text>
               </Stack>
             )}
-            {props.asset?.purchasedDate &&
+            {props.asset?.purchaseDate &&
               props.asset.purchasePrice &&
-              props.asset.soldDate &&
-              props.asset.soldPrice && (
+              props.asset.sellDate &&
+              props.asset.sellPrice && (
                 <Stack gap={0} justify="center" align="center">
                   <MoveRightIcon size={32} />
                   <Text
                     size="xs"
                     c={
-                      props.asset.soldPrice - props.asset.purchasePrice >= 0
+                      props.asset.sellPrice - props.asset.purchasePrice >= 0
                         ? "green"
                         : "red"
                     }
                   >
-                    {props.asset.soldPrice - props.asset.purchasePrice >= 0
+                    {props.asset.sellPrice - props.asset.purchasePrice >= 0
                       ? "+"
                       : ""}
                     {convertNumberToCurrency(
-                      props.asset.soldPrice - props.asset.purchasePrice,
+                      props.asset.sellPrice - props.asset.purchasePrice,
                       true,
                       props.userCurrency
                     )}
                   </Text>
                 </Stack>
               )}
-            {props.asset?.soldDate && props.asset.soldPrice && (
+            {props.asset?.sellDate && props.asset.sellPrice && (
               <Stack gap={0} justify="center" align="center">
                 <Text size="xs" c="dimmed">
                   Sold on
                 </Text>
                 <Text size="md" fw={600}>
-                  {new Date(props.asset.soldDate).toLocaleDateString()}
+                  {new Date(props.asset.sellDate).toLocaleDateString()}
                 </Text>
                 <Text size="xs" c="dimmed">
                   for
                 </Text>
                 <Text size="md" fw={600}>
                   {convertNumberToCurrency(
-                    props.asset.soldPrice,
+                    props.asset.sellPrice,
                     true,
                     props.userCurrency
                   )}

@@ -44,7 +44,7 @@ const AssetSelectInput = ({
     );
 
     if (hideHidden) {
-      filteredAssets = filteredAssets.filter((a) => !a.hideProperty);
+      filteredAssets = filteredAssets.filter((a) => !a.hide);
     }
 
     return filteredAssets;

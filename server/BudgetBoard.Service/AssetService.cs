@@ -70,13 +70,13 @@ public class AssetService(
         }
 
         asset.Name = editedAsset.Name;
-        asset.PurchasedDate = editedAsset.PurchasedDate.HasValue
-            ? new DateTime(editedAsset.PurchasedDate.Value.Ticks).ToUniversalTime()
-            : (DateTime?)null;
+        asset.PurchaseDate = editedAsset.PurchaseDate.HasValue
+            ? new DateTime(editedAsset.PurchaseDate.Value.Ticks).ToUniversalTime()
+            : null;
         asset.PurchasePrice = editedAsset.PurchasePrice;
-        asset.SoldDate = editedAsset.SoldDate;
-        asset.SoldPrice = editedAsset.SoldPrice;
-        asset.HideProperty = editedAsset.HideProperty;
+        asset.SellDate = editedAsset.SellDate;
+        asset.SellPrice = editedAsset.SellPrice;
+        asset.Hide = editedAsset.Hide;
 
         await _userDataContext.SaveChangesAsync();
     }

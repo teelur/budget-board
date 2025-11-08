@@ -28,10 +28,10 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
           >
             <PencilIcon size={16} />
           </ActionIcon>
-          {props.asset.soldDate && props.asset.soldPrice && (
+          {props.asset.sellDate && props.asset.sellPrice && (
             <Badge bg="green">Sold</Badge>
           )}
-          {props.asset.hideProperty && <Badge bg="yellow">Hidden</Badge>}
+          {props.asset.hide && <Badge bg="yellow">Hidden</Badge>}
           {props.asset.deleted && <Badge bg="red">Deleted</Badge>}
         </Group>
         <Text
@@ -47,10 +47,10 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
         </Text>
       </Group>
       <Group justify="space-between" align="center">
-        {props.asset.purchasedDate && props.asset.purchasePrice ? (
+        {props.asset.purchaseDate && props.asset.purchasePrice ? (
           <Text fw={600} size="sm" c="dimmed">
             Purchased on{" "}
-            {new Date(props.asset.purchasedDate).toLocaleDateString()} for{" "}
+            {new Date(props.asset.purchaseDate).toLocaleDateString()} for{" "}
             {convertNumberToCurrency(
               props.asset.purchasePrice ?? 0,
               true,

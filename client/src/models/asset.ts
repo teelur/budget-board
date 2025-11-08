@@ -5,11 +5,11 @@ export interface IAssetCreateRequest {
 export interface IAssetUpdateRequest {
   id: string;
   name: string;
-  purchasedDate: Date | null;
+  purchaseDate: Date | null;
   purchasePrice: number | null;
-  soldDate: Date | null;
-  soldPrice: number | null;
-  hideProperty: boolean;
+  sellDate: Date | null;
+  sellPrice: number | null;
+  hide: boolean;
 }
 
 export interface IAssetIndexRequest {
@@ -22,11 +22,11 @@ export interface IAssetResponse {
   name: string;
   currentValue: number;
   valueDate: Date;
-  purchasedDate: Date | null;
+  purchaseDate: Date | null;
   purchasePrice: number | null;
-  soldDate: Date | null;
-  soldPrice: number | null;
-  hideProperty: boolean;
+  sellDate: Date | null;
+  sellPrice: number | null;
+  hide: boolean;
   deleted: boolean;
   index: number;
   userID: string;

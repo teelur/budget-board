@@ -98,7 +98,7 @@ public class ValueServiceTests
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        var returnedValues = await valueService.ReadValuesAsync(helper.demoUser.Id);
+        var returnedValues = await valueService.ReadValuesAsync(helper.demoUser.Id, asset.ID);
 
         // Assert
         returnedValues.Should().HaveCount(3);
@@ -116,39 +116,10 @@ public class ValueServiceTests
         );
 
         // Act
-        var returnedValues = await valueService.ReadValuesAsync(helper.demoUser.Id);
+        var returnedValues = await valueService.ReadValuesAsync(helper.demoUser.Id, Guid.NewGuid());
 
         // Assert
         returnedValues.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task ReadValuesAsync_WhenValueGuidProvided_ShouldReturnSpecificValue()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var valueService = new ValueService(
-            Mock.Of<ILogger<IValueService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>()
-        );
-
-        var asset = new AssetFaker().Generate();
-        asset.UserID = helper.demoUser.Id;
-
-        var values = new ValueFaker().Generate(3);
-        values.ForEach(v => v.AssetID = asset.ID);
-        asset.Values = values;
-
-        helper.UserDataContext.Assets.Add(asset);
-        await helper.UserDataContext.SaveChangesAsync();
-
-        // Act
-        var targetValue = values[1];
-        var returnedValues = await valueService.ReadValuesAsync(helper.demoUser.Id, targetValue.ID);
-
-        // Assert
-        returnedValues.Should().ContainSingle(v => v.ID == targetValue.ID);
     }
 
     [Fact]

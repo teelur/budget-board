@@ -54,7 +54,7 @@ const AssetsSelectHeader = (
         onClick={() => {
           props.setSelectedAssetIds(
             assetsQuery.data
-              ?.filter((asset: IAssetResponse) => !asset?.hideProperty)
+              ?.filter((asset: IAssetResponse) => !asset?.hide)
               ?.map((asset) => asset.id) ?? []
           );
         }}

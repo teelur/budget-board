@@ -183,11 +183,11 @@ public class AssetServiceTests
         {
             ID = existingAsset.ID,
             Name = "Updated Asset Name",
-            PurchasedDate = existingAsset.PurchasedDate,
+            PurchaseDate = existingAsset.PurchaseDate,
             PurchasePrice = existingAsset.PurchasePrice,
-            SoldDate = existingAsset.SoldDate,
-            SoldPrice = existingAsset.SoldPrice,
-            HideProperty = existingAsset.HideProperty,
+            SellDate = existingAsset.SellDate,
+            SellPrice = existingAsset.SellPrice,
+            Hide = existingAsset.Hide,
         };
 
         // Act
@@ -213,11 +213,11 @@ public class AssetServiceTests
         {
             ID = Guid.NewGuid(),
             Name = "Updated Asset Name",
-            PurchasedDate = null,
+            PurchaseDate = null,
             PurchasePrice = null,
-            SoldDate = null,
-            SoldPrice = null,
-            HideProperty = false,
+            SellDate = null,
+            SellPrice = null,
+            Hide = false,
         };
 
         // Act
@@ -255,11 +255,11 @@ public class AssetServiceTests
         {
             ID = existingAsset2.ID,
             Name = "Asset 1", // Duplicate name
-            PurchasedDate = existingAsset2.PurchasedDate,
+            PurchaseDate = existingAsset2.PurchaseDate,
             PurchasePrice = existingAsset2.PurchasePrice,
-            SoldDate = existingAsset2.SoldDate,
-            SoldPrice = existingAsset2.SoldPrice,
-            HideProperty = existingAsset2.HideProperty,
+            SellDate = existingAsset2.SellDate,
+            SellPrice = existingAsset2.SellPrice,
+            Hide = existingAsset2.Hide,
         };
 
         // Act
@@ -278,7 +278,7 @@ public class AssetServiceTests
         var helper = new TestHelper();
         var nowProviderMock = new Mock<INowProvider>();
         var fixedNow = new DateTime(2024, 1, 1);
-        nowProviderMock.Setup(np => np.Now).Returns(fixedNow);
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fixedNow);
 
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),

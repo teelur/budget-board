@@ -42,23 +42,23 @@ const EditableAssetItemContent = (
     },
   });
   const purchaseDate = useField<string | null>({
-    initialValue: props.asset.purchasedDate
-      ? dayjs(props.asset.purchasedDate).toString()
+    initialValue: props.asset.purchaseDate
+      ? dayjs(props.asset.purchaseDate).toString()
       : null,
   });
   const purchasePrice = useField<string | number | undefined>({
     initialValue: props.asset.purchasePrice ?? undefined,
   });
   const sellDate = useField<string | null>({
-    initialValue: props.asset.soldDate
-      ? dayjs(props.asset.soldDate).toString()
+    initialValue: props.asset.sellDate
+      ? dayjs(props.asset.sellDate).toString()
       : null,
   });
   const sellPrice = useField<string | number | undefined>({
-    initialValue: props.asset.soldPrice ?? undefined,
+    initialValue: props.asset.sellPrice ?? undefined,
   });
   const hideAssetField = useField<boolean>({
-    initialValue: props.asset.hideProperty,
+    initialValue: props.asset.hide,
   });
 
   const { request } = React.useContext<any>(AuthContext);
@@ -69,17 +69,17 @@ const EditableAssetItemContent = (
       const editedAsset: IAssetUpdateRequest = {
         id: props.asset.id,
         name: assetNameField.getValue(),
-        purchasedDate: dayjs(purchaseDate.getValue()).toDate() || null,
+        purchaseDate: dayjs(purchaseDate.getValue()).toDate() || null,
         purchasePrice:
           purchasePrice.getValue() === undefined
             ? null
             : Number(purchasePrice.getValue()),
-        soldDate: dayjs(sellDate.getValue()).toDate() || null,
-        soldPrice:
+        sellDate: dayjs(sellDate.getValue()).toDate() || null,
+        sellPrice:
           sellPrice.getValue() === undefined
             ? null
             : Number(sellPrice.getValue()),
-        hideProperty: hideAssetField.getValue(),
+        hide: hideAssetField.getValue(),
       };
 
       return await request({
