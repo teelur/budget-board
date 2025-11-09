@@ -63,8 +63,10 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
 
   if (props.items?.length === 0 || props.values?.length === 0) {
     return (
-      <Group justify="center">
-        <Text>No data available.</Text>
+      <Group justify="center" p="0.5rem">
+        <Text fw={600} c="dimmed" size="sm">
+          No data available.
+        </Text>
       </Group>
     );
   }
