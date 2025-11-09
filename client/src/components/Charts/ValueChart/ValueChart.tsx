@@ -64,7 +64,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   if (props.items?.length === 0 || props.values?.length === 0) {
     return (
       <Group justify="center">
-        <Text>Select an account to display the chart.</Text>
+        <Text>No data available.</Text>
       </Group>
     );
   }
