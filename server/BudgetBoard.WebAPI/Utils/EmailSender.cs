@@ -48,7 +48,7 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
             EnableSsl = true,
             UseDefaultCredentials = false,
             Port = smtpPort,
-            Credentials = new NetworkCredential(senderUsername ?? sender, senderPassword),
+            Credentials = new NetworkCredential(senderUsername, senderPassword),
         };
 
         await smtp.SendMailAsync(mm);
