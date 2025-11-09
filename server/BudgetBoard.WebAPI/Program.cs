@@ -149,7 +149,7 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
     if (syncIntervalHours < 1)
     {
         throw new ArgumentOutOfRangeException(
-            nameof(syncIntervalHours),
+            "SYNC_INTERVAL_HOURS",
             "SYNC_INTERVAL_HOURS must be at least 1"
         );
     }
