@@ -41,7 +41,8 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
         mm.Subject = subject;
         mm.Body = htmlMessage;
         mm.IsBodyHtml = true;
-        SmtpClient smtp = new()
+
+        using SmtpClient smtp = new()
         {
             Host = smtpHost,
             EnableSsl = true,
@@ -49,6 +50,7 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
             Port = smtpPort,
             Credentials = new NetworkCredential(senderUsername ?? sender, senderPassword),
         };
+
         await smtp.SendMailAsync(mm);
     }
 }
