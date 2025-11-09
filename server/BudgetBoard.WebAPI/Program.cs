@@ -145,20 +145,29 @@ var autoUpdateDb = builder.Configuration.GetValue<bool>("AUTO_UPDATE_DB");
 
 if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 {
+    var syncIntervalHours = builder.Configuration.GetValue<int?>("SYNC_INTERVAL_HOURS") ?? 8;
+    if (syncIntervalHours < 1)
+    {
+        throw new ArgumentOutOfRangeException(
+            "SYNC_INTERVAL_HOURS",
+            "SYNC_INTERVAL_HOURS must be at least 1"
+        );
+    }
+
     builder.Services.AddQuartz(options =>
     {
         var jobKey = new JobKey("SyncBackgroundJob");
+        options.AddJob<SyncBackgroundJob>(opts => opts.WithIdentity(jobKey));
 
-        options
-            .AddJob<SyncBackgroundJob>(jobKey)
-            .AddTrigger(trigger =>
-                trigger
-                    .ForJob(jobKey)
-                    // Allow a minute for everything to settle after boot before starting the job
-                    .StartAt(DateBuilder.FutureDate(1, IntervalUnit.Minute))
-                    // Sync every 8 hours
-                    .WithSimpleSchedule(schedule => schedule.WithIntervalInHours(8).RepeatForever())
-            );
+        options.AddTrigger(trigger =>
+            trigger
+                .ForJob(jobKey)
+                // Allow a minute for everything to settle after boot before starting the job
+                .StartAt(DateBuilder.FutureDate(1, IntervalUnit.Minute))
+                .WithSimpleSchedule(schedule =>
+                    schedule.WithIntervalInHours(syncIntervalHours).RepeatForever()
+                )
+        );
     });
 
     builder.Services.AddQuartzHostedService(options =>

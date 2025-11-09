@@ -244,7 +244,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedValues.length === 0 ? (
-                    <Text size="sm" c="dimmed">
+                    <Text size="sm" c="dimmed" fw={600}>
                       No value entries
                     </Text>
                   ) : (
@@ -269,7 +269,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedDeletedValues.length === 0 ? (
-                    <Text size="sm" c="dimmed">
+                    <Text size="sm" c="dimmed" fw={600}>
                       No value entries
                     </Text>
                   ) : (

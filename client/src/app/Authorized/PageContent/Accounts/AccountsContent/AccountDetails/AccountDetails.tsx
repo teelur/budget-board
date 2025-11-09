@@ -178,7 +178,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     <Skeleton height={20} radius="lg" />
                   )}
                   {balancesQuery.data && balancesQuery.data.length === 0 ? (
-                    <Text size="sm" c="dimmed">
+                    <Text size="sm" c="dimmed" fw={600}>
                       No balance entries
                     </Text>
                   ) : (
