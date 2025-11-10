@@ -73,7 +73,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       size="md"
       title={
         <Text size="lg" fw={600}>
-          Account Details
+          Asset Details
         </Text>
       }
       styles={{
