@@ -38,38 +38,9 @@ public class SyncBackgroundJob(
         {
             try
             {
-                if (user.AccessToken == string.Empty)
-                {
-                    continue;
-                }
-
                 _logger.LogInformation("Syncing SimpleFin data for {user}...", user.Email);
 
-                long startDate;
-                if (user.LastSync == DateTime.MinValue)
-                {
-                    // If we haven't synced before, sync the full 90 days of history
-                    startDate =
-                        ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds()
-                        - (Helpers.UNIX_MONTH * 3);
-                }
-                else
-                {
-                    var oneMonthAgo =
-                        ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds()
-                        - Helpers.UNIX_MONTH;
-                    var lastSyncWithBuffer =
-                        ((DateTimeOffset)user.LastSync).ToUnixTimeSeconds() - Helpers.UNIX_WEEK;
-
-                    startDate = Math.Min(oneMonthAgo, lastSyncWithBuffer);
-                }
-
                 await _simpleFinService.SyncAsync(user.Id);
-
-                await _applicationUserService.UpdateApplicationUserAsync(
-                    user.Id,
-                    new ApplicationUserUpdateRequest { LastSync = _nowProvider.UtcNow }
-                );
 
                 _logger.LogInformation("Sync successful for {user}", user.Email);
             }

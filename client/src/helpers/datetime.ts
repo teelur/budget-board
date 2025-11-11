@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 const DATE = 1;
 const HOUR = 12;
 const MINUTES = 0;
@@ -33,14 +35,13 @@ export const getDaysSinceDate = (date: Date): string => {
  * @param {Date} date - The original date object to standardize.
  * @returns {Date} A new date object with standard time set.
  */
-export const getStandardDate = (date: Date) => {
-  const newDate = new Date(date);
-  newDate.setHours(HOUR);
-  newDate.setMinutes(MINUTES);
-  newDate.setSeconds(SECONDS);
-  newDate.setMilliseconds(MILLISECONDS);
-  return newDate;
-};
+export const getStandardDate = (date: Date) =>
+  dayjs(date)
+    .hour(HOUR)
+    .minute(MINUTES)
+    .second(SECONDS)
+    .millisecond(MILLISECONDS)
+    .toDate();
 
 /**
  * Initializes the current month by setting the date to 1, and time to 12:00:00.000.

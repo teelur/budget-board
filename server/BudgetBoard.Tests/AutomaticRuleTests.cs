@@ -17,7 +17,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         var rule = new AutomaticRuleCreateRequest
@@ -64,7 +65,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
         var rule = new AutomaticRuleCreateRequest
         {
@@ -98,7 +100,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
         var rule = new AutomaticRuleCreateRequest
         {
@@ -132,7 +135,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         var rule = new AutomaticRuleCreateRequest
@@ -180,7 +184,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         // Act
@@ -197,7 +202,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         var initialRule = new AutomaticRuleCreateRequest
@@ -279,7 +285,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         var updatedRule = new AutomaticRuleUpdateRequest
@@ -326,7 +333,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         var rule = new AutomaticRuleCreateRequest
@@ -374,7 +382,8 @@ public class AutomaticRuleTests
         var helper = new TestHelper();
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>()
         );
 
         // Act
@@ -388,5 +397,57 @@ public class AutomaticRuleTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("Automatic rule not found.");
+    }
+
+    [Fact]
+    public async Task RunAutomaticRuleAsync_WhenValidRule_ShouldRunRule()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionServiceMock = new Mock<ITransactionService>();
+        transactionServiceMock
+            .Setup(ts =>
+                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>())
+            )
+            .Returns(Task.CompletedTask);
+
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            transactionServiceMock.Object
+        );
+
+        var rule = new AutomaticRuleCreateRequest
+        {
+            Conditions =
+            [
+                new RuleParameterCreateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Merchant,
+                    Operator = AutomaticRuleConstants.ConditionalOperators.MatchesRegex,
+                    Value = ".*test.*",
+                    Type = "string",
+                },
+            ],
+            Actions =
+            [
+                new RuleParameterCreateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Category,
+                    Operator = AutomaticRuleConstants.ActionOperators.Set,
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.First()
+                        .Value,
+                    Type = "string",
+                },
+            ],
+        };
+
+        // Act
+        var result = await automaticRuleService.RunAutomaticRuleAsync(helper.demoUser.Id, rule);
+
+        // Assert
+        result.Should().Be("Rule matched 0 transactions and applied 0 changes.");
     }
 }

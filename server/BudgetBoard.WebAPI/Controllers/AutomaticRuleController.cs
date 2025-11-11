@@ -116,4 +116,29 @@ public class AutomaticRuleController(
             return Helpers.BuildErrorResponse("An unexpected server error occurred.");
         }
     }
+
+    [HttpPost]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> Run([FromBody] AutomaticRuleCreateRequest automaticRule)
+    {
+        try
+        {
+            return Ok(
+                await _automaticRuleService.RunAutomaticRuleAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    automaticRule
+                )
+            );
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+        }
+    }
 }

@@ -14,6 +14,7 @@ interface MonthToolcardsProps {
   timeToMonthlyTotalsMap: Map<number, number>;
   isPending: boolean;
   allowSelectMultiple: boolean;
+  allowFutureMonths?: boolean;
 }
 
 const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
@@ -81,7 +82,7 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
       <ActionIcon
         className={classes.pageButton}
         variant="light"
-        disabled={index <= 0}
+        disabled={index <= 0 && !props.allowFutureMonths}
         onClick={() => setIndex(index - 1)}
       >
         <ChevronRightIcon />

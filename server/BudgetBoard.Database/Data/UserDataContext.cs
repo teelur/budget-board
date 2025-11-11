@@ -111,6 +111,15 @@ namespace BudgetBoard.Database.Data
                 r.ToTable("AutomaticRule");
             });
 
+            modelBuilder.Entity<Value>().ToTable("Value");
+
+            modelBuilder.Entity<Asset>(a =>
+            {
+                a.HasMany(e => e.Values).WithOne(e => e.Asset).HasForeignKey(e => e.AssetID);
+
+                a.ToTable("Asset");
+            });
+
             modelBuilder.UseIdentityColumns();
         }
 
@@ -127,5 +136,7 @@ namespace BudgetBoard.Database.Data
         public DbSet<RuleParameterBase> RuleParameters { get; set; }
         public DbSet<RuleCondition> RuleConditions { get; set; }
         public DbSet<RuleAction> RuleActions { get; set; }
+        public DbSet<Asset> Assets { get; set; }
+        public DbSet<Value> Values { get; set; }
     }
 }

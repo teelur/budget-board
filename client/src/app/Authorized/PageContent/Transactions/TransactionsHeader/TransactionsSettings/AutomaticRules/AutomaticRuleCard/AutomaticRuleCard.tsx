@@ -1,9 +1,10 @@
 import { ActionIcon, Button, Card, Group, Stack, Text } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PencilIcon, TrashIcon } from "lucide-react";
+import { PencilIcon, PlayIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import {
+  IAutomaticRuleRequest,
   IAutomaticRuleResponse,
   IAutomaticRuleUpdateRequest,
   IRuleParameterEdit,
@@ -13,6 +14,9 @@ import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { ICategoryResponse } from "~/models/category";
 import { defaultTransactionCategories } from "~/models/transaction";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
+import { translateAxiosError } from "~/helpers/requests";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -80,6 +84,9 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
         queryKey: ["automaticRule"],
       });
     },
+    onError: (error: AxiosError) => {
+      notifications.show({ message: translateAxiosError(error), color: "red" });
+    },
   });
 
   const doUpdateAutomaticRule = useMutation({
@@ -95,6 +102,32 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
         queryKey: ["automaticRule"],
       });
       setIsSelected(false);
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({ message: translateAxiosError(error), color: "red" });
+    },
+  });
+
+  const doRunRule = useMutation({
+    mutationFn: async (automaticRule: IAutomaticRuleRequest) =>
+      await request({
+        url: "/api/automaticRule/run",
+        method: "POST",
+        data: automaticRule,
+      }),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["transactions"],
+      });
+
+      notifications.show({
+        title: "Rule Executed",
+        message: data?.data ?? "Rule run successfully",
+        color: "green",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({ message: translateAxiosError(error), color: "red" });
     },
   });
 
@@ -179,6 +212,29 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
           </Group>
         </Stack>
         <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
+          <ActionIcon
+            variant="outline"
+            onClick={() => {
+              doRunRule.mutate({
+                conditions: conditionItems.map((item) => ({
+                  field: item.field,
+                  operator: item.operator,
+                  value: item.value,
+                  type: "",
+                })),
+                actions: actionItems.map((item) => ({
+                  field: item.field,
+                  operator: item.operator,
+                  value: item.value,
+                  type: "",
+                })),
+              });
+            }}
+            loading={doRunRule.isPending}
+            h="100%"
+          >
+            <PlayIcon size="1rem" />
+          </ActionIcon>
           <ActionIcon
             onClick={() => {
               setConditionItems(props.rule.conditions ?? []);

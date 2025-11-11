@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class BalanceService(ILogger<IBalanceService> logger, UserDataContext userDataContext) : IBalanceService
+public class BalanceService(ILogger<IBalanceService> logger, UserDataContext userDataContext)
+    : IBalanceService
 {
     private readonly ILogger<IBalanceService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
@@ -19,7 +20,9 @@ public class BalanceService(ILogger<IBalanceService> logger, UserDataContext use
         if (account == null)
         {
             _logger.LogError("Attempt to add balance to account that does not exist.");
-            throw new BudgetBoardServiceException("The account you are trying to add a balance to does not exist.");
+            throw new BudgetBoardServiceException(
+                "The account you are trying to add a balance to does not exist."
+            );
         }
 
         Balance newBalance = new()
@@ -33,14 +36,19 @@ public class BalanceService(ILogger<IBalanceService> logger, UserDataContext use
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IBalanceResponse>> ReadBalancesAsync(Guid userGuid, Guid accountId)
+    public async Task<IEnumerable<IBalanceResponse>> ReadBalancesAsync(
+        Guid userGuid,
+        Guid accountId
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var account = userData.Accounts.FirstOrDefault(a => a.ID == accountId);
         if (account == null)
         {
             _logger.LogError("Attempt to read balance from account that does not exist.");
-            throw new BudgetBoardServiceException("The account you are trying to read a balance from does not exist.");
+            throw new BudgetBoardServiceException(
+                "The account you are trying to read a balance from does not exist."
+            );
         }
 
         return account.Balances.Select(b => new BalanceResponse(b));
@@ -49,11 +57,15 @@ public class BalanceService(ILogger<IBalanceService> logger, UserDataContext use
     public async Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest updatedBalance)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var balance = userData.Accounts.SelectMany(a => a.Balances).FirstOrDefault(b => b.ID == updatedBalance.ID);
+        var balance = userData
+            .Accounts.SelectMany(a => a.Balances)
+            .FirstOrDefault(b => b.ID == updatedBalance.ID);
         if (balance == null)
         {
             _logger.LogError("Attempt to update balance that does not exist.");
-            throw new BudgetBoardServiceException("The balance you are trying to update does not exist.");
+            throw new BudgetBoardServiceException(
+                "The balance you are trying to update does not exist."
+            );
         }
 
         balance.DateTime = updatedBalance.DateTime;
@@ -65,11 +77,15 @@ public class BalanceService(ILogger<IBalanceService> logger, UserDataContext use
     public async Task DeleteBalanceAsync(Guid userGuid, Guid balanceId)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var balance = userData.Accounts.SelectMany(a => a.Balances).FirstOrDefault(b => b.ID == balanceId);
+        var balance = userData
+            .Accounts.SelectMany(a => a.Balances)
+            .FirstOrDefault(b => b.ID == balanceId);
         if (balance == null)
         {
             _logger.LogError("Attempt to delete balance that does not exist.");
-            throw new BudgetBoardServiceException("The balance you are trying to delete does not exist.");
+            throw new BudgetBoardServiceException(
+                "The balance you are trying to delete does not exist."
+            );
         }
 
         _userDataContext.Balances.Remove(balance);
@@ -82,8 +98,8 @@ public class BalanceService(ILogger<IBalanceService> logger, UserDataContext use
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext.ApplicationUsers
-                .Include(u => u.Accounts)
+            users = await _userDataContext
+                .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
                 .AsSplitQuery()
                 .ToListAsync();
@@ -91,8 +107,13 @@ public class BalanceService(ILogger<IBalanceService> logger, UserDataContext use
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while retrieving the user data: {ExceptionMessage}", ex.Message);
-            throw new BudgetBoardServiceException("An error occurred while retrieving the user data.");
+            _logger.LogError(
+                "An error occurred while retrieving the user data: {ExceptionMessage}",
+                ex.Message
+            );
+            throw new BudgetBoardServiceException(
+                "An error occurred while retrieving the user data."
+            );
         }
 
         if (foundUser == null)

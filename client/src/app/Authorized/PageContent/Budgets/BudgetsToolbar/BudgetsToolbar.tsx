@@ -104,6 +104,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         timeToMonthlyTotalsMap={props.timeToMonthlyTotalsMap}
         isPending={props.isPending}
         allowSelectMultiple={canSelectMultiple}
+        allowFutureMonths
       />
       <Group justify="space-between" gap="0.5rem">
         <Button

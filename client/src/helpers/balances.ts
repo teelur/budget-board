@@ -2,24 +2,6 @@ import { IBalance } from "~/models/balance";
 import { getStandardDate } from "./datetime";
 
 /**
- * Generates a sorted array of Date objects from an array of IBalance entries.
- * @param balances - Collection of balance objects.
- * @returns Sorted list of Date objects in ascending order.
- */
-export const getSortedBalanceDates = (balances: IBalance[]): Date[] =>
-  balances
-    .map((balance) =>
-      getStandardDate(
-        new Date(
-          new Date(balance.dateTime).getFullYear(),
-          new Date(balance.dateTime).getMonth(),
-          new Date(balance.dateTime).getDate()
-        )
-      )
-    )
-    .sort((a, b) => a.getTime() - b.getTime());
-
-/**
  * Groups balances by account ID, sorted by dateTime in ascending order.
  * @param balances - Array of balance objects
  * @returns Map keyed by account ID with corresponding sorted balances

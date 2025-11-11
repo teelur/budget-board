@@ -27,6 +27,7 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DatePickerInput, DateValue } from "@mantine/dates";
 import dayjs from "dayjs";
+import { getGoalTargetAmount } from "~/helpers/goals";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -294,14 +295,27 @@ const EditableGoalCardContent = (
                   e.stopPropagation();
                 }}
               >
-                <NumberInput
-                  maw={100}
-                  min={0}
-                  prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
-                  thousandSeparator=","
-                  {...goalTargetAmountField.getInputProps()}
-                  onBlur={submitChanges}
-                />
+                {props.goal.amount !== 0 ? (
+                  <NumberInput
+                    maw={100}
+                    min={0}
+                    prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+                    thousandSeparator=","
+                    {...goalTargetAmountField.getInputProps()}
+                    onBlur={submitChanges}
+                  />
+                ) : (
+                  <Text size="lg" fw={600}>
+                    {convertNumberToCurrency(
+                      getGoalTargetAmount(
+                        props.goal.amount,
+                        props.goal.initialAmount
+                      ),
+                      false,
+                      userSettingsQuery.data?.currency ?? "USD"
+                    )}
+                  </Text>
+                )}
               </Flex>
             </Flex>
           </Flex>
