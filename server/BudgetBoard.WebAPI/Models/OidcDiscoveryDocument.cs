@@ -5,7 +5,7 @@ namespace BudgetBoard.WebAPI.Models;
 /// <summary>
 /// Represents the OpenID Connect Discovery Document
 /// </summary>
-public class DiscoveryDocument
+public class OidcDiscoveryDocument
 {
     [JsonPropertyName("issuer")]
     public string? Issuer { get; set; }
@@ -51,25 +51,4 @@ public class DiscoveryDocument
 
     [JsonPropertyName("claims_supported")]
     public string[]? ClaimsSupported { get; set; }
-}
-
-/// <summary>
-/// Represents the token response from the token endpoint
-/// </summary>
-public class TokenResponse
-{
-    [JsonPropertyName("access_token")]
-    public string? AccessToken { get; set; }
-
-    [JsonPropertyName("id_token")]
-    public string? IdToken { get; set; }
-
-    [JsonPropertyName("refresh_token")]
-    public string? RefreshToken { get; set; }
-
-    [JsonPropertyName("expires_in")]
-    public int ExpiresIn { get; set; }
-
-    [JsonPropertyName("token_type")]
-    public string? TokenType { get; set; }
 }

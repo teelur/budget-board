@@ -81,7 +81,7 @@ public class OidcTokenService(
     /// </summary>
     /// <param name="authority">The OIDC authority URL.</param>
     /// <returns>The discovery document, or null if retrieval fails.</returns>
-    private async Task<DiscoveryDocument?> GetDiscoveryDocumentAsync(string authority)
+    private async Task<OidcDiscoveryDocument?> GetDiscoveryDocumentAsync(string authority)
     {
         try
         {
@@ -97,7 +97,7 @@ public class OidcTokenService(
             var content = await response.Content.ReadAsStringAsync();
             _logger.LogDebug("Discovery document content: {Content}", content);
 
-            var discoveryDoc = JsonSerializer.Deserialize<DiscoveryDocument>(
+            var discoveryDoc = JsonSerializer.Deserialize<OidcDiscoveryDocument>(
                 content,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
             );
@@ -132,7 +132,7 @@ public class OidcTokenService(
     /// <param name="clientId">The client ID.</param>
     /// <param name="clientSecret">The client secret.</param>
     /// <returns>The token response, or null if the exchange fails.</returns>
-    private async Task<TokenResponse?> ExchangeCodeForTokensAsync(
+    private async Task<OidcTokenResponse?> ExchangeCodeForTokensAsync(
         string tokenEndpoint,
         string authorizationCode,
         string clientId,
@@ -164,7 +164,7 @@ public class OidcTokenService(
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(
+            var tokenResponse = JsonSerializer.Deserialize<OidcTokenResponse>(
                 responseContent,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
             );
