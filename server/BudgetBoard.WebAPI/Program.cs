@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Text.Json.Serialization;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
@@ -7,15 +6,12 @@ using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Jobs;
-using Microsoft.AspNetCore.Authentication;
+using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Quartz;
 using Serilog;
 
@@ -86,105 +82,45 @@ var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 
 if (oidcEnabled)
 {
+    // Validate OIDC configuration is present for token service
     var oidcAuthority = builder.Configuration.GetValue<string>("OIDC_ISSUER");
+    var oidcClientId = builder.Configuration.GetValue<string>("OIDC_CLIENT_ID");
+    var oidcClientSecret = builder.Configuration.GetValue<string>("OIDC_CLIENT_SECRET");
+
     if (string.IsNullOrEmpty(oidcAuthority))
     {
-        throw new ArgumentNullException(nameof(oidcAuthority));
+        throw new ArgumentNullException(
+            "OIDC_ISSUER",
+            "OIDC_ISSUER is required when OIDC_ENABLED is true"
+        );
     }
-    var oidcClientId = builder.Configuration.GetValue<string>("OIDC_CLIENT_ID");
     if (string.IsNullOrEmpty(oidcClientId))
     {
-        throw new ArgumentNullException(nameof(oidcClientId));
+        throw new ArgumentNullException(
+            "OIDC_CLIENT_ID",
+            "OIDC_CLIENT_ID is required when OIDC_ENABLED is true"
+        );
     }
-    var oidcClientSecret = builder.Configuration.GetValue<string>("OIDC_CLIENT_SECRET");
     if (string.IsNullOrEmpty(oidcClientSecret))
     {
-        throw new ArgumentNullException(nameof(oidcClientSecret));
-    }
-
-    // Configure Identity + OpenID Connect
-    builder
-        .Services.AddAuthentication(options =>
-        {
-            // Application uses cookie authentication as the default
-            options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-            options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
-            // When a challenge occurs, use the OIDC external scheme to redirect to the provider
-            options.DefaultChallengeScheme = IdentityConstants.ExternalScheme;
-        })
-        .AddCookie(IdentityConstants.ApplicationScheme)
-        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
-        .AddOpenIdConnect(
-            IdentityConstants.ExternalScheme,
-            options =>
-            {
-                options.Authority = oidcAuthority;
-                options.ClientId = oidcClientId;
-                options.ClientSecret = oidcClientSecret;
-
-                // Standard OIDC opts for Authorization Code flow with PKCE
-                options.ResponseType = "code";
-                options.UsePkce = true;
-                options.SaveTokens = true;
-
-                // Set callback to controller endpoint implemented at /api/oidc/callback
-                options.CallbackPath = "/api/oidc/callback";
-
-                // Request the common scopes
-                options.Scope.Clear();
-                options.Scope.Add("openid");
-                options.Scope.Add("profile");
-                options.Scope.Add("email");
-
-                // Make sure name/role claim types are sensible for Identity
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    NameClaimType = ClaimTypes.Name,
-                    RoleClaimType = ClaimTypes.Role,
-                };
-
-                // Optional: map or keep inbound claims as-is
-                options.MapInboundClaims = false;
-
-                // Delegate provisioning to a testable service
-                options.Events = new OpenIdConnectEvents
-                {
-                    OnTokenValidated = async ctx =>
-                    {
-                        var provisioner =
-                            ctx.HttpContext.RequestServices.GetRequiredService<IExternalUserProvisioningService>();
-                        var success = await provisioner.ProvisionExternalUserAsync(
-                            ctx.Principal!,
-                            ctx.HttpContext,
-                            ctx.Scheme.Name
-                        );
-                        if (!success)
-                        {
-                            ctx.Response.StatusCode = 500;
-                            ctx.HandleResponse();
-                        }
-                    },
-
-                    OnRemoteFailure = ctx =>
-                    {
-                        // Handle failures from the provider, if necessary
-                        ctx.Response.StatusCode = 500;
-                        ctx.HandleResponse();
-                        return Task.CompletedTask;
-                    },
-                };
-            }
+        throw new ArgumentNullException(
+            "OIDC_CLIENT_SECRET",
+            "OIDC_CLIENT_SECRET is required when OIDC_ENABLED is true"
         );
+    }
 }
-else
-{
-    // Configure Identity (no OIDC)
-    builder
-        .Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-        .AddCookie(IdentityConstants.ApplicationScheme)
-        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
-    builder.Services.AddAuthorization();
-}
+
+// Configure Identity with cookie authentication
+// Same configuration whether OIDC is enabled or not since frontend handles OIDC flow
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+    })
+    .AddCookie(IdentityConstants.ApplicationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 builder.Services.AddAuthorization();
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
@@ -238,6 +174,12 @@ var autoUpdateDb = builder.Configuration.GetValue<bool>("AUTO_UPDATE_DB");
 
 // Register the new provisioning service after Identity is configured
 builder.Services.AddScoped<IExternalUserProvisioningService, ExternalUserProvisioningService>();
+
+// Register OIDC token service if OIDC is enabled
+if (oidcEnabled)
+{
+    builder.Services.AddScoped<IOidcTokenService, OidcTokenService>();
+}
 
 if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 {

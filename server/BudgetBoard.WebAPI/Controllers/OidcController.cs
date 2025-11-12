@@ -1,76 +1,92 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Models;
+using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OidcController : ControllerBase
+    public class OidcController(
+        IExternalUserProvisioningService provisioner,
+        IOidcTokenService tokenService,
+        ILogger<OidcController> logger
+    ) : ControllerBase
     {
-        private readonly IExternalUserProvisioningService _provisioner;
-        private readonly ILogger<OidcController> _logger;
+        private readonly IExternalUserProvisioningService _provisioner =
+            provisioner ?? throw new ArgumentNullException(nameof(provisioner));
+        private readonly IOidcTokenService _tokenService =
+            tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+        private readonly ILogger<OidcController> _logger =
+            logger ?? throw new ArgumentNullException(nameof(logger));
 
-        public OidcController(
-            IExternalUserProvisioningService provisioner,
-            ILogger<OidcController> logger
-        )
-        {
-            _provisioner = provisioner ?? throw new ArgumentNullException(nameof(provisioner));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        [HttpGet("signin")]
-        public IActionResult SignIn(string returnUrl = "/")
-        {
-            var props = new AuthenticationProperties { RedirectUri = returnUrl };
-            return Challenge(props, IdentityConstants.ExternalScheme);
-        }
-
-        // OIDC provider will redirect back to this endpoint; the OpenID Connect middleware
-        // will populate the external principal on the ExternalScheme. This endpoint reads it,
-        // delegates provisioning to the testable service, then redirects the user.
+        // Frontend calls this endpoint after receiving authorization code from OIDC provider
         [AllowAnonymous]
-        [HttpGet("callback")]
-        public async Task<IActionResult> Callback(string returnUrl = "/")
+        [HttpPost("callback")]
+        public async Task<IActionResult> Callback([FromBody] OidcCallbackRequest request)
         {
-            var result = await HttpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
-            if (result?.Principal == null || !result.Succeeded)
-            {
-                _logger.LogWarning(
-                    "External authentication did not produce a principal or did not succeed."
-                );
-                return StatusCode(500, "External authentication failed.");
-            }
-
-            var provisioned = await _provisioner.ProvisionExternalUserAsync(
-                result.Principal,
-                HttpContext,
-                IdentityConstants.ExternalScheme
+            _logger.LogInformation(
+                "OIDC callback started. Code: {Code}, ReturnUrl: {ReturnUrl}",
+                string.IsNullOrEmpty(request.Code) ? "null" : "provided",
+                request.ReturnUrl
             );
 
-            // Clear the temporary external cookie (if any)
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
-            if (!provisioned)
+            if (string.IsNullOrEmpty(request.Code))
             {
-                _logger.LogWarning("Provisioning external user failed.");
-                return StatusCode(500, "Failed to provision external user.");
+                _logger.LogWarning("No authorization code provided");
+                return BadRequest("Authorization code is required");
             }
 
-            // Prevent open redirect
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            try
             {
-                return LocalRedirect(returnUrl);
-            }
+                // Exchange authorization code for user claims
+                var principal = await _tokenService.ExchangeCodeForUserAsync(request.Code);
+                if (principal == null)
+                {
+                    _logger.LogError("Failed to exchange code for user principal");
+                    return StatusCode(500, "Token exchange failed");
+                }
 
-            return Redirect("/");
+                _logger.LogInformation(
+                    "Token exchange succeeded. Claims count: {ClaimCount}",
+                    principal.Claims?.Count() ?? 0
+                );
+
+                // Provision the user in our system
+                var provisioned = await _provisioner.ProvisionExternalUserAsync(
+                    principal,
+                    HttpContext,
+                    "oidc"
+                );
+
+                if (!provisioned)
+                {
+                    _logger.LogWarning("User provisioning failed");
+                    return StatusCode(500, "Failed to provision external user");
+                }
+
+                _logger.LogInformation(
+                    "User provisioning succeeded. ReturnUrl: {ReturnUrl}",
+                    request.ReturnUrl
+                );
+
+                // Return success response for frontend to handle
+                return Ok(
+                    new OidcCallbackResponse
+                    {
+                        Success = true,
+                        ReturnUrl = request.ReturnUrl ?? "/",
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during OIDC callback processing");
+                return StatusCode(500, "Authentication failed");
+            }
         }
 
         [Authorize]
@@ -84,13 +100,6 @@ namespace BudgetBoard.WebAPI.Controllers
                     Claims = User.Claims.Select(c => new { c.Type, c.Value }),
                 }
             );
-        }
-
-        [HttpPost("signout")]
-        public async Task<IActionResult> SignOut()
-        {
-            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
-            return Ok();
         }
     }
 }
