@@ -3,8 +3,6 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
 import { notifications } from "@mantine/notifications";
 
-export const AuthContext = createContext({});
-
 export interface AuthContextValue {
   isUserAuthenticated: boolean;
   setIsUserAuthenticated: (isLoggedIn: boolean) => void;
@@ -12,6 +10,15 @@ export interface AuthContextValue {
   request: ({ ...options }) => Promise<AxiosResponse>;
   startOidcLogin?: () => void; // added
 }
+
+export const AuthContext = createContext<AuthContextValue>({
+  isUserAuthenticated: false,
+  setIsUserAuthenticated: () => {},
+  loading: false,
+  request: async () => {
+    return {} as AxiosResponse;
+  },
+});
 
 const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
   const [isUserAuthenticated, setIsUserAuthenticated] =
@@ -37,6 +44,7 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
 
   React.useEffect(() => {
     setLoading(true);
+
     request({
       url: "/api/isAuthenticated",
       method: "GET",
@@ -55,17 +63,16 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
       });
   }, []);
 
-  const startOidcLogin = (): void => {
+  const startOidcLogin = async (): Promise<void> => {
     const authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
     const clientId = envVariables.VITE_OIDC_CLIENT_ID;
-    const clientSecret = envVariables.VITE_OIDC_CLIENT_SECRET;
     const redirectUri = `${window.location.origin}/oidc-callback`;
 
-    if (!authorizeUrl || !clientId || !clientSecret) {
+    if (!authorizeUrl || !clientId) {
       notifications.show({
         color: "red",
         message:
-          "OIDC is not configured. Set VITE_OIDC_PROVIDER, VITE_OIDC_CLIENT_ID, and VITE_OIDC_CLIENT_SECRET.",
+          "OIDC is not configured. Set VITE_OIDC_PROVIDER and VITE_OIDC_CLIENT_ID.",
       });
       return;
     }
