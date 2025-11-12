@@ -1,9 +1,7 @@
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Models;
 using BudgetBoard.WebAPI.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BudgetBoard.WebAPI.Controllers
