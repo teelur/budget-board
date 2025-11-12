@@ -79,6 +79,16 @@ builder.Services.AddDbContext<UserDataContext>(o =>
 );
 
 var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
+var disableLocalAuth = builder.Configuration.GetValue<bool>("DISABLE_LOCAL_AUTH");
+
+// Validate configuration: if local auth is disabled, OIDC must be enabled
+if (disableLocalAuth && !oidcEnabled)
+{
+    throw new InvalidOperationException(
+        "OIDC_ENABLED must be true when DISABLE_LOCAL_AUTH is true. "
+            + "Cannot disable local authentication without an alternative authentication method."
+    );
+}
 
 if (oidcEnabled)
 {
@@ -129,19 +139,25 @@ var emailSender = builder.Configuration.GetValue<string>("EMAIL_SENDER");
 builder
     .Services.AddIdentityCore<ApplicationUser>(opt =>
     {
-        opt.Password.RequiredLength = 3;
-        opt.Password.RequiredUniqueChars = 0;
-        opt.Password.RequireNonAlphanumeric = false;
-        opt.Password.RequireDigit = false;
-        opt.Password.RequireUppercase = false;
-        opt.Password.RequireLowercase = false;
+        // Configure password requirements (only relevant when local auth is enabled)
+        if (!disableLocalAuth)
+        {
+            opt.Password.RequiredLength = 3;
+            opt.Password.RequiredUniqueChars = 0;
+            opt.Password.RequireNonAlphanumeric = false;
+            opt.Password.RequireDigit = false;
+            opt.Password.RequireUppercase = false;
+            opt.Password.RequireLowercase = false;
+        }
+
         opt.User.RequireUniqueEmail = true;
-        opt.SignIn.RequireConfirmedEmail = !string.IsNullOrEmpty(emailSender);
+        opt.SignIn.RequireConfirmedEmail = !string.IsNullOrEmpty(emailSender) && !disableLocalAuth;
     })
     .AddEntityFrameworkStores<UserDataContext>()
     .AddApiEndpoints();
 
-if (!string.IsNullOrEmpty(emailSender))
+// Configure email sender only when local auth is enabled (for email confirmation)
+if (!string.IsNullOrEmpty(emailSender) && !disableLocalAuth)
 {
     builder.Services.AddTransient<IEmailSender, EmailSender>();
 }
@@ -234,6 +250,32 @@ builder.Services.AddScoped<IValueService, ValueService>();
 
 var app = builder.Build();
 
+// Log authentication configuration
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var disableNewUsers = builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS");
+
+if (disableLocalAuth)
+{
+    logger.LogInformation("Local authentication disabled - OIDC only");
+}
+else if (oidcEnabled)
+{
+    logger.LogInformation("Both local and OIDC authentication enabled");
+}
+else
+{
+    logger.LogInformation("Local authentication only");
+}
+
+if (disableNewUsers)
+{
+    logger.LogInformation("New user creation disabled - existing users only");
+}
+else
+{
+    logger.LogInformation("New user creation enabled");
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -249,7 +291,13 @@ app.UseSerilogRequestLogging();
 app.MyMapIdentityApi<ApplicationUser>(
     new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
     {
-        ExcludeRegisterPost = builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS"),
+        ExcludeRegisterPost =
+            builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS") || disableLocalAuth,
+        ExcludeLoginPost = disableLocalAuth,
+        ExcludeLogoutPost = false, // Keep logout available even with OIDC
+        ExcludeForgotPasswordPost = disableLocalAuth,
+        ExcludeResetPasswordPost = disableLocalAuth,
+        ExcludeResendConfirmationEmailPost = disableLocalAuth,
     }
 );
 

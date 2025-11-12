@@ -11,19 +11,18 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Utils
 {
-    public class ExternalUserProvisioningService : IExternalUserProvisioningService
+    public class ExternalUserProvisioningService(
+        UserManager<ApplicationUser> userManager,
+        IConfiguration configuration,
+        ILogger<ExternalUserProvisioningService> logger
+    ) : IExternalUserProvisioningService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<ExternalUserProvisioningService> _logger;
-
-        public ExternalUserProvisioningService(
-            UserManager<ApplicationUser> userManager,
-            ILogger<ExternalUserProvisioningService> logger
-        )
-        {
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        private readonly UserManager<ApplicationUser> _userManager =
+            userManager ?? throw new ArgumentNullException(nameof(userManager));
+        private readonly IConfiguration _configuration =
+            configuration ?? throw new ArgumentNullException(nameof(configuration));
+        private readonly ILogger<ExternalUserProvisioningService> _logger =
+            logger ?? throw new ArgumentNullException(nameof(logger));
 
         public async Task<bool> ProvisionExternalUserAsync(
             ClaimsPrincipal principal,
@@ -54,6 +53,17 @@ namespace BudgetBoard.Utils
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
+                // Check if new user creation is disabled
+                var disableNewUsers = _configuration.GetValue<bool>("DISABLE_NEW_USERS");
+                if (disableNewUsers)
+                {
+                    _logger.LogWarning(
+                        "New user creation is disabled. Cannot provision user with email: {Email}",
+                        email
+                    );
+                    return false;
+                }
+
                 user = new ApplicationUser
                 {
                     UserName = email,
@@ -70,6 +80,18 @@ namespace BudgetBoard.Utils
                     );
                     return false;
                 }
+
+                _logger.LogInformation(
+                    "Created new user via OIDC provisioning for email: {Email}",
+                    email
+                );
+            }
+            else
+            {
+                _logger.LogInformation(
+                    "Found existing user for OIDC login with email: {Email}",
+                    email
+                );
             }
 
             // Ensure external login association exists
