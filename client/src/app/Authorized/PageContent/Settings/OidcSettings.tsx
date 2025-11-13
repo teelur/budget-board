@@ -1,0 +1,43 @@
+import { Button, Card, Stack, Text } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
+import React from "react";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { IApplicationUser } from "~/models/applicationUser";
+
+const OidcSettings = (): React.ReactNode => {
+  const { request } = React.useContext<any>(AuthContext);
+
+  const userQuery = useQuery({
+    queryKey: ["user"],
+    queryFn: async (): Promise<IApplicationUser | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/applicationUser",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IApplicationUser;
+      }
+
+      return undefined;
+    },
+  });
+
+  if (!userQuery.data?.hasOidcLogin) {
+    return null;
+  }
+
+  return (
+    <Card p="0.5rem" withBorder radius="md" shadow="sm">
+      <Stack gap="1rem">
+        <Text fw={700} size="lg">
+          OIDC Settings
+        </Text>
+        <Button>Disconnect OIDC Provider</Button>
+      </Stack>
+    </Card>
+  );
+};
+
+export default OidcSettings;

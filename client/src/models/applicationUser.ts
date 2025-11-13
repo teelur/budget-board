@@ -3,6 +3,7 @@ export interface IApplicationUser {
   accessToken: boolean;
   lastSync: Date;
   twoFactorEnabled: boolean;
+  hasOidcLogin: boolean;
 }
 
 export const defaultGuid: string = "00000000-0000-0000-0000-000000000000";
