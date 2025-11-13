@@ -1,8 +1,10 @@
 import { Button, Card, Stack, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { translateAxiosError } from "~/helpers/requests";
 import { IApplicationUser } from "~/models/applicationUser";
 
 const OidcSettings = (): React.ReactNode => {
@@ -24,6 +26,24 @@ const OidcSettings = (): React.ReactNode => {
     },
   });
 
+  const queryClient = useQueryClient();
+  const doDisconnectOidc = useMutation({
+    mutationFn: async () =>
+      await request({
+        url: "/api/applicationUser/disconnectOidcLogin",
+        method: "DELETE",
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        color: "red",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
   if (!userQuery.data?.hasOidcLogin) {
     return null;
   }
@@ -34,7 +54,13 @@ const OidcSettings = (): React.ReactNode => {
         <Text fw={700} size="lg">
           OIDC Settings
         </Text>
-        <Button>Disconnect OIDC Provider</Button>
+        <Button
+          color="red"
+          onClick={() => doDisconnectOidc.mutate()}
+          loading={doDisconnectOidc.isPending}
+        >
+          Disconnect OIDC Provider
+        </Button>
       </Stack>
     </Card>
   );
