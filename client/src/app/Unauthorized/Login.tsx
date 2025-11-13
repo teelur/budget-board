@@ -7,15 +7,15 @@ import {
   TextInput,
   Divider,
 } from "@mantine/core";
-import { hasLength, isEmail, useForm } from "@mantine/form";
+import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
-import classes from "./Welcome.module.css";
 import { LoginCardState } from "./Welcome";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
+import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -26,13 +26,16 @@ interface LoginProps {
 const Login = (props: LoginProps): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
 
-  const form = useForm({
-    mode: "controlled",
-    initialValues: { email: "", password: "" },
-    validate: {
-      email: isEmail("Invalid email"),
-      password: hasLength({ min: 3 }, "Must be at least 3 characters"),
-    },
+  const { envVariables } = getProjectEnvVariables();
+
+  const emailField = useField<string>({
+    initialValue: "",
+    validate: isEmail("Invalid email"),
+  });
+
+  const passwordField = useField<string>({
+    initialValue: "",
+    validate: hasLength({ min: 3 }, "Must be at least 3 characters"),
   });
 
   const { request, setIsUserAuthenticated, startOidcLogin } =
@@ -40,26 +43,22 @@ const Login = (props: LoginProps): React.ReactNode => {
 
   const queryClient = useQueryClient();
 
-  const submitUserLogin = async (
-    values: typeof form.values,
-    e: any
-  ): Promise<void> => {
-    e.preventDefault();
+  const doLogin = async (): Promise<void> => {
     setLoading(true);
 
     request({
       url: "/api/login",
       method: "POST",
       data: {
-        email: values.email,
-        password: values.password,
+        email: emailField.getValue(),
+        password: passwordField.getValue(),
       },
     })
       .then((res: AxiosResponse) => {
         if (res.data === "RequiresTwoFactor") {
           props.setLoginCardState(LoginCardState.LoginWith2fa);
-          props.setUserEmail(values.email);
-          props.setUserPassword(values.password);
+          props.setUserEmail(emailField.getValue());
+          props.setUserPassword(passwordField.getValue());
           return;
         }
 
@@ -136,42 +135,39 @@ const Login = (props: LoginProps): React.ReactNode => {
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <form
-        className={classes.form}
-        style={{ width: "100%" }}
-        onSubmit={form.onSubmit(submitUserLogin)}
-      >
-        <TextInput
-          {...form.getInputProps("email")}
-          key={form.key("email")}
-          label="Email"
-          w="100%"
-        />
-        <PasswordInput
-          {...form.getInputProps("password")}
-          key={form.key("password")}
-          label="Password"
-          w="100%"
-        />
-        <Button variant="filled" fullWidth type="submit">
-          Login
+      {envVariables.VITE_DISABLE_LOCAL_AUTH.toLowerCase() !== "true" && (
+        <Stack w="100%" align="center" gap="1rem">
+          <TextInput {...emailField.getInputProps()} label="Email" w="100%" />
+          <PasswordInput
+            {...passwordField.getInputProps()}
+            label="Password"
+            w="100%"
+          />
+          <Button variant="filled" fullWidth onClick={doLogin}>
+            Login
+          </Button>
+          <Anchor
+            size="sm"
+            fw={600}
+            onClick={submitPasswordReset.bind(null, emailField.getValue())}
+          >
+            Reset Password
+          </Anchor>
+        </Stack>
+      )}
+      {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" &&
+        envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
+          <Divider w="100%" label="or" />
+        )}
+      {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" && (
+        <Button
+          variant="outline"
+          fullWidth
+          onClick={() => startOidcLogin && startOidcLogin()}
+        >
+          Sign in with OIDC
         </Button>
-      </form>
-      <Anchor
-        size="sm"
-        fw={600}
-        onClick={submitPasswordReset.bind(null, form.values.email)}
-      >
-        Reset Password
-      </Anchor>
-      <Divider w="100%" label="or" />
-      <Button
-        variant="outline"
-        fullWidth
-        onClick={() => startOidcLogin && startOidcLogin()}
-      >
-        Sign in with OIDC
-      </Button>
+      )}
     </Stack>
   );
 };
