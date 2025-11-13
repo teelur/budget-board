@@ -95,6 +95,17 @@ namespace BudgetBoard.Utils
             );
             if (!hasLogin)
             {
+                // Check if adding new logins is disabled
+                var disableNewUsers = _configuration.GetValue<bool>("DISABLE_NEW_USERS");
+                if (disableNewUsers)
+                {
+                    _logger.LogWarning(
+                        "Adding OIDC login to existing users is disabled (DISABLE_NEW_USERS=true). Cannot add OIDC login for user with email: {Email}",
+                        email
+                    );
+                    return false;
+                }
+
                 var loginInfo = new UserLoginInfo(schemeName, providerKey, schemeName);
                 var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
                 if (!addLoginResult.Succeeded)
