@@ -39,7 +39,8 @@ public class ApplicationUserController(
         {
             return Ok(
                 await _applicationUserService.ReadApplicationUserAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    _userManager
                 )
             );
         }
