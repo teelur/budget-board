@@ -93,14 +93,14 @@ public class ApplicationUserController(
             if (string.IsNullOrEmpty(userId))
             {
                 _logger.LogWarning("User ID not found in the current context.");
-                return Unauthorized();
+                return Unauthorized("User is not authenticated.");
             }
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 _logger.LogWarning("User not found for ID {UserId}.", userId);
-                return NotFound("User not found");
+                return NotFound("User not found.");
             }
 
             // Get all external logins for the user
@@ -110,7 +110,7 @@ public class ApplicationUserController(
             if (oidcLogin == null)
             {
                 _logger.LogWarning("No OIDC login found for user {UserId}.", userId);
-                return BadRequest("No OIDC login found for this user");
+                return BadRequest("No OIDC login found for this user.");
             }
 
             // Check if user has a password set (local auth) before removing OIDC
@@ -140,11 +140,11 @@ public class ApplicationUserController(
                     userId,
                     string.Join(", ", result.Errors.Select(e => e.Description))
                 );
-                return StatusCode(500, "Failed to remove OIDC login");
+                return StatusCode(500, "Failed to remove OIDC login.");
             }
 
             _logger.LogInformation("Successfully removed OIDC login for user {UserId}", userId);
-            return Ok(new { message = "OIDC login disconnected successfully" });
+            return Ok(new { message = "OIDC login disconnected successfully." });
         }
         catch (Exception ex)
         {

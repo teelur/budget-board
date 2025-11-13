@@ -33,8 +33,14 @@ const OidcSettings = (): React.ReactNode => {
         url: "/api/applicationUser/disconnectOidcLogin",
         method: "DELETE",
       }),
-    onSuccess: async () => {
+    onSuccess: async (res: AxiosResponse) => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
+
+      notifications.show({
+        color: "green",
+        message:
+          res?.data?.message ?? "OIDC provider disconnected successfully.",
+      });
     },
     onError: (error: any) => {
       notifications.show({
