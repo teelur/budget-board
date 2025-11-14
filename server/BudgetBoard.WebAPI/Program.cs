@@ -97,25 +97,18 @@ if (oidcEnabled)
     var oidcClientId = builder.Configuration.GetValue<string>("OIDC_CLIENT_ID");
     var oidcClientSecret = builder.Configuration.GetValue<string>("OIDC_CLIENT_SECRET");
 
+    var missingConfigs = new List<string>();
     if (string.IsNullOrEmpty(oidcAuthority))
-    {
-        throw new ArgumentNullException(
-            "OIDC_ISSUER",
-            "OIDC_ISSUER is required when OIDC_ENABLED is true"
-        );
-    }
+        missingConfigs.Add("OIDC_ISSUER");
     if (string.IsNullOrEmpty(oidcClientId))
-    {
-        throw new ArgumentNullException(
-            "OIDC_CLIENT_ID",
-            "OIDC_CLIENT_ID is required when OIDC_ENABLED is true"
-        );
-    }
+        missingConfigs.Add("OIDC_CLIENT_ID");
     if (string.IsNullOrEmpty(oidcClientSecret))
+        missingConfigs.Add("OIDC_CLIENT_SECRET");
+    if (missingConfigs.Count > 0)
     {
-        throw new ArgumentNullException(
-            "OIDC_CLIENT_SECRET",
-            "OIDC_CLIENT_SECRET is required when OIDC_ENABLED is true"
+        throw new InvalidOperationException(
+            "The following OIDC configuration values are missing or empty: "
+                + string.Join(", ", missingConfigs)
         );
     }
 }

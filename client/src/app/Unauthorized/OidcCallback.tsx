@@ -1,6 +1,6 @@
 import React from "react";
 import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   AuthContext,
@@ -8,6 +8,7 @@ import {
 } from "~/components/AuthProvider/AuthProvider";
 import { useNavigate } from "react-router";
 import { Center, Loader } from "@mantine/core";
+import { IOidcCallbackRequest, IOidcCallbackResponse } from "~/models/oidc";
 
 const OidcCallback = (): React.ReactNode => {
   const { request, setIsUserAuthenticated } =
@@ -60,17 +61,26 @@ const OidcCallback = (): React.ReactNode => {
       }
 
       try {
-        const response = await request({
+        const response: AxiosResponse<IOidcCallbackResponse> = await request({
           url: "/api/oidc/callback",
           method: "POST",
           data: {
             code,
-            redirectUri: `${window.location.origin}/oidc-callback`,
-          },
+          } as IOidcCallbackRequest,
         });
 
         setIsUserAuthenticated(response.data?.success ?? false);
-        navigate("/");
+
+        if (!response.data?.success) {
+          notifications.show({
+            color: "red",
+            message: "Authentication failed.",
+          });
+          navigate("/");
+          return;
+        }
+
+        navigate("/dashboard");
       } catch (e) {
         const err = e as AxiosError;
         notifications.show({ color: "red", message: translateAxiosError(err) });

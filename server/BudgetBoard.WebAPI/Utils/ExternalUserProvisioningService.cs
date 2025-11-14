@@ -51,10 +51,7 @@ namespace BudgetBoard.Utils
                 var disableNewUsers = _configuration.GetValue<bool>("DISABLE_NEW_USERS");
                 if (disableNewUsers)
                 {
-                    _logger.LogWarning(
-                        "New user creation is disabled. Cannot provision user with email: {Email}",
-                        email
-                    );
+                    _logger.LogWarning("New user creation is disabled.");
                     return false;
                 }
 
@@ -75,17 +72,11 @@ namespace BudgetBoard.Utils
                     return false;
                 }
 
-                _logger.LogInformation(
-                    "Created new user via OIDC provisioning for email: {Email}",
-                    email
-                );
+                _logger.LogInformation("Created new user via OIDC provisioning.");
             }
             else
             {
-                _logger.LogInformation(
-                    "Found existing user for OIDC login with email: {Email}",
-                    email
-                );
+                _logger.LogInformation("Found existing user for OIDC login.");
             }
 
             // Ensure external login association exists
@@ -100,8 +91,7 @@ namespace BudgetBoard.Utils
                 if (disableNewUsers)
                 {
                     _logger.LogWarning(
-                        "Adding OIDC login to existing users is disabled (DISABLE_NEW_USERS=true). Cannot add OIDC login for user with email: {Email}",
-                        email
+                        "Adding OIDC login to existing users is disabled (DISABLE_NEW_USERS=true). Cannot add OIDC login for user."
                     );
                     return false;
                 }
