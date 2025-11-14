@@ -66,6 +66,7 @@ const OidcCallback = (): React.ReactNode => {
           method: "POST",
           data: {
             code,
+            redirect_uri: `${window.location.origin}/oidc-callback`,
           } as IOidcCallbackRequest,
         });
 

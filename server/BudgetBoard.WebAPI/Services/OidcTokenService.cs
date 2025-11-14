@@ -25,7 +25,10 @@ public class OidcTokenService(
     /// </summary>
     /// <param name="authorizationCode">The authorization code received from the OIDC provider.</param>
     /// <returns>A ClaimsPrincipal representing the user, or null if the exchange fails.</returns>
-    public async Task<ClaimsPrincipal?> ExchangeCodeForUserAsync(string authorizationCode)
+    public async Task<ClaimsPrincipal?> ExchangeCodeForUserAsync(
+        string authorizationCode,
+        string redirectUri = "postmessage"
+    )
     {
         try
         {
@@ -57,7 +60,8 @@ public class OidcTokenService(
                 discoveryDoc.TokenEndpoint,
                 authorizationCode,
                 clientId,
-                clientSecret
+                clientSecret,
+                redirectUri
             );
 
             if (tokenResponse?.IdToken == null)
@@ -142,7 +146,8 @@ public class OidcTokenService(
         string tokenEndpoint,
         string authorizationCode,
         string clientId,
-        string clientSecret
+        string clientSecret,
+        string redirectUri
     )
     {
         try
@@ -153,6 +158,7 @@ public class OidcTokenService(
                 new("code", authorizationCode),
                 new("client_id", clientId),
                 new("client_secret", clientSecret),
+                new("redirect_uri", redirectUri),
             };
 
             var content = new FormUrlEncodedContent(tokenRequest);
