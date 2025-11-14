@@ -2,6 +2,7 @@ import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
 import { notifications } from "@mantine/notifications";
+import { IOidcDiscoveryDocument } from "~/models/oidc";
 
 export interface AuthContextValue {
   isUserAuthenticated: boolean;
@@ -88,7 +89,24 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
       state,
     });
 
-    window.location.href = `${authorizeUrl}/authorize?${params.toString()}`;
+    const discoveryUrl = `${authorizeUrl}/.well-known/openid-configuration`;
+    try {
+      const discoveryResponse = await fetch(discoveryUrl);
+      const discoveryData: IOidcDiscoveryDocument =
+        await discoveryResponse.json();
+
+      if (discoveryData?.authorization_endpoint) {
+        window.location.href = `${
+          discoveryData.authorization_endpoint
+        }?${params.toString()}`;
+      }
+    } catch (error) {
+      // Handle error if needed
+      notifications.show({
+        color: "red",
+        message: "Failed to retrieve OIDC discovery document.",
+      });
+    }
   };
 
   const authValue: AuthContextValue = {
