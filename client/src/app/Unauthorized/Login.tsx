@@ -143,7 +143,7 @@ const Login = (props: LoginProps): React.ReactNode => {
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      {envVariables.VITE_DISABLE_LOCAL_AUTH.toLowerCase() !== "true" && (
+      {envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
         <Stack w="100%" align="center" gap="1rem">
           <TextInput {...emailField.getInputProps()} label="Email" w="100%" />
           <PasswordInput
