@@ -209,7 +209,7 @@ public class OidcTokenService(
 
             // Fetch signing keys from the JWKS endpoint
             var signingKeys = await GetSigningKeysAsync(jwksUri);
-            if (signingKeys == null || !signingKeys.Any())
+            if (signingKeys == null || signingKeys.Count == 0)
             {
                 _logger.LogError("Failed to retrieve signing keys from JWKS endpoint");
                 return null;
@@ -324,7 +324,10 @@ public class OidcTokenService(
                 return null;
             }
 
-            _logger.LogInformation("Successfully retrieved {Count} signing key(s)", jwks.Keys.Count);
+            _logger.LogInformation(
+                "Successfully retrieved {Count} signing key(s)",
+                jwks.Keys.Count
+            );
             return jwks.Keys.Cast<SecurityKey>().ToList();
         }
         catch (Exception ex)
