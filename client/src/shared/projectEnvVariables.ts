@@ -5,7 +5,6 @@ type ProjectEnvVariablesType = Pick<
   | "VITE_OIDC_ENABLED"
   | "VITE_OIDC_PROVIDER"
   | "VITE_OIDC_CLIENT_ID"
-  | "VITE_OIDC_CLIENT_SECRET"
   | "VITE_DISABLE_LOCAL_AUTH"
   | "VITE_DISABLE_NEW_USERS"
 >;
@@ -16,7 +15,6 @@ const projectEnvVariables: ProjectEnvVariablesType = {
   VITE_OIDC_ENABLED: "${VITE_OIDC_ENABLED}",
   VITE_OIDC_PROVIDER: "${VITE_OIDC_PROVIDER}",
   VITE_OIDC_CLIENT_ID: "${VITE_OIDC_CLIENT_ID}",
-  VITE_OIDC_CLIENT_SECRET: "${VITE_OIDC_CLIENT_SECRET}",
   VITE_DISABLE_LOCAL_AUTH: "${VITE_DISABLE_LOCAL_AUTH}",
   VITE_DISABLE_NEW_USERS: "${VITE_DISABLE_NEW_USERS}",
 };
@@ -45,10 +43,6 @@ export const getProjectEnvVariables = (): {
       )
         ? projectEnvVariables.VITE_OIDC_CLIENT_ID
         : import.meta.env.VITE_OIDC_CLIENT_ID,
-      VITE_OIDC_CLIENT_SECRET:
-        !projectEnvVariables.VITE_OIDC_CLIENT_SECRET?.includes("VITE_")
-          ? projectEnvVariables.VITE_OIDC_CLIENT_SECRET
-          : import.meta.env.VITE_OIDC_CLIENT_SECRET,
       VITE_DISABLE_LOCAL_AUTH:
         !projectEnvVariables.VITE_DISABLE_LOCAL_AUTH?.includes("VITE_")
           ? projectEnvVariables.VITE_DISABLE_LOCAL_AUTH
