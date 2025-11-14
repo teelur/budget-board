@@ -156,13 +156,23 @@ public class OidcTokenService(
             {
                 new("grant_type", "authorization_code"),
                 new("code", authorizationCode),
-                new("client_id", clientId),
-                new("client_secret", clientSecret),
                 new("redirect_uri", redirectUri),
             };
 
             using var content = new FormUrlEncodedContent(tokenRequest);
-            var response = await _httpClient.PostAsync(tokenEndpoint, content);
+
+            // Use Basic authentication for client credentials
+            var credentials = Convert.ToBase64String(
+                System.Text.Encoding.ASCII.GetBytes($"{clientId}:{clientSecret}")
+            );
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint)
+            {
+                Content = content,
+            };
+            request.Headers.Add("Authorization", $"Basic {credentials}");
+
+            var response = await _httpClient.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
             {
