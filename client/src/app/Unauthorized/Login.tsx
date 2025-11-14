@@ -46,6 +46,14 @@ const Login = (props: LoginProps): React.ReactNode => {
   const doLogin = async (): Promise<void> => {
     setLoading(true);
 
+    const isEmailValid = emailField.validate();
+    const isPasswordValid = passwordField.validate();
+
+    if (!isEmailValid || !isPasswordValid) {
+      setLoading(false);
+      return;
+    }
+
     request({
       url: "/api/login",
       method: "POST",
