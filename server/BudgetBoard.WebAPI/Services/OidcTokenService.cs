@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BudgetBoard.WebAPI.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BudgetBoard.WebAPI.Services;
 
@@ -66,7 +67,12 @@ public class OidcTokenService(
             }
 
             // Parse and validate ID token
-            var principal = ParseIdToken(tokenResponse.IdToken);
+            var principal = await ValidateIdTokenAsync(
+                tokenResponse.IdToken,
+                authority,
+                clientId,
+                discoveryDoc.JwksUri
+            );
             return principal;
         }
         catch (Exception ex)
@@ -178,26 +184,63 @@ public class OidcTokenService(
         }
     }
 
-    private ClaimsPrincipal? ParseIdToken(string idToken)
+    /// <summary>
+    /// Validates the ID token using proper JWT validation with signature, issuer, audience, and expiration checks.
+    /// </summary>
+    /// <param name="idToken">The ID token to validate.</param>
+    /// <param name="authority">The OIDC authority/issuer.</param>
+    /// <param name="clientId">The client ID (audience).</param>
+    /// <param name="jwksUri">The JWKS URI to fetch signing keys.</param>
+    /// <returns>A validated ClaimsPrincipal, or null if validation fails.</returns>
+    private async Task<ClaimsPrincipal?> ValidateIdTokenAsync(
+        string idToken,
+        string authority,
+        string clientId,
+        string? jwksUri
+    )
     {
         try
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwt = tokenHandler.ReadJwtToken(idToken);
-
-            // Extract claims from the token
-            var claims = new List<Claim>();
-
-            foreach (var claim in jwt.Claims)
+            if (string.IsNullOrEmpty(jwksUri))
             {
-                claims.Add(new Claim(claim.Type, claim.Value));
+                _logger.LogError("JWKS URI is missing from discovery document");
+                return null;
             }
 
+            // Fetch signing keys from the JWKS endpoint
+            var signingKeys = await GetSigningKeysAsync(jwksUri);
+            if (signingKeys == null || !signingKeys.Any())
+            {
+                _logger.LogError("Failed to retrieve signing keys from JWKS endpoint");
+                return null;
+            }
+
+            // Configure token validation parameters
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = authority,
+                ValidateAudience = true,
+                ValidAudience = clientId,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeys = signingKeys,
+                // Allow for some clock skew
+                ClockSkew = TimeSpan.FromMinutes(5),
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(
+                idToken,
+                validationParameters,
+                out SecurityToken validatedToken
+            );
+
             // Ensure we have the required claims for user provisioning
-            var subClaim = claims.FirstOrDefault(c =>
+            var subClaim = principal.FindFirst(c =>
                 c.Type == "sub" || c.Type == ClaimTypes.NameIdentifier
             );
-            var emailClaim = claims.FirstOrDefault(c =>
+            var emailClaim = principal.FindFirst(c =>
                 c.Type == "email" || c.Type == ClaimTypes.Email
             );
 
@@ -208,31 +251,85 @@ public class OidcTokenService(
             }
 
             // Add standard claim types if they don't exist
-            if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+            var identity = (ClaimsIdentity)principal.Identity!;
+            if (!principal.HasClaim(c => c.Type == ClaimTypes.NameIdentifier))
             {
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, subClaim.Value));
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, subClaim.Value));
             }
 
-            if (!claims.Any(c => c.Type == ClaimTypes.Email))
+            if (!principal.HasClaim(c => c.Type == ClaimTypes.Email))
             {
-                claims.Add(new Claim(ClaimTypes.Email, emailClaim.Value));
+                identity.AddClaim(new Claim(ClaimTypes.Email, emailClaim.Value));
             }
 
             // Add name claim if available
-            var nameClaim = claims.FirstOrDefault(c =>
+            var nameClaim = principal.FindFirst(c =>
                 c.Type == "name" || c.Type == "preferred_username"
             );
-            if (nameClaim != null && !claims.Any(c => c.Type == ClaimTypes.Name))
+            if (nameClaim != null && !principal.HasClaim(c => c.Type == ClaimTypes.Name))
             {
-                claims.Add(new Claim(ClaimTypes.Name, nameClaim.Value));
+                identity.AddClaim(new Claim(ClaimTypes.Name, nameClaim.Value));
             }
 
-            var identity = new ClaimsIdentity(claims, "oidc");
-            return new ClaimsPrincipal(identity);
+            _logger.LogInformation("ID token validated successfully");
+            return principal;
+        }
+        catch (SecurityTokenExpiredException ex)
+        {
+            _logger.LogError(ex, "ID token has expired");
+            return null;
+        }
+        catch (SecurityTokenInvalidSignatureException ex)
+        {
+            _logger.LogError(ex, "ID token has invalid signature");
+            return null;
+        }
+        catch (SecurityTokenInvalidIssuerException ex)
+        {
+            _logger.LogError(ex, "ID token has invalid issuer");
+            return null;
+        }
+        catch (SecurityTokenInvalidAudienceException ex)
+        {
+            _logger.LogError(ex, "ID token has invalid audience");
+            return null;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error parsing ID token");
+            _logger.LogError(ex, "Error validating ID token");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Fetches the signing keys from the JWKS endpoint.
+    /// </summary>
+    /// <param name="jwksUri">The JWKS URI.</param>
+    /// <returns>A collection of security keys, or null if retrieval fails.</returns>
+    private async Task<ICollection<SecurityKey>?> GetSigningKeysAsync(string jwksUri)
+    {
+        try
+        {
+            _logger.LogInformation("Fetching signing keys from: {JwksUri}", jwksUri);
+
+            var response = await _httpClient.GetAsync(jwksUri);
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            var jwks = new JsonWebKeySet(content);
+
+            if (jwks.Keys == null || !jwks.Keys.Any())
+            {
+                _logger.LogError("No signing keys found in JWKS response");
+                return null;
+            }
+
+            _logger.LogInformation("Successfully retrieved {Count} signing key(s)", jwks.Keys.Count);
+            return jwks.Keys.Cast<SecurityKey>().ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get signing keys from {JwksUri}", jwksUri);
             return null;
         }
     }
