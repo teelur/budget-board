@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using BudgetBoard.Overrides;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Overrides;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http.Metadata;
@@ -656,7 +657,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                                 {
                                     var userId = await userManager.GetUserIdAsync(user);
                                     var loginInfo = new UserLoginInfo(
-                                        "local",
+                                        IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
                                         userId,
                                         "Local Account"
                                     );

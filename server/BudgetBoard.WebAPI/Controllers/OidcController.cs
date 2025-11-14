@@ -1,5 +1,6 @@
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Models;
+using BudgetBoard.WebAPI.Overrides;
 using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -78,7 +79,7 @@ namespace BudgetBoard.WebAPI.Controllers
                 var provisioned = await _provisioner.ProvisionExternalUserAsync(
                     principal,
                     HttpContext,
-                    "oidc"
+                    IdentityApiEndpointRouteBuilderConstants.OidcLoginProvider
                 );
 
                 if (!provisioned)

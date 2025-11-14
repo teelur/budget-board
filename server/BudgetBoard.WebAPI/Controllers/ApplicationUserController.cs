@@ -3,6 +3,7 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Overrides;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -105,7 +106,9 @@ public class ApplicationUserController(
 
             // Get all external logins for the user
             var logins = await _userManager.GetLoginsAsync(user);
-            var oidcLogin = logins.FirstOrDefault(l => l.LoginProvider == "oidc");
+            var oidcLogin = logins.FirstOrDefault(l =>
+                l.LoginProvider == IdentityApiEndpointRouteBuilderConstants.OidcLoginProvider
+            );
 
             if (oidcLogin == null)
             {
@@ -115,7 +118,9 @@ public class ApplicationUserController(
 
             // Check if user has a password set (local auth) before removing OIDC
             var hasPassword = await _userManager.HasPasswordAsync(user);
-            var remainingLogins = logins.Count(l => l.LoginProvider != "oidc");
+            var remainingLogins = logins.Count(l =>
+                l.LoginProvider != IdentityApiEndpointRouteBuilderConstants.OidcLoginProvider
+            );
             if (!hasPassword && remainingLogins == 0)
             {
                 _logger.LogWarning(
