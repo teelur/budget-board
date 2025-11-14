@@ -26,11 +26,7 @@ namespace BudgetBoard.WebAPI.Controllers
         [HttpPost("callback")]
         public async Task<IActionResult> Callback([FromBody] OidcCallbackRequest request)
         {
-            _logger.LogInformation(
-                "OIDC callback started. Code: {Code}, ReturnUrl: {ReturnUrl}",
-                string.IsNullOrEmpty(request.Code) ? "null" : "provided",
-                request.ReturnUrl
-            );
+            _logger.LogInformation("OIDC callback started.");
 
             if (string.IsNullOrEmpty(request.Code))
             {
@@ -66,19 +62,10 @@ namespace BudgetBoard.WebAPI.Controllers
                     return StatusCode(500, "Failed to provision external user");
                 }
 
-                _logger.LogInformation(
-                    "User provisioning succeeded. ReturnUrl: {ReturnUrl}",
-                    request.ReturnUrl
-                );
+                _logger.LogInformation("User provisioning succeeded.");
 
                 // Return success response for frontend to handle
-                return Ok(
-                    new OidcCallbackResponse
-                    {
-                        Success = true,
-                        ReturnUrl = request.ReturnUrl ?? "/",
-                    }
-                );
+                return Ok(new OidcCallbackResponse { Success = true });
             }
             catch (Exception ex)
             {
