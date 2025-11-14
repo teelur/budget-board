@@ -31,7 +31,7 @@ namespace BudgetBoard.WebAPI.Controllers
             if (string.IsNullOrEmpty(request.Code))
             {
                 _logger.LogWarning("No authorization code provided");
-                return BadRequest("Authorization code is required");
+                return BadRequest("Authorization code is required.");
             }
 
             try
@@ -44,7 +44,7 @@ namespace BudgetBoard.WebAPI.Controllers
                 if (principal == null)
                 {
                     _logger.LogError("Failed to exchange code for user principal");
-                    return StatusCode(500, "Token exchange failed");
+                    return StatusCode(500, "Authentication failed.");
                 }
 
                 _logger.LogInformation(
@@ -62,7 +62,7 @@ namespace BudgetBoard.WebAPI.Controllers
                 if (!provisioned)
                 {
                     _logger.LogWarning("User provisioning failed");
-                    return StatusCode(500, "Failed to provision external user");
+                    return StatusCode(500, "Unable to complete login.");
                 }
 
                 _logger.LogInformation("User provisioning succeeded.");
@@ -73,7 +73,7 @@ namespace BudgetBoard.WebAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during OIDC callback processing");
-                return StatusCode(500, "Authentication failed");
+                return StatusCode(500, "Authentication failed.");
             }
         }
 
