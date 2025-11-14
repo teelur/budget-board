@@ -161,7 +161,7 @@ public class OidcTokenService(
                 new("redirect_uri", redirectUri),
             };
 
-            var content = new FormUrlEncodedContent(tokenRequest);
+            using var content = new FormUrlEncodedContent(tokenRequest);
             var response = await _httpClient.PostAsync(tokenEndpoint, content);
 
             if (!response.IsSuccessStatusCode)
