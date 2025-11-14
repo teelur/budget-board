@@ -78,7 +78,7 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
       return;
     }
 
-    const state = Math.random().toString(36).slice(2);
+    const state = crypto.randomUUID();
     sessionStorage.setItem("oidc_state", state);
 
     const params = new URLSearchParams({
