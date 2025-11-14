@@ -43,7 +43,8 @@ interface NavbarProps {
 }
 
 const Navbar = (props: NavbarProps) => {
-  const { request, setAccessToken } = React.useContext<any>(AuthContext);
+  const { request, setIsUserAuthenticated } =
+    React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
   const Logout = (): void => {
@@ -54,8 +55,7 @@ const Navbar = (props: NavbarProps) => {
     })
       .then(() => {
         queryClient.removeQueries();
-        setAccessToken("");
-        localStorage.removeItem("refresh-token");
+        setIsUserAuthenticated(false);
       })
       .catch((error: AxiosError) => {
         notifications.show({

@@ -2,7 +2,7 @@
 using System.Net.Mail;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
-namespace BudgetBoard.WebAPI.Utils;
+namespace BudgetBoard.Utils;
 
 public class EmailSender(IConfiguration configuration) : IEmailSender
 {

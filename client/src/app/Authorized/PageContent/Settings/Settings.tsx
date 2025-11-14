@@ -8,8 +8,32 @@ import ResetPassword from "./ResetPassword";
 import UserSettings from "./UserSettings";
 import TwoFactorAuth from "./TwoFactorAuth";
 import AdvancedSettings from "./AdvancedSettings/AdvancedSettings";
+import OidcSettings from "./OidcSettings";
+import { useQuery } from "@tanstack/react-query";
+import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { IApplicationUser } from "~/models/applicationUser";
+import { AxiosResponse } from "axios";
+import CreatePassword from "./CreatePassword";
 
 const Settings = (): React.ReactNode => {
+  const { request } = React.useContext<any>(AuthContext);
+
+  const userQuery = useQuery({
+    queryKey: ["user"],
+    queryFn: async (): Promise<IApplicationUser | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/applicationUser",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IApplicationUser;
+      }
+
+      return undefined;
+    },
+  });
+
   return (
     <Stack className={classes.root}>
       <Title order={1}>Settings</Title>
@@ -17,7 +41,12 @@ const Settings = (): React.ReactNode => {
       <UserSettings />
       <LinkSimpleFin />
       <TwoFactorAuth />
-      <ResetPassword />
+      <OidcSettings />
+      {userQuery.data?.hasLocalLogin ?? true ? (
+        <ResetPassword />
+      ) : (
+        <CreatePassword />
+      )}
       <AdvancedSettings />
     </Stack>
   );

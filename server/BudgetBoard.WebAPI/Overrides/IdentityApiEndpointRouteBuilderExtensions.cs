@@ -7,7 +7,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using BudgetBoard.Overrides;
-using BudgetBoard.WebAPI.Utils;
+using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Overrides;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http.Metadata;
@@ -126,11 +127,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 {
                     var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
 
-                    var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
-                    var isPersistent = (useCookies == true) && (useSessionCookies != true);
-                    signInManager.AuthenticationScheme = useCookieScheme
-                        ? IdentityConstants.ApplicationScheme
-                        : IdentityConstants.BearerScheme;
+                    // TODO: Probably should add a Remember Me? option to login.
+                    var isPersistent = true;
 
                     var result = await signInManager.PasswordSignInAsync(
                         login.Email,
@@ -175,6 +173,41 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             );
         }
 
+        if (!configureOptions.ExcludeLogoutPost)
+        {
+            routeGroup
+                .MapPost(
+                    "/logout",
+                    async Task<Ok> ([FromServices] IServiceProvider sp) =>
+                    {
+                        var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
+                        await signInManager.SignOutAsync();
+                        return TypedResults.Ok();
+                    }
+                )
+                .RequireAuthorization();
+        }
+
+        if (!configureOptions.ExcludeIsAuthenticatedGet)
+        {
+            routeGroup.MapGet(
+                "/isAuthenticated",
+                Ok<IsAuthenticatedResponse> (
+                    [FromServices] IServiceProvider sp,
+                    HttpContext context
+                ) =>
+                {
+                    // Check if the user is authenticated by checking the cookie.
+
+                    var isAuthenticated = context.User?.Identity?.IsAuthenticated ?? false;
+                    return TypedResults.Ok(
+                        new IsAuthenticatedResponse { IsAuthenticated = isAuthenticated }
+                    );
+                }
+            );
+        }
+
+        // TODO: This might not be needed anymore.
         if (!configureOptions.ExcludeRefreshPost)
         {
             routeGroup.MapPost(
@@ -596,7 +629,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
                         if (!string.IsNullOrEmpty(infoRequest.NewPassword))
                         {
-                            if (string.IsNullOrEmpty(infoRequest.OldPassword))
+                            var hasPassword = await userManager.HasPasswordAsync(user);
+                            if (string.IsNullOrEmpty(infoRequest.OldPassword) && hasPassword)
                             {
                                 return CreateValidationProblem(
                                     "OldPasswordRequired",
@@ -604,11 +638,34 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                                 );
                             }
 
-                            var changePasswordResult = await userManager.ChangePasswordAsync(
-                                user,
-                                infoRequest.OldPassword,
-                                infoRequest.NewPassword
-                            );
+                            IdentityResult changePasswordResult;
+                            if (!hasPassword)
+                            {
+                                changePasswordResult = await userManager.AddPasswordAsync(
+                                    user,
+                                    infoRequest.NewPassword
+                                );
+
+                                if (changePasswordResult.Succeeded)
+                                {
+                                    var userId = await userManager.GetUserIdAsync(user);
+                                    var loginInfo = new UserLoginInfo(
+                                        IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
+                                        userId,
+                                        "Local Account"
+                                    );
+                                    await userManager.AddLoginAsync(user, loginInfo);
+                                }
+                            }
+                            else
+                            {
+                                changePasswordResult = await userManager.ChangePasswordAsync(
+                                    user,
+                                    infoRequest.OldPassword ?? string.Empty,
+                                    infoRequest.NewPassword
+                                );
+                            }
+
                             if (!changePasswordResult.Succeeded)
                             {
                                 return CreateValidationProblem(changePasswordResult);

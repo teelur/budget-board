@@ -1,5 +1,5 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
@@ -25,6 +25,8 @@ public interface IApplicationUserResponse
     bool AccessToken { get; set; }
     DateTime LastSync { get; set; }
     bool TwoFactorEnabled { get; set; }
+    bool HasOidcLogin { get; set; }
+    bool HasLocalLogin { get; set; }
 }
 
 public class ApplicationUserResponse : IApplicationUserResponse
@@ -33,6 +35,8 @@ public class ApplicationUserResponse : IApplicationUserResponse
     public bool AccessToken { get; set; }
     public DateTime LastSync { get; set; }
     public bool TwoFactorEnabled { get; set; }
+    public bool HasOidcLogin { get; set; }
+    public bool HasLocalLogin { get; set; }
 
     [JsonConstructor]
     public ApplicationUserResponse()
@@ -41,13 +45,21 @@ public class ApplicationUserResponse : IApplicationUserResponse
         AccessToken = false;
         LastSync = DateTime.MinValue;
         TwoFactorEnabled = false;
+        HasOidcLogin = false;
+        HasLocalLogin = false;
     }
 
-    public ApplicationUserResponse(ApplicationUser user)
+    public ApplicationUserResponse(
+        ApplicationUser user,
+        bool hasOidcLogin = false,
+        bool hasLocalLogin = false
+    )
     {
         ID = user.Id;
         AccessToken = (user.AccessToken != string.Empty);
         LastSync = user.LastSync;
         TwoFactorEnabled = user.TwoFactorEnabled;
+        HasOidcLogin = hasOidcLogin;
+        HasLocalLogin = hasLocalLogin;
     }
 }

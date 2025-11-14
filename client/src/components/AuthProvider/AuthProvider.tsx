@@ -1,33 +1,32 @@
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
-
-export const AuthContext = createContext({});
+import { notifications } from "@mantine/notifications";
+import { IOidcDiscoveryDocument } from "~/models/oidc";
 
 export interface AuthContextValue {
-  accessToken: string;
-  setAccessToken: (isLoggedIn: string) => void;
+  isUserAuthenticated: boolean;
+  setIsUserAuthenticated: (isLoggedIn: boolean) => void;
   loading: boolean;
   request: ({ ...options }) => Promise<AxiosResponse>;
+  startOidcLogin?: () => void; // added
 }
 
+export const AuthContext = createContext<AuthContextValue>({
+  isUserAuthenticated: false,
+  setIsUserAuthenticated: () => {},
+  loading: false,
+  request: async () => {
+    return {} as AxiosResponse;
+  },
+});
+
 const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
-  const [accessToken, setAccessToken] = useState<string>("");
-  const [accessTokenExpirationDate, setAccessTokenExpirationDate] = useState(
-    new Date(0)
-  );
+  const [isUserAuthenticated, setIsUserAuthenticated] =
+    useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const { envVariables } = getProjectEnvVariables();
-
-  // The access token will refresh when there are less than this amount of seconds left before it expires.
-  const accessTokenRefreshTime = 30;
-
-  const getDateXSecondsFromNow = (seconds: number): Date => {
-    const now = new Date();
-    now.setSeconds(now.getSeconds() + seconds);
-    return now;
-  };
 
   // base url is sourced from environment variables
   const client = axios.create({
@@ -41,66 +40,81 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
       throw error;
     };
 
-    // If the access token is expiring soon, refresh before the request
-    if (
-      (accessTokenExpirationDate.getTime() - new Date().getTime()) / 1000 <
-      accessTokenRefreshTime
-    ) {
-      const refreshToken = localStorage.getItem("refresh-token");
-      if (refreshToken) {
-        const res: AxiosResponse = await client({
-          url: "/api/refresh",
-          method: "POST",
-          data: { refreshToken },
-        });
-        localStorage.setItem("refresh-token", res.data.refreshToken);
-        setAccessToken(res.data.accessToken);
-        setAccessTokenExpirationDate(
-          getDateXSecondsFromNow(res.data.expiresIn)
-        );
-      }
-    }
-
-    client.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-
     return await client(options).then(onSuccess).catch(onError);
   };
 
   React.useEffect(() => {
     setLoading(true);
-    const refreshToken = localStorage.getItem("refresh-token");
-    if (refreshToken) {
-      request({
-        url: "/api/refresh",
-        method: "POST",
-        data: { refreshToken },
+
+    request({
+      url: "/api/isAuthenticated",
+      method: "GET",
+    })
+      .then((res: AxiosResponse) => {
+        setIsUserAuthenticated(res.data?.isAuthenticated ?? false);
       })
-        .then((res) => {
-          localStorage.setItem("refresh-token", res.data.refreshToken);
-          setAccessToken(res.data.accessToken);
-          setAccessTokenExpirationDate(
-            getDateXSecondsFromNow(res.data.expiresIn)
-          );
-        })
-        .catch((error: AxiosError) => {
-          if (error.response?.status === 401) {
-            // refresh-token is invalid, logout.
-            localStorage.removeItem("refresh-token");
-          }
-        })
-        .finally(() => {
-          setLoading(false);
+      .catch(() => {
+        notifications.show({
+          message: "Failed to check authentication status",
+          color: "red",
         });
-    } else {
-      setLoading(false);
-    }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
+  const startOidcLogin = async (): Promise<void> => {
+    const authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
+    const clientId = envVariables.VITE_OIDC_CLIENT_ID;
+    const redirectUri = `${window.location.origin}/oidc-callback`;
+
+    if (!authorizeUrl || !clientId) {
+      notifications.show({
+        color: "red",
+        message:
+          "OIDC is not configured. Set VITE_OIDC_PROVIDER and VITE_OIDC_CLIENT_ID.",
+      });
+      return;
+    }
+
+    const state = crypto.randomUUID();
+    sessionStorage.setItem("oidc_state", state);
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: "openid profile email",
+      state,
+    });
+
+    const discoveryUrl = `${authorizeUrl}/.well-known/openid-configuration`;
+    try {
+      const discoveryResponse = await fetch(discoveryUrl);
+      const discoveryData: IOidcDiscoveryDocument =
+        await discoveryResponse.json();
+
+      if (discoveryData?.authorization_endpoint) {
+        window.location.href = `${
+          discoveryData.authorization_endpoint
+        }?${params.toString()}`;
+      }
+    } catch (error) {
+      // Handle error if needed
+      notifications.show({
+        color: "red",
+        message: "Failed to retrieve OIDC discovery document.",
+      });
+    }
+  };
+
   const authValue: AuthContextValue = {
-    accessToken,
-    setAccessToken,
+    isUserAuthenticated,
+    setIsUserAuthenticated,
     loading,
     request,
+    startOidcLogin,
   };
 
   return (

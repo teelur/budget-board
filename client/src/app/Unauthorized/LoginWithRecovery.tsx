@@ -11,7 +11,7 @@ import React from "react";
 import { LoginCardState } from "./Welcome";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 
@@ -34,7 +34,8 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
     },
   });
 
-  const { request, setAccessToken } = React.useContext<any>(AuthContext);
+  const { request, setIsUserAuthenticated } =
+    React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
 
@@ -59,9 +60,8 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
         recoveryCode: recoveryCodeField.getValue(),
       },
     })
-      .then((res: AxiosResponse) => {
-        setAccessToken(res.data.accessToken);
-        localStorage.setItem("refresh-token", res.data.refreshToken);
+      .then(() => {
+        setIsUserAuthenticated(true);
       })
       .catch((error: AxiosError) => {
         // These error response values are specific to ASP.NET Identity,

@@ -4,13 +4,13 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
+using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Jobs;
-using BudgetBoard.WebAPI.Utils;
-using Microsoft.AspNetCore.Authentication.BearerToken;
+using BudgetBoard.WebAPI.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Serilog;
@@ -78,12 +78,51 @@ builder.Services.AddDbContext<UserDataContext>(o =>
     o.UseNpgsql(connectionString, op => op.MapEnum<Currency>("currency"))
 );
 
-// Configure Identity
-builder
-    .Services.AddAuthentication(IdentityConstants.BearerScheme)
-    .AddBearerToken(IdentityConstants.BearerScheme)
-    .AddIdentityCookies();
+var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
+var disableLocalAuth = builder.Configuration.GetValue<bool>("DISABLE_LOCAL_AUTH");
 
+// Validate configuration: if local auth is disabled, OIDC must be enabled
+if (disableLocalAuth && !oidcEnabled)
+{
+    throw new InvalidOperationException(
+        "OIDC_ENABLED must be true when DISABLE_LOCAL_AUTH is true. "
+            + "Cannot disable local authentication without an alternative authentication method."
+    );
+}
+
+if (oidcEnabled)
+{
+    // Validate OIDC configuration is present for token service
+    var oidcAuthority = builder.Configuration.GetValue<string>("OIDC_ISSUER");
+    var oidcClientId = builder.Configuration.GetValue<string>("OIDC_CLIENT_ID");
+    var oidcClientSecret = builder.Configuration.GetValue<string>("OIDC_CLIENT_SECRET");
+
+    var missingConfigs = new List<string>();
+    if (string.IsNullOrEmpty(oidcAuthority))
+        missingConfigs.Add("OIDC_ISSUER");
+    if (string.IsNullOrEmpty(oidcClientId))
+        missingConfigs.Add("OIDC_CLIENT_ID");
+    if (string.IsNullOrEmpty(oidcClientSecret))
+        missingConfigs.Add("OIDC_CLIENT_SECRET");
+    if (missingConfigs.Count > 0)
+    {
+        throw new InvalidOperationException(
+            "The following OIDC configuration values are missing or empty: "
+                + string.Join(", ", missingConfigs)
+        );
+    }
+}
+
+// Configure Identity with cookie authentication
+// Same configuration whether OIDC is enabled or not since frontend handles OIDC flow
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+    })
+    .AddCookie(IdentityConstants.ApplicationScheme);
 builder.Services.AddAuthorization();
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
@@ -98,24 +137,18 @@ builder
         opt.Password.RequireDigit = false;
         opt.Password.RequireUppercase = false;
         opt.Password.RequireLowercase = false;
+
         opt.User.RequireUniqueEmail = true;
-        opt.SignIn.RequireConfirmedEmail = !string.IsNullOrEmpty(emailSender);
+        opt.SignIn.RequireConfirmedEmail = !string.IsNullOrEmpty(emailSender) && !disableLocalAuth;
     })
     .AddEntityFrameworkStores<UserDataContext>()
     .AddApiEndpoints();
 
-if (!string.IsNullOrEmpty(emailSender))
+// Configure email sender only when local auth is enabled (for email confirmation)
+if (!string.IsNullOrEmpty(emailSender) && !disableLocalAuth)
 {
     builder.Services.AddTransient<IEmailSender, EmailSender>();
 }
-
-builder
-    .Services.AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme)
-    .Configure(options =>
-    {
-        options.BearerTokenExpiration = TimeSpan.FromHours(1);
-        options.RefreshTokenExpiration = TimeSpan.FromDays(14);
-    });
 
 builder
     .Services.AddControllers()
@@ -142,6 +175,15 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 var autoUpdateDb = builder.Configuration.GetValue<bool>("AUTO_UPDATE_DB");
+
+// Register the new provisioning service after Identity is configured
+builder.Services.AddScoped<IExternalUserProvisioningService, ExternalUserProvisioningService>();
+
+// Register OIDC token service if OIDC is enabled
+if (oidcEnabled)
+{
+    builder.Services.AddScoped<IOidcTokenService, OidcTokenService>();
+}
 
 if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 {
@@ -196,6 +238,32 @@ builder.Services.AddScoped<IValueService, ValueService>();
 
 var app = builder.Build();
 
+// Log authentication configuration
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var disableNewUsers = builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS");
+
+if (disableLocalAuth)
+{
+    logger.LogInformation("Local authentication disabled - OIDC only");
+}
+else if (oidcEnabled)
+{
+    logger.LogInformation("Both local and OIDC authentication enabled");
+}
+else
+{
+    logger.LogInformation("Local authentication only");
+}
+
+if (disableNewUsers)
+{
+    logger.LogInformation("New user creation disabled - existing users only");
+}
+else
+{
+    logger.LogInformation("New user creation enabled");
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -211,7 +279,13 @@ app.UseSerilogRequestLogging();
 app.MyMapIdentityApi<ApplicationUser>(
     new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
     {
-        ExcludeRegisterPost = builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS"),
+        ExcludeRegisterPost =
+            builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS") || disableLocalAuth,
+        ExcludeLoginPost = disableLocalAuth,
+        ExcludeLogoutPost = false, // Keep logout available even with OIDC
+        ExcludeForgotPasswordPost = disableLocalAuth,
+        ExcludeResetPasswordPost = disableLocalAuth,
+        ExcludeResendConfirmationEmailPost = disableLocalAuth,
     }
 );
 
@@ -224,20 +298,6 @@ app.UseCors(MyAllowSpecificOrigins);
 // to set the appropriate headers.
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapPost(
-        "/api/logout",
-        async (SignInManager<ApplicationUser> signInManager, [FromBody] object empty) =>
-        {
-            if (empty != null)
-            {
-                await signInManager.SignOutAsync();
-                return Results.Ok();
-            }
-            return Results.Unauthorized();
-        }
-    )
-    .RequireAuthorization(); // So that only authorized users can use this endpoint
 
 app.MapControllers();
 

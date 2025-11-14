@@ -15,6 +15,7 @@ import Login from "./Login";
 import ResetPassword from "./ResetPassword";
 import LoginWith2fa from "./LoginWith2fa";
 import LoginWithRecovery from "./LoginWithRecovery";
+import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 
 export enum LoginCardState {
   Login,
@@ -32,6 +33,8 @@ const Welcome = (): React.ReactNode => {
   const [userPassword, setUserPassword] = React.useState<string>("");
 
   const computedColorScheme = useComputedColorScheme();
+
+  const { envVariables } = getProjectEnvVariables();
 
   const getCardState = (): React.ReactNode => {
     switch (loginCardState) {
@@ -91,20 +94,22 @@ const Welcome = (): React.ReactNode => {
         <Card shadow="sm" withBorder mt="2em" w="100%" maw="500px" p={20}>
           {getCardState()}
         </Card>
-        {loginCardState !== LoginCardState.Register && (
-          <Group mt="xl" justify="center">
-            <Text size="sm" fw={600}>
-              Don't have an account?
-            </Text>
-            <Anchor
-              size="sm"
-              fw={600}
-              onClick={() => setLoginCardState(LoginCardState.Register)}
-            >
-              Register here
-            </Anchor>
-          </Group>
-        )}
+        {loginCardState !== LoginCardState.Register &&
+          envVariables.VITE_DISABLE_NEW_USERS?.toLowerCase() !== "true" &&
+          envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
+            <Group mt="xl" justify="center">
+              <Text size="sm" fw={600}>
+                Don't have an account?
+              </Text>
+              <Anchor
+                size="sm"
+                fw={600}
+                onClick={() => setLoginCardState(LoginCardState.Register)}
+              >
+                Register here
+              </Anchor>
+            </Group>
+          )}
       </Container>
     </Flex>
   );

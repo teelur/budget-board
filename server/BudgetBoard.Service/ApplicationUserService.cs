@@ -2,20 +2,33 @@
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class ApplicationUserService(ILogger<IApplicationUserService> logger, UserDataContext userDataContext) : IApplicationUserService
+public class ApplicationUserService(
+    ILogger<IApplicationUserService> logger,
+    UserDataContext userDataContext
+) : IApplicationUserService
 {
     private readonly ILogger<IApplicationUserService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
 
-    public async Task<IApplicationUserResponse> ReadApplicationUserAsync(Guid userGuid)
+    public async Task<IApplicationUserResponse> ReadApplicationUserAsync(
+        Guid userGuid,
+        UserManager<ApplicationUser> userManager
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        return new ApplicationUserResponse(userData);
+
+        // Check if user has OIDC login
+        var logins = await userManager.GetLoginsAsync(userData);
+        var hasOidcLogin = logins.Any(l => l.LoginProvider == "oidc");
+        var hasLocalLogin = logins.Any(l => l.LoginProvider == "local");
+
+        return new ApplicationUserResponse(userData, hasOidcLogin, hasLocalLogin);
     }
 
     public async Task UpdateApplicationUserAsync(Guid userGuid, IApplicationUserUpdateRequest user)
@@ -38,8 +51,13 @@ public class ApplicationUserService(ILogger<IApplicationUserService> logger, Use
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while retrieving the user data: {ExceptionMessage}", ex.Message);
-            throw new BudgetBoardServiceException("An error occurred while retrieving the user data.");
+            _logger.LogError(
+                "An error occurred while retrieving the user data: {ExceptionMessage}",
+                ex.Message
+            );
+            throw new BudgetBoardServiceException(
+                "An error occurred while retrieving the user data."
+            );
         }
 
         if (foundUser == null)
