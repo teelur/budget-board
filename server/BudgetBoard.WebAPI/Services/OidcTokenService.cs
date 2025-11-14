@@ -10,7 +10,7 @@ namespace BudgetBoard.WebAPI.Services;
 public class OidcTokenService(
     HttpClient httpClient,
     IConfiguration configuration,
-    ILogger<OidcTokenService> logger
+    ILogger<IOidcTokenService> logger
 ) : IOidcTokenService
 {
     private readonly HttpClient _httpClient =
