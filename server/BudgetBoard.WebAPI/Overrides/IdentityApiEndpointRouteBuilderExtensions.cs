@@ -178,18 +178,11 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             routeGroup
                 .MapPost(
                     "/logout",
-                    async Task<Results<Ok, UnauthorizedHttpResult>> (
-                        [FromBody] object? empty,
-                        [FromServices] IServiceProvider sp
-                    ) =>
+                    async Task<Ok> ([FromServices] IServiceProvider sp) =>
                     {
-                        if (empty is not null)
-                        {
-                            var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
-                            await signInManager.SignOutAsync();
-                            return TypedResults.Ok();
-                        }
-                        return TypedResults.Unauthorized();
+                        var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
+                        await signInManager.SignOutAsync();
+                        return TypedResults.Ok();
                     }
                 )
                 .RequireAuthorization();
