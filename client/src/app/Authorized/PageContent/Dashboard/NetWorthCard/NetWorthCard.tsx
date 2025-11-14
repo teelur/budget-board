@@ -3,11 +3,18 @@ import classes from "./NetWorthCard.module.css";
 import { Card, Skeleton, Stack, Title } from "@mantine/core";
 import React from "react";
 import NetWorthItem from "./NetWorthItem/NetWorthItem";
-import { filterVisibleAccounts } from "~/helpers/accounts";
+import {
+  filterVisibleAccounts,
+  getAccountsOfTypes,
+  sumAccountsTotalBalance,
+} from "~/helpers/accounts";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
+import { filterVisibleAssets, sumAssetsTotalValue } from "~/helpers/assets";
+import { IAssetResponse } from "~/models/asset";
+import { IUserSettings } from "~/models/userSettings";
 
 const NetWorthCard = (): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
@@ -27,7 +34,40 @@ const NetWorthCard = (): React.ReactNode => {
     },
   });
 
+  const assetsQuery = useQuery({
+    queryKey: ["assets"],
+    queryFn: async (): Promise<IAssetResponse[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/asset",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IAssetResponse[];
+      }
+
+      return [];
+    },
+  });
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const validAccounts = filterVisibleAccounts(accountsQuery.data ?? []);
+  const validAssets = filterVisibleAssets(assetsQuery.data ?? []);
 
   return (
     <Card
@@ -55,19 +95,25 @@ const NetWorthCard = (): React.ReactNode => {
               shadow="none"
             >
               <NetWorthItem
-                accounts={validAccounts}
-                types={["Checking", "Credit Card"]}
                 title="Spending"
+                totalBalance={sumAccountsTotalBalance(
+                  getAccountsOfTypes(validAccounts, ["Checking", "Credit Card"])
+                )}
+                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
               />
               <NetWorthItem
-                accounts={validAccounts}
-                types={["Loan"]}
                 title="Loans"
+                totalBalance={sumAccountsTotalBalance(
+                  getAccountsOfTypes(validAccounts, ["Loan"])
+                )}
+                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
               />
               <NetWorthItem
-                accounts={validAccounts}
-                types={["Savings"]}
                 title="Savings"
+                totalBalance={sumAccountsTotalBalance(
+                  getAccountsOfTypes(validAccounts, ["Savings"])
+                )}
+                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
               />
             </Card>
             <Card
@@ -77,14 +123,28 @@ const NetWorthCard = (): React.ReactNode => {
               shadow="none"
             >
               <NetWorthItem
-                accounts={validAccounts}
-                types={["Checking", "Credit Card", "Loan", "Savings"]}
                 title="Liquid"
+                totalBalance={sumAccountsTotalBalance(
+                  getAccountsOfTypes(validAccounts, [
+                    "Checking",
+                    "Credit Card",
+                    "Loan",
+                    "Savings",
+                  ])
+                )}
+                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
               />
               <NetWorthItem
-                accounts={validAccounts}
-                types={["Investment"]}
                 title="Investments"
+                totalBalance={sumAccountsTotalBalance(
+                  getAccountsOfTypes(validAccounts, ["Investment"])
+                )}
+                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+              />
+              <NetWorthItem
+                title="Assets"
+                totalBalance={sumAssetsTotalValue(validAssets)}
+                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
               />
             </Card>
             <Card
@@ -93,7 +153,14 @@ const NetWorthCard = (): React.ReactNode => {
               radius="lg"
               shadow="none"
             >
-              <NetWorthItem accounts={validAccounts} title="Total" />
+              <NetWorthItem
+                title="Total"
+                totalBalance={
+                  sumAccountsTotalBalance(validAccounts) +
+                  sumAssetsTotalValue(validAssets)
+                }
+                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+              />
             </Card>
           </Stack>
         )}
