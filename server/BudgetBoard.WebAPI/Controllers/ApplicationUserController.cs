@@ -115,7 +115,8 @@ public class ApplicationUserController(
 
             // Check if user has a password set (local auth) before removing OIDC
             var hasPassword = await _userManager.HasPasswordAsync(user);
-            if (!hasPassword)
+            var remainingLogins = logins.Count(l => l.LoginProvider != "oidc");
+            if (!hasPassword && remainingLogins == 0)
             {
                 _logger.LogWarning(
                     "Attempt to remove OIDC login for user {UserId} without a local password set.",
