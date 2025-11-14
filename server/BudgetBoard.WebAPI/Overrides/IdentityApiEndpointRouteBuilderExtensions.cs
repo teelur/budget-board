@@ -635,7 +635,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
                         if (!string.IsNullOrEmpty(infoRequest.NewPassword))
                         {
-                            if (string.IsNullOrEmpty(infoRequest.OldPassword))
+                            var hasPassword = await userManager.HasPasswordAsync(user);
+                            if (string.IsNullOrEmpty(infoRequest.OldPassword) && hasPassword)
                             {
                                 return CreateValidationProblem(
                                     "OldPasswordRequired",
@@ -643,11 +644,34 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                                 );
                             }
 
-                            var changePasswordResult = await userManager.ChangePasswordAsync(
-                                user,
-                                infoRequest.OldPassword,
-                                infoRequest.NewPassword
-                            );
+                            IdentityResult changePasswordResult;
+                            if (!hasPassword)
+                            {
+                                changePasswordResult = await userManager.AddPasswordAsync(
+                                    user,
+                                    infoRequest.NewPassword
+                                );
+
+                                if (changePasswordResult.Succeeded)
+                                {
+                                    var userId = await userManager.GetUserIdAsync(user);
+                                    var loginInfo = new UserLoginInfo(
+                                        "local",
+                                        userId,
+                                        "Local Account"
+                                    );
+                                    await userManager.AddLoginAsync(user, loginInfo);
+                                }
+                            }
+                            else
+                            {
+                                changePasswordResult = await userManager.ChangePasswordAsync(
+                                    user,
+                                    infoRequest.OldPassword ?? string.Empty,
+                                    infoRequest.NewPassword
+                                );
+                            }
+
                             if (!changePasswordResult.Succeeded)
                             {
                                 return CreateValidationProblem(changePasswordResult);

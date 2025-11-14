@@ -32,7 +32,7 @@ public class ApplicationUserTests
         );
 
         // Assert
-        result.Should().BeEquivalentTo(new ApplicationUserResponse(helper.demoUser, false));
+        result.Should().BeEquivalentTo(new ApplicationUserResponse(helper.demoUser, false, false));
     }
 
     [Fact]

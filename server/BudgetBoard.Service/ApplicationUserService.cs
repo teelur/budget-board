@@ -26,8 +26,9 @@ public class ApplicationUserService(
         // Check if user has OIDC login
         var logins = await userManager.GetLoginsAsync(userData);
         var hasOidcLogin = logins.Any(l => l.LoginProvider == "oidc");
+        var hasLocalLogin = logins.Any(l => l.LoginProvider == "local");
 
-        return new ApplicationUserResponse(userData, hasOidcLogin);
+        return new ApplicationUserResponse(userData, hasOidcLogin, hasLocalLogin);
     }
 
     public async Task UpdateApplicationUserAsync(Guid userGuid, IApplicationUserUpdateRequest user)

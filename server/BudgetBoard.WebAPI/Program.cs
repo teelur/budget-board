@@ -132,16 +132,12 @@ var emailSender = builder.Configuration.GetValue<string>("EMAIL_SENDER");
 builder
     .Services.AddIdentityCore<ApplicationUser>(opt =>
     {
-        // Configure password requirements (only relevant when local auth is enabled)
-        if (!disableLocalAuth)
-        {
-            opt.Password.RequiredLength = 3;
-            opt.Password.RequiredUniqueChars = 0;
-            opt.Password.RequireNonAlphanumeric = false;
-            opt.Password.RequireDigit = false;
-            opt.Password.RequireUppercase = false;
-            opt.Password.RequireLowercase = false;
-        }
+        opt.Password.RequiredLength = 3;
+        opt.Password.RequiredUniqueChars = 0;
+        opt.Password.RequireNonAlphanumeric = false;
+        opt.Password.RequireDigit = false;
+        opt.Password.RequireUppercase = false;
+        opt.Password.RequireLowercase = false;
 
         opt.User.RequireUniqueEmail = true;
         opt.SignIn.RequireConfirmedEmail = !string.IsNullOrEmpty(emailSender) && !disableLocalAuth;
