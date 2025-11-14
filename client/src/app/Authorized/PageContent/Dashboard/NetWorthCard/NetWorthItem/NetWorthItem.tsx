@@ -1,12 +1,7 @@
 import classes from "./NetWorthItem.module.css";
 
 import { Group, Text } from "@mantine/core";
-import { IAccountResponse } from "~/models/account";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import {
-  getAccountsOfTypes,
-  sumAccountsTotalBalance,
-} from "~/helpers/accounts";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -15,8 +10,8 @@ import { AxiosResponse } from "axios";
 
 interface NetWorthItemProps {
   title: string;
-  types?: string[];
-  accounts: IAccountResponse[];
+  totalBalance: number;
+  userCurrency: string;
 }
 
 const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
@@ -38,19 +33,13 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
     },
   });
 
-  const summedAccountsTotalBalance = sumAccountsTotalBalance(
-    props.types
-      ? getAccountsOfTypes(props.accounts, props.types)
-      : props.accounts
-  );
-
   return (
     <Group className={classes.root} justify="space-between" wrap="nowrap">
       <Text fw={600}>{props.title}</Text>
       {userSettingsQuery.isPending ? null : (
-        <Text c={summedAccountsTotalBalance < 0 ? "red" : "green"} fw={600}>
+        <Text c={props.totalBalance > 0 ? "green" : "red"} fw={600}>
           {convertNumberToCurrency(
-            summedAccountsTotalBalance,
+            props.totalBalance,
             true,
             userSettingsQuery.data?.currency ?? "USD"
           )}
