@@ -28,7 +28,7 @@ export const getProjectEnvVariables = (): {
       VITE_API_URL: !projectEnvVariables.VITE_API_URL.includes("VITE_")
         ? projectEnvVariables.VITE_API_URL
         : import.meta.env.VITE_API_URL,
-      VITE_OIDC_ENABLED: !projectEnvVariables.VITE_OIDC_ENABLED.includes(
+      VITE_OIDC_ENABLED: !projectEnvVariables.VITE_OIDC_ENABLED?.includes(
         "VITE_"
       )
         ? projectEnvVariables.VITE_OIDC_ENABLED
