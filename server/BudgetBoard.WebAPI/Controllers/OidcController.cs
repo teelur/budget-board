@@ -3,11 +3,33 @@ using BudgetBoard.WebAPI.Models;
 using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BudgetBoard.WebAPI.Controllers
 {
+    /// <summary>
+    /// Attribute to disable controller when OIDC is not enabled
+    /// </summary>
+    public class RequireOidcEnabledAttribute : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            var configuration =
+                context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+            var oidcEnabled = configuration.GetValue<bool>("OIDC_ENABLED");
+
+            if (!oidcEnabled)
+            {
+                context.Result = new NotFoundResult();
+            }
+
+            base.OnActionExecuting(context);
+        }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
+    [RequireOidcEnabled]
     public class OidcController(
         IExternalUserProvisioningService provisioner,
         IOidcTokenService tokenService,
