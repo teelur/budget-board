@@ -98,6 +98,15 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         return CreateValidationProblem(result);
                     }
 
+                    // Add local login provider
+                    var userId = await userManager.GetUserIdAsync(user);
+                    var loginInfo = new UserLoginInfo(
+                        IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
+                        userId,
+                        "Local Account"
+                    );
+                    await userManager.AddLoginAsync(user, loginInfo);
+
                     await SendConfirmationEmailAsync(user, userManager, context, email);
                     return TypedResults.Ok();
                 }
@@ -126,6 +135,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 ) =>
                 {
                     var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
+                    var userManager = signInManager.UserManager;
 
                     // TODO: Probably should add a Remember Me? option to login.
                     var isPersistent = true;
@@ -165,6 +175,28 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             result.ToString(),
                             statusCode: StatusCodes.Status401Unauthorized
                         );
+                    }
+
+                    // Add local login provider for existing users who don't have it
+                    var user = await userManager.FindByEmailAsync(login.Email);
+                    if (user is not null)
+                    {
+                        var logins = await userManager.GetLoginsAsync(user);
+                        var hasLocalProvider = logins.Any(l =>
+                            l.LoginProvider
+                            == IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider
+                        );
+
+                        if (!hasLocalProvider)
+                        {
+                            var userId = await userManager.GetUserIdAsync(user);
+                            var loginInfo = new UserLoginInfo(
+                                IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
+                                userId,
+                                "Local Account"
+                            );
+                            await userManager.AddLoginAsync(user, loginInfo);
+                        }
                     }
 
                     // The signInManager already produced the needed response in the form of a cookie or bearer token.
