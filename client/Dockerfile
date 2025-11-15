@@ -14,7 +14,6 @@ RUN yarn run build
 FROM nginx:stable-alpine AS production-stage
 
 COPY --from=build-stage /app/dist /usr/share/nginx/html
-COPY .docker/nginx/init-scripts/ /docker-entrypoint.d/
 
 COPY .docker/nginx/conf/nginx-substitute.sh .
 COPY .docker/nginx/conf/default.conf.template .
