@@ -30,7 +30,7 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
 
   // base url is sourced from environment variables
   const client = axios.create({
-    baseURL: envVariables.VITE_API_URL,
+    baseURL: envVariables.VITE_CLIENT_URL,
     withCredentials: true,
   });
 
