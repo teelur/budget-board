@@ -105,7 +105,18 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         userId,
                         "Local Account"
                     );
-                    await userManager.AddLoginAsync(user, loginInfo);
+                    var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
+                    if (!addLoginResult.Succeeded)
+                    {
+                        // I don't think we need to block login here. It'll just retry the next time they try to login.
+                        var logger = sp.GetRequiredService<ILoggerFactory>()
+                            .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
+                        logger.LogWarning(
+                            "Failed to add login to user {UserId}: {Errors}",
+                            userId,
+                            string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
+                        );
+                    }
 
                     await SendConfirmationEmailAsync(user, userManager, context, email);
                     return TypedResults.Ok();
@@ -189,13 +200,29 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
                         if (!hasLocalProvider)
                         {
+                            var logger = sp.GetRequiredService<ILoggerFactory>()
+                                .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
+
                             var userId = await userManager.GetUserIdAsync(user);
+                            logger.LogInformation("Adding local login for user {UserId}", userId);
+
                             var loginInfo = new UserLoginInfo(
                                 IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
                                 userId,
                                 "Local Account"
                             );
-                            await userManager.AddLoginAsync(user, loginInfo);
+                            var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
+                            if (!addLoginResult.Succeeded)
+                            {
+                                logger.LogWarning(
+                                    "Failed to add login to user {UserId}: {Errors}",
+                                    userId,
+                                    string.Join(
+                                        ", ",
+                                        addLoginResult.Errors.Select(e => e.Description)
+                                    )
+                                );
+                            }
                         }
                     }
 
