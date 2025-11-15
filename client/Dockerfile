@@ -3,6 +3,7 @@ FROM node:current-alpine AS build-stage
 WORKDIR /app
 
 COPY ["./package.json", "./yarn.lock", "./.yarnrc.yml", "./"]
+
 # Remove pre-installed Yarn binaries to ensure only Corepack-managed Yarn is used (avoids version conflicts)
 RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg
 RUN npm install --global corepack@latest
