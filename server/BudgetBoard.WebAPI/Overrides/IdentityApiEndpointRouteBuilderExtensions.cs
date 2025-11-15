@@ -98,6 +98,26 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         return CreateValidationProblem(result);
                     }
 
+                    // Add local login provider
+                    var userId = await userManager.GetUserIdAsync(user);
+                    var loginInfo = new UserLoginInfo(
+                        IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
+                        userId,
+                        "Local Account"
+                    );
+                    var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
+                    if (!addLoginResult.Succeeded)
+                    {
+                        // I don't think we need to block login here. It'll just retry the next time they try to login.
+                        var logger = sp.GetRequiredService<ILoggerFactory>()
+                            .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
+                        logger.LogWarning(
+                            "Failed to add login to user {UserId}: {Errors}",
+                            userId,
+                            string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
+                        );
+                    }
+
                     await SendConfirmationEmailAsync(user, userManager, context, email);
                     return TypedResults.Ok();
                 }
@@ -126,6 +146,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 ) =>
                 {
                     var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
+                    var userManager = signInManager.UserManager;
 
                     // TODO: Probably should add a Remember Me? option to login.
                     var isPersistent = true;
@@ -165,6 +186,44 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             result.ToString(),
                             statusCode: StatusCodes.Status401Unauthorized
                         );
+                    }
+
+                    // Add local login provider for existing users who don't have it
+                    var user = await userManager.FindByEmailAsync(login.Email);
+                    if (user is not null)
+                    {
+                        var logins = await userManager.GetLoginsAsync(user);
+                        var hasLocalProvider = logins.Any(l =>
+                            l.LoginProvider
+                            == IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider
+                        );
+
+                        if (!hasLocalProvider)
+                        {
+                            var logger = sp.GetRequiredService<ILoggerFactory>()
+                                .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
+
+                            var userId = await userManager.GetUserIdAsync(user);
+                            logger.LogInformation("Adding local login for user {UserId}", userId);
+
+                            var loginInfo = new UserLoginInfo(
+                                IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
+                                userId,
+                                "Local Account"
+                            );
+                            var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
+                            if (!addLoginResult.Succeeded)
+                            {
+                                logger.LogWarning(
+                                    "Failed to add login to user {UserId}: {Errors}",
+                                    userId,
+                                    string.Join(
+                                        ", ",
+                                        addLoginResult.Errors.Select(e => e.Description)
+                                    )
+                                );
+                            }
+                        }
                     }
 
                     // The signInManager already produced the needed response in the form of a cookie or bearer token.
