@@ -48,7 +48,7 @@ const DeletedAssetCard = (props: DeletedAssetCardProps): React.ReactNode => {
           </Text>
         </Stack>
 
-        <Group align="stretch">
+        <Group style={{ alignSelf: "stretch" }}>
           <ActionIcon h="100%" onClick={() => doRestoreAsset.mutate()}>
             <Undo2Icon size="1.2rem" />
           </ActionIcon>

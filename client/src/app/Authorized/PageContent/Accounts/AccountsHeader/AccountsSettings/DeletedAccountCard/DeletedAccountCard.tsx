@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Badge,
   Card,
   Group,
   LoadingOverlay,
@@ -46,17 +47,19 @@ const DeletedAccountCard = (
   return (
     <Card p="0.5rem">
       <LoadingOverlay visible={doRestoreAccount.isPending} />
-      <Group justify="space-between">
-        <Stack gap={0}>
-          <Text fw={600} size="sm">
-            {props.account.name}
-          </Text>
-          <Text size="xs" c="dimmed" fw={600}>
-            {props.institutionName ?? "Unknown Institution"}
-          </Text>
-        </Stack>
-
-        <Group align="stretch">
+      <Group justify="space-between" wrap="nowrap">
+        <Group gap="0.5rem">
+          <Stack gap={0}>
+            <Text fw={600} size="sm">
+              {props.account.name}
+            </Text>
+            <Text size="xs" c="dimmed" fw={600}>
+              {props.institutionName ?? "Unknown Institution"}
+            </Text>
+          </Stack>
+          {props.account.syncID !== null && <Badge bg="blue">SimpleFIN</Badge>}
+        </Group>
+        <Group style={{ alignSelf: "stretch" }}>
           <ActionIcon h="100%" onClick={() => doRestoreAccount.mutate()}>
             <Undo2Icon size="1.2rem" />
           </ActionIcon>
