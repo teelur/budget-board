@@ -1,4 +1,10 @@
-import { ActionIcon, Group, NumberInput, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Group,
+  LoadingOverlay,
+  NumberInput,
+  Stack,
+} from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
@@ -110,6 +116,13 @@ const EditableValueItemContent = (
 
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
+      <LoadingOverlay
+        visible={
+          doUpdateValue.isPending ||
+          doDeleteValue.isPending ||
+          doRestoreValue.isPending
+        }
+      />
       <Stack w="100%">
         <DatePickerInput {...valueDateField.getInputProps()} flex="1 1 auto" />
         <NumberInput
