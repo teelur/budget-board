@@ -8,7 +8,7 @@ import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSele
 import NetWorthChart from "~/components/Charts/NetWorthChart/NetWorthChart";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import dayjs from "dayjs";
@@ -26,7 +26,7 @@ const NetWorthTab = (): React.ReactNode => {
   const balancesQuery = useQueries({
     queries: selectedAccountIds.map((accountId: string) => ({
       queryKey: ["balances", accountId],
-      queryFn: async (): Promise<IBalance[]> => {
+      queryFn: async (): Promise<IBalanceResponse[]> => {
         const res: AxiosResponse = await request({
           url: "/api/balance",
           method: "GET",
@@ -34,7 +34,7 @@ const NetWorthTab = (): React.ReactNode => {
         });
 
         if (res.status === 200) {
-          return res.data as IBalance[];
+          return res.data as IBalanceResponse[];
         }
 
         return [];

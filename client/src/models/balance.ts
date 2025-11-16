@@ -1,4 +1,4 @@
-export interface IBalance {
+export interface IBalanceResponse {
   id: string;
   amount: number;
   dateTime: Date;

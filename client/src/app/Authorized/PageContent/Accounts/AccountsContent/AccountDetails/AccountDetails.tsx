@@ -14,7 +14,7 @@ import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
 
@@ -31,7 +31,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const { request } = React.useContext<any>(AuthContext);
   const balancesQuery = useQuery({
     queryKey: ["balances", props.account?.id],
-    queryFn: async (): Promise<IBalance[]> => {
+    queryFn: async (): Promise<IBalanceResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/balance",
         method: "GET",
@@ -39,7 +39,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       });
 
       if (res.status === 200) {
-        return res.data as IBalance[];
+        return res.data as IBalanceResponse[];
       }
 
       return [];

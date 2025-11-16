@@ -1,5 +1,5 @@
 import { IAccountResponse, liabilityAccountTypes } from "~/models/account";
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import { buildValueChartData } from "../../ValueChart/helpers/valueChart";
 
 /**
@@ -21,7 +21,7 @@ export interface NetWorthChartData {
  * @returns An array of objects, where each object represents a date and the corresponding net worth data.
  */
 export const BuildNetWorthChartData = (
-  balances: IBalance[],
+  balances: IBalanceResponse[],
   accounts: IAccountResponse[]
 ): NetWorthChartData[] => {
   // Use the account balance chart data to build the net worth chart data.

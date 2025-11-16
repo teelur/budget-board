@@ -1,10 +1,10 @@
 import { Group, Pagination, Stack } from "@mantine/core";
 import React from "react";
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import BalanceItem from "./BalanceItem/BalanceItem";
 
 interface BalanceItemsProps {
-  balances: IBalance[];
+  balances: IBalanceResponse[];
   currency: string;
 }
 

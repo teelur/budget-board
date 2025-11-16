@@ -4,7 +4,7 @@ import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
 import { IAccountResponse } from "~/models/account";
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ import { BuildNetWorthChartData } from "./helpers/netWorthChart";
 
 interface NetWorthChartProps {
   accounts: IAccountResponse[];
-  balances: IBalance[];
+  balances: IBalanceResponse[];
   dateRange: DatesRangeValue<string>;
   isPending?: boolean;
   invertYAxis?: boolean;
