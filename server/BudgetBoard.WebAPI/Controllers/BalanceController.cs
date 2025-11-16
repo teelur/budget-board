@@ -92,13 +92,37 @@ public class BalanceController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid guid)
     {
         try
         {
             await _balanceService.DeleteBalanceAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                id
+                guid
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred.");
+            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> Restore(Guid guid)
+    {
+        try
+        {
+            await _balanceService.RestoreBalanceAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid
             );
             return Ok();
         }

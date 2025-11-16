@@ -24,9 +24,8 @@ const BalanceItems = (props: BalanceItemsProps) => {
         .map((balance) => (
           <BalanceItem
             key={balance.id}
-            dateTime={balance.dateTime}
-            amount={balance.amount}
-            currency={props.currency}
+            balance={balance}
+            userCurrency={props.currency}
           />
         ))}
       <Group justify="center">
