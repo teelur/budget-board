@@ -68,6 +68,7 @@ const AccountsContent = (props: AccountsContentProps) => {
       setSortedInstitutions(
         institutionQuery.data
           .slice()
+          .filter((inst) => inst.deleted === null)
           .sort((a, b) => a.index - b.index)
           .map((inst, index) => ({
             ...inst,

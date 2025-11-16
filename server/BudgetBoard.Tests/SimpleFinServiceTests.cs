@@ -92,7 +92,8 @@ public class SimpleFinServiceTests
         );
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),
@@ -185,7 +186,8 @@ public class SimpleFinServiceTests
         );
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<INowProvider>()
         );
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),

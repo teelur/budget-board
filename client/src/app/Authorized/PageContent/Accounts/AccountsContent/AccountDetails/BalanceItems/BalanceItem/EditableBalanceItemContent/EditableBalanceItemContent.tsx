@@ -17,32 +17,32 @@ import React from "react";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
-import { IValueResponse, IValueUpdateRequest } from "~/models/value";
+import { IBalanceResponse, IBalanceUpdateRequest } from "~/models/balance";
 
-interface EditableValueItemContentProps {
-  value: IValueResponse;
+interface EditableBalanceItemContentProps {
+  balance: IBalanceResponse;
   userCurrency: string;
   doUnSelect: () => void;
 }
 
-const EditableValueItemContent = (
-  props: EditableValueItemContentProps
+const EditableBalanceItemContent = (
+  props: EditableBalanceItemContentProps
 ): React.ReactNode => {
-  const valueAmountField = useField<string | number | undefined>({
-    initialValue: props.value.amount,
+  const balanceAmountField = useField<string | number | undefined>({
+    initialValue: props.balance.amount,
     validateOnBlur: true,
-    validate: (value) => {
-      if (value === undefined || value === null || isNaN(Number(value))) {
+    validate: (balance) => {
+      if (balance === undefined || balance === null || isNaN(Number(balance))) {
         return "Amount must be a valid number";
       }
       return null;
     },
   });
-  const valueDateField = useField<string>({
-    initialValue: dayjs(props.value.dateTime).format("YYYY-MM-DD"),
+  const balanceDateField = useField<string>({
+    initialValue: dayjs(props.balance.dateTime).format("YYYY-MM-DD"),
     validateOnBlur: true,
-    validate: (value) => {
-      if (!dayjs(value).isValid()) {
+    validate: (balance) => {
+      if (!dayjs(balance).isValid()) {
         return "Date must be valid";
       }
       return null;
@@ -52,87 +52,90 @@ const EditableValueItemContent = (
   const { request } = React.useContext<any>(AuthContext);
 
   const queryClient = useQueryClient();
-  const doUpdateValue = useMutation({
+  const doUpdateBalance = useMutation({
     mutationFn: async () =>
       await request({
-        url: `/api/value`,
+        url: `/api/balance`,
         method: "PUT",
         data: {
-          id: props.value.id,
-          amount: Number(valueAmountField.getValue()),
-          dateTime: dayjs(valueDateField.getValue()).toDate(),
-        } as IValueUpdateRequest,
+          id: props.balance.id,
+          amount: Number(balanceAmountField.getValue()),
+          dateTime: dayjs(balanceDateField.getValue()).toDate(),
+        } as IBalanceUpdateRequest,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["values", props.value.assetID],
+        queryKey: ["balances", props.balance.accountID],
       });
 
-      notifications.show({ color: "green", message: "Value updated" });
+      notifications.show({ color: "green", message: "Balance updated." });
     },
     onError: (error: AxiosError) =>
       notifications.show({ color: "red", message: translateAxiosError(error) }),
   });
 
-  const doDeleteValue = useMutation({
+  const doDeleteBalance = useMutation({
     mutationFn: async () =>
       await request({
-        url: `/api/value`,
+        url: `/api/balance`,
         method: "DELETE",
-        params: { guid: props.value.id },
+        params: { guid: props.balance.id },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["values", props.value.assetID],
+        queryKey: ["balances", props.balance.accountID],
       });
 
-      notifications.show({ color: "green", message: "Value deleted" });
+      notifications.show({ color: "green", message: "Balance deleted" });
     },
     onError: (error: AxiosError) =>
       notifications.show({ color: "red", message: translateAxiosError(error) }),
   });
 
-  const doRestoreValue = useMutation({
+  const doRestoreBalance = useMutation({
     mutationFn: async () =>
       await request({
-        url: `/api/value/restore`,
+        url: `/api/balance/restore`,
         method: "POST",
-        params: { guid: props.value.id },
+        params: { guid: props.balance.id },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["values", props.value.assetID],
+        queryKey: ["balances", props.balance.accountID],
       });
 
-      notifications.show({ color: "green", message: "Value restored" });
+      notifications.show({ color: "green", message: "Balance restored." });
     },
     onError: (error: AxiosError) =>
       notifications.show({ color: "red", message: translateAxiosError(error) }),
   });
 
   useDidUpdate(() => {
-    doUpdateValue.mutate();
-  }, [valueDateField.getValue()]);
+    doUpdateBalance.mutate();
+  }, [balanceDateField.getValue()]);
 
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <LoadingOverlay
         visible={
-          doUpdateValue.isPending ||
-          doDeleteValue.isPending ||
-          doRestoreValue.isPending
+          doUpdateBalance.isPending ||
+          doDeleteBalance.isPending ||
+          doRestoreBalance.isPending
         }
       />
       <Stack w="100%">
-        <DatePickerInput {...valueDateField.getInputProps()} flex="1 1 auto" />
+        <DatePickerInput
+          {...balanceDateField.getInputProps()}
+          flex="1 1 auto"
+        />
         <NumberInput
-          {...valueAmountField.getInputProps()}
+          {...balanceAmountField.getInputProps()}
           flex="1 1 auto"
           prefix={getCurrencySymbol(props.userCurrency)}
           thousandSeparator=","
           decimalScale={2}
           fixedDecimalScale
-          onBlur={() => doUpdateValue.mutate()}
+          onBlur={() => doUpdateBalance.mutate()}
         />
       </Stack>
       <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
@@ -147,11 +150,11 @@ const EditableValueItemContent = (
         >
           <PencilIcon size={16} />
         </ActionIcon>
-        {props.value.deleted ? (
+        {props.balance.deleted ? (
           <ActionIcon
             h="100%"
             size="sm"
-            onClick={() => doRestoreValue.mutate()}
+            onClick={() => doRestoreBalance.mutate()}
           >
             <Undo2Icon size={16} />
           </ActionIcon>
@@ -160,7 +163,7 @@ const EditableValueItemContent = (
             h="100%"
             size="sm"
             bg="red"
-            onClick={() => doDeleteValue.mutate()}
+            onClick={() => doDeleteBalance.mutate()}
           >
             <Trash2Icon size={16} />
           </ActionIcon>
@@ -170,4 +173,4 @@ const EditableValueItemContent = (
   );
 };
 
-export default EditableValueItemContent;
+export default EditableBalanceItemContent;

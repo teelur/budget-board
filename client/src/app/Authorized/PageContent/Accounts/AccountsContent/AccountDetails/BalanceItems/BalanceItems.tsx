@@ -1,10 +1,10 @@
 import { Group, Pagination, Stack } from "@mantine/core";
 import React from "react";
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import BalanceItem from "./BalanceItem/BalanceItem";
 
 interface BalanceItemsProps {
-  balances: IBalance[];
+  balances: IBalanceResponse[];
   currency: string;
 }
 
@@ -24,9 +24,8 @@ const BalanceItems = (props: BalanceItemsProps) => {
         .map((balance) => (
           <BalanceItem
             key={balance.id}
-            dateTime={balance.dateTime}
-            amount={balance.amount}
-            currency={props.currency}
+            balance={balance}
+            userCurrency={props.currency}
           />
         ))}
       <Group justify="center">

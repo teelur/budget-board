@@ -36,7 +36,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           {props.account.hideTransactions && (
             <Badge bg="purple">Hidden Transactions</Badge>
           )}
-          {props.account.deleted && <Badge bg="red">Deleted</Badge>}
+          {props.account.syncID !== null && <Badge bg="blue">SimpleFIN</Badge>}
         </Group>
         <Text
           fw={600}
