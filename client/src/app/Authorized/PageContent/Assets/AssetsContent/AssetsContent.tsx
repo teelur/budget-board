@@ -65,6 +65,7 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
       setSortedAssets(
         assetsQuery.data
           .slice()
+          .filter((asset) => !asset.deleted)
           .sort((a, b) => a.index - b.index)
           .map((asset, index) => ({
             ...asset,
