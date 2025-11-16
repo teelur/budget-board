@@ -182,9 +182,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   {balancesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
                   )}
-                  {balancesQuery.data && balancesQuery.data.length === 0 ? (
+                  {sortedBalances.length === 0 ? (
                     <Text size="sm" c="dimmed" fw={600}>
-                      No balance entries
+                      No balance entries.
                     </Text>
                   ) : (
                     <BalanceItems
@@ -209,7 +209,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   )}
                   {sortedDeletedBalances.length === 0 ? (
                     <Text size="sm" c="dimmed" fw={600}>
-                      No deleted balances
+                      No deleted balances.
                     </Text>
                   ) : (
                     <BalanceItems

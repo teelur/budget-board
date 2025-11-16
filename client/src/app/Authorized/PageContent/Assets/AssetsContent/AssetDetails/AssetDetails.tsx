@@ -245,7 +245,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   )}
                   {sortedValues.length === 0 ? (
                     <Text size="sm" c="dimmed" fw={600}>
-                      No value entries
+                      No value entries.
                     </Text>
                   ) : (
                     <ValueItems
@@ -270,7 +270,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   )}
                   {sortedDeletedValues.length === 0 ? (
                     <Text size="sm" c="dimmed" fw={600}>
-                      No value entries
+                      No deleted values.
                     </Text>
                   ) : (
                     <ValueItems
