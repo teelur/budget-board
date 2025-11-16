@@ -48,9 +48,14 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   });
 
   const sortedBalances =
-    balancesQuery.data?.sort((a, b) =>
-      dayjs(b.dateTime).diff(dayjs(a.dateTime))
-    ) ?? [];
+    balancesQuery.data
+      ?.filter((balance) => !balance.deleted)
+      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+
+  const sortedDeletedBalances =
+    balancesQuery.data
+      ?.filter((balance) => balance.deleted)
+      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
 
   const balancesForChart = sortedBalances.filter((balance) =>
     dayjs(balance.dateTime).isAfter(
@@ -184,6 +189,31 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   ) : (
                     <BalanceItems
                       balances={sortedBalances}
+                      currency={props.currency}
+                    />
+                  )}
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item
+              value="deleted-balances"
+              bg="var(--mantine-color-content-background)"
+            >
+              <Accordion.Control>
+                <Text>Deleted Balances</Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Stack gap="0.5rem">
+                  {balancesQuery.isPending && (
+                    <Skeleton height={20} radius="lg" />
+                  )}
+                  {sortedDeletedBalances.length === 0 ? (
+                    <Text size="sm" c="dimmed" fw={600}>
+                      No value entries
+                    </Text>
+                  ) : (
+                    <BalanceItems
+                      balances={sortedDeletedBalances}
                       currency={props.currency}
                     />
                   )}
