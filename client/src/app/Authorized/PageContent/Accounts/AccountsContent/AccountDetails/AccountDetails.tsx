@@ -209,7 +209,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   )}
                   {sortedDeletedBalances.length === 0 ? (
                     <Text size="sm" c="dimmed" fw={600}>
-                      No value entries
+                      No deleted balances
                     </Text>
                   ) : (
                     <BalanceItems
