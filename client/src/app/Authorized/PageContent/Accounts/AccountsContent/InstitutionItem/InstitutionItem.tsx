@@ -44,6 +44,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
   >(
     props.institution.accounts
       .slice()
+      .filter((a) => a.deleted === null)
       .sort((a, b) => a.index - b.index)
       .map((a, index) => ({
         ...a,
@@ -85,6 +86,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
     setSortedAccounts(
       props.institution.accounts
         .slice()
+        .filter((a) => a.deleted === null)
         .sort((a, b) => a.index - b.index)
         .map((a, index) => ({
           ...a,

@@ -1,6 +1,7 @@
 import { Button, Group } from "@mantine/core";
 import React from "react";
 import CreateAccount from "./CreateAccount/CreateAccount";
+import AccountsSettings from "./AccountsSettings/AccountsSettings";
 
 interface AccountsHeaderProps {
   isSortable: boolean;
@@ -17,6 +18,7 @@ const AccountsHeader = (props: AccountsHeaderProps): React.ReactNode => {
         {props.isSortable ? "Save" : "Reorder"}
       </Button>
       <CreateAccount />
+      <AccountsSettings />
     </Group>
   );
 };
