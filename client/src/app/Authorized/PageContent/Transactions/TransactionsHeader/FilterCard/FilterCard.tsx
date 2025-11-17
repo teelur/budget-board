@@ -8,16 +8,17 @@ import { Filters } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import dayjs from "dayjs";
+import { useTransactionFilters } from "~/components/TransactionNavigationProvider/TransactionNavigationProvider";
 
 interface FilterCardProps {
-  isOpen: boolean;
   categories: ICategory[];
-  filters: Filters;
-  setFilters: (newFilters: Filters) => void;
 }
 
 const FilterCard = (props: FilterCardProps): React.ReactNode => {
-  if (!props.isOpen) {
+  const { transactionFilters, setTransactionFilters, isFiltersPanelOpen } =
+    useTransactionFilters();
+
+  if (!isFiltersPanelOpen) {
     return null;
   }
 
@@ -42,47 +43,52 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
             w={{ base: "100%", sm: "25%" }}
             type="range"
             placeholder="Pick a date range"
-            value={props.filters.dateRange}
+            value={transactionFilters.dateRange}
             onChange={(dateRange: DatesRangeValue<string>) => {
               const parsedDateRange: [Date | null, Date | null] = [
                 dateRange[0] ? dayjs(dateRange[0]).toDate() : null,
                 dateRange[1] ? dayjs(dateRange[1]).toDate() : null,
               ];
-              props.setFilters({
-                ...props.filters,
-                dateRange: parsedDateRange,
-              });
+              const newFilters = new Filters();
+              newFilters.accounts = transactionFilters.accounts;
+              newFilters.category = transactionFilters.category;
+              newFilters.dateRange = parsedDateRange;
+              setTransactionFilters(newFilters);
             }}
+            clearable
           />
           <AccountSelectInput
             w={{ base: "100%", sm: "50%" }}
-            selectedAccountIds={props.filters.accounts}
+            selectedAccountIds={transactionFilters.accounts}
             setSelectedAccountIds={(newAccountIds: string[]) => {
-              props.setFilters({
-                ...props.filters,
-                accounts: newAccountIds,
-              });
+              const newFilters = new Filters();
+              newFilters.accounts = newAccountIds;
+              newFilters.category = transactionFilters.category;
+              newFilters.dateRange = transactionFilters.dateRange;
+              setTransactionFilters(newFilters);
             }}
-            hideHidden
           />
           <CategorySelect
             w={{ base: "100%", sm: "20%" }}
             categories={props.categories}
-            value={props.filters.category}
-            onChange={(val) =>
-              props.setFilters({ ...props.filters, category: val })
-            }
+            value={transactionFilters.category}
+            onChange={(val) => {
+              const newFilters = new Filters();
+              newFilters.accounts = transactionFilters.accounts;
+              newFilters.category = val;
+              newFilters.dateRange = transactionFilters.dateRange;
+              setTransactionFilters(newFilters);
+            }}
             withinPortal
             includeUncategorized
           />
           <Button
             w={{ base: "100%", sm: "130px" }}
+            variant={
+              transactionFilters.isEqual(new Filters()) ? "outline" : "primary"
+            }
             onClick={() => {
-              props.setFilters({
-                dateRange: [null, null],
-                accounts: [],
-                category: "",
-              });
+              setTransactionFilters(new Filters());
             }}
           >
             Clear Filters
