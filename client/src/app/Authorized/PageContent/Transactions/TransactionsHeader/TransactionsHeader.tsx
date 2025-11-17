@@ -5,7 +5,6 @@ import { FilterIcon, SettingsIcon } from "lucide-react";
 import React from "react";
 import SortMenu from "./SortMenu/SortMenu";
 import { SortDirection } from "~/components/SortButton";
-import { Filters } from "~/models/transaction";
 import { Sorts } from "./SortMenu/SortMenuHelpers";
 import FilterCard from "./FilterCard/FilterCard";
 import { useDisclosure } from "@mantine/hooks";
@@ -28,12 +27,7 @@ const TransactionsHeader = (
 ): React.ReactNode => {
   const [settingsOpen, { open, close }] = useDisclosure(false);
 
-  const {
-    transactionFilters,
-    setTransactionFilters,
-    isFiltersPanelOpen,
-    toggleFiltersPanel,
-  } = useTransactionFilters();
+  const { isFiltersPanelOpen, toggleFiltersPanel } = useTransactionFilters();
 
   return (
     <Stack className={classes.root}>
@@ -61,12 +55,7 @@ const TransactionsHeader = (
           <TransactionsSettings modalOpened={settingsOpen} closeModal={close} />
         </Group>
       </Flex>
-      <FilterCard
-        isOpen={isFiltersPanelOpen}
-        categories={props.categories}
-        filters={transactionFilters ?? new Filters()}
-        setFilters={setTransactionFilters}
-      />
+      <FilterCard categories={props.categories} />
     </Stack>
   );
 };
