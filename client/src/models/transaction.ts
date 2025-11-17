@@ -85,8 +85,8 @@ export class Filters implements IFilters {
 
   public isEqual(other: Filters): boolean {
     return (
-      JSON.stringify(this.accounts.sort()) ===
-        JSON.stringify(other.accounts.sort()) &&
+      JSON.stringify([...this.accounts].sort()) ===
+        JSON.stringify([...other.accounts].sort()) &&
       this.category === other.category &&
       this.dateRange[0]?.getTime() === other.dateRange[0]?.getTime() &&
       this.dateRange[1]?.getTime() === other.dateRange[1]?.getTime()

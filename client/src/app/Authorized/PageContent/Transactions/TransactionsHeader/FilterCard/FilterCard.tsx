@@ -67,6 +67,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
               newFilters.dateRange = transactionFilters.dateRange;
               setTransactionFilters(newFilters);
             }}
+            hideHidden
           />
           <CategorySelect
             w={{ base: "100%", sm: "20%" }}

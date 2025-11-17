@@ -42,7 +42,7 @@ export const TransactionFiltersProvider = (
       openFiltersPanel();
       props.setCurrentPage(Pages.Transactions);
     },
-    [props]
+    [props.setCurrentPage, openFiltersPanel]
   );
 
   const value = React.useMemo(
@@ -55,7 +55,6 @@ export const TransactionFiltersProvider = (
     }),
     [
       transactionFilters,
-      setTransactionFilters,
       isFiltersPanelOpen,
       toggleFiltersPanel,
       navigateToTransactions,
@@ -69,12 +68,5 @@ export const TransactionFiltersProvider = (
   );
 };
 
-export const useTransactionFilters = () => {
-  const context = React.useContext(TransactionFiltersContext);
-  if (!context) {
-    throw new Error(
-      "useTransactionFilters must be used within TransactionFiltersProvider"
-    );
-  }
-  return context;
-};
+export const useTransactionFilters = () =>
+  React.useContext(TransactionFiltersContext);
