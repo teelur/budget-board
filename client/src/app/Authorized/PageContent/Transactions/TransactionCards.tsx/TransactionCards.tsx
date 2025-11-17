@@ -101,7 +101,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                 />
               ))
           ) : (
-            <Text>No transactions</Text>
+            <Text fw={600}>No transactions</Text>
           )}
         </Stack>
       )}
