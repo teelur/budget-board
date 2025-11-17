@@ -13,14 +13,13 @@ import TransactionsSettings from "./TransactionsSettings/TransactionsSettings";
 import { ICategory } from "~/models/category";
 import CreateTransactionModal from "./CreateTransactionModal/CreateTransactionModal";
 import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransactionsModal";
+import { useTransactionFilters } from "~/components/TransactionNavigationProvider/TransactionNavigationProvider";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
   setSort: (newSort: Sorts) => void;
   sortDirection: SortDirection;
   setSortDirection: (newSortDirection: SortDirection) => void;
-  filters: Filters;
-  setFilters: (newFilters: Filters) => void;
   categories: ICategory[];
 }
 
@@ -28,7 +27,13 @@ const TransactionsHeader = (
   props: TransactionsHeaderProps
 ): React.ReactNode => {
   const [settingsOpen, { open, close }] = useDisclosure(false);
-  const [isFilterCardOpen, { toggle }] = useDisclosure();
+
+  const {
+    transactionFilters,
+    setTransactionFilters,
+    isFiltersPanelOpen,
+    toggleFiltersPanel,
+  } = useTransactionFilters();
 
   return (
     <Stack className={classes.root}>
@@ -42,10 +47,10 @@ const TransactionsHeader = (
         <Group className={classes.buttonGroup}>
           <ImportTransactionsModal />
           <Button
-            variant={isFilterCardOpen ? "outline" : "primary"}
+            variant={isFiltersPanelOpen ? "outline" : "primary"}
             size="sm"
             rightSection={<FilterIcon size="1rem" />}
-            onClick={toggle}
+            onClick={toggleFiltersPanel}
           >
             Filter
           </Button>
@@ -57,10 +62,10 @@ const TransactionsHeader = (
         </Group>
       </Flex>
       <FilterCard
-        isOpen={isFilterCardOpen}
+        isOpen={isFiltersPanelOpen}
         categories={props.categories}
-        filters={props.filters}
-        setFilters={props.setFilters}
+        filters={transactionFilters ?? new Filters()}
+        setFilters={setTransactionFilters}
       />
     </Stack>
   );

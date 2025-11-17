@@ -16,9 +16,9 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { ICategoryResponse } from "~/models/category";
 import TransactionCard from "~/components/TransactionCard/TransactionCard";
+import { useTransactionFilters } from "~/components/TransactionNavigationProvider/TransactionNavigationProvider";
 
 interface TransactionCardsProps {
-  filters: Filters;
   sort: Sorts;
   sortDirection: SortDirection;
 }
@@ -26,6 +26,8 @@ interface TransactionCardsProps {
 const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const [itemsPerPage, _setItemsPerPage] = React.useState(25);
+
+  const { transactionFilters } = useTransactionFilters();
 
   const { request } = React.useContext<any>(AuthContext);
 
@@ -67,7 +69,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
 
   const filteredTransactions = getFilteredTransactions(
     transactionsQuery.data ?? [],
-    props.filters,
+    transactionFilters ?? new Filters(),
     transactionCategoriesWithCustom
   );
 
