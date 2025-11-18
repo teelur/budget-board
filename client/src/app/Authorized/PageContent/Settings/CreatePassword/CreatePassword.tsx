@@ -60,7 +60,7 @@ const CreatePassword = (): React.ReactNode => {
   });
 
   return (
-    <Card p="0.5rem" withBorder radius="md" shadow="sm">
+    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
       <Stack gap="1rem">
         <Text fw={700} size="lg">
           Create Password
