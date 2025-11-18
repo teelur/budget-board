@@ -223,10 +223,17 @@ public class AutomaticRuleService(
             Parent = tc.Parent,
         });
 
-        var allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-            customCategories
-        );
-
+        IEnumerable<ICategory> allCategories;
+        if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
+        {
+            allCategories = customCategories;
+        }
+        else
+        {
+            allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                customCategories
+            );
+        }
         var matchedTransactions = userData
             .Accounts.SelectMany(a => a.Transactions)
             .Where(t => t.Deleted == null && !(t.Account?.HideTransactions ?? false));
@@ -302,6 +309,7 @@ public class AutomaticRuleService(
                 .Include(u => u.TransactionCategories)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
+                .Include(u => u.UserSettings)
                 .AsSplitQuery()
                 .ToListAsync();
             foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));

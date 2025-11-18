@@ -52,7 +52,8 @@ public class TransactionService(
                     .Balances.Where(b => b.DateTime <= transaction.Date.ToUniversalTime())
                     .OrderByDescending(b => b.DateTime)
                     .FirstOrDefault()
-                    ?.Amount ?? 0;
+                    ?.Amount
+                ?? 0;
 
             // First, add the new balance for the new transaction.
             var newBalance = new Balance
@@ -283,9 +284,19 @@ public class TransactionService(
             Value = tc.Value,
             Parent = tc.Parent,
         });
-        var allCategories = TransactionCategoriesConstants
-            .DefaultTransactionCategories.Concat(customCategories)
-            .ToList();
+
+        IEnumerable<ICategory> allCategories;
+        if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
+        {
+            allCategories = customCategories;
+        }
+        else
+        {
+            allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                customCategories
+            );
+        }
+
         foreach (var transaction in transactions)
         {
             var account = userData.Accounts.FirstOrDefault(a =>
@@ -319,12 +330,12 @@ public class TransactionService(
 
             var parentCategory = TransactionCategoriesHelpers.GetParentCategory(
                 matchedCategory,
-                customCategories
+                allCategories
             );
 
             var childCategory = TransactionCategoriesHelpers.GetIsParentCategory(
                 matchedCategory,
-                customCategories
+                allCategories
             )
                 ? string.Empty
                 : matchedCategory;
@@ -356,6 +367,7 @@ public class TransactionService(
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
+                .Include(u => u.UserSettings)
                 .AsSplitQuery()
                 .ToListAsync();
             foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
