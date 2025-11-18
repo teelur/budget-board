@@ -223,17 +223,13 @@ public class AutomaticRuleService(
             Parent = tc.Parent,
         });
 
-        IEnumerable<ICategory> allCategories;
-        if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
-        {
-            allCategories = customCategories;
-        }
-        else
-        {
-            allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                customCategories
-            );
-        }
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
+
         var matchedTransactions = userData
             .Accounts.SelectMany(a => a.Transactions)
             .Where(t => t.Deleted == null && !(t.Account?.HideTransactions ?? false));

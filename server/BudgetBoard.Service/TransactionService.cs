@@ -285,17 +285,12 @@ public class TransactionService(
             Parent = tc.Parent,
         });
 
-        IEnumerable<ICategory> allCategories;
-        if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
-        {
-            allCategories = customCategories;
-        }
-        else
-        {
-            allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                customCategories
-            );
-        }
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
 
         foreach (var transaction in transactions)
         {

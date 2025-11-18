@@ -23,6 +23,19 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
+        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
+        {
+            Value = tc.Value,
+            Parent = tc.Parent,
+        });
+
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
+
         int newBudgetsCount = 0;
 
         foreach (var budget in budgets)
@@ -52,24 +65,6 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
             };
             userData.Budgets.Add(newBudget);
             newBudgetsCount++;
-
-            var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
-            {
-                Value = tc.Value,
-                Parent = tc.Parent,
-            });
-
-            IEnumerable<ICategory> allCategories;
-            if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
-            {
-                allCategories = customCategories;
-            }
-            else
-            {
-                allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                    customCategories
-                );
-            }
 
             var parentCategory = TransactionCategoriesHelpers.GetParentCategory(
                 budget.Category,
@@ -172,17 +167,12 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
             Parent = tc.Parent,
         });
 
-        IEnumerable<ICategory> allCategories;
-        if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
-        {
-            allCategories = customCategories;
-        }
-        else
-        {
-            allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                customCategories
-            );
-        }
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
 
         if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
         {
@@ -269,17 +259,12 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
             Parent = tc.Parent,
         });
 
-        IEnumerable<ICategory> allCategories;
-        if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
-        {
-            allCategories = customCategories;
-        }
-        else
-        {
-            allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                customCategories
-            );
-        }
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
 
         if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
         {
@@ -341,17 +326,12 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
             Parent = tc.Parent,
         });
 
-        IEnumerable<ICategory> allCategories;
-        if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
-        {
-            allCategories = customCategories;
-        }
-        else
-        {
-            allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                customCategories
-            );
-        }
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
 
         var childBudgets = userData.Budgets.Where(b =>
             !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)

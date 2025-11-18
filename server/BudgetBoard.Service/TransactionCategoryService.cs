@@ -25,17 +25,12 @@ public class TransactionCategoryService(
             Parent = tc.Parent,
         });
 
-        IEnumerable<ICategory> allCategories;
-        if (userData.UserSettings?.DisableBuiltInTransactionCategories == true)
-        {
-            allCategories = customCategories;
-        }
-        else
-        {
-            allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                customCategories
-            );
-        }
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
 
         if (
             allCategories.Any(c =>
