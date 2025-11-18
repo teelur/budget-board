@@ -223,9 +223,12 @@ public class AutomaticRuleService(
             Parent = tc.Parent,
         });
 
-        var allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-            customCategories
-        );
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
 
         var matchedTransactions = userData
             .Accounts.SelectMany(a => a.Transactions)
@@ -302,6 +305,7 @@ public class AutomaticRuleService(
                 .Include(u => u.TransactionCategories)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
+                .Include(u => u.UserSettings)
                 .AsSplitQuery()
                 .ToListAsync();
             foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));

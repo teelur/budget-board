@@ -5,7 +5,7 @@ import React from "react";
 import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
@@ -23,7 +23,7 @@ const AssetsTab = (): React.ReactNode => {
     dayjs().format(mantineDateFormat),
   ]);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const balancesQuery = useQueries({
     queries: selectedAccountIds.map((accountId: string) => ({
       queryKey: ["balances", accountId],

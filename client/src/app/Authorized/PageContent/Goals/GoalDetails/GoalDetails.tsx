@@ -14,7 +14,7 @@ import AccountItem from "~/components/AccountItem/AccountItem";
 import { IAccountResponse } from "~/models/account";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { DatesRangeValue } from "@mantine/dates";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
@@ -34,7 +34,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
     dayjs().toISOString(),
   ];
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const balancesQuery = useQueries({
     queries: (props.goal?.accounts ?? []).map((account: IAccountResponse) => ({
       queryKey: ["balances", account.id],

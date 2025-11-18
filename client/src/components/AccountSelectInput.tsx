@@ -1,6 +1,6 @@
 import { MultiSelect } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
@@ -24,7 +24,7 @@ const AccountSelectInput = ({
   maxSelectedValues = undefined,
   ...props
 }: AccountSelectInputProps): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],

@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";
@@ -28,7 +28,7 @@ interface AccountDetailsProps {
 const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const balancesQuery = useQuery({
     queryKey: ["balances", props.account?.id],
     queryFn: async (): Promise<IBalanceResponse[]> => {

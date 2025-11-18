@@ -8,7 +8,7 @@ import { Filters } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import dayjs from "dayjs";
-import { useTransactionFilters } from "~/components/TransactionNavigationProvider/TransactionNavigationProvider";
+import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 
 interface FilterCardProps {
   categories: ICategory[];

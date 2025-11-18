@@ -10,7 +10,7 @@ import React from "react";
 import { LoginCardState } from "./Welcome";
 
 import classes from "./Welcome.module.css";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
@@ -33,7 +33,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
     },
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const submitUserRegister = async (
     values: typeof form.values,

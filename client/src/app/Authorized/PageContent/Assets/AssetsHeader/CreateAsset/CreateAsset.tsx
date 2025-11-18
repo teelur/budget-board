@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetCreateRequest } from "~/models/asset";
 
@@ -25,7 +25,7 @@ const CreateAsset = (): React.ReactNode => {
     validate: isNotEmpty("Name is required"),
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const queryClient = useQueryClient();
   const doCreateAsset = useMutation({
     mutationFn: async (newAsset: IAssetCreateRequest) =>

@@ -450,6 +450,9 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("DisableBuiltInTransactionCategories")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("ForceSyncLookbackMonths")
                         .HasColumnType("integer");
 

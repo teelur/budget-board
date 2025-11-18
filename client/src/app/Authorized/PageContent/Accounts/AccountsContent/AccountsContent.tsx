@@ -1,7 +1,7 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IInstitution, InstitutionIndexRequest } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
 import { DragDropProvider } from "@dnd-kit/react";
@@ -28,7 +28,7 @@ const AccountsContent = (props: AccountsContentProps) => {
     IInstitution[]
   >([]);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const institutionQuery = useQuery({
     queryKey: ["institutions"],
     queryFn: async () => {

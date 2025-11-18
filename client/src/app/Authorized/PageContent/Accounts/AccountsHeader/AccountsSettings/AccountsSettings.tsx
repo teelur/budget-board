@@ -4,14 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { SettingsIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IAccountResponse } from "~/models/account";
 import DeletedAccountCard from "./DeletedAccountCard/DeletedAccountCard";
 
 const AccountsSettings = (): React.ReactNode => {
   const [isOpened, { open, close }] = useDisclosure(false);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const institutionsQuery = useQuery({
     queryKey: ["institutions"],

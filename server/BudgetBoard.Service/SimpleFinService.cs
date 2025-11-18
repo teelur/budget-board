@@ -530,9 +530,12 @@ public class SimpleFinService(
             Parent = tc.Parent,
         });
 
-        var allCategories = TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-            customCategories
-        );
+        var allCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories == true
+                ? customCategories
+                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
+                    customCategories
+                );
 
         var rules = await _automaticRuleService.ReadAutomaticRulesAsync(userData.Id);
 

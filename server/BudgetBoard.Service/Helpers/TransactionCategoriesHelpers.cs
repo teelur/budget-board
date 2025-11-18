@@ -16,10 +16,9 @@ public static class TransactionCategoriesHelpers
     /// <returns>
     /// The name of the parent category if found; otherwise, an empty string.
     /// </returns>
-    public static string GetParentCategory(string category, IEnumerable<ICategory> customCategories)
+    public static string GetParentCategory(string category, IEnumerable<ICategory> categories)
     {
-        var allCategories = GetAllCategories(customCategories);
-        var foundCategory = allCategories.FirstOrDefault(c =>
+        var foundCategory = categories.FirstOrDefault(c =>
             c.Value.Equals(category, StringComparison.CurrentCultureIgnoreCase)
         );
 
@@ -42,26 +41,23 @@ public static class TransactionCategoriesHelpers
     /// <returns>
     /// True if the specified category is a parent category; otherwise, false.
     /// </returns>
-    public static bool GetIsParentCategory(string category, IEnumerable<ICategory> customCategories)
+    public static bool GetIsParentCategory(string category, IEnumerable<ICategory> categories)
     {
         if (string.IsNullOrEmpty(category))
         {
             // Empty category is Uncategorized, which should be counted as a parent.
             return true;
         }
-        var allCategories = GetAllCategories(customCategories);
-        var foundCategory = allCategories.FirstOrDefault(c =>
+
+        var foundCategory = categories.FirstOrDefault(c =>
             c.Value.Equals(category, StringComparison.CurrentCultureIgnoreCase)
         );
         if (foundCategory != null)
         {
-            return allCategories.Any(c =>
+            return categories.Any(c =>
                 c.Parent.Equals(foundCategory.Value, StringComparison.CurrentCultureIgnoreCase)
             );
         }
         return false;
     }
-
-    private static IList<ICategory> GetAllCategories(IEnumerable<ICategory> customCategories) =>
-        [.. TransactionCategoriesConstants.DefaultTransactionCategories, .. customCategories];
 }

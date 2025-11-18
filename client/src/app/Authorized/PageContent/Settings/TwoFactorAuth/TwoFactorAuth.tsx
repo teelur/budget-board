@@ -1,12 +1,8 @@
-import classes from "./Settings.module.css";
-
 import {
   Badge,
   Card,
-  CardSection,
   Group,
   LoadingOverlay,
-  Title,
   Text,
   Code,
   Button,
@@ -16,7 +12,7 @@ import {
   Skeleton,
 } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
@@ -55,7 +51,7 @@ const TwoFactorAuth = (): React.ReactNode => {
     },
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const twoFactorAuthQuery = useQuery({
     queryKey: ["twoFactorAuth"],
@@ -98,6 +94,7 @@ const TwoFactorAuth = (): React.ReactNode => {
         color: "green",
         message: "2FA successfully updated.",
       });
+
       if (data.recoveryCodes) {
         setRecoveryCodes(data.recoveryCodes);
       } else {
@@ -177,6 +174,7 @@ const TwoFactorAuth = (): React.ReactNode => {
           <Stack gap="0.5rem">
             <Button
               variant="filled"
+              bg="red"
               onClick={() =>
                 doSetTwoFactorAuth.mutate({
                   enable: false,
@@ -276,15 +274,17 @@ const TwoFactorAuth = (): React.ReactNode => {
   };
 
   if (twoFactorAuthQuery.isPending) {
-    return <Skeleton height={300} radius="md" className={classes.skeleton} />;
+    return <Skeleton height={300} radius="md" />;
   }
 
   return (
-    <Card className={classes.card} withBorder radius="md" shadow="sm">
+    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
       <LoadingOverlay visible={doSetTwoFactorAuth.isPending} />
-      <CardSection className={classes.cardSection}>
-        <Group>
-          <Title order={3}>Two Factor Authentication</Title>
+      <Stack gap="1rem">
+        <Group gap="1rem">
+          <Text fw={700} size="lg">
+            Two Factor Authentication
+          </Text>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
             <Badge color="green" maw={80}>
               Enabled
@@ -295,10 +295,8 @@ const TwoFactorAuth = (): React.ReactNode => {
             </Badge>
           )}
         </Group>
-      </CardSection>
-      <CardSection className={classes.cardSection}>
         {getAuthenticatorCardContent()}
-      </CardSection>
+      </Stack>
     </Card>
   );
 };

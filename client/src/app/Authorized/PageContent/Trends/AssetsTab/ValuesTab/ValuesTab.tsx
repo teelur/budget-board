@@ -5,7 +5,7 @@ import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import React from "react";
 import AssetsSelectHeader from "~/components/AssetsSelectHeader/AssetsSelectHeader";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
 import { IAssetResponse } from "~/models/asset";
@@ -18,7 +18,7 @@ const ValuesTab = (): React.ReactNode => {
     dayjs().format(mantineDateFormat),
   ]);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const valuesQuery = useQueries({
     queries: selectedAssetIds.map((assetId: string) => ({
       queryKey: ["values", assetId],

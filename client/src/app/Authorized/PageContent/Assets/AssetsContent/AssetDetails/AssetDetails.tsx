@@ -12,7 +12,7 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
 import AddValue from "./AddValue/AddValue";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IValueResponse } from "~/models/value";
 import { AxiosResponse } from "axios";
@@ -30,7 +30,7 @@ interface AssetDetailsProps {
 const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const valuesQuery = useQuery({
     queryKey: ["values", props.asset?.id],
     queryFn: async (): Promise<IValueResponse[]> => {

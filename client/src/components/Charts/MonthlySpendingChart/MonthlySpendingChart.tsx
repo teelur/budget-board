@@ -5,7 +5,7 @@ import { buildMonthlySpendingChartData } from "~/helpers/charts";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Group, Skeleton, Stack, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 
@@ -23,7 +23,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
     (a, b) => a.getTime() - b.getTime()
   );
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

@@ -2,7 +2,7 @@ import classes from "./AccountsCard.module.css";
 
 import { Card, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
@@ -10,7 +10,7 @@ import InstitutionItem from "./InstitutionItems/InstitutionItem";
 import { IAccountResponse } from "~/models/account";
 
 const AccountsCard = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const institutionQuery = useQuery({
     queryKey: ["institutions"],
     queryFn: async (): Promise<IInstitution[]> => {

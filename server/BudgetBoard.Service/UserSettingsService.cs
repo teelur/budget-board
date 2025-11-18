@@ -91,6 +91,12 @@ public class UserSettingsService(
                 userSettingsUpdateRequest.ForceSyncLookbackMonths;
         }
 
+        if (userSettingsUpdateRequest.DisableBuiltInTransactionCategories != null)
+        {
+            userSettings.DisableBuiltInTransactionCategories = (bool)
+                userSettingsUpdateRequest.DisableBuiltInTransactionCategories;
+        }
+
         await _userDataContext.SaveChangesAsync();
     }
 

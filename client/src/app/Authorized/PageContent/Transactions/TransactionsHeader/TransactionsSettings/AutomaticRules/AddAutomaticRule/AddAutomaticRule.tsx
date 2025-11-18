@@ -16,7 +16,7 @@ import {
 } from "~/models/automaticRule";
 
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 const AddAutomaticRule = (): React.ReactNode => {
   const defaultField =
@@ -46,7 +46,7 @@ const AddAutomaticRule = (): React.ReactNode => {
     },
   ]);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doAddRule = useMutation({

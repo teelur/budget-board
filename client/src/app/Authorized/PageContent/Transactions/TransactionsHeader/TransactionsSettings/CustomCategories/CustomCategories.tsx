@@ -3,14 +3,14 @@ import classes from "./CustomCategories.module.css";
 import { Flex, Group, Stack, Text } from "@mantine/core";
 import React from "react";
 import AddCategory from "./AddCategory/AddCategory";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ICategoryResponse } from "~/models/category";
 import CustomCategoryCard from "./CustomCategoryCard/CustomCategoryCard";
-import { defaultTransactionCategories } from "~/models/transaction";
 
 const CustomCategories = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
+
   const transactionCategoriesQuery = useQuery({
     queryKey: ["transactionCategories"],
     queryFn: async () => {
@@ -27,16 +27,12 @@ const CustomCategories = (): React.ReactNode => {
     },
   });
 
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
-
   return (
     <Stack gap="0.5rem">
       <Text c="dimmed" size="sm" fw={600}>
         Create custom categories to organize your transactions.
       </Text>
-      <AddCategory categories={transactionCategoriesWithCustom} />
+      <AddCategory />
       <Stack>
         <Group px="0.5rem" justify="space-between">
           <Flex className={classes.nameContainer}>

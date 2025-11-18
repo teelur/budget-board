@@ -1,4 +1,4 @@
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { translateAxiosError } from "~/helpers/requests";
 import {
@@ -13,24 +13,22 @@ import {
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { ICategory, ICategoryCreateRequest } from "~/models/category";
+import { ICategoryCreateRequest } from "~/models/category";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
-
-interface AddCategoryProps {
-  categories: ICategory[];
-}
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface FormValues {
   name: string;
   parent: string;
 }
 
-const AddCategory = (props: AddCategoryProps): React.ReactNode => {
+const AddCategory = (): React.ReactNode => {
   const [isChildCategory, setIsChildCategory] = React.useState(false);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { transactionCategories } = useTransactionCategories();
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doAddCategory = useMutation({
@@ -56,7 +54,7 @@ const AddCategory = (props: AddCategoryProps): React.ReactNode => {
     },
   });
 
-  const parentCategories = props.categories.filter(
+  const parentCategories = transactionCategories.filter(
     (category) => category.parent?.length === 0
   );
 
