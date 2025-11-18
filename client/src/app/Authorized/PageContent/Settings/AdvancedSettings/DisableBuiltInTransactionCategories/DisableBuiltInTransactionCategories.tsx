@@ -55,17 +55,22 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   return (
     <Stack gap="0.25rem">
       <Text size="sm" fw={600}>
-        Disable Built-In Transaction Categories
+        Built-In Transaction Categories
       </Text>
       <Text size="xs" c="dimmed">
-        Disable the built-in transaction categories that come with Budget Board.
-        This will hide them from all category selection dropdowns.
+        You can disable the built-in transaction categories that come with
+        Budget Board. This will hide them from all category selection dropdowns
+        and allow you to solely use your custom categories.
+      </Text>
+      <Text size="xs" c="dimmed" fw={600}>
+        Note: This may cause issues with existing transactions/budgets that use
+        these categories.
       </Text>
       <Button
         bg={
           userSettingsQuery.data?.disableBuiltInTransactionCategories
-            ? ""
-            : "red"
+            ? "red"
+            : ""
         }
         variant="primary"
         size="xs"
@@ -78,8 +83,8 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
         }}
       >
         {userSettingsQuery.data?.disableBuiltInTransactionCategories
-          ? "Enable"
-          : "Disable"}
+          ? "Disabled"
+          : "Enabled"}
       </Button>
     </Stack>
   );
