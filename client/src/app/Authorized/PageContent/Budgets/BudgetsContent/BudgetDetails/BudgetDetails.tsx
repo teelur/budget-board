@@ -7,14 +7,11 @@ import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/Month
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { areStringsEqual } from "~/helpers/utils";
-import { ICategoryResponse } from "~/models/category";
-import {
-  defaultTransactionCategories,
-  ITransaction,
-} from "~/models/transaction";
+import { ITransaction } from "~/models/transaction";
 import TransactionCards from "./TransactionCards/TransactionCards";
 import dayjs from "dayjs";
 import { filterHiddenTransactions } from "~/helpers/transactions";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -26,7 +23,9 @@ interface BudgetDetailsProps {
 const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const chartLookbackMonths = 6;
 
+  const { transactionCategories } = useTransactionCategories();
   const { request } = React.useContext<any>(AuthContext);
+
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
@@ -43,26 +42,6 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     },
   });
 
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
-
   const transactionsForCategory = filterHiddenTransactions(
     transactionsQuery.data ?? []
   )
@@ -75,7 +54,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     .filter((transaction) => {
       if (
         !props.category ||
-        getIsParentCategory(props.category, transactionCategoriesWithCustom)
+        getIsParentCategory(props.category, transactionCategories)
       ) {
         return areStringsEqual(
           transaction.category ?? "",
@@ -98,7 +77,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   );
 
   const isExpenseCategory = !areStringsEqual(
-    getParentCategory(props.category ?? "", transactionCategoriesWithCustom),
+    getParentCategory(props.category ?? "", transactionCategories),
     "income"
   );
 
@@ -122,7 +101,6 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       }}
     >
       {transactionsQuery.isPending ||
-      transactionCategoriesQuery.isPending ||
       props.month === null ||
       props.category === null ? (
         <Skeleton height={425} radius="lg" />
@@ -178,7 +156,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
               <Accordion.Panel>
                 <TransactionCards
                   transactions={transactionsForCategoryForCurrentMonth ?? []}
-                  categories={transactionCategoriesWithCustom}
+                  categories={transactionCategories}
                 />
               </Accordion.Panel>
             </Accordion.Item>

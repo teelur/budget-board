@@ -1,8 +1,6 @@
 import { ActionIcon, Group, Stack, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import {
   ActionOperators,
   FieldToOperatorType,
@@ -11,10 +9,9 @@ import {
   OperatorTypes,
   TransactionFields,
 } from "~/models/automaticRule";
-import { ICategoryResponse } from "~/models/category";
-import { defaultTransactionCategories } from "~/models/transaction";
 import ActionItem from "./ActionItem/ActionItem";
 import ConditionItem from "./ConditionItem/ConditionItem";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface EditableAutomaticRuleContentProps {
   conditionItems: IRuleParameterEdit[];
@@ -29,27 +26,7 @@ const EditableAutomaticRuleContent = (
   const defaultField =
     TransactionFields.find((field) => field.value === "merchant")?.value ?? "";
 
-  const { request } = React.useContext<any>(AuthContext);
-
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
+  const { transactionCategories } = useTransactionCategories();
 
   const addNewCondition = () => {
     props.setConditionItems((prev) => [
@@ -114,7 +91,7 @@ const EditableAutomaticRuleContent = (
             allowDelete={props.conditionItems.length > 1}
             doDelete={removeCondition}
             index={index}
-            categories={transactionCategoriesWithCustom}
+            categories={transactionCategories}
           />
         ))}
       </Stack>
@@ -140,7 +117,7 @@ const EditableAutomaticRuleContent = (
             allowDelete={props.actionItems.length > 1}
             doDelete={removeAction}
             index={index}
-            categories={transactionCategoriesWithCustom}
+            categories={transactionCategories}
           />
         ))}
       </Stack>

@@ -8,21 +8,20 @@ import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
 } from "~/helpers/transactions";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { IBudget } from "~/models/budget";
 import { AxiosResponse } from "axios";
-import {
-  defaultTransactionCategories,
-  ITransaction,
-} from "~/models/transaction";
-import { ICategoryResponse } from "~/models/category";
+import { ITransaction } from "~/models/transaction";
 import BudgetsContent from "./BudgetsContent/BudgetsContent";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 const Budgets = (): React.ReactNode => {
   const [selectedDates, setSelectedDates] = React.useState<Date[]>([
     initCurrentMonth(),
   ]);
+
+  const { transactionCategories } = useTransactionCategories();
 
   const { request } = React.useContext<any>(AuthContext);
 
@@ -79,26 +78,6 @@ const Budgets = (): React.ReactNode => {
     },
   });
 
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
-
   // We need to filter out the transactions labelled with 'Hide From Budgets'
   const transactionsWithoutHidden = filterHiddenTransactions(
     transactionsForMonthsQuery.data ?? []
@@ -112,7 +91,7 @@ const Budgets = (): React.ReactNode => {
   return (
     <Stack className={classes.root}>
       <BudgetsToolbar
-        categories={transactionCategoriesWithCustom}
+        categories={transactionCategories}
         selectedDates={selectedDates}
         setSelectedDates={setSelectedDates}
         timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
@@ -121,20 +100,16 @@ const Budgets = (): React.ReactNode => {
           budgetsQuery.data.length === 0 &&
           selectedDates.length === 1
         }
-        isPending={
-          budgetsQuery.isPending || transactionCategoriesQuery.isPending
-        }
+        isPending={budgetsQuery.isPending}
       />
       <BudgetsContent
         budgets={budgetsQuery.data ?? []}
-        categories={transactionCategoriesWithCustom}
+        categories={transactionCategories}
         transactions={transactionsWithoutHidden}
         selectedDate={
           selectedDates.length === 1 ? selectedDates[0] ?? null : null
         }
-        isPending={
-          budgetsQuery.isPending || transactionCategoriesQuery.isPending
-        }
+        isPending={budgetsQuery.isPending}
       />
     </Stack>
   );

@@ -12,11 +12,10 @@ import {
 import ConditionItem from "./ConditionItem/ConditionItem";
 import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
-import { ICategoryResponse } from "~/models/category";
-import { defaultTransactionCategories } from "~/models/transaction";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -32,27 +31,8 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
     props.rule.actions ?? []
   );
 
+  const { transactionCategories } = useTransactionCategories();
   const { request } = React.useContext<any>(AuthContext);
-
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -192,7 +172,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
               <ConditionItem
                 key={condition.id}
                 condition={condition}
-                categories={transactionCategoriesWithCustom}
+                categories={transactionCategories}
                 currency={userSettingsQuery.data?.currency ?? ""}
               />
             ))}
@@ -205,7 +185,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
               <ActionItem
                 key={action.id}
                 action={action}
-                categories={transactionCategoriesWithCustom}
+                categories={transactionCategories}
                 currency={userSettingsQuery.data?.currency ?? ""}
               />
             ))}

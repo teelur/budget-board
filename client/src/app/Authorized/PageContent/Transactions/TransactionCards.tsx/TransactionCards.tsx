@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  defaultTransactionCategories,
-  Filters,
-  ITransaction,
-} from "~/models/transaction";
+import { Filters, ITransaction } from "~/models/transaction";
 import { Sorts } from "../TransactionsHeader/SortMenu/SortMenuHelpers";
 import { SortDirection } from "~/components/SortButton";
 import {
@@ -14,9 +10,9 @@ import { Group, Pagination, Skeleton, Stack, Text } from "@mantine/core";
 import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
-import { ICategoryResponse } from "~/models/category";
 import TransactionCard from "~/components/TransactionCard/TransactionCard";
-import { useTransactionFilters } from "~/providers/TransactionNavigationProvider/TransactionNavigationProvider";
+import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface TransactionCardsProps {
   sort: Sorts;
@@ -28,28 +24,8 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const [itemsPerPage, _setItemsPerPage] = React.useState(25);
 
   const { transactionFilters } = useTransactionFilters();
-
+  const { transactionCategories } = useTransactionCategories();
   const { request } = React.useContext<any>(AuthContext);
-
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
 
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],
@@ -70,7 +46,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const filteredTransactions = getFilteredTransactions(
     transactionsQuery.data ?? [],
     transactionFilters ?? new Filters(),
-    transactionCategoriesWithCustom
+    transactionCategories
   );
 
   const sortedFilteredTransactions = sortTransactions(
@@ -81,7 +57,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
 
   return (
     <Stack gap={10}>
-      {transactionsQuery.isPending || transactionCategoriesQuery.isPending ? (
+      {transactionsQuery.isPending ? (
         Array.from({ length: itemsPerPage }).map((_, index) => (
           <Skeleton key={index} height={40} radius="md" />
         ))
@@ -97,7 +73,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                 <TransactionCard
                   key={transaction.id}
                   transaction={transaction}
-                  categories={transactionCategoriesWithCustom}
+                  categories={transactionCategories}
                 />
               ))
           ) : (
