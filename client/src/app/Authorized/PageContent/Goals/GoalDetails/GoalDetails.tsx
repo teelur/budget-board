@@ -14,7 +14,7 @@ import AccountItem from "~/components/AccountItem/AccountItem";
 import { IAccountResponse } from "~/models/account";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { DatesRangeValue } from "@mantine/dates";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";

@@ -2,7 +2,7 @@ import classes from "./AccountsCard.module.css";
 
 import { Card, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";

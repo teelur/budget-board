@@ -3,7 +3,7 @@ import classes from "./CustomCategories.module.css";
 import { Flex, Group, Stack, Text } from "@mantine/core";
 import React from "react";
 import AddCategory from "./AddCategory/AddCategory";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ICategoryResponse } from "~/models/category";
 import CustomCategoryCard from "./CustomCategoryCard/CustomCategoryCard";

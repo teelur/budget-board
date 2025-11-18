@@ -5,7 +5,7 @@ import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";

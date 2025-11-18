@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";

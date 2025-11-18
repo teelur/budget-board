@@ -12,7 +12,7 @@ import TransactionsSettings from "./TransactionsSettings/TransactionsSettings";
 import { ICategory } from "~/models/category";
 import CreateTransactionModal from "./CreateTransactionModal/CreateTransactionModal";
 import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransactionsModal";
-import { useTransactionFilters } from "~/components/TransactionNavigationProvider/TransactionNavigationProvider";
+import { useTransactionFilters } from "~/providers/TransactionNavigationProvider/TransactionNavigationProvider";
 
 interface TransactionsHeaderProps {
   sort: Sorts;

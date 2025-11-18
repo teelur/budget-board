@@ -4,7 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
 
 const CreatePassword = (): React.ReactNode => {

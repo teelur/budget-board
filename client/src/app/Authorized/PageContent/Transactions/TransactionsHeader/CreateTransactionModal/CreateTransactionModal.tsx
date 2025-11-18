@@ -16,7 +16,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import AccountSelectInput from "~/components/AccountSelectInput";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";

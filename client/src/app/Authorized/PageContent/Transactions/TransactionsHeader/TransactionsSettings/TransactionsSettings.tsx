@@ -1,7 +1,7 @@
 import { Accordion, Modal, Stack, Text } from "@mantine/core";
 import React from "react";
 import CustomCategories from "./CustomCategories/CustomCategories";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";

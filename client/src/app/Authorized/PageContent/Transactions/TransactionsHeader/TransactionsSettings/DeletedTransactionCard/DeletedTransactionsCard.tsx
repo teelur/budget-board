@@ -1,4 +1,4 @@
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import classes from "./DeletedTransactionsCard.module.css";
 
 import { getDaysSinceDate } from "~/helpers/datetime";

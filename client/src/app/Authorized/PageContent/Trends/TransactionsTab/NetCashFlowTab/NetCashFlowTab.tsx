@@ -11,7 +11,7 @@ import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
 } from "~/helpers/transactions";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries } from "@tanstack/react-query";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";

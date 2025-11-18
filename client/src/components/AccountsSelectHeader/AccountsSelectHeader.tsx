@@ -1,5 +1,5 @@
 import AccountSelectInput from "~/components/AccountSelectInput";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
 import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
 import { IAccountResponse } from "~/models/account";

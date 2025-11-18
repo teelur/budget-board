@@ -8,7 +8,7 @@ import {
   getAccountsOfTypes,
   sumAccountsTotalBalance,
 } from "~/helpers/accounts";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";

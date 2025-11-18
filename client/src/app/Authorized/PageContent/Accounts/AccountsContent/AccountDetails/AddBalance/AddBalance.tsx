@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceCreateRequest } from "~/models/balance";

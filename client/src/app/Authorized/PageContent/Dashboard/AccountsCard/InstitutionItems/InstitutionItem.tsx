@@ -5,7 +5,7 @@ import { IInstitution } from "~/models/institution";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
 import { Filters } from "~/models/transaction";
-import { useTransactionFilters } from "~/components/TransactionNavigationProvider/TransactionNavigationProvider";
+import { useTransactionFilters } from "~/providers/TransactionNavigationProvider/TransactionNavigationProvider";
 
 interface InstitutionItemProps {
   institution: IInstitution;

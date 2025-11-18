@@ -16,7 +16,7 @@ import {
 } from "~/models/automaticRule";
 
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 
 const AddAutomaticRule = (): React.ReactNode => {
   const defaultField =

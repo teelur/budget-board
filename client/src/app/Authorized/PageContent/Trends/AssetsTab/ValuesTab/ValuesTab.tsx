@@ -5,7 +5,7 @@ import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import React from "react";
 import AssetsSelectHeader from "~/components/AssetsSelectHeader/AssetsSelectHeader";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
 import { IAssetResponse } from "~/models/asset";

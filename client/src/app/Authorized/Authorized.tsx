@@ -9,7 +9,7 @@ import React from "react";
 import PageContent, { Pages } from "./PageContent/PageContent";
 import Header from "./Header/Header";
 import { useDisclosure } from "@mantine/hooks";
-import { TransactionFiltersProvider } from "~/components/TransactionNavigationProvider/TransactionNavigationProvider";
+import { TransactionFiltersProvider } from "~/providers/TransactionNavigationProvider/TransactionNavigationProvider";
 
 const Authorized = (): React.ReactNode => {
   const [currentPage, setCurrentPage] = React.useState(Pages.Dashboard);

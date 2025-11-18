@@ -7,7 +7,7 @@ import { Group, Skeleton, Text } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";

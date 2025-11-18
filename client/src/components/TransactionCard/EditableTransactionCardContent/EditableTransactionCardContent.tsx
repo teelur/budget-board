@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";

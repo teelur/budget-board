@@ -9,7 +9,7 @@ import {
   filterHiddenTransactions,
 } from "~/helpers/transactions";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { IBudget } from "~/models/budget";
 import { AxiosResponse } from "axios";
 import {

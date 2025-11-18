@@ -3,7 +3,7 @@ import { notifications } from "@mantine/notifications";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";

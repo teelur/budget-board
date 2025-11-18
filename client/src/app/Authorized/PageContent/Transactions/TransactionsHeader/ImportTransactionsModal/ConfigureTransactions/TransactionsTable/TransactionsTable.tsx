@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";

@@ -1,6 +1,6 @@
 import classes from "./SpendingTab.module.css";
 
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import {

@@ -2,7 +2,7 @@ import { ActionIcon, Group, Stack, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import {
   ActionOperators,
   FieldToOperatorType,

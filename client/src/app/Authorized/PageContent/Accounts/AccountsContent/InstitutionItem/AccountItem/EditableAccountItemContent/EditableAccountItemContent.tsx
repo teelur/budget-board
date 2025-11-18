@@ -16,7 +16,7 @@ import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { convertNumberToCurrency } from "~/helpers/currency";

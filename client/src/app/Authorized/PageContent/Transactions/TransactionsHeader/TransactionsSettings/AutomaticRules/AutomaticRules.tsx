@@ -1,5 +1,5 @@
 import { Stack, Text } from "@mantine/core";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { IAutomaticRuleResponse } from "~/models/automaticRule";

@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";

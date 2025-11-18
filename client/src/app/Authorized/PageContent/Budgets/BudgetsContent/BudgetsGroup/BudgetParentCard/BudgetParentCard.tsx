@@ -27,7 +27,7 @@ import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
 import { notifications } from "@mantine/notifications";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IUserSettings } from "~/models/userSettings";
 

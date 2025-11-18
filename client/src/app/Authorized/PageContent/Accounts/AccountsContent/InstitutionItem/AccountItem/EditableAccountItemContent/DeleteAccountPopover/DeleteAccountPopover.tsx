@@ -1,4 +1,4 @@
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { ActionIcon, Button, Checkbox, Popover, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";

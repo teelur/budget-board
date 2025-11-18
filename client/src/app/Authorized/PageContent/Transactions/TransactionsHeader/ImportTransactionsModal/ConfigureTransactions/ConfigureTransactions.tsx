@@ -16,7 +16,7 @@ import ColumnsSelect, { ISelectedColumns } from "./ColumnsSelect/ColumnsSelect";
 import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";

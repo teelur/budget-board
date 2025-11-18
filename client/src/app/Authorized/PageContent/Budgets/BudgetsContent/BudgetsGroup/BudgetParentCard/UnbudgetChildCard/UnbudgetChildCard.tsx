@@ -8,7 +8,7 @@ import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { CornerDownRight, PlusIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";

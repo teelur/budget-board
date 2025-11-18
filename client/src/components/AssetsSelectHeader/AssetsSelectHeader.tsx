@@ -1,4 +1,4 @@
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
 import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
 import { useQuery } from "@tanstack/react-query";

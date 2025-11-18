@@ -6,7 +6,7 @@ import { DatesRangeValue } from "@mantine/dates";
 import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";

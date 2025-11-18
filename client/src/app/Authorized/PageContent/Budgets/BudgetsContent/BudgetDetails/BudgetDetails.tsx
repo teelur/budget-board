@@ -2,7 +2,7 @@ import { Accordion, Drawer, Group, Skeleton, Stack, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";

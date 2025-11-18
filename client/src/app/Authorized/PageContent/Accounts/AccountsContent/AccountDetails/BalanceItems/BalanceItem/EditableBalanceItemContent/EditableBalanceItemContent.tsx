@@ -14,7 +14,7 @@ import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceResponse, IBalanceUpdateRequest } from "~/models/balance";

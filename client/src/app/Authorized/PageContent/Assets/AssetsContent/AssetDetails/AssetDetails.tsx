@@ -12,7 +12,7 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
 import AddValue from "./AddValue/AddValue";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IValueResponse } from "~/models/value";
 import { AxiosResponse } from "axios";

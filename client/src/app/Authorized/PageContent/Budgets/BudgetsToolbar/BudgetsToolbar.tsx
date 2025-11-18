@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import AddBudget from "./AddBudget/AddBudget";
 import { ICategory } from "~/models/category";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IBudget, IBudgetCreateRequest } from "~/models/budget";
 import { AxiosError, AxiosResponse } from "axios";

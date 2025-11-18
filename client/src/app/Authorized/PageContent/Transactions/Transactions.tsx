@@ -7,7 +7,7 @@ import { SortDirection } from "~/components/SortButton";
 import { defaultTransactionCategories } from "~/models/transaction";
 import { Sorts } from "./TransactionsHeader/SortMenu/SortMenuHelpers";
 import TransactionCards from "./TransactionCards.tsx/TransactionCards";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ICategoryResponse } from "~/models/category";
 

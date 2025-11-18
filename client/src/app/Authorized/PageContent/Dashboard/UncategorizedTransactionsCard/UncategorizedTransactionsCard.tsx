@@ -1,6 +1,6 @@
 import classes from "./UncategorizedTransactionsCard.module.css";
 
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import {
   getTransactionsByCategory,
   getVisibleTransactions,

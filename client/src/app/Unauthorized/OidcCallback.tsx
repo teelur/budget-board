@@ -5,7 +5,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import {
   AuthContext,
   AuthContextValue,
-} from "~/components/AuthProvider/AuthProvider";
+} from "~/providers/AuthProvider/AuthProvider";
 import { useNavigate } from "react-router";
 import { Center, Loader } from "@mantine/core";
 import { IOidcCallbackRequest, IOidcCallbackResponse } from "~/models/oidc";

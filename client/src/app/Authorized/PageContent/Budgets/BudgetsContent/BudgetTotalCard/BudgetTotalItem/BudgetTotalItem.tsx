@@ -4,7 +4,7 @@ import { BudgetValueType, getBudgetValueColor } from "~/helpers/budgets";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Flex, Group, Progress, Stack, Text } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";

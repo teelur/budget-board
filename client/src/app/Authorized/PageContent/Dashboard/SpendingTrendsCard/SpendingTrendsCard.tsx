@@ -1,6 +1,6 @@
 import classes from "./SpendingTrendsCard.module.css";
 
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo, getDaysInMonth } from "~/helpers/datetime";

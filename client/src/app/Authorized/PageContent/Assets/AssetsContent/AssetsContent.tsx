@@ -1,7 +1,7 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { IAssetIndexRequest, IAssetResponse } from "~/models/asset";
 import AssetItem from "./AssetItem/AssetItem";
 import { DragDropProvider } from "@dnd-kit/react";

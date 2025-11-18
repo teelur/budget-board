@@ -10,7 +10,7 @@ import TwoFactorAuth from "./TwoFactorAuth/TwoFactorAuth";
 import AdvancedSettings from "./AdvancedSettings/AdvancedSettings";
 import OidcSettings from "./OidcSettings/OidcSettings";
 import { useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosResponse } from "axios";
 import CreatePassword from "./CreatePassword/CreatePassword";

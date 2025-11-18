@@ -1,6 +1,6 @@
 import classes from "./Goals.module.css";
 
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { Skeleton, Stack } from "@mantine/core";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { IGoalResponse } from "~/models/goal";

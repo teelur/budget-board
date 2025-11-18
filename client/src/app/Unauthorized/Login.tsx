@@ -10,7 +10,7 @@ import {
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "./Welcome";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";

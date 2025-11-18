@@ -8,7 +8,7 @@ import {
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Group, Skeleton, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
