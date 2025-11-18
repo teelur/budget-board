@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { PencilIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
@@ -30,7 +30,7 @@ const EditableInstitutionItemContent = (
     initialValue: props.institution.name,
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doUpdateInstitution = useMutation({

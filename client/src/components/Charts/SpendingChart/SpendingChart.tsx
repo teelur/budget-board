@@ -8,7 +8,7 @@ import {
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Group, Skeleton, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
@@ -24,7 +24,7 @@ interface SpendingChartProps {
 const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

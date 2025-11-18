@@ -16,7 +16,7 @@ import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
@@ -68,7 +68,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     initialValue: props.account.hideTransactions ?? false,
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doUpdateAccount = useMutation({

@@ -26,7 +26,7 @@ export const TransactionCategoryProvider = (
     ICategory[]
   >([]);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

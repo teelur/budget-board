@@ -1,6 +1,6 @@
 import classes from "./UncategorizedTransactionsCard.module.css";
 
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   getTransactionsByCategory,
   getVisibleTransactions,
@@ -26,7 +26,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   const [activePage, setPage] = React.useState(1);
 
   const { transactionCategories } = useTransactionCategories();
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],

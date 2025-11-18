@@ -10,7 +10,7 @@ import React from "react";
 import { LoginCardState } from "./Welcome";
 
 import classes from "./Welcome.module.css";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
@@ -34,7 +34,7 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
     },
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const submitPasswordUpdate = async (
     values: typeof form.values,

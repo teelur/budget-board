@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceCreateRequest } from "~/models/balance";
@@ -24,7 +24,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
     initialValue: 0,
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doCreateBalance = useMutation({

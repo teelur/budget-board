@@ -4,13 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { SettingsIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import DeletedAssetCard from "./DeletedAssetCard/DeletedAssetCard";
 
 const AssetsSettings = (): React.ReactNode => {
   const [isOpened, { open, close }] = useDisclosure(false);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const assetsQuery = useQuery({
     queryKey: ["assets"],

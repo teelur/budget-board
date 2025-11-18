@@ -7,7 +7,7 @@ import { Group, Skeleton, Text } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
@@ -28,7 +28,7 @@ interface NetCashFlowChartProps {
 }
 
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

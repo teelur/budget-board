@@ -3,7 +3,7 @@ import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { BarChart } from "@mantine/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
@@ -27,7 +27,7 @@ interface ValueChartProps {
 }
 
 const ValueChart = (props: ValueChartProps): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

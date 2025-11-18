@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { ImportIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   IAccountNameToIDKeyValuePair,
@@ -86,7 +86,7 @@ const ImportTransactionsModal = () => {
     setAccountNameToAccountIdMap(newMap);
   }, [importData]);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doImportMutation = useMutation({

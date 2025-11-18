@@ -9,7 +9,7 @@ import {
   filterHiddenTransactions,
 } from "~/helpers/transactions";
 import { useQueries } from "@tanstack/react-query";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IBudget } from "~/models/budget";
 import { AxiosResponse } from "axios";
 import { ITransaction } from "~/models/transaction";
@@ -23,7 +23,7 @@ const Budgets = (): React.ReactNode => {
 
   const { transactionCategories } = useTransactionCategories();
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const budgetsQuery = useQueries({
     queries: selectedDates.map((date: Date) => ({

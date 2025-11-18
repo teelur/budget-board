@@ -13,7 +13,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { SendIcon, SettingsIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   IUserSettings,
@@ -23,7 +23,7 @@ import {
 const BudgetSettings = (): React.ReactNode => {
   const [settingsOpen, { open, close }] = useDisclosure(false);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

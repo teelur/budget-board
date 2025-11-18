@@ -1,4 +1,4 @@
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { translateAxiosError } from "~/helpers/requests";
 import {
@@ -28,7 +28,7 @@ const AddCategory = (): React.ReactNode => {
   const [isChildCategory, setIsChildCategory] = React.useState(false);
 
   const { transactionCategories } = useTransactionCategories();
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doAddCategory = useMutation({

@@ -11,7 +11,7 @@ import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
 } from "~/helpers/transactions";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries } from "@tanstack/react-query";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
@@ -28,7 +28,7 @@ const NetCashFlowTab = (): React.ReactNode => {
 
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const transactionsQuery = useQueries({
     queries: getUniqueYears(selectedMonths).map((year: number) => ({
       queryKey: ["transactions", { year }],

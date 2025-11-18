@@ -1,4 +1,4 @@
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { ActionIcon, Button, Checkbox, Popover, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -17,7 +17,7 @@ const DeleteAccountPopover = (
 ): React.ReactNode => {
   const [deleteTransactions, { toggle }] = useDisclosure(false);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
 

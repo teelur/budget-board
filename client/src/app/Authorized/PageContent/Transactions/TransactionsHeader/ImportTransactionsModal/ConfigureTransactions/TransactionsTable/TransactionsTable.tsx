@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
@@ -24,7 +24,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 10;
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

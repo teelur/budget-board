@@ -7,7 +7,7 @@ import {
   sortTransactions,
 } from "~/helpers/transactions";
 import { Group, Pagination, Skeleton, Stack, Text } from "@mantine/core";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import TransactionCard from "~/components/TransactionCard/TransactionCard";
@@ -25,7 +25,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
 
   const { transactionFilters } = useTransactionFilters();
   const { transactionCategories } = useTransactionCategories();
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],

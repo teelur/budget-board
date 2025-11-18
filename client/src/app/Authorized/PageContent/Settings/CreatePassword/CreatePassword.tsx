@@ -4,7 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
 
 const CreatePassword = (): React.ReactNode => {
@@ -18,7 +18,7 @@ const CreatePassword = (): React.ReactNode => {
       value !== newPasswordField.getValue() ? "Passwords did not match" : null,
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doCreatePassword = useMutation({

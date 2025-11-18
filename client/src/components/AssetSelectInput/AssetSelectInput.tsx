@@ -1,6 +1,6 @@
 import { MultiSelect } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IAssetResponse } from "~/models/asset";
@@ -20,7 +20,7 @@ const AssetSelectInput = ({
   maxSelectedValues = undefined,
   ...props
 }: AssetSelectInputProps): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const assetsQuery = useQuery({
     queryKey: ["assets"],

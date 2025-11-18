@@ -2,7 +2,7 @@ import { Stack, Divider, Group, Button } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import { IAccountResponse } from "~/models/account";
 import AccountMappingItem from "./AccountMappingItem/AccountMappingItem";
@@ -27,7 +27,7 @@ interface AccountMappingProps {
 }
 
 const AccountMapping = (props: AccountMappingProps) => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],

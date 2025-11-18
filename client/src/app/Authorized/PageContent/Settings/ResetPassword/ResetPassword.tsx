@@ -8,7 +8,7 @@ import {
   Text,
 } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
@@ -34,7 +34,7 @@ const ResetPassword = (): React.ReactNode => {
     newPassword: string;
   };
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doResetPassword = useMutation({

@@ -17,7 +17,7 @@ import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
@@ -61,7 +61,7 @@ const EditableAssetItemContent = (
     initialValue: props.asset.hide,
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doUpdateAsset = useMutation({

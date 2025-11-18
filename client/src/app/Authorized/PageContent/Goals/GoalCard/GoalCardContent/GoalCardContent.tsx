@@ -12,7 +12,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
@@ -27,7 +27,7 @@ interface GoalCardContentProps {
 }
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

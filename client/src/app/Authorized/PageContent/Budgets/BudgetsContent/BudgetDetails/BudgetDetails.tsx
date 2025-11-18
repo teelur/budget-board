@@ -2,7 +2,7 @@ import { Accordion, Drawer, Group, Skeleton, Stack, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
@@ -24,7 +24,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const chartLookbackMonths = 6;
 
   const { transactionCategories } = useTransactionCategories();
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],

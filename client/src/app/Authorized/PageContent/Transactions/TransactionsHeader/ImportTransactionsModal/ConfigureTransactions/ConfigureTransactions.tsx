@@ -15,7 +15,7 @@ import ColumnsSelect, { ISelectedColumns } from "./ColumnsSelect/ColumnsSelect";
 import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
@@ -95,7 +95,7 @@ const ConfigureTransactions = (
   >(new Map<ITransactionImportTableData, ITransaction>());
 
   const { transactionCategories } = useTransactionCategories();
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],

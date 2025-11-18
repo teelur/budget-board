@@ -3,7 +3,7 @@ import classes from "./UncategorizedTransaction.module.css";
 import { Card, Flex, LoadingOverlay, Text } from "@mantine/core";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
@@ -24,7 +24,7 @@ const UncategorizedTransaction = (
 ): React.ReactNode => {
   const [opened, { toggle }] = useDisclosure(false);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

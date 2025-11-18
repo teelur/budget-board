@@ -1,5 +1,5 @@
 import AccountSelectInput from "~/components/AccountSelectInput";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   Button,
@@ -43,7 +43,7 @@ const PayGoalForm = (): React.ReactNode => {
     },
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

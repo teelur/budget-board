@@ -1,6 +1,6 @@
 import classes from "./Goals.module.css";
 
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Skeleton, Stack } from "@mantine/core";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { IGoalResponse } from "~/models/goal";
@@ -23,7 +23,7 @@ const Goals = (): React.ReactNode => {
     null
   );
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const goalsQuery = useQuery({
     queryKey: ["goals", { includeInterest }],

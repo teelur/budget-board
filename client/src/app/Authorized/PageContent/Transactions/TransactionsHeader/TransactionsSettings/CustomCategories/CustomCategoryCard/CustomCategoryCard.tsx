@@ -16,7 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface CustomCategoryCardProps {
   category: ICategoryResponse;
@@ -25,7 +25,7 @@ interface CustomCategoryCardProps {
 const CustomCategoryCard = (
   props: CustomCategoryCardProps
 ): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const queryClient = useQueryClient();
   const doDeleteCategory = useMutation({
     mutationFn: async (guid: string) =>

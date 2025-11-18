@@ -12,7 +12,7 @@ import {
   Skeleton,
 } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
@@ -51,7 +51,7 @@ const TwoFactorAuth = (): React.ReactNode => {
     },
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const twoFactorAuthQuery = useQuery({
     queryKey: ["twoFactorAuth"],

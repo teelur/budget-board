@@ -8,7 +8,7 @@ import {
   getAccountsOfTypes,
   sumAccountsTotalBalance,
 } from "~/helpers/accounts";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
@@ -17,7 +17,7 @@ import { IAssetResponse } from "~/models/asset";
 import { IUserSettings } from "~/models/userSettings";
 
 const NetWorthCard = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
     queryFn: async (): Promise<IAccountResponse[]> => {

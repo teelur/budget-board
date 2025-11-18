@@ -27,7 +27,7 @@ import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
 import { notifications } from "@mantine/notifications";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IUserSettings } from "~/models/userSettings";
 
@@ -71,7 +71,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       100
   );
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
@@ -34,8 +34,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
     },
   });
 
-  const { request, setIsUserAuthenticated } =
-    React.useContext<any>(AuthContext);
+  const { request, setIsUserAuthenticated } = useAuth();
 
   const queryClient = useQueryClient();
 

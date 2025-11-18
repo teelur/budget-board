@@ -3,7 +3,7 @@ import { notifications } from "@mantine/notifications";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
@@ -16,7 +16,7 @@ interface FixParentBudgetButtonProps {
 }
 
 const FixParentBudgetButton = (props: FixParentBudgetButtonProps) => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const queryClient = useQueryClient();
   const doEditBudget = useMutation({
     mutationFn: async (newBudget: IBudgetUpdateRequest) =>

@@ -16,7 +16,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
@@ -38,7 +38,7 @@ interface GoalCardContentProps {
 const EditableGoalCardContent = (
   props: GoalCardContentProps
 ): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const goalNameField = useField<string>({
     initialValue: props.goal.name,

@@ -1,5 +1,5 @@
 import AccountSelectInput from "~/components/AccountSelectInput";
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
 import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
 import { IAccountResponse } from "~/models/account";
@@ -18,7 +18,7 @@ interface AccountsSelectHeaderProps {
 const AccountsSelectHeader = (
   props: AccountsSelectHeaderProps
 ): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
     queryFn: async (): Promise<IAccountResponse[]> => {

@@ -1,4 +1,4 @@
-import { AuthContext } from "~/providers/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
 import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
 import { useQuery } from "@tanstack/react-query";
@@ -18,7 +18,7 @@ interface AssetsSelectHeaderProps {
 const AssetsSelectHeader = (
   props: AssetsSelectHeaderProps
 ): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const assetsQuery = useQuery({
     queryKey: ["assets"],
     queryFn: async (): Promise<IAssetResponse[]> => {
