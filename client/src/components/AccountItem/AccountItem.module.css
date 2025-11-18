@@ -1,0 +1,8 @@
+.root {
+  &:hover {
+    outline: 2px solid var(--mantine-primary-color-filled);
+    outline-offset: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+}

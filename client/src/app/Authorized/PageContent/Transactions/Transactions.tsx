@@ -4,7 +4,7 @@ import { Stack } from "@mantine/core";
 import TransactionsHeader from "./TransactionsHeader/TransactionsHeader";
 import React from "react";
 import { SortDirection } from "~/components/SortButton";
-import { defaultTransactionCategories, Filters } from "~/models/transaction";
+import { defaultTransactionCategories } from "~/models/transaction";
 import { Sorts } from "./TransactionsHeader/SortMenu/SortMenuHelpers";
 import TransactionCards from "./TransactionCards.tsx/TransactionCards";
 import { AuthContext } from "~/components/AuthProvider/AuthProvider";
@@ -16,7 +16,6 @@ const Transactions = (): React.ReactNode => {
   const [sortDirection, setSortDirection] = React.useState<SortDirection>(
     SortDirection.Decending
   );
-  const [filters, setFilters] = React.useState<Filters>(new Filters());
 
   const { request } = React.useContext<any>(AuthContext);
   const transactionCategoriesQuery = useQuery({
@@ -46,15 +45,9 @@ const Transactions = (): React.ReactNode => {
         setSort={setSort}
         sortDirection={sortDirection}
         setSortDirection={setSortDirection}
-        filters={filters}
-        setFilters={setFilters}
         categories={transactionCategoriesWithCustom}
       />
-      <TransactionCards
-        filters={filters}
-        sort={sort}
-        sortDirection={sortDirection}
-      />
+      <TransactionCards sort={sort} sortDirection={sortDirection} />
     </Stack>
   );
 };
