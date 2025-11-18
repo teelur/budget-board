@@ -16,7 +16,7 @@ import { Notifications } from "@mantine/notifications";
 
 import Welcome from "~/app/Unauthorized/Welcome";
 import OidcCallback from "~/app/Unauthorized/OidcCallback";
-import AuthProvider from "~/providers/AuthProvider/AuthProvider";
+import { AuthProvider } from "~/providers/AuthProvider/AuthProvider";
 import AuthorizedRoute from "~/providers/AuthProvider/AuthorizedRoute";
 import UnauthorizedRoute from "~/providers/AuthProvider/UnauthorizedRoute";
 import Authorized from "~/app/Authorized/Authorized";

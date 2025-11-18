@@ -1,6 +1,6 @@
 import React from "react";
 import { ICategory } from "~/models/category";
-import { AuthContext } from "../AuthProvider/AuthProvider";
+import { useAuth } from "../AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";

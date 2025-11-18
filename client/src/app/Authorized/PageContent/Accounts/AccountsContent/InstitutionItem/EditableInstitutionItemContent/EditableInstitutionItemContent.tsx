@@ -10,7 +10,6 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { PencilIcon } from "lucide-react";
-import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
