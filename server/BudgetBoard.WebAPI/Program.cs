@@ -22,10 +22,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 // Setup CORS for the frontend
-var clientUrl = builder.Configuration.GetValue<string>("CLIENT_URL");
-if (string.IsNullOrEmpty(clientUrl))
+var clientAddress = builder.Configuration.GetValue<string>("CLIENT_ADDRESS");
+if (string.IsNullOrEmpty(clientAddress))
 {
-    throw new ArgumentNullException(nameof(clientUrl));
+    throw new ArgumentNullException(nameof(clientAddress));
 }
 
 builder.Services.AddCors(options =>
@@ -34,7 +34,7 @@ builder.Services.AddCors(options =>
         name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins(clientUrl);
+            policy.WithOrigins(clientAddress);
             policy.AllowAnyHeader();
             policy.AllowAnyMethod();
             policy.AllowCredentials();

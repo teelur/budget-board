@@ -30,7 +30,9 @@ const AuthProvider = ({ children }: { children: any }): React.ReactNode => {
 
   // base url is sourced from environment variables
   const client = axios.create({
-    baseURL: import.meta.env.DEV ? envVariables.VITE_CLIENT_URL : undefined,
+    baseURL: import.meta.env.DEV
+      ? `http://${envVariables.VITE_BUDGET_BOARD_DOMAIN}`
+      : undefined,
     withCredentials: true,
   });
 

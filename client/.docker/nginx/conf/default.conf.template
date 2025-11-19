@@ -1,13 +1,13 @@
 upstream backend_server {
   # This should be the name of the server container and it's configured port
-  server ${VITE_SERVER_URL}:8080;
+  server ${VITE_SERVER_ADDRESS}:8080;
 }
 
 server {
   listen ${PORT};
 
   # You should configure this to the domain that points to this app.
-  server_name ${VITE_CLIENT_URL};
+  server_name ${VITE_BUDGET_BOARD_DOMAIN};
 
   access_log /var/log/nginx/nginx.vhost.access.log;
   error_log /var/log/nginx/nginx.vhost.error.log;
