@@ -19,7 +19,7 @@ import { IAccountIndexRequest, IAccountResponse } from "~/models/account";
 import React from "react";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
@@ -44,6 +44,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
   >(
     props.institution.accounts
       .slice()
+      .filter((a) => a.deleted === null)
       .sort((a, b) => a.index - b.index)
       .map((a, index) => ({
         ...a,
@@ -61,7 +62,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
     collisionDetector: closestCorners,
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const queryClient = useQueryClient();
   const doIndexAccounts = useMutation({
     mutationFn: async (accounts: IAccountIndexRequest[]) =>
@@ -85,6 +86,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
     setSortedAccounts(
       props.institution.accounts
         .slice()
+        .filter((a) => a.deleted === null)
         .sort((a, b) => a.index - b.index)
         .map((a, index) => ({
           ...a,

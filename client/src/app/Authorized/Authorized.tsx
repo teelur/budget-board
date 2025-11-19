@@ -9,6 +9,8 @@ import React from "react";
 import PageContent, { Pages } from "./PageContent/PageContent";
 import Header from "./Header/Header";
 import { useDisclosure } from "@mantine/hooks";
+import { TransactionFiltersProvider } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
+import { TransactionCategoryProvider } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 const Authorized = (): React.ReactNode => {
   const [currentPage, setCurrentPage] = React.useState(Pages.Dashboard);
@@ -48,7 +50,11 @@ const Authorized = (): React.ReactNode => {
         bg="var(--mantine-color-content-background)"
         flex={{ direction: "column" }}
       >
-        <PageContent currentPage={currentPage} />
+        <TransactionCategoryProvider>
+          <TransactionFiltersProvider setCurrentPage={setCurrentPage}>
+            <PageContent currentPage={currentPage} />
+          </TransactionFiltersProvider>
+        </TransactionCategoryProvider>
       </AppShellMain>
     </AppShell>
   );

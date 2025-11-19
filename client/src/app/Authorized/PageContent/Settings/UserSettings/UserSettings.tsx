@@ -1,19 +1,17 @@
-import classes from "./Settings.module.css";
-
 import {
   Card,
-  CardSection,
   LoadingOverlay,
   Select,
   Skeleton,
-  Title,
+  Stack,
+  Text,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   Currency,
@@ -22,7 +20,11 @@ import {
 } from "~/models/userSettings";
 
 const UserSettings = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const currencyField = useField({
+    initialValue: "",
+  });
+
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -59,47 +61,45 @@ const UserSettings = (): React.ReactNode => {
     },
   });
 
-  const currencyField = useField({
-    initialValue: userSettingsQuery.data?.currency || "",
-  });
-
   React.useEffect(() => {
     if (userSettingsQuery.data) {
       currencyField.setValue(userSettingsQuery.data.currency);
     }
   }, [userSettingsQuery.data]);
 
-  if (userSettingsQuery.isPending) {
-    return <Skeleton h={141} radius="md" className={classes.skeleton} />;
-  }
-
   return (
-    <Card className={classes.card} withBorder radius="md" shadow="sm">
+    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
       <LoadingOverlay visible={doUpdateUserSettings.isPending} />
-      <CardSection className={classes.cardSection}>
-        <Title order={3}>User Settings</Title>
-      </CardSection>
-      <CardSection className={classes.cardSection}>
-        {userSettingsQuery.isPending ? (
-          <Skeleton h={60} />
-        ) : (
-          <Select
-            label="Currency"
-            placeholder="Select currency"
-            searchable
-            nothingFoundMessage="No currencies found"
-            data={Intl.supportedValuesOf("currency")}
-            {...currencyField.getInputProps()}
-            onChange={(value) => {
-              if (value) {
-                doUpdateUserSettings.mutate({
-                  currency: value as Currency,
-                });
+      <Stack gap="1rem">
+        <Text fw={700} size="lg">
+          User Settings
+        </Text>
+        <Stack gap="0.5rem">
+          {userSettingsQuery.isPending ? (
+            <Skeleton h={60} radius="md" />
+          ) : (
+            <Select
+              label={
+                <Text fw={600} size="sm">
+                  Preferred Currency
+                </Text>
               }
-            }}
-          />
-        )}
-      </CardSection>
+              placeholder="Select currency"
+              searchable
+              nothingFoundMessage="No currencies found"
+              data={Intl.supportedValuesOf("currency")}
+              {...currencyField.getInputProps()}
+              onChange={(value) => {
+                if (value) {
+                  doUpdateUserSettings.mutate({
+                    currency: value as Currency,
+                  });
+                }
+              }}
+            />
+          )}
+        </Stack>
+      </Stack>
     </Card>
   );
 };

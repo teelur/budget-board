@@ -2,7 +2,6 @@ import { Alert, Button, Group, Stack } from "@mantine/core";
 import React from "react";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import {
-  defaultTransactionCategories,
   ITransaction,
   ITransactionImportTableData,
 } from "~/models/transaction";
@@ -16,13 +15,13 @@ import ColumnsSelect, { ISelectedColumns } from "./ColumnsSelect/ColumnsSelect";
 import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
-import { ICategoryResponse } from "~/models/category";
 import { IAccountResponse } from "~/models/account";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -95,7 +94,9 @@ const ConfigureTransactions = (
     Map<ITransactionImportTableData, ITransaction>
   >(new Map<ITransactionImportTableData, ITransaction>());
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { transactionCategories } = useTransactionCategories();
+  const { request } = useAuth();
+
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
@@ -127,26 +128,6 @@ const ConfigureTransactions = (
       return [];
     },
   });
-
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
 
   const disableNextButton = () => {
     // Cannot proceed if there are no imported transactions.
@@ -504,14 +485,14 @@ const ConfigureTransactions = (
         } else {
           const importedParent = getParentCategory(
             (t as any).category ?? "",
-            transactionCategoriesWithCustom
+            transactionCategories
           )
             .toString()
             .trim()
             .toLowerCase();
           const isParent = getIsParentCategory(
             (t as any).category ?? "",
-            transactionCategoriesWithCustom
+            transactionCategories
           );
           const importedChild = isParent ? "" : (t as any).category ?? "";
           parts.push(importedParent);
@@ -572,11 +553,11 @@ const ConfigureTransactions = (
           if (ok && filterOpts.category) {
             const importedParent = getParentCategory(
               imp.category ?? "",
-              transactionCategoriesWithCustom
+              transactionCategories
             );
             const isParent = getIsParentCategory(
               imp.category ?? "",
-              transactionCategoriesWithCustom
+              transactionCategories
             );
             const importedChild = isParent ? "" : imp.category ?? "";
             ok =

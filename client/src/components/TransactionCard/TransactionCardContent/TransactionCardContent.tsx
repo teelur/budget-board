@@ -6,7 +6,7 @@ import React from "react";
 import { ICategory } from "~/models/category";
 import { getFormattedCategoryValue } from "~/helpers/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
@@ -19,7 +19,7 @@ interface TransactionCardContentProps {
 const TransactionCardContent = (
   props: TransactionCardContentProps
 ): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

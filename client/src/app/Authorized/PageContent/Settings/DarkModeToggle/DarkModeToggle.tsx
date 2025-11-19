@@ -1,4 +1,5 @@
 import {
+  Text,
   MantineColorScheme,
   NativeSelect,
   useMantineColorScheme,
@@ -15,7 +16,11 @@ const DarkModeToggle = () => {
   return (
     <NativeSelect
       data={darkModeOptions}
-      label="Dark mode"
+      label={
+        <Text fw={600} size="sm">
+          Appearance Mode
+        </Text>
+      }
       value={colorScheme}
       onChange={(event) =>
         setColorScheme(event.currentTarget.value as MantineColorScheme)

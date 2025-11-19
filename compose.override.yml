@@ -1,0 +1,24 @@
+services:
+  budget-board-server:
+    environment:
+      POSTGRES_HOST: budget-board-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: budgetboard
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: superSecretPassword
+      AUTO_UPDATE_DB: true
+      DISABLE_NEW_USERS: false
+
+      # Email confirmation is optional. See the README for more details.
+      # EMAIL_SENDER: example@gmail.com
+      # EMAIL_SENDER_PASSWORD: appPassword
+      # EMAIL_SMTP_HOST: smtp.gmail.com
+
+      # If you want to disable the scheduled job that automatically
+      # syncs SimpleFIN data every 12 hours, set this to true.
+      # DISABLE_AUTO_SYNC: true
+  budget-board-db:
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: superSecretPassword
+      POSTGRES_DB: budgetboard

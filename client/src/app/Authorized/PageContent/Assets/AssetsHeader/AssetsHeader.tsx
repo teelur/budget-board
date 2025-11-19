@@ -1,6 +1,7 @@
 import { Button, Group } from "@mantine/core";
 import React from "react";
 import CreateAsset from "./CreateAsset/CreateAsset";
+import AssetsSettings from "./AssetsSettings/AssetsSettings";
 
 interface AssetsHeaderProps {
   isSortable: boolean;
@@ -17,6 +18,7 @@ const AssetsHeader = (props: AssetsHeaderProps): React.ReactNode => {
         {props.isSortable ? "Save" : "Reorder"}
       </Button>
       <CreateAsset />
+      <AssetsSettings />
     </Group>
   );
 };

@@ -11,10 +11,10 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
 
@@ -28,10 +28,10 @@ interface AccountDetailsProps {
 const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const balancesQuery = useQuery({
     queryKey: ["balances", props.account?.id],
-    queryFn: async (): Promise<IBalance[]> => {
+    queryFn: async (): Promise<IBalanceResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/balance",
         method: "GET",
@@ -39,7 +39,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       });
 
       if (res.status === 200) {
-        return res.data as IBalance[];
+        return res.data as IBalanceResponse[];
       }
 
       return [];
@@ -48,9 +48,14 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   });
 
   const sortedBalances =
-    balancesQuery.data?.sort((a, b) =>
-      dayjs(b.dateTime).diff(dayjs(a.dateTime))
-    ) ?? [];
+    balancesQuery.data
+      ?.filter((balance) => !balance.deleted)
+      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+
+  const sortedDeletedBalances =
+    balancesQuery.data
+      ?.filter((balance) => balance.deleted)
+      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
 
   const balancesForChart = sortedBalances.filter((balance) =>
     dayjs(balance.dateTime).isAfter(
@@ -177,13 +182,38 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   {balancesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
                   )}
-                  {balancesQuery.data && balancesQuery.data.length === 0 ? (
+                  {sortedBalances.length === 0 ? (
                     <Text size="sm" c="dimmed" fw={600}>
-                      No balance entries
+                      No balance entries.
                     </Text>
                   ) : (
                     <BalanceItems
                       balances={sortedBalances}
+                      currency={props.currency}
+                    />
+                  )}
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item
+              value="deleted-balances"
+              bg="var(--mantine-color-content-background)"
+            >
+              <Accordion.Control>
+                <Text>Deleted Balances</Text>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Stack gap="0.5rem">
+                  {balancesQuery.isPending && (
+                    <Skeleton height={20} radius="lg" />
+                  )}
+                  {sortedDeletedBalances.length === 0 ? (
+                    <Text size="sm" c="dimmed" fw={600}>
+                      No deleted balances.
+                    </Text>
+                  ) : (
+                    <BalanceItems
+                      balances={sortedDeletedBalances}
                       currency={props.currency}
                     />
                   )}

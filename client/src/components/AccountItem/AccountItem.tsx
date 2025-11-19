@@ -1,18 +1,21 @@
+import classes from "./AccountItem.module.css";
+
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Group, Stack, Text } from "@mantine/core";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 
 interface AccountItemProps {
   account: IAccountResponse;
+  onClick?: () => void;
 }
 
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -31,7 +34,11 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
   });
 
   return (
-    <Stack gap={0.5}>
+    <Stack
+      gap={0.5}
+      className={props.onClick ? classes.root : undefined}
+      onClick={props.onClick}
+    >
       <Group justify="space-between" wrap="nowrap">
         <Text fw={600}>{props.account.name}</Text>
         {userSettingsQuery.isPending ? null : (

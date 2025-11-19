@@ -17,7 +17,7 @@ namespace BudgetBoard.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.9")
+                .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "currency", new[] { "aud", "cad", "chf", "cny", "eur", "gbp", "inr", "jpy", "nzd", "sek", "usd" });
@@ -237,6 +237,9 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("ID");
 
                     b.HasIndex("AccountID");
@@ -446,6 +449,9 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("DisableBuiltInTransactionCategories")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("ForceSyncLookbackMonths")
                         .HasColumnType("integer");

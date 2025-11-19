@@ -1,5 +1,6 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +8,15 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class BalanceService(ILogger<IBalanceService> logger, UserDataContext userDataContext)
-    : IBalanceService
+public class BalanceService(
+    ILogger<IBalanceService> logger,
+    UserDataContext userDataContext,
+    INowProvider nowProvider
+) : IBalanceService
 {
     private readonly ILogger<IBalanceService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly INowProvider _nowProvider = nowProvider;
 
     public async Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest balance)
     {
@@ -88,7 +93,25 @@ public class BalanceService(ILogger<IBalanceService> logger, UserDataContext use
             );
         }
 
-        _userDataContext.Balances.Remove(balance);
+        balance.Deleted = _nowProvider.UtcNow;
+        await _userDataContext.SaveChangesAsync();
+    }
+
+    public async Task RestoreBalanceAsync(Guid userGuid, Guid balanceId)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var balance = userData
+            .Accounts.SelectMany(a => a.Balances)
+            .FirstOrDefault(b => b.ID == balanceId);
+        if (balance == null)
+        {
+            _logger.LogError("Attempt to restore balance that does not exist.");
+            throw new BudgetBoardServiceException(
+                "The balance you are trying to restore does not exist."
+            );
+        }
+
+        balance.Deleted = null;
         await _userDataContext.SaveChangesAsync();
     }
 

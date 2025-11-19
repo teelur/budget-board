@@ -9,7 +9,7 @@ import {
 import { useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "./Welcome";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
@@ -34,8 +34,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
     },
   });
 
-  const { request, setIsUserAuthenticated } =
-    React.useContext<any>(AuthContext);
+  const { request, setIsUserAuthenticated } = useAuth();
 
   const queryClient = useQueryClient();
 

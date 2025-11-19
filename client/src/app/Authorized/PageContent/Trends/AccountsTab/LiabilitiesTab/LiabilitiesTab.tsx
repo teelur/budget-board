@@ -6,9 +6,9 @@ import { DatesRangeValue } from "@mantine/dates";
 import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import dayjs from "dayjs";
@@ -23,11 +23,11 @@ const LiabilitiesTab = (): React.ReactNode => {
     dayjs().format(mantineDateFormat),
   ]);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const balancesQuery = useQueries({
     queries: selectedAccountIds.map((accountId: string) => ({
       queryKey: ["balances", accountId],
-      queryFn: async (): Promise<IBalance[]> => {
+      queryFn: async (): Promise<IBalanceResponse[]> => {
         const res: AxiosResponse = await request({
           url: "/api/balance",
           method: "GET",
@@ -35,7 +35,7 @@ const LiabilitiesTab = (): React.ReactNode => {
         });
 
         if (res.status === 200) {
-          return res.data as IBalance[];
+          return res.data as IBalanceResponse[];
         }
 
         return [];

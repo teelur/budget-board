@@ -1,4 +1,10 @@
-import { ActionIcon, Group, NumberInput, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Group,
+  LoadingOverlay,
+  NumberInput,
+  Stack,
+} from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
@@ -8,7 +14,7 @@ import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IValueResponse, IValueUpdateRequest } from "~/models/value";
@@ -43,7 +49,7 @@ const EditableValueItemContent = (
     },
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doUpdateValue = useMutation({
@@ -110,6 +116,13 @@ const EditableValueItemContent = (
 
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
+      <LoadingOverlay
+        visible={
+          doUpdateValue.isPending ||
+          doDeleteValue.isPending ||
+          doRestoreValue.isPending
+        }
+      />
       <Stack w="100%">
         <DatePickerInput {...valueDateField.getInputProps()} flex="1 1 auto" />
         <NumberInput

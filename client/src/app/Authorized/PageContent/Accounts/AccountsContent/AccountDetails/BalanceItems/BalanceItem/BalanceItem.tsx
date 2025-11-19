@@ -1,24 +1,31 @@
-import { Card, Group, Text } from "@mantine/core";
-import dayjs from "dayjs";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { Card } from "@mantine/core";
+import EditableBalanceItemContent from "./EditableBalanceItemContent/EditableBalanceItemContent";
+import BalanceItemContent from "./BalanceItemContent/BalanceItemContent";
+import { IBalanceResponse } from "~/models/balance";
+import { useDisclosure } from "@mantine/hooks";
 
 interface BalanceItemProps {
-  dateTime: Date;
-  amount: number;
-  currency: string;
+  balance: IBalanceResponse;
+  userCurrency: string;
 }
 
 const BalanceItem = (props: BalanceItemProps) => {
+  const [isSelected, { open, close }] = useDisclosure(false);
   return (
     <Card radius="md" p="0.5rem">
-      <Group justify="space-between" w="100%">
-        <Text size="sm" fw={600} c="dimmed">
-          {dayjs(props.dateTime).format("L LT")}
-        </Text>
-        <Text size="sm" fw={600} c={props.amount < 0 ? "red" : "green"}>
-          {convertNumberToCurrency(props.amount, true, props.currency)}
-        </Text>
-      </Group>
+      {isSelected ? (
+        <EditableBalanceItemContent
+          balance={props.balance}
+          userCurrency={props.userCurrency}
+          doUnSelect={close}
+        />
+      ) : (
+        <BalanceItemContent
+          balance={props.balance}
+          userCurrency={props.userCurrency}
+          doSelect={open}
+        />
+      )}
     </Card>
   );
 };

@@ -38,36 +38,6 @@ public class AssetServiceTests
     }
 
     [Fact]
-    public async Task CreateAssetAsync_WhenDuplicateName_ShouldThrowException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var assetService = new AssetService(
-            Mock.Of<ILogger<IAssetService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>()
-        );
-
-        var assetFaker = new AssetFaker();
-        var existingAsset = assetFaker.Generate();
-        existingAsset.UserID = helper.demoUser.Id;
-        existingAsset.Name = "Duplicate Asset";
-
-        helper.UserDataContext.Assets.Add(existingAsset);
-        await helper.UserDataContext.SaveChangesAsync();
-
-        var newAsset = _assetCreateRequestFaker.Generate();
-        newAsset.Name = "Duplicate Asset";
-
-        // Act
-        Func<Task> act = async () =>
-            await assetService.CreateAssetAsync(helper.demoUser.Id, newAsset);
-
-        // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>("Asset already exists.");
-    }
-
-    [Fact]
     public async Task ReadAssetsAsync_WhenAssetsExist_ShouldReturnAssets()
     {
         // Arrange

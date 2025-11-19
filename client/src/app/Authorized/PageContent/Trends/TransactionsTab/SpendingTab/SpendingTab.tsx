@@ -1,6 +1,6 @@
 import classes from "./SpendingTab.module.css";
 
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import {
@@ -26,7 +26,7 @@ const SpendingTab = (): React.ReactNode => {
 
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const transactionsQuery = useQueries({
     queries: getUniqueYears(selectedMonths).map((year: number) => ({
       queryKey: ["transactions", { year }],

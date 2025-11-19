@@ -16,18 +16,15 @@ import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import AccountSelectInput from "~/components/AccountSelectInput";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { AccountSource } from "~/models/account";
-import { ICategoryResponse } from "~/models/category";
-import {
-  defaultTransactionCategories,
-  ITransactionCreateRequest,
-} from "~/models/transaction";
+import { ITransactionCreateRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface formValues {
   date: Date | null;
@@ -57,7 +54,8 @@ const CreateTransactionModal = (): React.ReactNode => {
     },
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { transactionCategories } = useTransactionCategories();
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -74,26 +72,6 @@ const CreateTransactionModal = (): React.ReactNode => {
       return undefined;
     },
   });
-
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
 
   const queryClient = useQueryClient();
   const doCreateTransaction = useMutation({
@@ -127,14 +105,8 @@ const CreateTransactionModal = (): React.ReactNode => {
     doCreateTransaction.mutate({
       date: values.date,
       merchantName: values.description,
-      category: getParentCategory(
-        values.category,
-        transactionCategoriesWithCustom
-      ),
-      subcategory: getIsParentCategory(
-        values.category,
-        transactionCategoriesWithCustom
-      )
+      category: getParentCategory(values.category, transactionCategories),
+      subcategory: getIsParentCategory(values.category, transactionCategories)
         ? null
         : values.category,
       amount: values.amount === "" ? 0 : (values.amount as number),
@@ -180,7 +152,7 @@ const CreateTransactionModal = (): React.ReactNode => {
               <CategorySelect
                 placeholder="Select category"
                 required
-                categories={transactionCategoriesWithCustom}
+                categories={transactionCategories}
                 value={form.getValues().category}
                 onChange={(val) => form.setFieldValue("category", val)}
                 key={form.key("category")}

@@ -14,9 +14,8 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
-import { PencilIcon, Undo2Icon } from "lucide-react";
-import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { PencilIcon } from "lucide-react";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
@@ -68,7 +67,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     initialValue: props.account.hideTransactions ?? false,
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doUpdateAccount = useMutation({
@@ -113,23 +112,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     },
   });
 
-  const doRestoreAccount = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/account/restore`,
-        method: "POST",
-        params: { guid: props.account.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
-    },
-  });
-
   useDidUpdate(
     () => doUpdateAccount.mutate(),
     [
@@ -143,9 +125,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <Stack gap="0.5rem" flex="1 1 auto">
-        <LoadingOverlay
-          visible={doUpdateAccount.isPending || doRestoreAccount.isPending}
-        />
+        <LoadingOverlay visible={doUpdateAccount.isPending} />
         <Group justify="space-between" align="center">
           <Group gap="0.5rem" align="center">
             <TextInput
@@ -242,17 +222,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
         </Group>
       </Stack>
       <Group style={{ alignSelf: "stretch" }}>
-        {props.account.deleted ? (
-          <ActionIcon
-            h="100%"
-            size="sm"
-            onClick={() => doRestoreAccount.mutate()}
-          >
-            <Undo2Icon size={16} />
-          </ActionIcon>
-        ) : (
-          <DeleteAccountPopover accountId={props.account.id} />
-        )}
+        <DeleteAccountPopover accountId={props.account.id} />
       </Group>
     </Group>
   );

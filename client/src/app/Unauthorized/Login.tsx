@@ -10,7 +10,7 @@ import {
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "./Welcome";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
@@ -38,8 +38,7 @@ const Login = (props: LoginProps): React.ReactNode => {
     validate: hasLength({ min: 3 }, "Must be at least 3 characters"),
   });
 
-  const { request, setIsUserAuthenticated, startOidcLogin } =
-    React.useContext<any>(AuthContext);
+  const { request, setIsUserAuthenticated, startOidcLogin } = useAuth();
 
   const queryClient = useQueryClient();
 

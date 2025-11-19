@@ -1,26 +1,30 @@
-import classes from "./Settings.module.css";
-
 import {
   Button,
   Card,
-  CardSection,
-  Title,
   Badge,
   Group,
   LoadingOverlay,
   PasswordInput,
+  Stack,
+  Text,
+  Skeleton,
 } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useField } from "@mantine/form";
 
 const LinkSimpleFin = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const simpleFinKeyField = useField<string>({
+    initialValue: "",
+    validate: isNotEmpty("SimpleFin key is required"),
+  });
+
+  const { request } = useAuth();
 
   const userQuery = useQuery({
     queryKey: ["user"],
@@ -61,44 +65,45 @@ const LinkSimpleFin = (): React.ReactNode => {
     },
   });
 
-  const form = useForm({
-    mode: "uncontrolled",
-    initialValues: { simpleFinKey: "" },
-    validate: {
-      simpleFinKey: isNotEmpty("SimpleFin key is required"),
-    },
-  });
+  if (userQuery.isLoading) {
+    return <Skeleton height={150} radius="md" />;
+  }
 
   return (
-    <Card className={classes.card} withBorder radius="md" shadow="sm">
-      <CardSection>
-        <Group>
-          <Title order={3}>Link SimpleFIN</Title>
+    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
+      <LoadingOverlay visible={doSetAccessToken.isPending} zIndex={1000} />
+      <Stack gap="1rem">
+        <Group gap="1rem">
+          <Text fw={700} size="lg">
+            Link SimpleFIN
+          </Text>
           {userQuery.data?.accessToken && (
             <Badge color="green" maw={80}>
               Linked
             </Badge>
           )}
         </Group>
-      </CardSection>
-      <CardSection className={classes.cardSection}>
-        <LoadingOverlay visible={doSetAccessToken.isPending} zIndex={1000} />
-        <form
-          className={classes.form}
-          style={{ width: "100%" }}
-          onSubmit={form.onSubmit((values) =>
-            doSetAccessToken.mutate(values.simpleFinKey)
-          )}
-        >
+        <Stack gap="0.5rem">
           <PasswordInput
-            {...form.getInputProps("simpleFinKey")}
-            key={form.key("simpleFinKey")}
-            label="SimpleFIN Key"
-            w="100%"
+            {...simpleFinKeyField.getInputProps()}
+            label={
+              <Text fw={600} size="sm">
+                SimpleFin Access Token
+              </Text>
+            }
           />
-          <Button type="submit">Save Changes</Button>
-        </form>
-      </CardSection>
+          <Button
+            onClick={() => {
+              simpleFinKeyField.validate();
+              if (!simpleFinKeyField.error) {
+                doSetAccessToken.mutate(simpleFinKeyField.getValue());
+              }
+            }}
+          >
+            Save Changes
+          </Button>
+        </Stack>
+      </Stack>
     </Card>
   );
 };

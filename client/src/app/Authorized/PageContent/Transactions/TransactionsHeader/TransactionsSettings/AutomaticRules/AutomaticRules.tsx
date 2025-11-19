@@ -1,5 +1,5 @@
 import { Stack, Text } from "@mantine/core";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { IAutomaticRuleResponse } from "~/models/automaticRule";
@@ -7,7 +7,7 @@ import AddAutomaticRule from "./AddAutomaticRule/AddAutomaticRule";
 import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
 
 const AutomaticRules = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const AutomaticRuleQuery = useQuery({
     queryKey: ["automaticRule"],

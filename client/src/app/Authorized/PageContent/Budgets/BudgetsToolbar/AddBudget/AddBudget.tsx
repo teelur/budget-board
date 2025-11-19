@@ -1,6 +1,6 @@
 import classes from "./AddBudget.module.css";
 
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import CategorySelect from "~/components/CategorySelect";
 import { translateAxiosError } from "~/helpers/requests";
 import {
@@ -43,7 +43,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
     },
   });
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

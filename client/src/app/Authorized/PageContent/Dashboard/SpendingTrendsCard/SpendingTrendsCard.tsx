@@ -1,6 +1,6 @@
 import classes from "./SpendingTrendsCard.module.css";
 
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo, getDaysInMonth } from "~/helpers/datetime";
@@ -18,7 +18,7 @@ import { IUserSettings } from "~/models/userSettings";
 const SpendingTrendsCard = (): React.ReactNode => {
   const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

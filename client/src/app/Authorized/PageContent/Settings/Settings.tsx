@@ -1,22 +1,22 @@
 import classes from "./Settings.module.css";
 
 import { Stack, Title } from "@mantine/core";
-import DarkModeToggle from "./DarkModeToggle";
-import LinkSimpleFin from "./LinkSimpleFin";
+import DarkModeToggle from "./DarkModeToggle/DarkModeToggle";
+import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 import React from "react";
-import ResetPassword from "./ResetPassword";
-import UserSettings from "./UserSettings";
-import TwoFactorAuth from "./TwoFactorAuth";
+import ResetPassword from "./ResetPassword/ResetPassword";
+import UserSettings from "./UserSettings/UserSettings";
+import TwoFactorAuth from "./TwoFactorAuth/TwoFactorAuth";
 import AdvancedSettings from "./AdvancedSettings/AdvancedSettings";
-import OidcSettings from "./OidcSettings";
+import OidcSettings from "./OidcSettings/OidcSettings";
 import { useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosResponse } from "axios";
-import CreatePassword from "./CreatePassword";
+import CreatePassword from "./CreatePassword/CreatePassword";
 
 const Settings = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const userQuery = useQuery({
     queryKey: ["user"],

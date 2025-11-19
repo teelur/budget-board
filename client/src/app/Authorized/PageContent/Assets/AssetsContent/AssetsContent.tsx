@@ -1,7 +1,7 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IAssetIndexRequest, IAssetResponse } from "~/models/asset";
 import AssetItem from "./AssetItem/AssetItem";
 import { DragDropProvider } from "@dnd-kit/react";
@@ -25,7 +25,7 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
 
   const [sortedAssets, setSortedAssets] = React.useState<IAssetResponse[]>([]);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const assetsQuery = useQuery({
     queryKey: ["assets"],
     queryFn: async () => {
@@ -65,6 +65,7 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
       setSortedAssets(
         assetsQuery.data
           .slice()
+          .filter((asset) => !asset.deleted)
           .sort((a, b) => a.index - b.index)
           .map((asset, index) => ({
             ...asset,

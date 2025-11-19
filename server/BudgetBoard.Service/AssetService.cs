@@ -22,12 +22,6 @@ public class AssetService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (userData.Assets.Any(a => a.Name == asset.Name))
-        {
-            _logger.LogError("Attempted to create an asset with a duplicate name.");
-            throw new BudgetBoardServiceException("An asset with this name already exists.");
-        }
-
         var newAsset = new Asset { Name = asset.Name, UserID = userData.Id };
 
         userData.Assets.Add(newAsset);

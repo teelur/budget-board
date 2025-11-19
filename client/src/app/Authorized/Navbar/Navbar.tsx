@@ -15,8 +15,7 @@ import {
 import NavbarLink from "./NavbarLink";
 import { Pages } from "../PageContent/PageContent";
 import { useQueryClient } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
-import React from "react";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
@@ -43,8 +42,7 @@ interface NavbarProps {
 }
 
 const Navbar = (props: NavbarProps) => {
-  const { request, setIsUserAuthenticated } =
-    React.useContext<any>(AuthContext);
+  const { request, setIsUserAuthenticated } = useAuth();
 
   const queryClient = useQueryClient();
   const Logout = (): void => {

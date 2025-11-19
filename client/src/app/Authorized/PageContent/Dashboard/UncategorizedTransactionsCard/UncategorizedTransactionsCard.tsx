@@ -1,6 +1,6 @@
 import classes from "./UncategorizedTransactionsCard.module.css";
 
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   getTransactionsByCategory,
   getVisibleTransactions,
@@ -14,21 +14,20 @@ import {
   Stack,
   Title,
 } from "@mantine/core";
-import {
-  defaultTransactionCategories,
-  ITransaction,
-} from "~/models/transaction";
+import { ITransaction } from "~/models/transaction";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { ICategoryResponse } from "~/models/category";
 import TransactionCard from "~/components/TransactionCard/TransactionCard";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;
   const [activePage, setPage] = React.useState(1);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { transactionCategories } = useTransactionCategories();
+  const { request } = useAuth();
+
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
@@ -44,26 +43,6 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
       return [];
     },
   });
-
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
 
   const sortedFilteredTransactions = React.useMemo(
     () =>
@@ -83,7 +62,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
         <Group justify="center">
           <Title order={2}>Uncategorized Transactions</Title>
         </Group>
-        {transactionsQuery.isPending || transactionCategoriesQuery.isPending ? (
+        {transactionsQuery.isPending ? (
           <Skeleton height={350} radius="lg" />
         ) : (
           <ScrollArea.Autosize
@@ -102,7 +81,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
                   <TransactionCard
                     key={transaction.id}
                     transaction={transaction}
-                    categories={transactionCategoriesWithCustom}
+                    categories={transactionCategories}
                     alternateColor
                   />
                 ))}

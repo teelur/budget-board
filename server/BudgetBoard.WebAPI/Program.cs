@@ -7,7 +7,6 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Jobs;
 using BudgetBoard.WebAPI.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;

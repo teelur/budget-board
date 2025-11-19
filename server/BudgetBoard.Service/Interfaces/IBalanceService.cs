@@ -8,4 +8,5 @@ public interface IBalanceService
     Task<IEnumerable<IBalanceResponse>> ReadBalancesAsync(Guid userGuid, Guid accountId);
     Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest updatedBalance);
     Task DeleteBalanceAsync(Guid userGuid, Guid guid);
+    Task RestoreBalanceAsync(Guid userGuid, Guid guid);
 }

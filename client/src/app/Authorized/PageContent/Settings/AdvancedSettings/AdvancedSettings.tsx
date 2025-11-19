@@ -1,5 +1,6 @@
 import { Card, Stack, Text } from "@mantine/core";
 import ForceSyncLookbackPeriod from "./ForceSyncLookbackPeriod/ForceSyncLookbackPeriod";
+import DisableBuiltInTransactionCategories from "./DisableBuiltInTransactionCategories/DisableBuiltInTransactionCategories";
 
 const AdvancedSettings = () => {
   return (
@@ -8,6 +9,7 @@ const AdvancedSettings = () => {
         <Text size="lg" fw={700}>
           Advanced Settings
         </Text>
+        <DisableBuiltInTransactionCategories />
         <ForceSyncLookbackPeriod />
       </Stack>
     </Card>

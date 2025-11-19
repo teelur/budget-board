@@ -1,4 +1,4 @@
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import classes from "./DeletedTransactionsCard.module.css";
 
 import { getDaysSinceDate } from "~/helpers/datetime";
@@ -25,7 +25,7 @@ interface DeletedTransactionCardProps {
 const DeletedTransactionsCard = (
   props: DeletedTransactionCardProps
 ): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doRestoreTransaction = useMutation({
