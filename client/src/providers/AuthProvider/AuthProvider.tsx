@@ -9,7 +9,8 @@ export interface AuthContextValue {
   setIsUserAuthenticated: (isLoggedIn: boolean) => void;
   loading: boolean;
   request: ({ ...options }) => Promise<AxiosResponse>;
-  startOidcLogin?: () => void; // added
+  startOidcLogin?: () => void;
+  oidcLoading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextValue>({
@@ -19,6 +20,8 @@ export const AuthContext = createContext<AuthContextValue>({
   request: async () => {
     return {} as AxiosResponse;
   },
+  startOidcLogin: () => {},
+  oidcLoading: false,
 });
 
 export const AuthProvider = ({
@@ -29,6 +32,7 @@ export const AuthProvider = ({
   const [isUserAuthenticated, setIsUserAuthenticated] =
     useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [oidcLoading, setOidcLoading] = useState<boolean>(false);
 
   const { envVariables } = getProjectEnvVariables();
 
@@ -71,35 +75,37 @@ export const AuthProvider = ({
   }, []);
 
   const startOidcLogin = async (): Promise<void> => {
-    let authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
-    if (authorizeUrl) {
-      authorizeUrl = authorizeUrl.replace(/\/+$/, "");
-    }
-    const clientId = envVariables.VITE_OIDC_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/oidc-callback`;
-
-    if (!authorizeUrl || !clientId) {
-      notifications.show({
-        color: "red",
-        message:
-          "OIDC is not configured. Set VITE_OIDC_PROVIDER and VITE_OIDC_CLIENT_ID.",
-      });
-      return;
-    }
-
-    const state = crypto.randomUUID();
-    sessionStorage.setItem("oidc_state", state);
-
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      response_type: "code",
-      scope: "openid profile email",
-      state,
-    });
-
-    const discoveryUrl = `${authorizeUrl}/.well-known/openid-configuration`;
+    setOidcLoading(true);
     try {
+      let authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
+      if (authorizeUrl) {
+        authorizeUrl = authorizeUrl.replace(/\/+$/, "");
+      }
+      const clientId = envVariables.VITE_OIDC_CLIENT_ID;
+      const redirectUri = `${window.location.origin}/oidc-callback`;
+
+      if (!authorizeUrl || !clientId) {
+        notifications.show({
+          color: "red",
+          message:
+            "OIDC is not configured. Set VITE_OIDC_PROVIDER and VITE_OIDC_CLIENT_ID.",
+        });
+        return;
+      }
+
+      const state = crypto.randomUUID();
+      sessionStorage.setItem("oidc_state", state);
+
+      const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: "code",
+        scope: "openid profile email",
+        state,
+      });
+
+      const discoveryUrl = `${authorizeUrl}/.well-known/openid-configuration`;
+
       const discoveryResponse = await fetch(discoveryUrl);
       const discoveryData: IOidcDiscoveryDocument =
         await discoveryResponse.json();
@@ -115,6 +121,8 @@ export const AuthProvider = ({
         color: "red",
         message: "Failed to retrieve OIDC discovery document.",
       });
+    } finally {
+      setOidcLoading(false);
     }
   };
 
@@ -124,6 +132,7 @@ export const AuthProvider = ({
     loading,
     request,
     startOidcLogin,
+    oidcLoading,
   };
 
   return (

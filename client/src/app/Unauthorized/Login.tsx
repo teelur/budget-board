@@ -38,7 +38,8 @@ const Login = (props: LoginProps): React.ReactNode => {
     validate: hasLength({ min: 3 }, "Must be at least 3 characters"),
   });
 
-  const { request, setIsUserAuthenticated, startOidcLogin } = useAuth();
+  const { request, setIsUserAuthenticated, startOidcLogin, oidcLoading } =
+    useAuth();
 
   const queryClient = useQueryClient();
 
@@ -171,6 +172,7 @@ const Login = (props: LoginProps): React.ReactNode => {
           variant="outline"
           fullWidth
           onClick={() => startOidcLogin && startOidcLogin()}
+          loading={oidcLoading}
         >
           Sign in with OIDC
         </Button>
