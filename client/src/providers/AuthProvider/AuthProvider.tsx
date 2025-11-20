@@ -71,7 +71,10 @@ export const AuthProvider = ({
   }, []);
 
   const startOidcLogin = async (): Promise<void> => {
-    const authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
+    let authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
+    if (authorizeUrl) {
+      authorizeUrl = authorizeUrl.replace(/\/+$/, "");
+    }
     const clientId = envVariables.VITE_OIDC_CLIENT_ID;
     const redirectUri = `${window.location.origin}/oidc-callback`;
 

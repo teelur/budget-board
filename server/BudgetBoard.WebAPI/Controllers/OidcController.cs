@@ -62,7 +62,7 @@ namespace BudgetBoard.WebAPI.Controllers
                 // Exchange authorization code for user claims
                 var principal = await _tokenService.ExchangeCodeForUserAsync(
                     request.Code,
-                    request.RedirectUri ?? string.Empty
+                    request.RedirectUri
                 );
                 if (principal == null)
                 {
