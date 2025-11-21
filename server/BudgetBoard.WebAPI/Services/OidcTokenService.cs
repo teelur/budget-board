@@ -157,7 +157,6 @@ public class OidcTokenService(
                 new("grant_type", "authorization_code"),
                 new("code", authorizationCode),
                 new("redirect_uri", redirectUri),
-                new("client_id", clientId),
             };
 
             using var content = new FormUrlEncodedContent(tokenRequest);
