@@ -2,7 +2,7 @@ services:
   budget-board-server:
     container_name: budget-board-server
     restart: unless-stopped
-    image: ghcr.io/teelur/budget-board/server:latest
+    image: ghcr.io/teelur/budget-board/server:v3
     build: ./server
     environment:
       Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
@@ -35,7 +35,7 @@ services:
   budget-board-client:
     container_name: budget-board-client
     restart: unless-stopped
-    image: ghcr.io/teelur/budget-board/client:latest
+    image: ghcr.io/teelur/budget-board/client:v3
     build: ./client
     environment:
       PORT: ${PORT:-6253}
