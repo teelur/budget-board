@@ -47,7 +47,7 @@ services:
       VITE_DISABLE_NEW_USERS: ${DISABLE_NEW_USERS:-false}
       VITE_DISABLE_LOCAL_AUTH: ${DISABLE_LOCAL_AUTH:-false}
     ports:
-      - 6253:6253
+      - ${PORT:-6253}:6253
     networks:
       - budget-board-network
     depends_on:
@@ -57,9 +57,9 @@ services:
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: superSecretPassword
-      POSTGRES_DB: budgetboard
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-superSecretPassword}
+      POSTGRES_DB: ${POSTGRES_DATABASE:-budgetboard}
     ports:
       - "6252:5432"
     volumes:
