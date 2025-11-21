@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 type ProjectEnvVariablesType = Pick<
   ImportMetaEnv,
-  | "VITE_CLIENT_URL"
+  | "VITE_BUDGET_BOARD_DOMAIN"
   | "VITE_OIDC_ENABLED"
   | "VITE_OIDC_PROVIDER"
   | "VITE_OIDC_CLIENT_ID"
@@ -11,7 +11,7 @@ type ProjectEnvVariablesType = Pick<
 
 // Environment Variable Template to Be Replaced at Runtime
 const projectEnvVariables: ProjectEnvVariablesType = {
-  VITE_CLIENT_URL: "${VITE_CLIENT_URL}",
+  VITE_BUDGET_BOARD_DOMAIN: "${VITE_BUDGET_BOARD_DOMAIN}",
   VITE_OIDC_ENABLED: "${VITE_OIDC_ENABLED}",
   VITE_OIDC_PROVIDER: "${VITE_OIDC_PROVIDER}",
   VITE_OIDC_CLIENT_ID: "${VITE_OIDC_CLIENT_ID}",
@@ -25,9 +25,10 @@ export const getProjectEnvVariables = (): {
 } => {
   return {
     envVariables: {
-      VITE_CLIENT_URL: !projectEnvVariables.VITE_CLIENT_URL.includes("VITE_")
-        ? projectEnvVariables.VITE_CLIENT_URL
-        : import.meta.env.VITE_CLIENT_URL,
+      VITE_BUDGET_BOARD_DOMAIN:
+        !projectEnvVariables.VITE_BUDGET_BOARD_DOMAIN.includes("VITE_")
+          ? projectEnvVariables.VITE_BUDGET_BOARD_DOMAIN
+          : import.meta.env.VITE_BUDGET_BOARD_DOMAIN,
       VITE_OIDC_ENABLED: !projectEnvVariables.VITE_OIDC_ENABLED?.includes(
         "VITE_"
       )

@@ -27,7 +27,7 @@ public class OidcTokenService(
     /// <returns>A ClaimsPrincipal representing the user, or null if the exchange fails.</returns>
     public async Task<ClaimsPrincipal?> ExchangeCodeForUserAsync(
         string authorizationCode,
-        string redirectUri = "postmessage"
+        string redirectUri
     )
     {
         try
@@ -157,6 +157,7 @@ public class OidcTokenService(
                 new("grant_type", "authorization_code"),
                 new("code", authorizationCode),
                 new("redirect_uri", redirectUri),
+                new("client_id", clientId),
             };
 
             using var content = new FormUrlEncodedContent(tokenRequest);

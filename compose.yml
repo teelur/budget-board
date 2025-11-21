@@ -2,16 +2,30 @@ services:
   budget-board-server:
     container_name: budget-board-server
     restart: unless-stopped
-    image: ghcr.io/teelur/budget-board/server:release
+    image: ghcr.io/teelur/budget-board/server:v3
     build: ./server
     environment:
-      Logging__LogLevel__Default: Information
-      CLIENT_URL: budget-board-client
-      POSTGRES_HOST: budget-board-db
-      POSTGRES_DATABASE: budgetboard
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: superSecretPassword
-      AUTO_UPDATE_DB: true
+      Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
+      CLIENT_ADDRESS: ${CLIENT_ADDRESS:-budget-board-client}
+      POSTGRES_HOST: ${POSTGRES_HOST:-budget-board-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-budgetboard}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-superSecretPassword}
+      OIDC_ENABLED: ${OIDC_ENABLED:-false}
+      OIDC_ISSUER: ${OIDC_ISSUER:-}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      EMAIL_SENDER: ${EMAIL_SENDER:-}
+      EMAIL_SENDER_USERNAME: ${EMAIL_SENDER_USERNAME:-}
+      EMAIL_SENDER_PASSWORD: ${EMAIL_SENDER_PASSWORD:-}
+      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST:-}
+      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT:-587}
+      DISABLE_NEW_USERS: ${DISABLE_NEW_USERS:-false}
+      DISABLE_LOCAL_AUTH: ${DISABLE_LOCAL_AUTH:-false}
+      AUTO_UPDATE_DB: ${AUTO_UPDATE_DB:-true}
+      DISABLE_AUTO_SYNC: ${DISABLE_AUTO_SYNC:-false}
+      SYNC_INTERVAL_HOURS: ${SYNC_INTERVAL_HOURS:-8}
     networks:
       - budget-board-network
     depends_on:
@@ -21,11 +35,17 @@ services:
   budget-board-client:
     container_name: budget-board-client
     restart: unless-stopped
-    image: ghcr.io/teelur/budget-board/client:release
+    image: ghcr.io/teelur/budget-board/client:v3
     build: ./client
     environment:
-      VITE_API_URL: budget-board-client
-      PORT: 6253
+      PORT: ${PORT:-6253}
+      VITE_BUDGET_BOARD_DOMAIN: ${BUDGET_BOARD_DOMAIN:-localhost:6253}
+      VITE_SERVER_ADDRESS: ${SERVER_ADDRESS:-budget-board-server}
+      VITE_OIDC_ENABLED: ${OIDC_ENABLED:-false}
+      VITE_OIDC_PROVIDER: ${OIDC_ISSUER:-}
+      VITE_OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      VITE_DISABLE_NEW_USERS: ${DISABLE_NEW_USERS:-false}
+      VITE_DISABLE_LOCAL_AUTH: ${DISABLE_LOCAL_AUTH:-false}
     ports:
       - 6253:6253
     networks:

@@ -290,7 +290,7 @@ const TwoFactorAuth = (): React.ReactNode => {
               Enabled
             </Badge>
           ) : (
-            <Badge color="red" maw={80}>
+            <Badge color="red" maw={85}>
               Disabled
             </Badge>
           )}
