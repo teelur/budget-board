@@ -39,7 +39,7 @@ services:
     build: ./client
     environment:
       PORT: ${PORT:-6253}
-      VITE_BUDGET_BOARD_DOMAIN: ${BUDGET_BOARD_DOMAIN:-http://localhost:6253}
+      VITE_BUDGET_BOARD_DOMAIN: ${BUDGET_BOARD_DOMAIN:-localhost:6253}
       VITE_SERVER_ADDRESS: ${SERVER_ADDRESS:-budget-board-server}
       VITE_OIDC_ENABLED: ${OIDC_ENABLED:-false}
       VITE_OIDC_PROVIDER: ${OIDC_ISSUER:-}
