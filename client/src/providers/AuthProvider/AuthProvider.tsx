@@ -88,7 +88,7 @@ export const AuthProvider = ({
         notifications.show({
           color: "red",
           message:
-            "OIDC is not configured. Set VITE_OIDC_PROVIDER and VITE_OIDC_CLIENT_ID.",
+            "OIDC is enabled but not configured. Be sure all required environment variables are set.",
         });
         return;
       }
