@@ -18,6 +18,7 @@ public class ValueService(
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
 
+    /// <inheritdoc />
     public async Task CreateValueAsync(Guid userGuid, IValueCreateRequest value)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -42,15 +43,17 @@ public class ValueService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IValueResponse>> ReadValuesAsync(Guid userGuid, Guid assetId)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IValueResponse>> ReadValuesAsync(Guid userGuid, Guid assetId)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var values = userData.Assets.Where(a => a.ID == assetId).SelectMany(a => a.Values);
 
-        return values.Select(v => new ValueResponse(v));
+        return values.Select(v => new ValueResponse(v)).ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateValueAsync(Guid userGuid, IValueUpdateRequest editedValue)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -72,6 +75,7 @@ public class ValueService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteValueAsync(Guid userGuid, Guid valueGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -92,6 +96,7 @@ public class ValueService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task RestoreValueAsync(Guid userGuid, Guid valueGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

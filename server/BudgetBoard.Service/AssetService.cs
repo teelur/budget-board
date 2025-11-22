@@ -18,6 +18,7 @@ public class AssetService(
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
 
+    /// <inheritdoc />
     public async Task CreateAssetAsync(Guid userGuid, IAssetCreateRequest asset)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -28,7 +29,8 @@ public class AssetService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IAssetResponse>> ReadAssetsAsync(
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IAssetResponse>> ReadAssetsAsync(
         Guid userGuid,
         Guid assetGuid = default
     )
@@ -45,6 +47,7 @@ public class AssetService(
         return assetsQuery.OrderBy(a => a.Index).Select(a => new AssetResponse(a)).ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateAssetAsync(Guid userGuid, IAssetUpdateRequest editedAsset)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -75,6 +78,7 @@ public class AssetService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteAssetAsync(Guid userGuid, Guid assetGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -90,6 +94,7 @@ public class AssetService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task RestoreAssetAsync(Guid userGuid, Guid assetGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -105,6 +110,7 @@ public class AssetService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task OrderAssetsAsync(Guid userGuid, IEnumerable<IAssetIndexRequest> orderedAssets)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

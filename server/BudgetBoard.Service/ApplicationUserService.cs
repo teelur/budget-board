@@ -16,6 +16,7 @@ public class ApplicationUserService(
     private readonly ILogger<IApplicationUserService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
 
+    /// <inheritdoc />
     public async Task<IApplicationUserResponse> ReadApplicationUserAsync(
         Guid userGuid,
         UserManager<ApplicationUser> userManager
@@ -31,6 +32,7 @@ public class ApplicationUserService(
         return new ApplicationUserResponse(userData, hasOidcLogin, hasLocalLogin);
     }
 
+    /// <inheritdoc />
     public async Task UpdateApplicationUserAsync(Guid userGuid, IApplicationUserUpdateRequest user)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

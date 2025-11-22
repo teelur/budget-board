@@ -15,6 +15,7 @@ public class UserSettingsService(
     private readonly ILogger<IApplicationUserService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
 
+    /// <inheritdoc />
     public async Task<IUserSettingsResponse> ReadUserSettingsAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -32,6 +33,7 @@ public class UserSettingsService(
         return new UserSettingsResponse(userData.UserSettings);
     }
 
+    /// <inheritdoc />
     public async Task UpdateUserSettingsAsync(
         Guid userGuid,
         IUserSettingsUpdateRequest userSettingsUpdateRequest

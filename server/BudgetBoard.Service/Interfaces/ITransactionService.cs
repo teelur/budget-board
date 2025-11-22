@@ -2,13 +2,67 @@
 
 namespace BudgetBoard.Service.Interfaces;
 
+/// <summary>
+/// Service for managing financial transactions.
+/// </summary>
 public interface ITransactionService
 {
+    /// <summary>
+    /// Creates a new transaction for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="transaction">The transaction creation details.</param>
     Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest transaction);
-    Task<IEnumerable<ITransactionResponse>> ReadTransactionsAsync(Guid userGuid, int? year, int? month, bool getHidden, Guid guid = default);
+
+    /// <summary>
+    /// Retrieves transactions for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="year">Optional. The year to filter transactions by.</param>
+    /// <param name="month">Optional. The month to filter transactions by.</param>
+    /// <param name="getHidden">If true, includes hidden transactions in the response.</param>
+    /// <param name="guid">Optional. The unique identifier of a specific transaction to retrieve.</param>
+    /// <returns>A collection of transaction details.</returns>
+    Task<IReadOnlyList<ITransactionResponse>> ReadTransactionsAsync(
+        Guid userGuid,
+        int? year,
+        int? month,
+        bool getHidden,
+        Guid guid = default
+    );
+
+    /// <summary>
+    /// Updates an existing transaction.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="editedTransaction">The transaction update details.</param>
     Task UpdateTransactionAsync(Guid userGuid, ITransactionUpdateRequest editedTransaction);
+
+    /// <summary>
+    /// Deletes (soft deletes) a transaction.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="transactionID">The unique identifier of the transaction to delete.</param>
     Task DeleteTransactionAsync(Guid userGuid, Guid transactionID);
+
+    /// <summary>
+    /// Restores a previously deleted transaction.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="transactionID">The unique identifier of the transaction to restore.</param>
     Task RestoreTransactionAsync(Guid userGuid, Guid transactionID);
+
+    /// <summary>
+    /// Splits a transaction into two parts.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="transaction">The transaction split details.</param>
     Task SplitTransactionAsync(Guid userGuid, ITransactionSplitRequest transaction);
+
+    /// <summary>
+    /// Imports a batch of transactions.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="transactionImportRequest">The transaction import details.</param>
     Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest transactionImportRequest);
 }

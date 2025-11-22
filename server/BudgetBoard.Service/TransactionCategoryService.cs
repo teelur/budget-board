@@ -15,6 +15,7 @@ public class TransactionCategoryService(
     private readonly ILogger<ITransactionCategoryService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
 
+    /// <inheritdoc />
     public async Task CreateTransactionCategoryAsync(Guid userGuid, ICategoryCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -82,7 +83,8 @@ public class TransactionCategoryService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<ICategoryResponse>> ReadTransactionCategoriesAsync(
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ICategoryResponse>> ReadTransactionCategoriesAsync(
         Guid userGuid,
         Guid categoryGuid = default
     )
@@ -104,9 +106,10 @@ public class TransactionCategoryService(
             return [new CategoryResponse(transactionCategory)];
         }
 
-        return userData.TransactionCategories.Select(c => new CategoryResponse(c));
+        return userData.TransactionCategories.Select(c => new CategoryResponse(c)).ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateTransactionCategoryAsync(
         Guid userGuid,
         ICategoryUpdateRequest updatedCategory
@@ -130,6 +133,7 @@ public class TransactionCategoryService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteTransactionCategoryAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

@@ -18,6 +18,7 @@ public class TransactionService(
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
 
+    /// <inheritdoc />
     public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest transaction)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -78,7 +79,8 @@ public class TransactionService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<ITransactionResponse>> ReadTransactionsAsync(
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ITransactionResponse>> ReadTransactionsAsync(
         Guid userGuid,
         int? year,
         int? month,
@@ -115,9 +117,10 @@ public class TransactionService(
             return [new TransactionResponse(transaction)];
         }
 
-        return transactions.Select(t => new TransactionResponse(t));
+        return transactions.Select(t => new TransactionResponse(t)).ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateTransactionAsync(
         Guid userGuid,
         ITransactionUpdateRequest editedTransaction
@@ -158,6 +161,7 @@ public class TransactionService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteTransactionAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -199,6 +203,7 @@ public class TransactionService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task RestoreTransactionAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -217,6 +222,7 @@ public class TransactionService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task SplitTransactionAsync(
         Guid userGuid,
         ITransactionSplitRequest transactionSplitRequest
@@ -271,6 +277,7 @@ public class TransactionService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task ImportTransactionsAsync(
         Guid userGuid,
         ITransactionImportRequest transactionImportRequest

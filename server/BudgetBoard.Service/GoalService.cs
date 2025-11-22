@@ -18,6 +18,7 @@ public class GoalService(
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
 
+    /// <inheritdoc />
     public async Task CreateGoalAsync(Guid userGuid, IGoalCreateRequest createdGoal)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -85,7 +86,8 @@ public class GoalService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IGoalResponse>> ReadGoalsAsync(
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IGoalResponse>> ReadGoalsAsync(
         Guid userGuid,
         bool includeInterest
     )
@@ -116,10 +118,11 @@ public class GoalService(
         return goalsResponse;
     }
 
-    public async Task UpdateGoalAsync(Guid userGuid, IGoalUpdateRequest updatedGoal)
+    /// <inheritdoc />
+    public async Task UpdateGoalAsync(Guid userGuid, IGoalUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var goal = userData.Goals.FirstOrDefault(g => g.ID == updatedGoal.ID);
+        var goal = userData.Goals.FirstOrDefault(g => g.ID == request.ID);
         if (goal == null)
         {
             _logger.LogError("Attempt to update goal that does not exist.");
@@ -129,19 +132,16 @@ public class GoalService(
         }
 
         if (
-            updatedGoal.CompleteDate.HasValue
-            && updatedGoal.IsCompleteDateEditable
-            && updatedGoal.CompleteDate.Value < _nowProvider.UtcNow
+            request.CompleteDate.HasValue
+            && request.IsCompleteDateEditable
+            && request.CompleteDate.Value < _nowProvider.UtcNow
         )
         {
             _logger.LogError("Attempt to update goal with a target date in the past.");
             throw new BudgetBoardServiceException("A goal cannot have a target date in the past.");
         }
 
-        if (
-            ((updatedGoal.MonthlyContribution ?? -1) <= 0)
-            && updatedGoal.IsMonthlyContributionEditable
-        )
+        if (((request.MonthlyContribution ?? -1) <= 0) && request.IsMonthlyContributionEditable)
         {
             _logger.LogError("Attempt to update goal without a monthly contribution.");
             throw new BudgetBoardServiceException(
@@ -149,18 +149,19 @@ public class GoalService(
             );
         }
 
-        goal.Name = updatedGoal.Name;
-        goal.Amount = updatedGoal.Amount;
-        goal.CompleteDate = updatedGoal.IsCompleteDateEditable
-            ? updatedGoal.CompleteDate
+        goal.Name = request.Name;
+        goal.Amount = request.Amount;
+        goal.CompleteDate = request.IsCompleteDateEditable
+            ? request.CompleteDate
             : goal.CompleteDate;
-        goal.MonthlyContribution = updatedGoal.IsMonthlyContributionEditable
-            ? updatedGoal.MonthlyContribution
+        goal.MonthlyContribution = request.IsMonthlyContributionEditable
+            ? request.MonthlyContribution
             : goal.MonthlyContribution;
 
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteGoalAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -177,6 +178,7 @@ public class GoalService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task CompleteGoalAsync(Guid userGuid, Guid goalID, DateTime completedDate)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

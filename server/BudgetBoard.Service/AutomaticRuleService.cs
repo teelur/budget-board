@@ -18,6 +18,7 @@ public class AutomaticRuleService(
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly ITransactionService _transactionService = transactionService;
 
+    /// <inheritdoc />
     public async Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest rule)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -84,7 +85,8 @@ public class AutomaticRuleService(
         }
     }
 
-    public async Task<IEnumerable<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         return userData
@@ -115,6 +117,7 @@ public class AutomaticRuleService(
             .ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateAutomaticRuleAsync(
         Guid userGuid,
         IAutomaticRuleUpdateRequest updatedRule
@@ -189,6 +192,7 @@ public class AutomaticRuleService(
         }
     }
 
+    /// <inheritdoc />
     public async Task DeleteAutomaticRuleAsync(Guid userGuid, Guid ruleGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -217,6 +221,7 @@ public class AutomaticRuleService(
         }
     }
 
+    /// <inheritdoc />
     public async Task<string> RunAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest rule)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

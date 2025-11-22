@@ -77,6 +77,8 @@ builder.Services.AddDbContext<UserDataContext>(o =>
     o.UseNpgsql(connectionString, op => op.MapEnum<Currency>("currency"))
 );
 
+builder.Services.AddLocalization();
+
 var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 var disableLocalAuth = builder.Configuration.GetValue<bool>("DISABLE_LOCAL_AUTH");
 
@@ -290,6 +292,14 @@ app.MyMapIdentityApi<ApplicationUser>(
 
 // Activate the CORS policy
 app.UseCors(MyAllowSpecificOrigins);
+
+// Add localization support
+var supportedCultures = new[] { "en-US" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
 
 // Enable authentication and authorization after CORS Middleware
 // processing (UseCors) in case the Authorization Middleware tries

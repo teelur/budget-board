@@ -18,6 +18,7 @@ public class BalanceService(
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
 
+    /// <inheritdoc />
     public async Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest balance)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -41,7 +42,8 @@ public class BalanceService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IBalanceResponse>> ReadBalancesAsync(
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IBalanceResponse>> ReadBalancesAsync(
         Guid userGuid,
         Guid accountId
     )
@@ -56,9 +58,10 @@ public class BalanceService(
             );
         }
 
-        return account.Balances.Select(b => new BalanceResponse(b));
+        return account.Balances.Select(b => new BalanceResponse(b)).ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest updatedBalance)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -79,12 +82,13 @@ public class BalanceService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task DeleteBalanceAsync(Guid userGuid, Guid balanceId)
+    /// <inheritdoc />
+    public async Task DeleteBalanceAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var balance = userData
             .Accounts.SelectMany(a => a.Balances)
-            .FirstOrDefault(b => b.ID == balanceId);
+            .FirstOrDefault(b => b.ID == guid);
         if (balance == null)
         {
             _logger.LogError("Attempt to delete balance that does not exist.");
@@ -97,12 +101,13 @@ public class BalanceService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task RestoreBalanceAsync(Guid userGuid, Guid balanceId)
+    /// <inheritdoc />
+    public async Task RestoreBalanceAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var balance = userData
             .Accounts.SelectMany(a => a.Balances)
-            .FirstOrDefault(b => b.ID == balanceId);
+            .FirstOrDefault(b => b.ID == guid);
         if (balance == null)
         {
             _logger.LogError("Attempt to restore balance that does not exist.");

@@ -18,6 +18,7 @@ public class InstitutionService(
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
 
+    /// <inheritdoc />
     public async Task CreateInstitutionAsync(Guid userGuid, IInstitutionCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -38,7 +39,8 @@ public class InstitutionService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IInstitutionResponse>> ReadInstitutionsAsync(
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IInstitutionResponse>> ReadInstitutionsAsync(
         Guid userGuid,
         Guid guid = default
     )
@@ -58,9 +60,10 @@ public class InstitutionService(
             return [new InstitutionResponse(insitution)];
         }
 
-        return userData.Institutions.Select(i => new InstitutionResponse(i));
+        return userData.Institutions.Select(i => new InstitutionResponse(i)).ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateInstitutionAsync(Guid userGuid, IInstitutionUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -95,6 +98,7 @@ public class InstitutionService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteInstitutionAsync(Guid userGuid, Guid id, bool deleteTransactions)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -119,6 +123,7 @@ public class InstitutionService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task OrderInstitutionsAsync(
         Guid userGuid,
         IEnumerable<IInstitutionIndexRequest> orderedInstitutions

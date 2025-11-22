@@ -72,7 +72,8 @@ public class SimpleFinService(
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
     private readonly IAutomaticRuleService _automaticRuleService = automaticRuleService;
 
-    public async Task<IEnumerable<string>> SyncAsync(Guid userGuid)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<string>> SyncAsync(Guid userGuid)
     {
         var errors = new List<string>();
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -149,6 +150,7 @@ public class SimpleFinService(
         return errors;
     }
 
+    /// <inheritdoc />
     public async Task UpdateAccessTokenFromSetupToken(Guid userGuid, string setupToken)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

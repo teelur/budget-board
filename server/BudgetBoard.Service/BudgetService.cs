@@ -15,6 +15,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
     private readonly ILogger<IBudgetService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
 
+    /// <inheritdoc />
     public async Task CreateBudgetsAsync(
         Guid userGuid,
         IEnumerable<IBudgetCreateRequest> budgets,
@@ -137,16 +138,21 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         }
     }
 
-    public async Task<IEnumerable<IBudgetResponse>> ReadBudgetsAsync(Guid userGuid, DateTime date)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IBudgetResponse>> ReadBudgetsAsync(
+        Guid userGuid,
+        DateTime monthDate
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var budgets = userData.Budgets.Where(b =>
-            b.Date.Month == date.Month && b.Date.Year == date.Year
+            b.Date.Month == monthDate.Month && b.Date.Year == monthDate.Year
         );
 
-        return budgets.Select(b => new BudgetResponse(b));
+        return budgets.Select(b => new BudgetResponse(b)).ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateBudgetAsync(Guid userGuid, IBudgetUpdateRequest updatedBudget)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -239,6 +245,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteBudgetAsync(Guid userGuid, Guid budgetGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

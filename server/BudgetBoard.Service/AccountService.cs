@@ -3,55 +3,63 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
+/// <inheritdoc />
 public class AccountService(
     ILogger<IAccountService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IAccountService
 {
     private readonly ILogger<IAccountService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
-    public async Task CreateAccountAsync(Guid userGuid, IAccountCreateRequest account)
+    /// <inheritdoc />
+    public async Task CreateAccountAsync(Guid userGuid, IAccountCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (userData.Accounts.Any(a => account.SyncID != null && a.SyncID == account.SyncID))
+        if (userData.Accounts.Any(a => request.SyncID != null && a.SyncID == request.SyncID))
         {
-            _logger.LogError("Attempted to create an account with a duplicate SyncID.");
-            throw new BudgetBoardServiceException("An account with this SyncID already exists.");
+            _logger.LogError("{LogMessage}", _logLocalizer["DuplicateSyncIDLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["DuplicateSyncIDError"]);
         }
 
-        if (!userData.Institutions.Any(i => i.ID == account.InstitutionID))
+        if (!userData.Institutions.Any(i => i.ID == request.InstitutionID))
         {
-            _logger.LogError("Attempted to create an account with an invalid institution ID.");
-            throw new BudgetBoardServiceException("Invalid Institution ID.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidInstitutionIDLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidInstitutionIDError"]);
         }
 
-        var institution = userData.Institutions.Single(i => i.ID == account.InstitutionID);
+        var institution = userData.Institutions.Single(i => i.ID == request.InstitutionID);
 
+        // Creating an account under a deleted institution should restore the institution.
         if (institution.Deleted.HasValue)
         {
-            // If the institution is deleted, we need to restore it.
             institution.Deleted = null;
         }
 
         var newAccount = new Account
         {
-            SyncID = account.SyncID,
-            Name = account.Name,
-            InstitutionID = account.InstitutionID,
-            Type = account.Type,
-            Subtype = account.Subtype,
-            HideTransactions = account.HideTransactions,
-            HideAccount = account.HideAccount,
-            Source = account.Source ?? AccountSource.Manual,
+            SyncID = request.SyncID,
+            Name = request.Name,
+            InstitutionID = request.InstitutionID,
+            Type = request.Type,
+            Subtype = request.Subtype,
+            HideTransactions = request.HideTransactions,
+            HideAccount = request.HideAccount,
+            Source = request.Source ?? AccountSource.Manual,
             UserID = userData.Id,
         };
 
@@ -59,101 +67,102 @@ public class AccountService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IAccountResponse>> ReadAccountsAsync(
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IAccountResponse>> ReadAccountsAsync(
         Guid userGuid,
         Guid accountGuid = default
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        if (accountGuid != default)
-        {
-            var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
-            if (account == null)
-            {
-                _logger.LogError("Attempt to access account that does not exist.");
-                throw new BudgetBoardServiceException(
-                    "The account you are trying to access does not exist."
-                );
-            }
 
-            return [new AccountResponse(account)];
+        if (accountGuid == default)
+        {
+            return userData.Accounts.Select(a => new AccountResponse(a)).ToList();
         }
 
-        return userData.Accounts.Select(a => new AccountResponse(a));
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
+        if (account == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["AccountNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["AccountNotFoundError"]);
+        }
+
+        return [new AccountResponse(account)];
     }
 
+    /// <inheritdoc />
     public async Task UpdateAccountAsync(Guid userGuid, IAccountUpdateRequest editedAccount)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var account = userData.Accounts.FirstOrDefault(a => a.ID == editedAccount.ID);
         if (account == null)
         {
-            _logger.LogError("Attempt to edit account that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The account you are trying to edit does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["AccountEditNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["AccountEditNotFoundError"]);
         }
 
         if (string.IsNullOrEmpty(editedAccount.Name))
         {
-            _logger.LogError("Attempt to edit account with empty name.");
-            throw new BudgetBoardServiceException("Account name cannot be empty.");
+            _logger.LogError("{LogMessage}", _logLocalizer["AccountEditEmptyNameLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["AccountEditEmptyNameError"]);
         }
 
-        account.Name = editedAccount.Name;
-        account.Type = editedAccount.Type;
-        account.Subtype = editedAccount.Subtype;
-        account.HideTransactions = editedAccount.HideTransactions;
-        account.HideAccount = editedAccount.HideAccount;
-        account.InterestRate = editedAccount.InterestRate;
-
+        _userDataContext.Entry(account).CurrentValues.SetValues(editedAccount);
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task DeleteAccountAsync(Guid userGuid, Guid guid, bool deleteTransactions = false)
+    /// <inheritdoc />
+    public async Task DeleteAccountAsync(
+        Guid userGuid,
+        Guid accountGuid,
+        bool deleteTransactions = false
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == guid);
+
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
         if (account == null)
         {
-            _logger.LogError("Attempt to delete account that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The account you are trying to delete does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["AccountDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["AccountDeleteNotFoundError"]);
         }
 
-        account.Deleted = _nowProvider.UtcNow;
+        var now = _nowProvider.UtcNow;
+        account.Deleted = now;
 
         if (deleteTransactions)
         {
             foreach (var transaction in account.Transactions)
             {
-                transaction.Deleted = _nowProvider.UtcNow;
+                transaction.Deleted = now;
             }
         }
 
         if (account.Institution?.Accounts.All(a => a.Deleted != null) ?? false)
         {
-            account.Institution.Deleted = _nowProvider.UtcNow;
+            account.Institution.Deleted = now;
             account.Institution.Index = 0;
         }
 
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task RestoreAccountAsync(
         Guid userGuid,
-        Guid guid,
+        Guid accountGuid,
         bool restoreTransactions = false
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == guid);
+
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
         if (account == null)
         {
-            _logger.LogError("Attempt to restore account that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["AccountRestoreNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The account you are trying to restore does not exist."
+                _responseLocalizer["AccountRestoreNotFoundError"]
             );
         }
 
@@ -175,20 +184,22 @@ public class AccountService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task OrderAccountsAsync(
         Guid userGuid,
         IEnumerable<IAccountIndexRequest> orderedAccounts
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         foreach (var orderedAccount in orderedAccounts)
         {
             var account = userData.Accounts.FirstOrDefault(a => a.ID == orderedAccount.ID);
             if (account == null)
             {
-                _logger.LogError("Attempt to set index for account that does not exist.");
+                _logger.LogError("{LogMessage}", _logLocalizer["AccountOrderNotFoundLog"]);
                 throw new BudgetBoardServiceException(
-                    "The account you are trying to set the index for does not exist."
+                    _responseLocalizer["AccountOrderNotFoundError"]
                 );
             }
 
@@ -219,18 +230,16 @@ public class AccountService(
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;
