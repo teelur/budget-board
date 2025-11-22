@@ -51,23 +51,24 @@ public class ApplicationUserService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
+        ApplicationUser? foundUser;
         try
         {
             var users = await _userDataContext.ApplicationUsers.ToListAsync();
-            var foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
-
-            if (foundUser == null)
-            {
-                _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserLog"]);
-                throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
-            }
-
-            return foundUser;
+            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["UserRetrievalErrorLog", ex.Message]);
             throw new BudgetBoardServiceException(_responseLocalizer["UserRetrievalError"]);
         }
+
+        if (foundUser == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
+        }
+
+        return foundUser;
     }
 }

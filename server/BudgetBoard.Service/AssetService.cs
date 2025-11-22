@@ -3,7 +3,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -11,12 +13,16 @@ namespace BudgetBoard.Service;
 public class AssetService(
     ILogger<IAssetService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IAssetService
 {
     private readonly ILogger<IAssetService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
     public async Task CreateAssetAsync(Guid userGuid, IAssetCreateRequest asset)
@@ -25,7 +31,7 @@ public class AssetService(
 
         var newAsset = new Asset { Name = asset.Name, UserID = userData.Id };
 
-        userData.Assets.Add(newAsset);
+        _userDataContext.Assets.Add(newAsset);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -42,6 +48,11 @@ public class AssetService(
         if (assetGuid != default)
         {
             assetsQuery = [.. assetsQuery.Where(a => a.ID == assetGuid)];
+            if (assetsQuery.Count == 0)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["AssetNotFoundLog"]);
+                throw new BudgetBoardServiceException(_responseLocalizer["AssetNotFoundError"]);
+            }
         }
 
         return assetsQuery.OrderBy(a => a.Index).Select(a => new AssetResponse(a)).ToList();
@@ -56,25 +67,17 @@ public class AssetService(
 
         if (asset == null)
         {
-            _logger.LogError("Attempted to update a non-existent asset.");
-            throw new BudgetBoardServiceException("Asset not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["AssetEditNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["AssetEditNotFoundError"]);
         }
 
         if (userData.Assets.Any(a => a.Name == editedAsset.Name && a.ID != editedAsset.ID))
         {
-            _logger.LogError("Attempted to update an asset to a duplicate name.");
-            throw new BudgetBoardServiceException("An asset with this name already exists.");
+            _logger.LogError("{LogMessage}", _logLocalizer["DuplicateAssetNameLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["DuplicateAssetNameError"]);
         }
 
-        asset.Name = editedAsset.Name;
-        asset.PurchaseDate = editedAsset.PurchaseDate.HasValue
-            ? new DateTime(editedAsset.PurchaseDate.Value.Ticks).ToUniversalTime()
-            : null;
-        asset.PurchasePrice = editedAsset.PurchasePrice;
-        asset.SellDate = editedAsset.SellDate;
-        asset.SellPrice = editedAsset.SellPrice;
-        asset.Hide = editedAsset.Hide;
-
+        _userDataContext.Entry(asset).CurrentValues.SetValues(editedAsset);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -131,11 +134,10 @@ public class AssetService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            var users = await _userDataContext
                 .ApplicationUsers.Include(u => u.Assets)
                 .ThenInclude(a => a.Values)
                 .AsSplitQuery()

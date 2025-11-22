@@ -63,7 +63,7 @@ public class AccountService(
             UserID = userData.Id,
         };
 
-        userData.Accounts.Add(newAccount);
+        _userDataContext.Accounts.Add(newAccount);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -75,19 +75,19 @@ public class AccountService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (accountGuid == default)
+        var accountsQuery = userData.Accounts.ToList();
+
+        if (accountGuid != default)
         {
-            return userData.Accounts.Select(a => new AccountResponse(a)).ToList();
+            accountsQuery = [.. accountsQuery.Where(a => a.ID == accountGuid)];
+            if (accountsQuery.Count == 0)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["AccountNotFoundLog"]);
+                throw new BudgetBoardServiceException(_responseLocalizer["AccountNotFoundError"]);
+            }
         }
 
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
-        if (account == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["AccountNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["AccountNotFoundError"]);
-        }
-
-        return [new AccountResponse(account)];
+        return accountsQuery.OrderBy(a => a.Index).Select(a => new AccountResponse(a)).ToList();
     }
 
     /// <inheritdoc />
@@ -211,6 +211,7 @@ public class AccountService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
+        ApplicationUser? foundUser;
         try
         {
             var users = await _userDataContext
@@ -223,15 +224,7 @@ public class AccountService(
                 .Include(u => u.Institutions)
                 .AsSplitQuery()
                 .ToListAsync();
-            var foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
-
-            if (foundUser == null)
-            {
-                _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-                throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
-            }
-
-            return foundUser;
+            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
@@ -241,5 +234,13 @@ public class AccountService(
             );
             throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
+
+        if (foundUser == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
+        }
+
+        return foundUser;
     }
 }
