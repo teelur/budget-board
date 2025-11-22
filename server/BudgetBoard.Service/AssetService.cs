@@ -89,8 +89,8 @@ public class AssetService(
         var asset = userData.Assets.SingleOrDefault(a => a.ID == assetGuid);
         if (asset == null)
         {
-            _logger.LogError("Attempted to delete a non-existent asset.");
-            throw new BudgetBoardServiceException("Asset not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["AssetDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["AssetDeleteNotFoundError"]);
         }
 
         asset.Deleted = _nowProvider.UtcNow;
@@ -105,8 +105,8 @@ public class AssetService(
         var asset = userData.Assets.SingleOrDefault(a => a.ID == assetGuid);
         if (asset == null)
         {
-            _logger.LogError("Attempted to restore a non-existent asset.");
-            throw new BudgetBoardServiceException("Asset not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["AssetRestoreNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["AssetRestoreNotFoundError"]);
         }
 
         asset.Deleted = null;
@@ -123,8 +123,10 @@ public class AssetService(
             var asset = userData.Assets.SingleOrDefault(a => a.ID == orderedAsset.ID);
             if (asset == null)
             {
-                _logger.LogError("Attempted to order a non-existent asset.");
-                throw new BudgetBoardServiceException("Asset not found.");
+                _logger.LogError("{LogMessage}", _logLocalizer["AssetOrderNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    _responseLocalizer["AssetOrderNotFoundError"]
+                );
             }
             asset.Index = orderedAsset.Index;
         }
@@ -146,19 +148,14 @@ public class AssetService(
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
-            );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["GetUserDataErrorLog", ex.Message]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GetUserDataError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["UserNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["UserNotFoundError"]);
         }
 
         return foundUser;
