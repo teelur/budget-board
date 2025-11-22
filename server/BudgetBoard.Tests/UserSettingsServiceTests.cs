@@ -16,8 +16,8 @@ public class UserSettingsServiceTests
     private readonly Mock<ILogger<IApplicationUserService>> _loggerMock;
     private readonly Faker<UserSettingsUpdateRequest> _userSettingsUpdateRequestFaker =
         new Faker<UserSettingsUpdateRequest>().RuleFor(
-            s => s.Currency,
-            f => f.Random.Enum<Currency>().ToString()
+            u => u.Currency,
+            f => f.Finance.Currency().Code
         );
 
     public UserSettingsServiceTests()
@@ -92,7 +92,7 @@ public class UserSettingsServiceTests
 
         // Assert
         result.Should().BeOfType<UserSettingsResponse>();
-        result.Currency.Should().Be(Currency.USD.ToString()); // Default currency
+        result.Currency.Should().Be("USD");
     }
 
     [Fact]

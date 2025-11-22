@@ -73,9 +73,7 @@ var connectionString = new string(
 
 System.Diagnostics.Debug.WriteLine("Connection string: " + connectionString);
 
-builder.Services.AddDbContext<UserDataContext>(o =>
-    o.UseNpgsql(connectionString, op => op.MapEnum<Currency>("currency"))
-);
+builder.Services.AddDbContext<UserDataContext>(o => o.UseNpgsql(connectionString));
 
 builder.Services.AddLocalization();
 
