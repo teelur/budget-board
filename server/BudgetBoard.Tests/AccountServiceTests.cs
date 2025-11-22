@@ -4,7 +4,9 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit.Abstractions;
@@ -43,7 +45,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -75,7 +79,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var account = _accountCreateRequestFaker.Generate();
@@ -99,7 +105,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -136,7 +144,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -177,7 +187,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -214,7 +226,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -245,7 +259,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -271,7 +287,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -300,7 +318,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -331,7 +351,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -359,7 +381,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -397,7 +421,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -422,7 +448,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var invalidGuid = Guid.NewGuid();
 
@@ -457,7 +485,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -497,7 +527,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -531,7 +563,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -572,7 +606,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -603,7 +639,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -640,7 +678,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -682,7 +722,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -714,7 +756,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var randomNumberBetween1And10 = new Random().Next(1, 10);
@@ -759,7 +803,9 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var randomNumberBetween1And10 = new Random().Next(1, 10);

@@ -4,7 +4,9 @@ using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
@@ -83,7 +85,9 @@ public class SimpleFinServiceTests
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
@@ -102,7 +106,9 @@ public class SimpleFinServiceTests
         );
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
@@ -177,7 +183,9 @@ public class SimpleFinServiceTests
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
@@ -196,7 +204,9 @@ public class SimpleFinServiceTests
         );
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),

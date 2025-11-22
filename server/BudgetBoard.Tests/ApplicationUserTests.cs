@@ -3,8 +3,10 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -20,7 +22,9 @@ public class ApplicationUserTests
         var helper = new TestHelper();
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var mockUserManager = MockUserManager(helper.demoUser);
@@ -42,7 +46,9 @@ public class ApplicationUserTests
         var helper = new TestHelper();
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var mockUserManager = MockUserManager(helper.demoUser);
@@ -69,7 +75,9 @@ public class ApplicationUserTests
         var helper = new TestHelper();
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var userUpdateRequest = new ApplicationUserUpdateRequest { LastSync = fakeDate };
 
@@ -92,7 +100,9 @@ public class ApplicationUserTests
         var helper = new TestHelper();
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var userUpdateRequest = new ApplicationUserUpdateRequest { LastSync = fakeDate };

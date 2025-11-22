@@ -24,6 +24,6 @@ public interface IApplicationUserService
     /// Updates the details of an existing application user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="user">The user update details.</param>
-    Task UpdateApplicationUserAsync(Guid userGuid, IApplicationUserUpdateRequest user);
+    /// <param name="request">The user update details.</param>
+    Task UpdateApplicationUserAsync(Guid userGuid, IApplicationUserUpdateRequest request);
 }

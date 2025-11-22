@@ -211,11 +211,9 @@ public class AccountService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
-        ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            var users = await _userDataContext
                 .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.Accounts)
@@ -225,7 +223,15 @@ public class AccountService(
                 .Include(u => u.Institutions)
                 .AsSplitQuery()
                 .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+            var foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+
+            if (foundUser == null)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+                throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
+            }
+
+            return foundUser;
         }
         catch (Exception ex)
         {
@@ -235,13 +241,5 @@ public class AccountService(
             );
             throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
-
-        if (foundUser == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
     }
 }
