@@ -240,8 +240,10 @@ public class SimpleFinServiceTests
 
         helper.UserDataContext.Transactions.Add(transaction);
 
+        var newRuleId = Guid.NewGuid();
         var automaticRule = new AutomaticRule()
         {
+            ID = newRuleId,
             UserID = helper.demoUser.Id,
             Conditions =
             [
@@ -250,6 +252,7 @@ public class SimpleFinServiceTests
                     Field = "merchant",
                     Operator = "contains",
                     Value = "Starbucks",
+                    RuleID = newRuleId,
                 },
             ],
             Actions =
@@ -259,6 +262,7 @@ public class SimpleFinServiceTests
                     Field = "category",
                     Operator = "set",
                     Value = "Coffee Shops",
+                    RuleID = newRuleId,
                 },
             ],
         };

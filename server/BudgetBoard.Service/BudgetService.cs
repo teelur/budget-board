@@ -268,7 +268,11 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
 
         if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
         {
-            var childBudgetsForMonth = GetChildBudgetsForMonth(userData, budget);
+            var childBudgetsForMonth = GetChildBudgetsForMonth(
+                userData,
+                budget.Category,
+                budget.Date
+            );
 
             foreach (var childBudget in childBudgetsForMonth)
             {
@@ -312,7 +316,11 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         return foundUser;
     }
 
-    private List<Budget> GetChildBudgetsForMonth(ApplicationUser? userData, Budget parentBudget)
+    private List<Budget> GetChildBudgetsForMonth(
+        ApplicationUser? userData,
+        string parentCategory,
+        DateTime monthDate
+    )
     {
         if (userData == null)
         {
@@ -337,13 +345,11 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
             !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)
             && TransactionCategoriesHelpers
                 .GetParentCategory(b.Category, allCategories)
-                .Equals(parentBudget.Category, StringComparison.CurrentCultureIgnoreCase)
+                .Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
         );
 
         var childBudgetsForMonth = childBudgets
-            .Where(b =>
-                b.Date.Month == parentBudget.Date.Month && b.Date.Year == parentBudget.Date.Year
-            )
+            .Where(b => b.Date.Month == monthDate.Month && b.Date.Year == monthDate.Year)
             .ToList();
 
         return childBudgetsForMonth ?? [];
@@ -353,18 +359,5 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         string parentCategory,
         DateTime date,
         ApplicationUser userData
-    )
-    {
-        IList<Budget> childrenBudgets = GetChildBudgetsForMonth(
-            userData,
-            new Budget
-            {
-                Category = parentCategory,
-                Date = date,
-                UserID = userData.Id,
-            }
-        );
-
-        return childrenBudgets.Sum(b => b.Limit);
-    }
+    ) => GetChildBudgetsForMonth(userData, parentCategory, date).Sum(b => b.Limit);
 }

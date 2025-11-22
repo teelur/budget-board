@@ -232,7 +232,6 @@ public class TransactionResponse : ITransactionResponse
         Category = transaction.Category;
         Subcategory = transaction.Subcategory;
         MerchantName = transaction.MerchantName;
-        Pending = transaction.Pending;
         Deleted = transaction.Deleted;
         Source = transaction.Source;
         AccountID = transaction.AccountID;

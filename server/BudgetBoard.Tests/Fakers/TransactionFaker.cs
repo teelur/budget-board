@@ -18,7 +18,6 @@ public class TransactionFaker : Faker<Transaction>
             .RuleFor(t => t.Category, f => f.Random.String(10))
             .RuleFor(t => t.Subcategory, f => f.Random.String(10))
             .RuleFor(t => t.MerchantName, f => f.Random.String(10))
-            .RuleFor(t => t.Pending, f => false)
             .RuleFor(t => t.Source, f => f.Random.String(10))
             .RuleFor(t => t.AccountID, f => f.PickRandom(AccountIds));
     }

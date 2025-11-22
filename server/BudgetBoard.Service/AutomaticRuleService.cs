@@ -38,9 +38,10 @@ public class AutomaticRuleService(
             );
         }
 
+        var newRuleId = Guid.NewGuid();
         var newRule = new AutomaticRule
         {
-            ID = Guid.NewGuid(),
+            ID = newRuleId,
             UserID = userData.Id,
             Conditions =
             [
@@ -50,6 +51,7 @@ public class AutomaticRuleService(
                     Field = c.Field,
                     Operator = c.Operator,
                     Value = c.Value,
+                    RuleID = newRuleId,
                 }),
             ],
             Actions =
@@ -60,6 +62,7 @@ public class AutomaticRuleService(
                     Field = a.Field,
                     Operator = a.Operator,
                     Value = a.Value,
+                    RuleID = newRuleId,
                 }),
             ],
         };

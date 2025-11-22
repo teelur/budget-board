@@ -75,21 +75,11 @@ public class GoalService(
             Name = createdGoal.Name,
             CompleteDate = createdGoal.CompleteDate,
             Amount = createdGoal.Amount,
+            InitialAmount = createdGoal.InitialAmount ?? runningBalance,
             MonthlyContribution = createdGoal.MonthlyContribution,
             Accounts = accounts,
             UserID = userData.Id,
         };
-
-        if (!createdGoal.InitialAmount.HasValue)
-        {
-            // The frontend will set the initial balance if we don't want to include existing balances
-            // in the goal.
-            newGoal.InitialAmount = runningBalance;
-        }
-        else
-        {
-            newGoal.InitialAmount = createdGoal.InitialAmount.Value;
-        }
 
         userData.Goals.Add(newGoal);
         await _userDataContext.SaveChangesAsync();
