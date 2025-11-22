@@ -88,4 +88,55 @@
   <data name="InvalidUserErrorLog" xml:space="preserve">
     <value>Attempted to access an invalid user.</value>
   </data>
+  <data name="AssetNotFoundLog" xml:space="preserve">
+    <value>Attempted to access an asset that does not exist.</value>
+  </data>
+  <data name="AssetEditNotFoundLog" xml:space="preserve">
+    <value>Attempted to edit an asset that does not exist.</value>
+  </data>
+  <data name="DuplicateAssetNameLog" xml:space="preserve">
+    <value>Attempted to update an asset with a duplicate name.</value>
+  </data>
+  <data name="AssetDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete an asset that does not exist.</value>
+  </data>
+  <data name="AssetRestoreNotFoundLog" xml:space="preserve">
+    <value>Attempted to restore an asset that does not exist.</value>
+  </data>
+  <data name="AssetOrderNotFoundLog" xml:space="preserve">
+    <value>Attempted to set index for asset that does not exist.</value>
+  </data>
+  <data name="NoConditionsLog" xml:space="preserve">
+    <value>Attempted to create an automatic rule with no conditions.</value>
+  </data>
+  <data name="NoActionsLog" xml:space="preserve">
+    <value>Attempted to create an automatic rule with no actions.</value>
+  </data>
+  <data name="AutomaticRuleNotFoundLog" xml:space="preserve">
+    <value>Attempted to update an automatic rule that does not exist.</value>
+  </data>
+  <data name="NoConditionsLog" xml:space="preserve">
+    <value>Attempted to update an automatic rule with no conditions.</value>
+  </data>
+  <data name="NoActionsLog" xml:space="preserve">
+    <value>Attempted to update an automatic rule with no actions.</value>
+  </data>
+  <data name="AutomaticRuleDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete an automatic rule that does not exist.</value>
+  </data>
+  <data name="InvalidConditionLog" xml:space="preserve">
+    <value>Encountered null condition in automatic rule.</value>
+  </data>
+  <data name="ErrorApplyingConditionLog" xml:space="preserve">
+    <value>Error applying condition.</value>
+  </data>
+  <data name="RuleMatchedTransactionsLog" xml:space="preserve">
+    <value>Rule matched {0} transactions.</value>
+  </data>
+  <data name="ErrorApplyingActionLog" xml:space="preserve">
+    <value>Error applying action: {ErrorMessage}</value>
+  </data>
+  <data name="RuleAppliedActionsLog" xml:space="preserve">
+    <value>Rule applied changes to {0} transactions.</value>
+  </data>
 </root>

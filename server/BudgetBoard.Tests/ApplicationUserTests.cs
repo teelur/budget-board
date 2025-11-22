@@ -23,8 +23,8 @@ public class ApplicationUserTests
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
             helper.UserDataContext,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var mockUserManager = MockUserManager(helper.demoUser);
@@ -47,8 +47,8 @@ public class ApplicationUserTests
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
             helper.UserDataContext,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var mockUserManager = MockUserManager(helper.demoUser);
@@ -63,7 +63,7 @@ public class ApplicationUserTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Provided user not found.");
+            .WithMessage("InvalidUserError");
     }
 
     [Fact]
@@ -76,8 +76,8 @@ public class ApplicationUserTests
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
             helper.UserDataContext,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
         var userUpdateRequest = new ApplicationUserUpdateRequest { LastSync = fakeDate };
 
@@ -101,8 +101,8 @@ public class ApplicationUserTests
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
             helper.UserDataContext,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var userUpdateRequest = new ApplicationUserUpdateRequest { LastSync = fakeDate };
@@ -117,7 +117,7 @@ public class ApplicationUserTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Provided user not found.");
+            .WithMessage("InvalidUserError");
     }
 
     private static Mock<UserManager<ApplicationUser>> MockUserManager(ApplicationUser user)

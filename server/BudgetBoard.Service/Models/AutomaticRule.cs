@@ -1,4 +1,6 @@
-﻿namespace BudgetBoard.Service.Models;
+﻿using BudgetBoard.Database.Models;
+
+namespace BudgetBoard.Service.Models;
 
 public interface IRuleParameterRequest
 {
@@ -33,13 +35,29 @@ public interface IRuleParameterResponse : IRuleParameterRequest
     Guid ID { get; }
 }
 
-public class RuleParameterResponse() : IRuleParameterResponse
+public class RuleParameterResponse : IRuleParameterResponse
 {
-    public required Guid ID { get; set; }
+    public Guid ID { get; set; } = Guid.Empty;
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
+
+    public RuleParameterResponse(RuleCondition condition)
+    {
+        ID = condition.ID;
+        Field = condition.Field;
+        Operator = condition.Operator;
+        Value = condition.Value;
+    }
+
+    public RuleParameterResponse(RuleAction action)
+    {
+        ID = action.ID;
+        Field = action.Field;
+        Operator = action.Operator;
+        Value = action.Value;
+    }
 }
 
 public interface IAutomaticRuleResponse

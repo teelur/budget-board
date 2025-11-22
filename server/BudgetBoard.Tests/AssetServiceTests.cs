@@ -4,7 +4,9 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -24,7 +26,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var newAsset = _assetCreateRequestFaker.Generate();
@@ -45,7 +49,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var assetFaker = new AssetFaker();
@@ -77,7 +83,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var assetFaker = new AssetFaker();
@@ -108,7 +116,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var assetFaker = new AssetFaker();
@@ -124,10 +134,12 @@ public class AssetServiceTests
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        var assets = await assetService.ReadAssetsAsync(helper.demoUser.Id, Guid.NewGuid());
+        var act = () => assetService.ReadAssetsAsync(helper.demoUser.Id, Guid.NewGuid());
 
         // Assert
-        assets.Should().BeEmpty();
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AssetNotFoundError");
     }
 
     [Fact]
@@ -138,7 +150,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var assetFaker = new AssetFaker();
@@ -176,7 +190,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var updatedAsset = new AssetUpdateRequest
@@ -206,7 +222,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var assetFaker = new AssetFaker();
@@ -237,8 +255,7 @@ public class AssetServiceTests
             await assetService.UpdateAssetAsync(helper.demoUser.Id, updatedAsset);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>("An asset with this name already exists.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>("DuplicateAssetNameError");
     }
 
     [Fact]
@@ -253,7 +270,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var assetFaker = new AssetFaker();
@@ -280,7 +299,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -299,7 +320,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var assetFaker = new AssetFaker();
@@ -327,7 +350,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -346,7 +371,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var assetFaker = new AssetFaker();
@@ -393,7 +420,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var newOrder = new List<IAssetIndexRequest>

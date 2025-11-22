@@ -11,8 +11,8 @@ public interface IAutomaticRuleService
     /// Creates a new automatic rule for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="rule">The automatic rule creation details.</param>
-    Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest rule);
+    /// <param name="request">The automatic rule creation details.</param>
+    Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request);
 
     /// <summary>
     /// Retrieves automatic rules for the specified user.
@@ -25,8 +25,8 @@ public interface IAutomaticRuleService
     /// Updates an existing automatic rule for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="rule">The automatic rule update details.</param>
-    Task UpdateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleUpdateRequest rule);
+    /// <param name="request">The automatic rule update details.</param>
+    Task UpdateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleUpdateRequest request);
 
     /// <summary>
     /// Deletes an automatic rule for the specified user.
@@ -39,7 +39,7 @@ public interface IAutomaticRuleService
     /// Runs an automatic rule immediately against existing transactions.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="rule">The automatic rule details to run.</param>
+    /// <param name="request">The automatic rule details to run.</param>
     /// <returns>A summary string describing the result of the rule execution.</returns>
-    Task<string> RunAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest rule);
+    Task<string> RunAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request);
 }

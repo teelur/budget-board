@@ -25,11 +25,11 @@ public class AssetService(
     private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
-    public async Task CreateAssetAsync(Guid userGuid, IAssetCreateRequest asset)
+    public async Task CreateAssetAsync(Guid userGuid, IAssetCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var newAsset = new Asset { Name = asset.Name, UserID = userData.Id };
+        var newAsset = new Asset { Name = request.Name, UserID = userData.Id };
 
         _userDataContext.Assets.Add(newAsset);
         await _userDataContext.SaveChangesAsync();
@@ -59,11 +59,11 @@ public class AssetService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateAssetAsync(Guid userGuid, IAssetUpdateRequest editedAsset)
+    public async Task UpdateAssetAsync(Guid userGuid, IAssetUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var asset = userData.Assets.SingleOrDefault(a => a.ID == editedAsset.ID);
+        var asset = userData.Assets.SingleOrDefault(a => a.ID == request.ID);
 
         if (asset == null)
         {
@@ -71,13 +71,13 @@ public class AssetService(
             throw new BudgetBoardServiceException(_responseLocalizer["AssetEditNotFoundError"]);
         }
 
-        if (userData.Assets.Any(a => a.Name == editedAsset.Name && a.ID != editedAsset.ID))
+        if (userData.Assets.Any(a => a.Name == request.Name && a.ID != request.ID))
         {
             _logger.LogError("{LogMessage}", _logLocalizer["DuplicateAssetNameLog"]);
             throw new BudgetBoardServiceException(_responseLocalizer["DuplicateAssetNameError"]);
         }
 
-        _userDataContext.Entry(asset).CurrentValues.SetValues(editedAsset);
+        _userDataContext.Entry(asset).CurrentValues.SetValues(request);
         await _userDataContext.SaveChangesAsync();
     }
 

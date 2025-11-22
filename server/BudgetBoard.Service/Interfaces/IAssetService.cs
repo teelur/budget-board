@@ -11,8 +11,8 @@ public interface IAssetService
     /// Creates a new asset for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="asset">The asset creation details.</param>
-    Task CreateAssetAsync(Guid userGuid, IAssetCreateRequest asset);
+    /// <param name="request">The asset creation details.</param>
+    Task CreateAssetAsync(Guid userGuid, IAssetCreateRequest request);
 
     /// <summary>
     /// Retrieves assets for the specified user.
@@ -26,8 +26,8 @@ public interface IAssetService
     /// Updates an existing asset for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="editedAsset">The asset update details.</param>
-    Task UpdateAssetAsync(Guid userGuid, IAssetUpdateRequest editedAsset);
+    /// <param name="request">The asset update details.</param>
+    Task UpdateAssetAsync(Guid userGuid, IAssetUpdateRequest request);
 
     /// <summary>
     /// Deletes (soft deletes) an asset for the specified user.

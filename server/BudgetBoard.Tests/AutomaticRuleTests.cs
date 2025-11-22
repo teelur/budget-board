@@ -1,7 +1,9 @@
 ﻿using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -18,7 +20,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var rule = new AutomaticRuleCreateRequest
@@ -66,7 +70,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var rule = new AutomaticRuleCreateRequest
         {
@@ -101,7 +107,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var rule = new AutomaticRuleCreateRequest
         {
@@ -136,7 +144,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var rule = new AutomaticRuleCreateRequest
@@ -185,7 +195,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act
@@ -203,7 +215,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var initialRule = new AutomaticRuleCreateRequest
@@ -286,7 +300,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var updatedRule = new AutomaticRuleUpdateRequest
@@ -334,7 +350,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var rule = new AutomaticRuleCreateRequest
@@ -383,7 +401,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act
@@ -415,7 +435,9 @@ public class AutomaticRuleTests
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            transactionServiceMock.Object
+            transactionServiceMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var rule = new AutomaticRuleCreateRequest

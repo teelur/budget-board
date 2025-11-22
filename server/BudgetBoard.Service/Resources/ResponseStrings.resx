@@ -88,4 +88,40 @@
   <data name="InvalidUserError" xml:space="preserve">
     <value>The provided user is invalid.</value>
   </data>
+  <data name="AssetNotFoundError" xml:space="preserve">
+    <value>The asset you are trying to access does not exist.</value>
+  </data>
+  <data name="AssetEditNotFoundError" xml:space="preserve">
+    <value>The asset you are trying to edit does not exist.</value>
+  </data>
+  <data name="DuplicateAssetNameError" xml:space="preserve">
+    <value>An asset with this name already exists.</value>
+  </data>
+  <data name="AssetDeleteNotFoundError" xml:space="preserve">
+    <value>The asset you are trying to delete does not exist.</value>
+  </data>
+  <data name="AssetRestoreNotFoundError" xml:space="preserve">
+    <value>The asset you are trying to restore does not exist.</value>
+  </data>
+  <data name="AssetOrderNotFoundError" xml:space="preserve">
+    <value>The asset you are trying to order does not exist.</value>
+  </data>
+  <data name="NoConditionsError" xml:space="preserve">
+    <value>At least one condition must be provided for the rule.</value>
+  </data>
+  <data name="NoActionsError" xml:space="preserve">
+    <value>At least one action must be provided for the rule.</value>
+  </data>
+  <data name="AutomaticRuleNotFoundError" xml:space="preserve">
+    <value>The automatic rule you are trying to access does not exist.</value>
+  </data>
+  <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
+    <value>The automatic rule you are trying to delete does not exist.</value>
+  </data>
+  <data name="InvalidConditionError" xml:space="preserve">
+    <value>One or more conditions in the automatic rule are invalid.</value>
+  </data>
+  <data name="RuleRunSummary" xml:space="preserve">
+    <value>Rule matched {matchedTransactionsCount} transactions and applied {updatedCount} changes.</value>
+  </data>
 </root>

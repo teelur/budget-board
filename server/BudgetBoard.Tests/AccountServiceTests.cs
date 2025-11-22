@@ -46,8 +46,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -68,7 +68,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await createAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Provided user not found.");
+            .WithMessage("InvalidUserError");
     }
 
     [Fact]
@@ -80,8 +80,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var account = _accountCreateRequestFaker.Generate();
@@ -94,7 +94,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await createAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Invalid Institution ID.");
+            .WithMessage("InvalidInstitutionIDError");
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -145,8 +145,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -176,7 +176,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await createAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("An account with this SyncID already exists.");
+            .WithMessage("DuplicateSyncIDError");
     }
 
     [Fact]
@@ -188,8 +188,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -227,8 +227,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -260,8 +260,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -288,8 +288,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -319,8 +319,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -340,7 +340,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await readAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The account you are trying to access does not exist.");
+            .WithMessage("AccountNotFoundError");
     }
 
     [Fact]
@@ -352,8 +352,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -382,8 +382,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -405,7 +405,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await updateAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The account you are trying to edit does not exist.");
+            .WithMessage("AccountEditNotFoundError");
     }
 
     [Fact]
@@ -422,8 +422,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             nowProviderMock.Object,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -449,8 +449,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
         var invalidGuid = Guid.NewGuid();
 
@@ -469,7 +469,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await deleteAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The account you are trying to delete does not exist.");
+            .WithMessage("AccountDeleteNotFoundError");
     }
 
     [Fact]
@@ -486,8 +486,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             nowProviderMock.Object,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -528,8 +528,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             nowProviderMock.Object,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -564,8 +564,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -607,8 +607,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             nowProviderMock.Object,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -640,8 +640,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             nowProviderMock.Object,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -662,7 +662,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await restoreAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The account you are trying to restore does not exist.");
+            .WithMessage("AccountRestoreNotFoundError");
     }
 
     [Fact]
@@ -679,8 +679,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             nowProviderMock.Object,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var accountFaker = new AccountFaker();
@@ -723,8 +723,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             nowProviderMock.Object,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -757,8 +757,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var randomNumberBetween1And10 = new Random().Next(1, 10);
@@ -804,8 +804,8 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var randomNumberBetween1And10 = new Random().Next(1, 10);
@@ -840,6 +840,6 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await orderAccountsAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The account you are trying to set the index for does not exist.");
+            .WithMessage("AccountOrderNotFoundError");
     }
 }

@@ -86,8 +86,8 @@ public class SimpleFinServiceTests
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
@@ -107,13 +107,15 @@ public class SimpleFinServiceTests
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
             helper.UserDataContext,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
@@ -184,8 +186,8 @@ public class SimpleFinServiceTests
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
@@ -205,13 +207,15 @@ public class SimpleFinServiceTests
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
             helper.UserDataContext,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
         var automaticRuleService = new AutomaticRuleService(
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
-            Mock.Of<ITransactionService>()
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
