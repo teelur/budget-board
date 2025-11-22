@@ -1,6 +1,6 @@
 ﻿using BudgetBoard.Service.Models;
 
-namespace BudgetBoard.Service.Interfaces;
+namespace BudgetBoard.Service.Services.Interfaces;
 
 /// <summary>
 /// Service for managing user accounts, including creation, retrieval, updates, and deletion.
