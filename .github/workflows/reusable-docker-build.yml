@@ -1,0 +1,134 @@
+name: Reusable Docker Build
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        required: true
+        type: string
+      dockerfile:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+      platform:
+        required: true
+        type: string
+      push:
+        required: false
+        type: boolean
+        default: false
+      check_paths:
+        required: false
+        type: boolean
+        default: false
+      job_index:
+        required: false
+        type: string
+        default: "0"
+    secrets:
+      GHCR_TOKEN:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine changed paths
+        if: ${{ inputs.check_paths }}
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            src:
+              - '${{ inputs.service_name }}/**'
+              - 'compose.yml'
+              - 'compose.override.yml'
+
+      - name: Set Build Flag
+        id: check
+        run: |
+          if [ "${{ inputs.check_paths }}" == "true" ]; then
+            echo "should_build=${{ steps.changes.outputs.src }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_build=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        if: steps.check.outputs.should_build == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up QEMU
+        if: steps.check.outputs.should_build == 'true'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Create .env File (Client Release)
+        if: steps.check.outputs.should_build == 'true' && inputs.service_name == 'client' && github.event_name == 'release'
+        run: echo "VITE_VERSION=PLACEHOLDER" >> client/.env
+
+      - name: Write Version to File (Client Release)
+        if: steps.check.outputs.should_build == 'true' && inputs.service_name == 'client' && github.event_name == 'release'
+        uses: eball/write-tag-to-version-file@latest
+        with:
+          filename: "client/.env"
+          placeholder: "PLACEHOLDER"
+
+      - name: Log in to the Container registry
+        if: steps.check.outputs.should_build == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        if: steps.check.outputs.should_build == 'true'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ inputs.image }}
+          flavor: |
+            latest=true
+          tags: |
+            type=semver,pattern={{raw}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            type=sha
+            raw,value=release,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'beta') }}
+
+      - name: Build and push Docker image
+        if: steps.check.outputs.should_build == 'true'
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ inputs.dockerfile }}
+          platforms: ${{ inputs.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: ${{ inputs.push }}
+          outputs: type=image,name=${{ inputs.image }},push-by-digest=true,name-canonical=true,push=${{ inputs.push }}
+
+      - name: Export digest
+        if: steps.check.outputs.should_build == 'true' && inputs.push == 'true'
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        if: steps.check.outputs.should_build == 'true' && inputs.push == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ inputs.service_name }}-${{ inputs.job_index }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
