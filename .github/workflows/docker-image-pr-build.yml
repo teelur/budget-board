@@ -11,14 +11,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dockerfile:
-          - ./client
-          - ./server
-        include:
-          - dockerfile: ./client
+        service:
+          - name: client
+            dockerfile: ./client
             image: ghcr.io/teelur/budget-board/client
-          - dockerfile: ./server
+          - name: server
+            dockerfile: ./server
             image: ghcr.io/teelur/budget-board/server
+        platform:
+          - linux/amd64
+          - linux/arm64
 
     steps:
       - name: Checkout code
@@ -73,15 +75,15 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ matrix.image }}
+          images: ${{ matrix.service.image }}
 
       - name: Build the Docker image
         if: ${{ env.BUILD_CHANGED == 'true' }}
         id: push
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.dockerfile }}
+          context: ${{ matrix.service.dockerfile }}
           push: false
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
