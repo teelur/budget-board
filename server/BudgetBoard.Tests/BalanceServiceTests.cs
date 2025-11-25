@@ -4,7 +4,9 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -31,7 +33,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var balanceCreateRequest = _balanceCreateRequestFaker.Generate();
@@ -54,7 +58,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -83,7 +89,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var balanceCreateRequest = _balanceCreateRequestFaker.Generate();
@@ -106,7 +114,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -137,7 +147,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act
@@ -158,7 +170,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -193,7 +207,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var balanceUpdateRequest = _balanceUpdateRequestFaker.Generate();
@@ -216,7 +232,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -247,7 +265,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act

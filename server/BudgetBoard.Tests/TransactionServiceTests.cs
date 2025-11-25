@@ -4,7 +4,9 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -31,7 +33,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transaction = _transactionCreateRequestFaker.Generate();
@@ -54,7 +58,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -84,7 +90,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transaction = _transactionCreateRequestFaker.Generate();
@@ -107,7 +115,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -145,7 +155,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -199,7 +211,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -235,7 +249,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act
@@ -267,7 +283,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -314,7 +332,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -356,7 +376,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -392,7 +414,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -428,7 +452,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -472,7 +498,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var editedTransaction = new TransactionUpdateRequest
@@ -508,7 +536,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -576,7 +606,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -611,7 +643,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act
@@ -637,7 +671,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -699,7 +735,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -738,7 +776,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act
@@ -759,7 +799,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -797,7 +839,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -858,7 +902,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var splitTransactionRequest = new TransactionSplitRequest
@@ -895,7 +941,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();
@@ -942,7 +990,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var accountFaker = new AccountFaker();

@@ -4,7 +4,9 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -27,7 +29,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var asset = new AssetFaker().Generate();
@@ -61,7 +65,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var valueCreateRequest = _valueCreateRequestFaker.Generate();
@@ -84,7 +90,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var asset = new AssetFaker().Generate();
@@ -112,7 +120,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act
@@ -130,7 +140,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var asset = new AssetFaker().Generate();
@@ -158,7 +170,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var asset = new AssetFaker().Generate();
@@ -200,7 +214,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var editedValue = new ValueUpdateRequest
@@ -228,7 +244,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var asset = new AssetFaker().Generate();
@@ -259,7 +277,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act
@@ -280,7 +300,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var asset = new AssetFaker().Generate();
@@ -311,7 +333,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // Act

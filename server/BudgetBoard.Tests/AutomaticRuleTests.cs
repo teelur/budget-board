@@ -94,9 +94,7 @@ public class AutomaticRuleTests
         Func<Task> act = async () =>
             await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("At least one condition must be provided for the rule.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>();
     }
 
     [Fact]
@@ -131,9 +129,7 @@ public class AutomaticRuleTests
             await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("At least one action must be provided for the rule.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>();
     }
 
     [Fact]
@@ -337,9 +333,7 @@ public class AutomaticRuleTests
             await automaticRuleService.UpdateAutomaticRuleAsync(helper.demoUser.Id, updatedRule);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Automatic rule not found.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>();
     }
 
     [Fact]
@@ -414,9 +408,7 @@ public class AutomaticRuleTests
             );
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Automatic rule not found.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>();
     }
 
     [Fact]
@@ -470,6 +462,6 @@ public class AutomaticRuleTests
         var result = await automaticRuleService.RunAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Assert
-        result.Should().Be("Rule matched 0 transactions and applied 0 changes.");
+        result.Should().NotBeNullOrEmpty();
     }
 }

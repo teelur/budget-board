@@ -4,7 +4,9 @@ using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -32,7 +34,9 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
         var userSettingsService = new UserSettingsService(
             _loggerMock.Object,
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var userSettingsFaker = new UserSettingsFaker();
@@ -59,7 +63,9 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
         var userSettingsService = new UserSettingsService(
             _loggerMock.Object,
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var userGuid = Guid.NewGuid();
@@ -82,7 +88,9 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
         var userSettingsService = new UserSettingsService(
             _loggerMock.Object,
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         helper.demoUser.UserSettings = null;
@@ -102,7 +110,9 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
         var userSettingsService = new UserSettingsService(
             _loggerMock.Object,
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         helper.demoUser.UserSettings ??= new UserSettings { UserID = helper.demoUser.Id };
@@ -128,7 +138,9 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
         var userSettingsService = new UserSettingsService(
             _loggerMock.Object,
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
@@ -154,7 +166,9 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
         var userSettingsService = new UserSettingsService(
             _loggerMock.Object,
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();

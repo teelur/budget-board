@@ -44,7 +44,9 @@ public class SimpleFinServiceTests
             Mock.Of<IGoalService>(),
             Mock.Of<IApplicationUserService>(),
             Mock.Of<IAutomaticRuleService>(),
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // This is a demo token provided by SimpleFIN for dev.
@@ -80,7 +82,9 @@ public class SimpleFinServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
@@ -92,17 +96,23 @@ public class SimpleFinServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
@@ -134,7 +144,9 @@ public class SimpleFinServiceTests
             goalService,
             applicationUserService,
             automaticRuleService,
-            nowProvider
+            nowProvider,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // This is a demo token provided by SimpleFIN for dev.
@@ -180,7 +192,9 @@ public class SimpleFinServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
@@ -192,17 +206,23 @@ public class SimpleFinServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
@@ -233,7 +253,9 @@ public class SimpleFinServiceTests
             goalService,
             applicationUserService,
             automaticRuleService,
-            nowProvider
+            nowProvider,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         // This is a demo token provided by SimpleFIN for dev.

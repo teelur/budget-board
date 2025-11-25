@@ -4,7 +4,9 @@ using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -31,7 +33,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budget = _budgetCreateRequestFaker.Generate();
@@ -53,7 +57,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budget = _budgetCreateRequestFaker.Generate();
@@ -73,7 +79,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -106,7 +114,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budget = _budgetCreateRequestFaker.Generate();
@@ -143,7 +153,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -196,7 +208,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -232,7 +246,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -267,7 +283,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -286,7 +304,7 @@ public class BudgetServiceTests
         budget.Date = DateTime.Today;
 
         // Act
-        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget], true);
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
 
         // Assert
         helper.UserDataContext.Budgets.Should().HaveCount(2);
@@ -304,7 +322,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -343,7 +363,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -370,7 +392,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -400,7 +424,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var parentLimit = 1000;
@@ -456,7 +482,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var parentLimit = 1000;
@@ -500,7 +528,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -538,7 +568,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -580,7 +612,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -604,7 +638,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();
@@ -631,7 +667,9 @@ public class BudgetServiceTests
         var helper = new TestHelper();
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var budgetFaker = new BudgetFaker();

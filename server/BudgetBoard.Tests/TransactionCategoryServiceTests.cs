@@ -4,7 +4,9 @@ using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -30,7 +32,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
@@ -55,7 +59,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -85,7 +91,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
@@ -119,7 +127,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
@@ -149,7 +159,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
@@ -175,7 +187,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
@@ -205,7 +219,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -231,7 +247,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -258,7 +276,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -288,7 +308,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -321,7 +343,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -354,7 +378,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -387,7 +413,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -417,7 +445,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -458,7 +488,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -499,7 +531,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();
@@ -535,7 +569,9 @@ public class TransactionCategoryServiceTests
         var helper = new TestHelper();
         var transactionCategoryService = new TransactionCategoryService(
             Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext
+            helper.UserDataContext,
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker();

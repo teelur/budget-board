@@ -4,7 +4,9 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -27,7 +29,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionCreateRequest = _institutionCreateRequestFaker.Generate();
@@ -53,7 +57,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionCreateRequest = _institutionCreateRequestFaker.Generate();
@@ -80,7 +86,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -106,7 +114,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -135,7 +145,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -163,7 +175,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var insitutionFaker = new InstitutionFaker();
@@ -198,7 +212,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionUpdateRequest = _institutionUpdateRequestFaker.Generate();
@@ -224,7 +240,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var insitutionFaker = new InstitutionFaker();
@@ -265,7 +283,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var insitutionFaker = new InstitutionFaker();
@@ -303,7 +323,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var updateInstitutionRequest = _institutionUpdateRequestFaker.Generate();
@@ -330,7 +352,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
@@ -374,7 +398,9 @@ public class InstitutionServiceTests
         var institutionService = new InstitutionService(
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            Mock.Of<IStringLocalizer<ResponseStrings>>(),
+            Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
         var institutionFaker = new InstitutionFaker();
