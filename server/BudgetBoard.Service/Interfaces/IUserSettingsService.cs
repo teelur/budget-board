@@ -18,9 +18,6 @@ public interface IUserSettingsService
     /// Updates the settings for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="userSettingsUpdateRequest">The user settings update details.</param>
-    Task UpdateUserSettingsAsync(
-        Guid userGuid,
-        IUserSettingsUpdateRequest userSettingsUpdateRequest
-    );
+    /// <param name="request">The user settings update details.</param>
+    Task UpdateUserSettingsAsync(Guid userGuid, IUserSettingsUpdateRequest request);
 }

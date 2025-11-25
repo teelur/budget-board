@@ -139,23 +139,25 @@ public class AssetService(
         ApplicationUser? foundUser;
         try
         {
-            var users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.Assets)
                 .ThenInclude(a => a.Values)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GetUserDataErrorLog", ex.Message]);
-            throw new BudgetBoardServiceException(_responseLocalizer["GetUserDataError"]);
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["UserNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["UserNotFoundError"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

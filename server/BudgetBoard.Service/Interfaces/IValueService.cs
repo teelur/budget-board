@@ -11,8 +11,8 @@ public interface IValueService
     /// Creates a new value entry for an asset.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="value">The value creation details.</param>
-    Task CreateValueAsync(Guid userGuid, IValueCreateRequest value);
+    /// <param name="request">The value creation details.</param>
+    Task CreateValueAsync(Guid userGuid, IValueCreateRequest request);
 
     /// <summary>
     /// Retrieves value history for a specific asset.
@@ -26,8 +26,8 @@ public interface IValueService
     /// Updates an existing value entry.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="editedValue">The value update details.</param>
-    Task UpdateValueAsync(Guid userGuid, IValueUpdateRequest editedValue);
+    /// <param name="request">The value update details.</param>
+    Task UpdateValueAsync(Guid userGuid, IValueUpdateRequest request);
 
     /// <summary>
     /// Deletes (soft deletes) a value entry.

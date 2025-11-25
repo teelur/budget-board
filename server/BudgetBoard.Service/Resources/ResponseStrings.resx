@@ -124,4 +124,199 @@
   <data name="RuleRunSummary" xml:space="preserve">
     <value>Rule matched {matchedTransactionsCount} transactions and applied {updatedCount} changes.</value>
   </data>
+  <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
+    <value>The account you are trying to add a balance to does not exist.</value>
+  </data>
+  <data name="BalanceAccountNotFoundError" xml:space="preserve">
+    <value>The account you are trying to access does not exist.</value>
+  </data>
+  <data name="BalanceAccountUpdateNotFoundError" xml:space="preserve">
+    <value>The account you are trying to update does not exist.</value>
+  </data>
+  <data name="BalanceAccountDeleteNotFoundError" xml:space="preserve">
+    <value>The account you are trying to delete does not exist.</value>
+  </data>
+  <data name="BalanceAccountRestoreNotFoundError" xml:space="preserve">
+    <value>The account you are trying to restore does not exist.</value>
+  </data>
+  <data name="BudgetUpdateNotFoundError" xml:space="preserve">
+    <value>The budget you are trying to update does not exist.</value>
+  </data>
+  <data name="BudgetUpdateParentLimitError" xml:space="preserve">
+    <value>The parent budget cannot be less than the sum of its children.</value>
+  </data>
+  <data name="BudgetDeleteNotFoundError" xml:space="preserve">
+    <value>The budget you are trying to delete does not exist.</value>
+  </data>
+  <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
+    <value>A goal must have a monthly contribution or target date.</value>
+  </data>
+  <data name="GoalCreateInPastError" xml:space="preserve">
+    <value>A goal cannot have a target date in the past.</value>
+  </data>
+  <data name="GoalCreateNoAccountsError" xml:space="preserve">
+    <value>A goal must be associated with at least one account.</value>
+  </data>
+  <data name="GoalCreateInvalidAccountError" xml:space="preserve">
+    <value>The account you are trying to use does not exist.</value>
+  </data>
+  <data name="GoalUpdateNotFoundError" xml:space="preserve">
+    <value>The goal you are trying to update does not exist.</value>
+  </data>
+  <data name="GoalUpdatePastDateError" xml:space="preserve">
+    <value>The target date for the goal cannot be in the past.</value>
+  </data>
+  <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
+    <value>A goal must have a monthly contribution greater than 0.</value>
+  </data>
+  <data name="GoalDeleteNotFoundError" xml:space="preserve">
+    <value>The goal you are trying to delete does not exist.</value>
+  </data>
+  <data name="GoalCompleteNotFoundError" xml:space="preserve">
+    <value>The goal you are trying to complete does not exist.</value>
+  </data>
+  <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
+    <value>The goal you are trying to complete has already been completed.</value>
+  </data>
+  <data name="InstitutionCreateDuplicateNameError" xml:space="preserve">
+    <value>An institution with this name already exists.</value>
+  </data>
+  <data name="InstitutionNotFoundError" xml:space="preserve">
+    <value>The institution you are trying to access does not exist.</value>
+  </data>
+  <data name="InstitutionUpdateNotFoundError" xml:space="preserve">
+    <value>The institution you are trying to update does not exist.</value>
+  </data>
+  <data name="InstitutionUpdateEmptyNameError" xml:space="preserve">
+    <value>Institution name cannot be empty.</value>
+  </data>
+  <data name="InstitutionUpdateDuplicateNameError" xml:space="preserve">
+    <value>An institution with this name already exists.</value>
+  </data>
+  <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
+    <value>The institution you are trying to delete does not exist.</value>
+  </data>
+  <data name="InstitutionOrderNotFoundError" xml:space="preserve">
+    <value>The institution you are trying to order does not exist.</value>
+  </data>
+  <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
+    <value>A transaction category with this name already exists.</value>
+  </data>
+  <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
+    <value>Transaction category name cannot be empty.</value>
+  </data>
+  <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
+    <value>Transaction category cannot have the same name as its parent category.</value>
+  </data>
+  <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
+    <value>The parent transaction category you are trying to use does not exist.</value>
+  </data>
+  <data name="TransactionCategoryNotFoundError" xml:space="preserve">
+    <value>The transaction category you are trying to access does not exist.</value>
+  </data>
+  <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
+    <value>The transaction category you are trying to update does not exist.</value>
+  </data>
+  <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
+    <value>Transaction category name cannot be empty.</value>
+  </data>
+  <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
+    <value>A transaction category with this name already exists.</value>
+  </data>
+  <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
+    <value>Transaction category cannot have the same name as its parent category.</value>
+  </data>
+  <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
+    <value>The parent transaction category you are trying to use does not exist.</value>
+  </data>
+  <data name="TransactionCategoryDeleteInUseByTransactionsError" xml:space="preserve">
+    <value>The transaction category you are trying to delete is currently assigned to one or more transactions. Please reassign or remove these transactions first.</value>
+  </data>
+  <data name="TransactionCategoryDeleteInUseByBudgetsError" xml:space="preserve">
+    <value>The transaction category you are trying to delete is currently assigned to one or more budgets. Please reassign or remove these budgets first.</value>
+  </data>
+  <data name="TransactionCategoryDeleteHasChildrenError" xml:space="preserve">
+    <value>The transaction category you are trying to delete has child categories. Please reassign or delete the child categories first.</value>
+  </data>
+  <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
+    <value>The transaction category you are trying to delete does not exist.</value>
+  </data>
+  <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
+    <value>The account you are trying to add a transaction to does not exist.</value>
+  </data>
+  <data name="TransactionNotFoundError" xml:space="preserve">
+    <value>The transaction you are trying to access does not exist.</value>
+  </data>
+  <data name="TransactionUpdateNotFoundError" xml:space="preserve">
+    <value>The transaction you are trying to update does not exist.</value>
+  </data>
+  <data name="TransactionDeleteNotFoundError" xml:space="preserve">
+    <value>The transaction you are trying to delete does not exist.</value>
+  </data>
+  <data name="TransactionDeleteNoAccountError" xml:space="preserve">
+    <value>The transaction you are trying to delete is not associated with any account.</value>
+  </data>
+  <data name="TransactionRestoreNotFoundError" xml:space="preserve">
+    <value>The transaction you are trying to restore does not exist.</value>
+  </data>
+  <data name="TransactionSplitNotFoundError" xml:space="preserve">
+    <value>The transaction you are trying to split does not exist.</value>
+  </data>
+  <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
+    <value>The split amount must be less than the transaction amount.</value>
+  </data>
+  <data name="TransactionSplitNoAccountError" xml:space="preserve">
+    <value>The transaction you are trying to split is not associated with any account.</value>
+  </data>
+  <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
+    <value>The account you are trying to add a transaction to does not exist.</value>
+  </data>
+  <data name="UserSettingsNotFoundError" xml:space="preserve">
+    <value>The user settings you are trying to access do not exist.</value>
+  </data>
+  <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
+    <value>Budget warning threshold must be between 0% and 100%.</value>
+  </data>
+  <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
+    <value>Force sync lookback months must be between 0 and 12 months.</value>
+  </data>
+  <data name="ValueCreateAssetNotFoundError" xml:space="preserve">
+    <value>The asset you are trying to add a value to does not exist.</value>
+  </data>
+  <data name="ValueUpdateAssetNotFoundError" xml:space="preserve">
+    <value>The asset you are trying to update does not exist.</value>
+  </data>
+  <data name="ValueDeleteNotFoundError" xml:space="preserve">
+    <value>The value you are trying to delete does not exist.</value>
+  </data>
+  <data name="ValueRestoreNotFoundError" xml:space="preserve">
+    <value>The value you are trying to restore does not exist.</value>
+  </data>
+  <data name="SimpleFinDataNotFoundError" xml:space="preserve">
+    <value>SimpleFin data not found.</value>
+  </data>
+  <data name="SimpleFinDecodeTokenError" xml:space="preserve">
+    <value>There was an issue decoding the setup token.</value>
+  </data>
+  <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
+    <value>Invalid access token.</value>
+  </data>
+  <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
+    <value>Unsupported field '{0}' in rule condition.</value>
+  </data>
+  <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
+    <value>Unsupported field '{0}' in rule action.</value>
+  </data>
+  <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
+    <value>The category '{0}' does not exist.</value>
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
+    <value>Unsupported operator '{0}' in rule action.</value>
+  </data>
+  <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
+    <value>The amount '{0}' is not a valid decimal number.</value>
+  </data>
+  <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
+    <value>The date '{0}' is not a valid date.</value>
+  </data>
 </root>

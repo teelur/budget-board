@@ -3,7 +3,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -11,34 +13,40 @@ namespace BudgetBoard.Service;
 public class BalanceService(
     ILogger<IBalanceService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IBalanceService
 {
     private readonly ILogger<IBalanceService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
     public async Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest balance)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var account = userData.Accounts.FirstOrDefault(a => a.ID == balance.AccountID);
+
         if (account == null)
         {
-            _logger.LogError("Attempt to add balance to account that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["BalanceAccountCreateNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The account you are trying to add a balance to does not exist."
+                _responseLocalizer["BalanceAccountCreateNotFoundError"]
             );
         }
 
-        Balance newBalance = new()
+        var newBalance = new Balance
         {
             DateTime = balance.DateTime,
             Amount = balance.Amount,
             AccountID = balance.AccountID,
         };
 
-        account.Balances.Add(newBalance);
+        _userDataContext.Balances.Add(newBalance);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -49,12 +57,14 @@ public class BalanceService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var account = userData.Accounts.FirstOrDefault(a => a.ID == accountId);
+
         if (account == null)
         {
-            _logger.LogError("Attempt to read balance from account that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["BalanceAccountNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The account you are trying to read a balance from does not exist."
+                _responseLocalizer["BalanceAccountNotFoundError"]
             );
         }
 
@@ -65,20 +75,18 @@ public class BalanceService(
     public async Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest updatedBalance)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var balance = userData
             .Accounts.SelectMany(a => a.Balances)
             .FirstOrDefault(b => b.ID == updatedBalance.ID);
+
         if (balance == null)
         {
-            _logger.LogError("Attempt to update balance that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The balance you are trying to update does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["BalanceUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["BalanceUpdateNotFoundError"]);
         }
 
-        balance.DateTime = updatedBalance.DateTime;
-        balance.Amount = updatedBalance.Amount;
-
+        _userDataContext.Entry(balance).CurrentValues.SetValues(updatedBalance);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -86,15 +94,15 @@ public class BalanceService(
     public async Task DeleteBalanceAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var balance = userData
             .Accounts.SelectMany(a => a.Balances)
             .FirstOrDefault(b => b.ID == guid);
+
         if (balance == null)
         {
-            _logger.LogError("Attempt to delete balance that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The balance you are trying to delete does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["BalanceDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["BalanceDeleteNotFoundError"]);
         }
 
         balance.Deleted = _nowProvider.UtcNow;
@@ -105,14 +113,16 @@ public class BalanceService(
     public async Task RestoreBalanceAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var balance = userData
             .Accounts.SelectMany(a => a.Balances)
             .FirstOrDefault(b => b.ID == guid);
+
         if (balance == null)
         {
-            _logger.LogError("Attempt to restore balance that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["BalanceRestoreNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The balance you are trying to restore does not exist."
+                _responseLocalizer["BalanceRestoreNotFoundError"]
             );
         }
 
@@ -122,32 +132,28 @@ public class BalanceService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

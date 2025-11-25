@@ -3,7 +3,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -11,12 +13,16 @@ namespace BudgetBoard.Service;
 public class InstitutionService(
     ILogger<IInstitutionService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IInstitutionService
 {
     private readonly ILogger<IInstitutionService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
     public async Task CreateInstitutionAsync(Guid userGuid, IInstitutionCreateRequest request)
@@ -29,13 +35,15 @@ public class InstitutionService(
             )
         )
         {
-            _logger.LogError("Attempted to create an institution with a duplicate name.");
-            throw new BudgetBoardServiceException("An institution with this name already exists.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionCreateDuplicateNameLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["InstitutionCreateDuplicateNameError"]
+            );
         }
 
         var institution = new Institution { Name = request.Name, UserID = userGuid };
 
-        userData.Institutions.Add(institution);
+        _userDataContext.Institutions.Add(institution);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -46,14 +54,15 @@ public class InstitutionService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         if (guid != default)
         {
             var insitution = userData.Institutions.FirstOrDefault(i => i.ID == guid);
             if (insitution == null)
             {
-                _logger.LogError("Attempt to access non-existent institution.");
+                _logger.LogError("{LogMessage}", _logLocalizer["InstitutionNotFoundLog"]);
                 throw new BudgetBoardServiceException(
-                    "The institution you are trying to access does not exist."
+                    _responseLocalizer["InstitutionNotFoundError"]
                 );
             }
 
@@ -67,19 +76,22 @@ public class InstitutionService(
     public async Task UpdateInstitutionAsync(Guid userGuid, IInstitutionUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var institution = userData.Institutions.FirstOrDefault(i => i.ID == request.ID);
         if (institution == null)
         {
-            _logger.LogError("Attempt to update non-existent institution.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionUpdateNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The institution you are trying to update does not exist."
+                _responseLocalizer["InstitutionUpdateNotFoundError"]
             );
         }
 
         if (string.IsNullOrEmpty(request.Name))
         {
-            _logger.LogError("Attempt to update institution with empty name.");
-            throw new BudgetBoardServiceException("Institution name cannot be empty.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionUpdateEmptyNameLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["InstitutionUpdateEmptyNameError"]
+            );
         }
 
         if (
@@ -89,12 +101,13 @@ public class InstitutionService(
             )
         )
         {
-            _logger.LogError("Attempted to rename an institution to a duplicate name.");
-            throw new BudgetBoardServiceException("An institution with this name already exists.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionUpdateDuplicateNameLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["InstitutionUpdateDuplicateNameError"]
+            );
         }
 
-        institution.Name = request.Name;
-
+        _userDataContext.Entry(institution).CurrentValues.SetValues(request);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -102,12 +115,13 @@ public class InstitutionService(
     public async Task DeleteInstitutionAsync(Guid userGuid, Guid id, bool deleteTransactions)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var institution = userData.Institutions.FirstOrDefault(i => i.ID == id);
         if (institution == null)
         {
-            _logger.LogError("Attempt to delete non-existent institution.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionDeleteNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The institution you are trying to delete does not exist."
+                _responseLocalizer["InstitutionDeleteNotFoundError"]
             );
         }
 
@@ -119,7 +133,7 @@ public class InstitutionService(
             }
         }
 
-        userData.Institutions.Remove(institution);
+        institution.Deleted = _nowProvider.UtcNow;
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -130,14 +144,15 @@ public class InstitutionService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         foreach (var institution in orderedInstitutions)
         {
             var insitution = userData.Institutions.FirstOrDefault(i => i.ID == institution.ID);
             if (insitution == null)
             {
-                _logger.LogError("Attempt to order non-existent institution.");
+                _logger.LogError("{LogMessage}", _logLocalizer["InstitutionOrderNotFoundLog"]);
                 throw new BudgetBoardServiceException(
-                    "The institution you are trying to order does not exist."
+                    _responseLocalizer["InstitutionOrderNotFoundError"]
                 );
             }
 
@@ -162,18 +177,16 @@ public class InstitutionService(
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

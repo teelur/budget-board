@@ -7,7 +7,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -23,7 +25,9 @@ public class SimpleFinService(
     IGoalService goalService,
     IApplicationUserService applicationUserService,
     IAutomaticRuleService automaticRuleService,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : ISimpleFinService
 {
     public const long UNIX_MONTH = 2629743;
@@ -63,7 +67,6 @@ public class SimpleFinService(
     private readonly ILogger<ISimpleFinService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
-
     private readonly IAccountService _accountService = accountService;
     private readonly IInstitutionService _institutionService = institutionService;
     private readonly ITransactionService _transactionService = transactionService;
@@ -71,6 +74,8 @@ public class SimpleFinService(
     private readonly IGoalService _goalService = goalService;
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
     private readonly IAutomaticRuleService _automaticRuleService = automaticRuleService;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<string>> SyncAsync(Guid userGuid)
@@ -80,7 +85,7 @@ public class SimpleFinService(
 
         if (!string.IsNullOrEmpty(userData.AccessToken))
         {
-            _logger.LogInformation("SimpleFIN token is configured. Syncing bank data.");
+            _logger.LogInformation("{LogMessage}", _logLocalizer["SimpleFinTokenConfiguredLog"]);
 
             // Exclude deleted accounts
             long lastSync = GetLastSyncTime(
@@ -117,16 +122,21 @@ public class SimpleFinService(
             }
 
             _logger.LogInformation(
-                "Syncing transactions from {StartDate} (Unix time {StartDateUnix})",
-                DateTimeOffset.FromUnixTimeSeconds(startDate).UtcDateTime,
-                startDate
+                "{LogMessage}",
+                _logLocalizer[
+                    "SimpleFinSyncingTransactionsLog",
+                    DateTimeOffset.FromUnixTimeSeconds(startDate).UtcDateTime,
+                    startDate
+                ]
             );
 
             var simpleFinData = await GetAccountData(userData.AccessToken, startDate);
             if (simpleFinData == null)
             {
-                _logger.LogError("SimpleFin data not found.");
-                throw new BudgetBoardServiceException("SimpleFin data not found.");
+                _logger.LogError("{LogMessage}", _logLocalizer["SimpleFinDataNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    _responseLocalizer["SimpleFinDataNotFoundError"]
+                );
             }
 
             await SyncInstitutionsAsync(userData, simpleFinData.Accounts);
@@ -141,7 +151,7 @@ public class SimpleFinService(
         }
         else
         {
-            _logger.LogInformation("SimpleFIN token is not configured. Skipping bank sync.");
+            _logger.LogInformation("{LogMessage}", _logLocalizer["SimpleFinTokenNotConfiguredLog"]);
         }
 
         await SyncGoalsAsync(userData);
@@ -159,16 +169,18 @@ public class SimpleFinService(
 
         if (!decodeAccessTokenResponse.IsSuccessStatusCode)
         {
-            _logger.LogError("Attempt to decode setup token was unsuccessful.");
-            throw new BudgetBoardServiceException("There was an issue decoding the setup token.");
+            _logger.LogError("{LogMessage}", _logLocalizer["SimpleFinDecodeTokenErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["SimpleFinDecodeTokenError"]);
         }
 
         var accessToken = await decodeAccessTokenResponse.Content.ReadAsStringAsync();
 
         if (!await IsAccessTokenValid(accessToken))
         {
-            _logger.LogError("Attempt to update user with invalid access token.");
-            throw new BudgetBoardServiceException("Invalid access token.");
+            _logger.LogError("{LogMessage}", _logLocalizer["SimpleFinInvalidAccessTokenLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["SimpleFinInvalidAccessTokenError"]
+            );
         }
 
         userData.AccessToken = accessToken;
@@ -235,11 +247,10 @@ public class SimpleFinService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.Accounts)
@@ -249,24 +260,22 @@ public class SimpleFinService(
                 .ThenInclude(g => g.Accounts)
                 .Include(u => u.UserSettings)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                ex,
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;
@@ -308,7 +317,11 @@ public class SimpleFinService(
         }
         catch (JsonException jex)
         {
-            _logger.LogError(jex, "Error deserializing SimpleFin data: {Message}", jex.Message);
+            _logger.LogError(
+                jex,
+                "{LogMessage}",
+                _logLocalizer["SimpleFinDeserializationErrorLog", jex.Message]
+            );
             return new SimpleFinAccountData();
         }
     }
@@ -501,7 +514,7 @@ public class SimpleFinService(
 
             if (!completeDate.HasValue)
             {
-                _logger.LogError("No balance found for goal {GoalName}", goal.Name);
+                _logger.LogError("{LogMessage}", _logLocalizer["GoalNoBalanceFoundLog", goal.Name]);
                 continue;
             }
 
@@ -555,17 +568,21 @@ public class SimpleFinService(
                     matchedTransactions = AutomaticRuleHelpers.FilterOnCondition(
                         condition,
                         matchedTransactions,
-                        allCategories
+                        allCategories,
+                        _responseLocalizer
                     );
                 }
                 catch (BudgetBoardServiceException bbex)
                 {
                     _logger.LogError(
                         bbex,
-                        "Error applying condition {ConditionId} of rule {RuleId}: {Message}",
-                        condition.ID,
-                        rule.ID,
-                        bbex.Message
+                        "{LogMessage}",
+                        _logLocalizer[
+                            "AutomaticRuleConditionErrorLog",
+                            condition.ID,
+                            rule.ID,
+                            bbex.Message
+                        ]
                     );
 
                     invalidCondition = true;
@@ -576,15 +593,15 @@ public class SimpleFinService(
             if (invalidCondition)
             {
                 _logger.LogInformation(
-                    "An error occurred in one of the conditions. Rule actions will not be applied."
+                    "{LogMessage}",
+                    _logLocalizer["AutomaticRuleConditionSkippedLog"]
                 );
                 continue;
             }
 
             _logger.LogInformation(
-                "Rule {RuleId} matched {matchedTransactionsCount} transactions.",
-                rule.ID,
-                matchedTransactions.Count()
+                "{LogMessage}",
+                _logLocalizer["AutomaticRuleMatchedLog", rule.ID, matchedTransactions.Count()]
             );
 
             int updatedCount = 0;
@@ -598,26 +615,29 @@ public class SimpleFinService(
                         matchedTransactions,
                         allCategories,
                         _transactionService,
-                        userData.Id
+                        userData.Id,
+                        _responseLocalizer
                     );
                 }
                 catch (BudgetBoardServiceException bbex)
                 {
                     _logger.LogError(
                         bbex,
-                        "Error applying action {ActionId} of rule {RuleId}: {Message}",
-                        action.ID,
-                        rule.ID,
-                        bbex.Message
+                        "{LogMessage}",
+                        _logLocalizer[
+                            "AutomaticRuleActionErrorLog",
+                            action.ID,
+                            rule.ID,
+                            bbex.Message
+                        ]
                     );
                     continue;
                 }
             }
 
             _logger.LogInformation(
-                "Applied automatic rule {RuleId}, updated {UpdatedCount} transactions.",
-                rule.ID,
-                updatedCount
+                "{LogMessage}",
+                _logLocalizer["AutomaticRuleAppliedLog", rule.ID, updatedCount]
             );
         }
     }

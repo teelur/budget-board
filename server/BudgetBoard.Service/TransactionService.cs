@@ -3,7 +3,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -11,69 +13,49 @@ namespace BudgetBoard.Service;
 public class TransactionService(
     ILogger<ITransactionService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : ITransactionService
 {
     private readonly ILogger<ITransactionService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
-    public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest transaction)
+    public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == transaction.AccountID);
+
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID);
         if (account == null)
         {
-            _logger.LogError("Attempt to add transaction to account that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionCreateAccountNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The account you are trying to add a transaction to does not exist."
+                _responseLocalizer["TransactionCreateAccountNotFoundError"]
             );
         }
 
         var newTransaction = new Transaction
         {
-            SyncID = transaction.SyncID,
-            Amount = transaction.Amount,
-            Date = transaction.Date.ToUniversalTime(),
-            Category = transaction.Category,
-            Subcategory = transaction.Subcategory,
-            MerchantName = transaction.MerchantName,
-            Source = transaction.Source ?? TransactionSource.Manual.Value,
-            AccountID = transaction.AccountID,
+            SyncID = request.SyncID,
+            Amount = request.Amount,
+            Date = request.Date.ToUniversalTime(),
+            Category = request.Category,
+            Subcategory = request.Subcategory,
+            MerchantName = request.MerchantName,
+            Source = request.Source ?? TransactionSource.Manual.Value,
+            AccountID = request.AccountID,
         };
 
-        account.Transactions.Add(newTransaction);
+        _userDataContext.Transactions.Add(newTransaction);
 
         // Manual accounts need to manually update the balance
         if (account.Source == AccountSource.Manual)
         {
-            var currentBalance =
-                account
-                    .Balances.Where(b => b.DateTime <= transaction.Date.ToUniversalTime())
-                    .OrderByDescending(b => b.DateTime)
-                    .FirstOrDefault()
-                    ?.Amount
-                ?? 0;
-
-            // First, add the new balance for the new transaction.
-            var newBalance = new Balance
-            {
-                Amount = transaction.Amount + currentBalance,
-                DateTime = transaction.Date.ToUniversalTime(),
-                AccountID = account.ID,
-            };
-
-            account.Balances.Add(newBalance);
-
-            // Then, update all following balances to include the new transaction.
-            var balancesAfterNew = account
-                .Balances.Where(b => b.DateTime > transaction.Date.ToUniversalTime())
-                .ToList();
-            foreach (var balance in balancesAfterNew)
-            {
-                balance.Amount += transaction.Amount;
-            }
+            UpdateBalancesForNewTransaction(account, request);
         }
 
         await _userDataContext.SaveChangesAsync();
@@ -89,6 +71,7 @@ public class TransactionService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var transactions = userData
             .Accounts.SelectMany(t => t.Transactions)
             .Where(t => getHidden || !(t.Account?.HideTransactions ?? false));
@@ -108,9 +91,9 @@ public class TransactionService(
             var transaction = transactions.FirstOrDefault(t => t.ID == guid);
             if (transaction == null)
             {
-                _logger.LogError("Attempt to access transaction that does not exist.");
+                _logger.LogError("{LogMessage}", _logLocalizer["TransactionNotFoundLog"]);
                 throw new BudgetBoardServiceException(
-                    "The transaction you are trying to access does not exist."
+                    _responseLocalizer["TransactionNotFoundError"]
                 );
             }
 
@@ -127,14 +110,16 @@ public class TransactionService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
             .FirstOrDefault(t => t.ID == editedTransaction.ID);
+
         if (transaction == null)
         {
-            _logger.LogError("Attempt to edit transaction that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionUpdateNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The transaction you are trying to edit does not exist."
+                _responseLocalizer["TransactionUpdateNotFoundError"]
             );
         }
 
@@ -165,14 +150,16 @@ public class TransactionService(
     public async Task DeleteTransactionAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
             .FirstOrDefault(t => t.ID == guid);
+
         if (transaction == null)
         {
-            _logger.LogError("Attempt to delete transaction that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionDeleteNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The transaction you are trying to delete does not exist."
+                _responseLocalizer["TransactionDeleteNotFoundError"]
             );
         }
 
@@ -181,9 +168,9 @@ public class TransactionService(
         var account = userData.Accounts.FirstOrDefault(a => a.ID == transaction.AccountID);
         if (account == null)
         {
-            _logger.LogError("Transaction has no associated account.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionDeleteNoAccountLog"]);
             throw new BudgetBoardServiceException(
-                "The transaction you are deleting has no associated account."
+                _responseLocalizer["TransactionDeleteNoAccountError"]
             );
         }
 
@@ -207,14 +194,16 @@ public class TransactionService(
     public async Task RestoreTransactionAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
             .FirstOrDefault(t => t.ID == guid);
+
         if (transaction == null)
         {
-            _logger.LogError("Attempt to restore transaction that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionRestoreNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The transaction you are trying to restore does not exist."
+                _responseLocalizer["TransactionRestoreNotFoundError"]
             );
         }
 
@@ -229,24 +218,24 @@ public class TransactionService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
             .FirstOrDefault(t => t.ID == transactionSplitRequest.ID);
+
         if (transaction == null)
         {
-            _logger.LogError("Attempt to split transaction that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionSplitNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The transaction you are trying to split does not exist."
+                _responseLocalizer["TransactionSplitNotFoundError"]
             );
         }
 
         if (Math.Abs(transaction.Amount) <= Math.Abs(transactionSplitRequest.Amount))
         {
-            _logger.LogError(
-                "Attempt to split transaction with amount less than or equal to the split amount."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionSplitInvalidAmountLog"]);
             throw new BudgetBoardServiceException(
-                "The split amount must be less than the transaction amount."
+                _responseLocalizer["TransactionSplitInvalidAmountError"]
             );
         }
 
@@ -267,13 +256,13 @@ public class TransactionService(
         var account = userData.Accounts.FirstOrDefault(a => a.ID == transaction.AccountID);
         if (account == null)
         {
-            _logger.LogError("Transaction has no associated account.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionSplitNoAccountLog"]);
             throw new BudgetBoardServiceException(
-                "The transaction you are splitting has no associated account."
+                _responseLocalizer["TransactionSplitNoAccountError"]
             );
         }
 
-        account.Transactions.Add(splitTransaction);
+        _userDataContext.Transactions.Add(splitTransaction);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -284,20 +273,20 @@ public class TransactionService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var transactions = transactionImportRequest.Transactions;
         var accountNameToIDMap = transactionImportRequest.AccountNameToIDMap;
+
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
         {
             Value = tc.Value,
             Parent = tc.Parent,
         });
 
-        var allCategories =
-            userData.UserSettings?.DisableBuiltInTransactionCategories == true
-                ? customCategories
-                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                    customCategories
-                );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            customCategories,
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
+        );
 
         foreach (var transaction in transactions)
         {
@@ -314,9 +303,12 @@ public class TransactionService(
             );
             if (account == null)
             {
-                _logger.LogError("Attempt to add transaction to account that does not exist.");
+                _logger.LogError(
+                    "{LogMessage}",
+                    _logLocalizer["TransactionImportAccountNotFoundLog"]
+                );
                 throw new BudgetBoardServiceException(
-                    "The account you are trying to add a transaction to does not exist."
+                    _responseLocalizer["TransactionImportAccountNotFoundError"]
                 );
             }
 
@@ -360,37 +352,66 @@ public class TransactionService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
                 .Include(u => u.UserSettings)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;
+    }
+
+    private void UpdateBalancesForNewTransaction(
+        Account account,
+        ITransactionCreateRequest transaction
+    )
+    {
+        var currentBalance =
+            account
+                .Balances.Where(b => b.DateTime <= transaction.Date.ToUniversalTime())
+                .OrderByDescending(b => b.DateTime)
+                .FirstOrDefault()
+                ?.Amount
+            ?? 0;
+
+        // First, add the new balance for the new transaction.
+        var newBalance = new Balance
+        {
+            Amount = transaction.Amount + currentBalance,
+            DateTime = transaction.Date.ToUniversalTime(),
+            AccountID = account.ID,
+        };
+
+        _userDataContext.Balances.Add(newBalance);
+
+        // Then, update all following balances to include the new transaction.
+        var balancesAfterNew = account
+            .Balances.Where(b => b.DateTime > transaction.Date.ToUniversalTime())
+            .ToList();
+        foreach (var balance in balancesAfterNew)
+        {
+            balance.Amount += transaction.Amount;
+        }
     }
 }

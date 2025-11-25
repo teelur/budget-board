@@ -214,7 +214,7 @@ public class AccountService(
         ApplicationUser? foundUser;
         try
         {
-            var users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.Accounts)
@@ -223,8 +223,7 @@ public class AccountService(
                 .ThenInclude(a => a.Institution)
                 .Include(u => u.Institutions)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {

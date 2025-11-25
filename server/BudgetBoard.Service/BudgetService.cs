@@ -4,138 +4,82 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userDataContext)
-    : IBudgetService
+public class BudgetService(
+    ILogger<IBudgetService> logger,
+    UserDataContext userDataContext,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
+) : IBudgetService
 {
     private readonly ILogger<IBudgetService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
-    public async Task CreateBudgetsAsync(
+    public async Task CreateBudgetsWithParentsAsync(
         Guid userGuid,
-        IEnumerable<IBudgetCreateRequest> budgets,
-        bool isCopy = false
+        IEnumerable<IBudgetCreateRequest> requests
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
+        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
         {
             Value = tc.Value,
             Parent = tc.Parent,
         });
-
-        var allCategories =
-            userData.UserSettings?.DisableBuiltInTransactionCategories == true
-                ? customCategories
-                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                    customCategories
-                );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            customCategories,
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
+        );
 
         int newBudgetsCount = 0;
-
-        foreach (var budget in budgets)
+        foreach (var request in requests)
         {
-            // Ignore duplicate categories in a given month
-            if (
-                userData.Budgets.Any(
-                    (b) =>
-                        b.Date.Month == budget.Date.Month
-                        && b.Date.Year == budget.Date.Year
-                        && b.Category.Equals(
-                            budget.Category,
-                            StringComparison.CurrentCultureIgnoreCase
-                        )
-                )
-            )
+            if (TryAddBudget(userData, request, out var newBudget))
             {
-                continue;
-            }
+                newBudgetsCount++;
 
-            Budget newBudget = new()
-            {
-                Date = budget.Date,
-                Category = budget.Category,
-                Limit = budget.Limit,
-                UserID = userData.Id,
-            };
-            userData.Budgets.Add(newBudget);
-            newBudgetsCount++;
-
-            var parentCategory = TransactionCategoriesHelpers.GetParentCategory(
-                budget.Category,
-                allCategories
-            );
-
-            // Copy operations will have all of the data we want to add in the data set,
-            // so don't auto-generate parent.
-            if (!string.IsNullOrEmpty(parentCategory) && !isCopy)
-            {
-                if (
-                    !userData.Budgets.Any(
-                        (b) =>
-                            b.Category.Equals(
-                                parentCategory,
-                                StringComparison.CurrentCultureIgnoreCase
-                            )
-                            && b.Date.Month == budget.Date.Month
-                            && b.Date.Year == budget.Date.Year
-                    )
-                )
+                if (TryAddParentBudget(userData, request, newBudget!, allCategories))
                 {
-                    var newParentBudget = new Budget
-                    {
-                        Date = budget.Date,
-                        Category = parentCategory,
-                        Limit = GetBudgetChildrenLimit(parentCategory, budget.Date, userData),
-                        UserID = userData.Id,
-                    };
-                    userData.Budgets.Add(newParentBudget);
                     newBudgetsCount++;
                 }
-                else
-                {
-                    var parentBudget = userData.Budgets.SingleOrDefault(b =>
-                        b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
-                        && b.Date.Month == budget.Date.Month
-                        && b.Date.Year == budget.Date.Year
-                    );
+            }
+        }
+        await _userDataContext.SaveChangesAsync();
+        _logger.LogInformation(
+            "{LogMessage}",
+            _logLocalizer["BudgetCreateCompletedLog", newBudgetsCount]
+        );
+    }
 
-                    // This should not happen, since we check in the if statement above
-                    if (parentBudget == null)
-                    {
-                        Debug.Fail(parentCategory + " budget not found.");
-                        _logger.LogError(
-                            "Parent budget not found for category {Category}.",
-                            parentCategory
-                        );
+    /// <inheritdoc />
+    public async Task CreateBudgetsAsync(Guid userGuid, IEnumerable<IBudgetCreateRequest> requests)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-                        continue;
-                    }
-
-                    // We need to update the parent budget limit with our new child budget limit
-                    if (parentBudget.Limit < parentBudget.Limit + budget.Limit)
-                    {
-                        parentBudget.Limit += budget.Limit;
-                    }
-                }
+        int newBudgetsCount = 0;
+        foreach (var request in requests)
+        {
+            if (TryAddBudget(userData, request, out var newBudget))
+            {
+                newBudgetsCount++;
             }
         }
 
         await _userDataContext.SaveChangesAsync();
-
-        if (newBudgetsCount == 0)
-        {
-            _logger.LogError("Attempt to create duplicate budgets.");
-            throw new BudgetBoardServiceException(
-                "The budget(s) you are trying to create already exist."
-            );
-        }
+        _logger.LogInformation(
+            "{LogMessage}",
+            _logLocalizer["BudgetCopyCompletedLog", newBudgetsCount]
+        );
     }
 
     /// <inheritdoc />
@@ -145,6 +89,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var budgets = userData.Budgets.Where(b =>
             b.Date.Month == monthDate.Month && b.Date.Year == monthDate.Year
         );
@@ -153,19 +98,18 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
     }
 
     /// <inheritdoc />
-    public async Task UpdateBudgetAsync(Guid userGuid, IBudgetUpdateRequest updatedBudget)
+    public async Task UpdateBudgetAsync(Guid userGuid, IBudgetUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var budget = userData.Budgets.FirstOrDefault(b => b.ID == updatedBudget.ID);
+
+        var budget = userData.Budgets.FirstOrDefault(b => b.ID == request.ID);
         if (budget == null)
         {
-            _logger.LogError("Attempt to update budget that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The budget you are trying to update does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["BudgetUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["BudgetUpdateNotFoundError"]);
         }
 
-        budget.Limit = updatedBudget.Limit;
+        budget.Limit = request.Limit;
 
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
         {
@@ -173,12 +117,10 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
             Parent = tc.Parent,
         });
 
-        var allCategories =
-            userData.UserSettings?.DisableBuiltInTransactionCategories == true
-                ? customCategories
-                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                    customCategories
-                );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            customCategories,
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
+        );
 
         if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
         {
@@ -190,11 +132,9 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
 
             if (childBudgetsLimitTotal > budget.Limit)
             {
-                _logger.LogError(
-                    "Attempt to update parent budget to a value less than the sum of its children."
-                );
+                _logger.LogError("{LogMessage}", _logLocalizer["BudgetUpdateParentLimitErrorLog"]);
                 throw new BudgetBoardServiceException(
-                    "The parent budget cannot be less than the sum of its children."
+                    _responseLocalizer["BudgetUpdateParentLimitError"]
                 );
             }
         }
@@ -237,7 +177,7 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
                         Limit = childBudgetsLimitTotal,
                         UserID = userData.Id,
                     };
-                    userData.Budgets.Add(newParentBudget);
+                    _userDataContext.Budgets.Add(newParentBudget);
                 }
             }
         }
@@ -249,13 +189,12 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
     public async Task DeleteBudgetAsync(Guid userGuid, Guid budgetGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var budget = userData.Budgets.SingleOrDefault(b => b.ID == budgetGuid);
         if (budget == null)
         {
-            _logger.LogError("Attempt to delete budget that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The budget you are trying to delete does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["BudgetDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["BudgetDeleteNotFoundError"]);
         }
 
         _userDataContext.Budgets.Remove(budget);
@@ -290,34 +229,134 @@ public class BudgetService(ILogger<IBudgetService> logger, UserDataContext userD
         await _userDataContext.SaveChangesAsync();
     }
 
+    private bool TryAddBudget(
+        ApplicationUser userData,
+        IBudgetCreateRequest request,
+        out Budget? newBudget
+    )
+    {
+        var budgetForCategoryAlreadyExists = userData.Budgets.Any(b =>
+            b.Date.Month == request.Date.Month
+            && b.Date.Year == request.Date.Year
+            && b.Category.Equals(request.Category, StringComparison.CurrentCultureIgnoreCase)
+        );
+
+        if (budgetForCategoryAlreadyExists)
+        {
+            _logger.LogWarning(
+                "{LogMessage}",
+                _logLocalizer[
+                    "BudgetCreateDuplicateLog",
+                    request.Category,
+                    request.Date.ToString("yyyy-MM")
+                ]
+            );
+
+            newBudget = null;
+            return false;
+        }
+
+        newBudget = new Budget
+        {
+            Date = request.Date,
+            Category = request.Category,
+            Limit = request.Limit,
+            UserID = userData.Id,
+        };
+
+        userData.Budgets.Add(newBudget);
+        return true;
+    }
+
+    private bool TryAddParentBudget(
+        ApplicationUser userData,
+        IBudgetCreateRequest childRequest,
+        Budget childBudget,
+        IEnumerable<ICategory> allCategories
+    )
+    {
+        var parentCategory = TransactionCategoriesHelpers.GetParentCategory(
+            childRequest.Category,
+            allCategories
+        );
+
+        if (
+            string.IsNullOrEmpty(parentCategory)
+            || parentCategory.Equals(
+                childRequest.Category,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return false;
+        }
+
+        var parentBudgetRequest = new BudgetCreateRequest
+        {
+            Date = childRequest.Date,
+            Category = parentCategory,
+            Limit = GetBudgetChildrenLimit(parentCategory, childRequest.Date, userData),
+        };
+
+        if (!TryAddBudget(userData, parentBudgetRequest, out var newParentBudget))
+        {
+            UpdateParentBudgetLimit(parentCategory, childBudget, userData);
+            return false;
+        }
+
+        _userDataContext.Budgets.Add(newParentBudget!);
+        return true;
+    }
+
+    private void UpdateParentBudgetLimit(
+        string parentCategory,
+        Budget childBudget,
+        ApplicationUser userData
+    )
+    {
+        var parentBudget = userData.Budgets.SingleOrDefault(b =>
+            b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
+            && b.Date.Month == childBudget.Date.Month
+            && b.Date.Year == childBudget.Date.Year
+        );
+
+        if (parentBudget == null)
+        {
+            _logger.LogError("Parent budget not found for category {Category}.", parentCategory);
+            return;
+        }
+
+        // A parent budget cannot have a limit less than the sum of its children.
+        if (parentBudget.Limit < parentBudget.Limit + childBudget.Limit)
+        {
+            parentBudget.Limit += childBudget.Limit;
+        }
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.Budgets)
                 .Include(u => u.TransactionCategories)
                 .Include(u => u.UserSettings)
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

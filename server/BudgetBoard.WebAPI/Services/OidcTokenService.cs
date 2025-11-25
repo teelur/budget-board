@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BudgetBoard.WebAPI.Models;
+using BudgetBoard.WebAPI.Resources;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BudgetBoard.WebAPI.Services;
@@ -10,7 +12,8 @@ namespace BudgetBoard.WebAPI.Services;
 public class OidcTokenService(
     HttpClient httpClient,
     IConfiguration configuration,
-    ILogger<IOidcTokenService> logger
+    ILogger<IOidcTokenService> logger,
+    IStringLocalizer<ApiLogStrings> logLocalizer
 ) : IOidcTokenService
 {
     private readonly HttpClient _httpClient =
@@ -19,6 +22,7 @@ public class OidcTokenService(
         configuration ?? throw new ArgumentNullException(nameof(configuration));
     private readonly ILogger<IOidcTokenService> _logger =
         logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
 
     /// <summary>
     /// Exchanges the authorization code for user claims by communicating with the OIDC provider.
@@ -43,19 +47,22 @@ public class OidcTokenService(
                 || string.IsNullOrEmpty(clientSecret)
             )
             {
-                _logger.LogError("OIDC configuration is missing");
+                _logger.LogError("{LogMessage}", _logLocalizer["OidcConfigurationMissingLog"]);
                 return null;
             }
 
             // Discover token endpoint
             var discoveryDoc = await GetDiscoveryDocumentAsync(authority);
-            if (discoveryDoc?.TokenEndpoint == null)
+            if (discoveryDoc == null || string.IsNullOrEmpty(discoveryDoc.TokenEndpoint))
             {
-                _logger.LogError("Could not discover token endpoint");
+                _logger.LogError(
+                    "{LogMessage}",
+                    _logLocalizer["OidcTokenEndpointDiscoveryErrorLog"]
+                );
                 return null;
             }
 
-            // Exchange authorization code for tokens
+            // Exchange code for token
             var tokenResponse = await ExchangeCodeForTokensAsync(
                 discoveryDoc.TokenEndpoint,
                 authorizationCode,
@@ -66,22 +73,21 @@ public class OidcTokenService(
 
             if (tokenResponse?.IdToken == null)
             {
-                _logger.LogError("Token exchange failed or no ID token received");
+                _logger.LogError("{LogMessage}", _logLocalizer["OidcTokenExchangeFailedLog"]);
                 return null;
             }
 
-            // Parse and validate ID token
-            var principal = await ValidateIdTokenAsync(
+            // Validate ID token and extract claims
+            return await ValidateIdTokenAsync(
                 tokenResponse.IdToken,
                 authority,
                 clientId,
                 discoveryDoc.JwksUri
             );
-            return principal;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during token exchange");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
             return null;
         }
     }
@@ -97,15 +103,15 @@ public class OidcTokenService(
         {
             var discoveryUrl = $"{authority.TrimEnd('/')}/.well-known/openid-configuration";
             _logger.LogInformation(
-                "Fetching discovery document from: {DiscoveryUrl}",
-                discoveryUrl
+                "{LogMessage}",
+                _logLocalizer["FetchingDiscoveryDocumentLog", discoveryUrl]
             );
 
             var response = await _httpClient.GetAsync(discoveryUrl);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            _logger.LogDebug("Discovery document content: {Content}", content);
+            _logger.LogDebug("{LogMessage}", _logLocalizer["DiscoveryDocumentContentLog", content]);
 
             var discoveryDoc = JsonSerializer.Deserialize<OidcDiscoveryDocument>(
                 content,
@@ -115,21 +121,31 @@ public class OidcTokenService(
             if (discoveryDoc != null)
             {
                 _logger.LogInformation(
-                    "Discovery document parsed. TokenEndpoint: {TokenEndpoint}, Issuer: {Issuer}",
-                    discoveryDoc.TokenEndpoint,
-                    discoveryDoc.Issuer
+                    "{LogMessage}",
+                    _logLocalizer[
+                        "DiscoveryDocumentParsedLog",
+                        discoveryDoc.TokenEndpoint ?? string.Empty,
+                        discoveryDoc.Issuer ?? string.Empty
+                    ]
                 );
             }
             else
             {
-                _logger.LogError("Failed to deserialize discovery document");
+                _logger.LogError(
+                    "{LogMessage}",
+                    _logLocalizer["OidcDiscoveryDocumentDeserializationErrorLog"]
+                );
             }
 
             return discoveryDoc;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get discovery document from {Authority}", authority);
+            _logger.LogError(
+                ex,
+                "{LogMessage}",
+                _logLocalizer["DiscoveryDocumentFetchErrorLog", authority]
+            );
             return null;
         }
     }
@@ -178,9 +194,8 @@ public class OidcTokenService(
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 _logger.LogError(
-                    "Token exchange failed with status {StatusCode}: {Error}",
-                    response.StatusCode,
-                    errorContent
+                    "{LogMessage}",
+                    _logLocalizer["TokenExchangeErrorLog", response.StatusCode, errorContent]
                 );
                 return null;
             }
@@ -195,7 +210,7 @@ public class OidcTokenService(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during token exchange request");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["TokenExchangeRequestErrorLog"]);
             return null;
         }
     }
@@ -219,7 +234,7 @@ public class OidcTokenService(
         {
             if (string.IsNullOrEmpty(jwksUri))
             {
-                _logger.LogError("JWKS URI is missing from discovery document");
+                _logger.LogError("{LogMessage}", _logLocalizer["OidcJwksUriMissingLog"]);
                 return null;
             }
 
@@ -227,7 +242,7 @@ public class OidcTokenService(
             var signingKeys = await GetSigningKeysAsync(jwksUri);
             if (signingKeys == null || signingKeys.Count == 0)
             {
-                _logger.LogError("Failed to retrieve signing keys from JWKS endpoint");
+                _logger.LogError("{LogMessage}", _logLocalizer["OidcSigningKeysRetrievalErrorLog"]);
                 return null;
             }
 
@@ -262,7 +277,7 @@ public class OidcTokenService(
 
             if (subClaim == null || emailClaim == null)
             {
-                _logger.LogError("Required claims (sub and email) not found in ID token");
+                _logger.LogError("{LogMessage}", _logLocalizer["OidcRequiredClaimsMissingLog"]);
                 return null;
             }
 
@@ -287,46 +302,44 @@ public class OidcTokenService(
                 identity.AddClaim(new Claim(ClaimTypes.Name, nameClaim.Value));
             }
 
-            _logger.LogInformation("ID token validated successfully");
+            _logger.LogInformation("{LogMessage}", _logLocalizer["IdTokenValidatedLog"]);
             return principal;
         }
         catch (SecurityTokenExpiredException ex)
         {
-            _logger.LogError(ex, "ID token has expired");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["IdTokenExpiredLog"]);
             return null;
         }
         catch (SecurityTokenInvalidSignatureException ex)
         {
-            _logger.LogError(ex, "ID token has invalid signature");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["IdTokenInvalidSignatureLog"]);
             return null;
         }
         catch (SecurityTokenInvalidIssuerException ex)
         {
-            _logger.LogError(ex, "ID token has invalid issuer");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["IdTokenInvalidIssuerLog"]);
             return null;
         }
         catch (SecurityTokenInvalidAudienceException ex)
         {
-            _logger.LogError(ex, "ID token has invalid audience");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["IdTokenInvalidAudienceLog"]);
             return null;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error validating ID token");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["IdTokenValidationErrorLog"]);
             return null;
         }
     }
 
-    /// <summary>
-    /// Fetches the signing keys from the JWKS endpoint.
-    /// </summary>
-    /// <param name="jwksUri">The JWKS URI.</param>
-    /// <returns>A collection of security keys, or null if retrieval fails.</returns>
     private async Task<ICollection<SecurityKey>?> GetSigningKeysAsync(string jwksUri)
     {
         try
         {
-            _logger.LogInformation("Fetching signing keys from: {JwksUri}", jwksUri);
+            _logger.LogInformation(
+                "{LogMessage}",
+                _logLocalizer["FetchingSigningKeysLog", jwksUri]
+            );
 
             var response = await _httpClient.GetAsync(jwksUri);
             response.EnsureSuccessStatusCode();
@@ -336,19 +349,23 @@ public class OidcTokenService(
 
             if (jwks.Keys == null || !jwks.Keys.Any())
             {
-                _logger.LogError("No signing keys found in JWKS response");
+                _logger.LogError("{LogMessage}", _logLocalizer["OidcNoSigningKeysFoundLog"]);
                 return null;
             }
 
             _logger.LogInformation(
-                "Successfully retrieved {Count} signing key(s)",
-                jwks.Keys.Count
+                "{LogMessage}",
+                _logLocalizer["SigningKeysRetrievalSuccessLog", jwks.Keys.Count]
             );
             return jwks.Keys.Cast<SecurityKey>().ToList();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get signing keys from {JwksUri}", jwksUri);
+            _logger.LogError(
+                ex,
+                "{LogMessage}",
+                _logLocalizer["SigningKeysFetchErrorLog", jwksUri]
+            );
             return null;
         }
     }

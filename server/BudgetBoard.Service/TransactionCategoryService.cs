@@ -1,19 +1,26 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
 public class TransactionCategoryService(
     ILogger<ITransactionCategoryService> logger,
-    UserDataContext userDataContext
+    UserDataContext userDataContext,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : ITransactionCategoryService
 {
     private readonly ILogger<ITransactionCategoryService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
     public async Task CreateTransactionCategoryAsync(Guid userGuid, ICategoryCreateRequest request)
@@ -26,12 +33,10 @@ public class TransactionCategoryService(
             Parent = tc.Parent,
         });
 
-        var allCategories =
-            userData.UserSettings?.DisableBuiltInTransactionCategories == true
-                ? customCategories
-                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                    customCategories
-                );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            customCategories,
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
+        );
 
         if (
             allCategories.Any(c =>
@@ -39,23 +44,34 @@ public class TransactionCategoryService(
             )
         )
         {
-            _logger.LogError("Attempt to create a duplicate transaction category.");
-            throw new BudgetBoardServiceException("Transaction category already exists.");
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryCreateDuplicateNameLog"]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["TransactionCategoryCreateDuplicateNameError"]
+            );
         }
 
         if (string.IsNullOrEmpty(request.Value))
         {
-            _logger.LogError("Attempt to create a transaction category without a value.");
-            throw new BudgetBoardServiceException("Transaction category must have a name.");
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryCreateEmptyNameLog"]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["TransactionCategoryCreateEmptyNameError"]
+            );
         }
 
         if (request.Value.Equals(request.Parent, StringComparison.OrdinalIgnoreCase))
         {
             _logger.LogError(
-                "Attempt to create a transaction category with the same name as its parent category."
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryCreateSameNameAsParentLog"]
             );
             throw new BudgetBoardServiceException(
-                "Transaction category cannot have the same name as its parent category."
+                _responseLocalizer["TransactionCategoryCreateSameNameAsParentError"]
             );
         }
 
@@ -67,9 +83,12 @@ public class TransactionCategoryService(
         )
         {
             _logger.LogError(
-                "Attempt to create a transaction category with a parent that does not exist."
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryCreateParentNotExistLog"]
             );
-            throw new BudgetBoardServiceException("Parent category does not exist.");
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["TransactionCategoryCreateParentNotFoundError"]
+            );
         }
 
         var newCategory = new Category
@@ -79,7 +98,7 @@ public class TransactionCategoryService(
             UserID = userData.Id,
         };
 
-        userData.TransactionCategories.Add(newCategory);
+        _userDataContext.TransactionCategories.Add(newCategory);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -90,6 +109,7 @@ public class TransactionCategoryService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         if (categoryGuid != default)
         {
             var transactionCategory = userData.TransactionCategories.FirstOrDefault(t =>
@@ -97,9 +117,9 @@ public class TransactionCategoryService(
             );
             if (transactionCategory == null)
             {
-                _logger.LogError("Attempt to access transaction category that does not exist.");
+                _logger.LogError("{LogMessage}", _logLocalizer["TransactionCategoryNotFoundLog"]);
                 throw new BudgetBoardServiceException(
-                    "The transaction category you are trying to access does not exist."
+                    _responseLocalizer["TransactionCategoryNotFoundError"]
                 );
             }
 
@@ -110,26 +130,60 @@ public class TransactionCategoryService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateTransactionCategoryAsync(
-        Guid userGuid,
-        ICategoryUpdateRequest updatedCategory
-    )
+    public async Task UpdateTransactionCategoryAsync(Guid userGuid, ICategoryUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var transactionCategory = userData.TransactionCategories.FirstOrDefault(t =>
-            t.ID == updatedCategory.ID
+            t.ID == request.ID
         );
         if (transactionCategory == null)
         {
-            _logger.LogError("Attempt to access transaction category that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionCategoryUpdateNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The transaction category you are trying to access does not exist."
+                _responseLocalizer["TransactionCategoryUpdateNotFoundError"]
             );
         }
 
-        transactionCategory.Value = updatedCategory.Value;
-        transactionCategory.Parent = updatedCategory.Parent;
+        if (string.IsNullOrEmpty(request.Value))
+        {
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryUpdateEmptyNameLog"]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["TransactionCategoryUpdateEmptyNameError"]
+            );
+        }
 
+        if (request.Value.Equals(request.Parent, StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryUpdateSameNameAsParentLog"]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["TransactionCategoryUpdateSameNameAsParentError"]
+            );
+        }
+
+        if (
+            userData.TransactionCategories.Any(c =>
+                c.Value.Equals(request.Value, StringComparison.OrdinalIgnoreCase)
+                && c.ID != request.ID
+            )
+        )
+        {
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryUpdateDuplicateNameLog"]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["TransactionCategoryUpdateDuplicateNameError"]
+            );
+        }
+
+        _userDataContext.Entry(transactionCategory).CurrentValues.SetValues(request);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -140,9 +194,9 @@ public class TransactionCategoryService(
         var transactionCategory = userData.TransactionCategories.FirstOrDefault(t => t.ID == guid);
         if (transactionCategory == null)
         {
-            _logger.LogError("Attempt to delete transaction category that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["TransactionCategoryDeleteNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The transaction category you are trying to delete does not exist."
+                _responseLocalizer["TransactionCategoryDeleteNotFoundError"]
             );
         }
 
@@ -162,24 +216,31 @@ public class TransactionCategoryService(
         )
         {
             _logger.LogError(
-                "Attempt to delete transaction category that is in use by transaction(s)."
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryDeleteInUseByTransactionsLog"]
             );
             throw new BudgetBoardServiceException(
-                "Category is in use by transaction(s) and cannot be deleted."
+                _responseLocalizer["TransactionCategoryDeleteInUseByTransactionsError"]
             );
         }
         else if (userData.Budgets.Any(b => b.Category == transactionCategory.Value))
         {
-            _logger.LogError("Attempt to delete transaction category that is in use by budget(s).");
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryDeleteInUseByBudgetsLog"]
+            );
             throw new BudgetBoardServiceException(
-                "Category is in use by budget(s) and cannot be deleted."
+                _responseLocalizer["TransactionCategoryDeleteInUseByBudgetsError"]
             );
         }
         else if (userData.TransactionCategories.Any(c => c.Parent == transactionCategory.Value))
         {
-            _logger.LogError("Attempt to delete transaction category that is a parent category.");
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["TransactionCategoryDeleteHasChildrenLog"]
+            );
             throw new BudgetBoardServiceException(
-                "Transaction category has subcategories associated with it and cannot be deleted."
+                _responseLocalizer["TransactionCategoryDeleteHasChildrenError"]
             );
         }
         else
@@ -191,35 +252,31 @@ public class TransactionCategoryService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.TransactionCategories)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.Budgets)
                 .Include(u => u.UserSettings)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

@@ -54,8 +54,9 @@ public class ApplicationUserService(
         ApplicationUser? foundUser;
         try
         {
-            var users = await _userDataContext.ApplicationUsers.ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+            foundUser = await _userDataContext.ApplicationUsers.FirstOrDefaultAsync(u =>
+                u.Id == new Guid(id)
+            );
         }
         catch (Exception ex)
         {

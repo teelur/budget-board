@@ -11,8 +11,8 @@ public interface ITransactionService
     /// Creates a new transaction for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="transaction">The transaction creation details.</param>
-    Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest transaction);
+    /// <param name="request">The transaction creation details.</param>
+    Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request);
 
     /// <summary>
     /// Retrieves transactions for the specified user.
@@ -35,8 +35,8 @@ public interface ITransactionService
     /// Updates an existing transaction.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="editedTransaction">The transaction update details.</param>
-    Task UpdateTransactionAsync(Guid userGuid, ITransactionUpdateRequest editedTransaction);
+    /// <param name="request">The transaction update details.</param>
+    Task UpdateTransactionAsync(Guid userGuid, ITransactionUpdateRequest request);
 
     /// <summary>
     /// Deletes (soft deletes) a transaction.
@@ -56,13 +56,13 @@ public interface ITransactionService
     /// Splits a transaction into two parts.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="transaction">The transaction split details.</param>
-    Task SplitTransactionAsync(Guid userGuid, ITransactionSplitRequest transaction);
+    /// <param name="request">The transaction split details.</param>
+    Task SplitTransactionAsync(Guid userGuid, ITransactionSplitRequest request);
 
     /// <summary>
     /// Imports a batch of transactions.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="transactionImportRequest">The transaction import details.</param>
-    Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest transactionImportRequest);
+    /// <param name="request">The transaction import details.</param>
+    Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request);
 }

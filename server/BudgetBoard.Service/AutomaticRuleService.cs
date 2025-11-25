@@ -31,14 +31,14 @@ public class AutomaticRuleService(
 
         if (request.Conditions.Count == 0)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["NoConditionsLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["NoConditionsError"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["NoConditionsCreateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["NoConditionsCreateError"]);
         }
 
         if (request.Actions.Count == 0)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["NoActionsLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["NoActionsError"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["NoActionsCreateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["NoActionsCreateError"]);
         }
 
         var newRuleId = Guid.NewGuid();
@@ -104,14 +104,14 @@ public class AutomaticRuleService(
 
         if (request.Conditions.Count == 0)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["NoConditionsLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["NoConditionsError"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["NoConditionsUpdateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["NoConditionsUpdateError"]);
         }
 
         if (request.Actions.Count == 0)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["NoActionsLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["NoActionsError"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["NoActionsUpdateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["NoActionsUpdateError"]);
         }
 
         _userDataContext.RuleConditions.RemoveRange(existingRule.Conditions);
@@ -231,7 +231,8 @@ public class AutomaticRuleService(
                 matchedTransactions = AutomaticRuleHelpers.FilterOnCondition(
                     condition,
                     matchedTransactions,
-                    allCategories
+                    allCategories,
+                    _responseLocalizer
                 );
             }
             catch (BudgetBoardServiceException bbex)
@@ -261,7 +262,8 @@ public class AutomaticRuleService(
                     transactions,
                     allCategories,
                     _transactionService,
-                    userId
+                    userId,
+                    _responseLocalizer
                 );
             }
             catch (BudgetBoardServiceException bbex)
@@ -282,7 +284,7 @@ public class AutomaticRuleService(
         ApplicationUser? foundUser;
         try
         {
-            var users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.AutomaticRules)
                 .ThenInclude(r => r.Conditions)
                 .Include(u => u.AutomaticRules)
@@ -292,10 +294,9 @@ public class AutomaticRuleService(
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.UserSettings)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
-        catch (Exception ex) when (ex is not BudgetBoardServiceException)
+        catch (Exception ex)
         {
             _logger.LogError(
                 "{LogMessage}",
