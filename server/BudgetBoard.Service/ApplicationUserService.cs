@@ -66,7 +66,7 @@ public class ApplicationUserService(
 
         if (foundUser == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserLog"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
             throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 

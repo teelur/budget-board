@@ -6,7 +6,6 @@ using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -70,8 +69,6 @@ public class ApplicationUserTests
     public async Task UpdateApplicationUserAsync_WhenUserExists_UpdatesUser()
     {
         // Arrange
-        var fakeDate = new Faker().Date.Past().ToUniversalTime();
-
         var helper = new TestHelper();
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
@@ -79,7 +76,11 @@ public class ApplicationUserTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
-        var userUpdateRequest = new ApplicationUserUpdateRequest { LastSync = fakeDate };
+
+        var userUpdateRequest = new ApplicationUserUpdateRequest
+        {
+            LastSync = new Faker().Date.Past().ToUniversalTime(),
+        };
 
         // Act
         await applicationUserService.UpdateApplicationUserAsync(
@@ -95,8 +96,6 @@ public class ApplicationUserTests
     public async Task UpdateApplicationUserAsync_WhenUserDoesNotExist_ThrowsError()
     {
         // Arrange
-        var fakeDate = new Faker().Date.Past().ToUniversalTime();
-
         var helper = new TestHelper();
         var applicationUserService = new ApplicationUserService(
             Mock.Of<ILogger<IApplicationUserService>>(),
@@ -105,7 +104,10 @@ public class ApplicationUserTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var userUpdateRequest = new ApplicationUserUpdateRequest { LastSync = fakeDate };
+        var userUpdateRequest = new ApplicationUserUpdateRequest
+        {
+            LastSync = new Faker().Date.Past().ToUniversalTime(),
+        };
 
         // Act
         Func<Task> act = async () =>
@@ -135,9 +137,7 @@ public class ApplicationUserTests
             null!
         );
 
-        mockUserManager
-            .Setup(um => um.GetLoginsAsync(user))
-            .ReturnsAsync(new List<UserLoginInfo>());
+        mockUserManager.Setup(um => um.GetLoginsAsync(user)).ReturnsAsync([]);
 
         return mockUserManager;
     }
