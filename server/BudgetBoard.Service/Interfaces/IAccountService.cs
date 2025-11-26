@@ -19,7 +19,7 @@ public interface IAccountService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="accountGuid">Optional. The unique identifier of a specific account to retrieve.</param>
-    /// <returns>A collection of account details.</returns>
+    /// <returns>A collection of account details ordered by index.</returns>
     Task<IReadOnlyList<IAccountResponse>> ReadAccountsAsync(
         Guid userGuid,
         Guid accountGuid = default

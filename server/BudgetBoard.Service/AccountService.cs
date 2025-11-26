@@ -36,19 +36,15 @@ public class AccountService(
             throw new BudgetBoardServiceException(_responseLocalizer["DuplicateSyncIDError"]);
         }
 
-        if (!userData.Institutions.Any(i => i.ID == request.InstitutionID))
+        var institution = userData.Institutions.SingleOrDefault(i => i.ID == request.InstitutionID);
+        if (institution == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["InvalidInstitutionIDLog"]);
             throw new BudgetBoardServiceException(_responseLocalizer["InvalidInstitutionIDError"]);
         }
 
-        var institution = userData.Institutions.Single(i => i.ID == request.InstitutionID);
-
         // Creating an account under a deleted institution should restore the institution.
-        if (institution.Deleted.HasValue)
-        {
-            institution.Deleted = null;
-        }
+        institution.Deleted = null;
 
         var newAccount = new Account
         {
@@ -75,19 +71,19 @@ public class AccountService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var accountsQuery = userData.Accounts.ToList();
+        var accounts = userData.Accounts.ToList();
 
         if (accountGuid != default)
         {
-            accountsQuery = [.. accountsQuery.Where(a => a.ID == accountGuid)];
-            if (accountsQuery.Count == 0)
+            accounts = [.. accounts.Where(a => a.ID == accountGuid)];
+            if (accounts.Count == 0)
             {
                 _logger.LogError("{LogMessage}", _logLocalizer["AccountNotFoundLog"]);
                 throw new BudgetBoardServiceException(_responseLocalizer["AccountNotFoundError"]);
             }
         }
 
-        return accountsQuery.OrderBy(a => a.Index).Select(a => new AccountResponse(a)).ToList();
+        return accounts.OrderBy(a => a.Index).Select(a => new AccountResponse(a)).ToList();
     }
 
     /// <inheritdoc />
