@@ -95,11 +95,12 @@ public class AutomaticRuleService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var existingRule = userData.AutomaticRules.FirstOrDefault(r => r.ID == request.ID);
-
         if (existingRule == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["AutomaticRuleNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["AutomaticRuleNotFoundError"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["AutomaticRuleUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["AutomaticRuleUpdateNotFoundError"]
+            );
         }
 
         if (request.Conditions.Count == 0)
@@ -307,7 +308,7 @@ public class AutomaticRuleService(
 
         if (foundUser == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserLog"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
             throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 

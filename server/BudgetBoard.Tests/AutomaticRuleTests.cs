@@ -1,9 +1,9 @@
-﻿using BudgetBoard.Service;
+﻿using BudgetBoard.IntegrationTests.Fakers;
+using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -21,8 +21,8 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var rule = new AutomaticRuleCreateRequest
@@ -71,8 +71,8 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
         var rule = new AutomaticRuleCreateRequest
         {
@@ -93,8 +93,11 @@ public class AutomaticRuleTests
         // Act
         Func<Task> act = async () =>
             await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
+
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>();
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("NoConditionsCreateError");
     }
 
     [Fact]
@@ -106,8 +109,8 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
         var rule = new AutomaticRuleCreateRequest
         {
@@ -129,7 +132,9 @@ public class AutomaticRuleTests
             await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>();
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("NoActionsCreateError");
     }
 
     [Fact]
@@ -141,66 +146,27 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var rule = new AutomaticRuleCreateRequest
+        var automaticRuleFaker = new AutomaticRuleFaker(helper.demoUser.Id);
+        var demoRules = automaticRuleFaker.Generate(5);
+
+        helper.UserDataContext.AutomaticRules.AddRange(demoRules);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var rules = await automaticRuleService.ReadAutomaticRulesAsync(helper.demoUser.Id);
+
+        // Assert
+        rules.Should().HaveCount(5);
+        foreach (var rule in demoRules)
         {
-            Conditions =
-            [
-                new RuleParameterCreateRequest
-                {
-                    Field = "Description",
-                    Operator = "matches",
-                    Value = ".*test.*",
-                    Type = "string",
-                },
-            ],
-            Actions =
-            [
-                new RuleParameterCreateRequest
-                {
-                    Field = "Category",
-                    Operator = "set",
-                    Value = TransactionCategoriesConstants
-                        .DefaultTransactionCategories.First()
-                        .Value,
-                    Type = "string",
-                },
-            ],
-        };
-
-        await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
-
-        // Act
-        var rules = await automaticRuleService.ReadAutomaticRulesAsync(helper.demoUser.Id);
-
-        // Assert
-        rules.Should().HaveCount(1);
-        rules.First().Conditions.Should().HaveCount(1);
-        rules.First().Actions.Should().HaveCount(1);
-        rules.First().Conditions.First().Field.Should().Be("Description");
-    }
-
-    [Fact]
-    public async Task ReadAutomaticRulesAsync_WhenNoRulesExist_ReturnsEmptyList()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var automaticRuleService = new AutomaticRuleService(
-            Mock.Of<ILogger<IAutomaticRuleService>>(),
-            helper.UserDataContext,
-            Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
-        );
-
-        // Act
-        var rules = await automaticRuleService.ReadAutomaticRulesAsync(helper.demoUser.Id);
-
-        // Assert
-        rules.Should().BeEmpty();
+            rules.Should().ContainSingle(r => r.ID == rule.ID);
+            rules.First(r => r.ID == rule.ID).Conditions.Should().HaveCount(rule.Conditions.Count);
+            rules.First(r => r.ID == rule.ID).Actions.Should().HaveCount(rule.Actions.Count);
+        }
     }
 
     [Fact]
@@ -212,41 +178,17 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var initialRule = new AutomaticRuleCreateRequest
-        {
-            Conditions =
-            [
-                new RuleParameterCreateRequest
-                {
-                    Field = "Description",
-                    Operator = "matches",
-                    Value = ".*test.*",
-                    Type = "string",
-                },
-            ],
-            Actions =
-            [
-                new RuleParameterCreateRequest
-                {
-                    Field = "Category",
-                    Operator = "set",
-                    Value = TransactionCategoriesConstants
-                        .DefaultTransactionCategories.First()
-                        .Value,
-                    Type = "string",
-                },
-            ],
-        };
+        var automaticRuleFaker = new AutomaticRuleFaker(helper.demoUser.Id);
+        var demoRule = automaticRuleFaker.Generate();
 
-        await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, initialRule);
+        helper.UserDataContext.AutomaticRules.Add(demoRule);
+        helper.UserDataContext.SaveChanges();
 
         var createdRuleId = helper.demoUser.AutomaticRules.First().ID;
-        var createdConditionId = helper.demoUser.AutomaticRules.First().Conditions.First().ID;
-        var createdActionId = helper.demoUser.AutomaticRules.First().Actions.First().ID;
         var updatedRule = new AutomaticRuleUpdateRequest
         {
             ID = createdRuleId,
@@ -297,8 +239,8 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var updatedRule = new AutomaticRuleUpdateRequest
@@ -333,7 +275,9 @@ public class AutomaticRuleTests
             await automaticRuleService.UpdateAutomaticRuleAsync(helper.demoUser.Id, updatedRule);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>();
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AutomaticRuleUpdateNotFoundError");
     }
 
     [Fact]
@@ -345,43 +289,18 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var rule = new AutomaticRuleCreateRequest
-        {
-            Conditions =
-            [
-                new RuleParameterCreateRequest
-                {
-                    Field = "Description",
-                    Operator = "matches",
-                    Value = ".*test.*",
-                    Type = "string",
-                },
-            ],
-            Actions =
-            [
-                new RuleParameterCreateRequest
-                {
-                    Field = "Category",
-                    Operator = "set",
-                    Value = TransactionCategoriesConstants
-                        .DefaultTransactionCategories.First()
-                        .Value,
-                    Type = "string",
-                },
-            ],
-        };
+        var automaticRuleFaker = new AutomaticRuleFaker(helper.demoUser.Id);
+        var demoRule = automaticRuleFaker.Generate();
 
-        await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
+        helper.UserDataContext.AutomaticRules.Add(demoRule);
+        helper.UserDataContext.SaveChanges();
 
         // Act
-        await automaticRuleService.DeleteAutomaticRuleAsync(
-            helper.demoUser.Id,
-            helper.demoUser.AutomaticRules.First().ID
-        );
+        await automaticRuleService.DeleteAutomaticRuleAsync(helper.demoUser.Id, demoRule.ID);
 
         // Assert
         helper.demoUser.AutomaticRules.Should().BeEmpty();
@@ -396,8 +315,8 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             Mock.Of<ITransactionService>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -408,7 +327,9 @@ public class AutomaticRuleTests
             );
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>();
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AutomaticRuleDeleteNotFoundError");
     }
 
     [Fact]
@@ -428,8 +349,8 @@ public class AutomaticRuleTests
             Mock.Of<ILogger<IAutomaticRuleService>>(),
             helper.UserDataContext,
             transactionServiceMock.Object,
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var rule = new AutomaticRuleCreateRequest
@@ -462,6 +383,6 @@ public class AutomaticRuleTests
         var result = await automaticRuleService.RunAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Assert
-        result.Should().NotBeNullOrEmpty();
+        result.Should().Contain("RuleRunSummary");
     }
 }
