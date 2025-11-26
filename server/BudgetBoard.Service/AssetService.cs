@@ -43,19 +43,19 @@ public class AssetService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var assetsQuery = userData.Assets.ToList();
+        var assets = userData.Assets.ToList();
 
         if (assetGuid != default)
         {
-            assetsQuery = [.. assetsQuery.Where(a => a.ID == assetGuid)];
-            if (assetsQuery.Count == 0)
+            assets = [.. assets.Where(a => a.ID == assetGuid)];
+            if (assets.Count == 0)
             {
                 _logger.LogError("{LogMessage}", _logLocalizer["AssetNotFoundLog"]);
                 throw new BudgetBoardServiceException(_responseLocalizer["AssetNotFoundError"]);
             }
         }
 
-        return assetsQuery.OrderBy(a => a.Index).Select(a => new AssetResponse(a)).ToList();
+        return assets.OrderBy(a => a.Index).Select(a => new AssetResponse(a)).ToList();
     }
 
     /// <inheritdoc />
@@ -64,17 +64,10 @@ public class AssetService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var asset = userData.Assets.SingleOrDefault(a => a.ID == request.ID);
-
         if (asset == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["AssetEditNotFoundLog"]);
             throw new BudgetBoardServiceException(_responseLocalizer["AssetEditNotFoundError"]);
-        }
-
-        if (userData.Assets.Any(a => a.Name == request.Name && a.ID != request.ID))
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["DuplicateAssetNameLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["DuplicateAssetNameError"]);
         }
 
         _userDataContext.Entry(asset).CurrentValues.SetValues(request);

@@ -792,7 +792,8 @@ public class AccountServiceTests()
 
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(10);
-        accounts = [.. accounts.OrderBy(a => Guid.NewGuid())];
+        var rnd = new Random();
+        accounts = [.. accounts.OrderBy(a => rnd.Next())];
         foreach (var account in accounts)
         {
             account.UserID = helper.demoUser.Id;
@@ -802,7 +803,7 @@ public class AccountServiceTests()
         helper.UserDataContext.Accounts.AddRange(accounts);
         helper.UserDataContext.SaveChanges();
 
-        List<IAccountIndexRequest> orderedAccounts = [];
+        var orderedAccounts = new List<IAccountIndexRequest>();
         List<Account> shuffledAccounts = [.. accounts.OrderBy(a => Guid.NewGuid())];
         foreach (var account in shuffledAccounts)
         {
