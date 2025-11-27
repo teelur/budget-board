@@ -160,6 +160,9 @@
   <data name="BudgetCreateCompletedLog" xml:space="preserve">
     <value>Successfully created {0} budgets.</value>
   </data>
+  <data name="ParentBudgetNotFoundLog" xml:space="preserve">
+    <value>Parent budget not found for category {0}.</value>
+  </data>
   <data name="BudgetCopyCompletedLog" xml:space="preserve">
     <value>Successfully copied {0} budgets.</value>
   </data>

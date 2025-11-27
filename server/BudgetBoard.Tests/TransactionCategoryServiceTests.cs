@@ -540,7 +540,7 @@ public class TransactionCategoryServiceTests
         var transactionCategories = transactionCategoryFaker.Generate(5);
         transactionCategories.ForEach(c => c.UserID = helper.demoUser.Id);
 
-        var budgetFaker = new BudgetFaker();
+        var budgetFaker = new BudgetFaker(helper.demoUser.Id);
         var budgets = budgetFaker.Generate(5);
         budgets.ForEach(budget => budget.UserID = helper.demoUser.Id);
         budgets.ForEach(b => b.Category = transactionCategories.First().Value);

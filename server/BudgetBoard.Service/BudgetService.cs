@@ -29,7 +29,7 @@ public class BudgetService(
         IEnumerable<IBudgetCreateRequest> requests
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        ApplicationUser userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
         {
@@ -229,6 +229,71 @@ public class BudgetService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    private static List<Budget> GetChildBudgetsForMonth(
+        ApplicationUser userData,
+        string parentCategory,
+        DateTime monthDate
+    )
+    {
+        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
+        {
+            Value = tc.Value,
+            Parent = tc.Parent,
+        });
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            customCategories,
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
+        );
+
+        var childBudgets = userData.Budgets.Where(b =>
+            !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)
+            && TransactionCategoriesHelpers
+                .GetParentCategory(b.Category, allCategories)
+                .Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
+        );
+
+        var childBudgetsForMonth = childBudgets
+            .Where(b => b.Date.Month == monthDate.Month && b.Date.Year == monthDate.Year)
+            .ToList();
+
+        return childBudgetsForMonth ?? [];
+    }
+
+    private static decimal GetBudgetChildrenLimit(
+        string parentCategory,
+        DateTime date,
+        ApplicationUser userData
+    ) => GetChildBudgetsForMonth(userData, parentCategory, date).Sum(b => b.Limit);
+
+    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    {
+        ApplicationUser? foundUser;
+        try
+        {
+            foundUser = await _userDataContext
+                .ApplicationUsers.Include(u => u.Budgets)
+                .Include(u => u.TransactionCategories)
+                .Include(u => u.UserSettings)
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
+        }
+
+        if (foundUser == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
+        }
+
+        return foundUser;
+    }
+
     private bool TryAddBudget(
         ApplicationUser userData,
         IBudgetCreateRequest request,
@@ -264,7 +329,7 @@ public class BudgetService(
             UserID = userData.Id,
         };
 
-        userData.Budgets.Add(newBudget);
+        _userDataContext.Budgets.Add(newBudget);
         return true;
     }
 
@@ -322,7 +387,10 @@ public class BudgetService(
 
         if (parentBudget == null)
         {
-            _logger.LogError("Parent budget not found for category {Category}.", parentCategory);
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["ParentBudgetNotFoundLog", parentCategory]
+            );
             return;
         }
 
@@ -332,78 +400,4 @@ public class BudgetService(
             parentBudget.Limit += childBudget.Limit;
         }
     }
-
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
-    {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await _userDataContext
-                .ApplicationUsers.Include(u => u.Budgets)
-                .Include(u => u.TransactionCategories)
-                .Include(u => u.UserSettings)
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                "{LogMessage}",
-                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
-            );
-            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
-    }
-
-    private List<Budget> GetChildBudgetsForMonth(
-        ApplicationUser? userData,
-        string parentCategory,
-        DateTime monthDate
-    )
-    {
-        if (userData == null)
-        {
-            _logger.LogError("User data is null.");
-            return [];
-        }
-
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-
-        var allCategories =
-            userData.UserSettings?.DisableBuiltInTransactionCategories == true
-                ? customCategories
-                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                    customCategories
-                );
-
-        var childBudgets = userData.Budgets.Where(b =>
-            !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)
-            && TransactionCategoriesHelpers
-                .GetParentCategory(b.Category, allCategories)
-                .Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
-        );
-
-        var childBudgetsForMonth = childBudgets
-            .Where(b => b.Date.Month == monthDate.Month && b.Date.Year == monthDate.Year)
-            .ToList();
-
-        return childBudgetsForMonth ?? [];
-    }
-
-    private decimal GetBudgetChildrenLimit(
-        string parentCategory,
-        DateTime date,
-        ApplicationUser userData
-    ) => GetChildBudgetsForMonth(userData, parentCategory, date).Sum(b => b.Limit);
 }
