@@ -25,12 +25,11 @@ public class BalanceService(
     private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
-    public async Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest balance)
+    public async Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == balance.AccountID);
-
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID);
         if (account == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["BalanceAccountCreateNotFoundLog"]);
@@ -41,9 +40,9 @@ public class BalanceService(
 
         var newBalance = new Balance
         {
-            DateTime = balance.DateTime,
-            Amount = balance.Amount,
-            AccountID = balance.AccountID,
+            DateTime = request.DateTime,
+            Amount = request.Amount,
+            AccountID = request.AccountID,
         };
 
         _userDataContext.Balances.Add(newBalance);
@@ -59,7 +58,6 @@ public class BalanceService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var account = userData.Accounts.FirstOrDefault(a => a.ID == accountId);
-
         if (account == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["BalanceAccountNotFoundLog"]);
@@ -72,21 +70,20 @@ public class BalanceService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest updatedBalance)
+    public async Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var balance = userData
             .Accounts.SelectMany(a => a.Balances)
-            .FirstOrDefault(b => b.ID == updatedBalance.ID);
-
+            .FirstOrDefault(b => b.ID == request.ID);
         if (balance == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["BalanceUpdateNotFoundLog"]);
             throw new BudgetBoardServiceException(_responseLocalizer["BalanceUpdateNotFoundError"]);
         }
 
-        _userDataContext.Entry(balance).CurrentValues.SetValues(updatedBalance);
+        _userDataContext.Entry(balance).CurrentValues.SetValues(request);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -98,7 +95,6 @@ public class BalanceService(
         var balance = userData
             .Accounts.SelectMany(a => a.Balances)
             .FirstOrDefault(b => b.ID == guid);
-
         if (balance == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["BalanceDeleteNotFoundLog"]);
@@ -117,7 +113,6 @@ public class BalanceService(
         var balance = userData
             .Accounts.SelectMany(a => a.Balances)
             .FirstOrDefault(b => b.ID == guid);
-
         if (balance == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["BalanceRestoreNotFoundLog"]);

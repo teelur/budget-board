@@ -131,7 +131,7 @@ public class GoalServiceTests
         var accountFaker = new AccountFaker();
         var accounts = accountFaker.Generate(5);
 
-        var balanceFaker = new BalanceFaker();
+        var balanceFaker = new BalanceFaker([]);
         accounts.ForEach(a =>
         {
             a.UserID = helper.demoUser.Id;
@@ -291,10 +291,9 @@ public class GoalServiceTests
         account.UserID = helper.demoUser.Id;
         account.InterestRate = 0.48M;
 
-        var balanceFaker = new BalanceFaker();
+        var balanceFaker = new BalanceFaker([account.ID]);
 
         var balance0 = balanceFaker.Generate();
-        balance0.AccountID = account.ID;
         balance0.Amount = balance;
         balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
 
@@ -366,10 +365,9 @@ public class GoalServiceTests
         account.UserID = helper.demoUser.Id;
         account.InterestRate = 0.48M;
 
-        var balanceFaker = new BalanceFaker();
+        var balanceFaker = new BalanceFaker([account.ID]);
 
         var balance0 = balanceFaker.Generate();
-        balance0.AccountID = account.ID;
         balance0.Amount = balance;
         balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
 
@@ -436,9 +434,8 @@ public class GoalServiceTests
 
         account.Transactions.Add(otherMonthTransaction);
 
-        var balanceFaker = new BalanceFaker();
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balance0 = balanceFaker.Generate();
-        balance0.AccountID = account.ID;
         balance0.Amount = 30000;
         balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
 

@@ -11,8 +11,8 @@ public interface IBalanceService
     /// Creates a new balance entry for a specific account.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="balance">The balance creation details.</param>
-    Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest balance);
+    /// <param name="request">The balance creation details.</param>
+    Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest request);
 
     /// <summary>
     /// Retrieves balance history for a specific account.
@@ -26,8 +26,8 @@ public interface IBalanceService
     /// Updates an existing balance entry.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="updatedBalance">The balance update details.</param>
-    Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest updatedBalance);
+    /// <param name="request">The balance update details.</param>
+    Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest request);
 
     /// <summary>
     /// Deletes (soft deletes) a balance entry.

@@ -165,7 +165,7 @@ public class TransactionServiceTests
         account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
-        var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
         balances[0].DateTime = fakeDate.AddDays(-10);
@@ -546,7 +546,7 @@ public class TransactionServiceTests
         account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
-        var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
         balances[0].DateTime = fakeDate.AddDays(-10);
@@ -681,7 +681,7 @@ public class TransactionServiceTests
         account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
-        var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
         balances[0].DateTime = fakeDate.AddDays(-10);
