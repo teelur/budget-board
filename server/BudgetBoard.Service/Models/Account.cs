@@ -11,14 +11,14 @@ public static class AccountSource
 
 public interface IAccountCreateRequest
 {
-    public string? SyncID { get; set; }
-    public string Name { get; set; }
-    public Guid? InstitutionID { get; set; }
-    public string Type { get; set; }
-    public string Subtype { get; set; }
-    public bool HideTransactions { get; set; }
-    public bool HideAccount { get; set; }
-    public string Source { get; set; }
+    public string? SyncID { get; }
+    public string Name { get; }
+    public Guid? InstitutionID { get; }
+    public string Type { get; }
+    public string Subtype { get; }
+    public bool HideTransactions { get; }
+    public bool HideAccount { get; }
+    public string Source { get; }
 }
 
 public class AccountCreateRequest() : IAccountCreateRequest
@@ -35,13 +35,13 @@ public class AccountCreateRequest() : IAccountCreateRequest
 
 public interface IAccountUpdateRequest
 {
-    public Guid ID { get; set; }
-    public string Name { get; set; }
-    public string Type { get; set; }
-    public string Subtype { get; set; }
-    public bool HideTransactions { get; set; }
-    public bool HideAccount { get; set; }
-    public decimal? InterestRate { get; set; }
+    public Guid ID { get; }
+    public string Name { get; }
+    public string Type { get; }
+    public string Subtype { get; }
+    public bool HideTransactions { get; }
+    public bool HideAccount { get; }
+    public decimal? InterestRate { get; }
 }
 
 public class AccountUpdateRequest() : IAccountUpdateRequest
@@ -69,8 +69,8 @@ public class AccountUpdateRequest() : IAccountUpdateRequest
 
 public interface IAccountIndexRequest
 {
-    public Guid ID { get; set; }
-    public int Index { get; set; }
+    public Guid ID { get; }
+    public int Index { get; }
 }
 
 public class AccountIndexRequest : IAccountIndexRequest
@@ -81,21 +81,21 @@ public class AccountIndexRequest : IAccountIndexRequest
 
 public interface IAccountResponse
 {
-    public Guid ID { get; set; }
-    public string? SyncID { get; set; }
-    public string Name { get; set; }
-    public Guid? InstitutionID { get; set; }
-    public string Type { get; set; }
-    public string Subtype { get; set; }
-    public decimal CurrentBalance { get; set; }
-    public DateTime? BalanceDate { get; set; }
-    public bool HideTransactions { get; set; }
-    public bool HideAccount { get; set; }
-    public DateTime? Deleted { get; set; }
-    public int Index { get; set; }
-    public decimal InterestRate { get; set; }
-    public string Source { get; set; }
-    public Guid UserID { get; set; }
+    public Guid ID { get; }
+    public string? SyncID { get; }
+    public string Name { get; }
+    public Guid? InstitutionID { get; }
+    public string Type { get; }
+    public string Subtype { get; }
+    public decimal CurrentBalance { get; }
+    public DateTime? BalanceDate { get; }
+    public bool HideTransactions { get; }
+    public bool HideAccount { get; }
+    public DateTime? Deleted { get; }
+    public int Index { get; }
+    public decimal InterestRate { get; }
+    public string Source { get; }
+    public Guid UserID { get; }
 }
 
 public class AccountResponse : IAccountResponse

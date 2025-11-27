@@ -24,14 +24,14 @@ public class TransactionSource
 
 public interface ITransactionCreateRequest
 {
-    string? SyncID { get; set; }
-    decimal Amount { get; set; }
-    DateTime Date { get; set; }
-    string? Category { get; set; }
-    string? Subcategory { get; set; }
-    string? MerchantName { get; set; }
-    string? Source { get; set; }
-    Guid AccountID { get; set; }
+    string? SyncID { get; }
+    decimal Amount { get; }
+    DateTime Date { get; }
+    string? Category { get; }
+    string? Subcategory { get; }
+    string? MerchantName { get; }
+    string? Source { get; }
+    Guid AccountID { get; }
 }
 
 public class TransactionCreateRequest : ITransactionCreateRequest
@@ -61,13 +61,13 @@ public class TransactionCreateRequest : ITransactionCreateRequest
 
 public interface ITransactionUpdateRequest
 {
-    Guid ID { get; set; }
-    decimal Amount { get; set; }
-    DateTime Date { get; set; }
-    string? Category { get; set; }
-    string? Subcategory { get; set; }
-    string? MerchantName { get; set; }
-    DateTime? Deleted { get; set; }
+    Guid ID { get; }
+    decimal Amount { get; }
+    DateTime Date { get; }
+    string? Category { get; }
+    string? Subcategory { get; }
+    string? MerchantName { get; }
+    DateTime? Deleted { get; }
 }
 
 public class TransactionUpdateRequest : ITransactionUpdateRequest
@@ -106,10 +106,10 @@ public class TransactionUpdateRequest : ITransactionUpdateRequest
 
 public interface ITransactionSplitRequest
 {
-    public Guid ID { get; set; }
-    public decimal Amount { get; set; }
-    public string Category { get; set; }
-    public string Subcategory { get; set; }
+    public Guid ID { get; }
+    public decimal Amount { get; }
+    public string Category { get; }
+    public string Subcategory { get; }
 }
 
 public class TransactionSplitRequest : ITransactionSplitRequest
@@ -163,8 +163,8 @@ public class AccountNameToIDKeyValuePair
 
 public interface ITransactionImportRequest
 {
-    public IEnumerable<TransactionImport> Transactions { get; set; }
-    public IEnumerable<AccountNameToIDKeyValuePair> AccountNameToIDMap { get; set; }
+    public IEnumerable<TransactionImport> Transactions { get; }
+    public IEnumerable<AccountNameToIDKeyValuePair> AccountNameToIDMap { get; }
 }
 
 public class TransactionImportRequest : ITransactionImportRequest
@@ -182,17 +182,17 @@ public class TransactionImportRequest : ITransactionImportRequest
 
 public interface ITransactionResponse
 {
-    Guid ID { get; set; }
-    string? SyncID { get; set; }
-    decimal Amount { get; set; }
-    DateTime Date { get; set; }
-    string? Category { get; set; }
-    string? Subcategory { get; set; }
-    string? MerchantName { get; set; }
-    bool Pending { get; set; }
-    DateTime? Deleted { get; set; }
-    string Source { get; set; }
-    Guid AccountID { get; set; }
+    Guid ID { get; }
+    string? SyncID { get; }
+    decimal Amount { get; }
+    DateTime Date { get; }
+    string? Category { get; }
+    string? Subcategory { get; }
+    string? MerchantName { get; }
+    bool Pending { get; }
+    DateTime? Deleted { get; }
+    string Source { get; }
+    Guid AccountID { get; }
 }
 
 public class TransactionResponse : ITransactionResponse

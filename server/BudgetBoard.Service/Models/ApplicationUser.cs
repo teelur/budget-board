@@ -5,7 +5,7 @@ namespace BudgetBoard.Service.Models;
 
 public interface IApplicationUserUpdateRequest
 {
-    DateTime LastSync { get; set; }
+    DateTime LastSync { get; }
 }
 
 public class ApplicationUserUpdateRequest : IApplicationUserUpdateRequest
@@ -21,12 +21,12 @@ public class ApplicationUserUpdateRequest : IApplicationUserUpdateRequest
 
 public interface IApplicationUserResponse
 {
-    Guid ID { get; set; }
-    bool AccessToken { get; set; }
-    DateTime LastSync { get; set; }
-    bool TwoFactorEnabled { get; set; }
-    bool HasOidcLogin { get; set; }
-    bool HasLocalLogin { get; set; }
+    Guid ID { get; }
+    bool AccessToken { get; }
+    DateTime LastSync { get; }
+    bool TwoFactorEnabled { get; }
+    bool HasOidcLogin { get; }
+    bool HasLocalLogin { get; }
 }
 
 public class ApplicationUserResponse : IApplicationUserResponse

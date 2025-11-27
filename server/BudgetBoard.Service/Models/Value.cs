@@ -4,9 +4,9 @@ namespace BudgetBoard.Service.Models;
 
 public interface IValueCreateRequest
 {
-    decimal Amount { get; set; }
-    DateTime DateTime { get; set; }
-    Guid AssetID { get; set; }
+    decimal Amount { get; }
+    DateTime DateTime { get; }
+    Guid AssetID { get; }
 }
 
 public class ValueCreateRequest() : IValueCreateRequest
@@ -18,11 +18,11 @@ public class ValueCreateRequest() : IValueCreateRequest
 
 public interface IValueResponse
 {
-    Guid ID { get; set; }
-    decimal Amount { get; set; }
-    DateTime DateTime { get; set; }
-    DateTime? Deleted { get; set; }
-    Guid AssetID { get; set; }
+    Guid ID { get; }
+    decimal Amount { get; }
+    DateTime DateTime { get; }
+    DateTime? Deleted { get; }
+    Guid AssetID { get; }
 }
 
 public class ValueResponse() : IValueResponse
@@ -46,9 +46,9 @@ public class ValueResponse() : IValueResponse
 
 public interface IValueUpdateRequest
 {
-    Guid ID { get; set; }
-    decimal Amount { get; set; }
-    DateTime DateTime { get; set; }
+    Guid ID { get; }
+    decimal Amount { get; }
+    DateTime DateTime { get; }
 }
 
 public class ValueUpdateRequest() : IValueUpdateRequest

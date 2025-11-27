@@ -7,12 +7,14 @@ public interface ISimpleFinData
     string Auth { get; }
     string BaseUrl { get; }
 }
+
 public class SimpleFinData() : ISimpleFinData
 {
     public string Auth { get; } = string.Empty;
     public string BaseUrl { get; } = string.Empty;
 
-    public SimpleFinData(string auth, string baseUrl) : this()
+    public SimpleFinData(string auth, string baseUrl)
+        : this()
     {
         Auth = auth;
         BaseUrl = baseUrl;
@@ -21,11 +23,13 @@ public class SimpleFinData() : ISimpleFinData
 
 public interface ISimpleFinOrganization
 {
-    string? Domain { get; set; }
+    string? Domain { get; }
+
     [JsonPropertyName("sfin-url")]
-    string SimpleFinUrl { get; set; }
-    string? Name { get; set; }
+    string SimpleFinUrl { get; }
+    string? Name { get; }
 }
+
 public class SimpleFinOrganization() : ISimpleFinOrganization
 {
     public string? Domain { get; set; }
@@ -35,14 +39,16 @@ public class SimpleFinOrganization() : ISimpleFinOrganization
 
 public interface ISimpleFinTransaction
 {
-    string Id { get; set; }
-    int Posted { get; set; }
-    string Amount { get; set; }
-    string Description { get; set; }
+    string Id { get; }
+    int Posted { get; }
+    string Amount { get; }
+    string Description { get; }
+
     [JsonPropertyName("transacted_at")]
-    int TransactedAt { get; set; }
-    bool Pending { get; set; }
+    int TransactedAt { get; }
+    bool Pending { get; }
 }
+
 public class SimpleFinTransaction() : ISimpleFinTransaction
 {
     public string Id { get; set; } = string.Empty;
@@ -55,17 +61,20 @@ public class SimpleFinTransaction() : ISimpleFinTransaction
 
 public interface ISimpleFinAccount
 {
-    ISimpleFinOrganization Org { get; set; }
-    string Id { get; set; }
-    string Name { get; set; }
-    string Currency { get; set; }
-    string Balance { get; set; }
+    ISimpleFinOrganization Org { get; }
+    string Id { get; }
+    string Name { get; }
+    string Currency { get; }
+    string Balance { get; }
+
     [JsonPropertyName("available-balance")]
-    string? AvailableBalance { get; set; }
+    string? AvailableBalance { get; }
+
     [JsonPropertyName("balance-date")]
-    int BalanceDate { get; set; }
-    IEnumerable<ISimpleFinTransaction> Transactions { get; set; }
+    int BalanceDate { get; }
+    IEnumerable<ISimpleFinTransaction> Transactions { get; }
 }
+
 public class SimpleFinAccount : ISimpleFinAccount
 {
     public ISimpleFinOrganization Org { get; set; }
@@ -93,9 +102,10 @@ public class SimpleFinAccount : ISimpleFinAccount
 
 public interface ISimpleFinAccountData
 {
-    IEnumerable<string> Errors { get; set; }
-    IEnumerable<ISimpleFinAccount> Accounts { get; set; }
+    IEnumerable<string> Errors { get; }
+    IEnumerable<ISimpleFinAccount> Accounts { get; }
 }
+
 public class SimpleFinAccountData : ISimpleFinAccountData
 {
     public IEnumerable<string> Errors { get; set; }
