@@ -48,10 +48,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-
-        institution.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Institutions.Add(institution);
         helper.UserDataContext.SaveChanges();
@@ -80,10 +78,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-
-        institution.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Institutions.Add(institution);
         helper.UserDataContext.SaveChanges();
@@ -140,9 +136,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Institutions.Add(institution);
 
@@ -182,9 +177,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Institutions.Add(institution);
 
@@ -220,9 +214,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
         institution.Deleted = new Faker().Date.Past().ToUniversalTime();
 
         helper.UserDataContext.Institutions.Add(institution);
@@ -547,9 +540,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
@@ -582,9 +574,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
@@ -736,9 +727,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
         institution.Deleted = fakeDate;
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);

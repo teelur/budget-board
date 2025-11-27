@@ -22,34 +22,6 @@ public class InstitutionServiceTests
         new Faker<InstitutionUpdateRequest>().RuleFor(i => i.Name, f => f.Company.CompanyName());
 
     [Fact]
-    public async Task CreateInstitutionAsync_InvalidUserId_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var institutionService = new InstitutionService(
-            Mock.Of<ILogger<IInstitutionService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
-        );
-
-        var institutionCreateRequest = _institutionCreateRequestFaker.Generate();
-
-        // Act
-        Func<Task> act = async () =>
-            await institutionService.CreateInstitutionAsync(
-                Guid.NewGuid(),
-                institutionCreateRequest
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Provided user not found.");
-    }
-
-    [Fact]
     public async Task CreateInstitutionAsync_WhenCalledWithValidData_ShouldCreateInstitution()
     {
         // Arrange
@@ -58,8 +30,8 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionCreateRequest = _institutionCreateRequestFaker.Generate();
@@ -79,6 +51,69 @@ public class InstitutionServiceTests
     }
 
     [Fact]
+    public async Task CreateInstitutionAsync_InvalidUserId_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var institutionService = new InstitutionService(
+            Mock.Of<ILogger<IInstitutionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institutionCreateRequest = _institutionCreateRequestFaker.Generate();
+
+        // Act
+        Func<Task> act = async () =>
+            await institutionService.CreateInstitutionAsync(
+                Guid.NewGuid(),
+                institutionCreateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidUserError");
+    }
+
+    [Fact]
+    public async Task CreateInstitutionAsync_DuplicateName_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var institutionService = new InstitutionService(
+            Mock.Of<ILogger<IInstitutionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
+        var institution = institutionFaker.Generate();
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.SaveChanges();
+
+        var institutionCreateRequest = _institutionCreateRequestFaker.Generate();
+        institutionCreateRequest.Name = institution.Name;
+
+        // Act
+        Func<Task> act = async () =>
+            await institutionService.CreateInstitutionAsync(
+                helper.demoUser.Id,
+                institutionCreateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InstitutionCreateDuplicateNameError");
+    }
+
+    [Fact]
     public async Task ReadInstitutionsAsync_WhenCalledWithValidData_ShouldReturnInstitutions()
     {
         // Arrange
@@ -87,13 +122,12 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Institutions.Add(institution);
         helper.UserDataContext.SaveChanges();
@@ -115,13 +149,12 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Institutions.Add(institution);
         helper.UserDataContext.SaveChanges();
@@ -146,13 +179,12 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Institutions.Add(institution);
         helper.UserDataContext.SaveChanges();
@@ -164,7 +196,7 @@ public class InstitutionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The institution you are trying to access does not exist.");
+            .WithMessage("InstitutionNotFoundError");
     }
 
     [Fact]
@@ -176,13 +208,12 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var insitutionFaker = new InstitutionFaker();
-        var institution = insitutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
+        var institution = institutionFaker.Generate();
 
         helper.UserDataContext.Institutions.Add(institution);
         helper.UserDataContext.SaveChanges();
@@ -213,8 +244,8 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var institutionUpdateRequest = _institutionUpdateRequestFaker.Generate();
@@ -229,7 +260,80 @@ public class InstitutionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The institution you are trying to update does not exist.");
+            .WithMessage("InstitutionUpdateNotFoundError");
+    }
+
+    [Fact]
+    public async Task UpdateInstitutionAsync_DuplicateName_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var institutionService = new InstitutionService(
+            Mock.Of<ILogger<IInstitutionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
+        var institution1 = institutionFaker.Generate();
+        var institution2 = institutionFaker.Generate();
+
+        helper.UserDataContext.Institutions.AddRange([institution1, institution2]);
+        helper.UserDataContext.SaveChanges();
+
+        var institutionUpdateRequest = _institutionUpdateRequestFaker.Generate();
+        institutionUpdateRequest.ID = institution2.ID;
+        institutionUpdateRequest.Name = institution1.Name;
+
+        // Act
+        Func<Task> act = async () =>
+            await institutionService.UpdateInstitutionAsync(
+                helper.demoUser.Id,
+                institutionUpdateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InstitutionUpdateDuplicateNameError");
+    }
+
+    [Fact]
+    public async Task UpdateInstitutionAsync_EmptyName_ShouldThrowError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var institutionService = new InstitutionService(
+            Mock.Of<ILogger<IInstitutionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
+        var institution = institutionFaker.Generate();
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.SaveChanges();
+
+        var institutionUpdateRequest = _institutionUpdateRequestFaker.Generate();
+        institutionUpdateRequest.ID = institution.ID;
+        institutionUpdateRequest.Name = string.Empty;
+
+        // Act
+        Func<Task> act = async () =>
+            await institutionService.UpdateInstitutionAsync(
+                helper.demoUser.Id,
+                institutionUpdateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InstitutionUpdateEmptyNameError");
     }
 
     [Fact]
@@ -241,17 +345,17 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var insitutionFaker = new InstitutionFaker();
+        var insitutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = insitutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
         account.InstitutionID = institution.ID;
+        account.Deleted = DateTime.UtcNow;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(10);
@@ -267,11 +371,13 @@ public class InstitutionServiceTests
         await institutionService.DeleteInstitutionAsync(helper.demoUser.Id, institution.ID, false);
 
         // Assert
-        helper.UserDataContext.Institutions.Should().BeEmpty();
+        helper.UserDataContext.Institutions.Single().Deleted.Should().NotBeNull();
+        helper.UserDataContext.Accounts.Single().Deleted.Should().NotBeNull();
         helper
             .UserDataContext.Transactions.Select(t => t.Deleted)
+            .All(t => t == null)
             .Should()
-            .AllBeEquivalentTo(default(DateTime?));
+            .BeTrue();
     }
 
     [Fact]
@@ -283,13 +389,12 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var insitutionFaker = new InstitutionFaker();
-        var institution = insitutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
+        var institution = institutionFaker.Generate();
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
@@ -309,8 +414,9 @@ public class InstitutionServiceTests
         await institutionService.DeleteInstitutionAsync(helper.demoUser.Id, institution.ID, true);
 
         // Assert
-        helper.UserDataContext.Institutions.Should().BeEmpty();
-        helper.UserDataContext.Transactions.Select(t => t.Deleted).Should().NotBeNull();
+        helper.UserDataContext.Institutions.Single().Deleted.Should().NotBeNull();
+        helper.UserDataContext.Accounts.Single().Deleted.Should().NotBeNull();
+        helper.UserDataContext.Transactions.All(t => t.Deleted != null).Should().BeTrue();
     }
 
     [Fact]
@@ -322,11 +428,9 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
-
-        var updateInstitutionRequest = _institutionUpdateRequestFaker.Generate();
 
         // Act
         Func<Task> act = async () =>
@@ -339,7 +443,7 @@ public class InstitutionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The institution you are trying to delete does not exist.");
+            .WithMessage("InstitutionDeleteNotFoundError");
     }
 
     [Fact]
@@ -351,41 +455,34 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institutions = institutionFaker.Generate(10);
 
-        institutions.ForEach(i => i.UserID = helper.demoUser.Id);
+        var rnd = new Random();
+        institutions = [.. institutions.OrderBy(i => rnd.Next())];
+        institutions.ForEach(i => i.Index = institutions.IndexOf(i));
 
         helper.UserDataContext.Institutions.AddRange(institutions);
         helper.UserDataContext.SaveChanges();
 
-        List<IInstitutionIndexRequest> orderedInstitutions = [];
-        foreach (var institution in institutions)
-        {
-            orderedInstitutions.Add(
-                new InstitutionIndexRequest
-                {
-                    ID = institution.ID,
-                    Index = institutions.IndexOf(institution),
-                }
-            );
-        }
+        var orderedInstitutions = institutions
+            .OrderBy(i => rnd.Next())
+            .Select(i => new InstitutionIndexRequest { ID = i.ID, Index = institutions.IndexOf(i) })
+            .ToList();
 
         // Act
         await institutionService.OrderInstitutionsAsync(helper.demoUser.Id, orderedInstitutions);
 
         // Assert
-        foreach (var institution in institutions)
-        {
-            helper
-                .UserDataContext.Institutions.Single(i => i.ID == institution.ID)
-                .Should()
-                .BeEquivalentTo(institution);
-        }
+        helper
+            .UserDataContext.Institutions.OrderBy(i => i.Index)
+            .Select(i => i.ID)
+            .Should()
+            .BeEquivalentTo(orderedInstitutions.OrderBy(i => i.Index).Select(i => i.ID));
     }
 
     [Fact]
@@ -397,28 +494,24 @@ public class InstitutionServiceTests
             Mock.Of<ILogger<IInstitutionService>>(),
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
-            Mock.Of<IStringLocalizer<ResponseStrings>>(),
-            Mock.Of<IStringLocalizer<LogStrings>>()
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institutions = institutionFaker.Generate(10);
-        institutions.ForEach(i => i.UserID = helper.demoUser.Id);
+
+        var rnd = new Random();
+        institutions = [.. institutions.OrderBy(i => rnd.Next())];
+        institutions.ForEach(i => i.Index = institutions.IndexOf(i));
 
         helper.UserDataContext.Institutions.AddRange(institutions);
         helper.UserDataContext.SaveChanges();
 
-        List<IInstitutionIndexRequest> orderedInstitutions = [];
-        foreach (var institution in institutions)
-        {
-            orderedInstitutions.Add(
-                new InstitutionIndexRequest
-                {
-                    ID = institution.ID,
-                    Index = institutions.IndexOf(institution),
-                }
-            );
-        }
+        var orderedInstitutions = institutions
+            .OrderBy(i => rnd.Next())
+            .Select(i => new InstitutionIndexRequest { ID = i.ID, Index = institutions.IndexOf(i) })
+            .ToList();
         orderedInstitutions.First().ID = Guid.NewGuid();
 
         // Act
@@ -431,6 +524,6 @@ public class InstitutionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The institution you are trying to order does not exist.");
+            .WithMessage("InstitutionOrderNotFoundError");
     }
 }

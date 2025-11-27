@@ -133,6 +133,12 @@ public class InstitutionService(
             }
         }
 
+        var accountsToDelete = institution.Accounts.Where(a => a.Deleted == null).ToList();
+        if (accountsToDelete.Count != 0)
+        {
+            accountsToDelete.ForEach(a => a.Deleted = _nowProvider.UtcNow);
+        }
+
         institution.Deleted = _nowProvider.UtcNow;
         await _userDataContext.SaveChangesAsync();
     }

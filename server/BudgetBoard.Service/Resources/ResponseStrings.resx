@@ -196,6 +196,9 @@
   <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
     <value>The institution you are trying to delete does not exist.</value>
   </data>
+  <data name="InstitutionDeleteHasAccountsError" xml:space="preserve">
+    <value>Cannot delete institution because it has associated accounts. Please delete or reassign these accounts first.</value>
+  </data>
   <data name="InstitutionOrderNotFoundError" xml:space="preserve">
     <value>The institution you are trying to order does not exist.</value>
   </data>

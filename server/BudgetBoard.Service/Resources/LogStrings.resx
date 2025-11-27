@@ -223,6 +223,9 @@
   <data name="InstitutionDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete an institution that does not exist.</value>
   </data>
+  <data name="InstitutionDeleteHasAccountsLog" xml:space="preserve">
+    <value>Attempted to delete an institution that has undeleted accounts.</value>
+  </data>
   <data name="InstitutionOrderNotFoundLog" xml:space="preserve">
     <value>Attempted to set index for institution that does not exist.</value>
   </data>
