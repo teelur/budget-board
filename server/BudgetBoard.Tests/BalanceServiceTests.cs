@@ -37,9 +37,8 @@ public class BalanceServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -118,9 +117,8 @@ public class BalanceServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(3);
@@ -173,9 +171,8 @@ public class BalanceServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var balanceFaker = new BalanceFaker([account.ID]);
         var balance = balanceFaker.Generate();
@@ -234,9 +231,8 @@ public class BalanceServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var balanceFaker = new BalanceFaker([account.ID]);
         var balance = balanceFaker.Generate();
@@ -289,9 +285,8 @@ public class BalanceServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var balanceFaker = new BalanceFaker([account.ID]);
         var balance = balanceFaker.Generate();

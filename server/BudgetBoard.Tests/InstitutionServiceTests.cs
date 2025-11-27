@@ -249,9 +249,8 @@ public class InstitutionServiceTests
         var institution = insitutionFaker.Generate();
         institution.UserID = helper.demoUser.Id;
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
         var transactionFaker = new TransactionFaker([account.ID]);
@@ -292,9 +291,8 @@ public class InstitutionServiceTests
         var institution = insitutionFaker.Generate();
         institution.UserID = helper.demoUser.Id;
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
         var transactionFaker = new TransactionFaker([account.ID]);

@@ -146,9 +146,8 @@ public class AccountServiceTests()
 
         helper.UserDataContext.Institutions.Add(institution);
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
         account.SyncID = "TestSyncID";
 
@@ -189,9 +188,8 @@ public class AccountServiceTests()
 
         helper.UserDataContext.Institutions.Add(institution);
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
         account.SyncID = null;
 
@@ -254,13 +252,11 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Index = 1;
 
         var secondAccount = accountFaker.Generate();
-        secondAccount.UserID = helper.demoUser.Id;
         secondAccount.Index = 2;
 
         helper.UserDataContext.Accounts.AddRange(account, secondAccount);
@@ -288,12 +284,9 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
-
         var secondAccount = accountFaker.Generate();
-        secondAccount.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.AddRange(account, secondAccount);
         helper.UserDataContext.SaveChanges();
@@ -319,9 +312,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -352,9 +344,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -382,9 +373,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -416,9 +406,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -456,9 +445,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -483,9 +471,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -519,9 +506,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate();
@@ -565,9 +551,8 @@ public class AccountServiceTests()
         var institution = institutionFaker.Generate();
         institution.UserID = helper.demoUser.Id;
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
         helper.UserDataContext.Institutions.Add(institution);
@@ -601,13 +586,11 @@ public class AccountServiceTests()
         var institution = institutionFaker.Generate();
         institution.UserID = helper.demoUser.Id;
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
         var secondAccount = accountFaker.Generate();
-        secondAccount.UserID = helper.demoUser.Id;
         secondAccount.InstitutionID = institution.ID;
 
         helper.UserDataContext.Institutions.Add(institution);
@@ -640,9 +623,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Deleted = fakeDate;
 
         helper.UserDataContext.Accounts.Add(account);
@@ -673,9 +655,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Deleted = fakeDate;
 
         helper.UserDataContext.Accounts.Add(account);
@@ -712,9 +693,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Deleted = fakeDate;
 
         var transactionFaker = new TransactionFaker([account.ID]);
@@ -761,9 +741,8 @@ public class AccountServiceTests()
         institution.UserID = helper.demoUser.Id;
         institution.Deleted = fakeDate;
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
         helper.UserDataContext.Institutions.Add(institution);
@@ -790,14 +769,13 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(10);
         var rnd = new Random();
         accounts = [.. accounts.OrderBy(a => rnd.Next())];
-        foreach (var account in accounts)
+        for (int i = 0; i < accounts.Count; i++)
         {
-            account.UserID = helper.demoUser.Id;
-            account.Index = accounts.IndexOf(account);
+            accounts[i].Index = i;
         }
 
         helper.UserDataContext.Accounts.AddRange(accounts);
@@ -836,12 +814,8 @@ public class AccountServiceTests()
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(10);
-        foreach (var account in accounts)
-        {
-            account.UserID = helper.demoUser.Id;
-        }
 
         helper.UserDataContext.Accounts.AddRange(accounts);
         helper.UserDataContext.SaveChanges();

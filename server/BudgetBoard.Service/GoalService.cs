@@ -279,7 +279,8 @@ public class GoalService(
                     numberOfMonthsLeftWithInterest = Math.Ceiling(
                         Math.Log(
                             (double)(
-                                ((goal.MonthlyContribution ?? 0) / monthlyInterestRate)
+                                (goal.MonthlyContribution ?? 0)
+                                / monthlyInterestRate
                                 / (
                                     ((goal.MonthlyContribution ?? 0) / monthlyInterestRate)
                                     - amountLeft

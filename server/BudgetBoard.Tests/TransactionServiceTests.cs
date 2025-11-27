@@ -63,9 +63,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -120,9 +119,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
         helper.UserDataContext.Accounts.Add(account);
@@ -160,9 +158,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
         var balanceFaker = new BalanceFaker([account.ID]);
@@ -216,9 +213,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -288,9 +284,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -337,9 +332,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -381,9 +375,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -419,9 +412,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -457,9 +449,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -541,9 +532,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
         var balanceFaker = new BalanceFaker([account.ID]);
@@ -611,9 +601,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -676,9 +665,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
         var balanceFaker = new BalanceFaker([account.ID]);
@@ -740,9 +728,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -804,9 +791,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -844,10 +830,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -946,10 +930,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -995,9 +977,8 @@ public class TransactionServiceTests
             Mock.Of<IStringLocalizer<LogStrings>>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);

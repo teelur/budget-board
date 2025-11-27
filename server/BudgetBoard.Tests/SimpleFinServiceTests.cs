@@ -262,9 +262,8 @@ public class SimpleFinServiceTests
         helper.demoUser.AccessToken = "https://demo:demo@beta-bridge.simplefin.org/simplefin";
         helper.UserDataContext.SaveChanges();
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
 

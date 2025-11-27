@@ -5,7 +5,7 @@ namespace BudgetBoard.IntegrationTests.Fakers;
 
 public class AccountFaker : Faker<Account>
 {
-    public AccountFaker()
+    public AccountFaker(Guid userId)
     {
         RuleFor(a => a.ID, f => Guid.NewGuid())
             .RuleFor(a => a.SyncID, f => f.Random.String(20))
@@ -14,6 +14,7 @@ public class AccountFaker : Faker<Account>
             .RuleFor(a => a.Type, f => f.Finance.TransactionType())
             .RuleFor(a => a.Subtype, f => f.Finance.TransactionType())
             .RuleFor(a => a.HideTransactions, f => false)
-            .RuleFor(a => a.HideAccount, f => false);
+            .RuleFor(a => a.HideAccount, f => false)
+            .RuleFor(a => a.UserID, f => userId);
     }
 }
