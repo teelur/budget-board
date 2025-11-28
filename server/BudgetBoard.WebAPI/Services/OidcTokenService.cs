@@ -35,7 +35,6 @@ public class OidcTokenService(
     {
         try
         {
-            // Get OIDC configuration
             var authority = _configuration.GetValue<string>("OIDC_ISSUER");
             var clientId = _configuration.GetValue<string>("OIDC_CLIENT_ID");
             var clientSecret = _configuration.GetValue<string>("OIDC_CLIENT_SECRET");
@@ -50,7 +49,6 @@ public class OidcTokenService(
                 return null;
             }
 
-            // Discover token endpoint
             var discoveryDoc = await GetDiscoveryDocumentAsync(authority);
             if (discoveryDoc == null || string.IsNullOrEmpty(discoveryDoc.TokenEndpoint))
             {
@@ -61,7 +59,6 @@ public class OidcTokenService(
                 return null;
             }
 
-            // Exchange code for token
             var tokenResponse = await ExchangeCodeForTokensAsync(
                 discoveryDoc.TokenEndpoint,
                 authorizationCode,
@@ -76,7 +73,6 @@ public class OidcTokenService(
                 return null;
             }
 
-            // Validate ID token and extract claims
             return await ValidateIdTokenAsync(
                 tokenResponse.IdToken,
                 authority,
