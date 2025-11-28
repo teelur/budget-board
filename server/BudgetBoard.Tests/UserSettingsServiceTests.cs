@@ -114,7 +114,6 @@ public class UserSettingsServiceTests
         helper.UserDataContext.SaveChanges();
 
         var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
-        userSettingsUpdateRequest.Currency = new Faker().Finance.Currency().Code;
         userSettingsUpdateRequest.DisableBuiltInTransactionCategories = true;
         userSettingsUpdateRequest.BudgetWarningThreshold = 50;
         userSettingsUpdateRequest.ForceSyncLookbackMonths = 6;
