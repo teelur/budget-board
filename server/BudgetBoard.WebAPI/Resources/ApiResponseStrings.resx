@@ -62,7 +62,7 @@
     <value>An unexpected error occurred.</value>
   </data>
   <data name="AuthCodeRequired" xml:space="preserve">
-    <value>Authorization code is required.</value>
+    <value>The authorization code is required.</value>
   </data>
   <data name="AuthFailed" xml:space="preserve">
     <value>Authentication failed.</value>
@@ -71,16 +71,16 @@
     <value>Unable to complete login.</value>
   </data>
   <data name="UserNotAuthenticated" xml:space="preserve">
-    <value>User is not authenticated.</value>
+    <value>The user is not authenticated.</value>
   </data>
   <data name="UserNotFound" xml:space="preserve">
-    <value>User not found.</value>
+    <value>The user was not found.</value>
   </data>
   <data name="NoOidcLoginFound" xml:space="preserve">
-    <value>No OIDC login found for this user.</value>
+    <value>No OIDC login was found for this user.</value>
   </data>
   <data name="RemoveOidcNoPassword" xml:space="preserve">
-    <value>Cannot remove OIDC login. User must have a local password set first to maintain account access.</value>
+    <value>Cannot remove OIDC login. The user must have a local password set first to maintain account access.</value>
   </data>
   <data name="RemoveOidcFailed" xml:space="preserve">
     <value>Failed to remove OIDC login.</value>
@@ -89,7 +89,7 @@
     <value>OIDC login disconnected successfully.</value>
   </data>
   <data name="UserIdNotFound" xml:space="preserve">
-    <value>User ID not found.</value>
+    <value>The user ID was not found.</value>
   </data>
     <data name="InvalidJsonType" xml:space="preserve">
     <value>The provided JSON token type is invalid.</value>
@@ -104,9 +104,9 @@
     <value>No email confirmation endpoint was registered!</value>
   </data>
   <data name="UserEmailRequiredError" xml:space="preserve">
-    <value>Users must have an email.</value>
+    <value>The user must have an email address.</value>
   </data>
   <data name="EndpointNotFoundError" xml:space="preserve">
-    <value>Could not find endpoint named '{0}'.</value>
+    <value>Could not find the endpoint named '{0}'.</value>
   </data>
 </root>

@@ -71,7 +71,7 @@
     <value>Attempted to edit an account that does not exist.</value>
   </data>
   <data name="AccountEditEmptyNameLog" xml:space="preserve">
-    <value>Attempted to edit an account with empty name.</value>
+    <value>Attempted to edit an account with an empty name.</value>
   </data>
   <data name="AccountDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete an account that does not exist.</value>
@@ -215,7 +215,7 @@
     <value>Attempted to update an institution that does not exist.</value>
   </data>
   <data name="InstitutionUpdateEmptyNameLog" xml:space="preserve">
-    <value>Attempted to update an institution with empty name.</value>
+    <value>Attempted to update an institution with an empty name.</value>
   </data>
   <data name="InstitutionUpdateDuplicateNameLog" xml:space="preserve">
     <value>Attempted to update an institution with a duplicate name.</value>
