@@ -43,4 +43,11 @@ public interface IGoalService
     /// <param name="goalID">The unique identifier of the goal to complete.</param>
     /// <param name="completedDate">The date the goal was completed.</param>
     Task CompleteGoalAsync(Guid userGuid, Guid goalID, DateTime completedDate);
+
+    /// <summary>
+    /// Marks all eligible financial goals as complete.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task CompleteGoalsAsync(Guid userGuid);
 }

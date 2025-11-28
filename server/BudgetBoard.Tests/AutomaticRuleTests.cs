@@ -385,4 +385,42 @@ public class AutomaticRuleTests
         // Assert
         result.Should().Contain("RuleRunSummary");
     }
+
+    [Fact]
+    public async Task RunAutomaticRulesAsync_WhenCalled_ShouldRunAllRules()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionServiceMock = new Mock<ITransactionService>();
+        transactionServiceMock
+            .Setup(ts =>
+                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>())
+            )
+            .Returns(Task.CompletedTask);
+
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            transactionServiceMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var automaticRuleFaker = new AutomaticRuleFaker(helper.demoUser.Id);
+        var demoRules = automaticRuleFaker.Generate(3);
+
+        helper.UserDataContext.AutomaticRules.AddRange(demoRules);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await automaticRuleService.RunAutomaticRulesAsync(helper.demoUser.Id);
+
+        // Assert
+        transactionServiceMock.Verify(
+            ts =>
+                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>()),
+            Times.AtLeastOnce
+        );
+    }
 }

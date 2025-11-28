@@ -9,7 +9,6 @@ using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit.Abstractions;
 
 namespace BudgetBoard.IntegrationTests;
 

@@ -122,7 +122,7 @@
     <value>One or more conditions in the automatic rule are invalid.</value>
   </data>
   <data name="RuleRunSummary" xml:space="preserve">
-    <value>Rule matched {matchedTransactionsCount} transactions and applied {updatedCount} changes.</value>
+    <value>Rule applied {0} updates.</value>
   </data>
   <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
     <value>The account you are trying to add a balance to does not exist.</value>
@@ -296,7 +296,22 @@
     <value>The value you are trying to restore does not exist.</value>
   </data>
   <data name="SimpleFinDataNotFoundError" xml:space="preserve">
-    <value>SimpleFin data not found.</value>
+    <value>SimpleFIN data not found.</value>
+  </data>
+  <data name="SimpleFinDataRetrievalError" xml:space="preserve">
+    <value>There was an error retrieving SimpleFIN data.</value>
+  </data>
+  <data name="SimpleFinOrganizationMissingIdError" xml:space="preserve">
+    <value>Institution for account '{0}' is missing an ID. Skipping account sync.</value>
+  </data>
+  <data name="SyncInstitutionCreationError" xml:space="preserve">
+    <value>There was an error creating institution for account '{0}'. Skipping account sync.</value>
+  </data>
+  <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
+    <value>No matching account found for transaction with SyncID '{0}'.</value>
+  </data>
+  <data name="SimpleFinAccountNotFoundForBalanceError" xml:space="preserve">
+    <value>No matching account found for balance with SyncID '{0}'.</value>
   </data>
   <data name="SimpleFinDecodeTokenError" xml:space="preserve">
     <value>There was an issue decoding the setup token.</value>

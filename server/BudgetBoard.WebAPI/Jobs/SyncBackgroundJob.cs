@@ -12,7 +12,7 @@ namespace BudgetBoard.WebAPI.Jobs;
 public class SyncBackgroundJob(
     ILogger<SyncBackgroundJob> logger,
     UserDataContext userDataContext,
-    ISimpleFinService simpleFinService,
+    ISyncService simpleFinService,
     IApplicationUserService applicationUserService,
     INowProvider nowProvider,
     IStringLocalizer<ApiLogStrings> logLocalizer
@@ -20,7 +20,7 @@ public class SyncBackgroundJob(
 {
     private readonly ILogger _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly ISimpleFinService _simpleFinService = simpleFinService;
+    private readonly ISyncService _simpleFinService = simpleFinService;
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
     private readonly INowProvider _nowProvider = nowProvider;
     private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;

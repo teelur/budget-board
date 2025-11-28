@@ -203,6 +203,30 @@ public class GoalService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
+    public async Task CompleteGoalsAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var goals = userData.Goals.ToList();
+        foreach (var goal in goals)
+        {
+            // Skip goals that are already completed
+            if (goal.Completed.HasValue)
+                continue;
+
+            var percentComplete = CalculatePercentComplete(goal);
+
+            // Complete the goal if it's 100% complete
+            if (percentComplete >= 100.0M)
+            {
+                goal.Completed = _nowProvider.UtcNow;
+            }
+        }
+
+        await _userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         ApplicationUser? foundUser;
@@ -452,7 +476,7 @@ public class GoalService(
             return 0.0M;
         }
 
-        decimal percentComplete = (totalProgress / adjustedAmount) * 100.0M;
+        decimal percentComplete = totalProgress / adjustedAmount * 100.0M;
 
         return percentComplete > 100.0M ? 100.0M : percentComplete;
     }

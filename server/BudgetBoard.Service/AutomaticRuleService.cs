@@ -177,14 +177,111 @@ public class AutomaticRuleService(
             Value = tc.Value,
             Parent = tc.Parent,
         });
-
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
             customCategories,
             userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
         );
 
+        int updatedCount = await RunAutomaticRule(userData, request, allCategories);
+        _logger.LogInformation(
+            "{LogMessage}",
+            _logLocalizer["RuleAppliedActionsLog", updatedCount]
+        );
+
+        return _responseLocalizer["RuleRunSummary", updatedCount];
+    }
+
+    /// <inheritdoc />
+    public async Task RunAutomaticRulesAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
+        {
+            Value = tc.Value,
+            Parent = tc.Parent,
+        });
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            customCategories,
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
+        );
+
+        var rules = await ReadAutomaticRulesAsync(userGuid);
+        foreach (var rule in rules)
+        {
+            var ruleRequest = new AutomaticRuleCreateRequest
+            {
+                Conditions =
+                [
+                    .. rule.Conditions.Select(c => new RuleParameterCreateRequest
+                    {
+                        Field = c.Field,
+                        Operator = c.Operator,
+                        Value = c.Value,
+                    }),
+                ],
+                Actions =
+                [
+                    .. rule.Actions.Select(a => new RuleParameterCreateRequest
+                    {
+                        Field = a.Field,
+                        Operator = a.Operator,
+                        Value = a.Value,
+                    }),
+                ],
+            };
+
+            int updatedCount = await RunAutomaticRule(userData, ruleRequest, allCategories);
+            _logger.LogInformation(
+                "{LogMessage}",
+                _logLocalizer["RuleAppliedActionsLog", updatedCount]
+            );
+        }
+    }
+
+    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    {
+        ApplicationUser? foundUser;
+        try
+        {
+            foundUser = await _userDataContext
+                .ApplicationUsers.Include(u => u.AutomaticRules)
+                .ThenInclude(r => r.Conditions)
+                .Include(u => u.AutomaticRules)
+                .ThenInclude(r => r.Actions)
+                .Include(u => u.TransactionCategories)
+                .Include(u => u.Accounts)
+                .ThenInclude(a => a.Transactions)
+                .Include(u => u.UserSettings)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
+        }
+
+        if (foundUser == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
+        }
+
+        return foundUser;
+    }
+
+    private async Task<int> RunAutomaticRule(
+        ApplicationUser userData,
+        IAutomaticRuleCreateRequest rule,
+        IEnumerable<ICategory> allCategories
+    )
+    {
         var matchedTransactions = GetMatchingTransactions(
-            request.Conditions,
+            rule.Conditions,
             userData.Accounts.SelectMany(a => a.Transactions),
             allCategories
         );
@@ -195,18 +292,12 @@ public class AutomaticRuleService(
             _logLocalizer["RuleMatchedTransactionsLog", matchedTransactionsCount]
         );
 
-        int updatedCount = await ApplyActionsToTransactions(
-            request.Actions,
+        return await ApplyActionsToTransactions(
+            rule.Actions,
             matchedTransactions,
             allCategories,
             userData.Id
         );
-        _logger.LogInformation(
-            "{LogMessage}",
-            _logLocalizer["RuleAppliedActionsLog", updatedCount]
-        );
-
-        return _responseLocalizer["RuleRunSummary", matchedTransactionsCount, updatedCount];
     }
 
     private List<Transaction> GetMatchingTransactions(
@@ -278,40 +369,5 @@ public class AutomaticRuleService(
             }
         }
         return updatedCount;
-    }
-
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
-    {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await _userDataContext
-                .ApplicationUsers.Include(u => u.AutomaticRules)
-                .ThenInclude(r => r.Conditions)
-                .Include(u => u.AutomaticRules)
-                .ThenInclude(r => r.Actions)
-                .Include(u => u.TransactionCategories)
-                .Include(u => u.Accounts)
-                .ThenInclude(a => a.Transactions)
-                .Include(u => u.UserSettings)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                "{LogMessage}",
-                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
-            );
-            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
     }
 }

@@ -331,8 +331,26 @@
   <data name="SimpleFinSyncingTransactionsLog" xml:space="preserve">
     <value>Syncing transactions from {0} (Unix time {1})</value>
   </data>
+  <data name="SimpleFinDataRetrievalErrorLog" xml:space="preserve">
+    <value>Attempt to sync SimpleFIN data was unsuccessful.</value>
+  </data>
   <data name="SimpleFinDataNotFoundLog" xml:space="preserve">
-    <value>SimpleFin data not found.</value>
+    <value>SimpleFIN data not found.</value>
+  </data>
+  <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
+    <value>SimpleFIN account {0} is deleted. Skipping.</value>
+  </data>
+  <data name="SimpleFinOrganizationMissingIdLog" xml:space="preserve">
+    <value>SimpleFIN organization for account {0} is missing one of Name or Domain. Skipping account sync.</value>
+  </data>
+  <data name="SyncInstitutionCreationErrorLog" xml:space="preserve">
+    <value>Error creating institution for SimpleFIN account {0}</value>
+  </data>
+  <data name="SimpleFinAccountNotFoundForTransactionLog" xml:space="preserve">
+    <value>SimpleFIN account with SyncID {0} not found for transaction. Skipping transactions sync.</value>
+  </data>
+  <data name="SimpleFinAccountNotFoundForBalanceLog" xml:space="preserve">
+    <value>SimpleFIN account with SyncID {0} not found for balance. Skipping balances sync.</value>
   </data>
   <data name="SimpleFinTokenNotConfiguredLog" xml:space="preserve">
     <value>SimpleFIN token is not configured. Skipping bank sync.</value>
@@ -348,20 +366,5 @@
   </data>
   <data name="GoalNoBalanceFoundLog" xml:space="preserve">
     <value>No balance found for goal {0}</value>
-  </data>
-  <data name="AutomaticRuleConditionErrorLog" xml:space="preserve">
-    <value>Error applying condition {0} of rule {1}: {2}</value>
-  </data>
-  <data name="AutomaticRuleConditionSkippedLog" xml:space="preserve">
-    <value>An error occurred in one of the conditions. Rule actions will not be applied.</value>
-  </data>
-  <data name="AutomaticRuleMatchedLog" xml:space="preserve">
-    <value>Rule {0} matched {1} transactions.</value>
-  </data>
-  <data name="AutomaticRuleActionErrorLog" xml:space="preserve">
-    <value>Error applying action {0} of rule {1}: {2}</value>
-  </data>
-  <data name="AutomaticRuleAppliedLog" xml:space="preserve">
-    <value>Applied automatic rule {0}, updated {1} transactions.</value>
   </data>
 </root>

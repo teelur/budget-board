@@ -15,14 +15,14 @@ namespace BudgetBoard.WebAPI.Controllers;
 public class SimpleFinController(
     ILogger<SimpleFinController> logger,
     UserManager<ApplicationUser> userManager,
-    ISimpleFinService simpleFinService,
+    ISyncService simpleFinService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
     private readonly ILogger<SimpleFinController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly ISimpleFinService _simpleFinService = simpleFinService;
+    private readonly ISyncService _simpleFinService = simpleFinService;
     private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
     private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
 

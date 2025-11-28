@@ -25,7 +25,7 @@ public class ApplicationUserController(
     UserManager<ApplicationUser> userManager,
     UserDataContext context,
     IApplicationUserService applicationUserService,
-    ISimpleFinService simpleFinService,
+    ISyncService simpleFinService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
@@ -34,7 +34,7 @@ public class ApplicationUserController(
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly UserDataContext _userDataContext = context;
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
-    private readonly ISimpleFinService _simpleFinService = simpleFinService;
+    private readonly ISyncService _simpleFinService = simpleFinService;
     private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
     private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
 
