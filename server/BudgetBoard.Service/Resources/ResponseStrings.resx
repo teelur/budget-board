@@ -256,9 +256,6 @@
   <data name="TransactionDeleteNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to delete does not exist.</value>
   </data>
-  <data name="TransactionDeleteNoAccountError" xml:space="preserve">
-    <value>The transaction you are trying to delete is not associated with any account.</value>
-  </data>
   <data name="TransactionRestoreNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to restore does not exist.</value>
   </data>

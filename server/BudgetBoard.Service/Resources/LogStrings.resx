@@ -286,9 +286,6 @@
   <data name="TransactionDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a transaction that does not exist.</value>
   </data>
-  <data name="TransactionDeleteNoAccountLog" xml:space="preserve">
-    <value>Attempted to delete a transaction for an account that does not exist.</value>
-  </data>
   <data name="TransactionRestoreNotFoundLog" xml:space="preserve">
     <value>Attempted to restore a transaction that does not exist.</value>
   </data>

@@ -80,7 +80,6 @@ public class TransactionService(
         {
             transactions = transactions.Where(t => t.Date.Year == year);
         }
-
         if (month != null)
         {
             transactions = transactions.Where(t => t.Date.Month == month);
@@ -114,7 +113,6 @@ public class TransactionService(
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
             .FirstOrDefault(t => t.ID == editedTransaction.ID);
-
         if (transaction == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["TransactionUpdateNotFoundLog"]);
@@ -154,7 +152,6 @@ public class TransactionService(
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
             .FirstOrDefault(t => t.ID == guid);
-
         if (transaction == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["TransactionDeleteNotFoundLog"]);
@@ -165,15 +162,7 @@ public class TransactionService(
 
         transaction.Deleted = _nowProvider.UtcNow;
 
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == transaction.AccountID);
-        if (account == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["TransactionDeleteNoAccountLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["TransactionDeleteNoAccountError"]
-            );
-        }
-
+        Account account = transaction.Account!;
         // Manual accounts need to manually update the balance
         if (account.Source == AccountSource.Manual)
         {
@@ -198,7 +187,6 @@ public class TransactionService(
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
             .FirstOrDefault(t => t.ID == guid);
-
         if (transaction == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["TransactionRestoreNotFoundLog"]);
@@ -222,7 +210,6 @@ public class TransactionService(
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
             .FirstOrDefault(t => t.ID == transactionSplitRequest.ID);
-
         if (transaction == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["TransactionSplitNotFoundLog"]);
@@ -253,36 +240,23 @@ public class TransactionService(
 
         transaction.Amount -= transactionSplitRequest.Amount;
 
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == transaction.AccountID);
-        if (account == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["TransactionSplitNoAccountLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["TransactionSplitNoAccountError"]
-            );
-        }
-
         _userDataContext.Transactions.Add(splitTransaction);
         await _userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task ImportTransactionsAsync(
-        Guid userGuid,
-        ITransactionImportRequest transactionImportRequest
-    )
+    public async Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var transactions = transactionImportRequest.Transactions;
-        var accountNameToIDMap = transactionImportRequest.AccountNameToIDMap;
+        var transactions = request.Transactions;
+        var accountNameToIDMap = request.AccountNameToIDMap;
 
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
         {
             Value = tc.Value,
             Parent = tc.Parent,
         });
-
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
             customCategories,
             userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
