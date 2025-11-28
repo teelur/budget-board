@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Bogus;
-using BudgetBoard.Database.Models;
+﻿using Bogus;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
