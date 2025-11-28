@@ -858,4 +858,68 @@ public class GoalServiceTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("GoalCompleteNotFoundError");
     }
+
+    [Fact]
+    public async Task CompleteGoalsAsync_ShouldCompleteEligibleGoals()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(5);
+
+        var balanceFaker = new BalanceFaker([.. accounts.Select(a => a.ID)]);
+        var newBalance = balanceFaker.Generate();
+        newBalance.Amount = 5000;
+        newBalance.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        accounts.Where(a => a.ID == newBalance.AccountID).Single().Balances.Add(newBalance);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
+
+        var eligibleGoal = goalFaker.Generate();
+        eligibleGoal.Accounts = accounts;
+        eligibleGoal.Amount = 5000;
+        eligibleGoal.InitialAmount = 0;
+        eligibleGoal.CompleteDate = null;
+
+        helper.UserDataContext.Goals.Add(eligibleGoal);
+
+        var ineligibleGoal = goalFaker.Generate();
+        ineligibleGoal.Accounts = accounts;
+        ineligibleGoal.Amount = 6000;
+        ineligibleGoal.InitialAmount = 5000;
+        ineligibleGoal.CompleteDate = null;
+
+        helper.UserDataContext.Goals.Add(ineligibleGoal);
+
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await goalService.CompleteGoalsAsync(helper.demoUser.Id);
+
+        // Assert
+        helper.UserDataContext.Goals.Should().HaveCount(2);
+        helper
+            .UserDataContext.Goals.Single(g => g.ID == eligibleGoal.ID)
+            .Completed.Should()
+            .NotBeNull();
+        helper
+            .UserDataContext.Goals.Single(g => g.ID == ineligibleGoal.ID)
+            .Completed.Should()
+            .BeNull();
+    }
 }
