@@ -1,5 +1,3 @@
-using BudgetBoard.Database.Data;
-
 namespace BudgetBoard.Service.Interfaces;
 
 /// <summary>
