@@ -93,14 +93,14 @@ public class ApplicationUserController(
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
-                _logger.LogWarning(_logLocalizer["UserIdNotFoundLog"]);
+                _logger.LogWarning("{LogMessage}", _logLocalizer["UserIdNotFoundLog"]);
                 return Unauthorized(_responseLocalizer["UserNotAuthenticated"].Value);
             }
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                _logger.LogWarning(_logLocalizer["UserNotFoundLog"], userId);
+                _logger.LogWarning("{LogMessage}", _logLocalizer["UserNotFoundLog", userId]);
                 return NotFound(_responseLocalizer["UserNotFound"].Value);
             }
 
@@ -112,7 +112,7 @@ public class ApplicationUserController(
 
             if (oidcLogin == null)
             {
-                _logger.LogWarning(_logLocalizer["NoOidcLoginFoundLog"], userId);
+                _logger.LogWarning("{LogMessage}", _logLocalizer["NoOidcLoginFoundLog", userId]);
                 return BadRequest(_responseLocalizer["NoOidcLoginFound"].Value);
             }
 
@@ -123,7 +123,10 @@ public class ApplicationUserController(
             );
             if (!hasPassword && remainingLogins == 0)
             {
-                _logger.LogWarning(_logLocalizer["RemoveOidcNoPasswordLog"], userId);
+                _logger.LogWarning(
+                    "{LogMessage}",
+                    _logLocalizer["RemoveOidcNoPasswordLog", userId]
+                );
                 return BadRequest(_responseLocalizer["RemoveOidcNoPassword"].Value);
             }
 
@@ -137,14 +140,17 @@ public class ApplicationUserController(
             if (!result.Succeeded)
             {
                 _logger.LogError(
-                    _logLocalizer["RemoveOidcFailedLog"],
-                    userId,
-                    string.Join(", ", result.Errors.Select(e => e.Description))
+                    "{LogMessage}",
+                    _logLocalizer[
+                        "RemoveOidcFailedLog",
+                        userId,
+                        string.Join(", ", result.Errors.Select(e => e.Description))
+                    ]
                 );
                 return StatusCode(500, _responseLocalizer["RemoveOidcFailed"].Value);
             }
 
-            _logger.LogInformation(_logLocalizer["RemoveOidcSuccessLog"], userId);
+            _logger.LogInformation("{LogMessage}", _logLocalizer["RemoveOidcSuccessLog", userId]);
             return Ok(new { message = _responseLocalizer["RemoveOidcSuccess"].Value });
         }
         catch (Exception ex)
