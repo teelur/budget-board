@@ -71,7 +71,7 @@
     <value>Failed to exchange code for user principal</value>
   </data>
   <data name="OidcExchangeSucceededLog" xml:space="preserve">
-    <value>Token exchange succeeded. Claims count: {ClaimCount}</value>
+    <value>Token exchange succeeded. Claims count: {0}</value>
   </data>
   <data name="OidcProvisioningFailedLog" xml:space="preserve">
     <value>User provisioning failed</value>

@@ -12,12 +12,6 @@ using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Controllers;
 
-public class ApplicationUserConstants
-{
-    public const string UserType =
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-}
-
 [Route("api/[controller]")]
 [ApiController]
 public class ApplicationUserController(

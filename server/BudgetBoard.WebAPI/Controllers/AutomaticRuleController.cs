@@ -32,13 +32,8 @@ public class AutomaticRuleController(
     {
         try
         {
-            var userIdString = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return Unauthorized(_responseLocalizer["UserIdNotFound"].Value);
-            }
             await _automaticRuleService.CreateAutomaticRuleAsync(
-                new Guid(userIdString),
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
                 automaticRule
             );
             return Ok();

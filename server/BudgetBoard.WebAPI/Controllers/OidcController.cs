@@ -56,11 +56,11 @@ namespace BudgetBoard.WebAPI.Controllers
         [HttpPost("callback")]
         public async Task<IActionResult> Callback([FromBody] OidcCallbackRequest request)
         {
-            _logger.LogInformation(_logLocalizer["OidcCallbackStartedLog"]);
+            _logger.LogInformation("{LogMessage}", _logLocalizer["OidcCallbackStartedLog"]);
 
             if (string.IsNullOrEmpty(request.Code))
             {
-                _logger.LogWarning(_logLocalizer["OidcNoAuthCodeLog"]);
+                _logger.LogWarning("{LogMessage}", _logLocalizer["OidcNoAuthCodeLog"]);
                 return BadRequest(_responseLocalizer["AuthCodeRequired"].Value);
             }
 
@@ -73,13 +73,13 @@ namespace BudgetBoard.WebAPI.Controllers
                 );
                 if (principal == null)
                 {
-                    _logger.LogError(_logLocalizer["OidcExchangeFailedLog"]);
+                    _logger.LogError("{LogMessage}", _logLocalizer["OidcExchangeFailedLog"]);
                     return StatusCode(500, _responseLocalizer["AuthFailed"].Value);
                 }
 
                 _logger.LogInformation(
-                    _logLocalizer["OidcExchangeSucceededLog"],
-                    principal.Claims?.Count() ?? 0
+                    "{LogMessage}",
+                    _logLocalizer["OidcExchangeSucceededLog", principal.Claims?.Count() ?? 0]
                 );
 
                 // Provision the user in our system
@@ -91,18 +91,21 @@ namespace BudgetBoard.WebAPI.Controllers
 
                 if (!provisioned)
                 {
-                    _logger.LogWarning(_logLocalizer["OidcProvisioningFailedLog"]);
+                    _logger.LogWarning("{LogMessage}", _logLocalizer["OidcProvisioningFailedLog"]);
                     return StatusCode(500, _responseLocalizer["LoginFailed"].Value);
                 }
 
-                _logger.LogInformation(_logLocalizer["OidcProvisioningSucceededLog"]);
+                _logger.LogInformation(
+                    "{LogMessage}",
+                    _logLocalizer["OidcProvisioningSucceededLog"]
+                );
 
                 // Return success response for frontend to handle
                 return Ok(new OidcCallbackResponse { Success = true });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, _logLocalizer["OidcCallbackErrorLog"]);
+                _logger.LogError(ex, "{LogMessage}", _logLocalizer["OidcCallbackErrorLog"]);
                 return StatusCode(500, _responseLocalizer["AuthFailed"].Value);
             }
         }

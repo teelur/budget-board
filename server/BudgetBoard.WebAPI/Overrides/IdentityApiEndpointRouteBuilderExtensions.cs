@@ -9,12 +9,14 @@ using System.Text.Encodings.Web;
 using BudgetBoard.Overrides;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Overrides;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.Routing;
@@ -50,6 +52,9 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         >();
         var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<TUser>>();
         var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
+        var localizer = endpoints.ServiceProvider.GetRequiredService<
+            IStringLocalizer<ApiResponseStrings>
+        >();
 
         // We'll figure out a unique endpoint name based on the final route pattern during endpoint generation.
         string? confirmEmailEndpointName = null;
@@ -103,7 +108,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                     var loginInfo = new UserLoginInfo(
                         IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
                         userId,
-                        "Local Account"
+                        localizer["LocalAccountProviderName"]
                     );
                     var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
                     if (!addLoginResult.Succeeded)
@@ -128,7 +133,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             // If registration is disabled, we need to return a 404 for the /register endpoint.
             routeGroup.MapPost(
                 "/register",
-                () => TypedResults.NotFound("Registration is disabled.")
+                () => TypedResults.NotFound(localizer["RegistrationDisabledError"].Value)
             );
         }
 
@@ -652,7 +657,9 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             return TypedResults.NotFound();
                         }
 
-                        return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
+                        return TypedResults.Ok(
+                            await CreateInfoResponseAsync(user, userManager, localizer)
+                        );
                     }
                 );
             }
@@ -747,7 +754,9 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             }
                         }
 
-                        return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
+                        return TypedResults.Ok(
+                            await CreateInfoResponseAsync(user, userManager, localizer)
+                        );
                     }
                 );
             }
@@ -763,7 +772,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         {
             if (confirmEmailEndpointName is null)
             {
-                throw new NotSupportedException("No email confirmation endpoint was registered!");
+                throw new NotSupportedException(localizer["NoEmailConfirmationEndpointError"]);
             }
 
             var code = isChange
@@ -789,7 +798,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                     Helpers.GetHostString(context.Request)
                 )
                 ?? throw new NotSupportedException(
-                    $"Could not find endpoint named '{confirmEmailEndpointName}'."
+                    localizer["EndpointNotFoundError", confirmEmailEndpointName]
                 );
 
             await emailSender.SendConfirmationLinkAsync(
@@ -840,7 +849,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
     private static async Task<InfoResponse> CreateInfoResponseAsync<TUser>(
         TUser user,
-        UserManager<TUser> userManager
+        UserManager<TUser> userManager,
+        IStringLocalizer<ApiResponseStrings> localizer
     )
         where TUser : class
     {
@@ -848,7 +858,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         {
             Email =
                 await userManager.GetEmailAsync(user)
-                ?? throw new NotSupportedException("Users must have an email."),
+                ?? throw new NotSupportedException(localizer["UserEmailRequiredError"]),
             IsEmailConfirmed = await userManager.IsEmailConfirmedAsync(user),
         };
     }

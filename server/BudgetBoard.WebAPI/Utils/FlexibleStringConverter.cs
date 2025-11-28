@@ -1,9 +1,12 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using BudgetBoard.WebAPI.Resources;
+using Microsoft.Extensions.Localization;
 
-namespace BudgetBoard.Service.Helpers;
+namespace BudgetBoard.WebAPI.Utils;
 
-public class FlexibleStringConverter : JsonConverter<string>
+public class FlexibleStringConverter(IStringLocalizer<ApiResponseStrings> localizer)
+    : JsonConverter<string>
 {
     public override string? Read(
         ref Utf8JsonReader reader,
@@ -24,7 +27,7 @@ public class FlexibleStringConverter : JsonConverter<string>
             return null;
 
         // Otherwise, throw
-        throw new JsonException($"Unexpected token {reader.TokenType} when parsing a string.");
+        throw new JsonException(localizer["InvalidJsonType"]);
     }
 
     public override void Write(Utf8JsonWriter writer, string? value, JsonSerializerOptions options)

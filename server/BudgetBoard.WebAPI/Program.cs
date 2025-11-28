@@ -7,6 +7,7 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Jobs;
 using BudgetBoard.WebAPI.Services;
+using BudgetBoard.WebAPI.Utils;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -149,13 +150,8 @@ if (!string.IsNullOrEmpty(emailSender) && !disableLocalAuth)
     builder.Services.AddTransient<IEmailSender, EmailSender>();
 }
 
-builder
-    .Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.Converters.Add(new FlexibleStringConverter());
-    });
+builder.Services.ConfigureOptions<ConfigureJsonOptions>();
+builder.Services.AddControllers();
 
 //Add support to logging with SERILOG
 builder.Host.UseSerilog(

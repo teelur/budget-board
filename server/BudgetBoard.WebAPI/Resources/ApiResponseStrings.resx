@@ -91,4 +91,22 @@
   <data name="UserIdNotFound" xml:space="preserve">
     <value>User ID not found.</value>
   </data>
+    <data name="InvalidJsonType" xml:space="preserve">
+    <value>The provided JSON token type is invalid.</value>
+  </data>
+  <data name="LocalAccountProviderName" xml:space="preserve">
+    <value>Local Account</value>
+  </data>
+  <data name="RegistrationDisabledError" xml:space="preserve">
+    <value>Registration is disabled.</value>
+  </data>
+  <data name="NoEmailConfirmationEndpointError" xml:space="preserve">
+    <value>No email confirmation endpoint was registered!</value>
+  </data>
+  <data name="UserEmailRequiredError" xml:space="preserve">
+    <value>Users must have an email.</value>
+  </data>
+  <data name="EndpointNotFoundError" xml:space="preserve">
+    <value>Could not find endpoint named '{0}'.</value>
+  </data>
 </root>
