@@ -54,13 +54,11 @@ public class AssetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var asset1 = assetFaker.Generate();
-        asset1.UserID = helper.demoUser.Id;
         asset1.Name = "Asset 1";
 
         var asset2 = assetFaker.Generate();
-        asset2.UserID = helper.demoUser.Id;
         asset2.Name = "Asset 2";
 
         helper.UserDataContext.Assets.AddRange(asset1, asset2);
@@ -88,13 +86,11 @@ public class AssetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var asset1 = assetFaker.Generate();
-        asset1.UserID = helper.demoUser.Id;
         asset1.Name = "Asset 1";
 
         var asset2 = assetFaker.Generate();
-        asset2.UserID = helper.demoUser.Id;
         asset2.Name = "Asset 2";
 
         helper.UserDataContext.Assets.AddRange(asset1, asset2);
@@ -121,13 +117,11 @@ public class AssetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var asset1 = assetFaker.Generate();
-        asset1.UserID = helper.demoUser.Id;
         asset1.Name = "Asset 1";
 
         var asset2 = assetFaker.Generate();
-        asset2.UserID = helper.demoUser.Id;
         asset2.Name = "Asset 2";
 
         helper.UserDataContext.Assets.AddRange(asset1, asset2);
@@ -155,9 +149,8 @@ public class AssetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var existingAsset = assetFaker.Generate();
-        existingAsset.UserID = helper.demoUser.Id;
         existingAsset.Name = "Old Asset Name";
 
         helper.UserDataContext.Assets.Add(existingAsset);
@@ -231,9 +224,8 @@ public class AssetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var existingAsset = assetFaker.Generate();
-        existingAsset.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Assets.Add(existingAsset);
         await helper.UserDataContext.SaveChangesAsync();
@@ -280,9 +272,8 @@ public class AssetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var existingAsset = assetFaker.Generate();
-        existingAsset.UserID = helper.demoUser.Id;
         existingAsset.Deleted = DateTime.UtcNow.AddDays(-1);
 
         helper.UserDataContext.Assets.Add(existingAsset);
@@ -330,15 +321,11 @@ public class AssetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var assets = assetFaker.Generate(10);
         var rnd = new Random();
-        assets = assets.OrderBy(a => rnd.Next()).ToList();
-        foreach (var asset in assets)
-        {
-            asset.UserID = helper.demoUser.Id;
-            asset.Index = assets.IndexOf(asset);
-        }
+        assets = [.. assets.OrderBy(a => rnd.Next())];
+        assets.ForEach(asset => asset.Index = assets.IndexOf(asset));
 
         helper.UserDataContext.Assets.AddRange(assets);
         await helper.UserDataContext.SaveChangesAsync();
@@ -347,7 +334,9 @@ public class AssetServiceTests
         List<Asset> shuffledAssets = [.. assets.OrderBy(a => rnd.Next())];
         foreach (var asset in shuffledAssets)
         {
-            newOrder.Add(new AssetIndexRequest { ID = asset.ID, Index = newOrder.Count });
+            newOrder.Add(
+                new AssetIndexRequest { ID = asset.ID, Index = shuffledAssets.IndexOf(asset) }
+            );
         }
 
         // Act

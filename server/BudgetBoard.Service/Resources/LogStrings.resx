@@ -316,6 +316,9 @@
   <data name="ValueCreateAssetNotFoundLog" xml:space="preserve">
     <value>Attempted to create a value for an asset that does not exist.</value>
   </data>
+  <data name="ValueAssetNotFoundLog" xml:space="preserve">
+    <value>Attempted to access values for an asset that does not exist.</value>
+  </data>
   <data name="ValueUpdateAssetNotFoundLog" xml:space="preserve">
     <value>Attempted to update a value for an asset that does not exist.</value>
   </data>

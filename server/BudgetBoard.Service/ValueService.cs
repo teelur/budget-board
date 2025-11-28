@@ -54,9 +54,17 @@ public class ValueService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var values = userData.Assets.Where(a => a.ID == assetId).SelectMany(a => a.Values);
+        var asset = userData.Assets.FirstOrDefault(a => a.ID == assetId);
+        if (asset == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueAssetNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["ValueAssetNotFoundError"]);
+        }
 
-        return values.Select(v => new ValueResponse(v)).ToList();
+        return asset
+            .Values.Where(v => v.Deleted == null)
+            .Select(v => new ValueResponse(v))
+            .ToList();
     }
 
     /// <inheritdoc />

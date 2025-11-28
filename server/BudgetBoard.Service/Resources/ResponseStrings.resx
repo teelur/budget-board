@@ -286,6 +286,9 @@
   <data name="ValueCreateAssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to add a value to does not exist.</value>
   </data>
+  <data name="ValueAssetNotFoundError" xml:space="preserve">
+    <value>The asset you are trying to access values for does not exist.</value>
+  </data>
   <data name="ValueUpdateAssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to update does not exist.</value>
   </data>
