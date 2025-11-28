@@ -46,7 +46,6 @@ public class UserSettingsService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var userSettings = userData.UserSettings;
-
         if (userSettings == null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["UserSettingsNotFoundLog"]);
@@ -55,6 +54,21 @@ public class UserSettingsService(
 
         if (request.Currency != null)
         {
+            var isValidCurrency = System
+                .Globalization.CultureInfo.GetCultures(
+                    System.Globalization.CultureTypes.SpecificCultures
+                )
+                .Select(c => new System.Globalization.RegionInfo(c.Name))
+                .Any(r => r.ISOCurrencySymbol == request.Currency);
+
+            if (!isValidCurrency)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["InvalidCurrencyCodeLog"]);
+                throw new BudgetBoardServiceException(
+                    _responseLocalizer["InvalidCurrencyCodeError"]
+                );
+            }
+
             userSettings.Currency = request.Currency;
         }
 
@@ -115,8 +129,8 @@ public class UserSettingsService(
 
         if (foundUser == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["UserNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["UserNotFoundError"]);
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

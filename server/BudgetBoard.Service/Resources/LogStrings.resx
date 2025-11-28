@@ -304,6 +304,9 @@
   <data name="UserSettingsNotFoundLog" xml:space="preserve">
     <value>Attempted to access user settings for a user that does not exist.</value>
   </data>
+  <data name="InvalidCurrencyCodeLog" xml:space="preserve">
+    <value>Attempted to update user settings with an invalid currency code.</value>
+  </data>
   <data name="InvalidBudgetWarningThresholdLog" xml:space="preserve">
     <value>Attempted to update user settings with an invalid budget threshold value.</value>
   </data>
