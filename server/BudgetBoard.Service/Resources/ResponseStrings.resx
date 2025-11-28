@@ -358,10 +358,4 @@
   <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
     <value>Unsupported operator '{0}' in rule action.</value>
   </data>
-  <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
-    <value>The amount '{0}' is not a valid decimal number.</value>
-  </data>
-  <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
-    <value>The date '{0}' is not a valid date.</value>
-  </data>
 </root>
