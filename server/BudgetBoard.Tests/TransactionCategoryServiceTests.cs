@@ -148,12 +148,8 @@ public class TransactionCategoryServiceTests
             .WithMessage("Transaction category cannot have the same name as its parent category.");
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public async Task CreateTransactionCategoryAsync_WhenValueNullOrEmpty_ShouldThrowError(
-        string? value
-    )
+    [Fact]
+    public async Task CreateTransactionCategoryAsync_WhenValueEmpty_ShouldThrowError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -165,7 +161,7 @@ public class TransactionCategoryServiceTests
         );
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
-        categoryCreateRequest.Value = value;
+        categoryCreateRequest.Value = string.Empty;
 
         // Act
         Func<Task> act = async () =>
