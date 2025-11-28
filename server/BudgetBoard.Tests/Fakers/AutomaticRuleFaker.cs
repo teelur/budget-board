@@ -1,5 +1,6 @@
 using Bogus;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Models;
 
 namespace BudgetBoard.IntegrationTests.Fakers;
 
@@ -24,7 +25,10 @@ public class ConditionFaker : Faker<RuleCondition>
     public ConditionFaker(Guid ruleId)
     {
         RuleFor(c => c.ID, f => Guid.NewGuid())
-            .RuleFor(c => c.Field, f => f.PickRandom(new[] { "Description", "Amount", "Merchant" }))
+            .RuleFor(
+                c => c.Field,
+                f => f.PickRandom(AutomaticRuleConstants.TransactionFields.AllFields)
+            )
             .RuleFor(
                 c => c.Operator,
                 f => f.PickRandom(new[] { "matches", "equals", "greater_than", "less_than" })
@@ -39,7 +43,10 @@ public class ActionFaker : Faker<RuleAction>
     public ActionFaker(Guid ruleId)
     {
         RuleFor(a => a.ID, f => Guid.NewGuid())
-            .RuleFor(a => a.Field, f => f.PickRandom(new[] { "Category", "Tag", "Note" }))
+            .RuleFor(
+                a => a.Field,
+                f => f.PickRandom(AutomaticRuleConstants.TransactionFields.AllFields)
+            )
             .RuleFor(a => a.Operator, f => "set")
             .RuleFor(a => a.Value, f => f.Lorem.Word())
             .RuleFor(a => a.RuleID, f => ruleId);

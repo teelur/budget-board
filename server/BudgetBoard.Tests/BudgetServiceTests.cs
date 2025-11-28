@@ -16,7 +16,15 @@ public class BudgetServiceTests
     private readonly Faker<BudgetCreateRequest> _budgetCreateRequestFaker =
         new Faker<BudgetCreateRequest>()
             .RuleFor(b => b.Date, f => f.Date.Past())
-            .RuleFor(b => b.Category, f => f.Finance.AccountName())
+            .RuleFor(
+                b => b.Category,
+                (f, b) =>
+                    f.PickRandom(
+                        TransactionCategoriesConstants.DefaultTransactionCategories.Select(tc =>
+                            tc.Value
+                        )
+                    )
+            )
             .RuleFor(b => b.Limit, f => f.Finance.Amount());
 
     private readonly Faker<BudgetUpdateRequest> _budgetUpdateRequestFaker =

@@ -1,12 +1,13 @@
+using System.Globalization;
 using Bogus;
 using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -15,17 +16,11 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class UserSettingsServiceTests
 {
-    private readonly Mock<ILogger<IApplicationUserService>> _loggerMock;
     private readonly Faker<UserSettingsUpdateRequest> _userSettingsUpdateRequestFaker =
         new Faker<UserSettingsUpdateRequest>().RuleFor(
             u => u.Currency,
-            f => f.Finance.Currency().Code
+            f => f.PickRandom(LocalizationHelpers.CurrencyCodes)
         );
-
-    public UserSettingsServiceTests()
-    {
-        _loggerMock = new Mock<ILogger<IApplicationUserService>>();
-    }
 
     [Fact]
     public async Task ReadUserSettingsAsync_ReturnsUserSettingsResponse_WhenUserExists()
@@ -34,7 +29,7 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
 
         var userSettingsService = new UserSettingsService(
-            _loggerMock.Object,
+            Mock.Of<ILogger<IUserSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -61,7 +56,7 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
 
         var userSettingsService = new UserSettingsService(
-            _loggerMock.Object,
+            Mock.Of<ILogger<IUserSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -85,7 +80,7 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
 
         var userSettingsService = new UserSettingsService(
-            _loggerMock.Object,
+            Mock.Of<ILogger<IUserSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -109,7 +104,7 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
 
         var userSettingsService = new UserSettingsService(
-            _loggerMock.Object,
+            Mock.Of<ILogger<IUserSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -143,7 +138,7 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
 
         var userSettingsService = new UserSettingsService(
-            _loggerMock.Object,
+            Mock.Of<ILogger<IUserSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -173,7 +168,7 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
 
         var userSettingsService = new UserSettingsService(
-            _loggerMock.Object,
+            Mock.Of<ILogger<IUserSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -207,7 +202,7 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
 
         var userSettingsService = new UserSettingsService(
-            _loggerMock.Object,
+            Mock.Of<ILogger<IUserSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -241,7 +236,7 @@ public class UserSettingsServiceTests
         var helper = new TestHelper();
 
         var userSettingsService = new UserSettingsService(
-            _loggerMock.Object,
+            Mock.Of<ILogger<IUserSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()

@@ -1,5 +1,6 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
@@ -10,13 +11,13 @@ using Microsoft.Extensions.Logging;
 namespace BudgetBoard.Service;
 
 public class UserSettingsService(
-    ILogger<IApplicationUserService> logger,
+    ILogger<IUserSettingsService> logger,
     UserDataContext userDataContext,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer
 ) : IUserSettingsService
 {
-    private readonly ILogger<IApplicationUserService> _logger = logger;
+    private readonly ILogger<IUserSettingsService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
     private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
@@ -54,13 +55,7 @@ public class UserSettingsService(
 
         if (request.Currency != null)
         {
-            var isValidCurrency = System
-                .Globalization.CultureInfo.GetCultures(
-                    System.Globalization.CultureTypes.SpecificCultures
-                )
-                .Select(c => new System.Globalization.RegionInfo(c.Name))
-                .Any(r => r.ISOCurrencySymbol == request.Currency);
-
+            var isValidCurrency = LocalizationHelpers.CurrencyCodes.Contains(request.Currency);
             if (!isValidCurrency)
             {
                 _logger.LogError("{LogMessage}", _logLocalizer["InvalidCurrencyCodeLog"]);

@@ -1,4 +1,5 @@
-﻿using BudgetBoard.IntegrationTests.Fakers;
+﻿using BudgetBoard.Database.Models;
+using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
@@ -407,10 +408,45 @@ public class AutomaticRuleTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var automaticRuleFaker = new AutomaticRuleFaker(helper.demoUser.Id);
-        var demoRules = automaticRuleFaker.Generate(3);
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        var transaction = new TransactionFaker([account.ID]).Generate();
+        transaction.MerchantName = "This is a test merchant";
 
-        helper.UserDataContext.AutomaticRules.AddRange(demoRules);
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.Transactions.Add(transaction);
+        helper.UserDataContext.SaveChanges();
+
+        var automaticRule = new AutomaticRule()
+        {
+            ID = Guid.NewGuid(),
+            UserID = helper.demoUser.Id,
+            Conditions =
+            [
+                new RuleCondition
+                {
+                    ID = Guid.NewGuid(),
+                    RuleID = Guid.NewGuid(),
+                    Field = AutomaticRuleConstants.TransactionFields.Merchant,
+                    Operator = AutomaticRuleConstants.ConditionalOperators.Contains,
+                    Value = "test",
+                },
+            ],
+            Actions =
+            [
+                new RuleAction
+                {
+                    ID = Guid.NewGuid(),
+                    RuleID = Guid.NewGuid(),
+                    Field = AutomaticRuleConstants.TransactionFields.Category,
+                    Operator = AutomaticRuleConstants.ActionOperators.Set,
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.First()
+                        .Value,
+                },
+            ],
+        };
+
+        helper.UserDataContext.AutomaticRules.Add(automaticRule);
         helper.UserDataContext.SaveChanges();
 
         // Act
