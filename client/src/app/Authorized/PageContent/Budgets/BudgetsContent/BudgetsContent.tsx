@@ -6,7 +6,7 @@ import { ITransaction } from "~/models/transaction";
 import { buildCategoryToTransactionsTotalMap } from "~/helpers/transactions";
 import { BudgetGroup, getBudgetGroupForCategory } from "~/helpers/budgets";
 import BudgetsGroupHeader from "./BudgetGroupHeader/BudgetsGroupHeader";
-import BudgetTotalCard from "./BudgetTotalCard/BudgetTotalCard";
+import BudgetSummaryCard from "./BudgetSummaryCard/BudgetSummaryCard";
 import BudgetsGroup from "./BudgetsGroup/BudgetsGroup";
 import UnbudgetedGroup from "./UnbudgetedGroup/UnbudgetedGroup";
 import { areStringsEqual } from "~/helpers/utils";
@@ -133,7 +133,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         w={{ base: "100%", md: "20%" }}
         h={{ base: "auto", md: "100%" }}
       >
-        <BudgetTotalCard
+        <BudgetSummaryCard
           incomeCategories={incomeCategoryTree}
           expenseCategories={expenseCategoryTree}
           budgets={props.budgets}

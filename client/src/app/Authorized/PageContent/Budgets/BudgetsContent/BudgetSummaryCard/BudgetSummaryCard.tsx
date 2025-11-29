@@ -2,7 +2,7 @@ import classes from "./BudgetTotalCard.module.css";
 
 import { Card, Skeleton, Stack, Text } from "@mantine/core";
 import React from "react";
-import BudgetTotalItem from "./BudgetTotalItem/BudgetTotalItem";
+import BudgetSummaryItem from "./BudgetSummaryItem/BudgetSummaryItem";
 import { IBudget } from "~/models/budget";
 import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
@@ -10,7 +10,7 @@ import { areStringsEqual } from "~/helpers/utils";
 import { sumTransactionAmounts } from "~/helpers/transactions";
 import { BudgetValueType } from "~/helpers/budgets";
 
-interface BudgetTotalCardProps {
+interface BudgetSummaryCardProps {
   incomeCategories: ICategory[];
   expenseCategories: ICategory[];
   budgets: IBudget[];
@@ -20,7 +20,7 @@ interface BudgetTotalCardProps {
   isPending: boolean;
 }
 
-const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
+const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
   const incomeBudgetsTotal = props.budgets
     .filter((b) => areStringsEqual(b.category, "Income"))
     .reduce((acc, b) => acc + b.limit, 0);
@@ -77,24 +77,24 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
           <Skeleton h={105} radius="md" />
         ) : (
           <Card className={classes.group} radius="md">
-            <BudgetTotalItem
+            <BudgetSummaryItem
               label="Income"
               amount={incomeTransactionsTotal}
               total={incomeBudgetsTotal}
               budgetValueType={BudgetValueType.Income}
             />
-            <BudgetTotalItem
+            <BudgetSummaryItem
               label="Expenses"
               amount={expenseTransactionsTotal}
               total={expenseBudgetsTotal}
               budgetValueType={BudgetValueType.Expense}
             />
-            <BudgetTotalItem
-              label="Unbudgeted"
-              amount={unbudgetedTransactionsTotal}
-              total={incomeBudgetsTotal - expenseBudgetsTotal}
+            <BudgetSummaryItem
+              label="Net Budgeted"
+              amount={incomeTransactionsTotal + expenseTransactionsTotal}
               budgetValueType={BudgetValueType.Total}
               hideProgress
+              showDivider
             />
           </Card>
         )}
@@ -102,11 +102,19 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
           <Skeleton h={56} radius="md" />
         ) : (
           <Card className={classes.group} radius="md">
-            <BudgetTotalItem
+            <BudgetSummaryItem
+              label="Unbudgeted"
+              amount={unbudgetedTransactionsTotal}
+              budgetValueType={BudgetValueType.Total}
+              hideProgress
+              showDivider
+            />
+            <BudgetSummaryItem
               label="Net Cash Flow"
               amount={totalTransactionsTotal}
               budgetValueType={BudgetValueType.Total}
               hideProgress
+              showDivider
             />
           </Card>
         )}
@@ -115,4 +123,4 @@ const BudgetTotalCard = (props: BudgetTotalCardProps): React.ReactNode => {
   );
 };
 
-export default BudgetTotalCard;
+export default BudgetSummaryCard;
