@@ -58,6 +58,8 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
                 .HasForeignKey(e => e.UserID)
                 .IsRequired();
 
+            u.HasMany(e => e.Assets).WithOne(e => e.User).HasForeignKey(e => e.UserID).IsRequired();
+
             u.ToTable("User");
         });
 

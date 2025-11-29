@@ -45,7 +45,7 @@ public class ValueService(
             AssetID = request.AssetID,
         };
 
-        asset.Values.Add(newValue);
+        _userDataContext.Values.Add(newValue);
         await _userDataContext.SaveChangesAsync();
     }
 

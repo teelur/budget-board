@@ -47,8 +47,7 @@ public class ValueServiceTests
 
         // Assert
         helper
-            .demoUser.Assets.SelectMany(a => a.Values)
-            .Should()
+            .UserDataContext.Values.Should()
             .ContainSingle(v =>
                 v.Amount == valueCreateRequest.Amount
                 && v.DateTime == valueCreateRequest.DateTime

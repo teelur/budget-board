@@ -17,7 +17,7 @@ internal class TestHelper
     public TestHelper()
     {
         var builder = new DbContextOptionsBuilder<UserDataContext>();
-        builder.UseInMemoryDatabase(new Guid().ToString());
+        builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
 
         var dbContextOptions = builder.Options;
         UserDataContext = new UserDataContext(dbContextOptions);
