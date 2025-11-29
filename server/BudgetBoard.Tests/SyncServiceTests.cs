@@ -90,7 +90,7 @@ public class SyncServiceTests
             .Returns<Guid, IApplicationUserUpdateRequest>((id, req) => Task.CompletedTask)
             .Verifiable();
 
-        var httpClient = new HttpClient();
+        using var httpClient = new HttpClient();
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock.Setup(_ => _.CreateClient(string.Empty)).Returns(httpClient);
 

@@ -19,7 +19,7 @@ public class SimpleFinServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var httpClient = new HttpClient();
+        using var httpClient = new HttpClient();
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
@@ -91,7 +91,8 @@ public class SimpleFinServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var httpClient = new HttpClient();
+
+        using var httpClient = new HttpClient();
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
