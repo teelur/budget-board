@@ -54,7 +54,7 @@ public class SimpleFinService(
         _logger.LogInformation("{LogMessage}", _logLocalizer["SimpleFinTokenConfiguredLog"]);
 
         // Deleted accounts do not get updated during sync.
-        long earliestBalanceTimestamp = GetEarliestBalanceTimestamp(
+        long earliestBalanceTimestamp = GetOldestLastSyncTimestamp(
             userData.Accounts.Where(a => !string.IsNullOrEmpty(a.SyncID) && !a.Deleted.HasValue)
         );
 
@@ -172,9 +172,9 @@ public class SimpleFinService(
         return new SimpleFinData(auth, baseUrl);
     }
 
-    private long GetEarliestBalanceTimestamp(IEnumerable<Account> accounts)
+    private long GetOldestLastSyncTimestamp(IEnumerable<Account> accounts)
     {
-        long earliestBalanceTimestamp = ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds();
+        long oldestLastSyncTimestamp = ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds();
 
         foreach (var account in accounts)
         {
@@ -186,20 +186,20 @@ public class SimpleFinService(
             }
             else
             {
-                var latestBalanceTimestamp = balanceTimestamps.Max();
+                var accountMostRecentBalanceTimestamp = balanceTimestamps.Max();
                 if (
-                    ((DateTimeOffset)latestBalanceTimestamp).ToUnixTimeSeconds()
-                    < earliestBalanceTimestamp
+                    ((DateTimeOffset)accountMostRecentBalanceTimestamp).ToUnixTimeSeconds()
+                    < oldestLastSyncTimestamp
                 )
                 {
-                    earliestBalanceTimestamp = (
-                        (DateTimeOffset)latestBalanceTimestamp
+                    oldestLastSyncTimestamp = (
+                        (DateTimeOffset)accountMostRecentBalanceTimestamp
                     ).ToUnixTimeSeconds();
                 }
             }
         }
 
-        return earliestBalanceTimestamp;
+        return oldestLastSyncTimestamp;
     }
 
     private long GetSyncStartDate(int forceSyncLookbackMonths, long earliestBalanceTimestamp)
