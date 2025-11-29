@@ -1,23 +1,22 @@
-import classes from "./BudgetTotalItem.module.css";
-
 import { BudgetValueType, getBudgetValueColor } from "~/helpers/budgets";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { Flex, Group, Progress, Stack, Text } from "@mantine/core";
+import { Divider, Flex, Group, Progress, Stack, Text } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 
-interface BudgetTotalItemProps {
+interface BudgetSummaryItemProps {
   label: string;
   amount: number;
   total?: number;
   budgetValueType: BudgetValueType;
   hideProgress?: boolean;
+  showDivider?: boolean;
 }
 
-const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
+const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -44,15 +43,24 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
   );
 
   return (
-    <Stack className={classes.root}>
-      <Group className={classes.dataContainer}>
+    <Stack gap={0}>
+      <Group
+        gap="0.25rem"
+        justify={props.showDivider ? "center" : "space-between"}
+      >
         <Flex>
-          <Text className={classes.text}>{props.label}</Text>
+          <Text size="md" fw={600}>
+            {props.label}
+          </Text>
         </Flex>
+        {props.showDivider ? (
+          <Divider my="sm" variant="dashed" flex="1 0 auto" />
+        ) : null}
         <Flex gap="0.25rem">
           {userSettingsQuery.isPending ? null : (
             <Text
-              className={classes.text}
+              size="md"
+              fw={600}
               c={getBudgetValueColor(
                 props.amount,
                 props.total ?? 0,
@@ -68,9 +76,13 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
               )}
             </Text>
           )}
-          {props.total ? <Text className={classes.text}>of</Text> : null}
           {props.total ? (
-            <Text className={classes.text}>
+            <Text size="md" fw={600}>
+              of
+            </Text>
+          ) : null}
+          {props.total ? (
+            <Text size="md" fw={600}>
               {convertNumberToCurrency(
                 props.total,
                 false,
@@ -99,4 +111,4 @@ const BudgetTotalItem = (props: BudgetTotalItemProps): React.ReactNode => {
   );
 };
 
-export default BudgetTotalItem;
+export default BudgetSummaryItem;
