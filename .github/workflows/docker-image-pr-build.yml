@@ -6,19 +6,38 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Install dependencies
+        working-directory: ./server
+        run: dotnet restore
+
+      - name: Build
+        working-directory: ./server
+        run: dotnet build --no-restore
+
+      - name: Test with the dotnet CLI
+        working-directory: ./server
+        run: dotnet test --no-build
+
+  build-client:
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    needs: test
     strategy:
       fail-fast: false
       matrix:
-        dockerfile:
-          - ./client
-          - ./server
-        include:
-          - dockerfile: ./client
-            image: ghcr.io/teelur/budget-board/client
-          - dockerfile: ./server
-            image: ghcr.io/teelur/budget-board/server
+        platform:
+          - linux/amd64
+          - linux/arm64
 
     steps:
       - name: Checkout code
@@ -31,17 +50,15 @@ jobs:
           filters: |
             build:
               - 'client/**'
-              - 'server/**'
               - 'client/**/package.json'
-              - 'server/**/Dockerfile'
               - 'compose.yml'
               - 'compose.override.yml'
+              - '.github/workflows/**'
             docs:
               - 'README.md'
               - 'img/**'
               - 'docs/**'
               - 'example/**'
-              - '.github/**'
               - '.gitignore'
               - '.gitattributes'
               - '.dockerignore'
@@ -73,15 +90,89 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ matrix.image }}
+          images: ghcr.io/teelur/budget-board/client
 
       - name: Build the Docker image
         if: ${{ env.BUILD_CHANGED == 'true' }}
-        id: push
+        id: build
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.dockerfile }}
+          context: ./client
           push: false
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-server:
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine changed paths
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            build:
+              - 'server/**'
+              - 'server/**/Dockerfile'
+              - 'compose.yml'
+              - 'compose.override.yml'
+              - '.github/workflows/**'
+            docs:
+              - 'README.md'
+              - 'img/**'
+              - 'docs/**'
+              - 'example/**'
+              - '.gitignore'
+              - '.gitattributes'
+              - '.dockerignore'
+              - 'LICENSE'
+
+      # Note: static YAML linters may report errors about accessing
+      # `steps.changes.outputs.build` or `env.BUILD_CHANGED`. These are
+      # false positives because the value is provided at runtime by
+      # `dorny/paths-filter`. GitHub Actions supports these expressions
+      # and the workflow will evaluate them correctly during execution.
+      - name: Export build flag
+        run: |
+          echo "BUILD_CHANGED=${{ steps.changes.outputs['build'] }}" >> $GITHUB_ENV
+
+      - name: Skip build (only docs/images changed)
+        if: ${{ env.BUILD_CHANGED == 'false' }}
+        run: echo "No build-relevant changes detected — skipping Docker build."
+
+      - name: Set up Docker Buildx
+        if: ${{ env.BUILD_CHANGED == 'true' }}
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up QEMU
+        if: ${{ env.BUILD_CHANGED == 'true' }}
+        uses: docker/setup-qemu-action@v3
+
+      - name: Extract metadata (tags, labels) for Docker
+        if: ${{ env.BUILD_CHANGED == 'true' }}
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/teelur/budget-board/server
+
+      - name: Build the Docker image
+        if: ${{ env.BUILD_CHANGED == 'true' }}
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          push: false
+          platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
