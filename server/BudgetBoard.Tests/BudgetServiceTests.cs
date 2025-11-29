@@ -44,8 +44,6 @@ public class BudgetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var budgetsFaker = new BudgetFaker(helper.demoUser.Id);
-
         var today = DateTime.Today;
         var budgets = new List<BudgetCreateRequest>();
         var newBudget1 = _budgetCreateRequestFaker.Generate();
