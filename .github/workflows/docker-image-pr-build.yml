@@ -30,7 +30,7 @@ jobs:
         run: dotnet test --no-build
 
   build-client:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -105,7 +105,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   build-server:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     needs: test
     strategy:
       fail-fast: false
