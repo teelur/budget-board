@@ -1,20 +1,28 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
 public class UserSettingsService(
-    ILogger<IApplicationUserService> logger,
-    UserDataContext userDataContext
+    ILogger<IUserSettingsService> logger,
+    UserDataContext userDataContext,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IUserSettingsService
 {
-    private readonly ILogger<IApplicationUserService> _logger = logger;
+    private readonly ILogger<IUserSettingsService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
+    /// <inheritdoc />
     public async Task<IUserSettingsResponse> ReadUserSettingsAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -25,6 +33,7 @@ public class UserSettingsService(
             var userSettings = new UserSettings { UserID = userData.Id };
 
             userData.UserSettings = userSettings;
+
             _userDataContext.UserSettings.Add(userSettings);
             await _userDataContext.SaveChangesAsync();
         }
@@ -32,69 +41,64 @@ public class UserSettingsService(
         return new UserSettingsResponse(userData.UserSettings);
     }
 
-    public async Task UpdateUserSettingsAsync(
-        Guid userGuid,
-        IUserSettingsUpdateRequest userSettingsUpdateRequest
-    )
+    /// <inheritdoc />
+    public async Task UpdateUserSettingsAsync(Guid userGuid, IUserSettingsUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var userSettings = userData.UserSettings;
-
         if (userSettings == null)
         {
-            _logger.LogError("User settings not found for user with ID {UserId}", userGuid);
-            throw new BudgetBoardServiceException("User settings not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["UserSettingsNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["UserSettingsNotFoundError"]);
         }
 
-        if (userSettingsUpdateRequest.Currency != null)
+        if (request.Currency != null)
         {
-            userSettings.Currency = userSettingsUpdateRequest.Currency;
-        }
-
-        if (userSettingsUpdateRequest.BudgetWarningThreshold != null)
-        {
-            if (
-                userSettingsUpdateRequest.BudgetWarningThreshold < 0
-                || userSettingsUpdateRequest.BudgetWarningThreshold > 100
-            )
+            var isValidCurrency = LocalizationHelpers.CurrencyCodes.Contains(request.Currency);
+            if (!isValidCurrency)
             {
-                _logger.LogError(
-                    "Invalid budget warning threshold value: {ThresholdValue}",
-                    userSettingsUpdateRequest.BudgetWarningThreshold
-                );
+                _logger.LogError("{LogMessage}", _logLocalizer["InvalidCurrencyCodeLog"]);
                 throw new BudgetBoardServiceException(
-                    "Budget warning threshold must be between 0% and 100%."
+                    _responseLocalizer["InvalidCurrencyCodeError"]
                 );
             }
 
-            userSettings.BudgetWarningThreshold = (int)
-                userSettingsUpdateRequest.BudgetWarningThreshold;
+            userSettings.Currency = request.Currency;
         }
 
-        if (userSettingsUpdateRequest.ForceSyncLookbackMonths != null)
+        if (request.BudgetWarningThreshold != null)
         {
-            if (
-                userSettingsUpdateRequest.ForceSyncLookbackMonths < 0
-                || userSettingsUpdateRequest.ForceSyncLookbackMonths > 12
-            )
+            if (request.BudgetWarningThreshold < 0 || request.BudgetWarningThreshold > 100)
             {
-                _logger.LogError(
-                    "Invalid force sync lookback months value: {LookbackValue}",
-                    userSettingsUpdateRequest.ForceSyncLookbackMonths
-                );
+                _logger.LogError("{LogMessage}", _logLocalizer["InvalidBudgetWarningThresholdLog"]);
                 throw new BudgetBoardServiceException(
-                    "Force sync lookback months must be between 0 and 12 months."
+                    _responseLocalizer["InvalidBudgetWarningThresholdError"]
                 );
             }
-            userSettings.ForceSyncLookbackMonths = (int)
-                userSettingsUpdateRequest.ForceSyncLookbackMonths;
+
+            userSettings.BudgetWarningThreshold = (int)request.BudgetWarningThreshold;
         }
 
-        if (userSettingsUpdateRequest.DisableBuiltInTransactionCategories != null)
+        if (request.ForceSyncLookbackMonths != null)
+        {
+            if (request.ForceSyncLookbackMonths < 0 || request.ForceSyncLookbackMonths > 12)
+            {
+                _logger.LogError(
+                    "{LogMessage}",
+                    _logLocalizer["InvalidForceSyncLookbackMonthsLog"]
+                );
+                throw new BudgetBoardServiceException(
+                    _responseLocalizer["InvalidForceSyncLookbackMonthsError"]
+                );
+            }
+            userSettings.ForceSyncLookbackMonths = (int)request.ForceSyncLookbackMonths;
+        }
+
+        if (request.DisableBuiltInTransactionCategories != null)
         {
             userSettings.DisableBuiltInTransactionCategories = (bool)
-                userSettingsUpdateRequest.DisableBuiltInTransactionCategories;
+                request.DisableBuiltInTransactionCategories;
         }
 
         await _userDataContext.SaveChangesAsync();
@@ -102,30 +106,26 @@ public class UserSettingsService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.UserSettings)
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

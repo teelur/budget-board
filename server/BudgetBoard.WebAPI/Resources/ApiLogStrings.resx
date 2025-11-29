@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="UnexpectedErrorLog" xml:space="preserve">
+    <value>An unexpected error occurred.</value>
+  </data>
+  <data name="OidcCallbackStartedLog" xml:space="preserve">
+    <value>OIDC callback started.</value>
+  </data>
+  <data name="OidcNoAuthCodeLog" xml:space="preserve">
+    <value>No authorization code provided.</value>
+  </data>
+  <data name="OidcExchangeFailedLog" xml:space="preserve">
+    <value>Failed to exchange code for the user principal.</value>
+  </data>
+  <data name="OidcExchangeSucceededLog" xml:space="preserve">
+    <value>Token exchange succeeded. Claims count: {0}</value>
+  </data>
+  <data name="OidcProvisioningFailedLog" xml:space="preserve">
+    <value>User provisioning failed.</value>
+  </data>
+  <data name="OidcProvisioningSucceededLog" xml:space="preserve">
+    <value>User provisioning succeeded.</value>
+  </data>
+  <data name="OidcCallbackErrorLog" xml:space="preserve">
+    <value>Error occurred during OIDC callback processing.</value>
+  </data>
+  <data name="UserIdNotFoundLog" xml:space="preserve">
+    <value>User ID not found in the current context.</value>
+  </data>
+  <data name="UserNotFoundLog" xml:space="preserve">
+    <value>User not found for ID {UserId}.</value>
+  </data>
+  <data name="NoOidcLoginFoundLog" xml:space="preserve">
+    <value>No OIDC login found for user {UserId}.</value>
+  </data>
+  <data name="RemoveOidcNoPasswordLog" xml:space="preserve">
+    <value>Attempt to remove OIDC login for user {UserId} without a local password set.</value>
+  </data>
+  <data name="RemoveOidcFailedLog" xml:space="preserve">
+    <value>Failed to remove OIDC login for user {UserId}: {Errors}</value>
+  </data>
+  <data name="RemoveOidcSuccessLog" xml:space="preserve">
+    <value>Successfully removed OIDC login for user {UserId}</value>
+  </data>
+  <data name="SyncBackgroundJobStartLog" xml:space="preserve">
+    <value>Syncing SimpleFin data for {0}...</value>
+  </data>
+  <data name="SyncBackgroundJobSuccessLog" xml:space="preserve">
+    <value>Sync successful for {0}</value>
+  </data>
+  <data name="SyncBackgroundJobErrorLog" xml:space="preserve">
+    <value>Error syncing SimpleFin data for {0}</value>
+  </data>
+  <data name="OidcConfigurationMissingLog" xml:space="preserve">
+    <value>The OIDC configuration is missing.</value>
+  </data>
+  <data name="OidcTokenEndpointDiscoveryErrorLog" xml:space="preserve">
+    <value>Could not discover the token endpoint.</value>
+  </data>
+  <data name="OidcTokenExchangeFailedLog" xml:space="preserve">
+    <value>The token exchange failed or no ID token was received.</value>
+  </data>
+  <data name="OidcDiscoveryDocumentDeserializationErrorLog" xml:space="preserve">
+    <value>Failed to deserialize the discovery document.</value>
+  </data>
+  <data name="OidcJwksUriMissingLog" xml:space="preserve">
+    <value>The JWKS URI is missing from the discovery document.</value>
+  </data>
+  <data name="OidcSigningKeysRetrievalErrorLog" xml:space="preserve">
+    <value>Failed to retrieve signing keys from the JWKS endpoint.</value>
+  </data>
+  <data name="OidcRequiredClaimsMissingLog" xml:space="preserve">
+    <value>Required claims (sub and email) were not found in the ID token.</value>
+  </data>
+  <data name="OidcNoSigningKeysFoundLog" xml:space="preserve">
+    <value>No signing keys were found in the JWKS response.</value>
+  </data>
+  <data name="IdTokenValidatedLog" xml:space="preserve">
+    <value>The ID token was validated successfully.</value>
+  </data>
+  <data name="FetchingSigningKeysLog" xml:space="preserve">
+    <value>Fetching signing keys from: {0}</value>
+  </data>
+  <data name="FetchingDiscoveryDocumentLog" xml:space="preserve">
+    <value>Fetching discovery document from: {0}</value>
+  </data>
+  <data name="DiscoveryDocumentContentLog" xml:space="preserve">
+    <value>Discovery document content: {0}</value>
+  </data>
+  <data name="DiscoveryDocumentParsedLog" xml:space="preserve">
+    <value>Discovery document parsed. TokenEndpoint: {0}, Issuer: {1}</value>
+  </data>
+  <data name="DiscoveryDocumentFetchErrorLog" xml:space="preserve">
+    <value>Failed to get discovery document from {0}</value>
+  </data>
+  <data name="TokenExchangeErrorLog" xml:space="preserve">
+    <value>Token exchange failed with status {0}: {1}</value>
+  </data>
+  <data name="TokenExchangeRequestErrorLog" xml:space="preserve">
+    <value>Error during token exchange request</value>
+  </data>
+  <data name="IdTokenExpiredLog" xml:space="preserve">
+    <value>The ID token has expired.</value>
+  </data>
+  <data name="IdTokenInvalidSignatureLog" xml:space="preserve">
+    <value>The ID token has an invalid signature.</value>
+  </data>
+  <data name="IdTokenInvalidIssuerLog" xml:space="preserve">
+    <value>The ID token has an invalid issuer.</value>
+  </data>
+  <data name="IdTokenInvalidAudienceLog" xml:space="preserve">
+    <value>The ID token has an invalid audience.</value>
+  </data>
+  <data name="IdTokenValidationErrorLog" xml:space="preserve">
+    <value>An error occurred while validating the ID token.</value>
+  </data>
+  <data name="SigningKeysRetrievalSuccessLog" xml:space="preserve">
+    <value>Successfully retrieved {0} signing key(s)</value>
+  </data>
+  <data name="SigningKeysFetchErrorLog" xml:space="preserve">
+    <value>Failed to get signing keys from {0}</value>
+  </data>
+  <data name="UserProvisionedLog" xml:space="preserve">
+    <value>A new user was created via OIDC provisioning.</value>
+  </data>
+  <data name="UserFoundLog" xml:space="preserve">
+    <value>An existing user was found for OIDC login.</value>
+  </data>
+  <data name="ExternalProviderClaimsMissingLog" xml:space="preserve">
+    <value>The external provider did not provide the required claims (sub/nameidentifier and email).</value>
+  </data>
+  <data name="NewUserCreationDisabledLog" xml:space="preserve">
+    <value>New user creation is disabled.</value>
+  </data>
+  <data name="UserCreationErrorLog" xml:space="preserve">
+    <value>Failed to create a local user for the external login: {0}</value>
+  </data>
+  <data name="AddingLoginDisabledLog" xml:space="preserve">
+    <value>Adding OIDC login to existing users is disabled (DISABLE_NEW_USERS=true). Cannot add OIDC login for the user.</value>
+  </data>
+  <data name="AddingLoginErrorLog" xml:space="preserve">
+    <value>Failed to add an external login to user {0}: {1}</value>
+  </data>
+</root>

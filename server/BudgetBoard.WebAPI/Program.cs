@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
@@ -7,6 +6,7 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Jobs;
 using BudgetBoard.WebAPI.Services;
+using BudgetBoard.WebAPI.Utils;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -73,9 +73,9 @@ var connectionString = new string(
 
 System.Diagnostics.Debug.WriteLine("Connection string: " + connectionString);
 
-builder.Services.AddDbContext<UserDataContext>(o =>
-    o.UseNpgsql(connectionString, op => op.MapEnum<Currency>("currency"))
-);
+builder.Services.AddDbContext<UserDataContext>(o => o.UseNpgsql(connectionString));
+
+builder.Services.AddLocalization();
 
 var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 var disableLocalAuth = builder.Configuration.GetValue<bool>("DISABLE_LOCAL_AUTH");
@@ -149,13 +149,8 @@ if (!string.IsNullOrEmpty(emailSender) && !disableLocalAuth)
     builder.Services.AddTransient<IEmailSender, EmailSender>();
 }
 
-builder
-    .Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.Converters.Add(new FlexibleStringConverter());
-    });
+builder.Services.ConfigureOptions<ConfigureJsonOptions>();
+builder.Services.AddControllers();
 
 //Add support to logging with SERILOG
 builder.Host.UseSerilog(
@@ -228,7 +223,8 @@ builder.Services.AddScoped<IBalanceService, BalanceService>();
 builder.Services.AddScoped<ITransactionCategoryService, TransactionCategoryService>();
 builder.Services.AddScoped<IGoalService, GoalService>();
 builder.Services.AddScoped<IInstitutionService, InstitutionService>();
-builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
+builder.Services.AddScoped<ISyncService, SyncService>();
+builder.Services.AddScoped<ISyncProvider, SimpleFinService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();
@@ -290,6 +286,14 @@ app.MyMapIdentityApi<ApplicationUser>(
 
 // Activate the CORS policy
 app.UseCors(MyAllowSpecificOrigins);
+
+// Add localization support
+var supportedCultures = new[] { "en-US" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
 
 // Enable authentication and authorization after CORS Middleware
 // processing (UseCors) in case the Authorization Middleware tries

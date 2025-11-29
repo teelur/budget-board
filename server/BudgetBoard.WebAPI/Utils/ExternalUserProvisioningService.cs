@@ -1,14 +1,17 @@
 ﻿using System.Security.Claims;
 using BudgetBoard.Database.Models;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.Utils
 {
     public class ExternalUserProvisioningService(
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
-        ILogger<ExternalUserProvisioningService> logger
+        ILogger<ExternalUserProvisioningService> logger,
+        IStringLocalizer<ApiLogStrings> logLocalizer
     ) : IExternalUserProvisioningService
     {
         private readonly UserManager<ApplicationUser> _userManager =
@@ -17,6 +20,7 @@ namespace BudgetBoard.Utils
             configuration ?? throw new ArgumentNullException(nameof(configuration));
         private readonly ILogger<ExternalUserProvisioningService> _logger =
             logger ?? throw new ArgumentNullException(nameof(logger));
+        private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
 
         public async Task<bool> ProvisionExternalUserAsync(
             ClaimsPrincipal principal,
@@ -38,7 +42,8 @@ namespace BudgetBoard.Utils
             if (string.IsNullOrEmpty(providerKey) || string.IsNullOrEmpty(email))
             {
                 _logger.LogWarning(
-                    "External provider did not provide required claims (sub/nameidentifier and email)."
+                    "{LogMessage}",
+                    _logLocalizer["ExternalProviderClaimsMissingLog"]
                 );
                 return false;
             }
@@ -51,7 +56,7 @@ namespace BudgetBoard.Utils
                 var disableNewUsers = _configuration.GetValue<bool>("DISABLE_NEW_USERS");
                 if (disableNewUsers)
                 {
-                    _logger.LogWarning("New user creation is disabled.");
+                    _logger.LogWarning("{LogMessage}", _logLocalizer["NewUserCreationDisabledLog"]);
                     return false;
                 }
 
@@ -66,17 +71,20 @@ namespace BudgetBoard.Utils
                 if (!createResult.Succeeded)
                 {
                     _logger.LogWarning(
-                        "Failed to create local user for external login: {Errors}",
-                        string.Join(", ", createResult.Errors.Select(e => e.Description))
+                        "{LogMessage}",
+                        _logLocalizer[
+                            "UserCreationErrorLog",
+                            string.Join(", ", createResult.Errors.Select(e => e.Description))
+                        ]
                     );
                     return false;
                 }
 
-                _logger.LogInformation("Created new user via OIDC provisioning.");
+                _logger.LogInformation("{LogMessage}", _logLocalizer["UserProvisionedLog"]);
             }
             else
             {
-                _logger.LogInformation("Found existing user for OIDC login.");
+                _logger.LogInformation("{LogMessage}", _logLocalizer["UserFoundLog"]);
             }
 
             // Ensure external login association exists
@@ -90,9 +98,7 @@ namespace BudgetBoard.Utils
                 var disableNewUsers = _configuration.GetValue<bool>("DISABLE_NEW_USERS");
                 if (disableNewUsers)
                 {
-                    _logger.LogWarning(
-                        "Adding OIDC login to existing users is disabled (DISABLE_NEW_USERS=true). Cannot add OIDC login for user."
-                    );
+                    _logger.LogWarning("{LogMessage}", _logLocalizer["AddingLoginDisabledLog"]);
                     return false;
                 }
 
@@ -101,9 +107,12 @@ namespace BudgetBoard.Utils
                 if (!addLoginResult.Succeeded)
                 {
                     _logger.LogWarning(
-                        "Failed to add external login to user {UserId}: {Errors}",
-                        user.Id,
-                        string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
+                        "{LogMessage}",
+                        _logLocalizer[
+                            "AddingLoginErrorLog",
+                            user.Id,
+                            string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
+                        ]
                     );
                     return false;
                 }

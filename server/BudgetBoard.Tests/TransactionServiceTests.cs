@@ -4,6 +4,7 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -24,42 +25,21 @@ public class TransactionServiceTests
             .RuleFor(t => t.Source, f => f.Random.String(10));
 
     [Fact]
-    public async Task CreateTransactionAsync_InvalidUserId_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var transactionService = new TransactionService(
-            Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>()
-        );
-
-        var transaction = _transactionCreateRequestFaker.Generate();
-
-        // Act
-        Func<Task> act = async () =>
-            await transactionService.CreateTransactionAsync(Guid.NewGuid(), transaction);
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Provided user not found.");
-    }
-
-    [Fact]
     public async Task CreateTransactionAsync_ShouldCreateTransaction()
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -77,14 +57,43 @@ public class TransactionServiceTests
     }
 
     [Fact]
+    public async Task CreateTransactionAsync_InvalidUserId_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var transaction = _transactionCreateRequestFaker.Generate();
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionService.CreateTransactionAsync(Guid.NewGuid(), transaction);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidUserError");
+    }
+
+    [Fact]
     public async Task CreateTransactionAsync_WhenAccountDoesNotExist_ShouldThrowException()
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var transaction = _transactionCreateRequestFaker.Generate();
@@ -96,23 +105,25 @@ public class TransactionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The account you are trying to add a transaction to does not exist.");
+            .WithMessage("TransactionCreateAccountNotFoundError");
     }
 
     [Fact]
-    public async Task CreateTransactionAsync_WhenNewTransaction_ShouldUpdateBalance()
+    public async Task CreateTransactionAsync_WhenNewTransactionAndManualAccount_ShouldUpdateBalance()
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
         helper.UserDataContext.Accounts.Add(account);
@@ -142,18 +153,20 @@ public class TransactionServiceTests
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
-        var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
         balances[0].DateTime = fakeDate.AddDays(-10);
@@ -196,15 +209,17 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -228,14 +243,62 @@ public class TransactionServiceTests
     }
 
     [Fact]
+    public async Task ReadTransactionAsync_WhenGuidProvided_ShouldReturnTransaction()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(5);
+
+        account.Transactions = transactions;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var transactionToGet = transactions.First();
+
+        // Act
+        var result = await transactionService.ReadTransactionsAsync(
+            helper.demoUser.Id,
+            null,
+            null,
+            false,
+            transactionToGet.ID
+        );
+
+        // Assert
+        result.Should().NotBeNull();
+        result
+            .Should()
+            .ContainSingle()
+            .Which.Should()
+            .BeEquivalentTo(new TransactionResponse(transactionToGet));
+    }
+
+    [Fact]
     public async Task ReadTransactionsAsync_WhenTransactionDoesNotExist_ShouldThrowException()
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -251,7 +314,7 @@ public class TransactionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The transaction you are trying to access does not exist.");
+            .WithMessage("TransactionNotFoundError");
     }
 
     [Fact]
@@ -264,15 +327,17 @@ public class TransactionServiceTests
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -311,15 +376,17 @@ public class TransactionServiceTests
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -353,15 +420,17 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -389,15 +458,17 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -425,15 +496,17 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -469,10 +542,13 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var editedTransaction = new TransactionUpdateRequest
@@ -492,7 +568,7 @@ public class TransactionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The transaction you are trying to edit does not exist.");
+            .WithMessage("TransactionUpdateNotFoundError");
     }
 
     [Fact]
@@ -505,18 +581,20 @@ public class TransactionServiceTests
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
-        var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
         balances[0].DateTime = fakeDate.AddDays(-10);
@@ -573,15 +651,17 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -608,10 +688,13 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -621,7 +704,7 @@ public class TransactionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The transaction you are trying to delete does not exist.");
+            .WithMessage("TransactionDeleteNotFoundError");
     }
 
     [Fact]
@@ -634,18 +717,20 @@ public class TransactionServiceTests
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.Source = AccountSource.Manual;
 
-        var balanceFaker = new BalanceFaker() { AccountIds = [account.ID] };
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
         balances[0].DateTime = fakeDate.AddDays(-10);
@@ -696,15 +781,17 @@ public class TransactionServiceTests
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -738,7 +825,9 @@ public class TransactionServiceTests
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -748,45 +837,7 @@ public class TransactionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The transaction you are trying to restore does not exist.");
-    }
-
-    [Fact]
-    public async Task RestoreTransactionAsync_WhenTransactionIsNotDeleted_ShouldNotRestoreTransaction()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var transactionService = new TransactionService(
-            Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>()
-        );
-
-        var accountFaker = new AccountFaker();
-        var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
-
-        var transactionFaker = new TransactionFaker([account.ID]);
-        var transactions = transactionFaker.Generate(5);
-
-        account.Transactions = transactions;
-
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.SaveChanges();
-
-        var transactionToRestore = transactions.First();
-
-        // Act
-        await transactionService.RestoreTransactionAsync(
-            helper.demoUser.Id,
-            transactionToRestore.ID
-        );
-
-        // Assert
-        helper
-            .UserDataContext.Transactions.Single(t => t.ID == transactionToRestore.ID)
-            .Deleted.Should()
-            .BeNull();
+            .WithMessage("TransactionRestoreNotFoundError");
     }
 
     [Fact]
@@ -794,16 +845,17 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -855,10 +907,13 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var splitTransactionRequest = new TransactionSplitRequest
@@ -879,7 +934,7 @@ public class TransactionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The transaction you are trying to split does not exist.");
+            .WithMessage("TransactionSplitNotFoundError");
     }
 
     [Theory]
@@ -892,16 +947,17 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -931,7 +987,7 @@ public class TransactionServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The split amount must be less than the transaction amount.");
+            .WithMessage("TransactionSplitInvalidAmountError");
     }
 
     [Fact]
@@ -939,15 +995,17 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
@@ -973,5 +1031,51 @@ public class TransactionServiceTests
 
         // Assert
         helper.UserDataContext.Transactions.Should().HaveCount(5);
+    }
+
+    [Fact]
+    public async Task ImportTransactionsAsync_WhenAccountNotFound_ShouldThrowError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(5);
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var importRequest = new TransactionImportRequest
+        {
+            Transactions = transactions.Select(t => new TransactionImport
+            {
+                Date = t.Date,
+                Description = t.MerchantName ?? string.Empty,
+                Category = t.Category,
+                Amount = t.Amount,
+                Account = "bongus",
+            }),
+            AccountNameToIDMap = [],
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionService.ImportTransactionsAsync(helper.demoUser.Id, importRequest);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionImportAccountNotFoundError");
     }
 }

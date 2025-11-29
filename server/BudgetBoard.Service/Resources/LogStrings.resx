@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DuplicateSyncIDLog" xml:space="preserve">
+    <value>Attempted to create an account with a duplicate SyncID.</value>
+  </data>
+  <data name="InvalidInstitutionIDLog" xml:space="preserve">
+    <value>Attempted to create an account with an invalid institution ID.</value>
+  </data>
+  <data name="AccountNotFoundLog" xml:space="preserve">
+    <value>Attempted to access an account that does not exist.</value>
+  </data>
+  <data name="AccountEditNotFoundLog" xml:space="preserve">
+    <value>Attempted to edit an account that does not exist.</value>
+  </data>
+  <data name="AccountEditEmptyNameLog" xml:space="preserve">
+    <value>Attempted to edit an account with an empty name.</value>
+  </data>
+  <data name="AccountDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete an account that does not exist.</value>
+  </data>
+  <data name="AccountRestoreNotFoundLog" xml:space="preserve">
+    <value>Attempted to restore an account that does not exist.</value>
+  </data>
+  <data name="AccountOrderNotFoundLog" xml:space="preserve">
+    <value>Attempted to set index for account that does not exist.</value>
+  </data>
+  <data name="UserDataRetrievalErrorLog" xml:space="preserve">
+    <value>An error occurred while retrieving the user data: {0}</value>
+  </data>
+  <data name="InvalidUserErrorLog" xml:space="preserve">
+    <value>Attempted to access an invalid user.</value>
+  </data>
+  <data name="AssetNotFoundLog" xml:space="preserve">
+    <value>Attempted to access an asset that does not exist.</value>
+  </data>
+  <data name="AssetEditNotFoundLog" xml:space="preserve">
+    <value>Attempted to edit an asset that does not exist.</value>
+  </data>
+  <data name="DuplicateAssetNameLog" xml:space="preserve">
+    <value>Attempted to update an asset with a duplicate name.</value>
+  </data>
+  <data name="AssetDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete an asset that does not exist.</value>
+  </data>
+  <data name="AssetRestoreNotFoundLog" xml:space="preserve">
+    <value>Attempted to restore an asset that does not exist.</value>
+  </data>
+  <data name="AssetOrderNotFoundLog" xml:space="preserve">
+    <value>Attempted to set index for asset that does not exist.</value>
+  </data>
+  <data name="NoConditionsCreateLog" xml:space="preserve">
+    <value>Attempted to create an automatic rule with no conditions.</value>
+  </data>
+  <data name="NoActionsLog" xml:space="preserve">
+    <value>Attempted to create an automatic rule with no actions.</value>
+  </data>
+  <data name="AutomaticRuleUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update an automatic rule that does not exist.</value>
+  </data>
+  <data name="NoConditionsUpdateLog" xml:space="preserve">
+    <value>Attempted to update an automatic rule with no conditions.</value>
+  </data>
+  <data name="NoActionsUpdateLog" xml:space="preserve">
+    <value>Attempted to update an automatic rule with no actions.</value>
+  </data>
+  <data name="AutomaticRuleDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete an automatic rule that does not exist.</value>
+  </data>
+  <data name="InvalidConditionLog" xml:space="preserve">
+    <value>Encountered null condition in automatic rule.</value>
+  </data>
+  <data name="ErrorApplyingConditionLog" xml:space="preserve">
+    <value>Error applying condition.</value>
+  </data>
+  <data name="RuleMatchedTransactionsLog" xml:space="preserve">
+    <value>Rule matched {0} transactions.</value>
+  </data>
+  <data name="ErrorApplyingActionLog" xml:space="preserve">
+    <value>Error applying action: {ErrorMessage}</value>
+  </data>
+  <data name="RuleAppliedActionsLog" xml:space="preserve">
+    <value>Rule applied changes to {0} transactions.</value>
+  </data>
+  <data name="BalanceAccountCreateNotFoundLog" xml:space="preserve">
+    <value>Attempted to add a balance to an account that does not exist.</value>
+  </data>
+  <data name="BalanceAccountNotFoundLog" xml:space="preserve">
+    <value>Attempted to access balances for an account that does not exist.</value>
+  </data>
+  <data name="BalanceAccountUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a balance that does not exist.</value>
+  </data>
+  <data name="BalanceDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a balance that does not exist.</value>
+  </data>
+  <data name="BalanceRestoreNotFoundLog" xml:space="preserve">
+    <value>Attempted to restore a balance that does not exist.</value>
+  </data>
+  <data name="BudgetCreateDuplicateLog" xml:space="preserve">
+    <value>Attempted to create a duplicate budget for {Category} in {Month}.</value>
+  </data>
+  <data name="BudgetCreateCompletedLog" xml:space="preserve">
+    <value>Successfully created {0} budgets.</value>
+  </data>
+  <data name="ParentBudgetNotFoundLog" xml:space="preserve">
+    <value>Parent budget not found for category {0}.</value>
+  </data>
+  <data name="BudgetCopyCompletedLog" xml:space="preserve">
+    <value>Successfully copied {0} budgets.</value>
+  </data>
+  <data name="BudgetUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a budget that does not exist.</value>
+  </data>
+  <data name="BudgetUpdateParentLimitErrorLog" xml:space="preserve">
+    <value>Attempted to update parent budget to a value less than the sum of its children.</value>
+  </data>
+  <data name="BudgetDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a budget that does not exist.</value>
+  </data>
+  <data name="GoalCreateMissingContributionOrDateLog" xml:space="preserve">
+    <value>Attempt to create goal without a monthly contribution and target date.</value>
+  </data>
+  <data name="GoalCreatePastDateLog" xml:space="preserve">
+    <value>Attempt to create goal with a target date in the past.</value>
+  </data>
+  <data name="GoalCreateNoAccountsLog" xml:space="preserve">
+    <value>Attempt to create goal without associated accounts.</value>
+  </data>
+  <data name="GoalCreateInvalidAccountLog" xml:space="preserve">
+    <value>Attempt to create goal with an invalid account.</value>
+  </data>
+  <data name="GoalUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a goal that does not exist.</value>
+  </data>
+  <data name="GoalUpdatePastDateLog" xml:space="preserve">
+    <value>Attempt to update goal with a target date in the past.</value>
+  </data>
+  <data name="GoalUpdateNoMonthlyContributionLog" xml:space="preserve">
+    <value>Attempt to update goal without a monthly contribution.</value>
+  </data>
+  <data name="GoalDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a goal that does not exist.</value>
+  </data>
+  <data name="GoalCompleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to complete a goal that does not exist.</value>
+  </data>
+  <data name="GoalCompleteAlreadyCompletedLog" xml:space="preserve">
+    <value>Attempted to complete a goal that is already completed.</value>
+  </data>
+  <data name="InstitutionCreateDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to create an institution with a duplicate name.</value>
+  </data>
+  <data name="InstitutionNotFoundLog" xml:space="preserve">
+    <value>Attempted to access an institution that does not exist.</value>
+  </data>
+  <data name="InstitutionUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update an institution that does not exist.</value>
+  </data>
+  <data name="InstitutionUpdateEmptyNameLog" xml:space="preserve">
+    <value>Attempted to update an institution with an empty name.</value>
+  </data>
+  <data name="InstitutionUpdateDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to update an institution with a duplicate name.</value>
+  </data>
+  <data name="InstitutionDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete an institution that does not exist.</value>
+  </data>
+  <data name="InstitutionDeleteHasAccountsLog" xml:space="preserve">
+    <value>Attempted to delete an institution that has undeleted accounts.</value>
+  </data>
+  <data name="InstitutionOrderNotFoundLog" xml:space="preserve">
+    <value>Attempted to set index for institution that does not exist.</value>
+  </data>
+  <data name="TransactionCategoryCreateDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to create a transaction category with a duplicate name.</value>
+  </data>
+  <data name="TransactionCategoryCreateEmptyNameLog" xml:space="preserve">
+    <value>Attempted to create a transaction category with an empty name.</value>
+  </data>
+  <data name="TransactionCategoryCreateSameNameAsParentLog" xml:space="preserve">
+    <value>Attempted to create a transaction category with the same name as its parent.</value>
+  </data>
+  <data name="TransactionCategoryCreateParentNotFoundLog" xml:space="preserve">
+    <value>Attempted to create a transaction category with a parent that does not exist.</value>
+  </data>
+  <data name="TransactioCategoryNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a transaction category that does not exist.</value>
+  </data>
+  <data name="TransactionCategoryUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a transaction category that does not exist.</value>
+  </data>
+  <data name="TransactionCategoryUpdateDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to update a transaction category with a duplicate name.</value>
+  </data>
+  <data name="TransactionCategoryUpdateEmptyNameLog" xml:space="preserve">
+    <value>Attempted to update a transaction category with an empty name.</value>
+  </data>
+  <data name="TransactionCategoryUpdateSameNameAsParentLog" xml:space="preserve">
+    <value>Attempted to update a transaction category with the same name as its parent.</value>
+  </data>
+  <data name="TransactionCategoryUpdateParentNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a transaction category with a parent that does not exist.</value>
+  </data>
+  <data name="TransactionCategoryDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a transaction category that does not exist.</value>
+  </data>
+  <data name="TransactionCategoryDeleteInUseByTransactionsLog" xml:space="preserve">
+    <value>Attempted to delete a transaction category that is in use by existing transactions.</value>
+  </data>
+  <data name="TransactionCategoryDeleteInUseByBudgetsLog" xml:space="preserve">
+    <value>Attempted to delete a transaction category that is in use by existing budgets.</value>
+  </data>
+  <data name="TransactionCategoryDeleteHasChildrenLog" xml:space="preserve">
+    <value>Attempted to delete a transaction category that has child categories.</value>
+  </data>
+  <data name="TransactionCategoryRestoreNotFoundLog" xml:space="preserve">
+    <value>Attempted to restore a transaction category that does not exist.</value>
+  </data>
+  <data name="TransactionCreateAccountNotFoundLog" xml:space="preserve">
+    <value>Attempted to create a transaction for an account that does not exist.</value>
+  </data>
+  <data name="TransactioNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a transaction that does not exist.</value>
+  </data>
+  <data name="TransactionUpdateNotFoundLog" xml:space="preserve"> xml:space="preserve">
+    <value>Attempted to update a transaction that does not exist.</value>
+  </data>
+  <data name="TransactionDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a transaction that does not exist.</value>
+  </data>
+  <data name="TransactionRestoreNotFoundLog" xml:space="preserve">
+    <value>Attempted to restore a transaction that does not exist.</value>
+  </data>
+  <data name="TransactionSplitNotFoundLog" xml:space="preserve">
+    <value>Attempted to split a transaction that does not exist.</value>
+  </data>
+  <data name="TransactionSplitInvalidAmountLog" xml:space="preserve">
+    <value>Attempt to split transaction with amount less than or equal to the split amount.</value>
+  </data>
+  <data name="TransactionSplitNoAccountLog" xml:space="preserve">
+    <value>Attempted to split a transaction for an account that does not exist.</value>
+  </data>
+  <data name="TransactionImportAccountNotFoundLog" xml:space="preserve">
+    <value>Attempted to import transactions for an account that does not exist.</value>
+  </data>
+  <data name="UserSettingsNotFoundLog" xml:space="preserve">
+    <value>Attempted to access user settings for a user that does not exist.</value>
+  </data>
+  <data name="InvalidCurrencyCodeLog" xml:space="preserve">
+    <value>Attempted to update user settings with an invalid currency code.</value>
+  </data>
+  <data name="InvalidBudgetWarningThresholdLog" xml:space="preserve">
+    <value>Attempted to update user settings with an invalid budget threshold value.</value>
+  </data>
+  <data name="InvalidForceSyncLookbackMonthsLog" xml:space="preserve">
+    <value>Attempted to update user settings with an invalid force sync lookback months value.</value>
+  </data>
+  <data name="ValueCreateAssetNotFoundLog" xml:space="preserve">
+    <value>Attempted to create a value for an asset that does not exist.</value>
+  </data>
+  <data name="ValueAssetNotFoundLog" xml:space="preserve">
+    <value>Attempted to access values for an asset that does not exist.</value>
+  </data>
+  <data name="ValueUpdateAssetNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a value for an asset that does not exist.</value>
+  </data>
+  <data name="ValueDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a value that does not exist.</value>
+  </data>
+  <data name="ValueRestoreNotFoundLog" xml:space="preserve">
+    <value>Attempted to restore a value that does not exist.</value>
+  </data>
+  <data name="SimpleFinTokenConfiguredLog" xml:space="preserve">
+    <value>SimpleFIN token is configured. Syncing bank data.</value>
+  </data>
+  <data name="SimpleFinSyncingTransactionsLog" xml:space="preserve">
+    <value>Syncing transactions from {0} (Unix time {1})</value>
+  </data>
+  <data name="SimpleFinDataRetrievalErrorLog" xml:space="preserve">
+    <value>Attempt to sync SimpleFIN data was unsuccessful.</value>
+  </data>
+  <data name="SimpleFinDataNotFoundLog" xml:space="preserve">
+    <value>SimpleFIN data not found.</value>
+  </data>
+  <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
+    <value>SimpleFIN account {0} is deleted. Skipping.</value>
+  </data>
+  <data name="SimpleFinOrganizationMissingIdLog" xml:space="preserve">
+    <value>SimpleFIN organization for account {0} is missing one of Name or Domain. Skipping account sync.</value>
+  </data>
+  <data name="SyncInstitutionCreationErrorLog" xml:space="preserve">
+    <value>Error creating institution for SimpleFIN account {0}</value>
+  </data>
+  <data name="SimpleFinAccountNotFoundForTransactionLog" xml:space="preserve">
+    <value>SimpleFIN account with SyncID {0} not found for transaction. Skipping transactions sync.</value>
+  </data>
+  <data name="SimpleFinAccountNotFoundForBalanceLog" xml:space="preserve">
+    <value>SimpleFIN account with SyncID {0} not found for balance. Skipping balances sync.</value>
+  </data>
+  <data name="SimpleFinTokenNotConfiguredLog" xml:space="preserve">
+    <value>SimpleFIN token is not configured. Skipping bank sync.</value>
+  </data>
+  <data name="SimpleFinDecodeTokenErrorLog" xml:space="preserve">
+    <value>Attempt to decode setup token was unsuccessful.</value>
+  </data>
+  <data name="SimpleFinInvalidAccessTokenLog" xml:space="preserve">
+    <value>Attempt to update user with invalid access token.</value>
+  </data>
+  <data name="SimpleFinDeserializationErrorLog" xml:space="preserve">
+    <value>Error deserializing SimpleFin data: {0}</value>
+  </data>
+  <data name="GoalNoBalanceFoundLog" xml:space="preserve">
+    <value>No balance found for goal {0}</value>
+  </data>
+</root>

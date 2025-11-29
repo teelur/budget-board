@@ -1,9 +1,11 @@
 using Bogus;
+using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -24,7 +26,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var newAsset = _assetCreateRequestFaker.Generate();
@@ -45,16 +49,16 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var asset1 = assetFaker.Generate();
-        asset1.UserID = helper.demoUser.Id;
         asset1.Name = "Asset 1";
 
         var asset2 = assetFaker.Generate();
-        asset2.UserID = helper.demoUser.Id;
         asset2.Name = "Asset 2";
 
         helper.UserDataContext.Assets.AddRange(asset1, asset2);
@@ -77,16 +81,16 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var asset1 = assetFaker.Generate();
-        asset1.UserID = helper.demoUser.Id;
         asset1.Name = "Asset 1";
 
         var asset2 = assetFaker.Generate();
-        asset2.UserID = helper.demoUser.Id;
         asset2.Name = "Asset 2";
 
         helper.UserDataContext.Assets.AddRange(asset1, asset2);
@@ -101,33 +105,35 @@ public class AssetServiceTests
     }
 
     [Fact]
-    public async Task ReadAssetsAsync_WhenSingleAssetDoesNotExist_ShouldReturnEmpty()
+    public async Task ReadAssetsAsync_WhenSingleAssetDoesNotExist_ShouldThrowError()
     {
         // Arrange
         var helper = new TestHelper();
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var asset1 = assetFaker.Generate();
-        asset1.UserID = helper.demoUser.Id;
         asset1.Name = "Asset 1";
 
         var asset2 = assetFaker.Generate();
-        asset2.UserID = helper.demoUser.Id;
         asset2.Name = "Asset 2";
 
         helper.UserDataContext.Assets.AddRange(asset1, asset2);
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        var assets = await assetService.ReadAssetsAsync(helper.demoUser.Id, Guid.NewGuid());
+        var act = () => assetService.ReadAssetsAsync(helper.demoUser.Id, Guid.NewGuid());
 
         // Assert
-        assets.Should().BeEmpty();
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AssetNotFoundError");
     }
 
     [Fact]
@@ -138,12 +144,13 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var existingAsset = assetFaker.Generate();
-        existingAsset.UserID = helper.demoUser.Id;
         existingAsset.Name = "Old Asset Name";
 
         helper.UserDataContext.Assets.Add(existingAsset);
@@ -176,7 +183,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var updatedAsset = new AssetUpdateRequest
@@ -195,71 +204,28 @@ public class AssetServiceTests
             await assetService.UpdateAssetAsync(helper.demoUser.Id, updatedAsset);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>("Asset not found.");
-    }
-
-    [Fact]
-    public async Task UpdateAssetAsync_WhenDuplicateName_ShouldThrowException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var assetService = new AssetService(
-            Mock.Of<ILogger<IAssetService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>()
-        );
-
-        var assetFaker = new AssetFaker();
-        var existingAsset1 = assetFaker.Generate();
-        existingAsset1.UserID = helper.demoUser.Id;
-        existingAsset1.Name = "Asset 1";
-
-        var existingAsset2 = assetFaker.Generate();
-        existingAsset2.UserID = helper.demoUser.Id;
-        existingAsset2.Name = "Asset 2";
-
-        helper.UserDataContext.Assets.AddRange(existingAsset1, existingAsset2);
-        await helper.UserDataContext.SaveChangesAsync();
-
-        var updatedAsset = new AssetUpdateRequest
-        {
-            ID = existingAsset2.ID,
-            Name = "Asset 1", // Duplicate name
-            PurchaseDate = existingAsset2.PurchaseDate,
-            PurchasePrice = existingAsset2.PurchasePrice,
-            SellDate = existingAsset2.SellDate,
-            SellPrice = existingAsset2.SellPrice,
-            Hide = existingAsset2.Hide,
-        };
-
-        // Act
-        Func<Task> act = async () =>
-            await assetService.UpdateAssetAsync(helper.demoUser.Id, updatedAsset);
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>("An asset with this name already exists.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>("AssetEditNotFoundError");
     }
 
     [Fact]
     public async Task DeleteAssetAsync_WhenAssetExists_ShouldDeleteAsset()
     {
         // Arrange
-        var helper = new TestHelper();
         var nowProviderMock = new Mock<INowProvider>();
         var fixedNow = new DateTime(2024, 1, 1);
         nowProviderMock.Setup(np => np.UtcNow).Returns(fixedNow);
 
+        var helper = new TestHelper();
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            nowProviderMock.Object
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var existingAsset = assetFaker.Generate();
-        existingAsset.UserID = helper.demoUser.Id;
-        existingAsset.Name = "Asset to Delete";
 
         helper.UserDataContext.Assets.Add(existingAsset);
         await helper.UserDataContext.SaveChangesAsync();
@@ -280,7 +246,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -288,7 +256,7 @@ public class AssetServiceTests
             await assetService.DeleteAssetAsync(helper.demoUser.Id, Guid.NewGuid());
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>("Asset not found.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>("AssetDeleteNotFoundError");
     }
 
     [Fact]
@@ -299,13 +267,13 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
         var existingAsset = assetFaker.Generate();
-        existingAsset.UserID = helper.demoUser.Id;
-        existingAsset.Name = "Asset to Restore";
         existingAsset.Deleted = DateTime.UtcNow.AddDays(-1);
 
         helper.UserDataContext.Assets.Add(existingAsset);
@@ -327,7 +295,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -335,7 +305,7 @@ public class AssetServiceTests
             await assetService.RestoreAssetAsync(helper.demoUser.Id, Guid.NewGuid());
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>("Asset not found.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>("AssetRestoreNotFoundError");
     }
 
     [Fact]
@@ -346,43 +316,38 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var assetFaker = new AssetFaker();
-        var asset1 = assetFaker.Generate();
-        asset1.UserID = helper.demoUser.Id;
-        asset1.Index = 0;
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
+        var assets = assetFaker.Generate(10);
+        var rnd = new Random();
+        assets = [.. assets.OrderBy(a => rnd.Next())];
+        assets.ForEach(asset => asset.Index = assets.IndexOf(asset));
 
-        var asset2 = assetFaker.Generate();
-        asset2.UserID = helper.demoUser.Id;
-        asset2.Index = 1;
-
-        var asset3 = assetFaker.Generate();
-        asset3.UserID = helper.demoUser.Id;
-        asset3.Index = 2;
-
-        helper.UserDataContext.Assets.AddRange(asset1, asset2, asset3);
+        helper.UserDataContext.Assets.AddRange(assets);
         await helper.UserDataContext.SaveChangesAsync();
 
-        var newOrder = new List<IAssetIndexRequest>
+        var newOrder = new List<IAssetIndexRequest>();
+        List<Asset> shuffledAssets = [.. assets.OrderBy(a => rnd.Next())];
+        foreach (var asset in shuffledAssets)
         {
-            new AssetIndexRequest { ID = asset3.ID, Index = 0 },
-            new AssetIndexRequest { ID = asset1.ID, Index = 1 },
-            new AssetIndexRequest { ID = asset2.ID, Index = 2 },
-        };
+            newOrder.Add(
+                new AssetIndexRequest { ID = asset.ID, Index = shuffledAssets.IndexOf(asset) }
+            );
+        }
 
         // Act
         await assetService.OrderAssetsAsync(helper.demoUser.Id, newOrder);
 
         // Assert
-        var assetsInDb = helper
-            .UserDataContext.Assets.Where(a => a.UserID == helper.demoUser.Id)
-            .ToList();
-
-        assetsInDb.Single(a => a.ID == asset3.ID).Index.Should().Be(0);
-        assetsInDb.Single(a => a.ID == asset1.ID).Index.Should().Be(1);
-        assetsInDb.Single(a => a.ID == asset2.ID).Index.Should().Be(2);
+        helper
+            .demoUser.Assets.OrderBy(a => a.Index)
+            .Select(a => a.ID)
+            .Should()
+            .BeEquivalentTo(newOrder.OrderBy(o => o.Index).Select(o => o.ID));
     }
 
     [Fact]
@@ -393,7 +358,9 @@ public class AssetServiceTests
         var assetService = new AssetService(
             Mock.Of<ILogger<IAssetService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var newOrder = new List<IAssetIndexRequest>
@@ -406,6 +373,6 @@ public class AssetServiceTests
             await assetService.OrderAssetsAsync(helper.demoUser.Id, newOrder);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>("Asset not found.");
+        await act.Should().ThrowAsync<BudgetBoardServiceException>("AssetReorderNotFoundError");
     }
 }

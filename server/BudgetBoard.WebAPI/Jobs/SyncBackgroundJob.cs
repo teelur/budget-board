@@ -1,9 +1,9 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
-using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Quartz;
 
 namespace BudgetBoard.WebAPI.Jobs;
@@ -12,16 +12,18 @@ namespace BudgetBoard.WebAPI.Jobs;
 public class SyncBackgroundJob(
     ILogger<SyncBackgroundJob> logger,
     UserDataContext userDataContext,
-    ISimpleFinService simpleFinService,
+    ISyncService simpleFinService,
     IApplicationUserService applicationUserService,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ApiLogStrings> logLocalizer
 ) : IJob
 {
     private readonly ILogger _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly ISimpleFinService _simpleFinService = simpleFinService;
+    private readonly ISyncService _simpleFinService = simpleFinService;
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
     private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
 
     public async Task Execute(IJobExecutionContext context)
     {
@@ -38,15 +40,25 @@ public class SyncBackgroundJob(
         {
             try
             {
-                _logger.LogInformation("Syncing SimpleFin data for {user}...", user.Email);
+                _logger.LogInformation(
+                    "{LogMessage}",
+                    _logLocalizer["SyncBackgroundJobStartLog", user.Email ?? string.Empty]
+                );
 
                 await _simpleFinService.SyncAsync(user.Id);
 
-                _logger.LogInformation("Sync successful for {user}", user.Email);
+                _logger.LogInformation(
+                    "{LogMessage}",
+                    _logLocalizer["SyncBackgroundJobSuccessLog", user.Email ?? string.Empty]
+                );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error syncing SimpleFin data for {user}", user.Email);
+                _logger.LogError(
+                    ex,
+                    "{LogMessage}",
+                    _logLocalizer["SyncBackgroundJobErrorLog", user.Email ?? string.Empty]
+                );
             }
         }
     }

@@ -8,6 +8,7 @@ public class AutomaticRuleConstants
         public const string Date = "date";
         public const string Merchant = "merchant";
         public const string Category = "category";
+        public static readonly IEnumerable<string> AllFields = [Amount, Date, Merchant, Category];
     }
 
     public readonly struct ConditionalOperators

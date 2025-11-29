@@ -20,7 +20,6 @@ namespace BudgetBoard.Database.Migrations
                 .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "currency", new[] { "aud", "cad", "chf", "cny", "eur", "gbp", "inr", "jpy", "nzd", "sek", "usd" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("AccountGoal", b =>
@@ -416,9 +415,6 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<string>("MerchantName")
                         .HasColumnType("text");
-
-                    b.Property<bool>("Pending")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Source")
                         .IsRequired()

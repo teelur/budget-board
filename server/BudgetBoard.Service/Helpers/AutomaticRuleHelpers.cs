@@ -1,6 +1,8 @@
 ﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.Service.Helpers;
 
@@ -9,7 +11,8 @@ public static class AutomaticRuleHelpers
     public static IEnumerable<Transaction> FilterOnCondition(
         IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions,
-        IEnumerable<ICategory> allCategories
+        IEnumerable<ICategory> allCategories,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (
@@ -19,7 +22,7 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return FilterOnMerchantCondition(condition, transactions);
+            return FilterOnMerchantCondition(condition, transactions, responseLocalizer);
         }
         else if (
             condition.Field.Equals(
@@ -28,7 +31,12 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return FilterOnCategoryCondition(condition, transactions, allCategories);
+            return FilterOnCategoryCondition(
+                condition,
+                transactions,
+                allCategories,
+                responseLocalizer
+            );
         }
         else if (
             condition.Field.Equals(
@@ -37,7 +45,7 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return FilterOnAmountCondition(condition, transactions);
+            return FilterOnAmountCondition(condition, transactions, responseLocalizer);
         }
         else if (
             condition.Field.Equals(
@@ -46,11 +54,11 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return FilterOnDateCondition(condition, transactions);
+            return FilterOnDateCondition(condition, transactions, responseLocalizer);
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported field '{condition.Field}' in rule condition."
+            responseLocalizer["AutomaticRuleUnsupportedFieldError", condition.Field]
         );
     }
 
@@ -59,7 +67,8 @@ public static class AutomaticRuleHelpers
         IEnumerable<Transaction> transactions,
         IEnumerable<ICategory> allCategories,
         ITransactionService transactionService,
-        Guid userGuid
+        Guid userGuid,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (
@@ -91,7 +100,8 @@ public static class AutomaticRuleHelpers
                     action,
                     transactions,
                     transactionService,
-                    userGuid
+                    userGuid,
+                    responseLocalizer
                 );
             }
             else if (
@@ -106,7 +116,8 @@ public static class AutomaticRuleHelpers
                     transactions,
                     allCategories,
                     transactionService,
-                    userGuid
+                    userGuid,
+                    responseLocalizer
                 );
             }
             else if (
@@ -120,7 +131,8 @@ public static class AutomaticRuleHelpers
                     action,
                     transactions,
                     transactionService,
-                    userGuid
+                    userGuid,
+                    responseLocalizer
                 );
             }
             else if (
@@ -130,12 +142,18 @@ public static class AutomaticRuleHelpers
                 )
             )
             {
-                return await ApplyActionForDate(action, transactions, transactionService, userGuid);
+                return await ApplyActionForDate(
+                    action,
+                    transactions,
+                    transactionService,
+                    userGuid,
+                    responseLocalizer
+                );
             }
             else
             {
                 throw new BudgetBoardServiceException(
-                    $"Unsupported field '{action.Field}' in rule action."
+                    responseLocalizer["AutomaticRuleUnsupportedActionFieldError", action.Field]
                 );
             }
         }
@@ -143,7 +161,8 @@ public static class AutomaticRuleHelpers
 
     private static IEnumerable<Transaction> FilterOnMerchantCondition(
         IRuleParameterRequest condition,
-        IEnumerable<Transaction> transactions
+        IEnumerable<Transaction> transactions,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         // Equals
@@ -252,20 +271,24 @@ public static class AutomaticRuleHelpers
             catch (ArgumentException)
             {
                 throw new BudgetBoardServiceException(
-                    $"The regex pattern '{condition.Value}' is not valid."
+                    responseLocalizer["AutomaticRuleInvalidRegexError", condition.Value]
                 );
             }
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported operator '{condition.Operator}' for Merchant field."
+            responseLocalizer[
+                "AutomaticRuleUnsupportedOperatorForMerchantError",
+                condition.Operator
+            ]
         );
     }
 
     private static IEnumerable<Transaction> FilterOnCategoryCondition(
         IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions,
-        IEnumerable<ICategory> allCategories
+        IEnumerable<ICategory> allCategories,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (
@@ -274,7 +297,7 @@ public static class AutomaticRuleHelpers
         )
         {
             throw new BudgetBoardServiceException(
-                $"The category '{condition.Value}' does not exist."
+                responseLocalizer["AutomaticRuleCategoryDoesNotExistError", condition.Value]
             );
         }
 
@@ -324,19 +347,23 @@ public static class AutomaticRuleHelpers
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported operator '{condition.Operator}' for Category field."
+            responseLocalizer[
+                "AutomaticRuleUnsupportedOperatorForCategoryError",
+                condition.Operator
+            ]
         );
     }
 
     private static IEnumerable<Transaction> FilterOnAmountCondition(
         IRuleParameterRequest condition,
-        IEnumerable<Transaction> transactions
+        IEnumerable<Transaction> transactions,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (!decimal.TryParse(condition.Value, out var conditionAmount))
         {
             throw new BudgetBoardServiceException(
-                $"The amount '{condition.Value}' is not a valid decimal number."
+                responseLocalizer["AutomaticRuleInvalidAmountError", condition.Value]
             );
         }
 
@@ -382,19 +409,20 @@ public static class AutomaticRuleHelpers
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported operator '{condition.Operator}' for Amount field."
+            responseLocalizer["AutomaticRuleUnsupportedOperatorForAmountError", condition.Operator]
         );
     }
 
     private static IEnumerable<Transaction> FilterOnDateCondition(
         IRuleParameterRequest condition,
-        IEnumerable<Transaction> transactions
+        IEnumerable<Transaction> transactions,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (!DateTime.TryParse(condition.Value, out var conditionDate))
         {
             throw new BudgetBoardServiceException(
-                $"The date '{condition.Value}' is not a valid date."
+                responseLocalizer["AutomaticRuleInvalidDateError", condition.Value]
             );
         }
 
@@ -430,7 +458,7 @@ public static class AutomaticRuleHelpers
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported operator '{condition.Operator}' for Date field."
+            responseLocalizer["AutomaticRuleUnsupportedOperatorForDateError", condition.Operator]
         );
     }
 
@@ -438,7 +466,8 @@ public static class AutomaticRuleHelpers
         IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
         ITransactionService transactionService,
-        Guid userGuid
+        Guid userGuid,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (
@@ -462,7 +491,7 @@ public static class AutomaticRuleHelpers
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported operator '{action.Operator}' in rule action."
+            responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
         );
     }
 
@@ -471,7 +500,8 @@ public static class AutomaticRuleHelpers
         IEnumerable<Transaction> transactions,
         IEnumerable<ICategory> allCategories,
         ITransactionService transactionService,
-        Guid userGuid
+        Guid userGuid,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (
@@ -498,7 +528,7 @@ public static class AutomaticRuleHelpers
                 else
                 {
                     throw new BudgetBoardServiceException(
-                        $"The category '{action.Value}' does not exist."
+                        responseLocalizer["AutomaticRuleCategoryNotFoundError", action.Value]
                     );
                 }
             }
@@ -529,7 +559,7 @@ public static class AutomaticRuleHelpers
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported operator '{action.Operator}' in rule action."
+            responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
         );
     }
 
@@ -537,7 +567,8 @@ public static class AutomaticRuleHelpers
         IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
         ITransactionService transactionService,
-        Guid userGuid
+        Guid userGuid,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (
@@ -550,7 +581,7 @@ public static class AutomaticRuleHelpers
             if (!decimal.TryParse(action.Value, out var newAmount))
             {
                 throw new BudgetBoardServiceException(
-                    $"The amount '{action.Value}' is not a valid decimal number."
+                    responseLocalizer["AutomaticRuleInvalidAmountError", action.Value]
                 );
             }
 
@@ -568,7 +599,7 @@ public static class AutomaticRuleHelpers
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported operator '{action.Operator}' in rule action."
+            responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
         );
     }
 
@@ -576,7 +607,8 @@ public static class AutomaticRuleHelpers
         IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
         ITransactionService transactionService,
-        Guid userGuid
+        Guid userGuid,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (
@@ -589,7 +621,7 @@ public static class AutomaticRuleHelpers
             if (!DateTime.TryParse(action.Value, out var newDate))
             {
                 throw new BudgetBoardServiceException(
-                    $"The date '{action.Value}' is not a valid date."
+                    responseLocalizer["AutomaticRuleInvalidDateError", action.Value]
                 );
             }
 
@@ -607,7 +639,7 @@ public static class AutomaticRuleHelpers
         }
 
         throw new BudgetBoardServiceException(
-            $"Unsupported operator '{action.Operator}' in rule action."
+            responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
         );
     }
 }

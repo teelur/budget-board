@@ -5,13 +5,11 @@ namespace BudgetBoard.IntegrationTests.Fakers;
 
 public class BalanceFaker : Faker<Balance>
 {
-    public ICollection<Guid> AccountIds { get; set; }
-    public BalanceFaker()
+    public BalanceFaker(ICollection<Guid> accountIds)
     {
-        AccountIds = [];
-
         RuleFor(b => b.ID, f => Guid.NewGuid())
             .RuleFor(b => b.Amount, f => f.Finance.Amount())
-            .RuleFor(b => b.DateTime, f => f.Date.Past());
+            .RuleFor(b => b.DateTime, f => f.Date.Past())
+            .RuleFor(b => b.AccountID, f => f.PickRandom(accountIds));
     }
 }

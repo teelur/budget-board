@@ -4,6 +4,7 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -24,14 +25,16 @@ public class ValueServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var asset = new AssetFaker().Generate();
-        asset.UserID = helper.demoUser.Id;
+        var asset = new AssetFaker(helper.demoUser.Id).Generate();
 
         helper.UserDataContext.Assets.Add(asset);
         await helper.UserDataContext.SaveChangesAsync();
@@ -44,8 +47,7 @@ public class ValueServiceTests
 
         // Assert
         helper
-            .demoUser.Assets.SelectMany(a => a.Values)
-            .Should()
+            .UserDataContext.Values.Should()
             .ContainSingle(v =>
                 v.Amount == valueCreateRequest.Amount
                 && v.DateTime == valueCreateRequest.DateTime
@@ -54,14 +56,43 @@ public class ValueServiceTests
     }
 
     [Fact]
+    public async Task CreateValueAsync_WhenUserInvalid_ShouldThrowError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var valueService = new ValueService(
+            Mock.Of<ILogger<IValueService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var valueCreateRequest = _valueCreateRequestFaker.Generate();
+
+        // Act
+        Func<Task> act = async () =>
+            await valueService.CreateValueAsync(Guid.NewGuid(), valueCreateRequest);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidUserError");
+    }
+
+    [Fact]
     public async Task CreateValueAsync_WhenAssetDoesNotExist_ShouldThrowException()
     {
         // Arrange
         var helper = new TestHelper();
+
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var valueCreateRequest = _valueCreateRequestFaker.Generate();
@@ -73,7 +104,7 @@ public class ValueServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The asset you are trying to add a value to does not exist.");
+            .WithMessage("ValueCreateAssetNotFoundError");
     }
 
     [Fact]
@@ -81,14 +112,16 @@ public class ValueServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var asset = new AssetFaker().Generate();
-        asset.UserID = helper.demoUser.Id;
+        var asset = new AssetFaker(helper.demoUser.Id).Generate();
 
         var values = new ValueFaker().Generate(3);
         values.ForEach(v => v.AssetID = asset.ID);
@@ -105,36 +138,20 @@ public class ValueServiceTests
     }
 
     [Fact]
-    public async Task ReadValuesAsync_WhenNoValuesExist_ShouldReturnEmptyList()
+    public async Task ReadValuesAsync_WhenInvalidAssetId_ShouldThrowError()
     {
         // Arrange
         var helper = new TestHelper();
+
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        // Act
-        var returnedValues = await valueService.ReadValuesAsync(helper.demoUser.Id, Guid.NewGuid());
-
-        // Assert
-        returnedValues.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task ReadValuesAsync_WhenValueGuidNotFound_ShouldReturnEmptyList()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var valueService = new ValueService(
-            Mock.Of<ILogger<IValueService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>()
-        );
-
-        var asset = new AssetFaker().Generate();
-        asset.UserID = helper.demoUser.Id;
+        var asset = new AssetFaker(helper.demoUser.Id).Generate();
 
         var values = new ValueFaker().Generate(3);
         values.ForEach(v => v.AssetID = asset.ID);
@@ -144,10 +161,13 @@ public class ValueServiceTests
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        var returnedValues = await valueService.ReadValuesAsync(helper.demoUser.Id, Guid.NewGuid());
+        Func<Task> act = async () =>
+            await valueService.ReadValuesAsync(helper.demoUser.Id, Guid.NewGuid());
 
         // Assert
-        returnedValues.Should().BeEmpty();
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("ValueAssetNotFoundError");
     }
 
     [Fact]
@@ -155,14 +175,16 @@ public class ValueServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var asset = new AssetFaker().Generate();
-        asset.UserID = helper.demoUser.Id;
+        var asset = new AssetFaker(helper.demoUser.Id).Generate();
 
         var value = new ValueFaker().Generate();
         value.AssetID = asset.ID;
@@ -200,7 +222,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var editedValue = new ValueUpdateRequest
@@ -217,7 +241,7 @@ public class ValueServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The value you are trying to update does not exist.");
+            .WithMessage("ValueUpdateNotFoundError");
     }
 
     [Fact]
@@ -228,11 +252,12 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var asset = new AssetFaker().Generate();
-        asset.UserID = helper.demoUser.Id;
+        var asset = new AssetFaker(helper.demoUser.Id).Generate();
 
         var value = new ValueFaker().Generate();
         value.AssetID = asset.ID;
@@ -259,7 +284,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -269,7 +296,7 @@ public class ValueServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The value you are trying to delete does not exist.");
+            .WithMessage("ValueDeleteNotFoundError");
     }
 
     [Fact]
@@ -277,14 +304,16 @@ public class ValueServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var asset = new AssetFaker().Generate();
-        asset.UserID = helper.demoUser.Id;
+        var asset = new AssetFaker(helper.demoUser.Id).Generate();
 
         var value = new ValueFaker().RuleFor(v => v.Deleted, f => f.Date.Past()).Generate();
         value.AssetID = asset.ID;
@@ -311,7 +340,9 @@ public class ValueServiceTests
         var valueService = new ValueService(
             Mock.Of<ILogger<IValueService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -321,6 +352,6 @@ public class ValueServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The value you are trying to restore does not exist.");
+            .WithMessage("ValueRestoreNotFoundError");
     }
 }

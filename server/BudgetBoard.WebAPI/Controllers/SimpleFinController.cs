@@ -2,9 +2,11 @@
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Controllers;
 
@@ -13,12 +15,16 @@ namespace BudgetBoard.WebAPI.Controllers;
 public class SimpleFinController(
     ILogger<SimpleFinController> logger,
     UserManager<ApplicationUser> userManager,
-    ISimpleFinService simpleFinService
+    ISyncService simpleFinService,
+    IStringLocalizer<ApiLogStrings> logLocalizer,
+    IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
     private readonly ILogger<SimpleFinController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly ISimpleFinService _simpleFinService = simpleFinService;
+    private readonly ISyncService _simpleFinService = simpleFinService;
+    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
+    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
 
     [HttpGet]
     [Authorize]
@@ -38,8 +44,8 @@ public class SimpleFinController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -61,8 +67,8 @@ public class SimpleFinController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 }

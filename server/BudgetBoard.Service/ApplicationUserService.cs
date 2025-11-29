@@ -2,20 +2,27 @@
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
 public class ApplicationUserService(
     ILogger<IApplicationUserService> logger,
-    UserDataContext userDataContext
+    UserDataContext userDataContext,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IApplicationUserService
 {
     private readonly ILogger<IApplicationUserService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
+    /// <inheritdoc />
     public async Task<IApplicationUserResponse> ReadApplicationUserAsync(
         Guid userGuid,
         UserManager<ApplicationUser> userManager
@@ -23,7 +30,6 @@ public class ApplicationUserService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        // Check if user has OIDC login
         var logins = await userManager.GetLoginsAsync(userData);
         var hasOidcLogin = logins.Any(l => l.LoginProvider == "oidc");
         var hasLocalLogin = logins.Any(l => l.LoginProvider == "local");
@@ -31,39 +37,37 @@ public class ApplicationUserService(
         return new ApplicationUserResponse(userData, hasOidcLogin, hasLocalLogin);
     }
 
-    public async Task UpdateApplicationUserAsync(Guid userGuid, IApplicationUserUpdateRequest user)
+    /// <inheritdoc />
+    public async Task UpdateApplicationUserAsync(
+        Guid userGuid,
+        IApplicationUserUpdateRequest request
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        userData.LastSync = user.LastSync;
-
+        _userDataContext.Entry(userData).CurrentValues.SetValues(request);
         await _userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext.ApplicationUsers.ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+            foundUser = await _userDataContext.ApplicationUsers.FirstOrDefaultAsync(u =>
+                u.Id == new Guid(id)
+            );
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
-            );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["UserRetrievalErrorLog", ex.Message]);
+            throw new BudgetBoardServiceException(_responseLocalizer["UserRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

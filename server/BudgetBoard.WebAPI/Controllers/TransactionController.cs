@@ -2,9 +2,11 @@
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Controllers;
 
@@ -13,12 +15,16 @@ namespace BudgetBoard.WebAPI.Controllers;
 public class TransactionController(
     ILogger<TransactionController> logger,
     UserManager<ApplicationUser> userManager,
-    ITransactionService transactionService
+    ITransactionService transactionService,
+    IStringLocalizer<ApiLogStrings> logLocalizer,
+    IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
     private readonly ILogger<TransactionController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly ITransactionService _transactionService = transactionService;
+    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
+    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
 
     [HttpPost]
     [Authorize]
@@ -38,8 +44,8 @@ public class TransactionController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -64,8 +70,8 @@ public class TransactionController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -91,8 +97,8 @@ public class TransactionController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -114,8 +120,8 @@ public class TransactionController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -137,8 +143,8 @@ public class TransactionController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -161,8 +167,8 @@ public class TransactionController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -185,8 +191,8 @@ public class TransactionController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -209,8 +215,8 @@ public class TransactionController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 }

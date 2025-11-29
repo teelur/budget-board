@@ -5,12 +5,12 @@ namespace BudgetBoard.Service.Models;
 
 public interface IGoalCreateRequest
 {
-    string Name { get; set; }
-    DateTime? CompleteDate { get; set; }
-    decimal Amount { get; set; }
-    decimal? InitialAmount { get; set; }
-    decimal? MonthlyContribution { get; set; }
-    IEnumerable<Guid> AccountIds { get; set; }
+    string Name { get; }
+    DateTime? CompleteDate { get; }
+    decimal Amount { get; }
+    decimal? InitialAmount { get; }
+    decimal? MonthlyContribution { get; }
+    IEnumerable<Guid> AccountIds { get; }
 }
 
 public class GoalCreateRequest : IGoalCreateRequest
@@ -36,13 +36,13 @@ public class GoalCreateRequest : IGoalCreateRequest
 
 public interface IGoalUpdateRequest
 {
-    Guid ID { get; set; }
-    string Name { get; set; }
-    DateTime? CompleteDate { get; set; }
-    bool IsCompleteDateEditable { get; set; }
-    decimal Amount { get; set; }
-    decimal? MonthlyContribution { get; set; }
-    bool IsMonthlyContributionEditable { get; set; }
+    Guid ID { get; }
+    string Name { get; }
+    DateTime? CompleteDate { get; }
+    bool IsCompleteDateEditable { get; }
+    decimal Amount { get; }
+    decimal? MonthlyContribution { get; }
+    bool IsMonthlyContributionEditable { get; }
 }
 
 public class GoalUpdateRequest : IGoalUpdateRequest
@@ -67,20 +67,20 @@ public class GoalUpdateRequest : IGoalUpdateRequest
 
 public interface IGoalResponse
 {
-    Guid ID { get; set; }
-    string Name { get; set; }
-    DateTime CompleteDate { get; set; }
-    bool IsCompleteDateEditable { get; set; }
-    decimal Amount { get; set; }
-    decimal InitialAmount { get; set; }
-    decimal MonthlyContribution { get; set; }
-    bool IsMonthlyContributionEditable { get; set; }
-    decimal MonthlyContributionProgress { get; set; }
-    decimal? InterestRate { get; set; }
-    DateTime? Completed { get; set; }
-    decimal PercentComplete { get; set; }
-    IEnumerable<IAccountResponse> Accounts { get; set; }
-    Guid UserID { get; set; }
+    Guid ID { get; }
+    string Name { get; }
+    DateTime CompleteDate { get; }
+    bool IsCompleteDateEditable { get; }
+    decimal Amount { get; }
+    decimal InitialAmount { get; }
+    decimal MonthlyContribution { get; }
+    bool IsMonthlyContributionEditable { get; }
+    decimal MonthlyContributionProgress { get; }
+    decimal? InterestRate { get; }
+    DateTime? Completed { get; }
+    decimal PercentComplete { get; }
+    IEnumerable<IAccountResponse> Accounts { get; }
+    Guid UserID { get; }
 }
 
 public class GoalResponse : IGoalResponse

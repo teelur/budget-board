@@ -3,7 +3,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -11,46 +13,61 @@ namespace BudgetBoard.Service;
 public class ValueService(
     ILogger<IValueService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IValueService
 {
     private readonly ILogger<IValueService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
-    public async Task CreateValueAsync(Guid userGuid, IValueCreateRequest value)
+    /// <inheritdoc />
+    public async Task CreateValueAsync(Guid userGuid, IValueCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var asset = userData.Assets.FirstOrDefault(a => a.ID == value.AssetID);
+        var asset = userData.Assets.FirstOrDefault(a => a.ID == request.AssetID);
         if (asset == null)
         {
-            _logger.LogError("Attempt to add value to asset that does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueCreateAssetNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "The asset you are trying to add a value to does not exist."
+                _responseLocalizer["ValueCreateAssetNotFoundError"]
             );
         }
 
         var newValue = new Value()
         {
-            DateTime = value.DateTime,
-            Amount = value.Amount,
-            AssetID = value.AssetID,
+            DateTime = request.DateTime,
+            Amount = request.Amount,
+            AssetID = request.AssetID,
         };
 
-        asset.Values.Add(newValue);
+        _userDataContext.Values.Add(newValue);
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IValueResponse>> ReadValuesAsync(Guid userGuid, Guid assetId)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IValueResponse>> ReadValuesAsync(Guid userGuid, Guid assetId)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var values = userData.Assets.Where(a => a.ID == assetId).SelectMany(a => a.Values);
+        var asset = userData.Assets.FirstOrDefault(a => a.ID == assetId);
+        if (asset == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueAssetNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["ValueAssetNotFoundError"]);
+        }
 
-        return values.Select(v => new ValueResponse(v));
+        return asset
+            .Values.Where(v => v.Deleted == null)
+            .Select(v => new ValueResponse(v))
+            .ToList();
     }
 
+    /// <inheritdoc />
     public async Task UpdateValueAsync(Guid userGuid, IValueUpdateRequest editedValue)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -60,18 +77,15 @@ public class ValueService(
             .FirstOrDefault(v => v.ID == editedValue.ID);
         if (value == null)
         {
-            _logger.LogError("Attempt to update value that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The value you are trying to update does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["ValueUpdateNotFoundError"]);
         }
 
-        value.DateTime = editedValue.DateTime;
-        value.Amount = editedValue.Amount;
-
+        _userDataContext.Entry(value).CurrentValues.SetValues(editedValue);
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteValueAsync(Guid userGuid, Guid valueGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -81,17 +95,15 @@ public class ValueService(
             .FirstOrDefault(v => v.ID == valueGuid);
         if (value == null)
         {
-            _logger.LogError("Attempt to delete value that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The value you are trying to delete does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["ValueDeleteNotFoundError"]);
         }
 
         value.Deleted = _nowProvider.UtcNow;
-
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task RestoreValueAsync(Guid userGuid, Guid valueGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -101,45 +113,35 @@ public class ValueService(
             .FirstOrDefault(v => v.ID == valueGuid);
         if (value == null)
         {
-            _logger.LogError("Attempt to restore value that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The value you are trying to restore does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueRestoreNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["ValueRestoreNotFoundError"]);
         }
 
         value.Deleted = null;
-
         await _userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.Assets)
                 .ThenInclude(a => a.Values)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
-            );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["UserDataRetrievalError", ex.Message]);
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserError"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

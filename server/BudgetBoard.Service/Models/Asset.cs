@@ -4,7 +4,7 @@ namespace BudgetBoard.Service.Models;
 
 public interface IAssetCreateRequest
 {
-    string Name { get; set; }
+    string Name { get; }
 }
 
 public class AssetCreateRequest() : IAssetCreateRequest
@@ -14,17 +14,17 @@ public class AssetCreateRequest() : IAssetCreateRequest
 
 public interface IAssetResponse
 {
-    Guid ID { get; set; }
-    string Name { get; set; }
-    decimal? CurrentValue { get; set; }
-    DateTime? PurchaseDate { get; set; }
-    decimal? PurchasePrice { get; set; }
-    DateTime? SellDate { get; set; }
-    decimal? SellPrice { get; set; }
-    bool Hide { get; set; }
-    DateTime? Deleted { get; set; }
-    int Index { get; set; }
-    Guid UserID { get; set; }
+    Guid ID { get; }
+    string Name { get; }
+    decimal? CurrentValue { get; }
+    DateTime? PurchaseDate { get; }
+    decimal? PurchasePrice { get; }
+    DateTime? SellDate { get; }
+    decimal? SellPrice { get; }
+    bool Hide { get; }
+    DateTime? Deleted { get; }
+    int Index { get; }
+    Guid UserID { get; }
 }
 
 public class AssetResponse() : IAssetResponse
@@ -62,13 +62,13 @@ public class AssetResponse() : IAssetResponse
 
 public interface IAssetUpdateRequest
 {
-    Guid ID { get; set; }
-    string Name { get; set; }
-    DateTime? PurchaseDate { get; set; }
-    decimal? PurchasePrice { get; set; }
-    DateTime? SellDate { get; set; }
-    decimal? SellPrice { get; set; }
-    bool Hide { get; set; }
+    Guid ID { get; }
+    string Name { get; }
+    DateTime? PurchaseDate { get; }
+    decimal? PurchasePrice { get; }
+    DateTime? SellDate { get; }
+    decimal? SellPrice { get; }
+    bool Hide { get; }
 }
 
 public class AssetUpdateRequest() : IAssetUpdateRequest
@@ -84,8 +84,8 @@ public class AssetUpdateRequest() : IAssetUpdateRequest
 
 public interface IAssetIndexRequest
 {
-    Guid ID { get; set; }
-    int Index { get; set; }
+    Guid ID { get; }
+    int Index { get; }
 }
 
 public class AssetIndexRequest() : IAssetIndexRequest

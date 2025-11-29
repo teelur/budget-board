@@ -4,6 +4,7 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -24,29 +25,6 @@ public class BalanceServiceTests
             .RuleFor(b => b.DateTime, f => f.Date.Past());
 
     [Fact]
-    public async Task CreateBalanceAsync_InvalidUserId_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var balanceService = new BalanceService(
-            Mock.Of<ILogger<IBalanceService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>()
-        );
-
-        var balanceCreateRequest = _balanceCreateRequestFaker.Generate();
-
-        // Act
-        Func<Task> act = async () =>
-            await balanceService.CreateBalancesAsync(Guid.NewGuid(), balanceCreateRequest);
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("Provided user not found.");
-    }
-
-    [Fact]
     public async Task CreateBalancesAsync_WhenCalledWithValidData_ShouldCreateBalances()
     {
         // Arrange
@@ -54,12 +32,13 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -76,6 +55,31 @@ public class BalanceServiceTests
     }
 
     [Fact]
+    public async Task CreateBalanceAsync_InvalidUserId_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var balanceService = new BalanceService(
+            Mock.Of<ILogger<IBalanceService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var balanceCreateRequest = _balanceCreateRequestFaker.Generate();
+
+        // Act
+        Func<Task> act = async () =>
+            await balanceService.CreateBalancesAsync(Guid.NewGuid(), balanceCreateRequest);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidUserError");
+    }
+
+    [Fact]
     public async Task CreateBalancesAsync_WhenCalledWithInvalidAccountID_ShouldThrowException()
     {
         // Arrange
@@ -83,7 +87,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var balanceCreateRequest = _balanceCreateRequestFaker.Generate();
@@ -95,7 +101,7 @@ public class BalanceServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The account you are trying to add a balance to does not exist.");
+            .WithMessage("BalanceAccountCreateNotFoundError");
     }
 
     [Fact]
@@ -106,15 +112,15 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
-        var balanceFaker = new BalanceFaker();
-        balanceFaker.AccountIds.Add(account.ID);
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(3);
 
         account.Balances = balances;
@@ -137,7 +143,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -147,7 +155,7 @@ public class BalanceServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The account you are trying to read a balance from does not exist.");
+            .WithMessage("BalanceAccountNotFoundError");
     }
 
     [Fact]
@@ -158,15 +166,15 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
-        var balanceFaker = new BalanceFaker();
-        balanceFaker.AccountIds.Add(account.ID);
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balance = balanceFaker.Generate();
 
         account.Balances.Add(balance);
@@ -193,7 +201,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var balanceUpdateRequest = _balanceUpdateRequestFaker.Generate();
@@ -205,7 +215,7 @@ public class BalanceServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The balance you are trying to update does not exist.");
+            .WithMessage("BalanceUpdateNotFoundError");
     }
 
     [Fact]
@@ -216,15 +226,15 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
-        var balanceFaker = new BalanceFaker();
-        balanceFaker.AccountIds.Add(account.ID);
+        var balanceFaker = new BalanceFaker([account.ID]);
         var balance = balanceFaker.Generate();
 
         account.Balances.Add(balance);
@@ -247,7 +257,9 @@ public class BalanceServiceTests
         var balanceService = new BalanceService(
             Mock.Of<ILogger<IBalanceService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>()
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         // Act
@@ -257,6 +269,61 @@ public class BalanceServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("The balance you are trying to delete does not exist.");
+            .WithMessage("BalanceDeleteNotFoundError");
+    }
+
+    [Fact]
+    public async Task RestoreBalanceAsync_WhenCalledWithValidData_ShouldRestoreBalance()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var balanceService = new BalanceService(
+            Mock.Of<ILogger<IBalanceService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balance = balanceFaker.Generate();
+        balance.Deleted = DateTime.UtcNow;
+
+        account.Balances.Add(balance);
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await balanceService.RestoreBalanceAsync(helper.demoUser.Id, balance.ID);
+
+        // Assert
+        helper.UserDataContext.Balances.Single().Deleted.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task RestoreBalanceAsync_WhenCalledWithInvalidBalanceID_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var balanceService = new BalanceService(
+            Mock.Of<ILogger<IBalanceService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await balanceService.RestoreBalanceAsync(helper.demoUser.Id, Guid.NewGuid());
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("BalanceRestoreNotFoundError");
     }
 }

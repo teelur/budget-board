@@ -1,5 +1,9 @@
 ﻿namespace BudgetBoard.Database.Models;
 
+/// <summary>
+/// Supported currency codes.
+/// </summary>
+[Obsolete("Currency enum is deprecated. Use ISO 4217 currency codes instead.")]
 public enum Currency
 {
     USD, // US Dollar
@@ -15,13 +19,40 @@ public enum Currency
     NZD, // New Zealand Dollar
 }
 
-public class UserSettings()
+public class UserSettings
 {
-    public Guid ID { get; set; }
+    /// <summary>
+    /// Unique identifier for the user settings.
+    /// </summary>
+    public Guid ID { get; set; } = Guid.NewGuid();
+
+    /// <summary>
+    /// The preferred currency code for the user.
+    /// </summary>
     public string Currency { get; set; } = "USD";
+
+    /// <summary>
+    /// The percentage threshold for budget warnings.
+    /// </summary>
     public int BudgetWarningThreshold { get; set; } = 80;
+
+    /// <summary>
+    /// Number of months to look back for forced sync operations.
+    /// </summary>
     public int ForceSyncLookbackMonths { get; set; } = 0;
+
+    /// <summary>
+    /// Indicates whether built-in transaction categories are disabled.
+    /// </summary>
     public bool DisableBuiltInTransactionCategories { get; set; } = false;
-    public Guid UserID { get; set; }
-    public ApplicationUser User { get; set; } = null!;
+
+    /// <summary>
+    /// Identifier for the user who owns these settings.
+    /// </summary>
+    public required Guid UserID { get; set; }
+
+    /// <summary>
+    /// Reference to the owning user.
+    /// </summary>
+    public ApplicationUser? User { get; set; } = null;
 }

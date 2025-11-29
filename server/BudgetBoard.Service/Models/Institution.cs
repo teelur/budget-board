@@ -5,7 +5,7 @@ namespace BudgetBoard.Service.Models;
 
 public interface IInstitutionCreateRequest
 {
-    string Name { get; set; }
+    string Name { get; }
 }
 
 public class InstitutionCreateRequest : IInstitutionCreateRequest
@@ -21,8 +21,8 @@ public class InstitutionCreateRequest : IInstitutionCreateRequest
 
 public interface IInstitutionUpdateRequest
 {
-    Guid ID { get; set; }
-    string Name { get; set; }
+    Guid ID { get; }
+    string Name { get; }
 }
 
 public class InstitutionUpdateRequest : IInstitutionUpdateRequest
@@ -40,8 +40,8 @@ public class InstitutionUpdateRequest : IInstitutionUpdateRequest
 
 public interface IInstitutionIndexRequest
 {
-    Guid ID { get; set; }
-    int Index { get; set; }
+    Guid ID { get; }
+    int Index { get; }
 }
 
 public class InstitutionIndexRequest : IInstitutionIndexRequest
@@ -52,11 +52,11 @@ public class InstitutionIndexRequest : IInstitutionIndexRequest
 
 public interface IInstitutionResponse
 {
-    Guid ID { get; set; }
-    string Name { get; set; }
-    int Index { get; set; }
-    Guid UserID { get; set; }
-    IEnumerable<IAccountResponse> Accounts { get; set; }
+    Guid ID { get; }
+    string Name { get; }
+    int Index { get; }
+    Guid UserID { get; }
+    IEnumerable<IAccountResponse> Accounts { get; }
 }
 
 public class InstitutionResponse : IInstitutionResponse

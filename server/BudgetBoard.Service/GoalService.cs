@@ -3,7 +3,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -11,57 +13,58 @@ namespace BudgetBoard.Service;
 public class GoalService(
     ILogger<IGoalService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IGoalService
 {
     private readonly ILogger<IGoalService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
-    public async Task CreateGoalAsync(Guid userGuid, IGoalCreateRequest createdGoal)
+    /// <inheritdoc />
+    public async Task CreateGoalAsync(Guid userGuid, IGoalCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         if (
-            (createdGoal.MonthlyContribution == 0 || !createdGoal.MonthlyContribution.HasValue)
-            && !createdGoal.CompleteDate.HasValue
+            (request.MonthlyContribution == 0 || !request.MonthlyContribution.HasValue)
+            && !request.CompleteDate.HasValue
         )
         {
             _logger.LogError(
-                "Attempt to create goal without a monthly contribution and target date."
+                "{LogMessage}",
+                _logLocalizer["GoalCreateMissingContributionOrDateLog"]
             );
             throw new BudgetBoardServiceException(
-                "A goal must have a monthly contribution or target date."
+                _responseLocalizer["GoalCreateMissingContributionOrDateError"]
             );
         }
 
-        if (
-            createdGoal.CompleteDate.HasValue
-            && createdGoal.CompleteDate.Value < _nowProvider.UtcNow
-        )
+        if (request.CompleteDate.HasValue && request.CompleteDate.Value < _nowProvider.UtcNow)
         {
-            _logger.LogError("Attempt to create goal with a target date in the past.");
-            throw new BudgetBoardServiceException("A goal cannot have a target date in the past.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalCreatePastDateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalCreatePastDateError"]);
         }
 
-        if (!createdGoal.AccountIds.Any())
+        if (!request.AccountIds.Any())
         {
-            _logger.LogError("Attempt to create goal without any accounts.");
-            throw new BudgetBoardServiceException(
-                "A goal must be associated with at least one account."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalCreateNoAccountsLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalCreateNoAccountsError"]);
         }
 
         decimal runningBalance = 0.0M;
         var accounts = new List<Account>();
-        foreach (var accountId in createdGoal.AccountIds)
+        foreach (var accountId in request.AccountIds)
         {
             var account = userData.Accounts.FirstOrDefault((a) => a.ID == accountId);
             if (account == null)
             {
-                _logger.LogError("Attempt to create goal with invalid account.");
+                _logger.LogError("{LogMessage}", _logLocalizer["GoalCreateInvalidAccountLog"]);
                 throw new BudgetBoardServiceException(
-                    "The account you are trying to use does not exist."
+                    _responseLocalizer["GoalCreateInvalidAccountError"]
                 );
             }
 
@@ -72,35 +75,27 @@ public class GoalService(
 
         var newGoal = new Goal
         {
-            Name = createdGoal.Name,
-            CompleteDate = createdGoal.CompleteDate,
-            Amount = createdGoal.Amount,
-            MonthlyContribution = createdGoal.MonthlyContribution,
+            Name = request.Name,
+            CompleteDate = request.CompleteDate,
+            Amount = request.Amount,
+            InitialAmount = request.InitialAmount ?? runningBalance,
+            MonthlyContribution = request.MonthlyContribution,
             Accounts = accounts,
             UserID = userData.Id,
         };
 
-        if (!createdGoal.InitialAmount.HasValue)
-        {
-            // The frontend will set the initial balance if we don't want to include existing balances
-            // in the goal.
-            newGoal.InitialAmount = runningBalance;
-        }
-        else
-        {
-            newGoal.InitialAmount = createdGoal.InitialAmount.Value;
-        }
-
-        userData.Goals.Add(newGoal);
+        _userDataContext.Goals.Add(newGoal);
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IGoalResponse>> ReadGoalsAsync(
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IGoalResponse>> ReadGoalsAsync(
         Guid userGuid,
         bool includeInterest
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var goalsResponse = new List<IGoalResponse>();
         var goals = userData.Goals.ToList();
         foreach (var goal in goals)
@@ -126,84 +121,81 @@ public class GoalService(
         return goalsResponse;
     }
 
-    public async Task UpdateGoalAsync(Guid userGuid, IGoalUpdateRequest updatedGoal)
+    /// <inheritdoc />
+    public async Task UpdateGoalAsync(Guid userGuid, IGoalUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var goal = userData.Goals.FirstOrDefault(g => g.ID == updatedGoal.ID);
+
+        var goal = userData.Goals.FirstOrDefault(g => g.ID == request.ID);
         if (goal == null)
         {
-            _logger.LogError("Attempt to update goal that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The goal you are trying to update does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalUpdateNotFoundError"]);
         }
 
         if (
-            updatedGoal.CompleteDate.HasValue
-            && updatedGoal.IsCompleteDateEditable
-            && updatedGoal.CompleteDate.Value < _nowProvider.UtcNow
+            request.CompleteDate.HasValue
+            && request.IsCompleteDateEditable
+            && request.CompleteDate.Value < _nowProvider.UtcNow
         )
         {
-            _logger.LogError("Attempt to update goal with a target date in the past.");
-            throw new BudgetBoardServiceException("A goal cannot have a target date in the past.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdatePastDateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalUpdatePastDateError"]);
         }
 
-        if (
-            ((updatedGoal.MonthlyContribution ?? -1) <= 0)
-            && updatedGoal.IsMonthlyContributionEditable
-        )
+        if (((request.MonthlyContribution ?? -1) <= 0) && request.IsMonthlyContributionEditable)
         {
-            _logger.LogError("Attempt to update goal without a monthly contribution.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdateNoMonthlyContributionLog"]);
             throw new BudgetBoardServiceException(
-                "A goal must have a monthly contribution greater than 0."
+                _responseLocalizer["GoalUpdateNoMonthlyContributionError"]
             );
         }
 
-        goal.Name = updatedGoal.Name;
-        goal.Amount = updatedGoal.Amount;
-        goal.CompleteDate = updatedGoal.IsCompleteDateEditable
-            ? updatedGoal.CompleteDate
+        goal.Name = request.Name;
+        goal.Amount = request.Amount;
+        goal.CompleteDate = request.IsCompleteDateEditable
+            ? request.CompleteDate
             : goal.CompleteDate;
-        goal.MonthlyContribution = updatedGoal.IsMonthlyContributionEditable
-            ? updatedGoal.MonthlyContribution
+        goal.MonthlyContribution = request.IsMonthlyContributionEditable
+            ? request.MonthlyContribution
             : goal.MonthlyContribution;
 
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteGoalAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var goal = userData.Goals.FirstOrDefault(g => g.ID == guid);
         if (goal == null)
         {
-            _logger.LogError("Attempt to delete goal that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The goal you are trying to delete does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalDeleteNotFoundError"]);
         }
 
         _userDataContext.Goals.Remove(goal);
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task CompleteGoalAsync(Guid userGuid, Guid goalID, DateTime completedDate)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var goal = userData.Goals.FirstOrDefault(g => g.ID == goalID);
         if (goal == null)
         {
-            _logger.LogError("Attempt to complete goal that does not exist.");
-            throw new BudgetBoardServiceException(
-                "The goal you are trying to complete does not exist."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalCompleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalCompleteNotFoundError"]);
         }
 
         if (goal.Completed.HasValue)
         {
-            _logger.LogError("Attempt to complete goal that has already been completed.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalCompleteAlreadyCompletedLog"]);
             throw new BudgetBoardServiceException(
-                "The goal you are trying to complete has already been completed."
+                _responseLocalizer["GoalCompleteAlreadyCompletedError"]
             );
         }
 
@@ -211,37 +203,57 @@ public class GoalService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
+    public async Task CompleteGoalsAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var goals = userData.Goals.ToList();
+        foreach (var goal in goals)
+        {
+            // Skip goals that are already completed
+            if (goal.Completed.HasValue)
+                continue;
+
+            var percentComplete = CalculatePercentComplete(goal);
+
+            // Complete the goal if it's 100% complete
+            if (percentComplete >= 100.0M)
+            {
+                goal.Completed = _nowProvider.UtcNow;
+            }
+        }
+
+        await _userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.Goals)
                 .ThenInclude((g) => g.Accounts)
                 .ThenInclude((a) => a.Transactions)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;
@@ -291,7 +303,8 @@ public class GoalService(
                     numberOfMonthsLeftWithInterest = Math.Ceiling(
                         Math.Log(
                             (double)(
-                                ((goal.MonthlyContribution ?? 0) / monthlyInterestRate)
+                                (goal.MonthlyContribution ?? 0)
+                                / monthlyInterestRate
                                 / (
                                     ((goal.MonthlyContribution ?? 0) / monthlyInterestRate)
                                     - amountLeft
@@ -463,7 +476,7 @@ public class GoalService(
             return 0.0M;
         }
 
-        decimal percentComplete = (totalProgress / adjustedAmount) * 100.0M;
+        decimal percentComplete = totalProgress / adjustedAmount * 100.0M;
 
         return percentComplete > 100.0M ? 100.0M : percentComplete;
     }

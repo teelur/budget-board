@@ -3,7 +3,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -11,141 +13,112 @@ namespace BudgetBoard.Service;
 public class AutomaticRuleService(
     ILogger<IAutomaticRuleService> logger,
     UserDataContext userDataContext,
-    ITransactionService transactionService
+    ITransactionService transactionService,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
 ) : IAutomaticRuleService
 {
     private readonly ILogger<IAutomaticRuleService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly ITransactionService _transactionService = transactionService;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
-    public async Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest rule)
+    /// <inheritdoc />
+    public async Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (rule.Conditions.Count == 0)
+        if (request.Conditions.Count == 0)
         {
-            _logger.LogError("Attempt to create an automatic rule with no conditions.");
-            throw new BudgetBoardServiceException(
-                "At least one condition must be provided for the rule."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["NoConditionsCreateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["NoConditionsCreateError"]);
         }
 
-        if (rule.Actions.Count == 0)
+        if (request.Actions.Count == 0)
         {
-            _logger.LogError("Attempt to create an automatic rule with no actions.");
-            throw new BudgetBoardServiceException(
-                "At least one action must be provided for the rule."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["NoActionsCreateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["NoActionsCreateError"]);
         }
 
+        var newRuleId = Guid.NewGuid();
         var newRule = new AutomaticRule
         {
-            ID = Guid.NewGuid(),
+            ID = newRuleId,
             UserID = userData.Id,
             Conditions =
             [
-                .. rule.Conditions.Select(c => new RuleCondition
+                .. request.Conditions.Select(c => new RuleCondition
                 {
                     ID = Guid.NewGuid(),
                     Field = c.Field,
                     Operator = c.Operator,
                     Value = c.Value,
+                    RuleID = newRuleId,
                 }),
             ],
             Actions =
             [
-                .. rule.Actions.Select(a => new RuleAction
+                .. request.Actions.Select(a => new RuleAction
                 {
                     ID = Guid.NewGuid(),
                     Field = a.Field,
                     Operator = a.Operator,
                     Value = a.Value,
+                    RuleID = newRuleId,
                 }),
             ],
         };
 
         _userDataContext.AutomaticRules.Add(newRule);
-        try
-        {
-            await _userDataContext.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                "An error occurred while saving the automatic rule: {ExceptionMessage}",
-                ex.Message
-            );
-            throw new BudgetBoardServiceException(
-                "An error occurred while saving the automatic rule."
-            );
-        }
+        await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         return userData
             .AutomaticRules.Select(r => new AutomaticRuleResponse
             {
                 ID = r.ID,
-                Conditions =
-                [
-                    .. r.Conditions.Select(c => new RuleParameterResponse
-                    {
-                        ID = c.ID,
-                        Field = c.Field,
-                        Operator = c.Operator,
-                        Value = c.Value,
-                    }),
-                ],
-                Actions =
-                [
-                    .. r.Actions.Select(a => new RuleParameterResponse
-                    {
-                        ID = a.ID,
-                        Field = a.Field,
-                        Operator = a.Operator,
-                        Value = a.Value,
-                    }),
-                ],
+                Conditions = [.. r.Conditions.Select(c => new RuleParameterResponse(c))],
+                Actions = [.. r.Actions.Select(a => new RuleParameterResponse(a))],
             })
             .ToList();
     }
 
-    public async Task UpdateAutomaticRuleAsync(
-        Guid userGuid,
-        IAutomaticRuleUpdateRequest updatedRule
-    )
+    /// <inheritdoc />
+    public async Task UpdateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var existingRule = userData.AutomaticRules.FirstOrDefault(r => r.ID == updatedRule.ID);
 
+        var existingRule = userData.AutomaticRules.FirstOrDefault(r => r.ID == request.ID);
         if (existingRule == null)
         {
-            _logger.LogError("Attempt to update an automatic rule that does not exist.");
-            throw new BudgetBoardServiceException("Automatic rule not found.");
-        }
-
-        if (updatedRule.Conditions.Count == 0)
-        {
-            _logger.LogError("Attempt to update an automatic rule with no conditions.");
+            _logger.LogError("{LogMessage}", _logLocalizer["AutomaticRuleUpdateNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                "At least one condition must be provided for the rule."
+                _responseLocalizer["AutomaticRuleUpdateNotFoundError"]
             );
         }
 
-        if (updatedRule.Actions.Count == 0)
+        if (request.Conditions.Count == 0)
         {
-            _logger.LogError("Attempt to update an automatic rule with no actions.");
-            throw new BudgetBoardServiceException(
-                "At least one action must be provided for the rule."
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["NoConditionsUpdateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["NoConditionsUpdateError"]);
         }
 
-        existingRule.Conditions.Clear();
-        foreach (var condition in updatedRule.Conditions)
+        if (request.Actions.Count == 0)
         {
-            existingRule.Conditions.Add(
+            _logger.LogError("{LogMessage}", _logLocalizer["NoActionsUpdateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["NoActionsUpdateError"]);
+        }
+
+        _userDataContext.RuleConditions.RemoveRange(existingRule.Conditions);
+        foreach (var condition in request.Conditions)
+        {
+            _userDataContext.RuleConditions.Add(
                 new RuleCondition
                 {
                     Field = condition.Field,
@@ -156,10 +129,10 @@ public class AutomaticRuleService(
             );
         }
 
-        existingRule.Actions.Clear();
-        foreach (var action in updatedRule.Actions)
+        _userDataContext.RuleActions.RemoveRange(existingRule.Actions);
+        foreach (var action in request.Actions)
         {
-            existingRule.Actions.Add(
+            _userDataContext.RuleActions.Add(
                 new RuleAction
                 {
                     Field = action.Field,
@@ -170,22 +143,10 @@ public class AutomaticRuleService(
             );
         }
 
-        try
-        {
-            await _userDataContext.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                "An error occurred while updating the automatic rule: {ExceptionMessage}",
-                ex.Message
-            );
-            throw new BudgetBoardServiceException(
-                "An error occurred while updating the automatic rule."
-            );
-        }
+        await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteAutomaticRuleAsync(Guid userGuid, Guid ruleGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -193,111 +154,97 @@ public class AutomaticRuleService(
         var rule = userData.AutomaticRules.FirstOrDefault(r => r.ID == ruleGuid);
         if (rule == null)
         {
-            _logger.LogError("Attempt to delete an automatic rule that does not exist.");
-            throw new BudgetBoardServiceException("Automatic rule not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["AutomaticRuleDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["AutomaticRuleDeleteNotFoundError"]
+            );
         }
 
         userData.AutomaticRules.Remove(rule);
-        try
-        {
-            await _userDataContext.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                "An error occurred while deleting the automatic rule: {ExceptionMessage}",
-                ex.Message
-            );
-            throw new BudgetBoardServiceException(
-                "An error occurred while deleting the automatic rule."
-            );
-        }
+        await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<string> RunAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest rule)
+    /// <inheritdoc />
+    public async Task<string> RunAutomaticRuleAsync(
+        Guid userGuid,
+        IAutomaticRuleCreateRequest request
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
         {
             Value = tc.Value,
             Parent = tc.Parent,
         });
-
-        var allCategories =
-            userData.UserSettings?.DisableBuiltInTransactionCategories == true
-                ? customCategories
-                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                    customCategories
-                );
-
-        var matchedTransactions = userData
-            .Accounts.SelectMany(a => a.Transactions)
-            .Where(t => t.Deleted == null && !(t.Account?.HideTransactions ?? false));
-
-        foreach (var condition in rule.Conditions)
-        {
-            if (condition == null)
-            {
-                _logger.LogError("Encountered null condition in automatic rule.");
-                throw new BudgetBoardServiceException("Invalid condition in automatic rule.");
-            }
-
-            try
-            {
-                matchedTransactions = AutomaticRuleHelpers.FilterOnCondition(
-                    condition,
-                    matchedTransactions,
-                    allCategories
-                );
-            }
-            catch (BudgetBoardServiceException bbex)
-            {
-                _logger.LogError(bbex, "Error applying condition: {Message}", bbex.Message);
-                throw;
-            }
-        }
-        var matchedTransactionsCount = matchedTransactions.Count();
-        _logger.LogInformation(
-            "Rule matched {matchedTransactionsCount} transactions.",
-            matchedTransactionsCount
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            customCategories,
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
         );
 
-        int updatedCount = 0;
-
-        foreach (var action in rule.Actions)
-        {
-            try
-            {
-                updatedCount += await AutomaticRuleHelpers.ApplyActionToTransactions(
-                    action,
-                    matchedTransactions,
-                    allCategories,
-                    _transactionService,
-                    userData.Id
-                );
-            }
-            catch (BudgetBoardServiceException bbex)
-            {
-                _logger.LogError(bbex, "Error applying action: {Message}", bbex.Message);
-                continue;
-            }
-        }
-
+        int updatedCount = await RunAutomaticRule(userData, request, allCategories);
         _logger.LogInformation(
-            "Applied automatic rule, updated {UpdatedCount} transactions.",
-            updatedCount
+            "{LogMessage}",
+            _logLocalizer["RuleAppliedActionsLog", updatedCount]
         );
 
-        return $"Rule matched {matchedTransactionsCount} transactions and applied {updatedCount} changes.";
+        return _responseLocalizer["RuleRunSummary", updatedCount];
+    }
+
+    /// <inheritdoc />
+    public async Task RunAutomaticRulesAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
+        {
+            Value = tc.Value,
+            Parent = tc.Parent,
+        });
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            customCategories,
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
+        );
+
+        var rules = await ReadAutomaticRulesAsync(userGuid);
+        var ruleRequests = rules.Select(r => new AutomaticRuleCreateRequest
+        {
+            Conditions =
+            [
+                .. r.Conditions.Select(c => new RuleParameterCreateRequest
+                {
+                    Field = c.Field,
+                    Operator = c.Operator,
+                    Value = c.Value,
+                }),
+            ],
+            Actions =
+            [
+                .. r.Actions.Select(a => new RuleParameterCreateRequest
+                {
+                    Field = a.Field,
+                    Operator = a.Operator,
+                    Value = a.Value,
+                }),
+            ],
+        });
+
+        foreach (var rule in ruleRequests)
+        {
+            int updatedCount = await RunAutomaticRule(userData, rule, allCategories);
+            _logger.LogInformation(
+                "{LogMessage}",
+                _logLocalizer["RuleAppliedActionsLog", updatedCount]
+            );
+        }
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext
+            foundUser = await _userDataContext
                 .ApplicationUsers.Include(u => u.AutomaticRules)
                 .ThenInclude(r => r.Conditions)
                 .Include(u => u.AutomaticRules)
@@ -307,26 +254,120 @@ public class AutomaticRuleService(
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.UserSettings)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
             _logger.LogError(
-                "An error occurred while retrieving the user data: {ExceptionMessage}",
-                ex.Message
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
             );
-            throw new BudgetBoardServiceException(
-                "An error occurred while retrieving the user data."
-            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;
+    }
+
+    private async Task<int> RunAutomaticRule(
+        ApplicationUser userData,
+        IAutomaticRuleCreateRequest rule,
+        IEnumerable<ICategory> allCategories
+    )
+    {
+        var matchedTransactions = GetMatchingTransactions(
+            rule.Conditions,
+            userData.Accounts.SelectMany(a => a.Transactions),
+            allCategories
+        );
+
+        var matchedTransactionsCount = matchedTransactions.Count;
+        _logger.LogInformation(
+            "{LogMessage}",
+            _logLocalizer["RuleMatchedTransactionsLog", matchedTransactionsCount]
+        );
+
+        return await ApplyActionsToTransactions(
+            rule.Actions,
+            matchedTransactions,
+            allCategories,
+            userData.Id
+        );
+    }
+
+    private List<Transaction> GetMatchingTransactions(
+        IEnumerable<IRuleParameterRequest> conditions,
+        IEnumerable<Transaction> transactions,
+        IEnumerable<ICategory> allCategories
+    )
+    {
+        var matchedTransactions = transactions.Where(t =>
+            t.Deleted == null && !(t.Account?.HideTransactions ?? false)
+        );
+
+        foreach (var condition in conditions)
+        {
+            if (condition == null)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["InvalidConditionLog"]);
+                throw new BudgetBoardServiceException(_responseLocalizer["InvalidConditionError"]);
+            }
+
+            try
+            {
+                matchedTransactions = AutomaticRuleHelpers.FilterOnCondition(
+                    condition,
+                    matchedTransactions,
+                    allCategories,
+                    _responseLocalizer
+                );
+            }
+            catch (BudgetBoardServiceException bbex)
+            {
+                _logger.LogError(bbex, "{LogMessage}", _logLocalizer["ErrorApplyingConditionLog"]);
+                throw;
+            }
+        }
+
+        return [.. matchedTransactions];
+    }
+
+    private async Task<int> ApplyActionsToTransactions(
+        IEnumerable<IRuleParameterRequest> actions,
+        IEnumerable<Transaction> transactions,
+        IEnumerable<ICategory> allCategories,
+        Guid userId
+    )
+    {
+        int updatedCount = 0;
+        foreach (var action in actions)
+        {
+            try
+            {
+                updatedCount += await AutomaticRuleHelpers.ApplyActionToTransactions(
+                    action,
+                    transactions,
+                    allCategories,
+                    _transactionService,
+                    userId,
+                    _responseLocalizer
+                );
+            }
+            catch (BudgetBoardServiceException bbex)
+            {
+                _logger.LogError(
+                    bbex,
+                    "{LogMessage}",
+                    _logLocalizer["ErrorApplyingActionLog", bbex.Message]
+                );
+                continue;
+            }
+        }
+        return updatedCount;
     }
 }

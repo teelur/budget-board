@@ -2,11 +2,51 @@
 
 namespace BudgetBoard.Service.Interfaces;
 
+/// <summary>
+/// Service for managing automatic rules that apply actions to transactions based on conditions.
+/// </summary>
 public interface IAutomaticRuleService
 {
-    Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest rule);
-    Task<IEnumerable<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid);
-    Task UpdateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleUpdateRequest rule);
+    /// <summary>
+    /// Creates a new automatic rule for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="request">The automatic rule creation details.</param>
+    Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request);
+
+    /// <summary>
+    /// Retrieves automatic rules for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <returns>A collection of automatic rule details.</returns>
+    Task<IReadOnlyList<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid);
+
+    /// <summary>
+    /// Updates an existing automatic rule for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="request">The automatic rule update details.</param>
+    Task UpdateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleUpdateRequest request);
+
+    /// <summary>
+    /// Deletes an automatic rule for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="ruleGuid">The unique identifier of the rule to delete.</param>
     Task DeleteAutomaticRuleAsync(Guid userGuid, Guid ruleGuid);
-    Task<string> RunAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest rule);
+
+    /// <summary>
+    /// Runs an automatic rule immediately against existing transactions.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="request">The automatic rule details to run.</param>
+    /// <returns>A summary string describing the result of the rule execution.</returns>
+    Task<string> RunAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request);
+
+    /// <summary>
+    /// Runs all automatic rules for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task RunAutomaticRulesAsync(Guid userGuid);
 }

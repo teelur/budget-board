@@ -2,9 +2,11 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Controllers;
 
@@ -13,12 +15,16 @@ namespace BudgetBoard.WebAPI.Controllers;
 public class ValueController(
     ILogger<ValueController> logger,
     UserManager<ApplicationUser> userManager,
-    IValueService valueService
+    IValueService valueService,
+    IStringLocalizer<ApiLogStrings> logLocalizer,
+    IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
     private readonly ILogger<ValueController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IValueService _valueService = valueService;
+    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
+    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
 
     [HttpPost]
     [Authorize]
@@ -38,8 +44,8 @@ public class ValueController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -62,8 +68,8 @@ public class ValueController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -85,8 +91,8 @@ public class ValueController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -108,8 +114,8 @@ public class ValueController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -132,8 +138,8 @@ public class ValueController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 }

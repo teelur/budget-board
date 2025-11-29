@@ -4,17 +4,13 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Overrides;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Controllers;
-
-public class ApplicationUserConstants
-{
-    public const string UserType =
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-}
 
 [Route("api/[controller]")]
 [ApiController]
@@ -23,14 +19,18 @@ public class ApplicationUserController(
     UserManager<ApplicationUser> userManager,
     UserDataContext context,
     IApplicationUserService applicationUserService,
-    ISimpleFinService simpleFinService
+    ISyncService simpleFinService,
+    IStringLocalizer<ApiLogStrings> logLocalizer,
+    IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
     private readonly ILogger<ApplicationUserController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly UserDataContext _userDataContext = context;
     private readonly IApplicationUserService _applicationUserService = applicationUserService;
-    private readonly ISimpleFinService _simpleFinService = simpleFinService;
+    private readonly ISyncService _simpleFinService = simpleFinService;
+    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
+    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
 
     [HttpGet]
     [Authorize]
@@ -51,8 +51,8 @@ public class ApplicationUserController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -74,8 +74,8 @@ public class ApplicationUserController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -93,15 +93,15 @@ public class ApplicationUserController(
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
-                _logger.LogWarning("User ID not found in the current context.");
-                return Unauthorized("User is not authenticated.");
+                _logger.LogWarning("{LogMessage}", _logLocalizer["UserIdNotFoundLog"]);
+                return Unauthorized(_responseLocalizer["UserNotAuthenticated"].Value);
             }
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                _logger.LogWarning("User not found for ID {UserId}.", userId);
-                return NotFound("User not found.");
+                _logger.LogWarning("{LogMessage}", _logLocalizer["UserNotFoundLog", userId]);
+                return NotFound(_responseLocalizer["UserNotFound"].Value);
             }
 
             // Get all external logins for the user
@@ -112,8 +112,8 @@ public class ApplicationUserController(
 
             if (oidcLogin == null)
             {
-                _logger.LogWarning("No OIDC login found for user {UserId}.", userId);
-                return BadRequest("No OIDC login found for this user.");
+                _logger.LogWarning("{LogMessage}", _logLocalizer["NoOidcLoginFoundLog", userId]);
+                return BadRequest(_responseLocalizer["NoOidcLoginFound"].Value);
             }
 
             // Check if user has a password set (local auth) before removing OIDC
@@ -124,12 +124,10 @@ public class ApplicationUserController(
             if (!hasPassword && remainingLogins == 0)
             {
                 _logger.LogWarning(
-                    "Attempt to remove OIDC login for user {UserId} without a local password set.",
-                    userId
+                    "{LogMessage}",
+                    _logLocalizer["RemoveOidcNoPasswordLog", userId]
                 );
-                return BadRequest(
-                    "Cannot remove OIDC login. User must have a local password set first to maintain account access."
-                );
+                return BadRequest(_responseLocalizer["RemoveOidcNoPassword"].Value);
             }
 
             // Remove the OIDC login
@@ -142,20 +140,23 @@ public class ApplicationUserController(
             if (!result.Succeeded)
             {
                 _logger.LogError(
-                    "Failed to remove OIDC login for user {UserId}: {Errors}",
-                    userId,
-                    string.Join(", ", result.Errors.Select(e => e.Description))
+                    "{LogMessage}",
+                    _logLocalizer[
+                        "RemoveOidcFailedLog",
+                        userId,
+                        string.Join(", ", result.Errors.Select(e => e.Description))
+                    ]
                 );
-                return StatusCode(500, "Failed to remove OIDC login.");
+                return StatusCode(500, _responseLocalizer["RemoveOidcFailed"].Value);
             }
 
-            _logger.LogInformation("Successfully removed OIDC login for user {UserId}", userId);
-            return Ok(new { message = "OIDC login disconnected successfully." });
+            _logger.LogInformation("{LogMessage}", _logLocalizer["RemoveOidcSuccessLog", userId]);
+            return Ok(new { message = _responseLocalizer["RemoveOidcSuccess"].Value });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred while disconnecting OIDC login.");
-            return Helpers.BuildErrorResponse("An unexpected server error occurred.");
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 }
