@@ -1,5 +1,3 @@
-import classes from "./BudgetTotalCard.module.css";
-
 import { Card, Skeleton, Stack, Text } from "@mantine/core";
 import React from "react";
 import BudgetSummaryItem from "./BudgetSummaryItem/BudgetSummaryItem";
@@ -65,59 +63,60 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
   return (
     <Stack gap="0.5rem">
       <Text fw={600} px="0.5rem">
-        Your Budget
+        Budget Summary
       </Text>
-      <Card
-        className={classes.root}
-        bg="var(--mantine-color-content)"
-        radius="md"
-        withBorder
-      >
-        {props.isPending ? (
-          <Skeleton h={105} radius="md" />
-        ) : (
-          <Card className={classes.group} radius="md">
-            <BudgetSummaryItem
-              label="Income"
-              amount={incomeTransactionsTotal}
-              total={incomeBudgetsTotal}
-              budgetValueType={BudgetValueType.Income}
-            />
-            <BudgetSummaryItem
-              label="Expenses"
-              amount={expenseTransactionsTotal}
-              total={expenseBudgetsTotal}
-              budgetValueType={BudgetValueType.Expense}
-            />
-            <BudgetSummaryItem
-              label="Net Budgeted"
-              amount={incomeTransactionsTotal + expenseTransactionsTotal}
-              budgetValueType={BudgetValueType.Total}
-              hideProgress
-              showDivider
-            />
-          </Card>
-        )}
-        {props.isPending ? (
-          <Skeleton h={56} radius="md" />
-        ) : (
-          <Card className={classes.group} radius="md">
-            <BudgetSummaryItem
-              label="Unbudgeted"
-              amount={unbudgetedTransactionsTotal}
-              budgetValueType={BudgetValueType.Total}
-              hideProgress
-              showDivider
-            />
-            <BudgetSummaryItem
-              label="Net Cash Flow"
-              amount={totalTransactionsTotal}
-              budgetValueType={BudgetValueType.Total}
-              hideProgress
-              showDivider
-            />
-          </Card>
-        )}
+      <Card p="0.5rem" bg="var(--mantine-color-content)" radius="md" withBorder>
+        <Stack gap="0.5rem">
+          {props.isPending ? (
+            <Skeleton h={105} radius="md" />
+          ) : (
+            <Card p="0.5rem" radius="md">
+              <Stack gap="0.25rem">
+                <BudgetSummaryItem
+                  label="Income"
+                  amount={incomeTransactionsTotal}
+                  total={incomeBudgetsTotal}
+                  budgetValueType={BudgetValueType.Income}
+                />
+                <BudgetSummaryItem
+                  label="Expenses"
+                  amount={expenseTransactionsTotal}
+                  total={expenseBudgetsTotal}
+                  budgetValueType={BudgetValueType.Expense}
+                />
+                <BudgetSummaryItem
+                  label="Net Budgeted"
+                  amount={incomeTransactionsTotal + expenseTransactionsTotal}
+                  budgetValueType={BudgetValueType.Total}
+                  hideProgress
+                  showDivider
+                />
+              </Stack>
+            </Card>
+          )}
+          {props.isPending ? (
+            <Skeleton h={56} radius="md" />
+          ) : (
+            <Card p="0.5rem" radius="md">
+              <Stack gap="0.25rem">
+                <BudgetSummaryItem
+                  label="Unbudgeted"
+                  amount={unbudgetedTransactionsTotal}
+                  budgetValueType={BudgetValueType.Total}
+                  hideProgress
+                  showDivider
+                />
+                <BudgetSummaryItem
+                  label="Net Cash Flow"
+                  amount={totalTransactionsTotal}
+                  budgetValueType={BudgetValueType.Total}
+                  hideProgress
+                  showDivider
+                />
+              </Stack>
+            </Card>
+          )}
+        </Stack>
       </Card>
     </Stack>
   );

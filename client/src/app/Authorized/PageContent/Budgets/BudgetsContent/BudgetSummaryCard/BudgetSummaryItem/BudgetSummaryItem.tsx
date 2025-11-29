@@ -43,7 +43,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   );
 
   return (
-    <Stack gap="0.25rem">
+    <Stack gap={0}>
       <Group
         gap="0.25rem"
         justify={props.showDivider ? "center" : "space-between"}
