@@ -57,6 +57,7 @@ jobs:
   build-client:
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     needs: test
+
     strategy:
       fail-fast: false
       matrix:
@@ -77,9 +78,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Create .env File
         run: echo "VITE_VERSION=PLACEHOLDER" >> client/.env
         if: github.event_name == 'release'
@@ -98,25 +96,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/teelur/budget-board/client
-          flavor: |
-            latest=false
-          tags: |
-            type=sha,suffix=-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+      - name: Extract platform name
+        id: platform
+        run: echo "name=${PLATFORM//\//-}" >> $GITHUB_OUTPUT
+        env:
+          PLATFORM: ${{ matrix.platform }}
 
-      - name: Build and push Docker image
-        id: push
+      - name: Build and push by digest
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: ./client
-          push: true
           platforms: ${{ matrix.platform }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=ghcr.io/teelur/budget-board/client,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-client-${{ steps.platform.outputs.name }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
 
   build-server:
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
@@ -142,9 +148,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
@@ -152,37 +155,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/teelur/budget-board/server
-          flavor: |
-            latest=false
-          tags: |
-            type=sha,suffix=-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+      - name: Extract platform name
+        id: platform
+        run: echo "name=${PLATFORM//\//-}" >> $GITHUB_OUTPUT
+        env:
+          PLATFORM: ${{ matrix.platform }}
 
-      - name: Build and push Docker image
-        id: push
+      - name: Build and push by digest
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: ./server
-          push: true
           platforms: ${{ matrix.platform }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=ghcr.io/teelur/budget-board/server,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-server-${{ steps.platform.outputs.name }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
 
   merge:
     runs-on: ubuntu-latest
     needs: [build-client, build-server]
-
-    strategy:
-      matrix:
-        image:
-          - name: client
-            registry: ghcr.io/teelur/budget-board/client
-          - name: server
-            registry: ghcr.io/teelur/budget-board/server
 
     permissions:
       contents: read
@@ -190,6 +193,23 @@ jobs:
       id-token: write
 
     steps:
+      - name: Download client digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests-client
+          pattern: digests-client-*
+          merge-multiple: true
+
+      - name: Download server digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests-server
+          pattern: digests-server-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
@@ -197,11 +217,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
+      - name: Extract client metadata (tags, labels) for Docker
+        id: meta-client
         uses: docker/metadata-action@v5
         with:
-          images: ${{ matrix.image.registry }}
+          images: ghcr.io/teelur/budget-board/client
           flavor: |
             latest=true
           tags: |
@@ -209,15 +229,34 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}
             type=sha
-            raw,value=release,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'beta') }}
+            type=raw,value=release,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'beta') }}
 
-      - name: Create and push multi-arch manifest
+      - name: Extract server metadata (tags, labels) for Docker
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/teelur/budget-board/server
+          flavor: |
+            latest=true
+          tags: |
+            type=semver,pattern={{raw}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            type=sha
+            type=raw,value=release,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'beta') }}
+
+      - name: Create client manifest list and push
+        working-directory: /tmp/digests-client
         run: |
-          SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
-          AMD64_TAG="${{ matrix.image.registry }}:sha-${SHA_SHORT}-amd64"
-          ARM64_TAG="${{ matrix.image.registry }}:sha-${SHA_SHORT}-arm64"
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'ghcr.io/teelur/budget-board/client@sha256:%s ' *)
+        env:
+          DOCKER_METADATA_OUTPUT_JSON: ${{ steps.meta-client.outputs.json }}
 
-          # Create manifest for each tag
-          echo "${{ steps.meta.outputs.tags }}" | while read -r TAG; do
-            docker buildx imagetools create -t "${TAG}" "${AMD64_TAG}" "${ARM64_TAG}"
-          done
+      - name: Create server manifest list and push
+        working-directory: /tmp/digests-server
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'ghcr.io/teelur/budget-board/server@sha256:%s ' *)
+        env:
+          DOCKER_METADATA_OUTPUT_JSON: ${{ steps.meta-server.outputs.json }}
