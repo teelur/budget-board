@@ -494,7 +494,7 @@ public class SimpleFinService(
         byte[] data = Convert.FromBase64String(setupToken);
         string decodedString = Encoding.UTF8.GetString(data);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, decodedString);
+        using var request = new HttpRequestMessage(HttpMethod.Post, decodedString);
         var client = _clientFactory.CreateClient();
         var response = await client.SendAsync(request);
 
