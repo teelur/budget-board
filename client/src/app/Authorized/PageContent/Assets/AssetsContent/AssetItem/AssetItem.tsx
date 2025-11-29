@@ -1,4 +1,5 @@
 import classes from "./AssetItem.module.css";
+import surfaceClasses from "~/styles/Surface.module.css";
 
 import { useSortable } from "@dnd-kit/react/sortable";
 import { Button, Card, Flex, Group } from "@mantine/core";
@@ -37,10 +38,10 @@ const AssetItem = (props: AssetItemProps): React.ReactNode => {
   return (
     <Card
       ref={props.isSortable ? ref : undefined}
+      className={`${surfaceClasses.root} ${isSelected ? "" : classes.card}`}
       shadow="sm"
       padding="0.5rem"
       radius="md"
-      className={isSelected ? undefined : classes.card}
       withBorder
       onClick={() => !isSelected && props.openDetails(props.asset)}
     >

@@ -1,0 +1,13 @@
+.root {
+  background-color: var(--background-color-elevated);
+  border-color: var(--elevated-color-border);
+}
+
+.input {
+  background-color: var(--background-color-elevated);
+  border-color: var(--elevated-color-border);
+}
+
+.input::placeholder {
+  color: var(--elevated-color-text-dimmed);
+}

@@ -65,6 +65,9 @@ const EditableValueItemContent = (
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
+        queryKey: ["assets"],
+      });
+      await queryClient.invalidateQueries({
         queryKey: ["values", props.value.assetID],
       });
 
@@ -83,6 +86,9 @@ const EditableValueItemContent = (
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
+        queryKey: ["assets"],
+      });
+      await queryClient.invalidateQueries({
         queryKey: ["values", props.value.assetID],
       });
 
@@ -100,6 +106,9 @@ const EditableValueItemContent = (
         params: { guid: props.value.id },
       }),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["assets"],
+      });
       await queryClient.invalidateQueries({
         queryKey: ["values", props.value.assetID],
       });

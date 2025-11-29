@@ -1,8 +1,13 @@
+import surfaceClasses from "~/styles/Surface.module.css";
+
 import { ActionIcon, Badge, Group, Stack, Text } from "@mantine/core";
 import { PencilIcon } from "lucide-react";
 import React from "react";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
+import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
+import SurfaceDimmedText from "~/components/Text/Surface/SurfaceDimmedText/SurfaceDimmedText";
+import StatusText from "~/components/Text/StatusText/StatusText";
 
 interface AssetItemContentProps {
   asset: IAssetResponse;
@@ -15,9 +20,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
         <Group gap="0.5rem" align="center">
-          <Text fw={600} size="md">
-            {props.asset.name}
-          </Text>
+          <SurfacePrimaryText size="md">{props.asset.name}</SurfacePrimaryText>
           <ActionIcon
             variant="transparent"
             size="md"
@@ -34,21 +37,17 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
           {props.asset.hide && <Badge bg="yellow">Hidden</Badge>}
           {props.asset.deleted && <Badge bg="red">Deleted</Badge>}
         </Group>
-        <Text
-          fw={600}
-          size="md"
-          c={props.asset.currentValue < 0 ? "red" : "green"}
-        >
+        <StatusText size="md" value={props.asset.currentValue ?? 0}>
           {convertNumberToCurrency(
             props.asset.currentValue ?? 0,
             true,
             props.userCurrency
           )}
-        </Text>
+        </StatusText>
       </Group>
       <Group justify="space-between" align="center">
         {props.asset.purchaseDate && props.asset.purchasePrice ? (
-          <Text fw={600} size="sm" c="dimmed">
+          <Text className={surfaceClasses.textDimmed} fw={600} size="sm">
             Purchased on{" "}
             {new Date(props.asset.purchaseDate).toLocaleDateString()} for{" "}
             {convertNumberToCurrency(
@@ -59,16 +58,16 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             .
           </Text>
         ) : (
-          <Text fw={600} size="sm" c="dimmed">
+          <SurfaceDimmedText size="sm">
             No purchase info available.
-          </Text>
+          </SurfaceDimmedText>
         )}
-        <Text fw={600} size="sm" c="dimmed">
+        <SurfaceDimmedText size="sm">
           Last Updated:{" "}
           {props.asset.valueDate
             ? new Date(props.asset.valueDate).toLocaleDateString()
             : "Never!"}
-        </Text>
+        </SurfaceDimmedText>
       </Group>
     </Stack>
   );
