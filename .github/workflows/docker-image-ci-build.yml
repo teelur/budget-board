@@ -13,7 +13,7 @@ on:
       - "README.md"
       - "img/**"
       - "docs/**"
-      - ".github/**"
+      - ".github/ISSUE_TEMPLATE/**"
       - ".gitignore"
       - ".gitattributes"
       - ".dockerignore"

@@ -39,12 +39,12 @@ jobs:
               - 'server/**/Dockerfile'
               - 'compose.yml'
               - 'compose.override.yml'
+              - '.github/workflows/**'
             docs:
               - 'README.md'
               - 'img/**'
               - 'docs/**'
               - 'example/**'
-              - '.github/**'
               - '.gitignore'
               - '.gitattributes'
               - '.dockerignore'
