@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  test-server:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -106,7 +106,7 @@ jobs:
 
   build-server:
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
-    needs: test
+    needs: test-server
     strategy:
       fail-fast: false
       matrix:
