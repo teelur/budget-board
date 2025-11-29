@@ -207,31 +207,31 @@ public class AutomaticRuleService(
         );
 
         var rules = await ReadAutomaticRulesAsync(userGuid);
-        foreach (var rule in rules)
+        var ruleRequests = rules.Select(r => new AutomaticRuleCreateRequest
         {
-            var ruleRequest = new AutomaticRuleCreateRequest
-            {
-                Conditions =
-                [
-                    .. rule.Conditions.Select(c => new RuleParameterCreateRequest
-                    {
-                        Field = c.Field,
-                        Operator = c.Operator,
-                        Value = c.Value,
-                    }),
-                ],
-                Actions =
-                [
-                    .. rule.Actions.Select(a => new RuleParameterCreateRequest
-                    {
-                        Field = a.Field,
-                        Operator = a.Operator,
-                        Value = a.Value,
-                    }),
-                ],
-            };
+            Conditions =
+            [
+                .. r.Conditions.Select(c => new RuleParameterCreateRequest
+                {
+                    Field = c.Field,
+                    Operator = c.Operator,
+                    Value = c.Value,
+                }),
+            ],
+            Actions =
+            [
+                .. r.Actions.Select(a => new RuleParameterCreateRequest
+                {
+                    Field = a.Field,
+                    Operator = a.Operator,
+                    Value = a.Value,
+                }),
+            ],
+        });
 
-            int updatedCount = await RunAutomaticRule(userData, ruleRequest, allCategories);
+        foreach (var rule in ruleRequests)
+        {
+            int updatedCount = await RunAutomaticRule(userData, rule, allCategories);
             _logger.LogInformation(
                 "{LogMessage}",
                 _logLocalizer["RuleAppliedActionsLog", updatedCount]
