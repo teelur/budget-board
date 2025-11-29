@@ -78,9 +78,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Create .env File
+      - name: Create .env File (release)
         run: echo "VITE_VERSION=PLACEHOLDER" >> client/.env
         if: github.event_name == 'release'
+
+      - name: Create .env File (non-release)
+        run: echo "VITE_VERSION=sha-${GITHUB_SHA::7}" >> client/.env
+        if: github.event_name != 'release'
 
       - name: Write Version to File
         uses: eball/write-tag-to-version-file@latest
