@@ -186,14 +186,14 @@ public class SimpleFinService(
             }
             else
             {
-                var firstBalanceTimestamp = balanceTimestamps.Min();
+                var latestBalanceTimestamp = balanceTimestamps.Max();
                 if (
-                    ((DateTimeOffset)firstBalanceTimestamp).ToUnixTimeSeconds()
+                    ((DateTimeOffset)latestBalanceTimestamp).ToUnixTimeSeconds()
                     < earliestBalanceTimestamp
                 )
                 {
                     earliestBalanceTimestamp = (
-                        (DateTimeOffset)firstBalanceTimestamp
+                        (DateTimeOffset)latestBalanceTimestamp
                     ).ToUnixTimeSeconds();
                 }
             }
@@ -213,7 +213,7 @@ public class SimpleFinService(
         // SimpleFIN can lookback a maximum of 365 days (not inclusive).
         if (
             earliestBalanceTimestamp
-            > ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - MAX_SYNC_LOOKBACK_UNIX
+            < ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - MAX_SYNC_LOOKBACK_UNIX
         )
         {
             return ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds()
