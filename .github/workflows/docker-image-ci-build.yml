@@ -79,14 +79,13 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Create .env File
-        run: echo "VITE_VERSION=PLACEHOLDER" >> client/.env
-        if: github.event_name == 'release'
+        run: echo "VITE_VERSION=sha-${GITHUB_SHA::7}" >> client/.env
 
       - name: Write Version to File
         uses: eball/write-tag-to-version-file@latest
         with:
           filename: "client/.env"
-          placeholder: "PLACEHOLDER"
+          placeholder: "sha-${GITHUB_SHA::7}"
         if: github.event_name == 'release'
 
       - name: Log in to the Container registry
