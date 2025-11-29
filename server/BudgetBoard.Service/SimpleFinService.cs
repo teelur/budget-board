@@ -54,7 +54,7 @@ public class SimpleFinService(
         _logger.LogInformation("{LogMessage}", _logLocalizer["SimpleFinTokenConfiguredLog"]);
 
         // Deleted accounts do not get updated during sync.
-        long earliestBalanceTimestamp = GetEarliestBalanceTimestamp(
+        long earliestBalanceTimestamp = GetOldestLastSyncTimestamp(
             userData.Accounts.Where(a => !string.IsNullOrEmpty(a.SyncID) && !a.Deleted.HasValue)
         );
 
@@ -172,9 +172,9 @@ public class SimpleFinService(
         return new SimpleFinData(auth, baseUrl);
     }
 
-    private long GetEarliestBalanceTimestamp(IEnumerable<Account> accounts)
+    private long GetOldestLastSyncTimestamp(IEnumerable<Account> accounts)
     {
-        long earliestBalanceTimestamp = ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds();
+        long oldestLastSyncTimestamp = ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds();
 
         foreach (var account in accounts)
         {
@@ -186,20 +186,20 @@ public class SimpleFinService(
             }
             else
             {
-                var firstBalanceTimestamp = balanceTimestamps.Min();
+                var accountMostRecentBalanceTimestamp = balanceTimestamps.Max();
                 if (
-                    ((DateTimeOffset)firstBalanceTimestamp).ToUnixTimeSeconds()
-                    < earliestBalanceTimestamp
+                    ((DateTimeOffset)accountMostRecentBalanceTimestamp).ToUnixTimeSeconds()
+                    < oldestLastSyncTimestamp
                 )
                 {
-                    earliestBalanceTimestamp = (
-                        (DateTimeOffset)firstBalanceTimestamp
+                    oldestLastSyncTimestamp = (
+                        (DateTimeOffset)accountMostRecentBalanceTimestamp
                     ).ToUnixTimeSeconds();
                 }
             }
         }
 
-        return earliestBalanceTimestamp;
+        return oldestLastSyncTimestamp;
     }
 
     private long GetSyncStartDate(int forceSyncLookbackMonths, long earliestBalanceTimestamp)
@@ -213,7 +213,7 @@ public class SimpleFinService(
         // SimpleFIN can lookback a maximum of 365 days (not inclusive).
         if (
             earliestBalanceTimestamp
-            > ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - MAX_SYNC_LOOKBACK_UNIX
+            < ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds() - MAX_SYNC_LOOKBACK_UNIX
         )
         {
             return ((DateTimeOffset)_nowProvider.UtcNow).ToUnixTimeSeconds()
