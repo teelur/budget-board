@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  test-server:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,6 +31,7 @@ jobs:
 
   build-client:
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    needs: test
     strategy:
       fail-fast: false
       matrix:
@@ -49,9 +50,7 @@ jobs:
           filters: |
             build:
               - 'client/**'
-              - 'server/**'
               - 'client/**/package.json'
-              - 'server/**/Dockerfile'
               - 'compose.yml'
               - 'compose.override.yml'
               - '.github/workflows/**'
@@ -95,7 +94,7 @@ jobs:
 
       - name: Build the Docker image
         if: ${{ env.BUILD_CHANGED == 'true' }}
-        id: push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: ./client
@@ -106,7 +105,7 @@ jobs:
 
   build-server:
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
-    needs: test-server
+    needs: test
     strategy:
       fail-fast: false
       matrix:
@@ -124,9 +123,7 @@ jobs:
         with:
           filters: |
             build:
-              - 'client/**'
               - 'server/**'
-              - 'client/**/package.json'
               - 'server/**/Dockerfile'
               - 'compose.yml'
               - 'compose.override.yml'
@@ -171,7 +168,7 @@ jobs:
 
       - name: Build the Docker image
         if: ${{ env.BUILD_CHANGED == 'true' }}
-        id: push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: ./server

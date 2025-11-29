@@ -56,7 +56,7 @@ jobs:
 
   build-client:
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
-
+    needs: test
     strategy:
       fail-fast: false
       matrix:
@@ -218,6 +218,6 @@ jobs:
           ARM64_TAG="${{ matrix.image.registry }}:sha-${SHA_SHORT}-arm64"
 
           # Create manifest for each tag
-          for TAG in ${{ steps.meta.outputs.tags }}; do
+          echo "${{ steps.meta.outputs.tags }}" | while read -r TAG; do
             docker buildx imagetools create -t "${TAG}" "${AMD64_TAG}" "${ARM64_TAG}"
           done
