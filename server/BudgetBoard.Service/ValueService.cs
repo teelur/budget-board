@@ -61,10 +61,7 @@ public class ValueService(
             throw new BudgetBoardServiceException(_responseLocalizer["ValueAssetNotFoundError"]);
         }
 
-        return asset
-            .Values.Where(v => v.Deleted == null)
-            .Select(v => new ValueResponse(v))
-            .ToList();
+        return asset.Values.Select(v => new ValueResponse(v)).ToList();
     }
 
     /// <inheritdoc />

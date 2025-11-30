@@ -67,11 +67,15 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--surface-color-border": backgroundWhite[3],
     "--surface-color-text-primary": textBlack[0],
     "--surface-color-text-dimmed": textBlack[6],
+    "--surface-color-input-background": backgroundWhite[2],
+    "--surface-color-input-border": backgroundWhite[5],
     // Elevated colors
-    "--background-color-elevated": backgroundWhite[1],
-    "--elevated-color-border": backgroundWhite[9],
+    "--background-color-elevated": backgroundWhite[2],
+    "--elevated-color-border": backgroundWhite[5],
     "--elevated-color-text-primary": textBlack[0],
     "--elevated-color-text-dimmed": textBlack[7],
+    "--elevated-color-input-background": backgroundWhite[4],
+    "--elevated-color-input-border": backgroundWhite[7],
     // Text Status colors
     "--text-color-status-good": lightModeGreen,
     "--text-color-status-neutral": lightModeBlue,
@@ -99,11 +103,17 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--surface-color-border": backgroundGray[3],
     "--surface-color-text-primary": textGray[0],
     "--surface-color-text-dimmed": textGray[9],
+    "--surface-color-input-background": backgroundGray[5],
+    "--surface-color-input-border": backgroundGray[2],
     // Elevated colors
     "--background-color-elevated": backgroundGray[5],
-    "--elevated-color-border": backgroundGray[1],
+    "--elevated-color-border": backgroundGray[0],
     "--elevated-color-text-primary": textGray[0],
     "--elevated-color-text-dimmed": textGray[9],
+    "--elevated-color-input-background": backgroundGray[6],
+    "--elevated-color-input-border": backgroundGray[2],
+    // Button colors
+    "--button-color-destructive": darkModeRed,
     // Other
     "--text-color-status-good": darkModeGreen,
     "--text-color-status-neutral": darkModeBlue,

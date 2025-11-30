@@ -21,9 +21,9 @@ import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import StatusText from "~/components/Text/StatusText/StatusText";
 import SurfaceDimmedText from "~/components/Text/Surface/SurfaceDimmedText/SurfaceDimmedText";
-import ElevatedTextInput from "~/components/Input/Elevated/ElevatedTextInput/ElevatedTextInput";
-import ElevatedNumberInput from "~/components/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
-import ElevatedDateInput from "~/components/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
+import SurfaceTextInput from "~/components/Input/Surface/SurfaceTextInput/SurfaceTextInput";
+import SurfaceDateInput from "~/components/Input/Surface/SurfaceDateInput/SurfaceDateInput";
+import SurfaceNumberInput from "~/components/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -147,7 +147,7 @@ const EditableAssetItemContent = (
         <LoadingOverlay visible={doUpdateAsset.isPending} />
         <Group justify="space-between" align="flex-end">
           <Group gap="0.5rem" align="flex-end">
-            <ElevatedTextInput
+            <SurfaceTextInput
               {...assetNameField.getInputProps()}
               onBlur={() => doUpdateAsset.mutate()}
             />
@@ -185,7 +185,7 @@ const EditableAssetItemContent = (
         <Group justify="space-between" align="flex-end">
           <Group gap="1rem">
             <Group gap="0.5rem">
-              <ElevatedDateInput
+              <SurfaceDateInput
                 {...purchaseDate.getInputProps()}
                 placeholder="Enter Date"
                 maw={400}
@@ -196,7 +196,7 @@ const EditableAssetItemContent = (
                   </Text>
                 }
               />
-              <ElevatedNumberInput
+              <SurfaceNumberInput
                 {...purchasePrice.getInputProps()}
                 placeholder="Enter Price"
                 maw={150}
@@ -213,7 +213,7 @@ const EditableAssetItemContent = (
               />
             </Group>
             <Group gap="0.5rem">
-              <ElevatedDateInput
+              <SurfaceDateInput
                 {...sellDate.getInputProps()}
                 placeholder="Enter Date"
                 maw={400}
@@ -224,7 +224,7 @@ const EditableAssetItemContent = (
                   </Text>
                 }
               />
-              <ElevatedNumberInput
+              <SurfaceNumberInput
                 {...sellPrice.getInputProps()}
                 placeholder="Enter Price"
                 maw={150}
@@ -262,7 +262,7 @@ const EditableAssetItemContent = (
           <ActionIcon
             h="100%"
             size="sm"
-            bg="var(--button-color-delete)"
+            bg="var(--button-color-destructive)"
             onClick={() => doDeleteAsset.mutate()}
           >
             <Trash2Icon size={16} />

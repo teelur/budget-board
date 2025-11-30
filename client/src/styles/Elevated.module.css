@@ -4,8 +4,8 @@
 }
 
 .input {
-  background-color: var(--background-color-elevated);
-  border-color: var(--elevated-color-border);
+  background-color: var(--elevated-color-input-background);
+  border-color: var(--elevated-color-input-border);
 }
 
 .input::placeholder {

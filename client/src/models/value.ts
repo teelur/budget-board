@@ -14,6 +14,6 @@ export interface IValueResponse {
   id: string;
   amount: number;
   dateTime: Date;
-  deleted: boolean;
+  deleted: Date | null;
   assetID: string;
 }

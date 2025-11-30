@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Group,
-  LoadingOverlay,
-  NumberInput,
-  Stack,
-} from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -18,6 +11,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IValueResponse, IValueUpdateRequest } from "~/models/value";
+import ElevatedDateInput from "~/components/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
+import ElevatedNumberInput from "~/components/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 
 interface EditableValueItemContentProps {
   value: IValueResponse;
@@ -133,8 +128,11 @@ const EditableValueItemContent = (
         }
       />
       <Stack w="100%">
-        <DatePickerInput {...valueDateField.getInputProps()} flex="1 1 auto" />
-        <NumberInput
+        <ElevatedDateInput
+          {...valueDateField.getInputProps()}
+          flex="1 1 auto"
+        />
+        <ElevatedNumberInput
           {...valueAmountField.getInputProps()}
           flex="1 1 auto"
           prefix={getCurrencySymbol(props.userCurrency)}
@@ -168,7 +166,7 @@ const EditableValueItemContent = (
           <ActionIcon
             h="100%"
             size="sm"
-            bg="red"
+            bg="var(--button-color-destructive)"
             onClick={() => doDeleteValue.mutate()}
           >
             <Trash2Icon size={16} />
