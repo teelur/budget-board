@@ -1,12 +1,4 @@
-import {
-  ActionIcon,
-  Badge,
-  Card,
-  Group,
-  LoadingOverlay,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -15,6 +7,9 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAccountResponse } from "~/models/account";
+import ElevatedCard from "~/components/Card/ElevatedCard/ElevatedCard";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 interface DeletedAccountCardProps {
   account: IAccountResponse;
@@ -45,17 +40,15 @@ const DeletedAccountCard = (
   });
 
   return (
-    <Card p="0.5rem">
+    <ElevatedCard>
       <LoadingOverlay visible={doRestoreAccount.isPending} />
       <Group justify="space-between" wrap="nowrap">
         <Group gap="0.5rem">
           <Stack gap={0}>
-            <Text fw={600} size="sm">
-              {props.account.name}
-            </Text>
-            <Text size="xs" c="dimmed" fw={600}>
+            <PrimaryText size="sm">{props.account.name}</PrimaryText>
+            <DimmedText size="xs">
               {props.institutionName ?? "Unknown Institution"}
-            </Text>
+            </DimmedText>
           </Stack>
           {props.account.syncID !== null && <Badge bg="blue">SimpleFIN</Badge>}
         </Group>
@@ -65,7 +58,7 @@ const DeletedAccountCard = (
           </ActionIcon>
         </Group>
       </Group>
-    </Card>
+    </ElevatedCard>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Accordion, ActionIcon, Modal, Stack, Text } from "@mantine/core";
+import { Accordion, ActionIcon, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -7,6 +7,10 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IAccountResponse } from "~/models/account";
 import DeletedAccountCard from "./DeletedAccountCard/DeletedAccountCard";
+import Modal from "~/components/Modal/Modal";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 const AccountsSettings = (): React.ReactNode => {
   const [isOpened, { open, close }] = useDisclosure(false);
@@ -55,35 +59,24 @@ const AccountsSettings = (): React.ReactNode => {
       </ActionIcon>
       <Modal
         size="40rem"
-        p="0.5rem"
-        centered
         opened={isOpened}
         onClose={close}
-        title={<Text fw={600}>Accounts Settings</Text>}
-        styles={{
-          inner: {
-            left: "0",
-            right: "0",
-            padding: "0 !important",
-          },
-        }}
+        title={<PrimaryText size="md">Accounts Settings</PrimaryText>}
       >
         <Stack gap="1rem">
-          <Accordion variant="separated" multiple defaultValue={[]}>
+          <SurfaceAccordionRoot defaultValue={[]}>
             <Accordion.Item
               value="deleted-accounts"
               bg="var(--mantine-color-accordion-alternate)"
             >
               <Accordion.Control>
-                <Text size="md" fw={600}>
-                  Deleted Accounts
-                </Text>
+                <PrimaryText size="md">Deleted Accounts</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack gap="0.5rem">
-                  <Text c="dimmed" size="sm" fw={600}>
+                  <DimmedText size="sm">
                     View and restore deleted accounts.
-                  </Text>
+                  </DimmedText>
                   {deletedAccounts.length !== 0 ? (
                     deletedAccounts.map((account) => (
                       <DeletedAccountCard
@@ -97,14 +90,14 @@ const AccountsSettings = (): React.ReactNode => {
                       />
                     ))
                   ) : (
-                    <Text c="dimmed" size="sm">
-                      No deleted accounts.
-                    </Text>
+                    <Group justify="center">
+                      <DimmedText size="sm">No deleted accounts.</DimmedText>
+                    </Group>
                   )}
                 </Stack>
               </Accordion.Panel>
             </Accordion.Item>
-          </Accordion>
+          </SurfaceAccordionRoot>
         </Stack>
       </Modal>
     </>

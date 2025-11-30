@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Button,
-  Modal,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { ActionIcon, Button, Stack } from "@mantine/core";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -17,6 +10,9 @@ import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import { IInstitution, IInstitutionCreateRequest } from "~/models/institution";
+import Modal from "~/components/Modal/Modal";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import BaseTextInput from "~/components/Input/Base/BaseTextInput/BaseTextInput";
 
 const CreateAccount = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -136,23 +132,16 @@ const CreateAccount = () => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<Text fw={600}>Create Account</Text>}
-        styles={{
-          inner: {
-            left: "0",
-            right: "0",
-            padding: "0 !important",
-          },
-        }}
+        title={<PrimaryText size="md">Create Account</PrimaryText>}
       >
-        <Stack gap={10}>
-          <TextInput
+        <Stack gap="0.5rem">
+          <BaseTextInput
             {...accountNameField.getInputProps()}
-            label="Account Name"
+            label={<PrimaryText size="sm">Account Name</PrimaryText>}
           />
-          <TextInput
+          <BaseTextInput
             {...institutionField.getInputProps()}
-            label="Institution"
+            label={<PrimaryText size="sm">Institution</PrimaryText>}
           />
           <Button
             type="submit"
