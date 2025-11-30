@@ -5,8 +5,8 @@ import { PencilIcon } from "lucide-react";
 import React from "react";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
-import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
-import SurfaceDimmedText from "~/components/Text/Surface/SurfaceDimmedText/SurfaceDimmedText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 import StatusText from "~/components/Text/StatusText/StatusText";
 
 interface AssetItemContentProps {
@@ -20,7 +20,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
         <Group gap="0.5rem" align="center">
-          <SurfacePrimaryText size="md">{props.asset.name}</SurfacePrimaryText>
+          <PrimaryText size="md">{props.asset.name}</PrimaryText>
           <ActionIcon
             variant="transparent"
             size="md"
@@ -58,16 +58,14 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             .
           </Text>
         ) : (
-          <SurfaceDimmedText size="sm">
-            No purchase info available.
-          </SurfaceDimmedText>
+          <DimmedText size="sm">No purchase info available.</DimmedText>
         )}
-        <SurfaceDimmedText size="sm">
+        <DimmedText size="sm">
           Last Updated:{" "}
           {props.asset.valueDate
             ? new Date(props.asset.valueDate).toLocaleDateString()
             : "Never!"}
-        </SurfaceDimmedText>
+        </DimmedText>
       </Group>
     </Stack>
   );

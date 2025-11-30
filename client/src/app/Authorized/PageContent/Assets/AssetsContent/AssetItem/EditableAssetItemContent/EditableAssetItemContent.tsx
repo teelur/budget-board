@@ -20,7 +20,7 @@ import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import StatusText from "~/components/Text/StatusText/StatusText";
-import SurfaceDimmedText from "~/components/Text/Surface/SurfaceDimmedText/SurfaceDimmedText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 import SurfaceTextInput from "~/components/Input/Surface/SurfaceTextInput/SurfaceTextInput";
 import SurfaceDateInput from "~/components/Input/Surface/SurfaceDateInput/SurfaceDateInput";
 import SurfaceNumberInput from "~/components/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
@@ -241,12 +241,12 @@ const EditableAssetItemContent = (
               />
             </Group>
           </Group>
-          <SurfaceDimmedText size="sm">
+          <DimmedText size="sm">
             Last Updated:{" "}
             {props.asset.valueDate
               ? new Date(props.asset.valueDate).toLocaleDateString()
               : "Never!"}
-          </SurfaceDimmedText>
+          </DimmedText>
         </Group>
       </Stack>
       <Group style={{ alignSelf: "stretch" }}>

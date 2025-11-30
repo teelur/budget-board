@@ -12,8 +12,8 @@ import dayjs from "dayjs";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import Drawer from "~/components/Drawer/Drawer";
-import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
-import SurfaceDimmedText from "~/components/Text/Surface/SurfaceDimmedText/SurfaceDimmedText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 import StatusText from "~/components/Text/StatusText/StatusText";
 import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
 
@@ -68,33 +68,31 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<SurfacePrimaryText size="lg">Asset Details</SurfacePrimaryText>}
+      title={<PrimaryText size="lg">Asset Details</PrimaryText>}
     >
       {!props.asset ? (
         <Skeleton height={425} radius="lg" />
       ) : (
         <Stack gap="1rem">
           <Stack gap={0}>
-            <SurfaceDimmedText size="xs">Asset Name</SurfaceDimmedText>
-            <SurfacePrimaryText size="xl">
-              {props.asset?.name}
-            </SurfacePrimaryText>
+            <DimmedText size="xs">Asset Name</DimmedText>
+            <PrimaryText size="xl">{props.asset?.name}</PrimaryText>
           </Stack>
           <Group justify="space-between">
             {props.asset?.purchaseDate && props.asset.purchasePrice && (
               <Stack gap={0} justify="center" align="center">
-                <SurfaceDimmedText size="xs">Purchased on</SurfaceDimmedText>
-                <SurfacePrimaryText size="md" fw={600}>
+                <DimmedText size="xs">Purchased on</DimmedText>
+                <PrimaryText size="md" fw={600}>
                   {new Date(props.asset.purchaseDate).toLocaleDateString()}
-                </SurfacePrimaryText>
-                <SurfaceDimmedText size="xs">for</SurfaceDimmedText>
-                <SurfacePrimaryText size="md" fw={600}>
+                </PrimaryText>
+                <DimmedText size="xs">for</DimmedText>
+                <PrimaryText size="md" fw={600}>
                   {convertNumberToCurrency(
                     props.asset.purchasePrice,
                     true,
                     props.userCurrency
                   )}
-                </SurfacePrimaryText>
+                </PrimaryText>
               </Stack>
             )}
             {props.asset?.purchaseDate &&
@@ -120,25 +118,25 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
               )}
             {props.asset?.sellDate && props.asset.sellPrice && (
               <Stack gap={0} justify="center" align="center">
-                <SurfaceDimmedText size="xs">Sold on</SurfaceDimmedText>
-                <SurfacePrimaryText size="md" fw={600}>
+                <DimmedText size="xs">Sold on</DimmedText>
+                <PrimaryText size="md" fw={600}>
                   {new Date(props.asset.sellDate).toLocaleDateString()}
-                </SurfacePrimaryText>
-                <SurfaceDimmedText size="xs">for</SurfaceDimmedText>
-                <SurfacePrimaryText size="md" fw={600}>
+                </PrimaryText>
+                <DimmedText size="xs">for</DimmedText>
+                <PrimaryText size="md" fw={600}>
                   {convertNumberToCurrency(
                     props.asset.sellPrice,
                     true,
                     props.userCurrency
                   )}
-                </SurfacePrimaryText>
+                </PrimaryText>
               </Stack>
             )}
           </Group>
           <SurfaceAccordionRoot defaultValue={["add-value", "chart", "values"]}>
             <Accordion.Item value="add-value">
               <Accordion.Control>
-                <SurfacePrimaryText>Add Value</SurfacePrimaryText>
+                <PrimaryText>Add Value</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <AddValue
@@ -149,7 +147,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </Accordion.Item>
             <Accordion.Item value="chart">
               <Accordion.Control>
-                <SurfacePrimaryText>Value Trends</SurfacePrimaryText>
+                <PrimaryText>Value Trends</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <Group>
@@ -195,7 +193,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </Accordion.Item>
             <Accordion.Item value="values">
               <Accordion.Control>
-                <SurfacePrimaryText>Value History</SurfacePrimaryText>
+                <PrimaryText>Value History</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack gap="0.5rem">
@@ -204,9 +202,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   )}
                   {sortedValues.length === 0 ? (
                     <Group justify="center">
-                      <SurfaceDimmedText size="sm">
-                        No value entries.
-                      </SurfaceDimmedText>
+                      <DimmedText size="sm">No value entries.</DimmedText>
                     </Group>
                   ) : (
                     <ValueItems
@@ -219,7 +215,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </Accordion.Item>
             <Accordion.Item value="deleted-values">
               <Accordion.Control>
-                <SurfacePrimaryText>Deleted Values</SurfacePrimaryText>
+                <PrimaryText>Deleted Values</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack gap="0.5rem">
@@ -227,9 +223,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedDeletedValues.length === 0 ? (
-                    <SurfaceDimmedText size="sm">
-                      No deleted values.
-                    </SurfaceDimmedText>
+                    <DimmedText size="sm">No deleted values.</DimmedText>
                   ) : (
                     <ValueItems
                       values={sortedDeletedValues}

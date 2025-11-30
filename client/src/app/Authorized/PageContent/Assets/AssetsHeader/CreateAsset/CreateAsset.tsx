@@ -10,7 +10,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetCreateRequest } from "~/models/asset";
 import Modal from "~/components/Modal/Modal";
-import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import BaseTextInput from "~/components/Input/Base/BaseTextInput/BaseTextInput";
 
 const CreateAsset = (): React.ReactNode => {
@@ -51,12 +51,12 @@ const CreateAsset = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<SurfacePrimaryText>Create Asset</SurfacePrimaryText>}
+        title={<PrimaryText>Create Asset</PrimaryText>}
       >
         <Stack gap="0.5rem">
           <BaseTextInput
             {...assetNameField.getInputProps()}
-            label={<SurfacePrimaryText size="sm">Name</SurfacePrimaryText>}
+            label={<PrimaryText size="sm">Name</PrimaryText>}
             placeholder="Enter asset name"
           />
           <Button

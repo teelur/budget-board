@@ -2,7 +2,7 @@ import { ActionIcon, Group } from "@mantine/core";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
 import StatusText from "~/components/Text/StatusText/StatusText";
-import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IValueResponse } from "~/models/value";
 
@@ -16,9 +16,9 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
-        <SurfacePrimaryText size="md">
+        <PrimaryText size="md">
           {dayjs(props.value.dateTime).format("L")}
-        </SurfacePrimaryText>
+        </PrimaryText>
         <ActionIcon
           variant="transparent"
           size="md"

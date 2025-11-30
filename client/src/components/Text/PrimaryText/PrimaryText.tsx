@@ -3,17 +3,17 @@ import surfaceClasses from "~/styles/Surface.module.css";
 import React from "react";
 import { Text, TextProps } from "@mantine/core";
 
-interface SurfacePrimaryTextProps extends TextProps {
+interface PrimaryTextProps extends TextProps {
   children: React.ReactNode;
 }
 
-const SurfacePrimaryText = ({
+const PrimaryText = ({
   children,
   ...props
-}: SurfacePrimaryTextProps): React.ReactNode => (
+}: PrimaryTextProps): React.ReactNode => (
   <Text className={surfaceClasses.textPrimary} fw={600} {...props}>
     {children}
   </Text>
 );
 
-export default SurfacePrimaryText;
+export default PrimaryText;

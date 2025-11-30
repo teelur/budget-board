@@ -7,9 +7,9 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import DeletedAssetCard from "./DeletedAssetCard/DeletedAssetCard";
 import Modal from "~/components/Modal/Modal";
-import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
-import SurfaceDimmedText from "~/components/Text/Surface/SurfaceDimmedText/SurfaceDimmedText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 const AssetsSettings = (): React.ReactNode => {
   const [isOpened, { open, close }] = useDisclosure(false);
@@ -43,7 +43,7 @@ const AssetsSettings = (): React.ReactNode => {
       <Modal
         opened={isOpened}
         onClose={close}
-        title={<SurfacePrimaryText>Assets Settings</SurfacePrimaryText>}
+        title={<PrimaryText>Assets Settings</PrimaryText>}
         size="40rem"
       >
         <Stack gap="1rem">
@@ -53,24 +53,20 @@ const AssetsSettings = (): React.ReactNode => {
               bg="var(--mantine-color-accordion-alternate)"
             >
               <Accordion.Control>
-                <SurfacePrimaryText size="md">
-                  Deleted Assets
-                </SurfacePrimaryText>
+                <PrimaryText size="md">Deleted Assets</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack gap="0.5rem">
-                  <SurfaceDimmedText size="sm">
+                  <DimmedText size="sm">
                     View and restore deleted assets.
-                  </SurfaceDimmedText>
+                  </DimmedText>
                   {deletedAssets.length !== 0 ? (
                     deletedAssets.map((asset) => (
                       <DeletedAssetCard key={asset.id} asset={asset} />
                     ))
                   ) : (
                     <Group justify="center">
-                      <SurfaceDimmedText size="xs">
-                        No deleted assets.
-                      </SurfaceDimmedText>
+                      <DimmedText size="xs">No deleted assets.</DimmedText>
                     </Group>
                   )}
                 </Stack>

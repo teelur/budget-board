@@ -7,7 +7,7 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IValueCreateRequest, IValueResponse } from "~/models/value";
-import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import SurfaceDateInput from "~/components/Input/Surface/SurfaceDateInput/SurfaceDateInput";
 import SurfaceNumberInput from "~/components/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 
@@ -56,12 +56,12 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
     <Stack gap={10}>
       <SurfaceDateInput
         {...dateField.getInputProps()}
-        label={<SurfacePrimaryText size="xs">Date</SurfacePrimaryText>}
+        label={<PrimaryText size="xs">Date</PrimaryText>}
         maw={400}
       />
       <SurfaceNumberInput
         {...amountField.getInputProps()}
-        label={<SurfacePrimaryText size="xs">Amount</SurfacePrimaryText>}
+        label={<PrimaryText size="xs">Amount</PrimaryText>}
         prefix={getCurrencySymbol(props.currency)}
         decimalScale={2}
         thousandSeparator=","

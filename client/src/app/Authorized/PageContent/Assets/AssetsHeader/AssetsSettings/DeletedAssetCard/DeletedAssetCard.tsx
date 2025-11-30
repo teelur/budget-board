@@ -8,7 +8,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse } from "~/models/asset";
 import ElevatedCard from "~/components/Card/ElevatedCard/ElevatedCard";
-import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 interface DeletedAssetCardProps {
   asset: IAssetResponse;
@@ -38,7 +38,7 @@ const DeletedAssetCard = (props: DeletedAssetCardProps): React.ReactNode => {
       <LoadingOverlay visible={doRestoreAsset.isPending} />
       <Group justify="space-between">
         <Stack gap={0}>
-          <SurfacePrimaryText size="sm">{props.asset.name}</SurfacePrimaryText>
+          <PrimaryText size="sm">{props.asset.name}</PrimaryText>
         </Stack>
         <Group style={{ alignSelf: "stretch" }}>
           <ActionIcon h="100%" onClick={() => doRestoreAsset.mutate()}>
