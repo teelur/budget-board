@@ -1,6 +1,8 @@
-import { ActionIcon, Group, Text } from "@mantine/core";
+import { ActionIcon, Group } from "@mantine/core";
 import { PencilIcon } from "lucide-react";
 import React from "react";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import StatusText from "~/components/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IInstitution } from "~/models/institution";
 
@@ -16,10 +18,8 @@ const InstitutionItemContent = (
 ): React.ReactNode => {
   return (
     <Group justify="space-between" align="center">
-      <Group>
-        <Text fw={600} size="md">
-          {props.institution.name}
-        </Text>
+      <Group gap="0.5rem">
+        <PrimaryText size="md">{props.institution.name}</PrimaryText>
         <ActionIcon
           variant="transparent"
           size="md"
@@ -31,9 +31,9 @@ const InstitutionItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <Text fw={600} size="md" c={props.totalBalance < 0 ? "red" : "green"}>
+      <StatusText value={props.totalBalance} size="md">
         {convertNumberToCurrency(props.totalBalance, true, props.userCurrency)}
-      </Text>
+      </StatusText>
     </Group>
   );
 };

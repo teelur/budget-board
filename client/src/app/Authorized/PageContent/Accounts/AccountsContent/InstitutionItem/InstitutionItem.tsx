@@ -1,11 +1,4 @@
-import {
-  Button,
-  Card,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { Button, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { IInstitution } from "~/models/institution";
 import AccountItem from "./AccountItem/AccountItem";
 import { GripVertical } from "lucide-react";
@@ -25,6 +18,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
 import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
+import SurfaceCard from "~/components/Card/SurfaceCard/SurfaceCard";
 
 interface IInstitutionItemProps {
   institution: IInstitution;
@@ -108,13 +102,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
   }, [props.isSortable]);
 
   return (
-    <Card
-      ref={props.isSortable ? ref : undefined}
-      bg="var(--mantine-color-bg)"
-      padding="0.5rem"
-      radius="md"
-      withBorder
-    >
+    <SurfaceCard ref={props.isSortable ? ref : undefined}>
       <LoadingOverlay visible={doIndexAccounts.isPending} />
       <Group w="100%" wrap="nowrap" gap="0.5rem" align="flex-start">
         {props.isSortable && (
@@ -170,7 +158,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
           </Stack>
         </Stack>
       </Group>
-    </Card>
+    </SurfaceCard>
   );
 };
 

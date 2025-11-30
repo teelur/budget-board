@@ -56,7 +56,7 @@ export const textGray: MantineColorsTuple = [
 export const darkModeGreen = "#39FF14";
 export const darkModeBlue = "#1E90FF";
 export const darkModeYellow = "#FFD300";
-export const darkModeRed = "#FF0033";
+export const darkModeRed = "#FF3B47";
 
 export const lightModeGreen = "#009B2D";
 export const lightModeBlue = "#0066CC";

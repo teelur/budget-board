@@ -1,12 +1,10 @@
 import {
   ActionIcon,
   Button,
+  Flex,
   Group,
   LoadingOverlay,
-  NumberInput,
   Stack,
-  Text,
-  TextInput,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
@@ -26,6 +24,11 @@ import {
   IAccountUpdateRequest,
 } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
+import ElevatedTextInput from "~/components/Input/Elevated/ElevatedTextInput/ElevatedTextInput";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import ElevatedNumberInput from "~/components/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
+import StatusText from "~/components/Text/StatusText/StatusText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -126,34 +129,29 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <Stack gap="0.5rem" flex="1 1 auto">
         <LoadingOverlay visible={doUpdateAccount.isPending} />
-        <Group justify="space-between" align="center">
-          <Group gap="0.5rem" align="center">
-            <TextInput
+        <Group justify="space-between" align="flex-end">
+          <Group gap="0.5rem" align="flex-end">
+            <ElevatedTextInput
               {...accountNameField.getInputProps()}
-              label={
-                <Text fw={600} size="xs" c="dimmed">
-                  Name
-                </Text>
-              }
+              label={<PrimaryText size="xs">Name</PrimaryText>}
               onBlur={() => doUpdateAccount.mutate()}
             />
-            <ActionIcon
-              variant="outline"
-              size="md"
-              onClick={(e) => {
-                e.stopPropagation();
-                props.toggle();
-              }}
-            >
-              <PencilIcon size={16} />
-            </ActionIcon>
-            <NumberInput
+            <Flex style={{ alignSelf: "stretch" }}>
+              <ActionIcon
+                variant="outline"
+                h="100%"
+                size="md"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.toggle();
+                }}
+              >
+                <PencilIcon size={16} />
+              </ActionIcon>
+            </Flex>
+            <ElevatedNumberInput
               {...interestRateField.getInputProps()}
-              label={
-                <Text fw={600} size="xs" c="dimmed">
-                  Interest Rate
-                </Text>
-              }
+              label={<PrimaryText size="xs">Interest Rate</PrimaryText>}
               decimalScale={2}
               min={0}
               step={1}
@@ -186,17 +184,13 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               </Button>
             </Group>
           </Group>
-          <Text
-            fw={600}
-            size="md"
-            c={props.account.currentBalance < 0 ? "red" : "green"}
-          >
+          <StatusText value={props.account.currentBalance} size="md">
             {convertNumberToCurrency(
               props.account.currentBalance,
               true,
               props.userCurrency
             )}
-          </Text>
+          </StatusText>
         </Group>
         <Group justify="space-between" align="center">
           <CategorySelect
@@ -216,9 +210,9 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             }}
             withinPortal
           />
-          <Text fw={600} size="sm" c="dimmed">
+          <DimmedText size="sm">
             Last Updated: {dayjs(props.account.balanceDate).format("L LT")}
-          </Text>
+          </DimmedText>
         </Group>
       </Stack>
       <Group style={{ alignSelf: "stretch" }}>

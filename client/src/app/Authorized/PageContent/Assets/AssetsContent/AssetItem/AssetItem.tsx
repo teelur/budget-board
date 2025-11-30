@@ -1,4 +1,4 @@
-import classes from "./AssetItem.module.css";
+import cardClasses from "~/styles/Card.module.css";
 import surfaceClasses from "~/styles/Surface.module.css";
 
 import { useSortable } from "@dnd-kit/react/sortable";
@@ -39,7 +39,7 @@ const AssetItem = (props: AssetItemProps): React.ReactNode => {
   return (
     <SurfaceCard
       ref={props.isSortable ? ref : undefined}
-      className={`${surfaceClasses.root} ${isSelected ? "" : classes.card}`}
+      className={`${surfaceClasses.root} ${isSelected ? "" : cardClasses.card}`}
       onClick={() => !isSelected && props.openDetails(props.asset)}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">

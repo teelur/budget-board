@@ -1,6 +1,9 @@
-import { ActionIcon, Badge, Group, Stack, Text } from "@mantine/core";
+import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import StatusText from "~/components/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAccountResponse } from "~/models/account";
 
@@ -15,9 +18,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
         <Group gap="0.5rem" align="center">
-          <Text fw={600} size="md">
-            {props.account.name}
-          </Text>
+          <PrimaryText size="md">{props.account.name}</PrimaryText>
           <ActionIcon
             variant="transparent"
             size="md"
@@ -38,29 +39,25 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           )}
           {props.account.syncID !== null && <Badge bg="blue">SimpleFIN</Badge>}
         </Group>
-        <Text
-          fw={600}
-          size="md"
-          c={props.account.currentBalance < 0 ? "red" : "green"}
-        >
+        <StatusText value={props.account.currentBalance} size="md">
           {convertNumberToCurrency(
             props.account.currentBalance,
             true,
             props.userCurrency
           )}
-        </Text>
+        </StatusText>
       </Group>
       <Group justify="space-between" align="center">
-        <Text fw={600} size="sm" c="dimmed">
+        <DimmedText size="sm">
           {props.account.subtype ? props.account.subtype : props.account.type}
-        </Text>
-        <Text fw={600} size="sm" c="dimmed">
+        </DimmedText>
+        <DimmedText size="sm">
           Last Updated:{" "}
           {(() => {
             const parsedDate = dayjs(props.account.balanceDate);
             return parsedDate.isValid() ? parsedDate.format("L LT") : "Never!";
           })()}
-        </Text>
+        </DimmedText>
       </Group>
     </Stack>
   );

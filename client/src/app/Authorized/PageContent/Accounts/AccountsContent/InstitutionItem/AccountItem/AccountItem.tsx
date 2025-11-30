@@ -1,7 +1,9 @@
-import classes from "./AccountItem.module.css";
+import cardClasses from "~/styles/Card.module.css";
+import elevatedClasses from "~/styles/Elevated.module.css";
 
+import React from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { Button, Card, Flex, Group } from "@mantine/core";
+import { Button, Flex, Group } from "@mantine/core";
 import { GripVertical } from "lucide-react";
 import { IAccountResponse } from "~/models/account";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
@@ -10,6 +12,7 @@ import { closestCenter } from "@dnd-kit/collision";
 import { useDisclosure } from "@mantine/hooks";
 import AccountItemContent from "./AccountItemContent/AccountItemContent";
 import EditableAccountItemContent from "./EditableAccountItemContent/EditableAccountItemContent";
+import ElevatedCard from "~/components/Card/ElevatedCard/ElevatedCard";
 
 interface IAccountItemProps {
   account: IAccountResponse;
@@ -19,7 +22,7 @@ interface IAccountItemProps {
   openDetails: (account: IAccountResponse | undefined) => void;
 }
 
-const AccountItem = (props: IAccountItemProps) => {
+const AccountItem = (props: IAccountItemProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { ref, handleRef } = useSortable({
@@ -35,13 +38,11 @@ const AccountItem = (props: IAccountItemProps) => {
   });
 
   return (
-    <Card
+    <ElevatedCard
       ref={props.isSortable ? ref : undefined}
-      shadow="sm"
-      padding="0.5rem"
-      radius="md"
-      className={isSelected ? undefined : classes.card}
-      withBorder
+      className={`${elevatedClasses.root} ${
+        isSelected ? "" : cardClasses.card
+      }`}
       onClick={() => !isSelected && props.openDetails(props.account)}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
@@ -66,7 +67,7 @@ const AccountItem = (props: IAccountItemProps) => {
           />
         )}
       </Group>
-    </Card>
+    </ElevatedCard>
   );
 };
 export default AccountItem;

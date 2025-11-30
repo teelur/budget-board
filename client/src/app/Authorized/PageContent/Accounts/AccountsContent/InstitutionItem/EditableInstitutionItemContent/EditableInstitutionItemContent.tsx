@@ -1,10 +1,4 @@
-import {
-  ActionIcon,
-  Group,
-  LoadingOverlay,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +8,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
+import SurfaceTextInput from "~/components/Input/Surface/SurfaceTextInput/SurfaceTextInput";
+import StatusText from "~/components/Text/StatusText/StatusText";
 
 interface IEditableInstitutionItemContentProps {
   institution: IInstitution;
@@ -59,7 +55,7 @@ const EditableInstitutionItemContent = (
     <Group justify="space-between" align="center" gap="0.5rem">
       <LoadingOverlay visible={doUpdateInstitution.isPending} />
       <Group wrap="nowrap" gap="0.5rem">
-        <TextInput
+        <SurfaceTextInput
           w={250}
           maw="100%"
           {...institutionNameField.getInputProps()}
@@ -76,9 +72,9 @@ const EditableInstitutionItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <Text fw={600} size="md" c={props.totalBalance < 0 ? "red" : "green"}>
+      <StatusText value={props.totalBalance} size="md">
         {convertNumberToCurrency(props.totalBalance, true, props.userCurrency)}
-      </Text>
+      </StatusText>
     </Group>
   );
 };
