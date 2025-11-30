@@ -1,5 +1,5 @@
-import { Button, NumberInput, Stack, Text } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { Button, Stack } from "@mantine/core";
+
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceCreateRequest } from "~/models/balance";
+import SurfaceDateInput from "~/components/Input/Surface/SurfaceDateInput/SurfaceDateInput";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import SurfaceNumberInput from "~/components/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 
 interface AddBalanceProps {
   accountId: string;
@@ -47,21 +50,13 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
 
   return (
     <Stack gap={10}>
-      <DatePickerInput
+      <SurfaceDateInput
         {...dateField.getInputProps()}
-        label={
-          <Text size="sm" fw={600} c="dimmed">
-            Date
-          </Text>
-        }
+        label={<PrimaryText size="sm">Date</PrimaryText>}
       />
-      <NumberInput
+      <SurfaceNumberInput
         {...amountField.getInputProps()}
-        label={
-          <Text size="sm" fw={600} c="dimmed">
-            Amount
-          </Text>
-        }
+        label={<PrimaryText size="sm">Amount</PrimaryText>}
         prefix={getCurrencySymbol(props.currency)}
         decimalScale={2}
         thousandSeparator=","

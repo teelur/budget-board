@@ -1,12 +1,4 @@
-import {
-  Accordion,
-  Button,
-  Drawer,
-  Group,
-  Skeleton,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Accordion, Button, Group, Skeleton, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
@@ -17,6 +9,10 @@ import { IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
+import Drawer from "~/components/Drawer/Drawer";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -69,11 +65,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={
-        <Text size="lg" fw={600}>
-          Account Details
-        </Text>
-      }
+      title={<PrimaryText size="lg">Account Details</PrimaryText>}
       styles={{
         inner: {
           left: "0",
@@ -88,33 +80,24 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
         <Stack gap="1rem">
           <Group justify="space-between" align="center">
             <Stack gap={0}>
-              <Text size="xs" fw={500} c="dimmed">
-                Account Name
-              </Text>
-              <Text size="lg" fw={600}>
-                {props.account.name}
-              </Text>
+              <DimmedText size="xs">Account Name</DimmedText>
+              <PrimaryText size="lg">{props.account.name}</PrimaryText>
             </Stack>
             <Stack gap={0}>
-              <Text size="xs" fw={500} c="dimmed">
-                Account Type
-              </Text>
-              <Text size="lg" fw={600}>
+              <DimmedText size="xs">Account Type</DimmedText>
+              <PrimaryText size="lg">
                 {props.account.subtype || props.account.type}
-              </Text>
+              </PrimaryText>
             </Stack>
           </Group>
-          <Accordion
+          <SurfaceAccordionRoot
             variant="separated"
-            defaultValue={["chart", "balances"]}
+            defaultValue={["add-balance", "chart", "balances"]}
             multiple
           >
-            <Accordion.Item
-              value="add-balance"
-              bg="var(--mantine-color-content-background)"
-            >
+            <Accordion.Item value="add-balance">
               <Accordion.Control>
-                <Text>Add Balance</Text>
+                <PrimaryText>Add Balance</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <AddBalance
@@ -123,12 +106,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                 />
               </Accordion.Panel>
             </Accordion.Item>
-            <Accordion.Item
-              value="chart"
-              bg="var(--mantine-color-content-background)"
-            >
+            <Accordion.Item value="chart">
               <Accordion.Control>
-                <Text>Account Trends</Text>
+                <PrimaryText>Account Trends</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <Group>
@@ -172,20 +152,19 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                 />
               </Accordion.Panel>
             </Accordion.Item>
-            <Accordion.Item
-              value="balances"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>Recent Balances</Accordion.Control>
+            <Accordion.Item value="balances">
+              <Accordion.Control>
+                <PrimaryText>Recent Balances</PrimaryText>
+              </Accordion.Control>
               <Accordion.Panel>
                 <Stack gap="0.5rem">
                   {balancesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedBalances.length === 0 ? (
-                    <Text size="sm" c="dimmed" fw={600}>
-                      No balance entries.
-                    </Text>
+                    <Group justify="center">
+                      <DimmedText size="sm">No balance entries.</DimmedText>
+                    </Group>
                   ) : (
                     <BalanceItems
                       balances={sortedBalances}
@@ -195,12 +174,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                 </Stack>
               </Accordion.Panel>
             </Accordion.Item>
-            <Accordion.Item
-              value="deleted-balances"
-              bg="var(--mantine-color-content-background)"
-            >
+            <Accordion.Item value="deleted-balances">
               <Accordion.Control>
-                <Text>Deleted Balances</Text>
+                <PrimaryText>Deleted Balances</PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack gap="0.5rem">
@@ -208,9 +184,11 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedDeletedBalances.length === 0 ? (
-                    <Text size="sm" c="dimmed" fw={600}>
-                      No deleted balances.
-                    </Text>
+                    <Group justify="center">
+                      <DimmedText size="sm">
+                        No deleted balance entries.
+                      </DimmedText>
+                    </Group>
                   ) : (
                     <BalanceItems
                       balances={sortedDeletedBalances}
@@ -220,7 +198,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                 </Stack>
               </Accordion.Panel>
             </Accordion.Item>
-          </Accordion>
+          </SurfaceAccordionRoot>
         </Stack>
       )}
     </Drawer>
