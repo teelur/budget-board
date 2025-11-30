@@ -1,3 +1,23 @@
 .root {
   background-color: var(--background-color-base);
 }
+
+.modalRoot {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--base-color-border);
+}
+
+.modal {
+  background-color: var(--background-color-base);
+}
+
+.input {
+  background-color: var(--base-color-input-background);
+  border: 1px solid var(--base-color-input-border);
+  color: var(--base-color-text-primary);
+}
+
+.input::placeholder {
+  color: var(--base-color-text-dimmed);
+}

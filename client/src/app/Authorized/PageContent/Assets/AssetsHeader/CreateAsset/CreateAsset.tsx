@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Button,
-  Modal,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { ActionIcon, Button, Stack } from "@mantine/core";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -16,6 +9,9 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetCreateRequest } from "~/models/asset";
+import Modal from "~/components/Modal/Modal";
+import SurfacePrimaryText from "~/components/Text/Surface/SurfacePrimaryText/SurfacePrimaryText";
+import BaseTextInput from "~/components/Input/Base/BaseTextInput/BaseTextInput";
 
 const CreateAsset = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -55,17 +51,14 @@ const CreateAsset = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<Text fw={600}>Create Asset</Text>}
-        styles={{
-          inner: {
-            left: "0",
-            right: "0",
-            padding: "0 !important",
-          },
-        }}
+        title={<SurfacePrimaryText>Create Asset</SurfacePrimaryText>}
       >
-        <Stack gap={10}>
-          <TextInput {...assetNameField.getInputProps()} label="Asset Name" />
+        <Stack gap="0.5rem">
+          <BaseTextInput
+            {...assetNameField.getInputProps()}
+            label={<SurfacePrimaryText size="sm">Name</SurfacePrimaryText>}
+            placeholder="Enter asset name"
+          />
           <Button
             type="submit"
             loading={doCreateAsset.isPending}

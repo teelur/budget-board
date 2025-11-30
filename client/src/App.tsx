@@ -60,6 +60,12 @@ const resolver: CSSVariablesResolver = (theme) => ({
   light: {
     // Base colors
     "--background-color-base": backgroundWhite[0],
+    "--base-color-border": backgroundWhite[4],
+    "--base-color-text-primary": textBlack[0],
+    "--base-color-text-dimmed": textBlack[6],
+    "--base-color-input-background": backgroundWhite[2],
+    "--base-color-input-border": backgroundWhite[6],
+    // Sidebar and Header colors
     "--background-color-sidebar": backgroundWhite[2],
     "--background-color-header": backgroundWhite[1],
     // Surface colors
@@ -82,6 +88,7 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--text-color-status-warning": lightModeYellow,
     "--text-color-status-bad": lightModeRed,
     // Button colors
+    "--button-color-confirm": lightModeGreen,
     "--button-color-destructive": lightModeRed,
 
     // TODO: remove
@@ -96,6 +103,12 @@ const resolver: CSSVariablesResolver = (theme) => ({
   dark: {
     // Base colors
     "--background-color-base": backgroundGray[9],
+    "--base-color-border": backgroundGray[4],
+    "--base-color-text-primary": textGray[0],
+    "--base-color-text-dimmed": textGray[9],
+    "--base-color-input-background": backgroundGray[5],
+    "--base-color-input-border": backgroundGray[1],
+    // Sidebar and Header colors
     "--background-color-sidebar": backgroundGray[7],
     "--background-color-header": backgroundGray[8],
     // Surface colors
@@ -112,13 +125,14 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--elevated-color-text-dimmed": textGray[9],
     "--elevated-color-input-background": backgroundGray[6],
     "--elevated-color-input-border": backgroundGray[2],
-    // Button colors
-    "--button-color-destructive": darkModeRed,
-    // Other
+    // Text Status colors
     "--text-color-status-good": darkModeGreen,
     "--text-color-status-neutral": darkModeBlue,
     "--text-color-status-warning": darkModeYellow,
     "--text-color-status-bad": darkModeRed,
+    // Button colors
+    "--button-color-confirm": lightModeGreen, // TODO: get a better color
+    "--button-color-destructive": darkModeRed,
 
     // TODO: remove
     "--mantine-color-header-background": theme.colors.dark[8],
