@@ -1,7 +1,7 @@
 import classes from "./AddBudget.module.css";
 
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/CategorySelect";
+import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   ActionIcon,

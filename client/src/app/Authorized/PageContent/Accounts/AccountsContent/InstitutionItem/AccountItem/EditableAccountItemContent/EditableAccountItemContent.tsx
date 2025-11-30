@@ -14,7 +14,7 @@ import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/CategorySelect";
+import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
@@ -29,6 +29,7 @@ import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import ElevatedNumberInput from "~/components/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 import StatusText from "~/components/Text/StatusText/StatusText";
 import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import ElevatedCategorySelect from "~/components/Select/ElevatedCategorySelect/ElevatedCategorySelect";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -193,7 +194,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
           </StatusText>
         </Group>
         <Group justify="space-between" align="center">
-          <CategorySelect
+          <ElevatedCategorySelect
             w={220}
             categories={accountCategories}
             value={

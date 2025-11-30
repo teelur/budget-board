@@ -22,7 +22,7 @@ import SplitTransaction from "../SplitTransaction/SplitTransaction";
 import { useField } from "@mantine/form";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { DatePickerInput } from "@mantine/dates";
-import CategorySelect from "~/components/CategorySelect";
+import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IUserSettings } from "~/models/userSettings";
 import dayjs from "dayjs";

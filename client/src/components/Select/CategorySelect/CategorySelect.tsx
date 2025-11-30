@@ -1,3 +1,5 @@
+import dropdownClasses from "~/styles/Dropdown.module.css";
+
 import {
   buildCategoriesTree,
   getFormattedCategoryValue,
@@ -10,7 +12,7 @@ import {
   Group,
   Input,
   InputBase,
-  StyleProp,
+  InputBaseProps,
   Text,
   useCombobox,
 } from "@mantine/core";
@@ -18,17 +20,22 @@ import { ICategory, ICategoryNode } from "~/models/category";
 import React from "react";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
 
-interface CategorySelectProps {
-  w?: StyleProp<React.CSSProperties["width"]>;
+export interface CategorySelectProps extends InputBaseProps {
   categories: ICategory[];
   value: string;
   onChange: (value: string) => void;
   withinPortal?: boolean;
   includeUncategorized?: boolean;
-  [key: string]: any;
 }
 
-const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
+const CategorySelect = ({
+  categories,
+  value,
+  onChange,
+  withinPortal,
+  includeUncategorized,
+  ...props
+}: CategorySelectProps): React.ReactNode => {
   const [search, setSearch] = React.useState("");
 
   const combobox = useCombobox({
@@ -42,8 +49,8 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
   });
 
   const categoriesTree = React.useMemo(
-    () => buildCategoriesTree(props.categories),
-    [props.categories]
+    () => buildCategoriesTree(categories),
+    [categories]
   );
 
   const buildCategoriesOptions = (categoriesTree: ICategoryNode[]) => {
@@ -54,10 +61,10 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
           <Combobox.Option
             key={category.value}
             value={category.value}
-            active={areStringsEqual(category.value, props.value)}
+            active={areStringsEqual(category.value, value)}
           >
             <Group gap="0.5rem">
-              {areStringsEqual(category.value, props.value) ? (
+              {areStringsEqual(category.value, value) ? (
                 <CheckIcon size={12} />
               ) : (
                 <div style={{ width: 12 }} />
@@ -65,17 +72,12 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
               <Text
                 fz="sm"
                 style={{
-                  fontWeight: getIsParentCategory(
-                    category.value,
-                    props.categories
-                  )
+                  fontWeight: getIsParentCategory(category.value, categories)
                     ? 700
                     : 400,
                   textWrap: "nowrap",
                 }}
-                pl={
-                  getIsParentCategory(category.value, props.categories) ? 0 : 10
-                }
+                pl={getIsParentCategory(category.value, categories) ? 0 : 10}
               >
                 {category.value}
               </Text>
@@ -102,7 +104,7 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
   const categoryOptions = (): React.ReactNode => {
     const options = buildCategoriesOptions(categoriesTree);
     if (
-      props.includeUncategorized &&
+      includeUncategorized &&
       uncategorizedTransactionCategory
         .toLowerCase()
         .includes(search.toLowerCase().trim())
@@ -111,13 +113,10 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
         <Combobox.Option
           key={uncategorizedTransactionCategory}
           value={uncategorizedTransactionCategory}
-          active={areStringsEqual(
-            uncategorizedTransactionCategory,
-            props.value
-          )}
+          active={areStringsEqual(uncategorizedTransactionCategory, value)}
         >
           <Group gap="0.5rem">
-            {areStringsEqual(uncategorizedTransactionCategory, props.value) ? (
+            {areStringsEqual(uncategorizedTransactionCategory, value) ? (
               <CheckIcon size={12} />
             ) : (
               <div style={{ width: 12 }} />
@@ -140,34 +139,35 @@ const CategorySelect = (props: CategorySelectProps): React.ReactNode => {
 
   return (
     <Combobox
+      classNames={{
+        dropdown: dropdownClasses.dropdown,
+        search: dropdownClasses.search,
+      }}
       store={combobox}
       onOptionSubmit={(val) => {
-        if (areStringsEqual(val, props.value)) {
-          props.onChange("");
+        if (areStringsEqual(val, value)) {
+          onChange("");
         } else {
-          props.onChange(val);
+          onChange(val);
         }
         combobox.closeDropdown();
       }}
-      withinPortal={props.withinPortal ?? false}
+      withinPortal={withinPortal ?? false}
     >
       <Combobox.Target>
         <InputBase
-          flex={props.flex}
-          w={props.w}
-          miw="max-content"
+          miw={props.miw ?? 200}
           component="button"
           type="button"
-          pointer
           rightSection={<Combobox.Chevron />}
           onClick={() => combobox.toggleDropdown()}
           rightSectionPointerEvents="none"
           multiline
+          pointer
+          {...props}
         >
-          {props.value ? (
-            <Text fz="sm">
-              {getFormattedCategoryValue(props.value, props.categories)}
-            </Text>
+          {value ? (
+            <Text fz="sm">{getFormattedCategoryValue(value, categories)}</Text>
           ) : (
             <Input.Placeholder>Pick value</Input.Placeholder>
           )}

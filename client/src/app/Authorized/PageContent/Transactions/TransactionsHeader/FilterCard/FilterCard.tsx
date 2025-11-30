@@ -1,4 +1,4 @@
-import CategorySelect from "~/components/CategorySelect";
+import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
 import classes from "./FilterCard.module.css";
 
 import AccountSelectInput from "~/components/AccountSelectInput";

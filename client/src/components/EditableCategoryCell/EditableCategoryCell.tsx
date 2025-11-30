@@ -9,7 +9,7 @@ import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import { getTransactionCategory } from "~/helpers/transactions";
-import CategorySelect from "~/components/CategorySelect";
+import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
 
 interface EditableCategoryCellProps {
   transaction: ITransaction;

@@ -37,6 +37,7 @@ import {
 
 // Your theme configuration is merged with default theme
 const theme = createTheme({
+  cursorType: "pointer",
   defaultRadius: "xs",
   primaryColor: "indigo",
   breakpoints: {
@@ -80,7 +81,7 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--elevated-color-border": backgroundWhite[5],
     "--elevated-color-text-primary": textBlack[0],
     "--elevated-color-text-dimmed": textBlack[7],
-    "--elevated-color-input-background": backgroundWhite[4],
+    "--elevated-color-input-background": backgroundWhite[3],
     "--elevated-color-input-border": backgroundWhite[7],
     // Text Status colors
     "--text-color-status-good": lightModeGreen,
