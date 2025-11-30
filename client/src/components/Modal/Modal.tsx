@@ -13,6 +13,7 @@ interface ModalProps extends MantineModalProps {
 const Modal = ({ children, ...props }: ModalProps): React.ReactNode => {
   return (
     <MantineModal
+      p={props.p ?? "0.5rem"}
       classNames={{
         content: `${baseClasses.modalRoot} ${baseClasses.modal}`,
         header: baseClasses.modal,
