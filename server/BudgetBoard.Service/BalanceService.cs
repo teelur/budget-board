@@ -83,7 +83,10 @@ public class BalanceService(
             throw new BudgetBoardServiceException(_responseLocalizer["BalanceUpdateNotFoundError"]);
         }
 
-        _userDataContext.Entry(balance).CurrentValues.SetValues(request);
+        balance.DateTime = request.DateTime;
+        balance.Amount = request.Amount;
+
+        _userDataContext.Balances.Update(balance);
         await _userDataContext.SaveChangesAsync();
     }
 

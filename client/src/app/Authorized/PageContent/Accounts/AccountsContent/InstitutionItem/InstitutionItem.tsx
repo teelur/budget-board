@@ -46,6 +46,19 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
       }))
   );
 
+  React.useEffect(() => {
+    setSortedAccounts(
+      props.institution.accounts
+        .slice()
+        .filter((a) => a.deleted === null)
+        .sort((a, b) => a.index - b.index)
+        .map((a, index) => ({
+          ...a,
+          index,
+        }))
+    );
+  }, [props.institution.accounts]);
+
   const { ref, handleRef } = useSortable({
     id: props.institution.id,
     index: props.institution.index,

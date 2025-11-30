@@ -62,6 +62,8 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({
         queryKey: ["balances", props.balance.accountID],
       });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
       notifications.show({ color: "green", message: "Balance updated." });
     },
@@ -80,6 +82,8 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({
         queryKey: ["balances", props.balance.accountID],
       });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
       notifications.show({ color: "green", message: "Balance deleted" });
     },
@@ -98,6 +102,8 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({
         queryKey: ["balances", props.balance.accountID],
       });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
       notifications.show({ color: "green", message: "Balance restored." });
     },
