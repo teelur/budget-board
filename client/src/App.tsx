@@ -62,8 +62,8 @@ const resolver: CSSVariablesResolver = (theme) => ({
     // Base colors
     "--background-color-base": backgroundWhite[0],
     "--base-color-border": backgroundWhite[4],
-    "--base-color-text-primary": textBlack[0],
-    "--base-color-text-dimmed": textBlack[6],
+    "--base-color-text-primary": textBlack[1],
+    "--base-color-text-dimmed": textBlack[7],
     "--base-color-input-background": backgroundWhite[2],
     "--base-color-input-border": backgroundWhite[6],
     // Sidebar and Header colors
@@ -72,14 +72,14 @@ const resolver: CSSVariablesResolver = (theme) => ({
     // Surface colors
     "--background-color-surface": backgroundWhite[1],
     "--surface-color-border": backgroundWhite[3],
-    "--surface-color-text-primary": textBlack[0],
+    "--surface-color-text-primary": textBlack[1],
     "--surface-color-text-dimmed": textBlack[6],
     "--surface-color-input-background": backgroundWhite[2],
     "--surface-color-input-border": backgroundWhite[5],
     // Elevated colors
     "--background-color-elevated": backgroundWhite[2],
     "--elevated-color-border": backgroundWhite[5],
-    "--elevated-color-text-primary": textBlack[0],
+    "--elevated-color-text-primary": textBlack[1],
     "--elevated-color-text-dimmed": textBlack[7],
     "--elevated-color-input-background": backgroundWhite[3],
     "--elevated-color-input-border": backgroundWhite[7],

@@ -1,6 +1,4 @@
-import surfaceClasses from "~/styles/Surface.module.css";
-
-import { ActionIcon, Badge, Group, Stack, Text } from "@mantine/core";
+import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
 import { PencilIcon } from "lucide-react";
 import React from "react";
 import { convertNumberToCurrency } from "~/helpers/currency";
@@ -47,7 +45,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
       </Group>
       <Group justify="space-between" align="center">
         {props.asset.purchaseDate && props.asset.purchasePrice ? (
-          <Text className={surfaceClasses.textDimmed} fw={600} size="sm">
+          <DimmedText size="sm">
             Purchased on{" "}
             {new Date(props.asset.purchaseDate).toLocaleDateString()} for{" "}
             {convertNumberToCurrency(
@@ -56,7 +54,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
               props.userCurrency
             )}
             .
-          </Text>
+          </DimmedText>
         ) : (
           <DimmedText size="sm">No purchase info available.</DimmedText>
         )}

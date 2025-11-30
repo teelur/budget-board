@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
-import AccountSelectInput from "~/components/AccountSelectInput";
+import AccountSelectInputBase from "~/components/Select/AccountSelect/AccountSelectInputBase/AccountSelectInputBase";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
@@ -169,7 +169,7 @@ const CreateTransactionModal = (): React.ReactNode => {
             />
             <Stack gap={3}>
               <Text fz="sm">Account</Text>
-              <AccountSelectInput
+              <AccountSelectInputBase
                 selectedAccountIds={form.getValues().accountIds}
                 setSelectedAccountIds={(val) =>
                   form.setFieldValue("accountIds", val)

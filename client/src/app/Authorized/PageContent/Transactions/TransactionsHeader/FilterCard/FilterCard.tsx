@@ -1,40 +1,31 @@
-import CategorySelectBase from "~/components/Select/CategorySelect/CategorySelectBase/CategorySelectBase";
-import classes from "./FilterCard.module.css";
-
-import AccountSelectInput from "~/components/AccountSelectInput";
-import { Flex, Stack, Text, Button, Card } from "@mantine/core";
-import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
+import { Flex, Stack, Button } from "@mantine/core";
+import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import dayjs from "dayjs";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import AccountSelect from "~/components/Select/AccountSelect/AccountSelect";
+import DatePickerInput from "~/components/Input/DatePickerInput/DatePickerInput";
 
 interface FilterCardProps {
   categories: ICategory[];
+  style?: React.CSSProperties;
 }
 
 const FilterCard = (props: FilterCardProps): React.ReactNode => {
-  const { transactionFilters, setTransactionFilters, isFiltersPanelOpen } =
-    useTransactionFilters();
-
-  if (!isFiltersPanelOpen) {
-    return null;
-  }
+  const { transactionFilters, setTransactionFilters } = useTransactionFilters();
 
   return (
-    <Card
-      p="0.5rem"
-      radius="md"
-      bg="var(--mantine-color-content-background)"
-      withBorder
-    >
-      <Stack gap="0.5rem">
-        <Text fw={600} size="md">
-          Filters
-        </Text>
+    <Card elevation={1} style={props.style}>
+      <Stack gap={0}>
+        <PrimaryText size="lg">Filters</PrimaryText>
         <Flex
-          className={classes.group}
+          justify="space-between"
+          align="center"
           direction={{ base: "column", sm: "row" }}
           wrap="nowrap"
           gap="md"
@@ -56,8 +47,10 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
               setTransactionFilters(newFilters);
             }}
             clearable
+            label={<PrimaryText size="sm">Date Range</PrimaryText>}
+            elevation={1}
           />
-          <AccountSelectInput
+          <AccountSelect
             w={{ base: "100%", sm: "50%" }}
             selectedAccountIds={transactionFilters.accounts}
             setSelectedAccountIds={(newAccountIds: string[]) => {
@@ -68,8 +61,10 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
               setTransactionFilters(newFilters);
             }}
             hideHidden
+            label={<PrimaryText size="sm">Accounts</PrimaryText>}
+            elevation={1}
           />
-          <CategorySelectBase
+          <CategorySelect
             w={{ base: "100%", sm: "20%" }}
             categories={props.categories}
             value={transactionFilters.category}
@@ -82,6 +77,8 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
             }}
             withinPortal
             includeUncategorized
+            label={<PrimaryText size="sm">Category</PrimaryText>}
+            elevation={1}
           />
           <Button
             w={{ base: "100%", sm: "130px" }}

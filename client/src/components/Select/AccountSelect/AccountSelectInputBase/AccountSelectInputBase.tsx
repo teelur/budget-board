@@ -1,21 +1,20 @@
-import { MultiSelect } from "@mantine/core";
+import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
 
-interface AccountSelectInputProps {
+export interface AccountSelectInputBaseProps extends MultiSelectProps {
   selectedAccountIds?: string[];
   setSelectedAccountIds?: (accountIds: string[]) => void;
   hideHidden?: boolean;
   filterTypes?: string[];
   manualOnly?: boolean;
   maxSelectedValues?: number;
-  [x: string]: any;
 }
 
-const AccountSelectInput = ({
+const AccountSelectInputBase = ({
   selectedAccountIds,
   setSelectedAccountIds,
   hideHidden = false,
@@ -23,7 +22,7 @@ const AccountSelectInput = ({
   manualOnly = false,
   maxSelectedValues = undefined,
   ...props
-}: AccountSelectInputProps): React.ReactNode => {
+}: AccountSelectInputBaseProps): React.ReactNode => {
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -81,4 +80,4 @@ const AccountSelectInput = ({
   );
 };
 
-export default AccountSelectInput;
+export default AccountSelectInputBase;

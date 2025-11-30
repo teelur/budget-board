@@ -1,4 +1,4 @@
-import AccountSelectInput from "~/components/AccountSelectInput";
+import AccountSelectInputBase from "~/components/Select/AccountSelect/AccountSelectInputBase/AccountSelectInputBase";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
 import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
@@ -42,7 +42,7 @@ const AccountsSelectHeader = (
         value={props.dateRange}
         onChange={props.setDateRange}
       />
-      <AccountSelectInput
+      <AccountSelectInputBase
         selectedAccountIds={props.selectedAccountIds}
         setSelectedAccountIds={props.setSelectedAccountIds}
         hideHidden

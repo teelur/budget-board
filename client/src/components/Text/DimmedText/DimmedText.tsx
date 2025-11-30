@@ -1,4 +1,4 @@
-import surfaceClasses from "~/styles/Surface.module.css";
+import textClasses from "~/styles/Text.module.css";
 
 import React from "react";
 import { Text, TextProps } from "@mantine/core";
@@ -11,7 +11,7 @@ const DimmedText = ({
   children,
   ...props
 }: DimmedTextProps): React.ReactNode => (
-  <Text className={surfaceClasses.textDimmed} fw={600} {...props}>
+  <Text className={textClasses.dimmed} fw={600} {...props}>
     {children}
   </Text>
 );

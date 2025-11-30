@@ -1,4 +1,4 @@
-import AccountSelectInput from "~/components/AccountSelectInput";
+import AccountSelectInputBase from "~/components/Select/AccountSelect/AccountSelectInputBase/AccountSelectInputBase";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
@@ -110,7 +110,7 @@ const PayGoalForm = (): React.ReactNode => {
           key={form.key("goalName")}
           {...form.getInputProps("goalName")}
         />
-        <AccountSelectInput
+        <AccountSelectInputBase
           label="Accounts"
           placeholder="Select account"
           required

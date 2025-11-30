@@ -16,6 +16,8 @@ const CategorySelect = ({
   ...props
 }: CategorySelectProps): React.ReactNode => {
   switch (elevation) {
+    case 0:
+      throw new Error("Base is not supported for CategorySelect");
     case 1:
       return <SurfaceCategorySelect {...props} />;
     case 2:

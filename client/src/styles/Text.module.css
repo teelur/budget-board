@@ -1,0 +1,7 @@
+.primary {
+  color: var(--base-color-text-primary);
+}
+
+.dimmed {
+  color: var(--base-color-text-dimmed);
+}
