@@ -13,7 +13,7 @@ import { AxiosResponse } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
@@ -100,7 +100,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
       );
     } else if (props.ruleParameter.field === "category") {
       return (
-        <CategorySelect
+        <CategorySelectBase
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({

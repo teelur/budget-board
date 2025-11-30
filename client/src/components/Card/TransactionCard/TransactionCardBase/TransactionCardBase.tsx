@@ -1,51 +1,45 @@
-import classes from "./TransactionCard.module.css";
-
-import { Card } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import EditableTransactionCardContent from "./EditableTransactionCardContent/EditableTransactionCardContent";
 import TransactionCardContent from "./TransactionCardContent/TransactionCardContent";
+import Card, { CardProps } from "../../Card";
 
-interface TransactionCardProps {
+export interface TransactionCardBaseProps extends CardProps {
   transaction: ITransaction;
   categories: ICategory[];
-  disableEdit?: boolean; // Optional prop to determine if the card is editable
-  alternateColor?: boolean; // Optional prop to apply alternate color
+  elevation?: number;
+  disableEdit?: boolean;
 }
 
-const TransactionCard = (props: TransactionCardProps): React.ReactNode => {
+const TransactionCardBase = (
+  props: TransactionCardBaseProps
+): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure();
 
   return (
     <Card
-      className={classes.card}
+      w={props.w ?? "100%"}
+      style={{ containerType: "inline-size" }}
       onClick={toggle}
-      radius="md"
-      withBorder={isSelected}
-      bg={
-        isSelected
-          ? "var(--mantine-primary-color-light)"
-          : props.alternateColor
-          ? "var(--mantine-color-card-alternate)"
-          : ""
-      }
-      shadow={props.alternateColor ? "none" : "sm"}
+      {...props}
     >
       {isSelected && !(props.disableEdit ?? false) ? (
         <EditableTransactionCardContent
           transaction={props.transaction}
           categories={props.categories}
+          elevation={props.elevation ?? 0}
         />
       ) : (
         <TransactionCardContent
           transaction={props.transaction}
           categories={props.categories}
+          elevation={props.elevation ?? 0}
         />
       )}
     </Card>
   );
 };
 
-export default TransactionCard;
+export default TransactionCardBase;

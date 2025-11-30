@@ -1,5 +1,5 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   Button,
@@ -100,7 +100,7 @@ const AddCategory = (): React.ReactNode => {
           {isChildCategory && (
             <Stack gap="0.25rem">
               <Text size="0.875rem">Parent Category</Text>
-              <CategorySelect
+              <CategorySelectBase
                 w="100%"
                 categories={parentCategories}
                 value={form.getValues().parent}

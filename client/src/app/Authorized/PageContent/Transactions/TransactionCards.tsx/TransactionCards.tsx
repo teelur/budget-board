@@ -10,9 +10,9 @@ import { Group, Pagination, Skeleton, Stack, Text } from "@mantine/core";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
-import TransactionCard from "~/components/TransactionCard/TransactionCard";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import SurfaceTransactionCard from "~/components/Card/TransactionCard/SurfaceTransactionCard/SurfaceTransactionCard";
 
 interface TransactionCardsProps {
   sort: Sorts;
@@ -70,7 +70,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                 (page - 1) * itemsPerPage + itemsPerPage
               )
               .map((transaction) => (
-                <TransactionCard
+                <SurfaceTransactionCard
                   key={transaction.id}
                   transaction={transaction}
                   categories={transactionCategories}

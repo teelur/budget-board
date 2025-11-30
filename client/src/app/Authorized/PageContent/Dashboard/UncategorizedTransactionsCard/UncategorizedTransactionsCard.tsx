@@ -18,7 +18,7 @@ import { ITransaction } from "~/models/transaction";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import TransactionCard from "~/components/TransactionCard/TransactionCard";
+import TransactionCardBase from "~/components/Card/TransactionCard/TransactionCardBase/TransactionCardBase";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
@@ -78,7 +78,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
                   (activePage - 1) * itemsPerPage + itemsPerPage
                 )
                 .map((transaction: ITransaction) => (
-                  <TransactionCard
+                  <TransactionCardBase
                     key={transaction.id}
                     transaction={transaction}
                     categories={transactionCategories}

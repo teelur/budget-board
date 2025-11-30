@@ -1,7 +1,7 @@
 import classes from "./AddBudget.module.css";
 
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   ActionIcon,
@@ -108,7 +108,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
           onSubmit={form.onSubmit(submitCreateBudget)}
         >
           <Stack gap="sm">
-            <CategorySelect
+            <CategorySelectBase
               value={form.getValues().category}
               onChange={(val) => form.setFieldValue("category", val)}
               key={form.key("category")}

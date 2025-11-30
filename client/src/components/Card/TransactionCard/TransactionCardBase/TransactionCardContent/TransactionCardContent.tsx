@@ -10,10 +10,12 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import StatusText from "~/components/Text/StatusText/StatusText";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;
   categories: ICategory[];
+  elevation: number;
 }
 
 const TransactionCardContent = (
@@ -37,6 +39,32 @@ const TransactionCardContent = (
     },
   });
 
+  const getPrimaryTextColor = (): string => {
+    switch (props.elevation) {
+      case 0:
+        return "var(--base-color-text-primary)";
+      case 1:
+        return "var(--surface-color-text-primary)";
+      case 2:
+        return "var(--elevated-color-text-primary)";
+      default:
+        return "var(--base-color-text-primary)";
+    }
+  };
+
+  const getDimmedTextColor = (): string => {
+    switch (props.elevation) {
+      case 0:
+        return "var(--base-color-text-dimmed)";
+      case 1:
+        return "var(--surface-color-text-dimmed)";
+      case 2:
+        return "var(--elevated-color-text-dimmed)";
+      default:
+        return "var(--base-color-text-dimmed)";
+    }
+  };
+
   const categoryValue =
     (props.transaction.subcategory ?? "").length > 0
       ? props.transaction.subcategory ?? ""
@@ -47,7 +75,7 @@ const TransactionCardContent = (
       <Text
         className={classes.dateText}
         flex="1 0 auto"
-        c="dimmed"
+        c={getDimmedTextColor()}
         size="sm"
         fw={600}
       >
@@ -57,7 +85,12 @@ const TransactionCardContent = (
           day: "numeric",
         })}
       </Text>
-      <Text className={classes.merchantNameText} w="100%" fw={600}>
+      <Text
+        className={classes.merchantNameText}
+        c={getPrimaryTextColor()}
+        w="100%"
+        fw={600}
+      >
         {props.transaction.merchantName}
       </Text>
       <Flex
@@ -74,13 +107,13 @@ const TransactionCardContent = (
         </Flex>
         <Flex className={classes.amountContainer}>
           {userSettingsQuery.isPending ? null : (
-            <Text c={props.transaction.amount < 0 ? "red" : "green"} fw={600}>
+            <StatusText value={props.transaction.amount} size="md">
               {convertNumberToCurrency(
                 props.transaction.amount,
                 true,
                 userSettingsQuery.data?.currency ?? "USD"
               )}
-            </Text>
+            </StatusText>
           )}
         </Flex>
       </Flex>

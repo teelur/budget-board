@@ -2,7 +2,7 @@ import { Group, Pagination, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
 import React from "react";
-import TransactionCard from "~/components/TransactionCard/TransactionCard";
+import TransactionCardBase from "~/components/Card/TransactionCard/TransactionCardBase/TransactionCardBase";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -21,7 +21,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   return (
     <Stack gap="0.5rem">
       {paginatedItems.map((transaction) => (
-        <TransactionCard
+        <TransactionCardBase
           key={transaction.id}
           transaction={transaction}
           categories={props.categories}

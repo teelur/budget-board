@@ -1,16 +1,17 @@
 import elevatedClasses from "~/styles/Elevated.module.css";
 
 import React from "react";
-import CategorySelect, {
-  CategorySelectProps,
-} from "../CategorySelect/CategorySelect";
-interface ElevatedCategorySelectProps extends CategorySelectProps {}
+import CategorySelectBase, {
+  CategorySelectBaseProps,
+} from "../CategorySelectBase/CategorySelectBase";
+
+export interface ElevatedCategorySelectProps extends CategorySelectBaseProps {}
 
 const ElevatedCategorySelect = ({
   ...props
 }: ElevatedCategorySelectProps): React.ReactNode => {
   return (
-    <CategorySelect
+    <CategorySelectBase
       classNames={{
         input: elevatedClasses.input,
       }}

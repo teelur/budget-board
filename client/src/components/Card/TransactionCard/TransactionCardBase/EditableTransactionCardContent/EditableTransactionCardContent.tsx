@@ -1,14 +1,6 @@
 import classes from "./EditableTransactionCardContent.module.css";
 
-import {
-  ActionIcon,
-  Flex,
-  Group,
-  LoadingOverlay,
-  NumberInput,
-  Stack,
-  TextInput,
-} from "@mantine/core";
+import { ActionIcon, Flex, Group, LoadingOverlay } from "@mantine/core";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -18,18 +10,21 @@ import { notifications } from "@mantine/notifications";
 import { AxiosError, AxiosResponse } from "axios";
 import { TrashIcon } from "lucide-react";
 import { ICategory } from "~/models/category";
-import SplitTransaction from "../SplitTransaction/SplitTransaction";
+import SplitTransaction from "./SplitTransaction/SplitTransaction";
 import { useField } from "@mantine/form";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
-import { DatePickerInput } from "@mantine/dates";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IUserSettings } from "~/models/userSettings";
 import dayjs from "dayjs";
+import NumberInput from "~/components/Input/NumberInput/NumberInput";
+import DateInput from "~/components/Input/DateInput/DateInput";
+import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import TextInput from "~/components/Input/TextInput/TextInput";
 
 interface EditableTransactionCardProps {
   transaction: ITransaction;
   categories: ICategory[];
+  elevation: number;
 }
 
 const EditableTransactionCardContent = (
@@ -182,18 +177,19 @@ const EditableTransactionCardContent = (
       />
       <Group wrap="nowrap" gap="2rem">
         <Flex className={classes.content} w="100%" gap="0.5rem" align="center">
-          <Stack
+          <Flex
             className={classes.dateContainer}
             flex="1 0 auto"
             align="start"
             onClick={(e) => e.stopPropagation()}
           >
-            <DatePickerInput
+            <DateInput
               w="100%"
               {...dateField.getInputProps()}
               onChange={onDateChange}
+              elevation={props.elevation}
             />
-          </Stack>
+          </Flex>
           <TextInput
             w="100%"
             flex="1 1 auto"
@@ -201,8 +197,9 @@ const EditableTransactionCardContent = (
             value={merchantField.getValue()}
             onBlur={handleSubmit}
             onClick={(e) => e.stopPropagation()}
+            elevation={props.elevation}
           />
-          <Group
+          <Flex
             className={classes.categoryContainer}
             flex="1 0 auto"
             onClick={(e) => e.stopPropagation()}
@@ -214,8 +211,8 @@ const EditableTransactionCardContent = (
               onChange={onCategoryChange}
               withinPortal
             />
-          </Group>
-          <Group
+          </Flex>
+          <Flex
             className={classes.amountContainer}
             flex="1 0 auto"
             onClick={(e) => e.stopPropagation()}
@@ -228,8 +225,9 @@ const EditableTransactionCardContent = (
               prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               decimalScale={2}
               fixedDecimalScale
+              elevation={props.elevation}
             />
-          </Group>
+          </Flex>
         </Flex>
         <Group gap={5} style={{ alignSelf: "stretch", flexWrap: "nowrap" }}>
           <Flex onClick={(e) => e.stopPropagation()} h="100%">
@@ -237,6 +235,7 @@ const EditableTransactionCardContent = (
               categories={props.categories}
               id={props.transaction.id}
               originalAmount={props.transaction.amount}
+              elevation={props.elevation}
             />
           </Flex>
           <ActionIcon

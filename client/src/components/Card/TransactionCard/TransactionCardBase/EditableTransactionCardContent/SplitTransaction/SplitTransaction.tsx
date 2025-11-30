@@ -1,57 +1,41 @@
+import React from "react";
 import {
   ActionIcon,
   Button,
-  NumberInput,
-  Popover,
   Stack,
-  Text,
+  Popover as MantinePopover,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { SplitIcon } from "lucide-react";
-import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { ICategory } from "~/models/category";
 import { ITransactionSplitRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
+import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import NumberInput from "~/components/Input/NumberInput/NumberInput";
+import Popover from "~/components/Popover/Popover";
 
 interface SplitTransactionProps {
   id: string;
   originalAmount: number;
   categories: ICategory[];
-}
-
-interface FormValues {
-  amount: string | number;
-  category: string;
+  elevation: number;
 }
 
 const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
-  const form = useForm<FormValues>({
-    mode: "uncontrolled",
-    initialValues: {
-      amount: 0,
-      category: "",
-    },
-    validate: {
-      amount: (value) =>
-        value === ""
-          ? "Amount is required."
-          : Math.abs(value as number) > Math.abs(props.originalAmount)
-          ? "Cannot be greater than original amount."
-          : null,
-      category: (value) => {
-        if (value === "") {
-          return "Category is required";
-        }
-      },
-    },
+  const amountField = useField<string | number>({
+    initialValue: 0,
+  });
+
+  const categoryField = useField<string>({
+    initialValue: "",
   });
 
   const { request } = useAuth();
@@ -95,56 +79,62 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
     },
   });
 
-  const submitSplitTransaction = (values: FormValues) => {
-    doSplitTransaction.mutate({
-      id: props.id,
-      amount: values.amount === "" ? 0 : (values.amount as number),
-      category: getParentCategory(values.category, props.categories),
-      subcategory: getIsParentCategory(values.category, props.categories)
-        ? ""
-        : values.category,
-    });
-  };
-
   return (
     <Popover>
-      <Popover.Target>
+      <MantinePopover.Target>
         <ActionIcon h="100%">
           <SplitIcon size="1rem" />
         </ActionIcon>
-      </Popover.Target>
-      <Popover.Dropdown style={{ padding: "0.5rem" }}>
-        <form onSubmit={form.onSubmit(submitSplitTransaction)}>
-          <Stack gap={5}>
-            <Text fw={600}>Split Transaction</Text>
+      </MantinePopover.Target>
+      <MantinePopover.Dropdown style={{ padding: "0.5rem" }}>
+        <Stack gap="0.5rem">
+          <PrimaryText size="md">Split Transaction</PrimaryText>
+          <Stack gap="0.25rem">
+            <PrimaryText size="sm">Amount</PrimaryText>
             <NumberInput
-              {...form.getInputProps("amount")}
+              {...amountField.getInputProps()}
               prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               decimalScale={2}
               thousandSeparator=","
-              label="Amount"
               maw={200}
+              elevation={props.elevation}
             />
-            <Stack gap={2}>
-              <Text size="sm">Category</Text>
-              <CategorySelect
-                value={form.getValues().category}
-                onChange={(val) => form.setFieldValue("category", val)}
-                key={form.key("category")}
-                categories={props.categories}
-              />
-            </Stack>
-            <Button
-              type="submit"
-              mt={5}
-              size="compact-sm"
-              loading={doSplitTransaction.isPending}
-            >
-              Submit
-            </Button>
           </Stack>
-        </form>
-      </Popover.Dropdown>
+          <Stack gap="0.25rem">
+            <PrimaryText size="sm">Category</PrimaryText>
+            <CategorySelect
+              {...categoryField.getInputProps()}
+              categories={props.categories}
+              elevation={props.elevation}
+            />
+          </Stack>
+          <Button
+            size="compact-sm"
+            loading={doSplitTransaction.isPending}
+            onClick={() => {
+              doSplitTransaction.mutate({
+                id: props.id,
+                amount:
+                  amountField.getValue() === ""
+                    ? 0
+                    : (amountField.getValue() as number),
+                category: getParentCategory(
+                  categoryField.getValue(),
+                  props.categories
+                ),
+                subcategory: getIsParentCategory(
+                  categoryField.getValue(),
+                  props.categories
+                )
+                  ? ""
+                  : categoryField.getValue(),
+              });
+            }}
+          >
+            Submit
+          </Button>
+        </Stack>
+      </MantinePopover.Dropdown>
     </Popover>
   );
 };

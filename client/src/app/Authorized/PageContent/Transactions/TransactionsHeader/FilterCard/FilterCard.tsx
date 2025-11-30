@@ -1,4 +1,4 @@
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
 import classes from "./FilterCard.module.css";
 
 import AccountSelectInput from "~/components/AccountSelectInput";
@@ -69,7 +69,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
             }}
             hideHidden
           />
-          <CategorySelect
+          <CategorySelectBase
             w={{ base: "100%", sm: "20%" }}
             categories={props.categories}
             value={transactionFilters.category}

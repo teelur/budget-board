@@ -17,7 +17,7 @@ import { PlusIcon } from "lucide-react";
 import React from "react";
 import AccountSelectInput from "~/components/AccountSelectInput";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
@@ -149,7 +149,7 @@ const CreateTransactionModal = (): React.ReactNode => {
             />
             <Stack gap={3}>
               <Text fz="sm">Category</Text>
-              <CategorySelect
+              <CategorySelectBase
                 placeholder="Select category"
                 required
                 categories={transactionCategories}

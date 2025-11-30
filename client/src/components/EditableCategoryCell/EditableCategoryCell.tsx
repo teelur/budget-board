@@ -9,7 +9,7 @@ import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import { getTransactionCategory } from "~/helpers/transactions";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
 
 interface EditableCategoryCellProps {
   transaction: ITransaction;
@@ -61,7 +61,7 @@ const EditableCategoryCell = (
     <Flex className={classes.container} w={{ base: "100%", xs: "180px" }}>
       {props.isSelected ? (
         <Group onClick={(e) => e.stopPropagation()} w="100%">
-          <CategorySelect
+          <CategorySelectBase
             w="100%"
             categories={props.categories}
             value={categoryDisplayValue}
