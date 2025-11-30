@@ -28,7 +28,7 @@ import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import ElevatedNumberInput from "~/components/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 import StatusText from "~/components/Text/StatusText/StatusText";
 import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import ElevatedCategorySelect from "~/components/Select/ElevatedCategorySelect/ElevatedCategorySelect";
+import ElevatedCategorySelect from "~/components/Select/CategorySelect/ElevatedCategorySelect/ElevatedCategorySelect";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -201,7 +201,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 ? accountSubTypeField.getValue()
                 : accountTypeField.getValue()
             }
-            onChange={(val) => {
+            onChange={(val: string) => {
               const parent = getParentCategory(val, accountCategories);
               accountTypeField.setValue(parent);
               getIsParentCategory(val, accountCategories)

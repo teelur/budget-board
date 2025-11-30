@@ -12,7 +12,7 @@ import { AxiosResponse } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
+import CategorySelectBase from "~/components/Select/CategorySelect/CategorySelectBase/CategorySelectBase";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {

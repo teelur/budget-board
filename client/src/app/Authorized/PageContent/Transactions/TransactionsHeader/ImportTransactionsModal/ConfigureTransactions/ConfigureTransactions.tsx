@@ -22,6 +22,7 @@ import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { IAccountResponse } from "~/models/account";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -690,12 +691,13 @@ const ConfigureTransactions = (
       {alertDetails && (
         <Alert
           variant="outline"
-          color="red"
+          color="var(--text-color-status-bad)"
           title="Missing Info"
           icon={<InfoIcon />}
           radius="md"
+          bg="var(--background-color-surface)"
         >
-          {alertDetails}
+          <PrimaryText size="sm">{alertDetails}</PrimaryText>
         </Alert>
       )}
       {importedTransactionsTableData.length > 0 && (

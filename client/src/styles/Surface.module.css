@@ -6,6 +6,8 @@
 .input {
   background-color: var(--surface-color-input-background);
   border-color: var(--surface-color-input-border);
+  color: var(--surface-color-text-primary);
+  font-weight: 600;
 }
 
 .input::placeholder {

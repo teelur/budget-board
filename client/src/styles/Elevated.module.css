@@ -6,6 +6,8 @@
 .input {
   background-color: var(--elevated-color-input-background);
   border-color: var(--elevated-color-input-border);
+  color: var(--base-color-text-primary);
+  font-weight: 600;
 }
 
 .input::placeholder {

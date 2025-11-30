@@ -1,8 +1,10 @@
-import { Flex, Grid, Select, Text } from "@mantine/core";
+import { Flex, Grid } from "@mantine/core";
 import { ArrowRightIcon } from "lucide-react";
 import React from "react";
 import { IAccountItem } from "../AccountMapping";
 import { useField } from "@mantine/form";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Select from "~/components/Select/Select/Select";
 
 interface AccountMappingItemProps {
   accountName: string;
@@ -29,9 +31,7 @@ const AccountMappingItem = (
   return (
     <Grid w="100%" align="center">
       <Grid.Col span={4}>
-        <Text size="md" fw={600}>
-          {props.accountName}
-        </Text>
+        <PrimaryText size="md">{props.accountName}</PrimaryText>
       </Grid.Col>
       <Grid.Col span={3}>
         <Flex justify="center" align="center">
@@ -44,6 +44,7 @@ const AccountMappingItem = (
           {...accountMappingField.getInputProps()}
           clearable
           placeholder="Select account"
+          elevation={0}
         />
       </Grid.Col>
     </Grid>

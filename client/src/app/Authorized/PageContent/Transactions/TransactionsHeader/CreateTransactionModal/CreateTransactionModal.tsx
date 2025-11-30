@@ -17,7 +17,6 @@ import { PlusIcon } from "lucide-react";
 import React from "react";
 import AccountSelectInput from "~/components/AccountSelectInput";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
@@ -25,6 +24,7 @@ import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import CategorySelectBase from "~/components/Select/CategorySelect/CategorySelectBase/CategorySelectBase";
 
 interface formValues {
   date: Date | null;
@@ -150,7 +150,6 @@ const CreateTransactionModal = (): React.ReactNode => {
             <Stack gap={3}>
               <Text fz="sm">Category</Text>
               <CategorySelectBase
-                placeholder="Select category"
                 required
                 categories={transactionCategories}
                 value={form.getValues().category}

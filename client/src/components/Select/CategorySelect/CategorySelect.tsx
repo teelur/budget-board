@@ -1,9 +1,9 @@
 import ElevatedCategorySelect, {
   ElevatedCategorySelectProps,
-} from "../ElevatedCategorySelect/ElevatedCategorySelect";
+} from "./ElevatedCategorySelect/ElevatedCategorySelect";
 import SurfaceCategorySelect, {
   SurfaceCategorySelectProps,
-} from "../SurfaceCategorySelect/SurfaceCategorySelect";
+} from "./SurfaceCategorySelect/SurfaceCategorySelect";
 
 export interface CategorySelectProps
   extends SurfaceCategorySelectProps,

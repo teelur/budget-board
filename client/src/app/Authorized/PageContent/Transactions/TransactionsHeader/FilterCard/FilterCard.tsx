@@ -1,4 +1,4 @@
-import CategorySelectBase from "~/components/Select/CategorySelectBase/CategorySelectBase";
+import CategorySelectBase from "~/components/Select/CategorySelect/CategorySelectBase/CategorySelectBase";
 import classes from "./FilterCard.module.css";
 
 import AccountSelectInput from "~/components/AccountSelectInput";

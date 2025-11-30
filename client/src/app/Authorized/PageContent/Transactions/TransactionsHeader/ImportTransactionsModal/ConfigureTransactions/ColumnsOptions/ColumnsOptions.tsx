@@ -1,15 +1,10 @@
-import {
-  Card,
-  Checkbox,
-  Divider,
-  Group,
-  LoadingOverlay,
-  Select,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Divider, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
+import Card from "~/components/Card/Card";
+import Checkbox from "~/components/Checkbox/Checkbox";
+import Select from "~/components/Select/Select/Select";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 export interface IFilterByOptions {
   date: boolean;
@@ -149,24 +144,31 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
       <Divider label="Columns Options" labelPosition="center" />
       <Stack>
         <Select
-          label="Date format"
+          label={<PrimaryText size="sm">Date Format</PrimaryText>}
           data={dateFormatOptions}
           {...dateFormatField.getInputProps()}
           maw="150px"
+          elevation={0}
         />
         <Checkbox
           checked={invertAmountField.getValue()}
           onChange={(event) => {
             invertAmountField.setValue(event.currentTarget.checked);
           }}
-          label="Invert amount"
+          label={<PrimaryText size="sm">Invert amount values</PrimaryText>}
+          elevation={0}
         />
         <Checkbox
           checked={splitAmountField.getValue()}
           onChange={(event) => {
             splitAmountField.setValue(event.currentTarget.checked);
           }}
-          label="Split income/expenses into separate columns"
+          label={
+            <PrimaryText size="sm">
+              Split income/expenses into separate columns
+            </PrimaryText>
+          }
+          elevation={0}
         />
         {!splitAmountField.getValue() && (
           <Group justify="flex-start" align="center" w="100%">
@@ -177,20 +179,26 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                   event.currentTarget.checked
                 );
               }}
-              label="Include income/expenses column"
+              label={
+                <PrimaryText size="sm">
+                  Include income/expenses column
+                </PrimaryText>
+              }
+              elevation={0}
             />
             {includeExpensesColumnField.getValue() && (
               <Select
-                label="Expenses column"
+                label={<PrimaryText size="sm">Expenses column</PrimaryText>}
                 data={props.columns}
                 clearable
                 {...expensesColumnField.getInputProps()}
+                elevation={0}
               />
             )}
             {includeExpensesColumnField.getValue() &&
               expensesColumnField.getValue() && (
                 <Select
-                  label="Expenses value"
+                  label={<PrimaryText size="sm">Expenses value</PrimaryText>}
                   data={
                     props.getExpensesColumnValues(
                       expensesColumnField.getValue() ?? ""
@@ -198,6 +206,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                   }
                   clearable
                   {...expensesColumnValueField.getInputProps()}
+                  elevation={0}
                 />
               )}
           </Group>
@@ -208,21 +217,21 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             onChange={(event) => {
               filterDuplicatesField.setValue(event.currentTarget.checked);
             }}
-            label="Filter duplicates"
+            label={<PrimaryText size="sm">Filter duplicates</PrimaryText>}
+            elevation={0}
           />
           {filterDuplicatesField.getValue() && (
-            <Card p="0.5rem" radius="md" withBorder>
+            <Card elevation={0}>
               <Stack justify="center">
-                <Text size="sm" fw={600}>
-                  Columns to Match
-                </Text>
+                <PrimaryText size="sm">Columns to Match</PrimaryText>
                 <Group>
                   <Checkbox
                     checked={filterByDateField.getValue()}
                     onChange={(event) =>
                       filterByDateField.setValue(event.currentTarget.checked)
                     }
-                    label="Date"
+                    label={<PrimaryText size="sm">Date</PrimaryText>}
+                    elevation={1}
                   />
                   <Checkbox
                     checked={filterByDescriptionField.getValue()}
@@ -231,7 +240,8 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                         event.currentTarget.checked
                       )
                     }
-                    label="Description"
+                    label={<PrimaryText size="sm">Description</PrimaryText>}
+                    elevation={1}
                   />
                   <Checkbox
                     checked={filterByCategoryField.getValue()}
@@ -240,21 +250,24 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                         event.currentTarget.checked
                       )
                     }
-                    label="Category"
+                    label={<PrimaryText size="sm">Category</PrimaryText>}
+                    elevation={1}
                   />
                   <Checkbox
                     checked={filterByAmountField.getValue()}
                     onChange={(event) =>
                       filterByAmountField.setValue(event.currentTarget.checked)
                     }
-                    label="Amount"
+                    label={<PrimaryText size="sm">Amount</PrimaryText>}
+                    elevation={1}
                   />
                   <Checkbox
                     checked={filterByAccountField.getValue()}
                     onChange={(event) =>
                       filterByAccountField.setValue(event.currentTarget.checked)
                     }
-                    label="Account"
+                    label={<PrimaryText size="sm">Account</PrimaryText>}
+                    elevation={1}
                   />
                 </Group>
               </Stack>

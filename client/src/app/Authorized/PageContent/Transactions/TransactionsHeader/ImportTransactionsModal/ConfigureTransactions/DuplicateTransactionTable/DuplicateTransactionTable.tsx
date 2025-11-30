@@ -117,8 +117,8 @@ const DuplicateTransactionTable = (
                 (page - 1) * itemsPerPage + itemsPerPage
               )
               .map((row, index) => (
-                <>
-                  <Table.Tr key={index}>
+                <React.Fragment key={row.importedTransaction.uid}>
+                  <Table.Tr>
                     <Table.Td>
                       <Flex justify="center" align="center">
                         <ActionIcon
@@ -176,7 +176,7 @@ const DuplicateTransactionTable = (
                       )}
                     </Table.Td>
                   </Table.Tr>
-                </>
+                </React.Fragment>
               ))}
           </Table.Tbody>
         </Table>

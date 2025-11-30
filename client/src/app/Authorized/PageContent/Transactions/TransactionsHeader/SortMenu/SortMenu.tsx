@@ -1,9 +1,10 @@
 import classes from "./SortMenu.module.css";
 
 import SortButton, { SortDirection } from "~/components/SortButton";
-import { Flex, Group, Text } from "@mantine/core";
+import { Flex, Group } from "@mantine/core";
 import React from "react";
 import { SortOption, SortOptions, Sorts } from "./SortMenuHelpers";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 interface SortMenuProps {
   currentSort: Sorts;
@@ -30,9 +31,7 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
       direction={{ base: "column", sm: "row" }}
       align={{ base: "start", sm: "center" }}
     >
-      <Text c="dimmed" fw={600} size="sm">
-        Sort By
-      </Text>
+      <DimmedText size="sm">Sort By</DimmedText>
       <Group className={classes.sortButtons}>
         {SortOptions.map((sortOption: SortOption) => (
           <SortButton

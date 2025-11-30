@@ -82,7 +82,6 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
                     key={transaction.id}
                     transaction={transaction}
                     categories={transactionCategories}
-                    alternateColor
                   />
                 ))}
             </Stack>
