@@ -1,5 +1,3 @@
-import textClasses from "~/styles/Text.module.css";
-
 import React from "react";
 import { Text, TextProps } from "@mantine/core";
 
@@ -11,7 +9,7 @@ const PrimaryText = ({
   children,
   ...props
 }: PrimaryTextProps): React.ReactNode => (
-  <Text className={textClasses.primary} fw={600} {...props}>
+  <Text c="var(--base-color-text-primary)" fw={600} {...props}>
     {children}
   </Text>
 );

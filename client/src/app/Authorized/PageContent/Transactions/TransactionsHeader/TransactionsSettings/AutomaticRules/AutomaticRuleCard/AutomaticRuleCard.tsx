@@ -115,7 +115,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
 
   if (isSelected) {
     return (
-      <Card>
+      <Card elevation={1}>
         <Stack gap="0.5rem">
           <EditableAutomaticRuleContent
             conditionItems={conditionItems}

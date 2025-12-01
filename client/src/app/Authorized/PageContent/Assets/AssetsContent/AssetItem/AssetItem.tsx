@@ -1,6 +1,4 @@
-import cardClasses from "~/styles/Card.module.css";
-import surfaceClasses from "~/styles/Surface.module.css";
-
+import React from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { Button, Flex, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -11,7 +9,7 @@ import { closestCenter } from "@dnd-kit/collision";
 import { GripVertical } from "lucide-react";
 import AssetItemContent from "./AssetItemContent/AssetItemContent";
 import EditableAssetItemContent from "./EditableAssetItemContent/EditableAssetItemContent";
-import SurfaceCard from "~/components/Card/SurfaceCard/SurfaceCard";
+import Card from "~/components/Card/Card";
 
 interface AssetItemProps {
   asset: IAssetResponse;
@@ -37,10 +35,11 @@ const AssetItem = (props: AssetItemProps): React.ReactNode => {
   });
 
   return (
-    <SurfaceCard
+    <Card
       ref={props.isSortable ? ref : undefined}
-      className={`${surfaceClasses.root} ${isSelected ? "" : cardClasses.card}`}
       onClick={() => !isSelected && props.openDetails(props.asset)}
+      hoverEffect={!isSelected}
+      elevation={1}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (
@@ -64,7 +63,7 @@ const AssetItem = (props: AssetItemProps): React.ReactNode => {
           />
         )}
       </Group>
-    </SurfaceCard>
+    </Card>
   );
 };
 

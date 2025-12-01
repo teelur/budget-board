@@ -9,6 +9,7 @@ import Card, { CardProps } from "../../Card";
 export interface TransactionCardBaseProps extends CardProps {
   transaction: ITransaction;
   categories: ICategory[];
+  hoverEffect?: boolean;
   elevation?: number;
   disableEdit?: boolean;
 }
@@ -23,6 +24,8 @@ const TransactionCardBase = (
       w={props.w ?? "100%"}
       style={{ containerType: "inline-size" }}
       onClick={toggle}
+      hoverEffect={props.hoverEffect ?? false}
+      elevation={props.elevation ?? 0}
       {...props}
     >
       {isSelected && !(props.disableEdit ?? false) ? (

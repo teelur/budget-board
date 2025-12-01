@@ -1,4 +1,3 @@
-import cardClasses from "~/styles/Card.module.css";
 import elevatedClasses from "~/styles/Elevated.module.css";
 
 import React from "react";
@@ -13,7 +12,7 @@ const ElevatedTransactionCard = ({
 }: ElevatedTransactionCardProps): React.ReactNode => {
   return (
     <TransactionCardBase
-      className={`${cardClasses.card} ${elevatedClasses.elevated}`}
+      className={elevatedClasses.elevated}
       elevation={2}
       {...props}
     />

@@ -221,7 +221,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             elevation={0}
           />
           {filterDuplicatesField.getValue() && (
-            <Card elevation={0}>
+            <Card elevation={1}>
               <Stack justify="center">
                 <PrimaryText size="sm">Columns to Match</PrimaryText>
                 <Group>

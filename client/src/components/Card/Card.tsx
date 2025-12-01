@@ -1,17 +1,26 @@
-import { CardProps as MantineCardProps } from "@mantine/core";
 import React from "react";
-import SurfaceCard from "./SurfaceCard/SurfaceCard";
-import ElevatedCard from "./ElevatedCard/ElevatedCard";
+import SurfaceCard, { SurfaceCardProps } from "./SurfaceCard/SurfaceCard";
+import ElevatedCard, { ElevatedCardProps } from "./ElevatedCard/ElevatedCard";
+import BaseCard from "./BaseCard/BaseCard";
 
-export interface CardProps extends MantineCardProps {
-  children?: React.ReactNode;
+export interface CardProps extends SurfaceCardProps, ElevatedCardProps {
   elevation?: number;
-  onClick?: () => void;
+  hoverEffect?: boolean;
 }
 
-const Card = ({ children, elevation = 0, onClick, ...props }: CardProps) => {
+const Card = ({
+  elevation = 0,
+  onClick,
+  children,
+  ...props
+}: CardProps): React.ReactNode => {
   switch (elevation) {
     case 0:
+      return (
+        <BaseCard {...props} onClick={onClick}>
+          {children}
+        </BaseCard>
+      );
     case 1:
       return (
         <SurfaceCard {...props} onClick={onClick}>
@@ -26,9 +35,9 @@ const Card = ({ children, elevation = 0, onClick, ...props }: CardProps) => {
       );
     default:
       return (
-        <SurfaceCard {...props} onClick={onClick}>
+        <BaseCard {...props} onClick={onClick}>
           {children}
-        </SurfaceCard>
+        </BaseCard>
       );
   }
 };

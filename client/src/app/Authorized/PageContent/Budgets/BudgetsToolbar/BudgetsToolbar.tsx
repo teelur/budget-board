@@ -97,7 +97,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   };
 
   return (
-    <Stack>
+    <Stack gap="1rem">
       <MonthToolcards
         selectedDates={props.selectedDates}
         setSelectedDates={props.setSelectedDates}

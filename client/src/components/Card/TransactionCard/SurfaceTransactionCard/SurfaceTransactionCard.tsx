@@ -1,4 +1,3 @@
-import cardClasses from "~/styles/Card.module.css";
 import surfaceClasses from "~/styles/Surface.module.css";
 
 import React from "react";
@@ -8,12 +7,13 @@ import TransactionCardBase, {
 
 interface SurfaceTransactionCardProps extends TransactionCardBaseProps {}
 
+// TODO: Convert to generic these are fucked.
 const SurfaceTransactionCard = ({
   ...props
 }: SurfaceTransactionCardProps): React.ReactNode => {
   return (
     <TransactionCardBase
-      className={`${cardClasses.card} ${surfaceClasses.root}`}
+      className={surfaceClasses.root}
       elevation={1}
       {...props}
     />

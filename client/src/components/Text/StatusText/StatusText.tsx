@@ -26,7 +26,7 @@ const StatusText = ({
         type ?? BudgetValueType.Total,
         warningThreshold ?? 110
       )}
-      fw={600}
+      fw={props.fw ?? 600}
       {...props}
     >
       {children}

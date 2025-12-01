@@ -1,6 +1,3 @@
-import cardClasses from "~/styles/Card.module.css";
-import elevatedClasses from "~/styles/Elevated.module.css";
-
 import React from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { Button, Flex, Group } from "@mantine/core";
@@ -12,7 +9,7 @@ import { closestCenter } from "@dnd-kit/collision";
 import { useDisclosure } from "@mantine/hooks";
 import AccountItemContent from "./AccountItemContent/AccountItemContent";
 import EditableAccountItemContent from "./EditableAccountItemContent/EditableAccountItemContent";
-import ElevatedCard from "~/components/Card/ElevatedCard/ElevatedCard";
+import Card from "~/components/Card/Card";
 
 interface IAccountItemProps {
   account: IAccountResponse;
@@ -38,12 +35,11 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
   });
 
   return (
-    <ElevatedCard
+    <Card
       ref={props.isSortable ? ref : undefined}
-      className={`${elevatedClasses.root} ${
-        isSelected ? "" : cardClasses.card
-      }`}
       onClick={() => !isSelected && props.openDetails(props.account)}
+      hoverEffect={!isSelected}
+      elevation={2}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (
@@ -67,7 +63,7 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
           />
         )}
       </Group>
-    </ElevatedCard>
+    </Card>
   );
 };
 export default AccountItem;

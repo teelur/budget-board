@@ -1,6 +1,4 @@
-import classes from "./UnbudgetedGroup.module.css";
-
-import { Accordion, Group, Stack, Text } from "@mantine/core";
+import { Accordion, Group, Stack } from "@mantine/core";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
@@ -9,6 +7,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -46,30 +47,24 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
     }, 0) + (props.categoryToTransactionsTotalMap.get("") ?? 0);
 
   return (
-    <Accordion variant="separated" radius="md">
-      <Accordion.Item
-        className={classes.accordion}
-        key="unbudgeted"
-        value="unbudgeted"
-      >
+    <SurfaceAccordionRoot defaultValue={[]}>
+      <Accordion.Item value="unbudgeted">
         <Accordion.Control>
           <Group justify="space-between" align="center" w="100%" pr="1rem">
-            <Text size="lg" fw={600}>
-              Unbudgeted
-            </Text>
+            <PrimaryText size="lg">Unbudgeted</PrimaryText>
             {userSettingsQuery.isPending ? null : (
-              <Text size="lg" fw={600}>
+              <PrimaryText size="lg">
                 {convertNumberToCurrency(
                   total,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </PrimaryText>
             )}
           </Group>
         </Accordion.Control>
-        <Accordion.Panel p={0}>
-          <Stack gap="0.6rem">
+        <Accordion.Panel>
+          <Stack gap="0.5rem">
             <UnbudgetedCard
               categoryTree={
                 new CategoryNode({
@@ -96,12 +91,14 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
                 />
               ))
             ) : (
-              <Text>No unbudgeted transactions found.</Text>
+              <DimmedText size="sm">
+                No unbudgeted transactions found.
+              </DimmedText>
             )}
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
-    </Accordion>
+    </SurfaceAccordionRoot>
   );
 };
 

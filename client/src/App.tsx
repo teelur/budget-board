@@ -87,6 +87,8 @@ const resolver: CSSVariablesResolver = (theme) => ({
     // Button colors
     "--button-color-confirm": green[9],
     "--button-color-destructive": red[5],
+    // Other
+    "--light-color-off": backgroundWhite[4],
 
     // TODO: remove
     "--mantine-color-text": theme.colors.dark[7],
@@ -130,6 +132,9 @@ const resolver: CSSVariablesResolver = (theme) => ({
     // Button colors
     "--button-color-confirm": green[9],
     "--button-color-destructive": red[4],
+    // Other
+    "--light-color-off": backgroundGray[3],
+
     // TODO: remove
     "--mantine-color-header-background": theme.colors.dark[8],
     "--mantine-color-content-background": theme.colors.dark[7],

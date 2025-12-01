@@ -1,7 +1,7 @@
 import classes from "./UnbudgetChildCard.module.css";
 
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { ActionIcon, Card, Group, LoadingOverlay, Text } from "@mantine/core";
+import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -13,6 +13,8 @@ import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 interface UnbudgetChildCardProps {
   selectedDate: Date | null;
@@ -65,15 +67,14 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
     <Group wrap="nowrap">
       <CornerDownRight />
       <Card
-        className={classes.unbudgetCard}
-        p="0.5rem"
-        radius="md"
         w="100%"
         onClick={() => {
           if (props.selectedDate) {
             props.openDetails(props.category, props.selectedDate);
           }
         }}
+        hoverEffect
+        elevation={2}
       >
         <LoadingOverlay visible={doAddBudget.isPending} />
         <Group
@@ -81,18 +82,16 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
           w="100%"
           style={{ containerType: "inline-size" }}
         >
-          <Text className={classes.text} fw={600}>
-            {props.category}
-          </Text>
-          <Group gap="sm">
+          <PrimaryText className={classes.text}>{props.category}</PrimaryText>
+          <Group gap="0.5rem">
             {userSettingsQuery.isPending ? null : (
-              <Text className={classes.text} fw={600}>
+              <PrimaryText className={classes.text}>
                 {convertNumberToCurrency(
                   props.amount * (props.isIncome ? 1 : -1),
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </PrimaryText>
             )}
             {props.selectedDate &&
               !areStringsEqual(

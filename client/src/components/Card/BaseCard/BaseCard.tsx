@@ -1,20 +1,23 @@
-import elevatedClasses from "~/styles/Elevated.module.css";
+import baseClasses from "~/styles/Base.module.css";
 
 import React from "react";
 import { Card, CardProps } from "@mantine/core";
 
-export interface ElevatedCardProps extends CardProps {
+export interface BaseCardProps extends CardProps {
   hoverEffect?: boolean;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
   onClick?: () => void;
 }
 
-const ElevatedCard = ({ children, ...props }: ElevatedCardProps) => {
+const BaseCard = ({ children, ...props }: BaseCardProps) => {
   return (
     <Card
       ref={props.ref}
-      className={elevatedClasses.root}
+      className={baseClasses.root}
+      style={{
+        transition: "background 0.2s",
+      }}
       onMouseEnter={(e) => {
         if (props.hoverEffect) {
           e.currentTarget.style.borderColor =
@@ -34,4 +37,4 @@ const ElevatedCard = ({ children, ...props }: ElevatedCardProps) => {
   );
 };
 
-export default ElevatedCard;
+export default BaseCard;

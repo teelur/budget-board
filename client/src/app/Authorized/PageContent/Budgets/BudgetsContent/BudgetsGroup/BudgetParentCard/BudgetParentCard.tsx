@@ -4,11 +4,9 @@ import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import {
   ActionIcon,
   Button,
-  Card,
   Flex,
   Group,
   LoadingOverlay,
-  NumberInput,
   Popover,
   Progress,
   Stack,
@@ -30,6 +28,11 @@ import { AxiosError, AxiosResponse } from "axios";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IUserSettings } from "~/models/userSettings";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import NumberInput from "~/components/Input/NumberInput/NumberInput";
+import StatusText from "~/components/Text/StatusText/StatusText";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -221,40 +224,33 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { budgetChildCards, unbudgetChildCards } = buildChildren();
 
   return (
-    <Card
-      className={classes.root}
-      bg="var(--mantine-color-content-background)"
-      p="0.25rem"
-      w="100%"
-      radius="md"
-    >
-      <Stack gap={5}>
+    <Card p="0.25rem" w="100%" elevation={1}>
+      <Stack gap="0.25rem">
         <Card
-          className={classes.budgetCard}
           p="0.25rem 0.5rem"
-          radius="md"
-          bg={isSelected ? "var(--mantine-primary-color-light)" : ""}
-          shadow="md"
           onClick={() => {
             if (id.length > 0) {
               props.openDetails(props.categoryTree.value, props.selectedDate);
             }
           }}
+          hoverEffect
+          elevation={2}
         >
           <LoadingOverlay
             visible={doEditBudget.isPending || doDeleteBudget.isPending}
           />
-          <Group gap="1rem" align="flex-start" wrap="nowrap">
+          <Group gap="0.75rem" align="flex-start" wrap="nowrap">
             <Stack gap={0} w="100%">
               <Group
                 justify="space-between"
                 align="center"
                 style={{ containerType: "inline-size" }}
+                gap={0}
               >
-                <Group gap={5} align="center">
-                  <Text className={classes.title} fw={600}>
+                <Group gap="0.25rem" align="center">
+                  <PrimaryText className={classes.title}>
                     {props.categoryTree.value}
-                  </Text>
+                  </PrimaryText>
                   <ActionIcon
                     variant={isSelected ? "outline" : "transparent"}
                     size="md"
@@ -269,20 +265,17 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     <PencilIcon size={16} />
                   </ActionIcon>
                 </Group>
-                <Group gap={5} justify="flex-end" align="center">
+                <Group gap="0.5rem" justify="flex-end" align="center">
                   {userSettingsQuery.isPending ? null : (
-                    <Text className={classes.text} fw={700}>
+                    <PrimaryText className={classes.text}>
                       {convertNumberToCurrency(
                         amount * (isIncome ? 1 : -1),
                         false,
                         userSettingsQuery.data?.currency ?? "USD"
                       )}
-                    </Text>
+                    </PrimaryText>
                   )}
-                  <Text className={classes.textSmall} fw={600}>
-                    {" "}
-                    of{" "}
-                  </Text>
+                  <DimmedText className={classes.textSmall}> of </DimmedText>
                   {isSelected ? (
                     <Flex onClick={(e) => e.stopPropagation()}>
                       <NumberInput
@@ -295,7 +288,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                           userSettingsQuery.data?.currency
                         )}
                         placeholder="Limit"
-                        radius="md"
                         size="xs"
                         styles={{
                           root: {
@@ -306,21 +298,22 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                             fontSize: "16px",
                           },
                         }}
+                        elevation={2}
                       />
                     </Flex>
                   ) : userSettingsQuery.isPending ? null : (
-                    <Text className={classes.text} fw={700}>
+                    <PrimaryText className={classes.text}>
                       {convertNumberToCurrency(
                         limit,
                         false,
                         userSettingsQuery.data?.currency ?? "USD"
                       )}
-                    </Text>
+                    </PrimaryText>
                   )}
                 </Group>
               </Group>
               <Group
-                gap={5}
+                gap="0.25rem"
                 justify="flex-end"
                 align="baseline"
                 style={{ containerType: "inline-size" }}
@@ -345,29 +338,27 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   </Progress.Root>
                 </Flex>
                 {userSettingsQuery.isPending ? null : (
-                  <Text
-                    size="md"
-                    fw={700}
-                    c={getBudgetValueColor(
-                      roundAwayFromZero(amount),
-                      limit,
+                  <StatusText
+                    amount={roundAwayFromZero(amount)}
+                    total={limit}
+                    type={
                       isIncome
                         ? BudgetValueType.Income
-                        : BudgetValueType.Expense,
+                        : BudgetValueType.Expense
+                    }
+                    warningThreshold={
                       userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                    )}
+                    }
+                    size="md"
                   >
                     {convertNumberToCurrency(
                       roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
                       false,
                       userSettingsQuery.data?.currency ?? "USD"
                     )}
-                  </Text>
+                  </StatusText>
                 )}
-                <Text size="sm" fw={600}>
-                  {" "}
-                  left
-                </Text>
+                <DimmedText size="sm"> left</DimmedText>
               </Group>
             </Stack>
             {isSelected && (
@@ -377,7 +368,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               >
                 <Popover>
                   <Popover.Target>
-                    <ActionIcon color="red" h="100%">
+                    <ActionIcon
+                      color="var(--button-color-destructive)"
+                      h="100%"
+                    >
                       <TrashIcon size="1rem" />
                     </ActionIcon>
                   </Popover.Target>
@@ -408,7 +402,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
         </Card>
         {props.categoryTree.subCategories.length > 0 &&
           (budgetChildCards.length > 0 || unbudgetChildCards.length > 0) && (
-            <Stack gap={5}>
+            <Stack gap="0.25rem">
               {budgetChildCards.length > 0 && budgetChildCards}
               {unbudgetChildCards.length > 0 && unbudgetChildCards}
             </Stack>

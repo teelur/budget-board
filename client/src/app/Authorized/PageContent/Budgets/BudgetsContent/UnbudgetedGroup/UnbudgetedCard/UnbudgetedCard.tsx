@@ -1,14 +1,5 @@
-import classes from "./UnbudgetedCard.module.css";
-
 import { convertNumberToCurrency } from "~/helpers/currency";
-import {
-  ActionIcon,
-  Card,
-  Group,
-  LoadingOverlay,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -22,6 +13,8 @@ import UnbudgetedChildCard from "./UnbudgetedChildCard/UnbudgetedChildCard";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -78,25 +71,24 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   return (
     <Stack gap="0.5rem" w="100%">
       <Card
-        className={classes.root}
-        radius="md"
-        p="0.5rem"
         onClick={() => {
           if (props.selectedDate) {
             props.openDetails(props.categoryTree.value, props.selectedDate);
           }
         }}
+        hoverEffect
+        elevation={2}
       >
         <LoadingOverlay visible={doAddBudget.isPending} />
         <Group w="100%" justify="space-between">
-          <Text size="1rem" fw={600}>
+          <PrimaryText size="md" fw={600}>
             {props.categoryTree.value.length === 0
               ? uncategorizedTransactionCategory
               : props.categoryTree.value}
-          </Text>
+          </PrimaryText>
           <Group gap="sm">
             {userSettingsQuery.isPending ? null : (
-              <Text size="1rem" fw={600}>
+              <PrimaryText size="1rem" fw={600}>
                 {convertNumberToCurrency(
                   props.categoryToTransactionsTotalMap.get(
                     props.categoryTree.value.toLocaleLowerCase()
@@ -104,7 +96,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </PrimaryText>
             )}
             {props.selectedDate &&
               !areStringsEqual(
