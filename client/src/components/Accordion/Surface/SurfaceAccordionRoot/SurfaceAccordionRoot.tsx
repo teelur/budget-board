@@ -7,6 +7,7 @@ export interface SurfaceAccordionRootProps extends AccordionProps<true> {
   children: React.ReactNode;
 }
 
+// TODO: Make this generic
 const SurfaceAccordionRoot = ({
   children,
   ...props

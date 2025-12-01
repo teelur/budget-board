@@ -2,6 +2,7 @@
   background-color: var(--background-color-surface);
   border-color: var(--surface-color-input-border);
   border-width: 1px;
+  font-weight: 600;
 }
 
 .search {

@@ -106,7 +106,7 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--background-color-base": backgroundGray[9],
     "--base-color-border": backgroundGray[4],
     "--base-color-text-primary": textGray[0],
-    "--base-color-text-dimmed": textGray[9],
+    "--base-color-text-dimmed": textGray[8],
     "--base-color-input-background": backgroundGray[5],
     "--base-color-input-border": backgroundGray[1],
     // Sidebar and Header colors

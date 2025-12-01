@@ -5,11 +5,9 @@ import CategorySelectBase, {
   CategorySelectBaseProps,
 } from "../CategorySelectBase/CategorySelectBase";
 
-export interface SurfaceCategorySelectProps extends CategorySelectBaseProps {}
-
 const SurfaceCategorySelect = ({
   ...props
-}: SurfaceCategorySelectProps): React.ReactNode => {
+}: CategorySelectBaseProps): React.ReactNode => {
   return (
     <CategorySelectBase
       classNames={{

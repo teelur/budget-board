@@ -1,4 +1,4 @@
-import { Accordion, Modal, Stack, Text } from "@mantine/core";
+import { Accordion, Group, Stack } from "@mantine/core";
 import React from "react";
 import CustomCategories from "./CustomCategories/CustomCategories";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -8,6 +8,10 @@ import { AxiosResponse } from "axios";
 import { getDeletedTransactions } from "~/helpers/transactions";
 import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
 import AutomaticRules from "./AutomaticRules/AutomaticRules";
+import Modal from "~/components/Modal/Modal";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 interface TransactionsSettingsProps {
   modalOpened: boolean;
@@ -43,93 +47,57 @@ const TransactionsSettings = (
   );
 
   return (
-    <Modal.Root
+    <Modal
       size="40rem"
-      centered
-      padding="0.5rem"
       opened={props.modalOpened}
       onClose={props.closeModal}
-      styles={{
-        inner: {
-          left: "0",
-          right: "0",
-          padding: "0 !important",
-        },
-      }}
+      title={<PrimaryText size="md">Transactions Settings</PrimaryText>}
     >
-      <Modal.Overlay />
-      <Modal.Content bg="var(--mantine-color-content-background)">
-        <Modal.Header bg="var(--mantine-color-content-background)">
-          <Modal.Title>
-            <Text fw={600}>Transactions Settings</Text>
-          </Modal.Title>
-          <Modal.CloseButton />
-        </Modal.Header>
-        <Modal.Body>
-          <Accordion
-            variant="separated"
-            multiple
-            defaultValue={["custom categories", "automatic rule"]}
-          >
-            <Accordion.Item
-              value="custom categories"
-              bg="var(--mantine-color-accordion-alternate)"
-            >
-              <Accordion.Control>
-                <Text size="md" fw={600}>
-                  Custom Categories
-                </Text>
-              </Accordion.Control>
-              <Accordion.Panel>
-                <CustomCategories />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item
-              value="automatic rule"
-              bg="var(--mantine-color-accordion-alternate)"
-            >
-              <Accordion.Control>
-                <Text size="md" fw={600}>
-                  Automatic Rules
-                </Text>
-              </Accordion.Control>
-              <Accordion.Panel>
-                <AutomaticRules />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item
-              value="deleted transactions"
-              bg="var(--mantine-color-accordion-alternate)"
-            >
-              <Accordion.Control>
-                <Text size="md" fw={600}>
-                  Deleted Transactions
-                </Text>
-              </Accordion.Control>
-              <Accordion.Panel>
-                <Stack gap="0.5rem">
-                  <Text c="dimmed" size="sm" fw={600}>
-                    View and restore deleted transactions.
-                  </Text>
-                  {deletedTransactions.length !== 0 ? (
-                    deletedTransactions.map(
-                      (deletedTransaction: ITransaction) => (
-                        <DeletedTransactionsCard
-                          key={deletedTransaction.id}
-                          deletedTransaction={deletedTransaction}
-                        />
-                      )
-                    )
-                  ) : (
-                    <span>No deleted transactions.</span>
-                  )}
-                </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-          </Accordion>
-        </Modal.Body>
-      </Modal.Content>
-    </Modal.Root>
+      <SurfaceAccordionRoot
+        defaultValue={["custom categories", "automatic rule"]}
+      >
+        <Accordion.Item value="custom categories">
+          <Accordion.Control>
+            <PrimaryText size="md">Custom Categories</PrimaryText>
+          </Accordion.Control>
+          <Accordion.Panel>
+            <CustomCategories />
+          </Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="automatic rule">
+          <Accordion.Control>
+            <PrimaryText size="md">Automatic Rules</PrimaryText>
+          </Accordion.Control>
+          <Accordion.Panel>
+            <AutomaticRules />
+          </Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="deleted transactions">
+          <Accordion.Control>
+            <PrimaryText size="md">Deleted Transactions</PrimaryText>
+          </Accordion.Control>
+          <Accordion.Panel>
+            <Stack gap="0.5rem">
+              <DimmedText size="sm">
+                View and restore deleted transactions.
+              </DimmedText>
+              {deletedTransactions.length !== 0 ? (
+                deletedTransactions.map((deletedTransaction: ITransaction) => (
+                  <DeletedTransactionsCard
+                    key={deletedTransaction.id}
+                    deletedTransaction={deletedTransaction}
+                  />
+                ))
+              ) : (
+                <Group justify="center">
+                  <DimmedText size="sm">No deleted transactions</DimmedText>
+                </Group>
+              )}
+            </Stack>
+          </Accordion.Panel>
+        </Accordion.Item>
+      </SurfaceAccordionRoot>
+    </Modal>
   );
 };
 

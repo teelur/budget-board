@@ -239,7 +239,7 @@ const EditableTransactionCardContent = (
             />
           </Flex>
           <ActionIcon
-            color="red"
+            color="var(--button-color-destructive)"
             onClick={(e) => {
               e.stopPropagation();
               doDeleteTransaction.mutate(props.transaction.id);

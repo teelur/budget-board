@@ -22,7 +22,3 @@
 .input::placeholder {
   color: var(--base-color-text-dimmed);
 }
-
-.input input-clear-button {
-  background-color: var(--base-color-text-dimmed);
-}

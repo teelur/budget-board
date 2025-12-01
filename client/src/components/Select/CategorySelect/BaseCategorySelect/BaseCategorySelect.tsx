@@ -1,21 +1,21 @@
-import elevatedClasses from "~/styles/Elevated.module.css";
+import baseClasses from "~/styles/Base.module.css";
 
 import React from "react";
 import CategorySelectBase, {
   CategorySelectBaseProps,
 } from "../CategorySelectBase/CategorySelectBase";
 
-const ElevatedCategorySelect = ({
+const BaseCategorySelect = ({
   ...props
 }: CategorySelectBaseProps): React.ReactNode => {
   return (
     <CategorySelectBase
       classNames={{
-        input: elevatedClasses.input,
+        input: baseClasses.input,
       }}
       {...props}
     />
   );
 };
 
-export default ElevatedCategorySelect;
+export default BaseCategorySelect;

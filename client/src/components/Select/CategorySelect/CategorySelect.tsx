@@ -1,29 +1,25 @@
-import ElevatedCategorySelect, {
-  ElevatedCategorySelectProps,
-} from "./ElevatedCategorySelect/ElevatedCategorySelect";
-import SurfaceCategorySelect, {
-  SurfaceCategorySelectProps,
-} from "./SurfaceCategorySelect/SurfaceCategorySelect";
+import BaseCategorySelect from "./BaseCategorySelect/BaseCategorySelect";
+import { CategorySelectBaseProps } from "./CategorySelectBase/CategorySelectBase";
+import ElevatedCategorySelect from "./ElevatedCategorySelect/ElevatedCategorySelect";
+import SurfaceCategorySelect from "./SurfaceCategorySelect/SurfaceCategorySelect";
 
-export interface CategorySelectProps
-  extends SurfaceCategorySelectProps,
-    ElevatedCategorySelectProps {
+export interface CategorySelectProps extends CategorySelectBaseProps {
   elevation?: number;
 }
 
 const CategorySelect = ({
-  elevation,
+  elevation = 0,
   ...props
 }: CategorySelectProps): React.ReactNode => {
   switch (elevation) {
     case 0:
-      throw new Error("Base is not supported for CategorySelect");
+      return <BaseCategorySelect {...props} />;
     case 1:
       return <SurfaceCategorySelect {...props} />;
     case 2:
       return <ElevatedCategorySelect {...props} />;
     default:
-      return <SurfaceCategorySelect {...props} />;
+      throw new Error("Invalid elevation level for CategorySelect");
   }
 };
 

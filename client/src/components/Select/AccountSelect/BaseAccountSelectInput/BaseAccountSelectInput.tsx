@@ -1,21 +1,23 @@
-import surfaceClasses from "~/styles/Surface.module.css";
+import baseClasses from "~/styles/Base.module.css";
+import dropdownClasses from "~/styles/Dropdown.module.css";
 
 import React from "react";
 import AccountSelectInputBase, {
   AccountSelectInputBaseProps,
 } from "../AccountSelectInputBase/AccountSelectInputBase";
 
-const SurfaceAccountSelectInput = ({
+const BaseAccountSelectInput = ({
   ...props
 }: AccountSelectInputBaseProps): React.ReactNode => {
   return (
     <AccountSelectInputBase
       classNames={{
-        input: surfaceClasses.input,
+        input: baseClasses.input,
+        dropdown: dropdownClasses.dropdown,
       }}
       {...props}
     />
   );
 };
 
-export default SurfaceAccountSelectInput;
+export default BaseAccountSelectInput;

@@ -4,11 +4,11 @@ import SurfaceTextInput from "../Surface/SurfaceTextInput/SurfaceTextInput";
 import ElevatedTextInput from "../Elevated/ElevatedTextInput/ElevatedTextInput";
 
 export interface TextInputProps extends MantineTextInputProps {
-  elevation: number;
+  elevation?: number;
 }
 
 const TextInput = ({
-  elevation,
+  elevation = 0,
   ...props
 }: TextInputProps): React.ReactNode => {
   switch (elevation) {

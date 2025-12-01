@@ -13,12 +13,14 @@ import {
   Input,
   InputBase,
   InputBaseProps,
-  Text,
   useCombobox,
 } from "@mantine/core";
 import { ICategory, ICategoryNode } from "~/models/category";
 import React from "react";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import CategoryOptionText from "./CategoryOptionText/CategoryOptionText";
 
 export interface CategorySelectBaseProps extends InputBaseProps {
   categories: ICategory[];
@@ -69,18 +71,14 @@ const CategorySelectBase = ({
               ) : (
                 <div style={{ width: 12 }} />
               )}
-              <Text
-                fz="sm"
-                style={{
-                  fontWeight: getIsParentCategory(category.value, categories)
-                    ? 700
-                    : 400,
-                  textWrap: "nowrap",
-                }}
+              <CategoryOptionText
+                size="sm"
+                isParent={getIsParentCategory(category.value, categories)}
                 pl={getIsParentCategory(category.value, categories) ? 0 : 10}
+                style={{ textWrap: "nowrap" }}
               >
                 {category.value}
-              </Text>
+              </CategoryOptionText>
             </Group>
           </Combobox.Option>
         );
@@ -121,15 +119,13 @@ const CategorySelectBase = ({
             ) : (
               <div style={{ width: 12 }} />
             )}
-            <Text
-              fz="sm"
-              style={{
-                fontWeight: 700,
-                textWrap: "nowrap",
-              }}
+            <CategoryOptionText
+              size="sm"
+              isParent
+              style={{ textWrap: "nowrap" }}
             >
               {uncategorizedTransactionCategory}
-            </Text>
+            </CategoryOptionText>
           </Group>
         </Combobox.Option>
       );
@@ -156,7 +152,6 @@ const CategorySelectBase = ({
     >
       <Combobox.Target>
         <InputBase
-          miw={props.miw ?? 200}
           component="button"
           type="button"
           rightSection={<Combobox.Chevron />}
@@ -167,9 +162,13 @@ const CategorySelectBase = ({
           {...props}
         >
           {value ? (
-            <Text fz="sm">{getFormattedCategoryValue(value, categories)}</Text>
+            <PrimaryText size="sm">
+              {getFormattedCategoryValue(value, categories)}
+            </PrimaryText>
           ) : (
-            <Input.Placeholder>Pick value</Input.Placeholder>
+            <Input.Placeholder>
+              <DimmedText size="sm">Pick value</DimmedText>
+            </Input.Placeholder>
           )}
         </InputBase>
       </Combobox.Target>

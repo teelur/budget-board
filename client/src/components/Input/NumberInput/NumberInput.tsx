@@ -8,7 +8,7 @@ export interface NumberInputProps extends MantineNumberInputProps {
 }
 
 const NumberInput = ({
-  elevation,
+  elevation = 0,
   ...props
 }: NumberInputProps): React.ReactNode => {
   switch (elevation) {
