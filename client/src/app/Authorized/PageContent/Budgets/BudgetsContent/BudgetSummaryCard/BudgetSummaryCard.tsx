@@ -1,4 +1,4 @@
-import { Card, Skeleton, Stack, Text } from "@mantine/core";
+import { Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import BudgetSummaryItem from "./BudgetSummaryItem/BudgetSummaryItem";
 import { IBudget } from "~/models/budget";
@@ -7,6 +7,8 @@ import { ICategory } from "~/models/category";
 import { areStringsEqual } from "~/helpers/utils";
 import { sumTransactionAmounts } from "~/helpers/transactions";
 import { BudgetValueType } from "~/helpers/budgets";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 interface BudgetSummaryCardProps {
   incomeCategories: ICategory[];
@@ -62,15 +64,15 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
-      <Text fw={600} px="0.5rem">
+      <PrimaryText size="md" px="0.5rem">
         Budget Summary
-      </Text>
-      <Card p="0.5rem" bg="var(--mantine-color-content)" radius="md" withBorder>
+      </PrimaryText>
+      <Card elevation={1}>
         <Stack gap="0.5rem">
           {props.isPending ? (
             <Skeleton h={105} radius="md" />
           ) : (
-            <Card p="0.5rem" radius="md">
+            <Card elevation={2}>
               <Stack gap="0.25rem">
                 <BudgetSummaryItem
                   label="Income"
@@ -97,7 +99,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
           {props.isPending ? (
             <Skeleton h={56} radius="md" />
           ) : (
-            <Card p="0.5rem" radius="md">
+            <Card elevation={2}>
               <Stack gap="0.25rem">
                 <BudgetSummaryItem
                   label="Unbudgeted"

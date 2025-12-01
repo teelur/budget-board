@@ -184,7 +184,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               </Button>
             </Group>
           </Group>
-          <StatusText value={props.account.currentBalance} size="md">
+          <StatusText amount={props.account.currentBalance} size="md">
             {convertNumberToCurrency(
               props.account.currentBalance,
               true,

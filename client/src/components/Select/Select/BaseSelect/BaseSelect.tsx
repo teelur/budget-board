@@ -1,4 +1,5 @@
 import baseClasses from "~/styles/Base.module.css";
+import dropdownClasses from "~/styles/Dropdown.module.css";
 
 import { Select, SelectProps } from "@mantine/core";
 
@@ -9,6 +10,7 @@ const BaseSelect = ({ ...props }: BaseSelectProps): React.ReactNode => {
     <Select
       classNames={{
         input: baseClasses.input,
+        dropdown: dropdownClasses.dropdown,
       }}
       {...props}
     />

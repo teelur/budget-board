@@ -39,7 +39,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           )}
           {props.account.syncID !== null && <Badge bg="blue">SimpleFIN</Badge>}
         </Group>
-        <StatusText value={props.account.currentBalance} size="md">
+        <StatusText amount={props.account.currentBalance} size="md">
           {convertNumberToCurrency(
             props.account.currentBalance,
             true,

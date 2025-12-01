@@ -1,20 +1,22 @@
 import { SelectProps as MantineSelectProps } from "@mantine/core";
 import BaseSelect from "./BaseSelect/BaseSelect";
+import SurfaceSelect from "./SurfaceSelect/SurfaceSelect";
+import ElevatedSelect from "./ElevatedSelect/ElevatedSelect";
 
 export interface SelectProps extends MantineSelectProps {
   elevation?: number;
 }
 
-const Select = ({ elevation, ...props }: SelectProps): React.ReactNode => {
+const Select = ({ elevation = 0, ...props }: SelectProps): React.ReactNode => {
   switch (elevation) {
     case 0:
       return <BaseSelect {...props} />;
     case 1:
-      throw new Error("SurfaceSelect not implemented");
+      return <SurfaceSelect {...props} />;
     case 2:
-      throw new Error("ElevatedSelect not implemented");
+      return <ElevatedSelect {...props} />;
     default:
-      return <BaseSelect {...props} />;
+      throw new Error("Invalid elevation level for Select");
   }
 };
 

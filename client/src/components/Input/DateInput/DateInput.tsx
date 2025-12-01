@@ -4,11 +4,11 @@ import SurfaceDateInput from "../Surface/SurfaceDateInput/SurfaceDateInput";
 import { DateInputProps as MantineDateInputProps } from "@mantine/dates";
 
 export interface DateInputProps extends MantineDateInputProps {
-  elevation: number;
+  elevation?: number;
 }
 
 const DateInput = ({
-  elevation,
+  elevation = 0,
   ...props
 }: DateInputProps): React.ReactNode => {
   switch (elevation) {
@@ -19,7 +19,7 @@ const DateInput = ({
     case 2:
       return <ElevatedDateInput {...props} />;
     default:
-      return <BaseDateInput {...props} />;
+      throw new Error("Invalid elevation level for DateInput");
   }
 };
 

@@ -143,33 +143,33 @@ export const getBudgetValueColor = (
 ): string => {
   if (type === BudgetValueType.Income) {
     if (amount < total) {
-      return "var(--mantine-primary-color-light-color)";
+      return "var(--text-color-status-neutral)";
     }
-    return "green";
+    return "var(--text-color-status-good)";
   }
 
   if (type === BudgetValueType.Expense) {
     {
       const invertedAmount = amount * -1;
       if (invertedAmount > total) {
-        return "red";
+        return "var(--text-color-status-bad)";
       }
       if (invertedAmount >= total * (warningThreshold / 100)) {
-        return "yellow";
+        return "var(--text-color-status-warning)";
       }
-      return "green";
+      return "var(--text-color-status-good)";
     }
   }
 
   if (type === BudgetValueType.Total) {
     if (amount < 0) {
-      return "red";
+      return "var(--text-color-status-bad)";
     } else if (amount >= 0) {
-      return "green";
+      return "var(--text-color-status-good)";
     }
   }
 
-  return "var(--mantine-color-text)";
+  return "var(--base-color-text-primary)";
 };
 
 /**

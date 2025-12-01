@@ -21,6 +21,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 const AddAutomaticRule = (): React.ReactNode => {
   const defaultField =
     TransactionFields.find((field) => field.value === "merchant")?.value ?? "";
+
   const [conditionItems, setConditionItems] = React.useState<
     IRuleParameterEdit[]
   >([

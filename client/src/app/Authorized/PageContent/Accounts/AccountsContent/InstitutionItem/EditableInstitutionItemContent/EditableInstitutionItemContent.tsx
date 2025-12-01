@@ -72,7 +72,7 @@ const EditableInstitutionItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <StatusText value={props.totalBalance} size="md">
+      <StatusText amount={props.totalBalance} size="md">
         {convertNumberToCurrency(props.totalBalance, true, props.userCurrency)}
       </StatusText>
     </Group>

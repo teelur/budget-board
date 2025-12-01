@@ -107,7 +107,7 @@ const TransactionCardContent = (
         </Flex>
         <Flex className={classes.amountContainer}>
           {userSettingsQuery.isPending ? null : (
-            <StatusText value={props.transaction.amount} size="md">
+            <StatusText amount={props.transaction.amount} size="md">
               {convertNumberToCurrency(
                 props.transaction.amount,
                 true,

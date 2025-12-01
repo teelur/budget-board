@@ -30,7 +30,7 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <StatusText value={props.value.amount} size="md">
+      <StatusText amount={props.value.amount} size="md">
         {convertNumberToCurrency(props.value.amount, true, props.userCurrency)}
       </StatusText>
     </Group>

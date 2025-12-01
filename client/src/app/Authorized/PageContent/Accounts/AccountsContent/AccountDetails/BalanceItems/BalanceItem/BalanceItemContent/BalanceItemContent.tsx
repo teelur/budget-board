@@ -32,7 +32,7 @@ const BalanceItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <StatusText value={props.balance.amount} size="md">
+      <StatusText amount={props.balance.amount} size="md">
         {convertNumberToCurrency(
           props.balance.amount,
           true,

@@ -1,5 +1,3 @@
-import classes from "./Budgets.module.css";
-
 import { Stack } from "@mantine/core";
 import React from "react";
 import BudgetsToolbar from "./BudgetsToolbar/BudgetsToolbar";
@@ -89,7 +87,7 @@ const Budgets = (): React.ReactNode => {
   );
 
   return (
-    <Stack className={classes.root}>
+    <Stack w="100%" maw={1400}>
       <BudgetsToolbar
         categories={transactionCategories}
         selectedDates={selectedDates}

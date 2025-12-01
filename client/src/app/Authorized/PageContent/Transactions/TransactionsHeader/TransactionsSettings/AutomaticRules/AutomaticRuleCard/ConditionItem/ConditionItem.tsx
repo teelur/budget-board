@@ -1,4 +1,6 @@
-import { Card, Group, Text } from "@mantine/core";
+import { Badge, Group } from "@mantine/core";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import { getFormattedValue } from "~/helpers/automaticRules";
 import {
   IRuleParameterResponse,
@@ -15,30 +17,25 @@ interface ConditionItemProps {
 
 const ConditionItem = (props: ConditionItemProps) => {
   return (
-    <Card
-      bg="var(--mantine-color-card-alternate)"
-      withBorder
-      p="0.25rem"
-      radius="md"
-    >
+    <Card p="0.25rem" shadow="xs" elevation={1}>
       <Group gap="0.3rem">
-        <Text fw={600} size="sm">
+        <Badge bg="purple" size="sm">
           {TransactionFields.find(
             (field) => field.value === props.condition.field
           )?.label ?? props.condition.field}
-        </Text>
-        <Text fw={600} size="sm">
+        </Badge>
+        <PrimaryText size="sm">
           {Operators.find((op) => op.value === props.condition.operator)
             ?.label ?? props.condition.operator}
-        </Text>
-        <Text fw={600} size="sm">
+        </PrimaryText>
+        <Badge size="sm">
           {getFormattedValue(
             props.condition.field,
             props.condition.value,
             props.currency,
             props.categories
           )}
-        </Text>
+        </Badge>
       </Group>
     </Card>
   );
