@@ -53,12 +53,100 @@ export const textGray: MantineColorsTuple = [
   "#808080",
 ];
 
-export const darkModeGreen = "#39FF14";
-export const darkModeBlue = "#1E90FF";
-export const darkModeYellow = "#FFD300";
-export const darkModeRed = "#FF3B47";
+export const green: MantineColorsTuple = [
+  "#ebfff0",
+  "#d4fee0",
+  "#a4fdbc",
+  "#71fd96",
+  "#4dfd77",
+  "#3cfe63",
+  "#33fe58",
+  "#29e248",
+  "#1dc93e",
+  "#00ba35",
+];
+export const blue: MantineColorsTuple = [
+  "#e2f6ff",
+  "#cce9ff",
+  "#9ad0ff",
+  "#64b5ff",
+  "#399ffe",
+  "#1f90fe",
+  "#0085ff",
+  "#0076e4",
+  "#0069cd",
+  "#005bb6",
+];
+export const orange: MantineColorsTuple = [
+  "#fff5e1",
+  "#ffe9cc",
+  "#ffd19a",
+  "#ffb864",
+  "#ffa337",
+  "#ff951b",
+  "#f98700",
+  "#e37b00",
+  "#cb6c00",
+  "#b15c00",
+];
+export const red: MantineColorsTuple = [
+  "#ffe9e9",
+  "#ffd2d2",
+  "#f8a4a4",
+  "#f17273",
+  "#ec4949",
+  "#e92c2c",
+  "#e91e20",
+  "#cf1014",
+  "#b90610",
+  "#a2000a",
+];
 
-export const lightModeGreen = "#009B2D";
-export const lightModeBlue = "#0066CC";
-export const lightModeYellow = "#FFAA00";
-export const lightModeRed = "#D7263D";
+export const lightModeGreen: MantineColorsTuple = [
+  "#00320E",
+  "#004A15",
+  "#01661B",
+  "#017020",
+  "#018C26",
+  "#00952A",
+  "#00A82F",
+  "#00BA34",
+  "#00C43A",
+  "#00D440",
+];
+export const lightModeBlue: MantineColorsTuple = [
+  "#00244D",
+  "#003666",
+  "#004F99",
+  "#005FCC",
+  "#1172CC",
+  "#0085FF",
+  "#339AFF",
+  "#66B3FF",
+  "#99CCFF",
+  "#CCE5FF",
+];
+export const lightModeOrange: MantineColorsTuple = [
+  "#402200",
+  "#643600",
+  "#7A4200",
+  "#955001",
+  "#A85A00",
+  "#C76B00",
+  "#E07A00",
+  "#F98600",
+  "#FFB366",
+  "#FFD9B3",
+];
+export const lightModeRed: MantineColorsTuple = [
+  "#5D1213",
+  "#6E1616",
+  "#7F1919",
+  "#8C1B1A",
+  "#A02122",
+  "#BA2324",
+  "#C92A2A",
+  "#D83232",
+  "#E92C2C",
+  "#F53A3A",
+];

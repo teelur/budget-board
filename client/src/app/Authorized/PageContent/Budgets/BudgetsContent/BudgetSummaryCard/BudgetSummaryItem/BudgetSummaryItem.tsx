@@ -64,7 +64,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         <Flex gap="0.25rem">
           {userSettingsQuery.isPending ? null : (
             <StatusText
-              value={props.amount}
+              amount={props.amount}
               total={props.total ?? 0}
               type={props.budgetValueType}
               warningThreshold={

@@ -35,7 +35,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
           {props.asset.hide && <Badge bg="yellow">Hidden</Badge>}
           {props.asset.deleted && <Badge bg="red">Deleted</Badge>}
         </Group>
-        <StatusText size="md" value={props.asset.currentValue ?? 0}>
+        <StatusText amount={props.asset.currentValue ?? 0} size="md">
           {convertNumberToCurrency(
             props.asset.currentValue ?? 0,
             true,

@@ -23,16 +23,12 @@ import Authorized from "~/app/Authorized/Authorized";
 import {
   backgroundGray,
   backgroundWhite,
-  darkModeBlue,
-  darkModeGreen,
-  darkModeRed,
-  darkModeYellow,
-  lightModeBlue,
-  lightModeGreen,
-  lightModeRed,
-  lightModeYellow,
   textBlack,
   textGray,
+  green,
+  blue,
+  orange,
+  red,
 } from "./shared/colors";
 
 // Your theme configuration is merged with default theme
@@ -84,13 +80,13 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--elevated-color-input-background": backgroundWhite[3],
     "--elevated-color-input-border": backgroundWhite[7],
     // Text Status colors
-    "--text-color-status-good": lightModeGreen,
-    "--text-color-status-neutral": lightModeBlue,
-    "--text-color-status-warning": lightModeYellow,
-    "--text-color-status-bad": lightModeRed,
+    "--text-color-status-good": green[9],
+    "--text-color-status-neutral": blue[7],
+    "--text-color-status-warning": orange[6],
+    "--text-color-status-bad": red[5],
     // Button colors
-    "--button-color-confirm": lightModeGreen,
-    "--button-color-destructive": lightModeRed,
+    "--button-color-confirm": green[9],
+    "--button-color-destructive": red[5],
 
     // TODO: remove
     "--mantine-color-text": theme.colors.dark[7],
@@ -127,14 +123,13 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--elevated-color-input-background": backgroundGray[6],
     "--elevated-color-input-border": backgroundGray[2],
     // Text Status colors
-    "--text-color-status-good": darkModeGreen,
-    "--text-color-status-neutral": darkModeBlue,
-    "--text-color-status-warning": darkModeYellow,
-    "--text-color-status-bad": darkModeRed,
+    "--text-color-status-good": green[8],
+    "--text-color-status-neutral": blue[5],
+    "--text-color-status-warning": orange[5],
+    "--text-color-status-bad": red[4],
     // Button colors
-    "--button-color-confirm": lightModeGreen, // TODO: get a better color
-    "--button-color-destructive": darkModeRed,
-
+    "--button-color-confirm": green[9],
+    "--button-color-destructive": red[4],
     // TODO: remove
     "--mantine-color-header-background": theme.colors.dark[8],
     "--mantine-color-content-background": theme.colors.dark[7],
