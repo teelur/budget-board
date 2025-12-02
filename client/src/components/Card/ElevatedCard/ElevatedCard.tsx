@@ -16,7 +16,7 @@ const ElevatedCard = ({ children, ...props }: ElevatedCardProps) => {
       ref={props.ref}
       className={elevatedClasses.root}
       onMouseEnter={(e) => {
-        if (props.hoverEffect) {
+        if (props.hoverEffect ?? false) {
           e.currentTarget.style.borderColor =
             "var(--mantine-primary-color-filled)";
         }

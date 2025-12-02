@@ -19,7 +19,7 @@ const SurfaceCard = ({ children, ...props }: SurfaceCardProps) => {
         transition: "background 0.2s",
       }}
       onMouseEnter={(e) => {
-        if (props.hoverEffect) {
+        if (props.hoverEffect ?? false) {
           e.currentTarget.style.borderColor =
             "var(--mantine-primary-color-filled)";
         }
