@@ -1,10 +1,12 @@
-import { Card, Tabs, Text } from "@mantine/core";
+import { Tabs } from "@mantine/core";
 import SpendingTab from "./SpendingTab/SpendingTab";
 import NetCashFlowTab from "./NetCashFlowTab/NetCashFlowTab";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 const TransactionsTab = (): React.ReactNode => {
   return (
-    <Card radius="md" withBorder mt="0.5rem" p="0.5rem">
+    <Card mt="0.5rem" elevation={1}>
       <Tabs
         variant="pills"
         defaultValue="spending"
@@ -13,14 +15,10 @@ const TransactionsTab = (): React.ReactNode => {
       >
         <Tabs.List grow>
           <Tabs.Tab value="spending">
-            <Text fw={600} size="sm">
-              Spending
-            </Text>
+            <PrimaryText size="sm">Spending</PrimaryText>
           </Tabs.Tab>
           <Tabs.Tab value="netCashFlow">
-            <Text fw={600} size="sm">
-              Net Cash Flow
-            </Text>
+            <PrimaryText size="sm">Net Cash Flow</PrimaryText>
           </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="spending">

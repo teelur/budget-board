@@ -1,9 +1,11 @@
-import { Card, Tabs, Text } from "@mantine/core";
+import { Tabs } from "@mantine/core";
 import ValuesTab from "./ValuesTab/ValuesTab";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/Card/Card";
 
 const AssetsTab = (): React.ReactNode => {
   return (
-    <Card radius="md" withBorder mt="0.5rem" p="0.5rem">
+    <Card mt="0.5rem" elevation={1}>
       <Tabs
         variant="pills"
         defaultValue="values"
@@ -12,9 +14,7 @@ const AssetsTab = (): React.ReactNode => {
       >
         <Tabs.List grow>
           <Tabs.Tab value="values">
-            <Text fw={600} size="sm">
-              Values
-            </Text>
+            <PrimaryText size="sm">Values</PrimaryText>
           </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="values">

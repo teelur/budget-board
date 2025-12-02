@@ -1,11 +1,12 @@
-import AccountSelectInputBase from "~/components/Select/AccountSelect/AccountSelectInputBase/AccountSelectInputBase";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
-import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
+import { DatesRangeValue } from "@mantine/dates";
 import { IAccountResponse } from "~/models/account";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
+import DatePickerInput from "../Input/DatePickerInput/DatePickerInput";
+import AccountSelect from "../Select/AccountSelect/AccountSelect";
 
 interface AccountsSelectHeaderProps {
   selectedAccountIds: string[];
@@ -41,14 +42,16 @@ const AccountsSelectHeader = (
         type="range"
         value={props.dateRange}
         onChange={props.setDateRange}
+        elevation={1}
       />
-      <AccountSelectInputBase
+      <AccountSelect
         selectedAccountIds={props.selectedAccountIds}
         setSelectedAccountIds={props.setSelectedAccountIds}
         hideHidden
         filterTypes={props.filters}
         miw="230px"
         maw="400px"
+        elevation={1}
       />
       <Button
         onClick={() => {

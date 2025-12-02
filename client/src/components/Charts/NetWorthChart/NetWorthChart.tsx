@@ -2,7 +2,7 @@ import { filterBalancesByDateRange } from "~/helpers/balances";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
-import { Group, Skeleton, Text } from "@mantine/core";
+import { Group, Skeleton } from "@mantine/core";
 import { IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";
 import React from "react";
@@ -14,6 +14,7 @@ import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { BuildNetWorthChartData } from "./helpers/netWorthChart";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 interface NetWorthChartProps {
   accounts: IAccountResponse[];
@@ -70,7 +71,9 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   if (props.accounts?.length === 0 || props.balances?.length === 0) {
     return (
       <Group justify="center">
-        <Text>Select an account to display the chart.</Text>
+        <DimmedText size="sm">
+          Select an account to display the chart.
+        </DimmedText>
       </Group>
     );
   }

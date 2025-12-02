@@ -2,15 +2,15 @@ import surfaceClasses from "~/styles/Surface.module.css";
 import dropdownClasses from "~/styles/Dropdown.module.css";
 
 import React from "react";
-import AccountSelectInputBase, {
-  AccountSelectInputBaseProps,
-} from "../AccountSelectInputBase/AccountSelectInputBase";
+import AssetSelectInputSurface, {
+  AssetSelectInputBaseProps,
+} from "../AssetSelectInputBase/AssetSelectInputBase";
 
-const SurfaceAccountSelectInput = ({
+const SurfaceAssetSelectInput = ({
   ...props
-}: AccountSelectInputBaseProps): React.ReactNode => {
+}: AssetSelectInputBaseProps): React.ReactNode => {
   return (
-    <AccountSelectInputBase
+    <AssetSelectInputSurface
       classNames={{
         input: surfaceClasses.input,
         dropdown: dropdownClasses.dropdown,
@@ -20,4 +20,4 @@ const SurfaceAccountSelectInput = ({
   );
 };
 
-export default SurfaceAccountSelectInput;
+export default SurfaceAssetSelectInput;

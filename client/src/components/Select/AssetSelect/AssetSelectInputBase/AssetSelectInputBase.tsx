@@ -1,25 +1,24 @@
-import { MultiSelect } from "@mantine/core";
+import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IAssetResponse } from "~/models/asset";
 
-interface AssetSelectInputProps {
+export interface AssetSelectInputBaseProps extends MultiSelectProps {
   selectedAssetIds?: string[];
   setSelectedAssetIds?: (assetIds: string[]) => void;
   hideHidden?: boolean;
   maxSelectedValues?: number;
-  [x: string]: any;
 }
 
-const AssetSelectInput = ({
+const AssetSelectInputBase = ({
   selectedAssetIds,
   setSelectedAssetIds,
   hideHidden = false,
   maxSelectedValues = undefined,
   ...props
-}: AssetSelectInputProps): React.ReactNode => {
+}: AssetSelectInputBaseProps): React.ReactNode => {
   const { request } = useAuth();
 
   const assetsQuery = useQuery({
@@ -65,4 +64,4 @@ const AssetSelectInput = ({
   );
 };
 
-export default AssetSelectInput;
+export default AssetSelectInputBase;
