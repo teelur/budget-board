@@ -1,4 +1,4 @@
-import { Button, Card, PasswordInput, Stack, Text } from "@mantine/core";
+import { Button, Stack } from "@mantine/core";
 import { hasLength, useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -6,6 +6,9 @@ import { AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import PasswordInput from "~/components/Input/PasswordInput/PasswordInput";
 
 const CreatePassword = (): React.ReactNode => {
   const newPasswordField = useField<string>({
@@ -60,14 +63,12 @@ const CreatePassword = (): React.ReactNode => {
   });
 
   return (
-    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
+    <Card elevation={1}>
       <Stack gap="1rem">
-        <Text fw={700} size="lg">
-          Create Password
-        </Text>
+        <PrimaryText size="lg">Create Password</PrimaryText>
         <PasswordInput
           {...newPasswordField.getInputProps()}
-          label="New Password"
+          label={<PrimaryText size="sm">New Password</PrimaryText>}
           w="100%"
         />
         <PasswordInput

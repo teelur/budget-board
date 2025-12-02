@@ -1,15 +1,12 @@
-import classes from "./Footer.module.css";
-
-import { ActionIcon, Group, Text } from "@mantine/core";
+import { ActionIcon, Group } from "@mantine/core";
 import React from "react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 const Footer = (): React.ReactNode => {
   return (
-    <Group className={classes.root}>
-      <Text size="xs" fw={600}>
-        {import.meta.env.VITE_VERSION}
-      </Text>
+    <Group gap="0.5rem">
+      <PrimaryText size="xs">{import.meta.env.VITE_VERSION}</PrimaryText>
       <ActionIcon
         component="a"
         href="https://github.com/teelur/budget-board"

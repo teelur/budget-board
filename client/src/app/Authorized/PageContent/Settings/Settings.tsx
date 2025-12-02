@@ -1,6 +1,4 @@
-import classes from "./Settings.module.css";
-
-import { Stack, Title } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import DarkModeToggle from "./DarkModeToggle/DarkModeToggle";
 import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 import React from "react";
@@ -35,8 +33,7 @@ const Settings = (): React.ReactNode => {
   });
 
   return (
-    <Stack className={classes.root}>
-      <Title order={1}>Settings</Title>
+    <Stack w="100%" maw={800} gap="1rem">
       <DarkModeToggle />
       <UserSettings />
       <LinkSimpleFin />

@@ -1,12 +1,12 @@
-import classes from "./NetWorthItem.module.css";
-
-import { Group, Text } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import StatusText from "~/components/Text/StatusText/StatusText";
 
 interface NetWorthItemProps {
   title: string;
@@ -34,16 +34,16 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
   });
 
   return (
-    <Group className={classes.root} justify="space-between" wrap="nowrap">
-      <Text fw={600}>{props.title}</Text>
+    <Group p={0} justify="space-between" align="center" wrap="nowrap">
+      <PrimaryText fw={600}>{props.title}</PrimaryText>
       {userSettingsQuery.isPending ? null : (
-        <Text c={props.totalBalance > 0 ? "green" : "red"} fw={600}>
+        <StatusText amount={props.totalBalance}>
           {convertNumberToCurrency(
             props.totalBalance,
             true,
             userSettingsQuery.data?.currency ?? "USD"
           )}
-        </Text>
+        </StatusText>
       )}
     </Group>
   );

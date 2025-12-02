@@ -1,21 +1,15 @@
 import React from "react";
 import BudgetBoardLogo from "~/assets/budget-board-logo";
-import {
-  Container,
-  Text,
-  Stack,
-  Group,
-  Anchor,
-  useComputedColorScheme,
-  Card,
-  Flex,
-} from "@mantine/core";
+import { Stack, Group, Anchor, useComputedColorScheme } from "@mantine/core";
 import Register from "./Register";
 import Login from "./Login";
 import ResetPassword from "./ResetPassword";
 import LoginWith2fa from "./LoginWith2fa";
 import LoginWithRecovery from "./LoginWithRecovery";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/Card/Card";
 
 export enum LoginCardState {
   Login,
@@ -77,30 +71,31 @@ const Welcome = (): React.ReactNode => {
   };
 
   return (
-    <Flex bg="var(--mantine-color-content-background)" w="100%" h="100vh">
-      <Container size="lg" w="500px" maw="100%">
-        <Stack align="center" gap={5}>
-          <Text size="lg" fw={600}>
-            Welcome to
-          </Text>
+    <Group
+      bg="var(--background-color-base)"
+      w="100%"
+      h="100vh"
+      justify="center"
+    >
+      <Stack w="500px" maw="100%">
+        <Stack align="center" gap="0.25rem">
+          <PrimaryText size="lg">Welcome to</PrimaryText>
           <BudgetBoardLogo
             width={340}
             darkMode={computedColorScheme === "dark"}
           />
-          <Text c="dimmed" size="md" fw={600}>
+          <DimmedText size="md">
             A simple app for managing monthly budgets.
-          </Text>
+          </DimmedText>
         </Stack>
-        <Card shadow="sm" withBorder mt="2em" w="100%" maw="500px" p={20}>
+        <Card p="1rem" w="100%" maw="500px" elevation={1}>
           {getCardState()}
         </Card>
         {loginCardState !== LoginCardState.Register &&
           envVariables.VITE_DISABLE_NEW_USERS?.toLowerCase() !== "true" &&
           envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
             <Group mt="xl" justify="center">
-              <Text size="sm" fw={600}>
-                Don't have an account?
-              </Text>
+              <DimmedText size="sm">Don't have an account?</DimmedText>
               <Anchor
                 size="sm"
                 fw={600}
@@ -110,8 +105,8 @@ const Welcome = (): React.ReactNode => {
               </Anchor>
             </Group>
           )}
-      </Container>
-    </Flex>
+      </Stack>
+    </Group>
   );
 };
 

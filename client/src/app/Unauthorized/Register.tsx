@@ -1,10 +1,4 @@
-import {
-  Stack,
-  TextInput,
-  PasswordInput,
-  Button,
-  LoadingOverlay,
-} from "@mantine/core";
+import { Stack, Button, LoadingOverlay } from "@mantine/core";
 import { hasLength, isEmail, useForm } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "./Welcome";
@@ -14,6 +8,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
+import TextInput from "~/components/Input/TextInput/TextInput";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import PasswordInput from "~/components/Input/PasswordInput/PasswordInput";
 
 interface RegisterProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -100,20 +97,23 @@ const Register = (props: RegisterProps): React.ReactNode => {
         <TextInput
           {...form.getInputProps("email")}
           key={form.key("email")}
-          label="Email"
+          label={<PrimaryText size="sm">Email Address</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <PasswordInput
           {...form.getInputProps("password")}
           key={form.key("password")}
-          label="Password"
+          label={<PrimaryText size="sm">Password</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <PasswordInput
           {...form.getInputProps("confirmPassword")}
           key={form.key("confirmPassword")}
-          label="Confirm Password"
+          label={<PrimaryText size="sm">Confirm Password</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <Button variant="filled" fullWidth type="submit">
           Register

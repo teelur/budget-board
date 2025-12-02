@@ -1,11 +1,13 @@
 import { filterVisibleAccounts } from "~/helpers/accounts";
-import { Card, Divider, Stack, Text } from "@mantine/core";
+import { Divider, Stack } from "@mantine/core";
 import { IAccountResponse } from "~/models/account";
 import { IInstitution } from "~/models/institution";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
 import { Filters } from "~/models/transaction";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 interface InstitutionItemProps {
   institution: IInstitution;
@@ -18,18 +20,15 @@ const InstitutionItem = (props: InstitutionItemProps): React.ReactNode => {
   ).sort((a, b) => a.index - b.index);
 
   return (
-    <Card
-      w="100%"
-      bg="var(--mantine-color-card-alternate)"
-      radius="lg"
-      padding="sm"
-      shadow="none"
-    >
-      <Stack gap={0.5}>
-        <Text fw={600} size="md">
-          {props.institution.name}
-        </Text>
-        <Divider mb="xs" size="sm" />
+    <Card w="100%" elevation={2}>
+      <Stack gap="0.25rem">
+        <PrimaryText size="md">{props.institution.name}</PrimaryText>
+        <Divider
+          c="var(--elevated-color-border)"
+          variant="dotted"
+          mb="xs"
+          size="sm"
+        />
       </Stack>
       <Stack gap={1}>
         {sortedFilteredAccounts.map((account: IAccountResponse) => (

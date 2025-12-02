@@ -1,6 +1,4 @@
-import classes from "./AccountsCard.module.css";
-
-import { Card, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +6,9 @@ import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItems/InstitutionItem";
 import { IAccountResponse } from "~/models/account";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 const AccountsCard = (): React.ReactNode => {
   const { request } = useAuth();
@@ -63,28 +64,25 @@ const AccountsCard = (): React.ReactNode => {
   );
 
   return (
-    <Card
-      className={classes.card}
-      padding="xs"
-      radius="md"
-      shadow="sm"
-      withBorder
-    >
-      <Group className={classes.headerContainer}>
-        <Title order={2}>Accounts</Title>
-      </Group>
-      <Stack className={classes.accountsContainer}>
-        {institutionQuery.isPending || accountsQuery.isPending ? (
-          <Skeleton height={600} radius="lg" />
-        ) : (sortedFilteredInstitutionsForDisplay ?? []).length > 0 ? (
-          (sortedFilteredInstitutionsForDisplay ?? []).map(
-            (institution: IInstitution) => (
-              <InstitutionItem key={institution.id} institution={institution} />
+    <Card w="100%" elevation={1}>
+      <Stack gap="0.5rem">
+        <PrimaryText size="xl">Accounts</PrimaryText>
+        <Stack align="center" gap="0.5rem">
+          {institutionQuery.isPending || accountsQuery.isPending ? (
+            <Skeleton height={600} radius="lg" />
+          ) : (sortedFilteredInstitutionsForDisplay ?? []).length > 0 ? (
+            (sortedFilteredInstitutionsForDisplay ?? []).map(
+              (institution: IInstitution) => (
+                <InstitutionItem
+                  key={institution.id}
+                  institution={institution}
+                />
+              )
             )
-          )
-        ) : (
-          <Text>No accounts found</Text>
-        )}
+          ) : (
+            <DimmedText size="md">No accounts found</DimmedText>
+          )}
+        </Stack>
       </Stack>
     </Card>
   );

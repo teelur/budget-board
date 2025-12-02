@@ -1,11 +1,4 @@
-import {
-  Card,
-  LoadingOverlay,
-  Select,
-  Skeleton,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { LoadingOverlay, Skeleton, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,6 +11,9 @@ import {
   IUserSettings,
   IUserSettingsUpdateRequest,
 } from "~/models/userSettings";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Select from "~/components/Select/Select/Select";
 
 const UserSettings = (): React.ReactNode => {
   const currencyField = useField({
@@ -68,22 +64,16 @@ const UserSettings = (): React.ReactNode => {
   }, [userSettingsQuery.data]);
 
   return (
-    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
+    <Card elevation={1}>
       <LoadingOverlay visible={doUpdateUserSettings.isPending} />
-      <Stack gap="1rem">
-        <Text fw={700} size="lg">
-          User Settings
-        </Text>
+      <Stack gap="0.5rem">
+        <PrimaryText size="lg">User Settings</PrimaryText>
         <Stack gap="0.5rem">
           {userSettingsQuery.isPending ? (
             <Skeleton h={60} radius="md" />
           ) : (
             <Select
-              label={
-                <Text fw={600} size="sm">
-                  Preferred Currency
-                </Text>
-              }
+              label={<PrimaryText size="sm">Preferred Currency</PrimaryText>}
               placeholder="Select currency"
               searchable
               nothingFoundMessage="No currencies found"
@@ -96,6 +86,7 @@ const UserSettings = (): React.ReactNode => {
                   });
                 }
               }}
+              elevation={1}
             />
           )}
         </Stack>

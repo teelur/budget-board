@@ -1,9 +1,6 @@
-import {
-  Text,
-  MantineColorScheme,
-  NativeSelect,
-  useMantineColorScheme,
-} from "@mantine/core";
+import { MantineColorScheme, useMantineColorScheme } from "@mantine/core";
+import Select from "~/components/Select/Select/Select";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 const DarkModeToggle = () => {
   const darkModeOptions = [
@@ -14,17 +11,12 @@ const DarkModeToggle = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   return (
-    <NativeSelect
+    <Select
       data={darkModeOptions}
-      label={
-        <Text fw={600} size="sm">
-          Appearance Mode
-        </Text>
-      }
+      label={<PrimaryText size="sm">Appearance Mode</PrimaryText>}
       value={colorScheme}
-      onChange={(event) =>
-        setColorScheme(event.currentTarget.value as MantineColorScheme)
-      }
+      onChange={(value) => setColorScheme(value as MantineColorScheme)}
+      elevation={0}
     />
   );
 };

@@ -272,7 +272,7 @@ const EditableGoalCardContent = (
               )}
               <ActionIcon
                 variant="outline"
-                size="sm"
+                size="md"
                 onClick={(e) => {
                   e.stopPropagation();
                   props.toggleIsSelected();

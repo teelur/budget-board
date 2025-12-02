@@ -22,3 +22,9 @@
 .input::placeholder {
   color: var(--base-color-text-dimmed);
 }
+
+.code {
+  background-color: var(--base-color-input-background);
+  color: var(--base-color-text-primary);
+  font-weight: 600;
+}

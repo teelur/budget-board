@@ -210,6 +210,7 @@ const EditableTransactionCardContent = (
               value={categoryField.getValue()}
               onChange={onCategoryChange}
               withinPortal
+              elevation={props.elevation}
             />
           </Flex>
           <Flex

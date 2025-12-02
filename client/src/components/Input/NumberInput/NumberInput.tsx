@@ -19,7 +19,7 @@ const NumberInput = ({
     case 2:
       return <ElevatedNumberInput {...props} />;
     default:
-      return <BaseNumberInput {...props} />;
+      throw new Error("Invalid elevation for NumberInput");
   }
 };
 

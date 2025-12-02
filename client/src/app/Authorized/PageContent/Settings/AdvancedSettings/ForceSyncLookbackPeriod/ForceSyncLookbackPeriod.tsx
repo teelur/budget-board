@@ -1,4 +1,4 @@
-import { LoadingOverlay, Select, Stack, Text } from "@mantine/core";
+import { LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,9 @@ import {
   IUserSettings,
   IUserSettingsUpdateRequest,
 } from "~/models/userSettings";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Select from "~/components/Select/Select/Select";
 
 const ForceSyncLookbackPeriod = (): React.ReactNode => {
   interface IForceSyncOverrideOption {
@@ -85,16 +88,14 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
   return (
     <Stack gap="0.25rem">
       <LoadingOverlay visible={doUpdateUserSettings.isPending} />
-      <Text size="sm" fw={600}>
-        Force Sync Lookback Period
-      </Text>
-      <Text size="xs" c="dimmed">
+      <PrimaryText size="sm">Force Sync Lookback Period</PrimaryText>
+      <DimmedText size="xs">
         This setting can be used to override the number of months to request
         from SimpleFIN during sync. Leave as "Auto" to let the system decide.
-      </Text>
-      <Text size="xs" c="dimmed" fw={600}>
+      </DimmedText>
+      <DimmedText size="xs">
         Note: Leave this on auto for the best performance.
-      </Text>
+      </DimmedText>
       <Select
         data={ForceSyncOverrideOptions.map((option) => ({
           value: option.value.toString(),
@@ -107,6 +108,7 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
             forceSyncLookbackMonths: intValue,
           });
         }}
+        elevation={1}
       />
     </Stack>
   );
