@@ -10,7 +10,7 @@ const ElevatedTransactionCard = ({
 }: TransactionCardBaseProps): React.ReactNode => {
   return (
     <TransactionCardBase
-      className={elevatedClasses.elevated}
+      className={elevatedClasses.root}
       elevation={2}
       {...props}
     />

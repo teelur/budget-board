@@ -110,7 +110,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         <Button
           onClick={toggleSelectMultiple}
           variant="outline"
-          color={canSelectMultiple ? "green" : "gray"}
+          color={canSelectMultiple ? "var(--button-color-confirm)" : ""}
         >
           Select Multiple
         </Button>

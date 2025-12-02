@@ -219,6 +219,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               style={{ containerType: "inline-size" }}
             >
               <Flex style={{ flex: "1 1 auto" }}>
+                {/* TODO: Create progress wrapper */}
                 <Progress.Root size={12} radius="xl" w="100%">
                   <Progress.Section
                     value={percentComplete}

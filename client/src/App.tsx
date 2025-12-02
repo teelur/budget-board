@@ -22,13 +22,15 @@ import UnauthorizedRoute from "~/providers/AuthProvider/UnauthorizedRoute";
 import Authorized from "~/app/Authorized/Authorized";
 import {
   backgroundGray,
-  backgroundWhite,
+  backgroundEggshell,
   textBlack,
   textGray,
   green,
   blue,
   orange,
   red,
+  borderEggshell,
+  textEggshellDimmed,
 } from "./shared/colors";
 
 // Your theme configuration is merged with default theme
@@ -46,7 +48,9 @@ const theme = createTheme({
     editTransactionBreakpoint: "850px", // Custom breakpoint for edit transactions
   },
   colors: {
-    backgroundWhite,
+    backgroundEggshell,
+    borderEggshell,
+    textEggshellDimmed,
     backgroundGray,
     textGray,
   },
@@ -56,29 +60,29 @@ const resolver: CSSVariablesResolver = (theme) => ({
   variables: {},
   light: {
     // Base colors
-    "--background-color-base": backgroundWhite[0],
-    "--base-color-border": backgroundWhite[4],
+    "--background-color-base": backgroundEggshell[0],
+    "--base-color-border": backgroundEggshell[4],
     "--base-color-text-primary": textBlack[1],
-    "--base-color-text-dimmed": textBlack[7],
-    "--base-color-input-background": backgroundWhite[2],
-    "--base-color-input-border": backgroundWhite[6],
+    "--base-color-text-dimmed": textEggshellDimmed[6],
+    "--base-color-input-background": backgroundEggshell[2],
+    "--base-color-input-border": backgroundEggshell[6],
     // Sidebar and Header colors
-    "--background-color-sidebar": backgroundWhite[2],
-    "--background-color-header": backgroundWhite[1],
+    "--background-color-sidebar": backgroundEggshell[2],
+    "--background-color-header": backgroundEggshell[1],
     // Surface colors
-    "--background-color-surface": backgroundWhite[1],
-    "--surface-color-border": backgroundWhite[3],
+    "--background-color-surface": backgroundEggshell[1],
+    "--surface-color-border": borderEggshell[2],
     "--surface-color-text-primary": textBlack[1],
     "--surface-color-text-dimmed": textBlack[6],
-    "--surface-color-input-background": backgroundWhite[2],
-    "--surface-color-input-border": backgroundWhite[5],
+    "--surface-color-input-background": backgroundEggshell[2],
+    "--surface-color-input-border": backgroundEggshell[5],
     // Elevated colors
-    "--background-color-elevated": backgroundWhite[2],
-    "--elevated-color-border": backgroundWhite[5],
+    "--background-color-elevated": backgroundEggshell[3],
+    "--elevated-color-border": borderEggshell[3],
     "--elevated-color-text-primary": textBlack[1],
     "--elevated-color-text-dimmed": textBlack[7],
-    "--elevated-color-input-background": backgroundWhite[3],
-    "--elevated-color-input-border": backgroundWhite[7],
+    "--elevated-color-input-background": backgroundEggshell[3],
+    "--elevated-color-input-border": backgroundEggshell[7],
     // Text Status colors
     "--text-color-status-good": green[9],
     "--text-color-status-neutral": blue[7],
@@ -88,7 +92,7 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--button-color-confirm": green[9],
     "--button-color-destructive": red[5],
     // Other
-    "--light-color-off": backgroundWhite[4],
+    "--light-color-off": backgroundEggshell[4],
 
     // TODO: remove
     "--mantine-color-text": theme.colors.dark[7],
