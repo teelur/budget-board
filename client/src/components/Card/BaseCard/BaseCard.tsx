@@ -7,7 +7,7 @@ export interface BaseCardProps extends CardProps {
   hoverEffect?: boolean;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 const BaseCard = ({ children, ...props }: BaseCardProps) => {

@@ -1,14 +1,6 @@
 import classes from "./GoalCardContent.module.css";
 
-import {
-  ActionIcon,
-  Badge,
-  Flex,
-  Group,
-  Progress,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Badge, Flex, Group, Progress, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -19,6 +11,10 @@ import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
 import { PencilIcon } from "lucide-react";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import StatusText from "~/components/Text/StatusText/StatusText";
+import { StatusColorType } from "~/helpers/budgets";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -46,13 +42,11 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   });
 
   return (
-    <Group wrap="nowrap" className={classes.root}>
+    <Group style={{ containerType: "inline-size" }} wrap="nowrap">
       <Stack w="100%" gap="0.1rem">
         <Flex className={classes.header}>
           <Group align="center" gap={10} wrap="nowrap">
-            <Text size="lg" fw={600}>
-              {props.goal.name}
-            </Text>
+            <PrimaryText size="lg">{props.goal.name}</PrimaryText>
             {props.includeInterest && props.goal.interestRate && (
               <Badge variant="light" flex="0 0 auto">
                 {props.goal.interestRate.toLocaleString(undefined, {
@@ -64,7 +58,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             )}
             <ActionIcon
               variant="transparent"
-              size="sm"
+              size="md"
               onClick={(e) => {
                 e.stopPropagation();
                 props.toggleIsSelected();
@@ -75,19 +69,17 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             {userSettingsQuery.isPending ? null : (
-              <Text size="lg" fw={600}>
+              <PrimaryText size="lg">
                 {convertNumberToCurrency(
                   sumAccountsTotalBalance(props.goal.accounts) -
                     props.goal.initialAmount,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </PrimaryText>
             )}
-            <Text size="md" fw={600}>
-              of
-            </Text>
-            <Text size="lg" fw={600}>
+            <DimmedText size="md">of</DimmedText>
+            <PrimaryText size="lg">
               {convertNumberToCurrency(
                 getGoalTargetAmount(
                   props.goal.amount,
@@ -96,7 +88,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                 false,
                 userSettingsQuery.data?.currency ?? "USD"
               )}
-            </Text>
+            </PrimaryText>
           </Flex>
         </Flex>
         <Progress.Root size={18} radius="xl">
@@ -109,51 +101,41 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
         <Flex className={classes.footer}>
           <Group align="center" gap="sm">
             <Flex align="center" gap="0.25rem">
-              <Text size="sm" fw={600} c="dimmed">
-                {"Projected: "}
-              </Text>
-              <Text size="sm" fw={600} c="dimmed">
+              <DimmedText size="sm">{"Projected: "}</DimmedText>
+              <PrimaryText size="sm">
                 {new Date(props.goal.completeDate).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                 })}
-              </Text>
+              </PrimaryText>
             </Flex>
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             {userSettingsQuery.isPending ? null : (
-              <Text
-                c={
-                  props.goal.monthlyContributionProgress <
-                  props.goal.monthlyContribution
-                    ? "red"
-                    : "green"
-                }
+              <StatusText
+                amount={props.goal.monthlyContributionProgress}
+                total={props.goal.monthlyContribution}
+                type={StatusColorType.Target}
                 size="md"
-                fw={600}
               >
                 {convertNumberToCurrency(
                   props.goal.monthlyContributionProgress,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </StatusText>
             )}
-            <Text size="sm" fw={600}>
-              of
-            </Text>
+            <DimmedText size="sm">of</DimmedText>
             {userSettingsQuery.isPending ? null : (
-              <Text size="md" fw={600}>
+              <PrimaryText size="md">
                 {convertNumberToCurrency(
                   props.goal.monthlyContribution,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </PrimaryText>
             )}
-            <Text size="sm" fw={600}>
-              this month
-            </Text>
+            <DimmedText size="sm">this month</DimmedText>
           </Flex>
         </Flex>
       </Stack>

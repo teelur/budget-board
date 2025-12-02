@@ -1,4 +1,4 @@
-import { Card, Flex, Group, Text } from "@mantine/core";
+import { Flex, Group } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -7,6 +7,9 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
+import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
 
 interface CompletedGoalCardProps {
   goal: IGoalResponse;
@@ -32,27 +35,23 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
   });
 
   return (
-    <Card padding="0.5rem" radius="md">
+    <Card elevation={2}>
       <Flex
         justify="space-between"
         align={{ base: "start", xs: "center" }}
         direction={{ base: "column", xs: "row" }}
       >
-        <Text size="lg" fw={600}>
-          {props.goal.name}
-        </Text>
+        <PrimaryText size="lg">{props.goal.name}</PrimaryText>
         <Flex
           gap={0}
           direction={{ base: "row", xs: "column" }}
           justify={{ base: "space-between", xs: "flex-end" }}
           w={{ base: "100%", xs: "auto" }}
         >
-          <Group gap={5}>
-            <Text c="dimmed" size="sm" fw={600}>
-              Total:
-            </Text>
+          <Group gap="0.25rem">
+            <DimmedText size="sm">Total:</DimmedText>
             {userSettingsQuery.isPending ? null : (
-              <Text fw={600}>
+              <PrimaryText>
                 {convertNumberToCurrency(
                   getGoalTargetAmount(
                     props.goal.amount,
@@ -61,16 +60,14 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
                   true,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </PrimaryText>
             )}
           </Group>
-          <Group gap={5}>
-            <Text c="dimmed" size="sm" fw={600}>
-              Completed:
-            </Text>
-            <Text fw={600}>
+          <Group gap="0.25rem">
+            <DimmedText size="sm">Completed:</DimmedText>
+            <PrimaryText>
               {new Date(props.goal.completed ?? 0).toLocaleDateString()}
-            </Text>
+            </PrimaryText>
           </Group>
         </Flex>
       </Flex>

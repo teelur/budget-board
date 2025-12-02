@@ -1,4 +1,4 @@
-import { BudgetValueType, getBudgetValueColor } from "~/helpers/budgets";
+import { StatusColorType, getStatusColor } from "~/helpers/budgets";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Divider, Flex, Group, Progress, Stack } from "@mantine/core";
 import React from "react";
@@ -13,7 +13,7 @@ interface BudgetSummaryItemProps {
   label: string;
   amount: number;
   total?: number;
-  budgetValueType: BudgetValueType;
+  budgetValueType: StatusColorType;
   hideProgress?: boolean;
   showDivider?: boolean;
 }
@@ -39,7 +39,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
 
   const percentComplete = Math.round(
     ((props.amount *
-      (props.budgetValueType === BudgetValueType.Expense ? -1 : 1)) /
+      (props.budgetValueType === StatusColorType.Expense ? -1 : 1)) /
       (props.total ?? 0)) *
       100
   );
@@ -75,7 +75,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
             >
               {convertNumberToCurrency(
                 props.amount *
-                  (props.budgetValueType === BudgetValueType.Expense ? -1 : 1),
+                  (props.budgetValueType === StatusColorType.Expense ? -1 : 1),
                 false,
                 userSettingsQuery.data?.currency ?? "USD"
               )}
@@ -97,7 +97,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         <Progress.Root size={16} radius="xl">
           <Progress.Section
             value={percentComplete > 100 ? 100 : percentComplete}
-            color={getBudgetValueColor(
+            color={getStatusColor(
               props.amount,
               props.total ?? 0,
               props.budgetValueType,

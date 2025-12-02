@@ -1,11 +1,9 @@
-import classes from "./GoalCard.module.css";
-
-import { Card } from "@mantine/core";
 import React from "react";
 import { IGoalResponse } from "~/models/goal";
 import { useDisclosure } from "@mantine/hooks";
 import EditableGoalCardContent from "./EditableGoalCardContent/EditableGoalCardContent";
 import GoalCardContent from "./GoalCardContent/GoalCardContent";
+import Card from "~/components/Card/Card";
 
 interface GoalCardProps {
   goal: IGoalResponse;
@@ -18,19 +16,15 @@ const GoalCard = (props: GoalCardProps): React.ReactNode => {
 
   return (
     <Card
-      className={classes.card}
       w="100%"
-      p="0.5rem"
-      radius="sm"
-      withBorder
-      shadow="sm"
-      bg={isEditing ? "var(--mantine-primary-color-light)" : ""}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent) => {
         e.stopPropagation();
         if (!isEditing) {
           props.openGoalDetails(props.goal);
         }
       }}
+      hoverEffect={!isEditing}
+      elevation={1}
     >
       {isEditing ? (
         <EditableGoalCardContent

@@ -6,7 +6,7 @@ import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
 import { areStringsEqual } from "~/helpers/utils";
 import { sumTransactionAmounts } from "~/helpers/transactions";
-import { BudgetValueType } from "~/helpers/budgets";
+import { StatusColorType } from "~/helpers/budgets";
 import Card from "~/components/Card/Card";
 import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
@@ -78,18 +78,18 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
                   label="Income"
                   amount={incomeTransactionsTotal}
                   total={incomeBudgetsTotal}
-                  budgetValueType={BudgetValueType.Income}
+                  budgetValueType={StatusColorType.Income}
                 />
                 <BudgetSummaryItem
                   label="Expenses"
                   amount={expenseTransactionsTotal}
                   total={expenseBudgetsTotal}
-                  budgetValueType={BudgetValueType.Expense}
+                  budgetValueType={StatusColorType.Expense}
                 />
                 <BudgetSummaryItem
                   label="Net Budgeted"
                   amount={incomeTransactionsTotal + expenseTransactionsTotal}
-                  budgetValueType={BudgetValueType.Total}
+                  budgetValueType={StatusColorType.Total}
                   hideProgress
                   showDivider
                 />
@@ -104,14 +104,14 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
                 <BudgetSummaryItem
                   label="Unbudgeted"
                   amount={unbudgetedTransactionsTotal}
-                  budgetValueType={BudgetValueType.Total}
+                  budgetValueType={StatusColorType.Total}
                   hideProgress
                   showDivider
                 />
                 <BudgetSummaryItem
                   label="Net Cash Flow"
                   amount={totalTransactionsTotal}
-                  budgetValueType={BudgetValueType.Total}
+                  budgetValueType={StatusColorType.Total}
                   hideProgress
                   showDivider
                 />

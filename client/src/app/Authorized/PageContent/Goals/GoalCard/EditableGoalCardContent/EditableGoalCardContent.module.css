@@ -1,7 +1,3 @@
-.root {
-  container-type: inline-size;
-}
-
 .header {
   justify-content: space-between;
   flex-direction: row;

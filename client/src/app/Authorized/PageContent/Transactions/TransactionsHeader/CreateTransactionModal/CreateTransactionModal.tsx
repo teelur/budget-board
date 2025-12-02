@@ -15,12 +15,12 @@ import { ITransactionCreateRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Modal from "~/components/Modal/Modal";
-import DatePickerInput from "~/components/Input/DatePickerInput/DatePickerInput";
 import TextInput from "~/components/Input/TextInput/TextInput";
 import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
 import NumberInput from "~/components/Input/NumberInput/NumberInput";
 import AccountSelect from "~/components/Select/AccountSelect/AccountSelect";
+import DateInput from "~/components/Input/DateInput/DateInput";
 
 interface formValues {
   date: Date | null;
@@ -131,7 +131,7 @@ const CreateTransactionModal = (): React.ReactNode => {
       >
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap={5}>
-            <DatePickerInput
+            <DateInput
               label={<PrimaryText size="sm">Date</PrimaryText>}
               placeholder="Pick date"
               {...form.getInputProps("date")}

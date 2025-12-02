@@ -1,13 +1,16 @@
 import classes from "./AccountItem.module.css";
 
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { Group, Stack, Text } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import PrimaryText from "../Text/PrimaryText/PrimaryText";
+import StatusText from "../Text/StatusText/StatusText";
+import DimmedText from "../Text/DimmedText/DimmedText";
 
 interface AccountItemProps {
   account: IAccountResponse;
@@ -40,24 +43,26 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
       onClick={props.onClick}
     >
       <Group justify="space-between" wrap="nowrap">
-        <Text fw={600}>{props.account.name}</Text>
+        <PrimaryText>{props.account.name}</PrimaryText>
         {userSettingsQuery.isPending ? null : (
-          <Text c={props.account.currentBalance < 0 ? "red" : "green"} fw={600}>
+          <StatusText amount={props.account.currentBalance}>
             {convertNumberToCurrency(
               props.account.currentBalance,
               true,
               userSettingsQuery.data?.currency ?? "USD"
             )}
-          </Text>
+          </StatusText>
         )}
       </Group>
       {props.account.source !== AccountSource.Manual && (
-        <Text c="dimmed" fw={600} size="sm">
-          {"Last updated: "}
-          {props.account.balanceDate
-            ? new Date(props.account.balanceDate).toLocaleString()
-            : "Never!"}
-        </Text>
+        <Group gap="0.25rem">
+          <DimmedText size="sm">{"Last updated: "}</DimmedText>
+          <DimmedText size="sm">
+            {props.account.balanceDate
+              ? new Date(props.account.balanceDate).toLocaleString()
+              : "Never!"}
+          </DimmedText>
+        </Group>
       )}
     </Stack>
   );

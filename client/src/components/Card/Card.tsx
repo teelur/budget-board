@@ -1,9 +1,12 @@
 import React from "react";
 import SurfaceCard, { SurfaceCardProps } from "./SurfaceCard/SurfaceCard";
 import ElevatedCard, { ElevatedCardProps } from "./ElevatedCard/ElevatedCard";
-import BaseCard from "./BaseCard/BaseCard";
+import BaseCard, { BaseCardProps } from "./BaseCard/BaseCard";
 
-export interface CardProps extends SurfaceCardProps, ElevatedCardProps {
+export interface CardProps
+  extends BaseCardProps,
+    SurfaceCardProps,
+    ElevatedCardProps {
   elevation?: number;
   hoverEffect?: boolean;
 }

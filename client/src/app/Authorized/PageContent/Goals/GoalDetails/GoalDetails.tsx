@@ -1,13 +1,4 @@
-import {
-  Accordion,
-  Button,
-  Card,
-  Drawer,
-  Group,
-  Skeleton,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Accordion, Button, Group, Skeleton, Stack } from "@mantine/core";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
@@ -19,6 +10,10 @@ import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
+import Drawer from "~/components/Drawer/Drawer";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
+import Card from "~/components/Card/Card";
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;
@@ -66,50 +61,29 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       onClose={props.doClose}
       position="right"
       size="md"
-      title={
-        <Text size="lg" fw={600}>
-          Goal Details
-        </Text>
-      }
-      styles={{
-        inner: {
-          left: "0",
-          right: "0",
-          padding: "0 !important",
-        },
-      }}
+      title={<PrimaryText size="lg">Goal Details</PrimaryText>}
     >
       {props.goal === null ? (
         <Skeleton height={425} radius="lg" />
       ) : (
-        <Accordion
-          variant="separated"
-          defaultValue={["accounts", "chart"]}
-          multiple
-        >
-          <Accordion.Item
-            value="accounts"
-            bg="var(--mantine-color-content-background)"
-          >
+        <SurfaceAccordionRoot defaultValue={["accounts", "chart"]}>
+          <Accordion.Item value="accounts">
             <Accordion.Control>
-              <Text fw={600}>Accounts</Text>
+              <PrimaryText size="md">Accounts</PrimaryText>
             </Accordion.Control>
             <Accordion.Panel>
               <Stack gap="0.5rem">
                 {props.goal.accounts.map((account: IAccountResponse) => (
-                  <Card key={account.id} radius="md">
+                  <Card key={account.id} elevation={2}>
                     <AccountItem account={account} />
                   </Card>
                 ))}
               </Stack>
             </Accordion.Panel>
           </Accordion.Item>
-          <Accordion.Item
-            value="chart"
-            bg="var(--mantine-color-content-background)"
-          >
+          <Accordion.Item value="chart">
             <Accordion.Control>
-              <Text fw={600}>Goal Trends</Text>
+              <PrimaryText size="md">Goal Trends</PrimaryText>
             </Accordion.Control>
             <Accordion.Panel>
               <Stack>
@@ -150,7 +124,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
               </Stack>
             </Accordion.Panel>
           </Accordion.Item>
-        </Accordion>
+        </SurfaceAccordionRoot>
       )}
     </Drawer>
   );

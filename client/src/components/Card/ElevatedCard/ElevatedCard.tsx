@@ -7,7 +7,7 @@ export interface ElevatedCardProps extends CardProps {
   hoverEffect?: boolean;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 const ElevatedCard = ({ children, ...props }: ElevatedCardProps) => {

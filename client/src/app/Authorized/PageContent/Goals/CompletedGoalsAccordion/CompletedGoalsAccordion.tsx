@@ -1,7 +1,9 @@
-import { Accordion, Stack, Text } from "@mantine/core";
+import { Accordion, Stack } from "@mantine/core";
 import React from "react";
 import { IGoalResponse } from "~/models/goal";
 import CompletedGoalCard from "./CompletedGoalCard/CompletedGoalCard";
+import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 
 interface CompletedGoalsAccordionProps {
   compeltedGoals: IGoalResponse[];
@@ -11,13 +13,10 @@ const CompletedGoalsAccordion = (
   props: CompletedGoalsAccordionProps
 ): React.ReactNode => {
   return (
-    <Accordion variant="separated">
-      <Accordion.Item
-        value="completed-goals"
-        bg="var(--mantine-color-accordion-alternate)"
-      >
+    <SurfaceAccordionRoot>
+      <Accordion.Item value="completed-goals">
         <Accordion.Control>
-          <Text fw={600}>Completed Goals</Text>
+          <PrimaryText>Completed Goals</PrimaryText>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="0.5rem">
@@ -27,7 +26,7 @@ const CompletedGoalsAccordion = (
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
-    </Accordion>
+    </SurfaceAccordionRoot>
   );
 };
 

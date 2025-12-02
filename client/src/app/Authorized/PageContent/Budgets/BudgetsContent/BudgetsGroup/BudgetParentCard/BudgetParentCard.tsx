@@ -17,7 +17,7 @@ import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
-import { getBudgetValueColor, BudgetValueType } from "~/helpers/budgets";
+import { getStatusColor, StatusColorType } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
@@ -322,12 +322,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   <Progress.Root size={16} radius="xl" w="100%">
                     <Progress.Section
                       value={percentComplete}
-                      color={getBudgetValueColor(
+                      color={getStatusColor(
                         roundAwayFromZero(amount),
                         limit,
                         isIncome
-                          ? BudgetValueType.Income
-                          : BudgetValueType.Expense,
+                          ? StatusColorType.Income
+                          : StatusColorType.Expense,
                         userSettingsQuery.data?.budgetWarningThreshold ?? 80
                       )}
                     >
@@ -343,8 +343,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     total={limit}
                     type={
                       isIncome
-                        ? BudgetValueType.Income
-                        : BudgetValueType.Expense
+                        ? StatusColorType.Income
+                        : StatusColorType.Expense
                     }
                     warningThreshold={
                       userSettingsQuery.data?.budgetWarningThreshold ?? 80

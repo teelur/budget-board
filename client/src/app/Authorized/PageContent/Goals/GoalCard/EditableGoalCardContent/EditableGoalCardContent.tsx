@@ -7,11 +7,8 @@ import {
   Flex,
   Group,
   LoadingOverlay,
-  NumberInput,
   Progress,
   Stack,
-  Text,
-  TextInput,
 } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
@@ -25,9 +22,16 @@ import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
-import { DatePickerInput, DateValue } from "@mantine/dates";
+import { DateValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import { getGoalTargetAmount } from "~/helpers/goals";
+import TextInput from "~/components/Input/TextInput/TextInput";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import NumberInput from "~/components/Input/NumberInput/NumberInput";
+import StatusText from "~/components/Text/StatusText/StatusText";
+import { StatusColorType } from "~/helpers/budgets";
+import DateInput from "~/components/Input/DateInput/DateInput";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -233,14 +237,15 @@ const EditableGoalCardContent = (
           doCompleteGoal.isPending
         }
       />
-      <Group wrap="nowrap" className={classes.root}>
-        <Stack w="100%" gap="0.1rem">
+      <Group style={{ containerType: "inline-size" }} wrap="nowrap">
+        <Stack w="100%" gap="0.25rem">
           <Flex className={classes.header}>
             <Group align="center" gap={10}>
               <TextInput
                 {...goalNameField.getInputProps()}
                 onBlur={submitChanges}
                 onClick={(e) => e.stopPropagation()}
+                elevation={1}
               />
               {props.includeInterest && props.goal.interestRate && (
                 <Badge variant="light">
@@ -278,18 +283,16 @@ const EditableGoalCardContent = (
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
               {userSettingsQuery.isPending ? null : (
-                <Text size="lg" fw={600}>
+                <PrimaryText size="lg">
                   {convertNumberToCurrency(
                     sumAccountsTotalBalance(props.goal.accounts) -
                       props.goal.initialAmount,
                     false,
                     userSettingsQuery.data?.currency ?? "USD"
                   )}
-                </Text>
+                </PrimaryText>
               )}
-              <Text size="md" fw={600}>
-                of
-              </Text>
+              <DimmedText size="md">of</DimmedText>
               <Flex
                 onClick={(e) => {
                   e.stopPropagation();
@@ -303,9 +306,10 @@ const EditableGoalCardContent = (
                     thousandSeparator=","
                     {...goalTargetAmountField.getInputProps()}
                     onBlur={submitChanges}
+                    elevation={1}
                   />
                 ) : (
-                  <Text size="lg" fw={600}>
+                  <PrimaryText size="lg">
                     {convertNumberToCurrency(
                       getGoalTargetAmount(
                         props.goal.amount,
@@ -314,7 +318,7 @@ const EditableGoalCardContent = (
                       false,
                       userSettingsQuery.data?.currency ?? "USD"
                     )}
-                  </Text>
+                  </PrimaryText>
                 )}
               </Flex>
             </Flex>
@@ -329,23 +333,21 @@ const EditableGoalCardContent = (
           <Flex className={classes.footer}>
             <Group align="center" gap="sm">
               <Flex align="center" gap="0.25rem">
-                <Text size="sm" fw={600} c="dimmed">
-                  {"Projected: "}
-                </Text>
+                <DimmedText size="sm">{"Projected: "}</DimmedText>
                 {props.goal.isCompleteDateEditable ? (
                   <Flex
                     onClick={(e) => {
                       e.stopPropagation();
                     }}
                   >
-                    <DatePickerInput
+                    <DateInput
                       className="h-8"
                       {...goalTargetDateField.getInputProps()}
                       onChange={submitTargetDateChanges}
                     />
                   </Flex>
                 ) : (
-                  <Text size="sm" fw={600} c="dimmed">
+                  <PrimaryText size="sm">
                     {new Date(props.goal.completeDate).toLocaleDateString(
                       "en-US",
                       {
@@ -353,55 +355,49 @@ const EditableGoalCardContent = (
                         month: "long",
                       }
                     )}
-                  </Text>
+                  </PrimaryText>
                 )}
               </Flex>
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
               {userSettingsQuery.isPending ? null : (
-                <Text
-                  c={
-                    props.goal.monthlyContributionProgress <
-                    props.goal.monthlyContribution
-                      ? "red"
-                      : "green"
-                  }
+                <StatusText
+                  amount={props.goal.monthlyContributionProgress}
+                  total={props.goal.monthlyContribution}
+                  type={StatusColorType.Target}
                   size="md"
-                  fw={600}
                 >
                   {convertNumberToCurrency(
                     props.goal.monthlyContributionProgress,
                     false,
                     userSettingsQuery.data?.currency ?? "USD"
                   )}
-                </Text>
+                </StatusText>
               )}
-              <Text size="sm" fw={600}>
-                of
-              </Text>
+              <DimmedText size="sm">of</DimmedText>
               {props.goal.isMonthlyContributionEditable ? (
                 <Flex onClick={(e) => e.stopPropagation()}>
                   <NumberInput
+                    size="sm"
                     maw={100}
                     min={0}
                     prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
                     thousandSeparator=","
                     {...goalMonthlyContributionField.getInputProps()}
                     onBlur={submitChanges}
+                    elevation={1}
                   />
                 </Flex>
               ) : userSettingsQuery.isPending ? null : (
-                <Text size="md" fw={600}>
+                <PrimaryText size="md">
                   {convertNumberToCurrency(
                     props.goal.monthlyContribution,
                     false,
                     userSettingsQuery.data?.currency ?? "USD"
                   )}
-                </Text>
+                </PrimaryText>
               )}
-              <Text size="sm" fw={600}>
-                this month
-              </Text>
+              <DimmedText size="sm">this month</DimmedText>
             </Flex>
           </Flex>
         </Stack>

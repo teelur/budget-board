@@ -1,11 +1,14 @@
 import React from "react";
 import { Text, TextProps } from "@mantine/core";
-import { BudgetValueType, getBudgetValueColor } from "~/helpers/budgets";
+import {
+  StatusColorType as StatusColorType,
+  getStatusColor,
+} from "~/helpers/budgets";
 
 interface StatusTextProps extends TextProps {
   amount: number;
   total?: number;
-  type?: BudgetValueType;
+  type?: StatusColorType;
   warningThreshold?: number;
   children: React.ReactNode;
 }
@@ -20,10 +23,10 @@ const StatusText = ({
 }: StatusTextProps) => {
   return (
     <Text
-      c={getBudgetValueColor(
+      c={getStatusColor(
         amount,
         total ?? 0,
-        type ?? BudgetValueType.Total,
+        type ?? StatusColorType.Total,
         warningThreshold ?? 110
       )}
       fw={props.fw ?? 600}
