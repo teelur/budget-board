@@ -73,14 +73,14 @@ const resolver: CSSVariablesResolver = (theme) => ({
     "--background-color-surface": backgroundEggshell[1],
     "--surface-color-border": borderEggshell[2],
     "--surface-color-text-primary": textBlack[1],
-    "--surface-color-text-dimmed": textBlack[6],
+    "--surface-color-text-dimmed": textEggshellDimmed[6],
     "--surface-color-input-background": backgroundEggshell[4],
     "--surface-color-input-border": backgroundEggshell[5],
     // Elevated colors
     "--background-color-elevated": backgroundEggshell[3],
     "--elevated-color-border": borderEggshell[3],
     "--elevated-color-text-primary": textBlack[1],
-    "--elevated-color-text-dimmed": textBlack[7],
+    "--elevated-color-text-dimmed": textEggshellDimmed[7],
     "--elevated-color-input-background": backgroundEggshell[5],
     "--elevated-color-input-border": backgroundEggshell[7],
     // Text Status colors
