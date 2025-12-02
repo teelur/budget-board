@@ -5,11 +5,9 @@ import TransactionCardBase, {
   TransactionCardBaseProps,
 } from "../TransactionCardBase/TransactionCardBase";
 
-interface ElevatedTransactionCardProps extends TransactionCardBaseProps {}
-
 const ElevatedTransactionCard = ({
   ...props
-}: ElevatedTransactionCardProps): React.ReactNode => {
+}: TransactionCardBaseProps): React.ReactNode => {
   return (
     <TransactionCardBase
       className={elevatedClasses.elevated}

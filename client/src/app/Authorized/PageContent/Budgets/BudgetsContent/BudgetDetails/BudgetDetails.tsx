@@ -1,4 +1,4 @@
-import { Accordion, Drawer, Group, Skeleton, Stack, Text } from "@mantine/core";
+import { Accordion, Group, Skeleton, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -12,6 +12,10 @@ import TransactionCards from "./TransactionCards/TransactionCards";
 import dayjs from "dayjs";
 import { filterHiddenTransactions } from "~/helpers/transactions";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import Drawer from "~/components/Drawer/Drawer";
+import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -87,18 +91,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={
-        <Text size="lg" fw={600}>
-          Budget Details
-        </Text>
-      }
-      styles={{
-        inner: {
-          left: "0",
-          right: "0",
-          padding: "0 !important",
-        },
-      }}
+      title={<PrimaryText size="lg">Budget Details</PrimaryText>}
     >
       {transactionsQuery.isPending ||
       props.month === null ||
@@ -108,36 +101,27 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
         <Stack gap="1rem">
           <Group justify="space-between" align="center">
             <Stack gap={0}>
-              <Text size="xs" fw={500} c="dimmed">
-                Category
-              </Text>
-              <Text size="lg" fw={600}>
+              <DimmedText size="xs">Category</DimmedText>
+              <PrimaryText size="lg">
                 {props.category ?? "No Category"}
-              </Text>
+              </PrimaryText>
             </Stack>
             <Stack gap={0}>
-              <Text size="xs" fw={500} c="dimmed">
-                Month
-              </Text>
-              <Text size="lg" fw={600}>
+              <DimmedText size="xs">Month</DimmedText>
+              <PrimaryText size="lg">
                 {props.month?.toLocaleString("default", {
                   month: "long",
                   year: "numeric",
                 })}
-              </Text>
+              </PrimaryText>
             </Stack>
           </Group>
-          <Accordion
-            variant="separated"
-            defaultValue={["chart", "transactions"]}
-            multiple
-          >
-            <Accordion.Item
-              value="chart"
-              bg="var(--mantine-color-content-background)"
-            >
+          <SurfaceAccordionRoot defaultValue={["chart", "transactions"]}>
+            <Accordion.Item value="chart">
               <Accordion.Control>
-                <Text>{isExpenseCategory ? "Expense" : "Income"} Trends</Text>
+                <PrimaryText size="md">
+                  {isExpenseCategory ? "Expense" : "Income"} Trends
+                </PrimaryText>
               </Accordion.Control>
               <Accordion.Panel>
                 <MonthlySpendingChart
@@ -148,11 +132,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                 />
               </Accordion.Panel>
             </Accordion.Item>
-            <Accordion.Item
-              value="transactions"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>Recent Transactions</Accordion.Control>
+            <Accordion.Item value="transactions">
+              <Accordion.Control>
+                <PrimaryText size="md">Recent Transactions</PrimaryText>
+              </Accordion.Control>
               <Accordion.Panel>
                 <TransactionCards
                   transactions={transactionsForCategoryForCurrentMonth ?? []}
@@ -160,7 +143,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                 />
               </Accordion.Panel>
             </Accordion.Item>
-          </Accordion>
+          </SurfaceAccordionRoot>
         </Stack>
       )}
     </Drawer>

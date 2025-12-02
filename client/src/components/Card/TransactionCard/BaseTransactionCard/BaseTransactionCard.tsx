@@ -1,20 +1,20 @@
-import surfaceClasses from "~/styles/Surface.module.css";
+import baseClasses from "~/styles/Base.module.css";
 
 import React from "react";
 import TransactionCardBase, {
   TransactionCardBaseProps,
 } from "../TransactionCardBase/TransactionCardBase";
 
-const SurfaceTransactionCard = ({
+const BaseTransactionCard = ({
   ...props
 }: TransactionCardBaseProps): React.ReactNode => {
   return (
     <TransactionCardBase
-      className={surfaceClasses.root}
+      className={baseClasses.root}
       elevation={1}
       {...props}
     />
   );
 };
 
-export default SurfaceTransactionCard;
+export default BaseTransactionCard;
