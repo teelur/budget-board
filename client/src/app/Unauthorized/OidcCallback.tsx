@@ -35,7 +35,6 @@ const OidcCallback = (): React.ReactNode => {
         ? sessionStorage.getItem(`oidc_state_${state}`)
         : null;
 
-      // Check for OAuth2 error response
       if (error) {
         notifications.show({
           color: "red",
@@ -70,7 +69,6 @@ const OidcCallback = (): React.ReactNode => {
           } as IOidcCallbackRequest,
         });
 
-        // Clear state after successful callback to prevent reuse
         if (state) {
           sessionStorage.removeItem(`oidc_state_${state}`);
         }
