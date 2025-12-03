@@ -9,9 +9,9 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetCreateRequest } from "~/models/asset";
-import Modal from "~/components/Modal/Modal";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import BaseTextInput from "~/components/Input/Base/BaseTextInput/BaseTextInput";
+import Modal from "~/components/core/Modal/Modal";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import BaseTextInput from "~/components/core/Input/Base/BaseTextInput/BaseTextInput";
 
 const CreateAsset = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);

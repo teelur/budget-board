@@ -17,10 +17,10 @@ import TransactionCards from "./TransactionCards/TransactionCards";
 import dayjs from "dayjs";
 import { filterHiddenTransactions } from "~/helpers/transactions";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Drawer from "~/components/Drawer/Drawer";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import Accordion from "~/components/Accordion/Accordion";
+import Drawer from "~/components/core/Drawer/Drawer";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface BudgetDetailsProps {
   isOpen: boolean;

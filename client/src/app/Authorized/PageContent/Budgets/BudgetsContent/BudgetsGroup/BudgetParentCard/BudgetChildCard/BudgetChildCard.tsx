@@ -22,11 +22,11 @@ import { AxiosError, AxiosResponse } from "axios";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IUserSettings } from "~/models/userSettings";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import StatusText from "~/components/Text/StatusText/StatusText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 
 interface BudgetChildCardProps {
   id: string;

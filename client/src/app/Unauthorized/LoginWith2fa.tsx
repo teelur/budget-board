@@ -7,9 +7,9 @@ import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { LoginCardState } from "./Welcome";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import PinInput from "~/components/Input/PinInput/PinInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PinInput from "~/components/core/Input/PinInput/PinInput";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;

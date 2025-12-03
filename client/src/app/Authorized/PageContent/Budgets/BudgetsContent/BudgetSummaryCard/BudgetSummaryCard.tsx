@@ -7,8 +7,8 @@ import { ICategory } from "~/models/category";
 import { areStringsEqual } from "~/helpers/utils";
 import { sumTransactionAmounts } from "~/helpers/transactions";
 import { StatusColorType } from "~/helpers/budgets";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface BudgetSummaryCardProps {
   incomeCategories: ICategory[];

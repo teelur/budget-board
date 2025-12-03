@@ -7,8 +7,8 @@ import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface CustomCategoryCardProps {
   category: ICategoryResponse;

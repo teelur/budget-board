@@ -1,6 +1,6 @@
 import { TextProps as MantineTextProps } from "@mantine/core";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface CategoryOptionTextProps extends MantineTextProps {
   isParent?: boolean;

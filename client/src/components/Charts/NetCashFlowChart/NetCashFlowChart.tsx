@@ -11,7 +11,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface ChartDatum {
   month: string;

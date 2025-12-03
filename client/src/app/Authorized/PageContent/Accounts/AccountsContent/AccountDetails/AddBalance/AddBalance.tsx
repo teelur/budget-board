@@ -10,9 +10,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceCreateRequest } from "~/models/balance";
-import SurfaceDateInput from "~/components/Input/Surface/SurfaceDateInput/SurfaceDateInput";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import SurfaceNumberInput from "~/components/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
+import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 
 interface AddBalanceProps {
   accountId: string;

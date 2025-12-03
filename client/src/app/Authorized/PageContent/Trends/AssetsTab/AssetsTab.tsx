@@ -1,7 +1,7 @@
 import { Tabs } from "@mantine/core";
 import ValuesTab from "./ValuesTab/ValuesTab";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import Card from "~/components/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
 
 const AssetsTab = (): React.ReactNode => {
   return (

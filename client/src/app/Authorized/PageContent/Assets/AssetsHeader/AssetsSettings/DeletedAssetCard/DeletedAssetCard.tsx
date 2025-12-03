@@ -7,8 +7,8 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse } from "~/models/asset";
-import ElevatedCard from "~/components/Card/ElevatedCard/ElevatedCard";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface DeletedAssetCardProps {
   asset: IAssetResponse;

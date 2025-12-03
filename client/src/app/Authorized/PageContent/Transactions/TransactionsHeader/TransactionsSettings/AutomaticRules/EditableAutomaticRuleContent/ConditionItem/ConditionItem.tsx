@@ -15,12 +15,12 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
-import Card from "~/components/Card/Card";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import DateInput from "~/components/Input/DateInput/DateInput";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
-import Select from "~/components/Select/Select/Select";
+import Card from "~/components/core/Card/Card";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import Select from "~/components/core/Select/Select/Select";
 
 export interface ConditionItemProps {
   ruleParameter: IRuleParameterEdit;

@@ -17,11 +17,11 @@ import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
-import Drawer from "~/components/Drawer/Drawer";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import StatusText from "~/components/Text/StatusText/StatusText";
-import Accordion from "~/components/Accordion/Accordion";
+import Drawer from "~/components/core/Drawer/Drawer";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface AssetDetailsProps {
   isOpen: boolean;

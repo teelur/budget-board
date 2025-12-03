@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface SpendingChartProps {
   transactions: ITransaction[];

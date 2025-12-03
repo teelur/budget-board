@@ -9,9 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import TransactionCard from "~/components/Card/TransactionCard/TransactionCard";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;

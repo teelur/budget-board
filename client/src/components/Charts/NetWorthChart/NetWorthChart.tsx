@@ -14,7 +14,7 @@ import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { BuildNetWorthChartData } from "./helpers/netWorthChart";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface NetWorthChartProps {
   accounts: IAccountResponse[];

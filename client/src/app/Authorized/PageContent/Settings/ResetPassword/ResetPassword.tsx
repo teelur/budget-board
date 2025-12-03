@@ -6,9 +6,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
 import { AxiosError } from "axios";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import PasswordInput from "~/components/Input/PasswordInput/PasswordInput";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 
 const ResetPassword = (): React.ReactNode => {
   const oldPasswordField = useField<string>({

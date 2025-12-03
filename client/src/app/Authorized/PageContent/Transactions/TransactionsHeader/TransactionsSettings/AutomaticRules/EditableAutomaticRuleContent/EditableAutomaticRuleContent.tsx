@@ -12,7 +12,7 @@ import {
 import ActionItem from "./ActionItem/ActionItem";
 import ConditionItem from "./ConditionItem/ConditionItem";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface EditableAutomaticRuleContentProps {
   conditionItems: IRuleParameterEdit[];

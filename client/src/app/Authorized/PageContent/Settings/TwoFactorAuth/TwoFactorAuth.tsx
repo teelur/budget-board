@@ -16,11 +16,11 @@ import { AxiosError, AxiosResponse } from "axios";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
 import { useDisclosure } from "@mantine/hooks";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import PinInput from "~/components/Input/PinInput/PinInput";
-import Code from "~/components/Code/Code";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PinInput from "~/components/core/Input/PinInput/PinInput";
+import Code from "~/components/core/Code/Code";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 type TwoFactorAuthResponse = {
   sharedKey: string;

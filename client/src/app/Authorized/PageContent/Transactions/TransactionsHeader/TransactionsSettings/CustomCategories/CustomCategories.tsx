@@ -5,8 +5,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ICategoryResponse } from "~/models/category";
 import CustomCategoryCard from "./CustomCategoryCard/CustomCategoryCard";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const CustomCategories = (): React.ReactNode => {
   const { request } = useAuth();

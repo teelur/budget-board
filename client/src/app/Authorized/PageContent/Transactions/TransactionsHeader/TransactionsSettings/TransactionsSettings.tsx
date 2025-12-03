@@ -7,11 +7,11 @@ import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { getDeletedTransactions } from "~/helpers/transactions";
 import AutomaticRules from "./AutomaticRules/AutomaticRules";
-import Modal from "~/components/Modal/Modal";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Modal from "~/components/core/Modal/Modal";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedTransactionCards from "./DeletedTransactionCards/DeletedTransactionCards";
-import Accordion from "~/components/Accordion/Accordion";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface TransactionsSettingsProps {
   modalOpened: boolean;

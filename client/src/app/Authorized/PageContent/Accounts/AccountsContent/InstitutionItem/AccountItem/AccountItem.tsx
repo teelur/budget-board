@@ -9,7 +9,7 @@ import { closestCenter } from "@dnd-kit/collision";
 import { useDisclosure } from "@mantine/hooks";
 import AccountItemContent from "./AccountItemContent/AccountItemContent";
 import EditableAccountItemContent from "./EditableAccountItemContent/EditableAccountItemContent";
-import Card from "~/components/Card/Card";
+import Card from "~/components/core/Card/Card";
 
 interface IAccountItemProps {
   account: IAccountResponse;

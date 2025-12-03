@@ -1,4 +1,4 @@
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import cardClasses from "../BudgetsGroup/BudgetParentCard/BudgetParentCard.module.css";
 
 import { Group } from "@mantine/core";

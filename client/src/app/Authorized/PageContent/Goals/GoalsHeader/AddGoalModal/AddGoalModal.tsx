@@ -5,9 +5,9 @@ import SaveGoalForm from "./SaveGoalForm/SaveGoalForm";
 import PayGoalForm from "./PayGoalForm/PayGoalForm";
 import { PlusIcon } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
-import Modal from "~/components/Modal/Modal";
-import Select from "~/components/Select/Select/Select";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Modal from "~/components/core/Modal/Modal";
+import Select from "~/components/core/Select/Select/Select";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const goalTypes: { label: string; value: string }[] = [
   { label: "Grow my funds", value: GoalType.SaveGoal },

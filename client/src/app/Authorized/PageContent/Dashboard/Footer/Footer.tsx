@@ -1,7 +1,7 @@
 import { ActionIcon, Group } from "@mantine/core";
 import React from "react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const Footer = (): React.ReactNode => {
   return (

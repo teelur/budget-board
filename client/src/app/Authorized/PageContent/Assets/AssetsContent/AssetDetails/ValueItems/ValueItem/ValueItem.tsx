@@ -2,7 +2,7 @@ import { IValueResponse } from "~/models/value";
 import ValueItemContent from "./ValueItemContent/ValueItemContent";
 import { useDisclosure } from "@mantine/hooks";
 import EditableValueItemContent from "./EditableValueItemContent/EditableValueItemContent";
-import ElevatedCard from "~/components/Card/ElevatedCard/ElevatedCard";
+import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 
 interface ValueItemProps {
   value: IValueResponse;

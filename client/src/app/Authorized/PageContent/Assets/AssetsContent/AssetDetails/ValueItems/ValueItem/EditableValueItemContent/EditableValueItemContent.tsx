@@ -11,8 +11,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IValueResponse, IValueUpdateRequest } from "~/models/value";
-import ElevatedDateInput from "~/components/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
-import ElevatedNumberInput from "~/components/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
+import ElevatedDateInput from "~/components/core/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
+import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 
 interface EditableValueItemContentProps {
   value: IValueResponse;

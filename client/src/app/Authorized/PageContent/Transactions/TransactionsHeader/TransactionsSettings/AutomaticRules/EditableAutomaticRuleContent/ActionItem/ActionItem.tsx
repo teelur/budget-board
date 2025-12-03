@@ -13,13 +13,13 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import DateInput from "~/components/Input/DateInput/DateInput";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import Select from "~/components/Select/Select/Select";
-import Card from "~/components/Card/Card";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import Select from "~/components/core/Select/Select/Select";
+import Card from "~/components/core/Card/Card";
 
 export interface ActionItemProps {
   ruleParameter: IRuleParameterEdit;

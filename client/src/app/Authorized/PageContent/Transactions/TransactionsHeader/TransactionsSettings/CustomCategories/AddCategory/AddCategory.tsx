@@ -8,11 +8,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Card from "~/components/Card/Card";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
+import Card from "~/components/core/Card/Card";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 
 const AddCategory = (): React.ReactNode => {
   const [isChildCategory, setIsChildCategory] = React.useState(false);

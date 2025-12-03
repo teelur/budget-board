@@ -18,8 +18,8 @@ import {
 import { ICategory, ICategoryNode } from "~/models/category";
 import React from "react";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategoryOptionText from "./CategoryOptionText/CategoryOptionText";
 
 export interface CategorySelectBaseProps extends InputBaseProps {

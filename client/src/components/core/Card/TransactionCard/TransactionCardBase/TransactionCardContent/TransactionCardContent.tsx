@@ -10,7 +10,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
-import StatusText from "~/components/Text/StatusText/StatusText";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;

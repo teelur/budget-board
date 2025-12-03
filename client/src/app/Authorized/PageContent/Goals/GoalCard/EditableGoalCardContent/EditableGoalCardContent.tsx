@@ -25,13 +25,13 @@ import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import { getGoalTargetAmount } from "~/helpers/goals";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import StatusText from "~/components/Text/StatusText/StatusText";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
-import DateInput from "~/components/Input/DateInput/DateInput";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;

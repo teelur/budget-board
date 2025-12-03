@@ -13,8 +13,8 @@ import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface UnbudgetChildCardProps {
   selectedDate: Date | null;

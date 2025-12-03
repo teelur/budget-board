@@ -12,8 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import SurfaceTransactionCard from "~/components/Card/TransactionCard/SurfaceTransactionCard/SurfaceTransactionCard";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import SurfaceTransactionCard from "~/components/core/Card/TransactionCard/SurfaceTransactionCard/SurfaceTransactionCard";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface TransactionCardsProps {
   sort: Sorts;

@@ -1,8 +1,8 @@
 import { ActionIcon, Group } from "@mantine/core";
 import { PencilIcon } from "lucide-react";
 import React from "react";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import StatusText from "~/components/Text/StatusText/StatusText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IInstitution } from "~/models/institution";
 

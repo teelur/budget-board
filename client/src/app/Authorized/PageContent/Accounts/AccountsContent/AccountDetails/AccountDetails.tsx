@@ -15,10 +15,10 @@ import { IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
-import Drawer from "~/components/Drawer/Drawer";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import Accordion from "~/components/Accordion/Accordion";
+import Drawer from "~/components/core/Drawer/Drawer";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface AccountDetailsProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import { MantineColorScheme, useMantineColorScheme } from "@mantine/core";
-import Select from "~/components/Select/Select/Select";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Select from "~/components/core/Select/Select/Select";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const DarkModeToggle = () => {
   const darkModeOptions = [

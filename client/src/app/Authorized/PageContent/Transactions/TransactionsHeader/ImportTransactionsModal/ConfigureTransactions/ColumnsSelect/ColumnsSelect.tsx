@@ -1,8 +1,8 @@
 import { Divider, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
-import Select from "~/components/Select/Select/Select";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Select from "~/components/core/Select/Select/Select";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export interface ISelectedColumns {
   date: string | null;

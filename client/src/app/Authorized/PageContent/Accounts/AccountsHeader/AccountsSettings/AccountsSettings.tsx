@@ -12,10 +12,10 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IAccountResponse } from "~/models/account";
 import DeletedAccountCard from "./DeletedAccountCard/DeletedAccountCard";
-import Modal from "~/components/Modal/Modal";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import Accordion from "~/components/Accordion/Accordion";
+import Modal from "~/components/core/Modal/Modal";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 const AccountsSettings = (): React.ReactNode => {
   const [isOpened, { open, close }] = useDisclosure(false);

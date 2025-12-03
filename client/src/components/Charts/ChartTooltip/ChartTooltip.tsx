@@ -2,9 +2,9 @@ import { ChartSeries, getFilteredChartTooltipPayload } from "@mantine/charts";
 import { getThemeColor, Group, Stack, useMantineTheme } from "@mantine/core";
 import { Square } from "lucide-react";
 import React from "react";
-import Card from "~/components/Card/Card";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getSeriesLabels } from "~/helpers/get-series-labels";
 
 interface ChartTooltipProps {

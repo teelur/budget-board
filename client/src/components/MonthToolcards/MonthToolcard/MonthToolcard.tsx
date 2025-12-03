@@ -1,9 +1,9 @@
 import { months } from "~/helpers/utils";
 import { Stack } from "@mantine/core";
 import { CashFlowValue } from "~/models/budget";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface MonthToolcardProps {
   date: Date;

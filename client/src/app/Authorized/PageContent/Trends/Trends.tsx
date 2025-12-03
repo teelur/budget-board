@@ -5,7 +5,7 @@ import React from "react";
 import TransactionsTab from "./TransactionsTab/TransactionsTab";
 import AccountsTab from "./AccountsTab/AccountsTab";
 import AssetsTab from "./AssetsTab/AssetsTab";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const Trends = (): React.ReactNode => {
   return (

@@ -17,8 +17,8 @@ import AccountMapping from "./AccountMapping/AccountMapping";
 import ConfigureTransactions from "./ConfigureTransactions/ConfigureTransactions";
 import { useDisclosure } from "@mantine/hooks";
 import ImportCompleted from "./ImportCompleted/ImportCompleted";
-import Modal from "~/components/Modal/Modal";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Modal from "~/components/core/Modal/Modal";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);

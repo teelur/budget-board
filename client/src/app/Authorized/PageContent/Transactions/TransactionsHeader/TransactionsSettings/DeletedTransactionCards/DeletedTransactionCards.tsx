@@ -2,7 +2,7 @@ import { Group, Pagination, Stack } from "@mantine/core";
 import React from "react";
 import { ITransaction } from "~/models/transaction";
 import DeletedTransactionsCard from "../DeletedTransactionCard/DeletedTransactionsCard";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface DeletedTransactionCardsProps {
   transactions: ITransaction[];

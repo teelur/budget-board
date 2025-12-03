@@ -1,9 +1,9 @@
 import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import StatusText from "~/components/Text/StatusText/StatusText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAccountResponse } from "~/models/account";
 

@@ -11,8 +11,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceResponse, IBalanceUpdateRequest } from "~/models/balance";
-import ElevatedDateInput from "~/components/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
-import ElevatedNumberInput from "~/components/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
+import ElevatedDateInput from "~/components/core/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
+import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 
 interface EditableBalanceItemContentProps {
   balance: IBalanceResponse;

@@ -11,9 +11,9 @@ import {
   IUserSettings,
   IUserSettingsUpdateRequest,
 } from "~/models/userSettings";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import Select from "~/components/Select/Select/Select";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import Select from "~/components/core/Select/Select/Select";
 
 const UserSettings = (): React.ReactNode => {
   const currencyField = useField({

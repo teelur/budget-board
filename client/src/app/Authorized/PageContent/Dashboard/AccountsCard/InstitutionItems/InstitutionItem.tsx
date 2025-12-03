@@ -6,8 +6,8 @@ import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
 import { Filters } from "~/models/transaction";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface InstitutionItemProps {
   institution: IInstitution;

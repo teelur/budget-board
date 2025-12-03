@@ -12,10 +12,10 @@ import {
   IUserSettings,
   IUserSettingsUpdateRequest,
 } from "~/models/userSettings";
-import Modal from "~/components/Modal/Modal";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Modal from "~/components/core/Modal/Modal";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 const BudgetSettings = (): React.ReactNode => {
   const [settingsOpen, { open, close }] = useDisclosure(false);

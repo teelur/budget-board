@@ -16,10 +16,10 @@ import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
-import Drawer from "~/components/Drawer/Drawer";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import Card from "~/components/Card/Card";
-import Accordion from "~/components/Accordion/Accordion";
+import Drawer from "~/components/core/Drawer/Drawer";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;

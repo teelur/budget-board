@@ -23,12 +23,12 @@ import {
   IAccountUpdateRequest,
 } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
-import ElevatedTextInput from "~/components/Input/Elevated/ElevatedTextInput/ElevatedTextInput";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import ElevatedNumberInput from "~/components/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
-import StatusText from "~/components/Text/StatusText/StatusText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import ElevatedCategorySelect from "~/components/Select/CategorySelect/ElevatedCategorySelect/ElevatedCategorySelect";
+import ElevatedTextInput from "~/components/core/Input/Elevated/ElevatedTextInput/ElevatedTextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import ElevatedCategorySelect from "~/components/core/Select/CategorySelect/ElevatedCategorySelect/ElevatedCategorySelect";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;

@@ -10,9 +10,9 @@ import {
   IUserSettings,
   IUserSettingsUpdateRequest,
 } from "~/models/userSettings";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import Select from "~/components/Select/Select/Select";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import Select from "~/components/core/Select/Select/Select";
 
 const ForceSyncLookbackPeriod = (): React.ReactNode => {
   interface IForceSyncOverrideOption {

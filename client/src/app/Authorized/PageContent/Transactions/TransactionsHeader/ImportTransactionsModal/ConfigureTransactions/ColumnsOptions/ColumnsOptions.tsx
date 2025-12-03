@@ -1,10 +1,10 @@
 import { Divider, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
-import Card from "~/components/Card/Card";
-import Checkbox from "~/components/Checkbox/Checkbox";
-import Select from "~/components/Select/Select/Select";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
+import Checkbox from "~/components/core/Checkbox/Checkbox";
+import Select from "~/components/core/Select/Select/Select";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export interface IFilterByOptions {
   date: boolean;

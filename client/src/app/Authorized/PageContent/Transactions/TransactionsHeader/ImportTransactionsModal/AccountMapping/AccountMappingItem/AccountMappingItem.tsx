@@ -3,8 +3,8 @@ import { ArrowRightIcon } from "lucide-react";
 import React from "react";
 import { IAccountItem } from "../AccountMapping";
 import { useField } from "@mantine/form";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import Select from "~/components/Select/Select/Select";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import Select from "~/components/core/Select/Select/Select";
 
 interface AccountMappingItemProps {
   accountName: string;

@@ -10,9 +10,9 @@ import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import { IInstitution, IInstitutionCreateRequest } from "~/models/institution";
-import Modal from "~/components/Modal/Modal";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import BaseTextInput from "~/components/Input/Base/BaseTextInput/BaseTextInput";
+import Modal from "~/components/core/Modal/Modal";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import BaseTextInput from "~/components/core/Input/Base/BaseTextInput/BaseTextInput";
 
 const CreateAccount = () => {
   const [opened, { open, close }] = useDisclosure(false);

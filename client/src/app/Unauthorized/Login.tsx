@@ -8,9 +8,9 @@ import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import PasswordInput from "~/components/Input/PasswordInput/PasswordInput";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;

@@ -7,9 +7,9 @@ import ResetPassword from "./ResetPassword";
 import LoginWith2fa from "./LoginWith2fa";
 import LoginWithRecovery from "./LoginWithRecovery";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import Card from "~/components/Card/Card";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
 
 export enum LoginCardState {
   Login,

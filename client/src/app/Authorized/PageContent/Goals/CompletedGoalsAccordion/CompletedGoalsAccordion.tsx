@@ -2,8 +2,8 @@ import { Accordion as MantineAccordion, Stack } from "@mantine/core";
 import React from "react";
 import { IGoalResponse } from "~/models/goal";
 import CompletedGoalCard from "./CompletedGoalCard/CompletedGoalCard";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import Accordion from "~/components/Accordion/Accordion";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface CompletedGoalsAccordionProps {
   compeltedGoals: IGoalResponse[];

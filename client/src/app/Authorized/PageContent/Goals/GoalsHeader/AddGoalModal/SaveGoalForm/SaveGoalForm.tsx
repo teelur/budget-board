@@ -10,12 +10,12 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { getCurrencySymbol } from "~/helpers/currency";
 import dayjs from "dayjs";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import AccountSelect from "~/components/Select/AccountSelect/AccountSelect";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import DateInput from "~/components/Input/DateInput/DateInput";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
 
 interface FormValues {
   goalName: string;

@@ -3,10 +3,10 @@ import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import Papa from "papaparse";
 import React from "react";
-import FileInput from "~/components/Input/FileInput/FileInput";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import FileInput from "~/components/core/Input/FileInput/FileInput";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export type CsvRow = Record<string, unknown> & { uid: number };
 

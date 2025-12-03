@@ -17,9 +17,9 @@ import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { IUserSettings } from "~/models/userSettings";
 import { getCurrencySymbol } from "~/helpers/currency";
-import Popover from "~/components/Popover/Popover";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
+import Popover from "~/components/core/Popover/Popover";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 interface AddBudgetProps {
   date: Date;

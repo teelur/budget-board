@@ -19,11 +19,11 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
-import StatusText from "~/components/Text/StatusText/StatusText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import SurfaceTextInput from "~/components/Input/Surface/SurfaceTextInput/SurfaceTextInput";
-import SurfaceDateInput from "~/components/Input/Surface/SurfaceDateInput/SurfaceDateInput";
-import SurfaceNumberInput from "~/components/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import SurfaceTextInput from "~/components/core/Input/Surface/SurfaceTextInput/SurfaceTextInput";
+import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
+import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;

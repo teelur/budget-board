@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { IAutomaticRuleResponse } from "~/models/automaticRule";
 import AddAutomaticRule from "./AddAutomaticRule/AddAutomaticRule";
 import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 const AutomaticRules = (): React.ReactNode => {
   const { request } = useAuth();

@@ -8,8 +8,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
-import SurfaceTextInput from "~/components/Input/Surface/SurfaceTextInput/SurfaceTextInput";
-import StatusText from "~/components/Text/StatusText/StatusText";
+import SurfaceTextInput from "~/components/core/Input/Surface/SurfaceTextInput/SurfaceTextInput";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 
 interface IEditableInstitutionItemContentProps {
   institution: IInstitution;

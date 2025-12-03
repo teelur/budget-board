@@ -16,10 +16,10 @@ import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IUserSettings } from "~/models/userSettings";
 import dayjs from "dayjs";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import DateInput from "~/components/Input/DateInput/DateInput";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
-import TextInput from "~/components/Input/TextInput/TextInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 interface EditableTransactionCardProps {
   transaction: ITransaction;

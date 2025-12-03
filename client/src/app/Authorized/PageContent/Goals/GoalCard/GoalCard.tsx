@@ -3,7 +3,7 @@ import { IGoalResponse } from "~/models/goal";
 import { useDisclosure } from "@mantine/hooks";
 import EditableGoalCardContent from "./EditableGoalCardContent/EditableGoalCardContent";
 import GoalCardContent from "./GoalCardContent/GoalCardContent";
-import Card from "~/components/Card/Card";
+import Card from "~/components/core/Card/Card";
 
 interface GoalCardProps {
   goal: IGoalResponse;

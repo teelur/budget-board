@@ -5,8 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { IAssetResponse } from "~/models/asset";
-import DatePickerInput from "../Input/DatePickerInput/DatePickerInput";
-import AssetSelect from "../Select/AssetSelect/AssetSelect";
+import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
+import AssetSelect from "../core/Select/AssetSelect/AssetSelect";
 
 interface AssetsSelectHeaderProps {
   selectedAssetIds: string[];

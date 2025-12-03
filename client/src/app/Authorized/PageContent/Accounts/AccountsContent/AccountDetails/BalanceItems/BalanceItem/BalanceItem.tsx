@@ -2,7 +2,7 @@ import EditableBalanceItemContent from "./EditableBalanceItemContent/EditableBal
 import BalanceItemContent from "./BalanceItemContent/BalanceItemContent";
 import { IBalanceResponse } from "~/models/balance";
 import { useDisclosure } from "@mantine/hooks";
-import ElevatedCard from "~/components/Card/ElevatedCard/ElevatedCard";
+import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 
 interface BalanceItemProps {
   balance: IBalanceResponse;

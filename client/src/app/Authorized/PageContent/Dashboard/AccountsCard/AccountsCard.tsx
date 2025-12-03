@@ -6,9 +6,9 @@ import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItems/InstitutionItem";
 import { IAccountResponse } from "~/models/account";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 const AccountsCard = (): React.ReactNode => {
   const { request } = useAuth();

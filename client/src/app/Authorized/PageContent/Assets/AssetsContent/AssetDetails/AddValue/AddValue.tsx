@@ -7,9 +7,9 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IValueCreateRequest, IValueResponse } from "~/models/value";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import SurfaceDateInput from "~/components/Input/Surface/SurfaceDateInput/SurfaceDateInput";
-import SurfaceNumberInput from "~/components/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
+import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 
 interface AddValueProps {
   assetId: string;

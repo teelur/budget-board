@@ -7,9 +7,9 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAccountResponse } from "~/models/account";
-import ElevatedCard from "~/components/Card/ElevatedCard/ElevatedCard";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface DeletedAccountCardProps {
   account: IAccountResponse;

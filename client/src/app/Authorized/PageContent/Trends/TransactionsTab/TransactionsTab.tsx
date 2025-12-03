@@ -1,8 +1,8 @@
 import { Tabs } from "@mantine/core";
 import SpendingTab from "./SpendingTab/SpendingTab";
 import NetCashFlowTab from "./NetCashFlowTab/NetCashFlowTab";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const TransactionsTab = (): React.ReactNode => {
   return (

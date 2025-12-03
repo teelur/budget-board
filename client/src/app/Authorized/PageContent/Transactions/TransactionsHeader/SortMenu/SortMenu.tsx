@@ -4,7 +4,7 @@ import SortButton, { SortDirection } from "~/components/SortButton";
 import { Flex, Group } from "@mantine/core";
 import React from "react";
 import { SortOption, SortOptions, Sorts } from "./SortMenuHelpers";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface SortMenuProps {
   currentSort: Sorts;

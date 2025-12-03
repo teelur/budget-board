@@ -7,7 +7,7 @@ import {
   buildCategoryToLimitsMap,
 } from "~/helpers/budgets";
 import BudgetParentCard from "./BudgetParentCard/BudgetParentCard";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface BudgetsGroupProps {
   budgets: IBudget[];

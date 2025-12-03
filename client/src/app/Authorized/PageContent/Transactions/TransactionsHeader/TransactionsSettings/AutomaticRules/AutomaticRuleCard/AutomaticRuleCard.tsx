@@ -16,8 +16,8 @@ import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Card from "~/components/Card/Card";
-import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Card from "~/components/core/Card/Card";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;

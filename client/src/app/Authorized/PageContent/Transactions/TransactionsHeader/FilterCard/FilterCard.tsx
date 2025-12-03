@@ -5,11 +5,11 @@ import React from "react";
 import { ICategory } from "~/models/category";
 import dayjs from "dayjs";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
-import AccountSelect from "~/components/Select/AccountSelect/AccountSelect";
-import DatePickerInput from "~/components/Input/DatePickerInput/DatePickerInput";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
+import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
 
 interface FilterCardProps {
   categories: ICategory[];

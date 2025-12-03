@@ -6,9 +6,9 @@ import { AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
-import Card from "~/components/Card/Card";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import PasswordInput from "~/components/Input/PasswordInput/PasswordInput";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 
 const CreatePassword = (): React.ReactNode => {
   const newPasswordField = useField<string>({

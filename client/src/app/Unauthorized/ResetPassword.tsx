@@ -8,9 +8,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import PasswordInput from "~/components/Input/PasswordInput/PasswordInput";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 
 interface ResetPasswordProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;

@@ -14,13 +14,13 @@ import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Modal from "~/components/Modal/Modal";
-import TextInput from "~/components/Input/TextInput/TextInput";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import AccountSelect from "~/components/Select/AccountSelect/AccountSelect";
-import DateInput from "~/components/Input/DateInput/DateInput";
+import Modal from "~/components/core/Modal/Modal";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
 
 interface formValues {
   date: Date | null;

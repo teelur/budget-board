@@ -22,7 +22,7 @@ import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { IAccountResponse } from "~/models/account";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];

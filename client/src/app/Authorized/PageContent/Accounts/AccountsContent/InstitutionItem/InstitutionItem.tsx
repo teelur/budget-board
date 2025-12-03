@@ -18,7 +18,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
 import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
-import SurfaceCard from "~/components/Card/SurfaceCard/SurfaceCard";
+import SurfaceCard from "~/components/core/Card/SurfaceCard/SurfaceCard";
 
 interface IInstitutionItemProps {
   institution: IInstitution;

@@ -5,8 +5,8 @@ import { IAccountResponse } from "~/models/account";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import DatePickerInput from "../Input/DatePickerInput/DatePickerInput";
-import AccountSelect from "../Select/AccountSelect/AccountSelect";
+import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
+import AccountSelect from "../core/Select/AccountSelect/AccountSelect";
 
 interface AccountsSelectHeaderProps {
   selectedAccountIds: string[];

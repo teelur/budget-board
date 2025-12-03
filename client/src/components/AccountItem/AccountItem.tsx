@@ -8,9 +8,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
-import PrimaryText from "../Text/PrimaryText/PrimaryText";
-import StatusText from "../Text/StatusText/StatusText";
-import DimmedText from "../Text/DimmedText/DimmedText";
+import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
+import StatusText from "../core/Text/StatusText/StatusText";
+import DimmedText from "../core/Text/DimmedText/DimmedText";
 
 interface AccountItemProps {
   account: IAccountResponse;

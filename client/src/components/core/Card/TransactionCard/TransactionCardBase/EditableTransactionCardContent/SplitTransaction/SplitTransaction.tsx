@@ -17,10 +17,10 @@ import { translateAxiosError } from "~/helpers/requests";
 import { ICategory } from "~/models/category";
 import { ITransactionSplitRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
-import CategorySelect from "~/components/Select/CategorySelect/CategorySelect";
-import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import NumberInput from "~/components/Input/NumberInput/NumberInput";
-import Popover from "~/components/Popover/Popover";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import Popover from "~/components/core/Popover/Popover";
 
 interface SplitTransactionProps {
   id: string;

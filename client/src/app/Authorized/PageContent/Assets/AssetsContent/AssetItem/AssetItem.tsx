@@ -9,7 +9,7 @@ import { closestCenter } from "@dnd-kit/collision";
 import { GripVertical } from "lucide-react";
 import AssetItemContent from "./AssetItemContent/AssetItemContent";
 import EditableAssetItemContent from "./EditableAssetItemContent/EditableAssetItemContent";
-import Card from "~/components/Card/Card";
+import Card from "~/components/core/Card/Card";
 
 interface AssetItemProps {
   asset: IAssetResponse;
