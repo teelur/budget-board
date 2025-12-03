@@ -174,7 +174,7 @@ const EditableAssetItemContent = (
               Hide Asset
             </Button>
           </Group>
-          <StatusText size="md" value={props.asset.currentValue}>
+          <StatusText size="md" amount={props.asset.currentValue}>
             {convertNumberToCurrency(
               props.asset.currentValue ?? 0,
               true,
