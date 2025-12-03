@@ -1,11 +1,12 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
-import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
+import { DatesRangeValue } from "@mantine/dates";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import AssetSelectInput from "../AssetSelectInput/AssetSelectInput";
 import { IAssetResponse } from "~/models/asset";
+import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
+import AssetSelect from "../core/Select/AssetSelect/AssetSelect";
 
 interface AssetsSelectHeaderProps {
   selectedAssetIds: string[];
@@ -41,14 +42,15 @@ const AssetsSelectHeader = (
         type="range"
         value={props.dateRange}
         onChange={props.setDateRange}
+        elevation={1}
       />
-      <AssetSelectInput
+      <AssetSelect
         selectedAssetIds={props.selectedAssetIds}
         setSelectedAssetIds={props.setSelectedAssetIds}
         hideHidden
-        filterTypes={props.filters}
         miw="230px"
         maw="400px"
+        elevation={1}
       />
       <Button
         onClick={() => {

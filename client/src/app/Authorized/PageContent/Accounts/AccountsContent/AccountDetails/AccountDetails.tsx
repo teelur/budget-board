@@ -1,11 +1,9 @@
 import {
-  Accordion,
+  Accordion as MantineAccordion,
   Button,
-  Drawer,
   Group,
   Skeleton,
   Stack,
-  Text,
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -17,6 +15,10 @@ import { IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
+import Drawer from "~/components/core/Drawer/Drawer";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -69,11 +71,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={
-        <Text size="lg" fw={600}>
-          Account Details
-        </Text>
-      }
+      title={<PrimaryText size="lg">Account Details</PrimaryText>}
       styles={{
         inner: {
           left: "0",
@@ -88,49 +86,36 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
         <Stack gap="1rem">
           <Group justify="space-between" align="center">
             <Stack gap={0}>
-              <Text size="xs" fw={500} c="dimmed">
-                Account Name
-              </Text>
-              <Text size="lg" fw={600}>
-                {props.account.name}
-              </Text>
+              <DimmedText size="xs">Account Name</DimmedText>
+              <PrimaryText size="lg">{props.account.name}</PrimaryText>
             </Stack>
             <Stack gap={0}>
-              <Text size="xs" fw={500} c="dimmed">
-                Account Type
-              </Text>
-              <Text size="lg" fw={600}>
+              <DimmedText size="xs">Account Type</DimmedText>
+              <PrimaryText size="lg">
                 {props.account.subtype || props.account.type}
-              </Text>
+              </PrimaryText>
             </Stack>
           </Group>
           <Accordion
-            variant="separated"
-            defaultValue={["chart", "balances"]}
-            multiple
+            defaultValue={["add-balance", "chart", "balances"]}
+            elevation={1}
           >
-            <Accordion.Item
-              value="add-balance"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>
-                <Text>Add Balance</Text>
-              </Accordion.Control>
-              <Accordion.Panel>
+            <MantineAccordion.Item value="add-balance">
+              <MantineAccordion.Control>
+                <PrimaryText>Add Balance</PrimaryText>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <AddBalance
                   accountId={props.account.id}
                   currency={props.currency}
                 />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item
-              value="chart"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>
-                <Text>Account Trends</Text>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="chart">
+              <MantineAccordion.Control>
+                <PrimaryText>Account Trends</PrimaryText>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Group>
                   <Button
                     variant={chartLookbackMonths === 3 ? "filled" : "outline"}
@@ -170,22 +155,21 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     dayjs().toString(),
                   ]}
                 />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item
-              value="balances"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>Recent Balances</Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="balances">
+              <MantineAccordion.Control>
+                <PrimaryText>Recent Balances</PrimaryText>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   {balancesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedBalances.length === 0 ? (
-                    <Text size="sm" c="dimmed" fw={600}>
-                      No balance entries.
-                    </Text>
+                    <Group justify="center">
+                      <DimmedText size="sm">No balance entries.</DimmedText>
+                    </Group>
                   ) : (
                     <BalanceItems
                       balances={sortedBalances}
@@ -193,24 +177,23 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     />
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item
-              value="deleted-balances"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>
-                <Text>Deleted Balances</Text>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="deleted-balances">
+              <MantineAccordion.Control>
+                <PrimaryText>Deleted Balances</PrimaryText>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   {balancesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedDeletedBalances.length === 0 ? (
-                    <Text size="sm" c="dimmed" fw={600}>
-                      No deleted balances.
-                    </Text>
+                    <Group justify="center">
+                      <DimmedText size="sm">
+                        No deleted balance entries.
+                      </DimmedText>
+                    </Group>
                   ) : (
                     <BalanceItems
                       balances={sortedDeletedBalances}
@@ -218,8 +201,8 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     />
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
           </Accordion>
         </Stack>
       )}

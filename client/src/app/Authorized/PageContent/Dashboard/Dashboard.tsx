@@ -10,7 +10,7 @@ import UncategorizedTransactionsCard from "./UncategorizedTransactionsCard/Uncat
 
 const Dashboard = (): React.ReactNode => {
   return (
-    <Stack className={classes.dashboardContainer} justify="space-between">
+    <Stack w="100%" maw={1400} h="100%" flex="1" justify="space-between">
       <Flex className={classes.mainContent}>
         <Stack className={classes.accountColumn}>
           <AccountsCard />

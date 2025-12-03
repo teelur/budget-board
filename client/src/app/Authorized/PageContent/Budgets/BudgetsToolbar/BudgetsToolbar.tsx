@@ -97,7 +97,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   };
 
   return (
-    <Stack>
+    <Stack gap="1rem">
       <MonthToolcards
         selectedDates={props.selectedDates}
         setSelectedDates={props.setSelectedDates}
@@ -110,7 +110,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         <Button
           onClick={toggleSelectMultiple}
           variant="outline"
-          color={canSelectMultiple ? "green" : "gray"}
+          color={canSelectMultiple ? "var(--button-color-confirm)" : ""}
         >
           Select Multiple
         </Button>

@@ -1,6 +1,4 @@
-import classes from "./UnbudgetedGroup.module.css";
-
-import { Accordion, Group, Stack, Text } from "@mantine/core";
+import { Accordion as MantineAccordion, Group, Stack } from "@mantine/core";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
@@ -9,6 +7,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -45,62 +46,72 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
       return acc + (categoryTotal ? categoryTotal : 0);
     }, 0) + (props.categoryToTransactionsTotalMap.get("") ?? 0);
 
+  const getUnbudgetedCards = (): React.ReactNode[] => {
+    const cards: React.ReactNode[] = [];
+
+    if (props.categoryToTransactionsTotalMap.has("")) {
+      cards.push(
+        <UnbudgetedCard
+          key="uncategorized"
+          categoryTree={
+            new CategoryNode({
+              value: "",
+              parent: "",
+            })
+          }
+          categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}
+          selectedDate={props.selectedDate}
+          openDetails={props.openDetails}
+        />
+      );
+    }
+
+    props.categoryTree.forEach((categoryTree) => {
+      cards.push(
+        <UnbudgetedCard
+          key={categoryTree.value}
+          categoryTree={categoryTree}
+          categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}
+          selectedDate={props.selectedDate}
+          openDetails={props.openDetails}
+        />
+      );
+    });
+
+    return cards;
+  };
+
+  const unbudgetedCards = getUnbudgetedCards();
+
   return (
-    <Accordion variant="separated" radius="md">
-      <Accordion.Item
-        className={classes.accordion}
-        key="unbudgeted"
-        value="unbudgeted"
-      >
-        <Accordion.Control>
+    <Accordion defaultValue={[]} elevation={1}>
+      <MantineAccordion.Item value="unbudgeted">
+        <MantineAccordion.Control>
           <Group justify="space-between" align="center" w="100%" pr="1rem">
-            <Text size="lg" fw={600}>
-              Unbudgeted
-            </Text>
+            <PrimaryText size="lg">Unbudgeted</PrimaryText>
             {userSettingsQuery.isPending ? null : (
-              <Text size="lg" fw={600}>
+              <PrimaryText size="lg">
                 {convertNumberToCurrency(
                   total,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </PrimaryText>
             )}
           </Group>
-        </Accordion.Control>
-        <Accordion.Panel p={0}>
-          <Stack gap="0.6rem">
-            <UnbudgetedCard
-              categoryTree={
-                new CategoryNode({
-                  value: "",
-                  parent: "",
-                })
-              }
-              categoryToTransactionsTotalMap={
-                props.categoryToTransactionsTotalMap
-              }
-              selectedDate={props.selectedDate}
-              openDetails={props.openDetails}
-            />
-            {props.categoryTree.length > 0 ? (
-              props.categoryTree.map((categoryTree) => (
-                <UnbudgetedCard
-                  key={categoryTree.value}
-                  categoryTree={categoryTree}
-                  categoryToTransactionsTotalMap={
-                    props.categoryToTransactionsTotalMap
-                  }
-                  selectedDate={props.selectedDate}
-                  openDetails={props.openDetails}
-                />
-              ))
+        </MantineAccordion.Control>
+        <MantineAccordion.Panel>
+          <Stack gap="0.5rem">
+            {unbudgetedCards.length > 0 ? (
+              unbudgetedCards
             ) : (
-              <Text>No unbudgeted transactions found.</Text>
+              <DimmedText size="sm">
+                No unbudgeted transactions found.
+              </DimmedText>
             )}
           </Stack>
-        </Accordion.Panel>
-      </Accordion.Item>
+        </MantineAccordion.Panel>
+      </MantineAccordion.Item>
     </Accordion>
   );
 };

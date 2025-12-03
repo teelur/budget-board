@@ -1,5 +1,3 @@
-import classes from "./SpendingTrendsCard.module.css";
-
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import { convertNumberToCurrency } from "~/helpers/currency";
@@ -8,12 +6,15 @@ import {
   filterHiddenTransactions,
   getRollingTotalSpendingForMonth,
 } from "~/helpers/transactions";
-import { Card, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { IUserSettings } from "~/models/userSettings";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 const SpendingTrendsCard = (): React.ReactNode => {
   const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
@@ -140,12 +141,12 @@ const SpendingTrendsCard = (): React.ReactNode => {
   };
 
   return (
-    <Card className={classes.root} withBorder radius="md">
-      <Stack className={classes.header}>
-        <Title order={2}>Spending Trends</Title>
-        <Text c="dimmed" fw={600} size="sm">
+    <Card w="100%" elevation={1}>
+      <Stack align="center" gap={0}>
+        <PrimaryText size="xl">Spending Trends</PrimaryText>
+        <DimmedText size="sm">
           You have spent {getSpendingComparisonString()} last month.
-        </Text>
+        </DimmedText>
       </Stack>
       <SpendingChart
         months={months}

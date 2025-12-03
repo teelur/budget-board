@@ -1,4 +1,6 @@
-import { Card, Group, Text } from "@mantine/core";
+import { Badge, Group } from "@mantine/core";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getFormattedValue } from "~/helpers/automaticRules";
 import {
   ActionOperators,
@@ -16,30 +18,24 @@ interface ActionItemProps {
 const ActionItem = (props: ActionItemProps) => {
   const getCardContent = (): React.ReactNode => {
     if (props.action.operator === "delete") {
-      return (
-        <Text fw={600} size="sm">
-          the transaction
-        </Text>
-      );
+      return <PrimaryText size="sm">the transaction</PrimaryText>;
     } else if (props.action.operator === "set") {
       return (
         <>
-          <Text fw={600} size="sm">
+          <Badge bg="purple" size="sm">
             {TransactionFields.find(
               (field) => field.value === props.action.field
             )?.label ?? props.action.field}
-          </Text>
-          <Text fw={600} size="sm">
-            to
-          </Text>
-          <Text fw={600} size="sm">
+          </Badge>
+          <PrimaryText size="sm">to</PrimaryText>
+          <Badge size="sm">
             {getFormattedValue(
               props.action.field,
               props.action.value,
               props.currency,
               props.categories
             )}
-          </Text>
+          </Badge>
         </>
       );
     }
@@ -47,17 +43,12 @@ const ActionItem = (props: ActionItemProps) => {
   };
 
   return (
-    <Card
-      bg="var(--mantine-color-card-alternate)"
-      withBorder
-      p="0.25rem"
-      radius="md"
-    >
+    <Card p="0.25rem" shadow="xs" elevation={1}>
       <Group gap="0.3rem">
-        <Text fw={600} size="sm">
+        <PrimaryText size="sm">
           {ActionOperators.find((op) => op.value === props.action.operator)
             ?.label ?? props.action.operator}
-        </Text>
+        </PrimaryText>
         {getCardContent()}
       </Group>
     </Card>

@@ -1,5 +1,3 @@
-import classes from "./MonthToolcards.module.css";
-
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { ActionIcon, Group } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
@@ -55,15 +53,22 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
   };
 
   return (
-    <Group className={classes.root} ref={ref}>
+    <Group wrap="nowrap" gap="0.5rem" ref={ref}>
       <ActionIcon
-        className={classes.pageButton}
-        variant="light"
+        h="62px"
+        w="32px"
+        flex="0 0"
+        variant="outline"
         onClick={() => setIndex(index + 1)}
       >
         <ChevronLeftIcon />
       </ActionIcon>
-      <Group className={classes.monthCards}>
+      <Group
+        style={{ flexDirection: "row-reverse", flexGrow: 1 }}
+        wrap="nowrap"
+        justify="space-around"
+        gap={0}
+      >
         {dates.map((date: Date, i: number) => (
           <MonthToolcard
             key={i}
@@ -80,8 +85,10 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
         ))}
       </Group>
       <ActionIcon
-        className={classes.pageButton}
-        variant="light"
+        h="62px"
+        w="32px"
+        flex="0 0"
+        variant="outline"
         disabled={index <= 0 && !props.allowFutureMonths}
         onClick={() => setIndex(index - 1)}
       >

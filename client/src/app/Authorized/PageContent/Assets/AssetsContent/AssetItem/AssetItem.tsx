@@ -1,7 +1,6 @@
-import classes from "./AssetItem.module.css";
-
+import React from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { Button, Card, Flex, Group } from "@mantine/core";
+import { Button, Flex, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IAssetResponse } from "~/models/asset";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
@@ -10,6 +9,7 @@ import { closestCenter } from "@dnd-kit/collision";
 import { GripVertical } from "lucide-react";
 import AssetItemContent from "./AssetItemContent/AssetItemContent";
 import EditableAssetItemContent from "./EditableAssetItemContent/EditableAssetItemContent";
+import Card from "~/components/core/Card/Card";
 
 interface AssetItemProps {
   asset: IAssetResponse;
@@ -37,12 +37,9 @@ const AssetItem = (props: AssetItemProps): React.ReactNode => {
   return (
     <Card
       ref={props.isSortable ? ref : undefined}
-      shadow="sm"
-      padding="0.5rem"
-      radius="md"
-      className={isSelected ? undefined : classes.card}
-      withBorder
       onClick={() => !isSelected && props.openDetails(props.asset)}
+      hoverEffect={!isSelected}
+      elevation={1}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (

@@ -1,11 +1,4 @@
-import {
-  Button,
-  Card,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { Button, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { IInstitution } from "~/models/institution";
 import AccountItem from "./AccountItem/AccountItem";
 import { GripVertical } from "lucide-react";
@@ -25,6 +18,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
 import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
+import Card from "~/components/core/Card/Card";
 
 interface IInstitutionItemProps {
   institution: IInstitution;
@@ -51,6 +45,19 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
         index,
       }))
   );
+
+  React.useEffect(() => {
+    setSortedAccounts(
+      props.institution.accounts
+        .slice()
+        .filter((a) => a.deleted === null)
+        .sort((a, b) => a.index - b.index)
+        .map((a, index) => ({
+          ...a,
+          index,
+        }))
+    );
+  }, [props.institution.accounts]);
 
   const { ref, handleRef } = useSortable({
     id: props.institution.id,
@@ -108,13 +115,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
   }, [props.isSortable]);
 
   return (
-    <Card
-      ref={props.isSortable ? ref : undefined}
-      bg="var(--mantine-color-bg)"
-      padding="0.5rem"
-      radius="md"
-      withBorder
-    >
+    <Card ref={props.isSortable ? ref : undefined} elevation={1}>
       <LoadingOverlay visible={doIndexAccounts.isPending} />
       <Group w="100%" wrap="nowrap" gap="0.5rem" align="flex-start">
         {props.isSortable && (

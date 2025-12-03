@@ -1,17 +1,19 @@
-import { BudgetValueType, getBudgetValueColor } from "~/helpers/budgets";
+import { StatusColorType, getStatusColor } from "~/helpers/budgets";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { Divider, Flex, Group, Progress, Stack, Text } from "@mantine/core";
+import { Divider, Flex, Group, Progress, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 
 interface BudgetSummaryItemProps {
   label: string;
   amount: number;
   total?: number;
-  budgetValueType: BudgetValueType;
+  budgetValueType: StatusColorType;
   hideProgress?: boolean;
   showDivider?: boolean;
 }
@@ -37,7 +39,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
 
   const percentComplete = Math.round(
     ((props.amount *
-      (props.budgetValueType === BudgetValueType.Expense ? -1 : 1)) /
+      (props.budgetValueType === StatusColorType.Expense ? -1 : 1)) /
       (props.total ?? 0)) *
       100
   );
@@ -49,46 +51,45 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         justify={props.showDivider ? "center" : "space-between"}
       >
         <Flex>
-          <Text size="md" fw={600}>
-            {props.label}
-          </Text>
+          <PrimaryText size="md">{props.label}</PrimaryText>
         </Flex>
         {props.showDivider ? (
-          <Divider my="sm" variant="dashed" flex="1 0 auto" />
+          <Divider
+            color="var(--elevated-color-border)"
+            my="sm"
+            variant="dashed"
+            flex="1 0 auto"
+          />
         ) : null}
         <Flex gap="0.25rem">
           {userSettingsQuery.isPending ? null : (
-            <Text
+            <StatusText
+              amount={props.amount}
+              total={props.total ?? 0}
+              type={props.budgetValueType}
+              warningThreshold={
+                userSettingsQuery.data?.budgetWarningThreshold ?? 80
+              }
               size="md"
               fw={600}
-              c={getBudgetValueColor(
-                props.amount,
-                props.total ?? 0,
-                props.budgetValueType,
-                userSettingsQuery.data?.budgetWarningThreshold ?? 80
-              )}
             >
               {convertNumberToCurrency(
                 props.amount *
-                  (props.budgetValueType === BudgetValueType.Expense ? -1 : 1),
+                  (props.budgetValueType === StatusColorType.Expense ? -1 : 1),
                 false,
                 userSettingsQuery.data?.currency ?? "USD"
               )}
-            </Text>
+            </StatusText>
           )}
+          {props.total ? <PrimaryText size="md">of</PrimaryText> : null}
           {props.total ? (
-            <Text size="md" fw={600}>
-              of
-            </Text>
-          ) : null}
-          {props.total ? (
-            <Text size="md" fw={600}>
+            <PrimaryText size="md">
               {convertNumberToCurrency(
                 props.total,
                 false,
                 userSettingsQuery.data?.currency ?? "USD"
               )}
-            </Text>
+            </PrimaryText>
           ) : null}
         </Flex>
       </Group>
@@ -96,7 +97,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         <Progress.Root size={16} radius="xl">
           <Progress.Section
             value={percentComplete > 100 ? 100 : percentComplete}
-            color={getBudgetValueColor(
+            color={getStatusColor(
               props.amount,
               props.total ?? 0,
               props.budgetValueType,

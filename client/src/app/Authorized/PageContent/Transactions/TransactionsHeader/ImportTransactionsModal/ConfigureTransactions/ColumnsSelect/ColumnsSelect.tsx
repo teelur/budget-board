@@ -1,6 +1,8 @@
-import { Divider, Group, Select, Stack } from "@mantine/core";
+import { Divider, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
+import Select from "~/components/core/Select/Select/Select";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export interface ISelectedColumns {
   date: string | null;
@@ -67,51 +69,58 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
       <Divider label="Columns Fields" labelPosition="center" />
       <Group>
         <Select
-          label="Date"
+          label={<PrimaryText size="sm">Date</PrimaryText>}
           data={props.csvHeaders}
           clearable
           {...dateColumnField.getInputProps()}
+          elevation={0}
         />
         <Select
-          label="Description"
+          label={<PrimaryText size="sm">Description</PrimaryText>}
           data={props.csvHeaders}
           clearable
           {...descriptionColumnField.getInputProps()}
+          elevation={0}
         />
         <Select
-          label="Category"
+          label={<PrimaryText size="sm">Category</PrimaryText>}
           data={props.csvHeaders}
           clearable
           {...categoryColumnField.getInputProps()}
+          elevation={0}
         />
         {props.isAmountSplit ? (
           <>
             <Select
-              label="Income Amount"
+              label={<PrimaryText size="sm">Income Amount</PrimaryText>}
               data={props.csvHeaders}
               clearable
               {...incomeAmountColumnField.getInputProps()}
+              elevation={0}
             />
             <Select
-              label="Expense Amount"
+              label={<PrimaryText size="sm">Expense Amount</PrimaryText>}
               data={props.csvHeaders}
               clearable
               {...expenseAmountColumnField.getInputProps()}
+              elevation={0}
             />
           </>
         ) : (
           <Select
-            label="Amount"
+            label={<PrimaryText size="sm">Amount</PrimaryText>}
             data={props.csvHeaders}
             clearable
             {...amountColumnField.getInputProps()}
+            elevation={0}
           />
         )}
         <Select
-          label="Account"
+          label={<PrimaryText size="sm">Account</PrimaryText>}
           data={props.csvHeaders}
           clearable
           {...accountColumnField.getInputProps()}
+          elevation={0}
         />
       </Group>
     </Stack>

@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Card, Group, Stack, Text } from "@mantine/core";
+import { ActionIcon, Button, Group, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, PlayIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -16,6 +16,8 @@ import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import Card from "~/components/core/Card/Card";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -113,7 +115,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
 
   if (isSelected) {
     return (
-      <Card bg="var(--mantine-color-bg)" radius="md" withBorder>
+      <Card elevation={1}>
         <Stack gap="0.5rem">
           <EditableAutomaticRuleContent
             conditionItems={conditionItems}
@@ -161,13 +163,13 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   }
 
   return (
-    <Card p="0.5rem" radius="md">
+    <Card elevation={2}>
       <Group gap={0} justify="space-between" wrap="nowrap">
         <Stack>
           <Group gap="0.25rem">
-            <Text c="dimmed" fw={600} size="sm" pr="0.5rem">
+            <DimmedText size="sm" pr="0.5rem">
               If
-            </Text>
+            </DimmedText>
             {(props.rule.conditions ?? []).map((condition) => (
               <ConditionItem
                 key={condition.id}
@@ -178,9 +180,9 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
             ))}
           </Group>
           <Group gap="0.25rem">
-            <Text c="dimmed" fw={600} size="sm" pr="0.5rem">
+            <DimmedText size="sm" pr="0.5rem">
               Then
-            </Text>
+            </DimmedText>
             {(props.rule.actions ?? []).map((action) => (
               <ActionItem
                 key={action.id}
@@ -226,7 +228,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
             <PencilIcon size="1rem" />
           </ActionIcon>
           <ActionIcon
-            color="red"
+            color="var(--button-color-destructive)"
             onClick={(e) => {
               e.stopPropagation();
               doDeleteAutomaticRule.mutate(props.rule.id);

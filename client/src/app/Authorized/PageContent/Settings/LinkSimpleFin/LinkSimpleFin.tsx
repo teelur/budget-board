@@ -1,12 +1,9 @@
 import {
   Button,
-  Card,
   Badge,
   Group,
   LoadingOverlay,
-  PasswordInput,
   Stack,
-  Text,
   Skeleton,
 } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,6 +14,9 @@ import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { isNotEmpty, useField } from "@mantine/form";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 
 const LinkSimpleFin = (): React.ReactNode => {
   const simpleFinKeyField = useField<string>({
@@ -70,13 +70,11 @@ const LinkSimpleFin = (): React.ReactNode => {
   }
 
   return (
-    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
+    <Card elevation={1}>
       <LoadingOverlay visible={doSetAccessToken.isPending} zIndex={1000} />
       <Stack gap="1rem">
         <Group gap="1rem">
-          <Text fw={700} size="lg">
-            Link SimpleFIN
-          </Text>
+          <PrimaryText size="lg">Link SimpleFIN</PrimaryText>
           {userQuery.data?.accessToken && (
             <Badge color="green" maw={80}>
               Linked
@@ -86,11 +84,8 @@ const LinkSimpleFin = (): React.ReactNode => {
         <Stack gap="0.5rem">
           <PasswordInput
             {...simpleFinKeyField.getInputProps()}
-            label={
-              <Text fw={600} size="sm">
-                SimpleFin Access Token
-              </Text>
-            }
+            label={<PrimaryText size="sm">SimpleFin Access Token</PrimaryText>}
+            elevation={1}
           />
           <Button
             onClick={() => {

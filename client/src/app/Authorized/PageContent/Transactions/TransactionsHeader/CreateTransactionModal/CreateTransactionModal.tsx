@@ -1,13 +1,4 @@
-import {
-  ActionIcon,
-  Button,
-  Modal,
-  NumberInput,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { ActionIcon, Button, Stack } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -15,9 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
-import AccountSelectInput from "~/components/AccountSelectInput";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
@@ -25,6 +14,13 @@ import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import Modal from "~/components/core/Modal/Modal";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
 
 interface formValues {
   date: Date | null;
@@ -135,50 +131,46 @@ const CreateTransactionModal = (): React.ReactNode => {
       >
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap={5}>
-            <DatePickerInput
-              label="Date"
+            <DateInput
+              label={<PrimaryText size="sm">Date</PrimaryText>}
               placeholder="Pick date"
               {...form.getInputProps("date")}
-              required
+              elevation={0}
             />
             <TextInput
-              label="Description"
+              label={<PrimaryText size="sm">Description</PrimaryText>}
               placeholder="Enter amount"
               {...form.getInputProps("description")}
-              required
+              elevation={0}
             />
-            <Stack gap={3}>
-              <Text fz="sm">Category</Text>
-              <CategorySelect
-                placeholder="Select category"
-                required
-                categories={transactionCategories}
-                value={form.getValues().category}
-                onChange={(val) => form.setFieldValue("category", val)}
-                key={form.key("category")}
-                withinPortal
-              />
-            </Stack>
+            <CategorySelect
+              label={<PrimaryText size="sm">Category</PrimaryText>}
+              categories={transactionCategories}
+              value={form.getValues().category}
+              onChange={(val) => form.setFieldValue("category", val)}
+              key={form.key("category")}
+              withinPortal
+              elevation={0}
+            />
             <NumberInput
-              label="Amount"
+              label={<PrimaryText size="sm">Amount</PrimaryText>}
               placeholder="Enter amount"
               prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               decimalScale={2}
               thousandSeparator=","
               {...form.getInputProps("amount")}
-              required
+              elevation={0}
             />
-            <Stack gap={3}>
-              <Text fz="sm">Account</Text>
-              <AccountSelectInput
-                selectedAccountIds={form.getValues().accountIds}
-                setSelectedAccountIds={(val) =>
-                  form.setFieldValue("accountIds", val)
-                }
-                key={form.key("accountIds")}
-                maxSelectedValues={1}
-              />
-            </Stack>
+            <AccountSelect
+              label={<PrimaryText size="sm">Account</PrimaryText>}
+              selectedAccountIds={form.getValues().accountIds}
+              setSelectedAccountIds={(val) =>
+                form.setFieldValue("accountIds", val)
+              }
+              key={form.key("accountIds")}
+              maxSelectedValues={1}
+              elevation={0}
+            />
             <Button
               type="submit"
               mt={5}

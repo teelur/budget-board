@@ -1,15 +1,7 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import classes from "./DeletedTransactionsCard.module.css";
 
 import { getDaysSinceDate } from "~/helpers/datetime";
-import {
-  ActionIcon,
-  Card,
-  Group,
-  LoadingOverlay,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
@@ -17,6 +9,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface DeletedTransactionCardProps {
   deletedTransaction: ITransaction;
@@ -45,16 +41,18 @@ const DeletedTransactionsCard = (
   });
 
   return (
-    <Card padding="0.5rem" radius="md">
+    <Card elevation={2}>
       <LoadingOverlay visible={doRestoreTransaction.isPending} />
       <Group justify="space-between" wrap="nowrap">
         <Stack gap={0}>
-          <Text fw={600} size="md">
+          <PrimaryText size="md">
             {props.deletedTransaction.merchantName}
-          </Text>
-          <Text c="dimmed" fw={600} size="sm">{`${getDaysSinceDate(
-            props.deletedTransaction.deleted!
-          )} days since deleted`}</Text>
+          </PrimaryText>
+          <DimmedText size="sm">
+            {`${getDaysSinceDate(
+              props.deletedTransaction.deleted!
+            )} days since deleted`}
+          </DimmedText>
         </Stack>
         <Group className={classes.buttonGroup}>
           <ActionIcon

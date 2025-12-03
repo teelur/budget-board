@@ -1,6 +1,4 @@
-import classes from "./NetWorthCard.module.css";
-
-import { Card, Skeleton, Stack, Title } from "@mantine/core";
+import { Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import NetWorthItem from "./NetWorthItem/NetWorthItem";
 import {
@@ -15,6 +13,8 @@ import { AxiosResponse } from "axios";
 import { filterVisibleAssets, sumAssetsTotalValue } from "~/helpers/assets";
 import { IAssetResponse } from "~/models/asset";
 import { IUserSettings } from "~/models/userSettings";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const NetWorthCard = (): React.ReactNode => {
   const { request } = useAuth();
@@ -70,16 +70,9 @@ const NetWorthCard = (): React.ReactNode => {
   const validAssets = filterVisibleAssets(assetsQuery.data ?? []);
 
   return (
-    <Card
-      className={classes.card}
-      w="100%"
-      padding="xs"
-      radius="md"
-      shadow="sm"
-      withBorder
-    >
-      <Stack className={classes.content}>
-        <Title order={3}>Net Worth</Title>
+    <Card w="100%" elevation={1}>
+      <Stack gap="0.5rem">
+        <PrimaryText size="xl">Net Worth</PrimaryText>
         {accountsQuery.isPending ? (
           <Stack gap="0.5rem">
             <Skeleton height={90} radius="lg" />
@@ -88,79 +81,73 @@ const NetWorthCard = (): React.ReactNode => {
           </Stack>
         ) : (
           <Stack gap="0.5rem">
-            <Card
-              className={classes.group}
-              bg="var(--mantine-color-card-alternate)"
-              radius="lg"
-              shadow="none"
-            >
-              <NetWorthItem
-                title="Spending"
-                totalBalance={sumAccountsTotalBalance(
-                  getAccountsOfTypes(validAccounts, ["Checking", "Credit Card"])
-                )}
-                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
-              />
-              <NetWorthItem
-                title="Loans"
-                totalBalance={sumAccountsTotalBalance(
-                  getAccountsOfTypes(validAccounts, ["Loan"])
-                )}
-                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
-              />
-              <NetWorthItem
-                title="Savings"
-                totalBalance={sumAccountsTotalBalance(
-                  getAccountsOfTypes(validAccounts, ["Savings"])
-                )}
-                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
-              />
+            <Card p="0.25rem" elevation={2}>
+              <Stack gap={0}>
+                <NetWorthItem
+                  title="Spending"
+                  totalBalance={sumAccountsTotalBalance(
+                    getAccountsOfTypes(validAccounts, [
+                      "Checking",
+                      "Credit Card",
+                    ])
+                  )}
+                  userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+                />
+                <NetWorthItem
+                  title="Loans"
+                  totalBalance={sumAccountsTotalBalance(
+                    getAccountsOfTypes(validAccounts, ["Loan"])
+                  )}
+                  userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+                />
+                <NetWorthItem
+                  title="Savings"
+                  totalBalance={sumAccountsTotalBalance(
+                    getAccountsOfTypes(validAccounts, ["Savings"])
+                  )}
+                  userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+                />
+              </Stack>
             </Card>
-            <Card
-              className={classes.group}
-              bg="var(--mantine-color-card-alternate)"
-              radius="lg"
-              shadow="none"
-            >
-              <NetWorthItem
-                title="Liquid"
-                totalBalance={sumAccountsTotalBalance(
-                  getAccountsOfTypes(validAccounts, [
-                    "Checking",
-                    "Credit Card",
-                    "Loan",
-                    "Savings",
-                  ])
-                )}
-                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
-              />
-              <NetWorthItem
-                title="Investments"
-                totalBalance={sumAccountsTotalBalance(
-                  getAccountsOfTypes(validAccounts, ["Investment"])
-                )}
-                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
-              />
-              <NetWorthItem
-                title="Assets"
-                totalBalance={sumAssetsTotalValue(validAssets)}
-                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
-              />
+            <Card p="0.25rem" elevation={2}>
+              <Stack gap={0}>
+                <NetWorthItem
+                  title="Liquid"
+                  totalBalance={sumAccountsTotalBalance(
+                    getAccountsOfTypes(validAccounts, [
+                      "Checking",
+                      "Credit Card",
+                      "Loan",
+                      "Savings",
+                    ])
+                  )}
+                  userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+                />
+                <NetWorthItem
+                  title="Investments"
+                  totalBalance={sumAccountsTotalBalance(
+                    getAccountsOfTypes(validAccounts, ["Investment"])
+                  )}
+                  userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+                />
+                <NetWorthItem
+                  title="Assets"
+                  totalBalance={sumAssetsTotalValue(validAssets)}
+                  userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+                />
+              </Stack>
             </Card>
-            <Card
-              className={classes.group}
-              bg="var(--mantine-color-card-alternate)"
-              radius="lg"
-              shadow="none"
-            >
-              <NetWorthItem
-                title="Total"
-                totalBalance={
-                  sumAccountsTotalBalance(validAccounts) +
-                  sumAssetsTotalValue(validAssets)
-                }
-                userCurrency={userSettingsQuery.data?.currency ?? "USD"}
-              />
+            <Card p="0.25rem" elevation={2}>
+              <Stack gap={0}>
+                <NetWorthItem
+                  title="Total"
+                  totalBalance={
+                    sumAccountsTotalBalance(validAccounts) +
+                    sumAssetsTotalValue(validAssets)
+                  }
+                  userCurrency={userSettingsQuery.data?.currency ?? "USD"}
+                />
+              </Stack>
             </Card>
           </Stack>
         )}

@@ -1,11 +1,9 @@
 import {
-  Accordion,
+  Accordion as MantineAccordion,
   Button,
-  Drawer,
   Group,
   Skeleton,
   Stack,
-  Text,
 } from "@mantine/core";
 import { MoveRightIcon } from "lucide-react";
 import { convertNumberToCurrency } from "~/helpers/currency";
@@ -19,6 +17,11 @@ import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
+import Drawer from "~/components/core/Drawer/Drawer";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
+import Accordion from "~/components/core/Accordion/Accordion";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -51,12 +54,12 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
 
   const sortedValues =
     valuesQuery.data
-      ?.filter((value) => !value.deleted)
+      ?.filter((value) => value.deleted === null)
       .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
 
   const sortedDeletedValues =
     valuesQuery.data
-      ?.filter((value) => value.deleted)
+      ?.filter((value) => value.deleted !== null)
       .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
 
   const valuesForChart = sortedValues.filter((value) =>
@@ -71,50 +74,31 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={
-        <Text size="lg" fw={600}>
-          Asset Details
-        </Text>
-      }
-      styles={{
-        inner: {
-          left: "0",
-          right: "0",
-          padding: "0 !important",
-        },
-      }}
+      title={<PrimaryText size="lg">Asset Details</PrimaryText>}
     >
       {!props.asset ? (
         <Skeleton height={425} radius="lg" />
       ) : (
-        <Stack>
+        <Stack gap="1rem">
           <Stack gap={0}>
-            <Text size="xs" c="dimmed">
-              Asset Name
-            </Text>
-            <Text size="xl" fw={600}>
-              {props.asset?.name}
-            </Text>
+            <DimmedText size="xs">Asset Name</DimmedText>
+            <PrimaryText size="xl">{props.asset?.name}</PrimaryText>
           </Stack>
           <Group justify="space-between">
             {props.asset?.purchaseDate && props.asset.purchasePrice && (
               <Stack gap={0} justify="center" align="center">
-                <Text size="xs" c="dimmed">
-                  Purchased on
-                </Text>
-                <Text size="md" fw={600}>
+                <DimmedText size="xs">Purchased on</DimmedText>
+                <PrimaryText size="md" fw={600}>
                   {new Date(props.asset.purchaseDate).toLocaleDateString()}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  for
-                </Text>
-                <Text size="md" fw={600}>
+                </PrimaryText>
+                <DimmedText size="xs">for</DimmedText>
+                <PrimaryText size="md" fw={600}>
                   {convertNumberToCurrency(
                     props.asset.purchasePrice,
                     true,
                     props.userCurrency
                   )}
-                </Text>
+                </PrimaryText>
               </Stack>
             )}
             {props.asset?.purchaseDate &&
@@ -123,13 +107,9 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
               props.asset.sellPrice && (
                 <Stack gap={0} justify="center" align="center">
                   <MoveRightIcon size={32} />
-                  <Text
+                  <StatusText
+                    amount={props.asset.sellPrice - props.asset.purchasePrice}
                     size="xs"
-                    c={
-                      props.asset.sellPrice - props.asset.purchasePrice >= 0
-                        ? "green"
-                        : "red"
-                    }
                   >
                     {props.asset.sellPrice - props.asset.purchasePrice >= 0
                       ? "+"
@@ -139,57 +119,46 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                       true,
                       props.userCurrency
                     )}
-                  </Text>
+                  </StatusText>
                 </Stack>
               )}
             {props.asset?.sellDate && props.asset.sellPrice && (
               <Stack gap={0} justify="center" align="center">
-                <Text size="xs" c="dimmed">
-                  Sold on
-                </Text>
-                <Text size="md" fw={600}>
+                <DimmedText size="xs">Sold on</DimmedText>
+                <PrimaryText size="md" fw={600}>
                   {new Date(props.asset.sellDate).toLocaleDateString()}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  for
-                </Text>
-                <Text size="md" fw={600}>
+                </PrimaryText>
+                <DimmedText size="xs">for</DimmedText>
+                <PrimaryText size="md" fw={600}>
                   {convertNumberToCurrency(
                     props.asset.sellPrice,
                     true,
                     props.userCurrency
                   )}
-                </Text>
+                </PrimaryText>
               </Stack>
             )}
           </Group>
           <Accordion
-            variant="separated"
             defaultValue={["add-value", "chart", "values"]}
-            multiple
+            elevation={1}
           >
-            <Accordion.Item
-              value="add-value"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>
-                <Text>Add Value</Text>
-              </Accordion.Control>
-              <Accordion.Panel>
+            <MantineAccordion.Item value="add-value">
+              <MantineAccordion.Control>
+                <PrimaryText>Add Value</PrimaryText>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <AddValue
                   assetId={props.asset.id}
                   currency={props.userCurrency}
                 />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item
-              value="chart"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>
-                <Text>Value Trends</Text>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="chart">
+              <MantineAccordion.Control>
+                <PrimaryText>Value Trends</PrimaryText>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Group>
                   <Button
                     variant={chartLookbackMonths === 3 ? "filled" : "outline"}
@@ -229,24 +198,21 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     dayjs().toString(),
                   ]}
                 />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item
-              value="values"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>
-                <Text>Value History</Text>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="values">
+              <MantineAccordion.Control>
+                <PrimaryText>Value History</PrimaryText>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   {valuesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedValues.length === 0 ? (
-                    <Text size="sm" c="dimmed" fw={600}>
-                      No value entries.
-                    </Text>
+                    <Group justify="center">
+                      <DimmedText size="sm">No value entries.</DimmedText>
+                    </Group>
                   ) : (
                     <ValueItems
                       values={sortedValues}
@@ -254,24 +220,19 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     />
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item
-              value="deleted-values"
-              bg="var(--mantine-color-content-background)"
-            >
-              <Accordion.Control>
-                <Text>Deleted Values</Text>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="deleted-values">
+              <MantineAccordion.Control>
+                <PrimaryText>Deleted Values</PrimaryText>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   {valuesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedDeletedValues.length === 0 ? (
-                    <Text size="sm" c="dimmed" fw={600}>
-                      No deleted values.
-                    </Text>
+                    <DimmedText size="sm">No deleted values.</DimmedText>
                   ) : (
                     <ValueItems
                       values={sortedDeletedValues}
@@ -279,8 +240,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     />
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
           </Accordion>
         </Stack>
       )}

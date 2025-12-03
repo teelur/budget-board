@@ -1,8 +1,0 @@
-.accordion {
-  outline: 1px solid
-    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-8));
-  background-color: light-dark(
-    var(--mantine-color-white),
-    var(--mantine-color-dark-6)
-  );
-}

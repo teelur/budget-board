@@ -1,14 +1,4 @@
-import classes from "./CustomCategoryCard.module.css";
-import parentClasses from "../CustomCategories.module.css";
-
-import {
-  ActionIcon,
-  Card,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Flex, Group, LoadingOverlay } from "@mantine/core";
 import { ICategoryResponse } from "~/models/category";
 import { TrashIcon } from "lucide-react";
 import React from "react";
@@ -17,6 +7,8 @@ import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface CustomCategoryCardProps {
   category: ICategoryResponse;
@@ -26,6 +18,7 @@ const CustomCategoryCard = (
   props: CustomCategoryCardProps
 ): React.ReactNode => {
   const { request } = useAuth();
+
   const queryClient = useQueryClient();
   const doDeleteCategory = useMutation({
     mutationFn: async (guid: string) =>
@@ -43,22 +36,19 @@ const CustomCategoryCard = (
   });
 
   return (
-    <Card className={classes.card} padding="md" radius="md">
+    <Card elevation={2}>
       <LoadingOverlay visible={doDeleteCategory.isPending} />
-      <Group className={classes.group}>
-        <Flex className={parentClasses.nameContainer}>
-          <Text fw={600} size="sm">
-            {props.category.value}
-          </Text>
+      <Group>
+        <Flex w="40%">
+          <PrimaryText size="sm">{props.category.value}</PrimaryText>
         </Flex>
-        <Flex className={parentClasses.parentContainer}>
-          <Text fw={600} size="sm">
-            {props.category.parent}
-          </Text>
+        <Flex w="40%">
+          <PrimaryText size="sm">{props.category.parent}</PrimaryText>
         </Flex>
-        <Flex className={parentClasses.deleteContainer}>
+        <Flex justify="flex-end" flex="1 1 auto">
           <ActionIcon
             onClick={() => doDeleteCategory.mutate(props.category.id)}
+            bg="var(--button-color-destructive)"
           >
             <TrashIcon size="1.2rem" />
           </ActionIcon>

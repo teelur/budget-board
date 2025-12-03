@@ -1,13 +1,3 @@
-.root {
-  outline: 1px solid var(--mantine-color-default-border);
-}
-
-.budgetCard {
-  &:hover {
-    outline: 1px solid var(--mantine-primary-color-filled);
-  }
-}
-
 .title {
   font-size: 1.2rem;
 

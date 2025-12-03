@@ -1,6 +1,13 @@
 import classes from "./TransactionsHeader.module.css";
 
-import { ActionIcon, Button, Flex, Group, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Flex,
+  Group,
+  Stack,
+  Transition,
+} from "@mantine/core";
 import { FilterIcon, SettingsIcon } from "lucide-react";
 import React from "react";
 import SortMenu from "./SortMenu/SortMenu";
@@ -55,7 +62,17 @@ const TransactionsHeader = (
           <TransactionsSettings modalOpened={settingsOpen} closeModal={close} />
         </Group>
       </Flex>
-      <FilterCard categories={props.categories} />
+      <Transition
+        mounted={isFiltersPanelOpen}
+        keepMounted
+        transition="slide-down"
+        duration={100}
+        exitDuration={100}
+      >
+        {(styles) => (
+          <FilterCard categories={props.categories} style={styles} />
+        )}
+      </Transition>
     </Stack>
   );
 };

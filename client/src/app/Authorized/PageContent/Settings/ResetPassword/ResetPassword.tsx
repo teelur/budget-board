@@ -1,18 +1,14 @@
 import { hasLength, useField } from "@mantine/form";
-import {
-  Button,
-  Card,
-  LoadingOverlay,
-  PasswordInput,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Button, LoadingOverlay, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
 import { AxiosError } from "axios";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 
 const ResetPassword = (): React.ReactNode => {
   const oldPasswordField = useField<string>({
@@ -82,38 +78,27 @@ const ResetPassword = (): React.ReactNode => {
   });
 
   return (
-    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
+    <Card elevation={1}>
       <LoadingOverlay visible={doResetPassword.isPending} />
       <Stack gap="1rem">
-        <Text fw={700} size="lg">
-          Reset Password
-        </Text>
+        <PrimaryText size="lg">Reset Password</PrimaryText>
         <PasswordInput
           {...oldPasswordField.getInputProps()}
-          label={
-            <Text fw={600} size="sm">
-              Current Password
-            </Text>
-          }
+          label={<PrimaryText size="sm">Current Password</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <PasswordInput
           {...newPasswordField.getInputProps()}
-          label={
-            <Text fw={600} size="sm">
-              New Password
-            </Text>
-          }
+          label={<PrimaryText size="sm">New Password</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <PasswordInput
           {...confirmNewPasswordField.getInputProps()}
-          label={
-            <Text fw={600} size="sm">
-              Confirm New Password
-            </Text>
-          }
+          label={<PrimaryText size="sm">Confirm New Password</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <Button
           onClick={() => {

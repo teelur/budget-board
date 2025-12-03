@@ -1,5 +1,4 @@
-import { Button, NumberInput, Stack, Text } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { Button, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,6 +7,9 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IValueCreateRequest, IValueResponse } from "~/models/value";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
+import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 
 interface AddValueProps {
   assetId: string;
@@ -41,7 +43,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] });
-      queryClient.invalidateQueries({ queryKey: ["values"] });
+      queryClient.invalidateQueries({ queryKey: ["values", props.assetId] });
 
       amountField.reset();
       dateField.reset();
@@ -52,22 +54,14 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
 
   return (
     <Stack gap={10}>
-      <DatePickerInput
+      <SurfaceDateInput
         {...dateField.getInputProps()}
-        label={
-          <Text size="xs" fw={600} c="dimmed">
-            Date
-          </Text>
-        }
+        label={<PrimaryText size="xs">Date</PrimaryText>}
         maw={400}
       />
-      <NumberInput
+      <SurfaceNumberInput
         {...amountField.getInputProps()}
-        label={
-          <Text size="xs" fw={600} c="dimmed">
-            Amount
-          </Text>
-        }
+        label={<PrimaryText size="xs">Amount</PrimaryText>}
         prefix={getCurrencySymbol(props.currency)}
         decimalScale={2}
         thousandSeparator=","

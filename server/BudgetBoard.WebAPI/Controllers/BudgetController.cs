@@ -35,10 +35,21 @@ public class BudgetController(
     {
         try
         {
-            await _budgetService.CreateBudgetsAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                budgets
-            );
+            if (isCopy ?? false)
+            {
+                await _budgetService.CreateBudgetsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    budgets
+                );
+            }
+            else
+            {
+                await _budgetService.CreateBudgetsWithParentsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    budgets
+                );
+            }
+
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)

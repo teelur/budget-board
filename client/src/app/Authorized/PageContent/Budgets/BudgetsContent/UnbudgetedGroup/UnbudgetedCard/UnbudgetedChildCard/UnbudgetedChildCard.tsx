@@ -1,7 +1,7 @@
 import classes from "./UnbudgetedChildCard.module.css";
 
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { ActionIcon, Card, Group, LoadingOverlay, Text } from "@mantine/core";
+import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -12,6 +12,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface UnbudgetedChildCardProps {
   category: string;
@@ -65,30 +67,28 @@ const UnbudgetedChildCard = (
     <Group w="100%" align="center" wrap="nowrap" gap="0.5rem">
       <CornerDownRightIcon size={20} />
       <Card
-        className={classes.root}
-        radius="md"
-        p="0.5rem"
+        p="0.25rem"
         w="100%"
         onClick={() => {
           if (props.selectedDate) {
             props.openDetails(props.category, props.selectedDate);
           }
         }}
+        hoverEffect
+        elevation={2}
       >
         <LoadingOverlay visible={doAddBudget.isPending} />
         <Group w="100%" justify="space-between">
-          <Text className={classes.text} fw={600}>
-            {props.category}
-          </Text>
+          <PrimaryText className={classes.text}>{props.category}</PrimaryText>
           <Group gap="sm">
             {userSettingsQuery.isPending ? null : (
-              <Text className={classes.text} fw={600}>
+              <PrimaryText className={classes.text}>
                 {convertNumberToCurrency(
                   props.amount,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
                 )}
-              </Text>
+              </PrimaryText>
             )}
             {props.selectedDate && (
               <ActionIcon

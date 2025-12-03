@@ -3,11 +3,12 @@ import { BarChart } from "@mantine/charts";
 import React from "react";
 import { buildMonthlySpendingChartData } from "~/helpers/charts";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { Group, Skeleton, Stack, Text } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -86,7 +87,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   if (props.months.length === 0) {
     return (
       <Group justify="center">
-        <Text>Select a month to display the chart.</Text>
+        <DimmedText size="md">Select a month to display the chart.</DimmedText>
       </Group>
     );
   }
@@ -94,10 +95,10 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   return (
     <Stack gap="1rem">
       <Group justify="space-between" align="center">
-        <Text size="sm" fw={500}>
+        <DimmedText size="sm">
           {props.invertData ? "Average Spending" : "Average Income"}
-        </Text>
-        <Text size="sm" fw={600}>
+        </DimmedText>
+        <DimmedText size="sm">
           {userSettingsQuery.isPending
             ? ""
             : convertNumberToCurrency(
@@ -105,7 +106,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
                 false,
                 userSettingsQuery.data?.currency ?? "USD"
               )}
-        </Text>
+        </DimmedText>
       </Group>
       <BarChart
         h={400}

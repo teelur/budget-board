@@ -1,13 +1,9 @@
 import {
   Badge,
-  Card,
   Group,
   LoadingOverlay,
-  Text,
-  Code,
   Button,
   Stack,
-  PinInput,
   CopyButton,
   Skeleton,
 } from "@mantine/core";
@@ -20,6 +16,11 @@ import { AxiosError, AxiosResponse } from "axios";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
 import { useDisclosure } from "@mantine/hooks";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PinInput from "~/components/core/Input/PinInput/PinInput";
+import Code from "~/components/core/Code/Code";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 type TwoFactorAuthResponse = {
   sharedKey: string;
@@ -140,16 +141,16 @@ const TwoFactorAuth = (): React.ReactNode => {
         <Stack gap="1rem">
           {recoveryCodes.length > 0 && (
             <Stack gap="0.5rem" align="center">
-              <Text size="md" fw={600}>
-                Recovery Codes
-              </Text>
-              <Text size="sm" c="dimmed">
+              <PrimaryText size="md">Recovery Codes</PrimaryText>
+              <DimmedText size="sm">
                 Keep these codes safe. They can be used to access your account
                 if you lose access to your authenticator app.
-              </Text>
+              </DimmedText>
               <Group gap="0.5rem" align="center" justify="center">
                 {recoveryCodes.map((code, index) => (
-                  <Code key={index}>{code}</Code>
+                  <Code key={index} elevation={1}>
+                    {code}
+                  </Code>
                 ))}
               </Group>
               <CopyButton value={recoveryCodes.join("\n")}>
@@ -174,7 +175,7 @@ const TwoFactorAuth = (): React.ReactNode => {
           <Stack gap="0.5rem">
             <Button
               variant="filled"
-              bg="red"
+              bg="var(--button-color-destructive)"
               onClick={() =>
                 doSetTwoFactorAuth.mutate({
                   enable: false,
@@ -207,19 +208,21 @@ const TwoFactorAuth = (): React.ReactNode => {
       return (
         <Stack>
           <Stack gap="0.5rem" align="center">
-            <Text size="sm">
+            <PrimaryText size="sm">
               Scan this code with your authenticator app or enter the manual
               code below.
-            </Text>
+            </PrimaryText>
             <QRCodeSVG
               value={buildAuthenticatorUrl(
                 twoFactorAuthQuery.data?.sharedKey ?? ""
               )}
-              bgColor="var(--mantine-color-default)"
-              fgColor="var(--mantine-color-text)"
+              bgColor="var(--background-color-surface)"
+              fgColor="var(--base-color-text-primary)"
             />
             <Group>
-              <Code>{formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}</Code>
+              <Code elevation={1}>
+                {formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
+              </Code>
               <CopyButton
                 value={formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
               >
@@ -242,15 +245,16 @@ const TwoFactorAuth = (): React.ReactNode => {
             </Group>
           </Stack>
           <Stack justify="center" align="center" gap="0.5rem">
-            <Text size="sm">
+            <PrimaryText size="sm">
               Then, enter the 6-digit code from your authenticator app.
-            </Text>
+            </PrimaryText>
             <PinInput
               length={6}
               type="number"
               autoFocus
               value={validationCodeField.getValue()}
               onChange={(value) => validationCodeField.setValue(value)}
+              elevation={1}
             />
           </Stack>
           <Button
@@ -278,13 +282,11 @@ const TwoFactorAuth = (): React.ReactNode => {
   }
 
   return (
-    <Card p="0.5rem" radius="md" shadow="sm" withBorder>
+    <Card elevation={1}>
       <LoadingOverlay visible={doSetTwoFactorAuth.isPending} />
       <Stack gap="1rem">
         <Group gap="1rem">
-          <Text fw={700} size="lg">
-            Two Factor Authentication
-          </Text>
+          <PrimaryText size="lg">Two Factor Authentication</PrimaryText>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
             <Badge color="green" maw={80}>
               Enabled

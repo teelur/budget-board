@@ -8,7 +8,7 @@ interface AuthRouteProps {
 }
 
 const AuthorizedRoute = (props: AuthRouteProps): React.ReactNode => {
-  const { isUserAuthenticated, loading } = useContext<any>(AuthContext);
+  const { isUserAuthenticated, loading } = useContext(AuthContext);
 
   if (loading) {
     return (

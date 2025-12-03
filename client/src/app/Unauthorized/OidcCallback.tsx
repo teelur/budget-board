@@ -30,13 +30,15 @@ const OidcCallback = (): React.ReactNode => {
       const state = q.get("state");
       const error = q.get("error");
       const errorDescription = q.get("error_description");
-      const saved = sessionStorage.getItem("oidc_state");
 
-      // Clear state immediately to prevent reuse
-      sessionStorage.removeItem("oidc_state");
+      const savedState = state
+        ? sessionStorage.getItem(`oidc_state_${state}`)
+        : null;
 
-      // Check for OAuth2 error response
       if (error) {
+        if (savedState) {
+          sessionStorage.removeItem(`oidc_state_${state}`);
+        }
         notifications.show({
           color: "red",
           message: `Authentication failed: ${errorDescription || error}`,
@@ -46,6 +48,9 @@ const OidcCallback = (): React.ReactNode => {
       }
 
       if (!code) {
+        if (savedState) {
+          sessionStorage.removeItem(`oidc_state_${state}`);
+        }
         notifications.show({
           color: "red",
           message: "OIDC callback missing code.",
@@ -54,7 +59,10 @@ const OidcCallback = (): React.ReactNode => {
         return;
       }
 
-      if (!state || state !== saved) {
+      if (!state || state !== savedState) {
+        if (savedState) {
+          sessionStorage.removeItem(`oidc_state_${state}`);
+        }
         notifications.show({ color: "red", message: "Invalid OIDC state." });
         navigate("/");
         return;
@@ -70,6 +78,10 @@ const OidcCallback = (): React.ReactNode => {
           } as IOidcCallbackRequest,
         });
 
+        if (savedState) {
+          sessionStorage.removeItem(`oidc_state_${state}`);
+        }
+
         setIsUserAuthenticated(response.data?.success ?? false);
 
         if (!response.data?.success) {
@@ -83,6 +95,9 @@ const OidcCallback = (): React.ReactNode => {
 
         navigate("/dashboard");
       } catch (e) {
+        if (savedState) {
+          sessionStorage.removeItem(`oidc_state_${state}`);
+        }
         const err = e as AxiosError;
         notifications.show({ color: "red", message: translateAxiosError(err) });
         navigate("/");

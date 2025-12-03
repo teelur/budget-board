@@ -1,8 +1,8 @@
-import { Card } from "@mantine/core";
 import EditableBalanceItemContent from "./EditableBalanceItemContent/EditableBalanceItemContent";
 import BalanceItemContent from "./BalanceItemContent/BalanceItemContent";
 import { IBalanceResponse } from "~/models/balance";
 import { useDisclosure } from "@mantine/hooks";
+import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 
 interface BalanceItemProps {
   balance: IBalanceResponse;
@@ -12,7 +12,7 @@ interface BalanceItemProps {
 const BalanceItem = (props: BalanceItemProps) => {
   const [isSelected, { open, close }] = useDisclosure(false);
   return (
-    <Card radius="md" p="0.5rem">
+    <ElevatedCard>
       {isSelected ? (
         <EditableBalanceItemContent
           balance={props.balance}
@@ -26,7 +26,7 @@ const BalanceItem = (props: BalanceItemProps) => {
           doSelect={open}
         />
       )}
-    </Card>
+    </ElevatedCard>
   );
 };
 

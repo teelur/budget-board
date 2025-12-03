@@ -1,17 +1,12 @@
-import {
-  Button,
-  FileInput,
-  Group,
-  LoadingOverlay,
-  Stack,
-  Switch,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Button, Group, LoadingOverlay, Stack, Switch } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import Papa from "papaparse";
 import React from "react";
+import FileInput from "~/components/core/Input/FileInput/FileInput";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export type CsvRow = Record<string, unknown> & { uid: number };
 
@@ -129,18 +124,15 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       <FileInput
         {...fileField.getInputProps()}
         accept="text/csv"
-        placeholder={
-          <Text fw={600} size="sm" c="dimmed">
-            Select CSV file
-          </Text>
-        }
+        placeholder={<DimmedText size="sm">Select a CSV file</DimmedText>}
+        elevation={0}
       />
       <Group align="center" w="100%" wrap="wrap" gap="0.5rem">
         <Switch
           label={
-            <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
+            <PrimaryText size="sm" style={{ whiteSpace: "nowrap" }}>
               Specify delimiter
-            </Text>
+            </PrimaryText>
           }
           checked={useDelimiter.getValue()}
           onChange={(event) =>
@@ -152,6 +144,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
             {...delimiterField.getInputProps()}
             maxLength={1}
             minLength={1}
+            elevation={0}
           />
         )}
       </Group>

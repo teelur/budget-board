@@ -1,19 +1,9 @@
-import {
-  ActionIcon,
-  Card,
-  Group,
-  NumberInput,
-  Select,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { ActionIcon, Group } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/CategorySelect";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
@@ -23,6 +13,13 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import Select from "~/components/core/Select/Select/Select";
+import Card from "~/components/core/Card/Card";
 
 export interface ActionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -65,6 +62,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
               value: event.currentTarget.value,
             })
           }
+          elevation={2}
         />
       );
     } else if (props.ruleParameter.field === "amount") {
@@ -82,6 +80,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
           decimalScale={2}
           thousandSeparator=","
+          elevation={2}
         />
       );
     } else if (props.ruleParameter.field === "date") {
@@ -96,11 +95,13 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
               value: value ?? "",
             })
           }
+          elevation={2}
         />
       );
     } else if (props.ruleParameter.field === "category") {
       return (
         <CategorySelect
+          flex="1 1 auto"
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({
@@ -110,7 +111,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           }
           categories={props.categories}
           withinPortal
-          flex="1 1 auto"
+          elevation={2}
         />
       );
     }
@@ -120,11 +121,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
 
   const getCardContent = (): React.ReactNode => {
     if (props.ruleParameter.operator === "delete") {
-      return (
-        <Text fw={600} size="sm">
-          the transaction
-        </Text>
-      );
+      return <PrimaryText size="sm">the transaction</PrimaryText>;
     } else if (props.ruleParameter.operator === "set") {
       return (
         <>
@@ -148,10 +145,9 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
                 ),
               })
             }
+            elevation={2}
           />
-          <Text size="sm" fw={600}>
-            to
-          </Text>
+          <PrimaryText size="sm">to</PrimaryText>
           {getValueInput()}
         </>
       );
@@ -160,7 +156,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
   };
 
   return (
-    <Card p="0.5rem" radius="md">
+    <Card elevation={2}>
       <Group gap="0.5rem">
         <Select
           w="90px"
@@ -178,6 +174,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
                 ActionOperators[0]!.value,
             });
           }}
+          elevation={2}
         />
         {getCardContent()}
         {props.allowDelete && (
@@ -185,7 +182,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
             <ActionIcon
               h="100%"
               size="sm"
-              color="red"
+              color="var(--button-color-destructive)"
               onClick={() => props.doDelete(props.index)}
             >
               <Trash2Icon size={16} />

@@ -1,14 +1,10 @@
 import { ChartSeries, getFilteredChartTooltipPayload } from "@mantine/charts";
-import {
-  Card,
-  getThemeColor,
-  Group,
-  Stack,
-  Text,
-  useMantineTheme,
-} from "@mantine/core";
+import { getThemeColor, Group, Stack, useMantineTheme } from "@mantine/core";
 import { Square } from "lucide-react";
 import React from "react";
+import Card from "~/components/core/Card/Card";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getSeriesLabels } from "~/helpers/get-series-labels";
 
 interface ChartTooltipProps {
@@ -31,9 +27,9 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
   }
 
   return (
-    <Card p="0.75rem" withBorder radius="md">
+    <Card elevation={0}>
       <Stack gap="1rem">
-        <Text fw={600}>{props.label}</Text>
+        <PrimaryText>{props.label}</PrimaryText>
         <Stack gap="0.25rem">
           {filteredPayload.map((item: any) => (
             <Group
@@ -49,15 +45,15 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
                   width={18}
                   height={18}
                 />
-                <Text fw={600} size="sm" c="dimmed">
+                <DimmedText size="sm">
                   {labels[item.name] ?? item.name}
-                </Text>
+                </DimmedText>
               </Group>
-              <Text fw={600} size="sm">
+              <PrimaryText size="sm">
                 {typeof props.valueFormatter === "function"
                   ? props.valueFormatter(item.value)
                   : item.value}
-              </Text>
+              </PrimaryText>
             </Group>
           ))}
         </Stack>
@@ -70,17 +66,15 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
                 width={18}
                 height={18}
               />
-              <Text fw={600} size="sm" c="dimmed">
-                Total
-              </Text>
+              <DimmedText size="sm">Total</DimmedText>
             </Group>
-            <Text fw={600} size="sm">
+            <PrimaryText size="sm">
               {typeof props.valueFormatter === "function"
                 ? props.valueFormatter(
                     filteredPayload.reduce((acc, item) => acc + item.value, 0)
                   )
                 : filteredPayload.reduce((acc, item) => acc + item.value, 0)}
-            </Text>
+            </PrimaryText>
           </Group>
         )}
       </Stack>

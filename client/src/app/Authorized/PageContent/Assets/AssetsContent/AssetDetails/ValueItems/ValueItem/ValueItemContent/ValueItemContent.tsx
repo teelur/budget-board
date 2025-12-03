@@ -1,6 +1,8 @@
-import { ActionIcon, Group, Text } from "@mantine/core";
+import { ActionIcon, Group } from "@mantine/core";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IValueResponse } from "~/models/value";
 
@@ -14,9 +16,9 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
-        <Text fw={600} size="md">
+        <PrimaryText size="md">
           {dayjs(props.value.dateTime).format("L")}
-        </Text>
+        </PrimaryText>
         <ActionIcon
           variant="transparent"
           size="md"
@@ -28,9 +30,9 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <Text fw={600} size="md" c={props.value.amount < 0 ? "red" : "green"}>
+      <StatusText amount={props.value.amount} size="md">
         {convertNumberToCurrency(props.value.amount, true, props.userCurrency)}
-      </Text>
+      </StatusText>
     </Group>
   );
 };

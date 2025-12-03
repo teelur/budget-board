@@ -2,7 +2,8 @@ import { Group, Pagination, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
 import React from "react";
-import TransactionCard from "~/components/TransactionCard/TransactionCard";
+import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -18,6 +19,14 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
     page * itemsPerPage
   );
 
+  if (props.transactions.length === 0) {
+    return (
+      <Group justify="center">
+        <DimmedText size="sm">No transactions found.</DimmedText>
+      </Group>
+    );
+  }
+
   return (
     <Stack gap="0.5rem">
       {paginatedItems.map((transaction) => (
@@ -25,6 +34,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
           key={transaction.id}
           transaction={transaction}
           categories={props.categories}
+          elevation={2}
         />
       ))}
       {props.transactions.length > itemsPerPage && (

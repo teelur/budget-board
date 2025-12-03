@@ -1,12 +1,4 @@
-import {
-  Anchor,
-  Button,
-  LoadingOverlay,
-  PasswordInput,
-  Stack,
-  TextInput,
-  Divider,
-} from "@mantine/core";
+import { Anchor, Button, LoadingOverlay, Stack, Divider } from "@mantine/core";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "./Welcome";
@@ -16,6 +8,9 @@ import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -137,19 +132,25 @@ const Login = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center">
+    <Stack gap="1rem" align="center">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       {envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-        <Stack w="100%" align="center" gap="1rem">
-          <TextInput {...emailField.getInputProps()} label="Email" w="100%" />
+        <Stack w="100%" align="center" gap="0.75rem">
+          <TextInput
+            {...emailField.getInputProps()}
+            label={<PrimaryText size="sm">Email Address</PrimaryText>}
+            w="100%"
+            elevation={1}
+          />
           <PasswordInput
             {...passwordField.getInputProps()}
-            label="Password"
+            label={<PrimaryText size="sm">Password</PrimaryText>}
             w="100%"
+            elevation={1}
           />
           <Button variant="filled" fullWidth onClick={doLogin}>
             Login

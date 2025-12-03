@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Group,
-  LoadingOverlay,
-  NumberInput,
-  Stack,
-} from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -18,6 +11,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceResponse, IBalanceUpdateRequest } from "~/models/balance";
+import ElevatedDateInput from "~/components/core/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
+import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 
 interface EditableBalanceItemContentProps {
   balance: IBalanceResponse;
@@ -67,6 +62,8 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({
         queryKey: ["balances", props.balance.accountID],
       });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
       notifications.show({ color: "green", message: "Balance updated." });
     },
@@ -85,6 +82,8 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({
         queryKey: ["balances", props.balance.accountID],
       });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
       notifications.show({ color: "green", message: "Balance deleted" });
     },
@@ -103,6 +102,8 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({
         queryKey: ["balances", props.balance.accountID],
       });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
       notifications.show({ color: "green", message: "Balance restored." });
     },
@@ -123,12 +124,12 @@ const EditableBalanceItemContent = (
           doRestoreBalance.isPending
         }
       />
-      <Stack w="100%">
-        <DatePickerInput
+      <Stack w="100%" gap="0.5rem">
+        <ElevatedDateInput
           {...balanceDateField.getInputProps()}
           flex="1 1 auto"
         />
-        <NumberInput
+        <ElevatedNumberInput
           {...balanceAmountField.getInputProps()}
           flex="1 1 auto"
           prefix={getCurrencySymbol(props.userCurrency)}
@@ -162,7 +163,7 @@ const EditableBalanceItemContent = (
           <ActionIcon
             h="100%"
             size="sm"
-            bg="red"
+            bg="var(--button-color-destructive)"
             onClick={() => doDeleteBalance.mutate()}
           >
             <Trash2Icon size={16} />

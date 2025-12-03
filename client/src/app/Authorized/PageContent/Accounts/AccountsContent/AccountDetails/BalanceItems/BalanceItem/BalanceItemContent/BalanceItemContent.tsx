@@ -1,6 +1,8 @@
-import { ActionIcon, Group, Text } from "@mantine/core";
+import { ActionIcon, Group } from "@mantine/core";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IBalanceResponse } from "~/models/balance";
 
@@ -16,9 +18,9 @@ const BalanceItemContent = (
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
-        <Text fw={600} size="md">
+        <PrimaryText size="md">
           {dayjs(props.balance.dateTime).format("L")}
-        </Text>
+        </PrimaryText>
         <ActionIcon
           variant="transparent"
           size="md"
@@ -30,13 +32,13 @@ const BalanceItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <Text fw={600} size="md" c={props.balance.amount < 0 ? "red" : "green"}>
+      <StatusText amount={props.balance.amount} size="md">
         {convertNumberToCurrency(
           props.balance.amount,
           true,
           props.userCurrency
         )}
-      </Text>
+      </StatusText>
     </Group>
   );
 };

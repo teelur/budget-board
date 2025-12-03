@@ -27,7 +27,7 @@ export const AuthContext = createContext<AuthContextValue>({
 export const AuthProvider = ({
   children,
 }: {
-  children: any;
+  children: React.ReactNode;
 }): React.ReactNode => {
   const [isUserAuthenticated, setIsUserAuthenticated] =
     useState<boolean>(false);
@@ -68,6 +68,7 @@ export const AuthProvider = ({
           message: "Failed to check authentication status",
           color: "red",
         });
+        setIsUserAuthenticated(false);
       })
       .finally(() => {
         setLoading(false);
@@ -94,7 +95,7 @@ export const AuthProvider = ({
       }
 
       const state = crypto.randomUUID();
-      sessionStorage.setItem("oidc_state", state);
+      sessionStorage.setItem(`oidc_state_${state}`, state);
 
       const params = new URLSearchParams({
         client_id: clientId,
@@ -107,6 +108,10 @@ export const AuthProvider = ({
       const discoveryUrl = `${authorizeUrl}/.well-known/openid-configuration`;
 
       const discoveryResponse = await fetch(discoveryUrl);
+      if (!discoveryResponse.ok) {
+        throw new Error("Failed to fetch OIDC discovery document");
+      }
+
       const discoveryData: IOidcDiscoveryDocument =
         await discoveryResponse.json();
 
@@ -116,12 +121,10 @@ export const AuthProvider = ({
         }?${params.toString()}`;
       }
     } catch (error) {
-      // Handle error if needed
       notifications.show({
         color: "red",
         message: "Failed to retrieve OIDC discovery document.",
       });
-    } finally {
       setOidcLoading(false);
     }
   };

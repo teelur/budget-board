@@ -1,17 +1,6 @@
-import AccountSelectInput from "~/components/AccountSelectInput";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
-import {
-  Button,
-  LoadingOverlay,
-  NumberInput,
-  Stack,
-  Switch,
-  Tabs,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { Button, LoadingOverlay, Stack, Switch, Tabs } from "@mantine/core";
 import { hasLength, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IGoalCreateRequest } from "~/models/goal";
@@ -21,6 +10,12 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { getCurrencySymbol } from "~/helpers/currency";
 import dayjs from "dayjs";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
 
 interface FormValues {
   goalName: string;
@@ -110,56 +105,65 @@ const SaveGoalForm = (): React.ReactNode => {
       <LoadingOverlay visible={doAddGoal.isPending} />
       <Stack gap="sm">
         <TextInput
-          label="Goal Name"
+          label={<PrimaryText size="sm">Goal Name</PrimaryText>}
           placeholder="Enter goal name"
-          required
           key={form.key("goalName")}
           {...form.getInputProps("goalName")}
+          elevation={1}
         />
-        <AccountSelectInput
-          label="Accounts"
+        <AccountSelect
+          label={<PrimaryText size="sm">Accounts</PrimaryText>}
           placeholder="Select account"
-          required
           key={form.key("goalAccounts")}
           {...form.getInputProps("goalAccounts")}
+          elevation={1}
         />
         <NumberInput
-          label="Target Amount"
+          label={<PrimaryText size="sm">Target Amount</PrimaryText>}
           placeholder="Enter target amount"
-          required
           prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
           min={0}
           decimalScale={2}
           thousandSeparator=","
           key={form.key("goalAmount")}
           {...form.getInputProps("goalAmount")}
+          elevation={1}
         />
         <Switch
-          label="Apply existing account balance towards goal target?"
+          label={
+            <DimmedText size="sm">
+              Apply existing account balance towards goal target?
+            </DimmedText>
+          }
           key={form.key("goalApplyAccountAmount")}
           {...form.getInputProps("goalApplyAccountAmount")}
         />
         <Stack gap={5}>
-          <Text size="sm">Create a goal with a specified:</Text>
+          <PrimaryText size="sm">Create a goal with a specified:</PrimaryText>
           <Tabs variant="outline" defaultValue="completeDate">
             <Tabs.List>
-              <Tabs.Tab value="completeDate">Complete Date</Tabs.Tab>
+              <Tabs.Tab value="completeDate">
+                <PrimaryText size="sm">Complete Date</PrimaryText>
+              </Tabs.Tab>
               <Tabs.Tab value="monthlyContribution">
-                Monthly Contribution
+                <PrimaryText size="sm">Monthly Contribution</PrimaryText>
               </Tabs.Tab>
             </Tabs.List>
             <Tabs.Panel value="completeDate">
-              <DatePickerInput
-                label="Complete Date"
+              <DateInput
+                label={<PrimaryText size="sm">Complete Date</PrimaryText>}
                 placeholder="Choose an end date"
                 clearable
                 key={form.key("goalCompleteDate")}
                 {...form.getInputProps("goalCompleteDate")}
+                elevation={1}
               />
             </Tabs.Panel>
             <Tabs.Panel value="monthlyContribution">
               <NumberInput
-                label="Monthly Contribution"
+                label={
+                  <PrimaryText size="sm">Monthly Contribution</PrimaryText>
+                }
                 placeholder="Enter monthly contribution"
                 prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
                 min={0}
@@ -167,6 +171,7 @@ const SaveGoalForm = (): React.ReactNode => {
                 thousandSeparator=","
                 key={form.key("goalMonthlyContribution")}
                 {...form.getInputProps("goalMonthlyContribution")}
+                elevation={1}
               />
             </Tabs.Panel>
           </Tabs>

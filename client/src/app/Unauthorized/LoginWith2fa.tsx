@@ -1,11 +1,4 @@
-import {
-  Button,
-  LoadingOverlay,
-  Stack,
-  Text,
-  PinInput,
-  Group,
-} from "@mantine/core";
+import { Button, LoadingOverlay, Stack, Group } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -14,6 +7,9 @@ import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { LoginCardState } from "./Welcome";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PinInput from "~/components/core/Input/PinInput/PinInput";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -92,12 +88,12 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <Stack align="center" gap={5} w="100%">
-        <Text size="lg" fw={700} ta="center">
+        <PrimaryText size="lg" ta="center">
           2-Factor Authentication
-        </Text>
-        <Text c="dimmed" size="sm" fw={600} ta="center">
+        </PrimaryText>
+        <DimmedText size="sm" ta="center">
           Enter the 6-digit security code from your authenticator app.
-        </Text>
+        </DimmedText>
       </Stack>
       <PinInput
         length={6}
@@ -106,6 +102,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         autoFocus
         value={authenticationCodeField.getValue()}
         onChange={(value) => authenticationCodeField.setValue(value)}
+        elevation={1}
       />
       <Button variant="filled" fullWidth onClick={submitUserLogin}>
         Submit

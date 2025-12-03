@@ -35,10 +35,10 @@ const Authorized = (): React.ReactNode => {
       }}
       padding={12}
     >
-      <AppShellHeader bg="var(--mantine-color-header-background)">
+      <AppShellHeader bg="var(--background-color-header)">
         <Header isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
       </AppShellHeader>
-      <AppShellNavbar bg="var(--mantine-color-sidebar-background)">
+      <AppShellNavbar bg="var(--background-color-sidebar)">
         <Navbar
           currentPage={currentPage}
           setCurrentPage={onPageSelect}
@@ -47,7 +47,7 @@ const Authorized = (): React.ReactNode => {
         />
       </AppShellNavbar>
       <AppShellMain
-        bg="var(--mantine-color-content-background)"
+        bg="var(--background-color-base)"
         flex={{ direction: "column" }}
       >
         <TransactionCategoryProvider>

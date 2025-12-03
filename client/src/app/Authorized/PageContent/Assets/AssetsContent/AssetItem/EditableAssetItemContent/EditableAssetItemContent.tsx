@@ -3,12 +3,10 @@ import {
   Group,
   Text,
   Stack,
-  TextInput,
   LoadingOverlay,
   Button,
-  NumberInput,
+  Flex,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -21,6 +19,11 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import SurfaceTextInput from "~/components/core/Input/Surface/SurfaceTextInput/SurfaceTextInput";
+import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
+import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -142,22 +145,25 @@ const EditableAssetItemContent = (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <Stack gap="0.5rem" flex="1 1 auto">
         <LoadingOverlay visible={doUpdateAsset.isPending} />
-        <Group justify="space-between" align="center">
-          <Group gap="0.5rem" align="center">
-            <TextInput
+        <Group justify="space-between" align="flex-end">
+          <Group gap="0.5rem" align="flex-end">
+            <SurfaceTextInput
               {...assetNameField.getInputProps()}
               onBlur={() => doUpdateAsset.mutate()}
             />
-            <ActionIcon
-              variant="outline"
-              size="md"
-              onClick={(e) => {
-                e.stopPropagation();
-                props.toggle();
-              }}
-            >
-              <PencilIcon size={16} />
-            </ActionIcon>
+            <Flex style={{ alignSelf: "stretch" }}>
+              <ActionIcon
+                variant="outline"
+                h="100%"
+                size="md"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.toggle();
+                }}
+              >
+                <PencilIcon size={16} />
+              </ActionIcon>
+            </Flex>
             <Button
               bg={hideAssetField.getValue() ? "yellow" : undefined}
               variant={hideAssetField.getValue() ? "filled" : "outline"}
@@ -168,24 +174,20 @@ const EditableAssetItemContent = (
               Hide Asset
             </Button>
           </Group>
-          <Text
-            fw={600}
-            size="md"
-            c={props.asset.currentValue < 0 ? "red" : "green"}
-          >
+          <StatusText size="md" amount={props.asset.currentValue}>
             {convertNumberToCurrency(
               props.asset.currentValue ?? 0,
               true,
               props.userCurrency
             )}
-          </Text>
+          </StatusText>
         </Group>
-        <Group justify="space-between" align="center">
+        <Group justify="space-between" align="flex-end">
           <Group gap="1rem">
             <Group gap="0.5rem">
-              <DatePickerInput
+              <SurfaceDateInput
                 {...purchaseDate.getInputProps()}
-                placeholder="Purchase Date"
+                placeholder="Enter Date"
                 maw={400}
                 clearable
                 label={
@@ -194,7 +196,7 @@ const EditableAssetItemContent = (
                   </Text>
                 }
               />
-              <NumberInput
+              <SurfaceNumberInput
                 {...purchasePrice.getInputProps()}
                 placeholder="Enter Price"
                 maw={150}
@@ -211,7 +213,7 @@ const EditableAssetItemContent = (
               />
             </Group>
             <Group gap="0.5rem">
-              <DatePickerInput
+              <SurfaceDateInput
                 {...sellDate.getInputProps()}
                 placeholder="Enter Date"
                 maw={400}
@@ -222,9 +224,9 @@ const EditableAssetItemContent = (
                   </Text>
                 }
               />
-              <NumberInput
+              <SurfaceNumberInput
                 {...sellPrice.getInputProps()}
-                placeholder="Sell Price"
+                placeholder="Enter Price"
                 maw={150}
                 prefix={getCurrencySymbol(props.userCurrency)}
                 thousandSeparator=","
@@ -239,12 +241,12 @@ const EditableAssetItemContent = (
               />
             </Group>
           </Group>
-          <Text fw={600} size="sm" c="dimmed">
+          <DimmedText size="sm">
             Last Updated:{" "}
             {props.asset.valueDate
               ? new Date(props.asset.valueDate).toLocaleDateString()
               : "Never!"}
-          </Text>
+          </DimmedText>
         </Group>
       </Stack>
       <Group style={{ alignSelf: "stretch" }}>
@@ -260,7 +262,7 @@ const EditableAssetItemContent = (
           <ActionIcon
             h="100%"
             size="sm"
-            bg="red"
+            bg="var(--button-color-destructive)"
             onClick={() => doDeleteAsset.mutate()}
           >
             <Trash2Icon size={16} />

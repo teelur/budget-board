@@ -1,7 +1,7 @@
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import cardClasses from "../BudgetsGroup/BudgetParentCard/BudgetParentCard.module.css";
-import groupClasses from "./BudgetsGroupHeader.module.css";
 
-import { Group, Text } from "@mantine/core";
+import { Group } from "@mantine/core";
 import React from "react";
 
 interface BudgetGroupHeaderProps {
@@ -12,7 +12,7 @@ const BudgetsGroupHeader = (props: BudgetGroupHeaderProps): React.ReactNode => {
   return (
     <Group className={cardClasses.dataContainer} px="0.5rem">
       <Group className={cardClasses.budgetNameContainer}>
-        <Text className={groupClasses.categoryHeader}>{props.groupName}</Text>
+        <PrimaryText>{props.groupName}</PrimaryText>
       </Group>
     </Group>
   );

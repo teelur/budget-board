@@ -1,6 +1,4 @@
-import classes from "./BudgetsGroup.module.css";
-
-import { Stack, Text } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { IBudget } from "~/models/budget";
 import React from "react";
 import { ICategory, ICategoryNode } from "~/models/category";
@@ -9,6 +7,7 @@ import {
   buildCategoryToLimitsMap,
 } from "~/helpers/budgets";
 import BudgetParentCard from "./BudgetParentCard/BudgetParentCard";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface BudgetsGroupProps {
   budgets: IBudget[];
@@ -27,7 +26,7 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
   );
 
   return (
-    <Stack className={classes.root}>
+    <Stack gap="0.5rem" align="center">
       {props.budgets.length > 0 ? (
         props.categoryTree.map((category) => {
           if (
@@ -53,7 +52,7 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
           return null;
         })
       ) : (
-        <Text size="sm">No budgets.</Text>
+        <DimmedText size="sm">No budgets.</DimmedText>
       )}
     </Stack>
   );

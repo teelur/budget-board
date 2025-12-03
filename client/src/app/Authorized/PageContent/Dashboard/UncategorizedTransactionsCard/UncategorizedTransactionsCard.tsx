@@ -1,25 +1,17 @@
-import classes from "./UncategorizedTransactionsCard.module.css";
-
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   getTransactionsByCategory,
   getVisibleTransactions,
 } from "~/helpers/transactions";
-import {
-  Card,
-  Group,
-  Pagination,
-  ScrollArea,
-  Skeleton,
-  Stack,
-  Title,
-} from "@mantine/core";
+import { Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import TransactionCard from "~/components/TransactionCard/TransactionCard";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;
@@ -57,21 +49,20 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   }
 
   return (
-    <Card className={classes.root} withBorder radius="md">
+    <Card w="100%" elevation={1}>
       <Stack gap="0.5rem" align="center" w="100%">
-        <Group justify="center">
-          <Title order={2}>Uncategorized Transactions</Title>
-        </Group>
+        <PrimaryText size="xl">Uncategorized Transactions</PrimaryText>
         {transactionsQuery.isPending ? (
           <Skeleton height={350} radius="lg" />
         ) : (
           <ScrollArea.Autosize
-            className={classes.scrollArea}
+            w="100%"
+            p="0.125rem"
             mah={350}
             type="auto"
             offsetScrollbars
           >
-            <Stack className={classes.transactionList}>
+            <Stack gap="0.5rem">
               {sortedFilteredTransactions
                 .slice(
                   (activePage - 1) * itemsPerPage,
@@ -82,17 +73,20 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
                     key={transaction.id}
                     transaction={transaction}
                     categories={transactionCategories}
-                    alternateColor
+                    hoverEffect
+                    elevation={2}
                   />
                 ))}
             </Stack>
           </ScrollArea.Autosize>
         )}
-        <Pagination
-          value={activePage}
-          onChange={setPage}
-          total={Math.ceil(sortedFilteredTransactions.length / itemsPerPage)}
-        />
+        {sortedFilteredTransactions.length > itemsPerPage && (
+          <Pagination
+            value={activePage}
+            onChange={setPage}
+            total={Math.ceil(sortedFilteredTransactions.length / itemsPerPage)}
+          />
+        )}
       </Stack>
     </Card>
   );

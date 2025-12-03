@@ -1,11 +1,4 @@
-import {
-  Button,
-  LoadingOverlay,
-  Stack,
-  TextInput,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Button, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "./Welcome";
@@ -14,6 +7,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -92,15 +88,19 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <Stack align="center" gap={5} w="100%">
-        <Title order={3} ta="center">
+        <PrimaryText size="md" ta="center">
           Use a Recovery Code
-        </Title>
-        <Text size="sm" ta="center">
+        </PrimaryText>
+        <DimmedText size="sm" ta="center">
           Enter one of your recovery codes for a one-time password
           authentication.
-        </Text>
+        </DimmedText>
       </Stack>
-      <TextInput {...recoveryCodeField.getInputProps()} w="100%" />
+      <TextInput
+        {...recoveryCodeField.getInputProps()}
+        w="100%"
+        elevation={1}
+      />
       <Stack gap="0.5rem" w="100%">
         <Button variant="filled" fullWidth onClick={submitUserLogin}>
           Submit

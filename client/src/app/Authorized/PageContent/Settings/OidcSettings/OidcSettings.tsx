@@ -1,4 +1,4 @@
-import { Button, Card, Stack, Text } from "@mantine/core";
+import { Button, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -6,6 +6,8 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IApplicationUser } from "~/models/applicationUser";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const OidcSettings = (): React.ReactNode => {
   const { request } = useAuth();
@@ -55,13 +57,11 @@ const OidcSettings = (): React.ReactNode => {
   }
 
   return (
-    <Card p="0.5rem" withBorder radius="md" shadow="sm">
+    <Card elevation={1}>
       <Stack gap="1rem">
-        <Text fw={700} size="lg">
-          OIDC Settings
-        </Text>
+        <PrimaryText size="lg">OIDC Settings</PrimaryText>
         <Button
-          color="red"
+          color="var(--button-color-destructive)"
           onClick={() => doDisconnectOidc.mutate()}
           loading={doDisconnectOidc.isPending}
         >

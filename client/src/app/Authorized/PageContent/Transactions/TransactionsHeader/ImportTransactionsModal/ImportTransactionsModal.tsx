@@ -1,4 +1,4 @@
-import { Button, Modal, Stepper, Text } from "@mantine/core";
+import { Button, Stepper } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -17,6 +17,8 @@ import AccountMapping from "./AccountMapping/AccountMapping";
 import ConfigureTransactions from "./ConfigureTransactions/ConfigureTransactions";
 import { useDisclosure } from "@mantine/hooks";
 import ImportCompleted from "./ImportCompleted/ImportCompleted";
+import Modal from "~/components/core/Modal/Modal";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -159,15 +161,7 @@ const ImportTransactionsModal = () => {
         opened={opened}
         onClose={close}
         size="auto"
-        p="0.5rem"
-        title={<Text fw={600}>Import Transactions</Text>}
-        styles={{
-          inner: {
-            left: "0",
-            right: "0",
-            padding: "0 !important",
-          },
-        }}
+        title={<PrimaryText>Import Transactions</PrimaryText>}
       >
         <Stepper
           active={activeStep}

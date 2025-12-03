@@ -1,18 +1,9 @@
-import {
-  ActionIcon,
-  Card,
-  Group,
-  NumberInput,
-  Select,
-  TextInput,
-} from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { ActionIcon, Group } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/CategorySelect";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
@@ -24,6 +15,12 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
+import Card from "~/components/core/Card/Card";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import Select from "~/components/core/Select/Select/Select";
 
 export interface ConditionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -66,6 +63,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               value: event.currentTarget.value,
             })
           }
+          elevation={2}
         />
       );
     } else if (props.ruleParameter.field === "amount") {
@@ -83,6 +81,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
           decimalScale={2}
           thousandSeparator=","
+          elevation={2}
         />
       );
     } else if (props.ruleParameter.field === "date") {
@@ -97,11 +96,13 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               value: value ?? "",
             })
           }
+          elevation={2}
         />
       );
     } else if (props.ruleParameter.field === "category") {
       return (
         <CategorySelect
+          flex="1 1 auto"
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({
@@ -111,7 +112,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           }
           categories={props.categories}
           withinPortal
-          flex="1 1 auto"
+          elevation={2}
         />
       );
     }
@@ -120,7 +121,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   };
 
   return (
-    <Card p="0.5rem" radius="md">
+    <Card elevation={2}>
       <Group gap="0.5rem">
         <Select
           w="110px"
@@ -152,6 +153,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             })
           }
           allowDeselect={false}
+          elevation={2}
         />
         <Select
           w="160px"
@@ -172,12 +174,13 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             })
           }
           allowDeselect={false}
+          elevation={2}
         />
         {getValueInput()}
         {props.allowDelete && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon
-              color="red"
+              color="var(--button-color-destructive)"
               size="sm"
               h="100%"
               onClick={() => props.doDelete?.(props.index)}

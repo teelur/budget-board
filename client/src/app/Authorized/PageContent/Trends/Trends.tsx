@@ -1,10 +1,11 @@
 import classes from "./Trends.module.css";
 
-import { Stack, Tabs, Text } from "@mantine/core";
+import { Stack, Tabs } from "@mantine/core";
 import React from "react";
 import TransactionsTab from "./TransactionsTab/TransactionsTab";
 import AccountsTab from "./AccountsTab/AccountsTab";
 import AssetsTab from "./AssetsTab/AssetsTab";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const Trends = (): React.ReactNode => {
   return (
@@ -17,19 +18,13 @@ const Trends = (): React.ReactNode => {
       >
         <Tabs.List grow>
           <Tabs.Tab value="transactions">
-            <Text fw={600} size="sm">
-              Transactions
-            </Text>
+            <PrimaryText size="sm">Transactions</PrimaryText>
           </Tabs.Tab>
           <Tabs.Tab value="accounts">
-            <Text fw={600} size="sm">
-              Accounts
-            </Text>
+            <PrimaryText size="sm">Accounts</PrimaryText>
           </Tabs.Tab>
           <Tabs.Tab value="assets">
-            <Text fw={600} size="sm">
-              Assets
-            </Text>
+            <PrimaryText size="sm">Assets</PrimaryText>
           </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="transactions">

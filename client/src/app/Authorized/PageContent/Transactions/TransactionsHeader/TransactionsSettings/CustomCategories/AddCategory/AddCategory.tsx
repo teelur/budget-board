@@ -1,33 +1,31 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/CategorySelect";
 import { translateAxiosError } from "~/helpers/requests";
-import {
-  Button,
-  Card,
-  LoadingOverlay,
-  Switch,
-  Stack,
-  Text,
-  TextInput,
-  Group,
-} from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { Button, LoadingOverlay, Switch, Stack, Group } from "@mantine/core";
+import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { ICategoryCreateRequest } from "~/models/category";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-
-interface FormValues {
-  name: string;
-  parent: string;
-}
+import Card from "~/components/core/Card/Card";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 
 const AddCategory = (): React.ReactNode => {
   const [isChildCategory, setIsChildCategory] = React.useState(false);
 
   const { transactionCategories } = useTransactionCategories();
+
+  const nameField = useField<string>({
+    initialValue: "",
+  });
+  const parentField = useField<string>({
+    initialValue: "",
+  });
+
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -46,74 +44,57 @@ const AddCategory = (): React.ReactNode => {
       notifications.show({ color: "red", message: translateAxiosError(error) }),
   });
 
-  const form = useForm({
-    mode: "controlled",
-    initialValues: { name: "", parent: "" },
-    validate: {
-      name: isNotEmpty("Name is required"),
-    },
-  });
-
   const parentCategories = transactionCategories.filter(
     (category) => category.parent?.length === 0
   );
 
-  const handleSubmit = (values: FormValues) => {
-    doAddCategory.mutate({
-      value: values.name,
-      parent: values.parent,
-    });
-    form.reset();
-  };
-
   return (
-    <Card withBorder>
+    <Card elevation={2}>
       <LoadingOverlay visible={doAddCategory.isPending} />
-      <form style={{ width: "100%" }} onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack>
-          <TextInput
-            {...form.getInputProps("name")}
-            key={form.key("name")}
-            label="Category Name"
-            w="100%"
-          />
-          <Stack gap="0.5rem">
-            <Text fw={500} size="sm">
-              Category Type
-            </Text>
-            <Group gap="0.5rem">
-              <Text fw={600} size="sm">
-                Parent
-              </Text>
-              <Switch
-                checked={isChildCategory}
-                onChange={(event) =>
-                  setIsChildCategory(event.currentTarget.checked)
-                }
-                size="md"
-              />
-              <Text fw={600} size="sm">
-                Child
-              </Text>
-            </Group>
-          </Stack>
-          {isChildCategory && (
-            <Stack gap="0.25rem">
-              <Text size="0.875rem">Parent Category</Text>
-              <CategorySelect
-                w="100%"
-                categories={parentCategories}
-                value={form.getValues().parent}
-                onChange={(value) => form.setFieldValue("parent", value)}
-                withinPortal
-              />
-            </Stack>
-          )}
-          <Button w="100%" type="submit">
-            Add Category
-          </Button>
+      <Stack>
+        <TextInput
+          {...nameField.getInputProps()}
+          label={<PrimaryText size="sm">Category Name</PrimaryText>}
+          elevation={2}
+        />
+        <Stack gap="0.5rem" justify="center">
+          <PrimaryText size="sm">Category Type</PrimaryText>
+          <Group gap="0.5rem">
+            <DimmedText size="sm">Parent</DimmedText>
+            <Switch
+              checked={isChildCategory}
+              onChange={(event) =>
+                setIsChildCategory(event.currentTarget.checked)
+              }
+              size="md"
+            />
+            <DimmedText size="sm">Child</DimmedText>
+          </Group>
         </Stack>
-      </form>
+        {isChildCategory && (
+          <Stack gap="0.25rem">
+            <PrimaryText size="sm">Parent Category</PrimaryText>
+            <CategorySelect
+              w="100%"
+              categories={parentCategories}
+              {...parentField.getInputProps()}
+              withinPortal
+              elevation={2}
+            />
+          </Stack>
+        )}
+        <Button
+          w="100%"
+          onClick={() =>
+            doAddCategory.mutate({
+              value: nameField.getValue(),
+              parent: parentField.getValue(),
+            })
+          }
+        >
+          Add Category
+        </Button>
+      </Stack>
     </Card>
   );
 };

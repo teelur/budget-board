@@ -3,7 +3,7 @@ import { getMonthAndYearDateString } from "~/helpers/datetime";
 import { getTransactionsForMonth } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
-import { Group, Skeleton, Text } from "@mantine/core";
+import { Group, Skeleton } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface ChartDatum {
   month: string;
@@ -108,7 +109,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   if (props.months.length === 0) {
     return (
       <Group justify="center">
-        <Text>Select a month to display the chart.</Text>
+        <DimmedText size="sm">Select a month to display the chart.</DimmedText>
       </Group>
     );
   }

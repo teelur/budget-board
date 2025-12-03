@@ -1,10 +1,4 @@
-import {
-  Stack,
-  TextInput,
-  PasswordInput,
-  Button,
-  LoadingOverlay,
-} from "@mantine/core";
+import { Stack, Button, LoadingOverlay } from "@mantine/core";
 import { useForm, hasLength, isNotEmpty } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "./Welcome";
@@ -14,6 +8,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 
 interface ResetPasswordProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -86,20 +83,23 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
         <TextInput
           {...form.getInputProps("resetCode")}
           key={form.key("resetCode")}
-          label="Reset Code"
+          label={<PrimaryText size="sm">Reset Code</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <PasswordInput
           {...form.getInputProps("password")}
           key={form.key("password")}
-          label="Password"
+          label={<PrimaryText size="sm">Password</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <PasswordInput
           {...form.getInputProps("confirmPassword")}
           key={form.key("confirmPassword")}
-          label="Confirm Password"
+          label={<PrimaryText size="sm">Confirm Password</PrimaryText>}
           w="100%"
+          elevation={1}
         />
         <Button variant="filled" fullWidth type="submit">
           Reset Password

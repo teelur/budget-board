@@ -1,16 +1,13 @@
-import classes from "./AddBudget.module.css";
-
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/CategorySelect";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   ActionIcon,
   LoadingOverlay,
-  NumberInput,
-  Popover,
   Stack,
+  Popover as MantinePopover,
+  Group,
 } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
 import { ICategory } from "~/models/category";
@@ -20,6 +17,9 @@ import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { IUserSettings } from "~/models/userSettings";
 import { getCurrencySymbol } from "~/helpers/currency";
+import Popover from "~/components/core/Popover/Popover";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 interface AddBudgetProps {
   date: Date;
@@ -27,20 +27,11 @@ interface AddBudgetProps {
 }
 
 const AddBudget = (props: AddBudgetProps): React.ReactNode => {
-  interface FormValues {
-    category: string;
-    limit: string | number;
-  }
-  const form = useForm<FormValues>({
-    mode: "uncontrolled",
-    initialValues: {
-      category: "",
-      limit: "",
-    },
-
-    validate: {
-      category: isNotEmpty("Category is required"),
-    },
+  const categoryField = useField<string>({
+    initialValue: "",
+  });
+  const limitField = useField<string | number>({
+    initialValue: "",
   });
 
   const { request } = useAuth();
@@ -84,55 +75,58 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
     },
   });
 
-  const submitCreateBudget = (values: FormValues) => {
-    doCreateBudget.mutate([
-      {
-        date: props.date,
-        category: values.category,
-        limit: values.limit === "" ? 0 : (values.limit as number),
-      },
-    ]);
-  };
-
   return (
     <Popover>
-      <Popover.Target>
+      <MantinePopover.Target>
         <ActionIcon size="input-sm">
           <PlusIcon />
         </ActionIcon>
-      </Popover.Target>
-      <Popover.Dropdown className={classes.root}>
+      </MantinePopover.Target>
+      <MantinePopover.Dropdown p="0.5rem">
         <LoadingOverlay visible={doCreateBudget.isPending} />
-        <form
-          className={classes.formContainer}
-          onSubmit={form.onSubmit(submitCreateBudget)}
-        >
-          <Stack gap="sm">
+        <Group gap="0.5rem">
+          <Stack gap="0.5rem">
             <CategorySelect
-              value={form.getValues().category}
-              onChange={(val) => form.setFieldValue("category", val)}
-              key={form.key("category")}
-              label="Category"
+              {...categoryField.getInputProps()}
               categories={props.categories}
+              elevation={1}
             />
             <NumberInput
-              {...form.getInputProps("limit")}
-              key={form.key("limit")}
+              {...limitField.getInputProps()}
               placeholder="Limit"
               w="100%"
               prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               min={0}
               decimalScale={2}
               thousandSeparator=","
+              elevation={1}
             />
           </Stack>
-          <Stack className={classes.submitContainer}>
-            <ActionIcon className={classes.submitButton} type="submit">
+          <Stack
+            style={{
+              alignSelf: "stretch",
+            }}
+          >
+            <ActionIcon
+              h="100%"
+              onClick={() =>
+                doCreateBudget.mutate([
+                  {
+                    date: props.date,
+                    category: categoryField.getValue(),
+                    limit:
+                      limitField.getValue() === ""
+                        ? 0
+                        : (limitField.getValue() as number),
+                  },
+                ])
+              }
+            >
               <SendIcon size={18} />
             </ActionIcon>
           </Stack>
-        </form>
-      </Popover.Dropdown>
+        </Group>
+      </MantinePopover.Dropdown>
     </Popover>
   );
 };

@@ -1,8 +1,9 @@
 import { months } from "~/helpers/utils";
-import classes from "./MonthToolcard.module.css";
-
-import { Card, Paper, Stack, Text } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { CashFlowValue } from "~/models/budget";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface MonthToolcardProps {
   date: Date;
@@ -20,40 +21,46 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
   ): string => {
     if (isSelected) {
       if (isPending) {
-        return "var(--mantine-color-light-off)";
+        return "var(--light-color-off)";
       }
 
       switch (cashFlowValue) {
         case CashFlowValue.Positive:
           return "green";
         case CashFlowValue.Neutral:
-          return "var(--mantine-color-light-off)";
+          return "var(--light-color-off)";
         case CashFlowValue.Negative:
           return "red";
       }
     }
-    return "var(--mantine-color-light-off)";
+    return "var(--light-color-off)";
   };
 
   return (
     <Card
-      className={props.isSelected ? classes.rootSelected : classes.root}
-      radius="md"
-      withBorder
+      h="62px"
+      w="60px"
+      flex="0 0 auto"
+      p="0.125rem"
       onClick={() => props.handleClick(props.date)}
+      hoverEffect
+      elevation={1}
     >
-      <Stack className={classes.content}>
-        <Paper
-          className={classes.indicator}
-          radius="md"
+      <Stack gap={0} style={{ userSelect: "none" }}>
+        <Card
+          h="20px"
+          w="100%"
           bg={getLightColor(props.cashFlowValue, props.isSelected)}
+          withBorder={false}
+          shadow="none"
+          elevation={1}
         />
-        <Text size="sm" fw={600}>
+        <PrimaryText size="sm">
           {months.at(props.date.getMonth())?.substring(0, 3)}
-        </Text>
-        <Text size="xs" c="dimmed" fw={600}>
+        </PrimaryText>
+        <DimmedText size="xs" c="dimmed">
           {props.date.getFullYear()}
-        </Text>
+        </DimmedText>
       </Stack>
     </Card>
   );

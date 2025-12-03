@@ -1,5 +1,3 @@
-import classes from "./CustomCategories.module.css";
-
 import { Flex, Group, Stack, Text } from "@mantine/core";
 import React from "react";
 import AddCategory from "./AddCategory/AddCategory";
@@ -7,6 +5,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ICategoryResponse } from "~/models/category";
 import CustomCategoryCard from "./CustomCategoryCard/CustomCategoryCard";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const CustomCategories = (): React.ReactNode => {
   const { request } = useAuth();
@@ -29,19 +29,19 @@ const CustomCategories = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
-      <Text c="dimmed" size="sm" fw={600}>
+      <DimmedText size="sm">
         Create custom categories to organize your transactions.
-      </Text>
+      </DimmedText>
       <AddCategory />
-      <Stack>
+      <Stack gap="0.25rem">
         <Group px="0.5rem" justify="space-between">
-          <Flex className={classes.nameContainer}>
-            <Text fw={600}>Name</Text>
+          <Flex w="40%">
+            <PrimaryText>Name</PrimaryText>
           </Flex>
-          <Flex className={classes.parentContainer}>
-            <Text fw={600}>Parent</Text>
+          <Flex w="40%">
+            <PrimaryText>Parent</PrimaryText>
           </Flex>
-          <Flex className={classes.deleteContainer}>
+          <Flex justify="flex-end" flex="1 1 auto">
             <Text />
           </Flex>
         </Group>
@@ -52,9 +52,9 @@ const CustomCategories = (): React.ReactNode => {
             )
           )
         ) : (
-          <Text fw={600} size="sm">
-            No custom categories.
-          </Text>
+          <Group justify="center">
+            <DimmedText size="sm">No custom categories.</DimmedText>
+          </Group>
         )}
       </Stack>
     </Stack>
