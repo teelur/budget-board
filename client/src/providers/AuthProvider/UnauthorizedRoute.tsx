@@ -12,7 +12,7 @@ const UnauthorizedRoute = (props: UnauthorizedRouteProps): React.ReactNode => {
 
   if (loading) {
     return (
-      <Center h="100vh">
+      <Center bg="var(--background-color-base)" h="100vh">
         <Loader size={100} />
       </Center>
     );
