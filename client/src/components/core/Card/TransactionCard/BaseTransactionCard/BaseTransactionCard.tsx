@@ -11,7 +11,7 @@ const BaseTransactionCard = ({
   return (
     <TransactionCardBase
       className={baseClasses.root}
-      elevation={1}
+      elevation={0}
       {...props}
     />
   );

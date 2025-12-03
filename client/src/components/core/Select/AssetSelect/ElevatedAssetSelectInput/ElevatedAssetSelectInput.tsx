@@ -1,4 +1,4 @@
-import elevatedClasses from "~/styles/Base.module.css";
+import elevatedClasses from "~/styles/Elevated.module.css";
 import dropdownClasses from "~/styles/Dropdown.module.css";
 
 import React from "react";
