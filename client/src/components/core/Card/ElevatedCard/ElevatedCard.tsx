@@ -10,13 +10,17 @@ export interface ElevatedCardProps extends CardProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-const ElevatedCard = ({ children, ...props }: ElevatedCardProps) => {
+const ElevatedCard = ({
+  children,
+  hoverEffect,
+  ...props
+}: ElevatedCardProps) => {
   return (
     <Card
       ref={props.ref}
       className={elevatedClasses.root}
       onMouseEnter={(e) => {
-        if (props.hoverEffect ?? false) {
+        if (hoverEffect ?? false) {
           e.currentTarget.style.borderColor =
             "var(--mantine-primary-color-filled)";
         }

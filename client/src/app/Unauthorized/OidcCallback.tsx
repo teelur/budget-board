@@ -30,10 +30,10 @@ const OidcCallback = (): React.ReactNode => {
       const state = q.get("state");
       const error = q.get("error");
       const errorDescription = q.get("error_description");
-      const saved = sessionStorage.getItem("oidc_state");
 
-      // Clear state immediately to prevent reuse
-      sessionStorage.removeItem("oidc_state");
+      const savedState = state
+        ? sessionStorage.getItem(`oidc_state_${state}`)
+        : null;
 
       // Check for OAuth2 error response
       if (error) {
@@ -54,7 +54,7 @@ const OidcCallback = (): React.ReactNode => {
         return;
       }
 
-      if (!state || state !== saved) {
+      if (!state || state !== savedState) {
         notifications.show({ color: "red", message: "Invalid OIDC state." });
         navigate("/");
         return;
@@ -69,6 +69,11 @@ const OidcCallback = (): React.ReactNode => {
             redirect_uri: `${window.location.origin}/oidc-callback`,
           } as IOidcCallbackRequest,
         });
+
+        // Clear state after successful callback to prevent reuse
+        if (state) {
+          sessionStorage.removeItem(`oidc_state_${state}`);
+        }
 
         setIsUserAuthenticated(response.data?.success ?? false);
 

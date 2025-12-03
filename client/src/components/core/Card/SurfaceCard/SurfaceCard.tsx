@@ -10,7 +10,7 @@ export interface SurfaceCardProps extends CardProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-const SurfaceCard = ({ children, ...props }: SurfaceCardProps) => {
+const SurfaceCard = ({ children, hoverEffect, ...props }: SurfaceCardProps) => {
   return (
     <Card
       ref={props.ref}
@@ -19,7 +19,7 @@ const SurfaceCard = ({ children, ...props }: SurfaceCardProps) => {
         transition: "background 0.2s",
       }}
       onMouseEnter={(e) => {
-        if (props.hoverEffect ?? false) {
+        if (hoverEffect ?? false) {
           e.currentTarget.style.borderColor =
             "var(--mantine-primary-color-filled)";
         }

@@ -10,7 +10,7 @@ export interface BaseCardProps extends CardProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-const BaseCard = ({ children, ...props }: BaseCardProps) => {
+const BaseCard = ({ children, hoverEffect, ...props }: BaseCardProps) => {
   return (
     <Card
       ref={props.ref}
@@ -19,7 +19,7 @@ const BaseCard = ({ children, ...props }: BaseCardProps) => {
         transition: "background 0.2s",
       }}
       onMouseEnter={(e) => {
-        if (props.hoverEffect ?? false) {
+        if (hoverEffect ?? false) {
           e.currentTarget.style.borderColor =
             "var(--mantine-primary-color-filled)";
         }
