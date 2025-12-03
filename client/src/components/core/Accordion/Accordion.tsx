@@ -26,7 +26,7 @@ const Accordion = ({ elevation, children, ...props }: AccordionProps) => {
         <ElevatedAccordionRoot {...props}>{children}</ElevatedAccordionRoot>
       );
     default:
-      throw new Error("Invalid elevation value for AccordionRoot component");
+      throw new Error("Invalid elevation value for Accordion component");
   }
 };
 

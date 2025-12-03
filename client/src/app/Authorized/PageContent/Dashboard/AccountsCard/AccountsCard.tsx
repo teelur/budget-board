@@ -80,7 +80,7 @@ const AccountsCard = (): React.ReactNode => {
               )
             )
           ) : (
-            <DimmedText size="md">No accounts found</DimmedText>
+            <DimmedText size="sm">No accounts found</DimmedText>
           )}
         </Stack>
       </Stack>

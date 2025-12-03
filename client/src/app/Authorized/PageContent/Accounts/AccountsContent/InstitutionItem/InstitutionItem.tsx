@@ -18,7 +18,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
 import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
-import SurfaceCard from "~/components/core/Card/SurfaceCard/SurfaceCard";
+import Card from "~/components/core/Card/Card";
 
 interface IInstitutionItemProps {
   institution: IInstitution;
@@ -115,7 +115,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
   }, [props.isSortable]);
 
   return (
-    <SurfaceCard ref={props.isSortable ? ref : undefined}>
+    <Card ref={props.isSortable ? ref : undefined} elevation={1}>
       <LoadingOverlay visible={doIndexAccounts.isPending} />
       <Group w="100%" wrap="nowrap" gap="0.5rem" align="flex-start">
         {props.isSortable && (
@@ -171,7 +171,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
           </Stack>
         </Stack>
       </Group>
-    </SurfaceCard>
+    </Card>
   );
 };
 

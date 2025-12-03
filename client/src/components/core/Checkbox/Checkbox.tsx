@@ -1,6 +1,7 @@
 import { CheckboxProps as MantineCheckboxProps } from "@mantine/core";
 import BaseCheckbox from "./BaseCheckbox/BaseCheckbox";
 import SurfaceCheckbox from "./SurfaceCheckbox/SurfaceCheckbox";
+import ElevatedCheckbox from "./ElevatedCheckbox/ElevatedCheckbox";
 
 export interface CheckboxProps extends MantineCheckboxProps {
   elevation?: number;
@@ -16,9 +17,9 @@ const Checkbox = ({
     case 1:
       return <SurfaceCheckbox {...props} />;
     case 2:
-      throw new Error("Elevation level not implemented for Checkbox");
+      return <ElevatedCheckbox {...props} />;
     default:
-      return <BaseCheckbox {...props} />;
+      throw new Error("Invalid elevation level for Checkbox");
   }
 };
 export default Checkbox;

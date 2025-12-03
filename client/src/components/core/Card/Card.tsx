@@ -37,11 +37,7 @@ const Card = ({
         </ElevatedCard>
       );
     default:
-      return (
-        <BaseCard {...props} onClick={onClick}>
-          {children}
-        </BaseCard>
-      );
+      throw new Error("Invalid elevation level for Card component");
   }
 };
 
