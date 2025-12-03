@@ -1,4 +1,10 @@
-import { Accordion, Button, Group, Skeleton, Stack } from "@mantine/core";
+import {
+  Accordion as MantineAccordion,
+  Button,
+  Group,
+  Skeleton,
+  Stack,
+} from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
@@ -12,7 +18,7 @@ import AddBalance from "./AddBalance/AddBalance";
 import Drawer from "~/components/Drawer/Drawer";
 import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/Text/DimmedText/DimmedText";
-import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
+import Accordion from "~/components/Accordion/Accordion";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -90,27 +96,26 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
               </PrimaryText>
             </Stack>
           </Group>
-          <SurfaceAccordionRoot
-            variant="separated"
+          <Accordion
             defaultValue={["add-balance", "chart", "balances"]}
-            multiple
+            elevation={1}
           >
-            <Accordion.Item value="add-balance">
-              <Accordion.Control>
+            <MantineAccordion.Item value="add-balance">
+              <MantineAccordion.Control>
                 <PrimaryText>Add Balance</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <AddBalance
                   accountId={props.account.id}
                   currency={props.currency}
                 />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item value="chart">
-              <Accordion.Control>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="chart">
+              <MantineAccordion.Control>
                 <PrimaryText>Account Trends</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Group>
                   <Button
                     variant={chartLookbackMonths === 3 ? "filled" : "outline"}
@@ -150,13 +155,13 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     dayjs().toString(),
                   ]}
                 />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item value="balances">
-              <Accordion.Control>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="balances">
+              <MantineAccordion.Control>
                 <PrimaryText>Recent Balances</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   {balancesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
@@ -172,13 +177,13 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     />
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item value="deleted-balances">
-              <Accordion.Control>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="deleted-balances">
+              <MantineAccordion.Control>
                 <PrimaryText>Deleted Balances</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   {balancesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
@@ -196,9 +201,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     />
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-          </SurfaceAccordionRoot>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+          </Accordion>
         </Stack>
       )}
     </Drawer>

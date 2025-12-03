@@ -1,4 +1,9 @@
-import { Accordion, ActionIcon, Group, Stack } from "@mantine/core";
+import {
+  Accordion as MantineAccordion,
+  ActionIcon,
+  Group,
+  Stack,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -9,8 +14,8 @@ import { IAccountResponse } from "~/models/account";
 import DeletedAccountCard from "./DeletedAccountCard/DeletedAccountCard";
 import Modal from "~/components/Modal/Modal";
 import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
 import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Accordion from "~/components/Accordion/Accordion";
 
 const AccountsSettings = (): React.ReactNode => {
   const [isOpened, { open, close }] = useDisclosure(false);
@@ -64,15 +69,12 @@ const AccountsSettings = (): React.ReactNode => {
         title={<PrimaryText size="md">Accounts Settings</PrimaryText>}
       >
         <Stack gap="1rem">
-          <SurfaceAccordionRoot defaultValue={[]}>
-            <Accordion.Item
-              value="deleted-accounts"
-              bg="var(--mantine-color-accordion-alternate)"
-            >
-              <Accordion.Control>
+          <Accordion elevation={1}>
+            <MantineAccordion.Item value="deleted-accounts">
+              <MantineAccordion.Control>
                 <PrimaryText size="md">Deleted Accounts</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   <DimmedText size="sm">
                     View and restore deleted accounts.
@@ -95,9 +97,9 @@ const AccountsSettings = (): React.ReactNode => {
                     </Group>
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-          </SurfaceAccordionRoot>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+          </Accordion>
         </Stack>
       </Modal>
     </>

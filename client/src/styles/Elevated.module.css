@@ -19,3 +19,9 @@
   color: var(--base-color-text-primary);
   font-weight: 600;
 }
+
+.accordion {
+  background-color: var(--background-color-elevated);
+  border-color: var(--elevated-color-border);
+  border-radius: 8px;
+}

@@ -1,4 +1,4 @@
-import { Accordion, Stack } from "@mantine/core";
+import { Accordion as MantineAccordion, Stack } from "@mantine/core";
 import React from "react";
 import CustomCategories from "./CustomCategories/CustomCategories";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -9,9 +9,9 @@ import { getDeletedTransactions } from "~/helpers/transactions";
 import AutomaticRules from "./AutomaticRules/AutomaticRules";
 import Modal from "~/components/Modal/Modal";
 import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
 import DimmedText from "~/components/Text/DimmedText/DimmedText";
 import DeletedTransactionCards from "./DeletedTransactionCards/DeletedTransactionCards";
+import Accordion from "~/components/Accordion/Accordion";
 
 interface TransactionsSettingsProps {
   modalOpened: boolean;
@@ -53,39 +53,40 @@ const TransactionsSettings = (
       onClose={props.closeModal}
       title={<PrimaryText size="md">Transactions Settings</PrimaryText>}
     >
-      <SurfaceAccordionRoot
+      <Accordion
         defaultValue={["custom categories", "automatic rule"]}
+        elevation={1}
       >
-        <Accordion.Item value="custom categories">
-          <Accordion.Control>
+        <MantineAccordion.Item value="custom categories">
+          <MantineAccordion.Control>
             <PrimaryText size="md">Custom Categories</PrimaryText>
-          </Accordion.Control>
-          <Accordion.Panel>
+          </MantineAccordion.Control>
+          <MantineAccordion.Panel>
             <CustomCategories />
-          </Accordion.Panel>
-        </Accordion.Item>
-        <Accordion.Item value="automatic rule">
-          <Accordion.Control>
+          </MantineAccordion.Panel>
+        </MantineAccordion.Item>
+        <MantineAccordion.Item value="automatic rule">
+          <MantineAccordion.Control>
             <PrimaryText size="md">Automatic Rules</PrimaryText>
-          </Accordion.Control>
-          <Accordion.Panel>
+          </MantineAccordion.Control>
+          <MantineAccordion.Panel>
             <AutomaticRules />
-          </Accordion.Panel>
-        </Accordion.Item>
-        <Accordion.Item value="deleted transactions">
-          <Accordion.Control>
+          </MantineAccordion.Panel>
+        </MantineAccordion.Item>
+        <MantineAccordion.Item value="deleted transactions">
+          <MantineAccordion.Control>
             <PrimaryText size="md">Deleted Transactions</PrimaryText>
-          </Accordion.Control>
-          <Accordion.Panel>
+          </MantineAccordion.Control>
+          <MantineAccordion.Panel>
             <Stack gap="0.5rem">
               <DimmedText size="sm">
                 View and restore deleted transactions.
               </DimmedText>
               <DeletedTransactionCards transactions={deletedTransactions} />
             </Stack>
-          </Accordion.Panel>
-        </Accordion.Item>
-      </SurfaceAccordionRoot>
+          </MantineAccordion.Panel>
+        </MantineAccordion.Item>
+      </Accordion>
     </Modal>
   );
 };

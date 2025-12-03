@@ -28,3 +28,9 @@
   color: var(--base-color-text-primary);
   font-weight: 600;
 }
+
+.accordion {
+  background-color: var(--background-color-base);
+  border-color: var(--base-color-border);
+  border-radius: 8px;
+}

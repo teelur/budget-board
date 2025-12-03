@@ -1,4 +1,4 @@
-import { Accordion, Group, Stack } from "@mantine/core";
+import { Accordion as MantineAccordion, Group, Stack } from "@mantine/core";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
@@ -8,8 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
 import DimmedText from "~/components/Text/DimmedText/DimmedText";
+import Accordion from "~/components/Accordion/Accordion";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -46,10 +46,47 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
       return acc + (categoryTotal ? categoryTotal : 0);
     }, 0) + (props.categoryToTransactionsTotalMap.get("") ?? 0);
 
+  const getUnbudgetedCards = (): React.ReactNode[] => {
+    const cards: React.ReactNode[] = [];
+
+    if (props.categoryToTransactionsTotalMap.has("")) {
+      cards.push(
+        <UnbudgetedCard
+          key="uncategorized"
+          categoryTree={
+            new CategoryNode({
+              value: "",
+              parent: "",
+            })
+          }
+          categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}
+          selectedDate={props.selectedDate}
+          openDetails={props.openDetails}
+        />
+      );
+    }
+
+    props.categoryTree.forEach((categoryTree) => {
+      cards.push(
+        <UnbudgetedCard
+          key={categoryTree.value}
+          categoryTree={categoryTree}
+          categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}
+          selectedDate={props.selectedDate}
+          openDetails={props.openDetails}
+        />
+      );
+    });
+
+    return cards;
+  };
+
+  const unbudgetedCards = getUnbudgetedCards();
+
   return (
-    <SurfaceAccordionRoot defaultValue={[]}>
-      <Accordion.Item value="unbudgeted">
-        <Accordion.Control>
+    <Accordion defaultValue={[]} elevation={1}>
+      <MantineAccordion.Item value="unbudgeted">
+        <MantineAccordion.Control>
           <Group justify="space-between" align="center" w="100%" pr="1rem">
             <PrimaryText size="lg">Unbudgeted</PrimaryText>
             {userSettingsQuery.isPending ? null : (
@@ -62,43 +99,20 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
               </PrimaryText>
             )}
           </Group>
-        </Accordion.Control>
-        <Accordion.Panel>
+        </MantineAccordion.Control>
+        <MantineAccordion.Panel>
           <Stack gap="0.5rem">
-            <UnbudgetedCard
-              categoryTree={
-                new CategoryNode({
-                  value: "",
-                  parent: "",
-                })
-              }
-              categoryToTransactionsTotalMap={
-                props.categoryToTransactionsTotalMap
-              }
-              selectedDate={props.selectedDate}
-              openDetails={props.openDetails}
-            />
-            {props.categoryTree.length > 0 ? (
-              props.categoryTree.map((categoryTree) => (
-                <UnbudgetedCard
-                  key={categoryTree.value}
-                  categoryTree={categoryTree}
-                  categoryToTransactionsTotalMap={
-                    props.categoryToTransactionsTotalMap
-                  }
-                  selectedDate={props.selectedDate}
-                  openDetails={props.openDetails}
-                />
-              ))
+            {unbudgetedCards.length > 0 ? (
+              unbudgetedCards
             ) : (
               <DimmedText size="sm">
                 No unbudgeted transactions found.
               </DimmedText>
             )}
           </Stack>
-        </Accordion.Panel>
-      </Accordion.Item>
-    </SurfaceAccordionRoot>
+        </MantineAccordion.Panel>
+      </MantineAccordion.Item>
+    </Accordion>
   );
 };
 

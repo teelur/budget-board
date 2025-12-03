@@ -1,4 +1,10 @@
-import { Accordion, Button, Group, Skeleton, Stack } from "@mantine/core";
+import {
+  Accordion as MantineAccordion,
+  Button,
+  Group,
+  Skeleton,
+  Stack,
+} from "@mantine/core";
 import { MoveRightIcon } from "lucide-react";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
@@ -15,7 +21,7 @@ import Drawer from "~/components/Drawer/Drawer";
 import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/Text/DimmedText/DimmedText";
 import StatusText from "~/components/Text/StatusText/StatusText";
-import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
+import Accordion from "~/components/Accordion/Accordion";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -102,7 +108,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 <Stack gap={0} justify="center" align="center">
                   <MoveRightIcon size={32} />
                   <StatusText
-                    value={props.asset.sellPrice - props.asset.purchasePrice}
+                    amount={props.asset.sellPrice - props.asset.purchasePrice}
                     size="xs"
                   >
                     {props.asset.sellPrice - props.asset.purchasePrice >= 0
@@ -133,23 +139,26 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
               </Stack>
             )}
           </Group>
-          <SurfaceAccordionRoot defaultValue={["add-value", "chart", "values"]}>
-            <Accordion.Item value="add-value">
-              <Accordion.Control>
+          <Accordion
+            defaultValue={["add-value", "chart", "values"]}
+            elevation={1}
+          >
+            <MantineAccordion.Item value="add-value">
+              <MantineAccordion.Control>
                 <PrimaryText>Add Value</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <AddValue
                   assetId={props.asset.id}
                   currency={props.userCurrency}
                 />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item value="chart">
-              <Accordion.Control>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="chart">
+              <MantineAccordion.Control>
                 <PrimaryText>Value Trends</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Group>
                   <Button
                     variant={chartLookbackMonths === 3 ? "filled" : "outline"}
@@ -189,13 +198,13 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     dayjs().toString(),
                   ]}
                 />
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item value="values">
-              <Accordion.Control>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="values">
+              <MantineAccordion.Control>
                 <PrimaryText>Value History</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   {valuesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
@@ -211,13 +220,13 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     />
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-            <Accordion.Item value="deleted-values">
-              <Accordion.Control>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+            <MantineAccordion.Item value="deleted-values">
+              <MantineAccordion.Control>
                 <PrimaryText>Deleted Values</PrimaryText>
-              </Accordion.Control>
-              <Accordion.Panel>
+              </MantineAccordion.Control>
+              <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   {valuesQuery.isPending && (
                     <Skeleton height={20} radius="lg" />
@@ -231,9 +240,9 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     />
                   )}
                 </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-          </SurfaceAccordionRoot>
+              </MantineAccordion.Panel>
+            </MantineAccordion.Item>
+          </Accordion>
         </Stack>
       )}
     </Drawer>

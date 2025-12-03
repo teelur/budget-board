@@ -1,4 +1,10 @@
-import { Accordion, Button, Group, Skeleton, Stack } from "@mantine/core";
+import {
+  Accordion as MantineAccordion,
+  Button,
+  Group,
+  Skeleton,
+  Stack,
+} from "@mantine/core";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
@@ -12,8 +18,8 @@ import { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import Drawer from "~/components/Drawer/Drawer";
 import PrimaryText from "~/components/Text/PrimaryText/PrimaryText";
-import SurfaceAccordionRoot from "~/components/Accordion/Surface/SurfaceAccordionRoot/SurfaceAccordionRoot";
 import Card from "~/components/Card/Card";
+import Accordion from "~/components/Accordion/Accordion";
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;
@@ -66,12 +72,12 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       {props.goal === null ? (
         <Skeleton height={425} radius="lg" />
       ) : (
-        <SurfaceAccordionRoot defaultValue={["accounts", "chart"]}>
-          <Accordion.Item value="accounts">
-            <Accordion.Control>
+        <Accordion defaultValue={["accounts", "chart"]} elevation={1}>
+          <MantineAccordion.Item value="accounts">
+            <MantineAccordion.Control>
               <PrimaryText size="md">Accounts</PrimaryText>
-            </Accordion.Control>
-            <Accordion.Panel>
+            </MantineAccordion.Control>
+            <MantineAccordion.Panel>
               <Stack gap="0.5rem">
                 {props.goal.accounts.map((account: IAccountResponse) => (
                   <Card key={account.id} elevation={2}>
@@ -79,13 +85,13 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
                   </Card>
                 ))}
               </Stack>
-            </Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item value="chart">
-            <Accordion.Control>
+            </MantineAccordion.Panel>
+          </MantineAccordion.Item>
+          <MantineAccordion.Item value="chart">
+            <MantineAccordion.Control>
               <PrimaryText size="md">Goal Trends</PrimaryText>
-            </Accordion.Control>
-            <Accordion.Panel>
+            </MantineAccordion.Control>
+            <MantineAccordion.Panel>
               <Stack>
                 <Group>
                   <Button
@@ -122,9 +128,9 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
                   invertYAxis={props.goal.amount === 0}
                 />
               </Stack>
-            </Accordion.Panel>
-          </Accordion.Item>
-        </SurfaceAccordionRoot>
+            </MantineAccordion.Panel>
+          </MantineAccordion.Item>
+        </Accordion>
       )}
     </Drawer>
   );
