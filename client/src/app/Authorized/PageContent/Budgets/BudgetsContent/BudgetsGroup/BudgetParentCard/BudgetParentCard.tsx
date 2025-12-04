@@ -7,10 +7,9 @@ import {
   Flex,
   Group,
   LoadingOverlay,
-  Popover,
+  Popover as MantinePopover,
   Progress,
   Stack,
-  Text,
 } from "@mantine/core";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
@@ -33,6 +32,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import Popover from "~/components/core/Popover/Popover";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -367,22 +367,22 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <Popover>
-                  <Popover.Target>
+                  <MantinePopover.Target>
                     <ActionIcon
                       color="var(--button-color-destructive)"
                       h="100%"
                     >
                       <TrashIcon size="1rem" />
                     </ActionIcon>
-                  </Popover.Target>
-                  <Popover.Dropdown p="0.5rem" maw={200}>
+                  </MantinePopover.Target>
+                  <MantinePopover.Dropdown p="0.5rem" maw={200}>
                     <Stack gap={5}>
-                      <Text size="sm" fw={500}>
+                      <PrimaryText size="sm">
                         Are you sure you want to delete this budget?
-                      </Text>
-                      <Text size="sm" fw={500}>
+                      </PrimaryText>
+                      <DimmedText size="xs">
                         All children will also be deleted.
-                      </Text>
+                      </DimmedText>
                       <Button
                         color="var(--button-color-destructive)"
                         size="compact-xs"
@@ -394,7 +394,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         Delete
                       </Button>
                     </Stack>
-                  </Popover.Dropdown>
+                  </MantinePopover.Dropdown>
                 </Popover>
               </Flex>
             )}
