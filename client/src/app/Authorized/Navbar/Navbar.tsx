@@ -52,7 +52,9 @@ const sidebarItems = [
     label: "Goals",
   },
   {
-    icon: <ChartNoAxesColumnIncreasingIcon />,
+    icon: (
+      <ChartNoAxesColumnIncreasingIcon color="var(--base-color-text-primary)" />
+    ),
     page: Pages.Trends,
     label: "Trends",
   },
