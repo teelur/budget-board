@@ -288,11 +288,11 @@ const TwoFactorAuth = (): React.ReactNode => {
         <Group gap="1rem">
           <PrimaryText size="lg">Two Factor Authentication</PrimaryText>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
-            <Badge color="green" maw={80}>
+            <Badge color="var(--button-color-confirm)" maw={80}>
               Enabled
             </Badge>
           ) : (
-            <Badge color="red" maw={85}>
+            <Badge color="var(--button-color-destructive)" maw={85}>
               Disabled
             </Badge>
           )}

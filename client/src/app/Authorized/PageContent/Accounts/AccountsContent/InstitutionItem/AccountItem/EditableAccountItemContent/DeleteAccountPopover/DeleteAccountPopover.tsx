@@ -40,7 +40,7 @@ const DeleteAccountPopover = (
   return (
     <Popover>
       <Popover.Target>
-        <ActionIcon h="100%" size="sm" color="red">
+        <ActionIcon h="100%" size="sm" color="var(--button-color-destructive)">
           <Trash2Icon size={16} />
         </ActionIcon>
       </Popover.Target>
@@ -52,7 +52,7 @@ const DeleteAccountPopover = (
             label="Delete Transactions?"
           />
           <Button
-            color="red"
+            color="var(--button-color-destructive)"
             loading={doDeleteAccount.isPending}
             onClick={() => doDeleteAccount.mutate()}
           >

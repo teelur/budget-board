@@ -403,7 +403,7 @@ const EditableGoalCardContent = (
         </Stack>
         <Group style={{ alignSelf: "stretch" }}>
           <ActionIcon
-            color="red"
+            color="var(--button-color-destructive)"
             onClick={(e) => {
               e.stopPropagation();
               doDeleteGoal.mutate(props.goal.id);

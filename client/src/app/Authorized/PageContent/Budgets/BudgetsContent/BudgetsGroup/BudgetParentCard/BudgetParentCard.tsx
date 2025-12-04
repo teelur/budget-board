@@ -384,7 +384,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         All children will also be deleted.
                       </Text>
                       <Button
-                        color="red"
+                        color="var(--button-color-destructive)"
                         size="compact-xs"
                         onClick={() => {
                           doDeleteBudget.mutate(id);
