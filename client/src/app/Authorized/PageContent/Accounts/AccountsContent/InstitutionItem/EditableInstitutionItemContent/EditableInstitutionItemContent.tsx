@@ -43,7 +43,10 @@ const EditableInstitutionItemContent = (
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      notifications.show({ message: "Institution updated", color: "green" });
+      notifications.show({
+        message: "Institution updated",
+        color: "var(--button-color-confirm)",
+      });
     },
     onError: (error: AxiosError) => {
       notifications.show({ color: "red", message: translateAxiosError(error) });

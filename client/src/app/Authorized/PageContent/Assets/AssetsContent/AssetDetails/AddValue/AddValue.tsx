@@ -48,7 +48,10 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
       amountField.reset();
       dateField.reset();
 
-      notifications.show({ color: "green", message: "Value added" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Value added",
+      });
     },
   });
 

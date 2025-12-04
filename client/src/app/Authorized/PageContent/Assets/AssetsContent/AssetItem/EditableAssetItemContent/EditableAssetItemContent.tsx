@@ -94,7 +94,10 @@ const EditableAssetItemContent = (
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
 
-      notifications.show({ color: "green", message: "Asset updated" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Asset updated",
+      });
     },
     onError: (error: AxiosError) => {
       notifications.show({ color: "red", message: translateAxiosError(error) });
@@ -114,7 +117,10 @@ const EditableAssetItemContent = (
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
 
-      notifications.show({ color: "green", message: "Asset deleted" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Asset deleted",
+      });
     },
     onError: (error: AxiosError) =>
       notifications.show({ color: "red", message: translateAxiosError(error) }),
@@ -130,7 +136,10 @@ const EditableAssetItemContent = (
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
 
-      notifications.show({ color: "green", message: "Asset restored" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Asset restored",
+      });
     },
     onError: (error: AxiosError) =>
       notifications.show({ color: "red", message: translateAxiosError(error) }),

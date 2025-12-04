@@ -92,7 +92,7 @@ const TwoFactorAuth = (): React.ReactNode => {
       }
 
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "2FA successfully updated.",
       });
 

@@ -13,7 +13,7 @@ const AccountsHeader = (props: AccountsHeaderProps): React.ReactNode => {
     <Group w="100%" justify="flex-end" gap="0.5rem">
       <Button
         onClick={props.toggleSort}
-        bg={props.isSortable ? "green" : undefined}
+        bg={props.isSortable ? "var(--button-color-confirm)" : undefined}
       >
         {props.isSortable ? "Save" : "Reorder"}
       </Button>

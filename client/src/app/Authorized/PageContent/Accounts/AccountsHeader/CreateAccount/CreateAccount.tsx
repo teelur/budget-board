@@ -78,7 +78,10 @@ const CreateAccount = () => {
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
-      notifications.show({ message: "Account created", color: "green" });
+      notifications.show({
+        message: "Account created",
+        color: "var(--button-color-confirm)",
+      });
 
       accountNameField.reset();
       institutionField.reset();

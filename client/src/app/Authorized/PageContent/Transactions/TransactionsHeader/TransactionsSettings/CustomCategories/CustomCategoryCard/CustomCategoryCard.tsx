@@ -29,7 +29,10 @@ const CustomCategoryCard = (
       }),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["transactionCategories"] });
-      notifications.show({ color: "green", message: "Category deleted!" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Category deleted!",
+      });
     },
     onError: (error: AxiosError) =>
       notifications.show({ color: "red", message: translateAxiosError(error) }),

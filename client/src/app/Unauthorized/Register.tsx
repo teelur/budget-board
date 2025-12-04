@@ -51,7 +51,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
         props.setLoginCardState(LoginCardState.Login);
 
         notifications.show({
-          color: "green",
+          color: "var(--button-color-confirm)",
           message:
             "Account created. Check your email for a verification message.",
         });

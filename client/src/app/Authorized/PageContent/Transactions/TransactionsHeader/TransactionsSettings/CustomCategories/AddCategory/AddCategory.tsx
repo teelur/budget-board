@@ -38,7 +38,10 @@ const AddCategory = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["transactionCategories"] });
-      notifications.show({ color: "green", message: "Category added!" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Category added!",
+      });
     },
     onError: (error: AxiosError) =>
       notifications.show({ color: "red", message: translateAxiosError(error) }),

@@ -105,7 +105,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       notifications.show({
         title: "Rule Executed",
         message: data?.data ?? "Rule run successfully",
-        color: "green",
+        color: "var(--button-color-confirm)",
       });
     },
     onError: (error: AxiosError) => {

@@ -53,7 +53,7 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
         props.setLoginCardState(LoginCardState.Login);
 
         notifications.show({
-          color: "green",
+          color: "var(--button-color-confirm)",
           message: "Password successfully updated. Please log in.",
         });
       })

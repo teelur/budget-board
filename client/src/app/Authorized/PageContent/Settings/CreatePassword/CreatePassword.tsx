@@ -36,7 +36,7 @@ const CreatePassword = (): React.ReactNode => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "Password successfully updated.",
       });
     },

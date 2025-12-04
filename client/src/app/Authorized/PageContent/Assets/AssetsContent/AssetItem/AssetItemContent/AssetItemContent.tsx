@@ -30,10 +30,11 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             <PencilIcon size={16} />
           </ActionIcon>
           {props.asset.sellDate && props.asset.sellPrice && (
-            <Badge bg="green">Sold</Badge>
+            <Badge bg="var(--button-color-confirm)">Sold</Badge>
           )}
-          {props.asset.hide && <Badge bg="yellow">Hidden</Badge>}
-          {props.asset.deleted && <Badge bg="red">Deleted</Badge>}
+          {props.asset.hide && (
+            <Badge bg="var(--button-color-warning)">Hidden</Badge>
+          )}
         </Group>
         <StatusText amount={props.asset.currentValue ?? 0} size="md">
           {convertNumberToCurrency(

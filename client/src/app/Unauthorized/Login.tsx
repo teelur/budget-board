@@ -110,7 +110,7 @@ const Login = (props: LoginProps): React.ReactNode => {
           props.setUserEmail(email);
 
           notifications.show({
-            color: "green",
+            color: "var(--button-color-confirm)",
             message: "An email has been set with a reset code.",
           });
         })

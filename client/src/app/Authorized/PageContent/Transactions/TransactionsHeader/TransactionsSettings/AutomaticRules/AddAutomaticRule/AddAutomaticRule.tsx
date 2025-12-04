@@ -63,7 +63,7 @@ const AddAutomaticRule = (): React.ReactNode => {
       });
       notifications.show({
         message: "Rule added successfully",
-        color: "green",
+        color: "var(--button-color-confirm)",
       });
     },
     onError: (error: AxiosError) => {
@@ -86,7 +86,7 @@ const AddAutomaticRule = (): React.ReactNode => {
       notifications.show({
         title: "Rule Executed",
         message: data?.data ?? "Rule run successfully",
-        color: "green",
+        color: "var(--button-color-confirm)",
       });
     },
     onError: (error: AxiosError) => {

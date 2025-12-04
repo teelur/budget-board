@@ -51,7 +51,7 @@ const ResetPassword = (): React.ReactNode => {
       confirmNewPasswordField.reset();
 
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "Password successfully updated.",
       });
     },

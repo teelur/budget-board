@@ -139,7 +139,7 @@ const EditableGoalCardContent = (
         queryKey: ["goals"],
       });
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "Goal successfully marked as completed",
       });
     },
@@ -163,7 +163,7 @@ const EditableGoalCardContent = (
         queryKey: ["goals"],
       });
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "Goal deleted successfully",
       });
     },
@@ -261,7 +261,7 @@ const EditableGoalCardContent = (
               {props.goal.percentComplete >= 100 && (
                 <Button
                   size="compact-xs"
-                  bg="green"
+                  bg="var(--button-color-confirm)"
                   onClick={(e) => {
                     e.stopPropagation();
                     doCompleteGoal.mutate(props.goal.id);

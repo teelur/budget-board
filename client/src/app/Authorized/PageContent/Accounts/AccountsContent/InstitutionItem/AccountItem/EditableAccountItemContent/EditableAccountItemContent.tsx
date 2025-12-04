@@ -96,7 +96,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
 
-      notifications.show({ color: "green", message: "Account updated" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Account updated",
+      });
     },
     onError: (error: AxiosError) => {
       notifications.show({ color: "red", message: translateAxiosError(error) });
