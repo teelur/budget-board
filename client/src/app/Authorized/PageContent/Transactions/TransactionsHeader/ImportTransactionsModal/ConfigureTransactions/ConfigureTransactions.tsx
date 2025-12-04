@@ -293,7 +293,7 @@ const ConfigureTransactions = (
 
       if (incomeValue && expenseValue) {
         notifications.show({
-          color: "yellow",
+          color: "var(--button-color-warning)",
           message: `Row has both income and expense values, defaulting to income. Row UID: ${row.uid}`,
         });
       }

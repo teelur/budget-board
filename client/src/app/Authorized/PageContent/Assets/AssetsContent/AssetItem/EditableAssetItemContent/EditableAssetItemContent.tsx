@@ -183,7 +183,11 @@ const EditableAssetItemContent = (
               </ActionIcon>
             </Flex>
             <Button
-              bg={hideAssetField.getValue() ? "yellow" : undefined}
+              bg={
+                hideAssetField.getValue()
+                  ? "var(--button-color-warning)"
+                  : undefined
+              }
               variant={hideAssetField.getValue() ? "filled" : "outline"}
               onClick={() =>
                 hideAssetField.setValue(!hideAssetField.getValue())

@@ -167,7 +167,11 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             />
             <Group gap="0.5rem">
               <Button
-                bg={hideAccountField.getValue() ? "yellow" : undefined}
+                bg={
+                  hideAccountField.getValue()
+                    ? "var(--button-color-warning)"
+                    : undefined
+                }
                 variant={hideAccountField.getValue() ? "filled" : "outline"}
                 onClick={() =>
                   hideAccountField.setValue(!hideAccountField.getValue())
