@@ -66,10 +66,16 @@ const EditableValueItemContent = (
         queryKey: ["values", props.value.assetID],
       });
 
-      notifications.show({ color: "green", message: "Value updated" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Value updated",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   const doDeleteValue = useMutation({
@@ -87,10 +93,16 @@ const EditableValueItemContent = (
         queryKey: ["values", props.value.assetID],
       });
 
-      notifications.show({ color: "green", message: "Value deleted" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Value deleted",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   const doRestoreValue = useMutation({
@@ -108,10 +120,16 @@ const EditableValueItemContent = (
         queryKey: ["values", props.value.assetID],
       });
 
-      notifications.show({ color: "green", message: "Value restored" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Value restored",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   useDidUpdate(() => {

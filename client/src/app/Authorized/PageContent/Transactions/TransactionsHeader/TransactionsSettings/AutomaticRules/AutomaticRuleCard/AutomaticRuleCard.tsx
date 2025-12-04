@@ -67,7 +67,10 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 
@@ -86,7 +89,10 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       setIsSelected(false);
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 
@@ -105,11 +111,14 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       notifications.show({
         title: "Rule Executed",
         message: data?.data ?? "Rule run successfully",
-        color: "green",
+        color: "var(--button-color-confirm)",
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 

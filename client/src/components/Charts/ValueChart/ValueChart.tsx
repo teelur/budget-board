@@ -1,7 +1,7 @@
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { BarChart } from "@mantine/charts";
-import { Group, Skeleton, Text } from "@mantine/core";
+import { Group, Skeleton } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +17,7 @@ import {
   IItem,
   IValue,
 } from "./helpers/valueChart";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface ValueChartProps {
   items: IItem[];
@@ -64,9 +65,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   if (props.items?.length === 0 || props.values?.length === 0) {
     return (
       <Group justify="center" p="0.5rem">
-        <Text fw={600} c="dimmed" size="sm">
-          No data available.
-        </Text>
+        <DimmedText size="sm">No data available.</DimmedText>
       </Group>
     );
   }

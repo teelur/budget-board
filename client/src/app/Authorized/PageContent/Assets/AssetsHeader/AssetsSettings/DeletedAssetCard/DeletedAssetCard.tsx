@@ -29,7 +29,10 @@ const DeletedAssetCard = (props: DeletedAssetCardProps): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
     },
   });
 

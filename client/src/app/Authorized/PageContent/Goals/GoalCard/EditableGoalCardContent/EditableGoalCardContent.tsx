@@ -7,7 +7,6 @@ import {
   Flex,
   Group,
   LoadingOverlay,
-  Progress,
   Stack,
 } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -32,6 +31,8 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
+import Progress from "~/components/core/Progress/Progress";
+import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -117,7 +118,10 @@ const EditableGoalCardContent = (
         ["goals", { includeInterest: props.includeInterest }],
         context?.previousGoals ?? []
       );
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({
@@ -138,13 +142,13 @@ const EditableGoalCardContent = (
         queryKey: ["goals"],
       });
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "Goal successfully marked as completed",
       });
     },
     onError: (error: AxiosError) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },
@@ -162,13 +166,13 @@ const EditableGoalCardContent = (
         queryKey: ["goals"],
       });
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "Goal deleted successfully",
       });
     },
     onError: (error: AxiosError) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },
@@ -181,7 +185,7 @@ const EditableGoalCardContent = (
       newGoal.name = goalNameField.getValue();
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid goal name",
       });
     }
@@ -190,7 +194,7 @@ const EditableGoalCardContent = (
       newGoal.amount = goalTargetAmountField.getValue();
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid target amount",
       });
     }
@@ -199,7 +203,7 @@ const EditableGoalCardContent = (
       newGoal.monthlyContribution = goalMonthlyContributionField.getValue();
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid monthly contribution",
       });
     }
@@ -215,7 +219,7 @@ const EditableGoalCardContent = (
       goalTargetDateField.setValue(parsedDate.toDate());
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid target date",
       });
     }
@@ -260,7 +264,7 @@ const EditableGoalCardContent = (
               {props.goal.percentComplete >= 100 && (
                 <Button
                   size="compact-xs"
-                  bg="green"
+                  bg="var(--button-color-confirm)"
                   onClick={(e) => {
                     e.stopPropagation();
                     doCompleteGoal.mutate(props.goal.id);
@@ -323,13 +327,14 @@ const EditableGoalCardContent = (
               </Flex>
             </Flex>
           </Flex>
-          <Progress.Root size={18} radius="xl">
-            <Progress.Section value={props.goal.percentComplete}>
-              <Progress.Label>
-                {props.goal.percentComplete.toFixed(0)}%
-              </Progress.Label>
-            </Progress.Section>
-          </Progress.Root>
+          <Progress
+            size={18}
+            percentComplete={props.goal.percentComplete}
+            amount={0}
+            limit={0}
+            type={ProgressType.Default}
+            elevation={1}
+          />
           <Flex className={classes.footer}>
             <Group align="center" gap="sm">
               <Flex align="center" gap="0.25rem">

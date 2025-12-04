@@ -36,7 +36,7 @@ const CreatePassword = (): React.ReactNode => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "Password successfully updated.",
       });
     },
@@ -49,13 +49,13 @@ const CreatePassword = (): React.ReactNode => {
         ) {
           notifications.show({
             title: "One or more validation errors occurred.",
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: Object.values(errorData.errors).join("\n"),
           });
         }
       } else {
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: translateAxiosError(error),
         });
       }

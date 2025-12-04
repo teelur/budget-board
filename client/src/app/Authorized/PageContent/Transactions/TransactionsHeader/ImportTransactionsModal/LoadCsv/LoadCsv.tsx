@@ -89,7 +89,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
         uniqueErrorMessages.forEach((errorMessage) => {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: `Error parsing CSV: ${errorMessage}`,
           });
         });
@@ -98,7 +98,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
       if (parsedText.data.length === 0) {
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: "CSV file is empty",
         });
         return false;
@@ -111,7 +111,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       return true;
     } catch (error) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: `Error reading file: ${error}`,
       });
       return false;
@@ -158,7 +158,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
             if (!file || fileField.error) {
               notifications.show({
-                color: "red",
+                color: "var(--button-color-destructive)",
                 message: "Please provide a valid CSV file",
               });
               return;
@@ -166,7 +166,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
             if (useDelimiter.getValue() && delimiterField.error) {
               notifications.show({
-                color: "red",
+                color: "var(--button-color-destructive)",
                 message: "Please provide a valid delimiter",
               });
               return;

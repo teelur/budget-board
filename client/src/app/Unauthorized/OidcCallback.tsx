@@ -40,7 +40,7 @@ const OidcCallback = (): React.ReactNode => {
           sessionStorage.removeItem(`oidc_state_${state}`);
         }
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: `Authentication failed: ${errorDescription || error}`,
         });
         navigate("/");
@@ -52,7 +52,7 @@ const OidcCallback = (): React.ReactNode => {
           sessionStorage.removeItem(`oidc_state_${state}`);
         }
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: "OIDC callback missing code.",
         });
         navigate("/");
@@ -63,7 +63,10 @@ const OidcCallback = (): React.ReactNode => {
         if (savedState) {
           sessionStorage.removeItem(`oidc_state_${state}`);
         }
-        notifications.show({ color: "red", message: "Invalid OIDC state." });
+        notifications.show({
+          color: "var(--button-color-destructive)",
+          message: "Invalid OIDC state.",
+        });
         navigate("/");
         return;
       }
@@ -86,7 +89,7 @@ const OidcCallback = (): React.ReactNode => {
 
         if (!response.data?.success) {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: "Authentication failed.",
           });
           navigate("/");
@@ -99,7 +102,10 @@ const OidcCallback = (): React.ReactNode => {
           sessionStorage.removeItem(`oidc_state_${state}`);
         }
         const err = e as AxiosError;
-        notifications.show({ color: "red", message: translateAxiosError(err) });
+        notifications.show({
+          color: "var(--button-color-destructive)",
+          message: translateAxiosError(err),
+        });
         navigate("/");
       }
     })();

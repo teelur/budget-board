@@ -64,13 +64,13 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["budgets"] });
       notifications.show({
         message: "Budget added successfully.",
-        color: "green",
+        color: "var(--button-color-confirm)",
       });
     },
     onError: (error: AxiosError) => {
       notifications.show({
         message: translateAxiosError(error),
-        color: "red",
+        color: "var(--button-color-destructive)",
       });
     },
   });

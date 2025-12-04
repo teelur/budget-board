@@ -66,7 +66,7 @@ export const AuthProvider = ({
       .catch(() => {
         notifications.show({
           message: "Failed to check authentication status",
-          color: "red",
+          color: "var(--button-color-destructive)",
         });
         setIsUserAuthenticated(false);
       })
@@ -87,7 +87,7 @@ export const AuthProvider = ({
 
       if (!authorizeUrl || !clientId) {
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message:
             "OIDC is enabled but not configured. Be sure all required environment variables are set.",
         });
@@ -122,7 +122,7 @@ export const AuthProvider = ({
       }
     } catch (error) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Failed to retrieve OIDC discovery document.",
       });
       setOidcLoading(false);

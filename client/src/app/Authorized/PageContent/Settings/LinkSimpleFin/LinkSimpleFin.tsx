@@ -53,13 +53,13 @@ const LinkSimpleFin = (): React.ReactNode => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message: "SimpleFin account linked!",
       });
     },
     onError: (error: AxiosError) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },

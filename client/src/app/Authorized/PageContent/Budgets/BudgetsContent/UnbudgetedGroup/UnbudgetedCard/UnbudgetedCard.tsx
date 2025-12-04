@@ -54,7 +54,10 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["budgets"] });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 

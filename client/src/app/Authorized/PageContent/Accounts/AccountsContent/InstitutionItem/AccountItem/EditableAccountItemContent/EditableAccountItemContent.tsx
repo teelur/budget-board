@@ -96,10 +96,16 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
 
-      notifications.show({ color: "green", message: "Account updated" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Account updated",
+      });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
 
       // Reset fields to original values on error
       accountNameField.setValue(props.account.name);
@@ -161,7 +167,11 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             />
             <Group gap="0.5rem">
               <Button
-                bg={hideAccountField.getValue() ? "yellow" : undefined}
+                bg={
+                  hideAccountField.getValue()
+                    ? "var(--button-color-warning)"
+                    : undefined
+                }
                 variant={hideAccountField.getValue() ? "filled" : "outline"}
                 onClick={() =>
                   hideAccountField.setValue(!hideAccountField.getValue())

@@ -79,7 +79,7 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
     },
     onError: (error: any) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },

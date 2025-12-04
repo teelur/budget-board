@@ -53,13 +53,13 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
         props.setLoginCardState(LoginCardState.Login);
 
         notifications.show({
-          color: "green",
+          color: "var(--button-color-confirm)",
           message: "Password successfully updated. Please log in.",
         });
       })
       .catch((error: AxiosError) => {
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: translateAxiosError(error),
         });
       })

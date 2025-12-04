@@ -1,7 +1,6 @@
 import {
   ActionIcon,
   Group,
-  Text,
   Stack,
   LoadingOverlay,
   Button,
@@ -22,8 +21,9 @@ import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import SurfaceTextInput from "~/components/core/Input/Surface/SurfaceTextInput/SurfaceTextInput";
-import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
-import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -94,10 +94,16 @@ const EditableAssetItemContent = (
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
 
-      notifications.show({ color: "green", message: "Asset updated" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Asset updated",
+      });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
 
       // Reset fields to original values on error
       assetNameField.setValue(props.asset.name);
@@ -114,10 +120,16 @@ const EditableAssetItemContent = (
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
 
-      notifications.show({ color: "green", message: "Asset deleted" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Asset deleted",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   const doRestoreAsset = useMutation({
@@ -130,10 +142,16 @@ const EditableAssetItemContent = (
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
 
-      notifications.show({ color: "green", message: "Asset restored" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Asset restored",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   useDidUpdate(
@@ -165,7 +183,11 @@ const EditableAssetItemContent = (
               </ActionIcon>
             </Flex>
             <Button
-              bg={hideAssetField.getValue() ? "yellow" : undefined}
+              bg={
+                hideAssetField.getValue()
+                  ? "var(--button-color-warning)"
+                  : undefined
+              }
               variant={hideAssetField.getValue() ? "filled" : "outline"}
               onClick={() =>
                 hideAssetField.setValue(!hideAssetField.getValue())
@@ -185,18 +207,15 @@ const EditableAssetItemContent = (
         <Group justify="space-between" align="flex-end">
           <Group gap="1rem">
             <Group gap="0.5rem">
-              <SurfaceDateInput
+              <DateInput
                 {...purchaseDate.getInputProps()}
                 placeholder="Enter Date"
                 maw={400}
                 clearable
-                label={
-                  <Text size="xs" fw={600}>
-                    Purchase Date
-                  </Text>
-                }
+                label={<PrimaryText size="xs">Purchase Date</PrimaryText>}
+                elevation={1}
               />
-              <SurfaceNumberInput
+              <NumberInput
                 {...purchasePrice.getInputProps()}
                 placeholder="Enter Price"
                 maw={150}
@@ -205,26 +224,20 @@ const EditableAssetItemContent = (
                 decimalScale={2}
                 fixedDecimalScale
                 onBlur={() => doUpdateAsset.mutate()}
-                label={
-                  <Text size="xs" fw={600}>
-                    Purchase Price
-                  </Text>
-                }
+                label={<PrimaryText size="xs">Purchase Price</PrimaryText>}
+                elevation={1}
               />
             </Group>
             <Group gap="0.5rem">
-              <SurfaceDateInput
+              <DateInput
                 {...sellDate.getInputProps()}
                 placeholder="Enter Date"
                 maw={400}
                 clearable
-                label={
-                  <Text size="xs" fw={600}>
-                    Sell Date
-                  </Text>
-                }
+                label={<PrimaryText size="xs">Sell Date</PrimaryText>}
+                elevation={1}
               />
-              <SurfaceNumberInput
+              <NumberInput
                 {...sellPrice.getInputProps()}
                 placeholder="Enter Price"
                 maw={150}
@@ -233,11 +246,8 @@ const EditableAssetItemContent = (
                 decimalScale={2}
                 fixedDecimalScale
                 onBlur={() => doUpdateAsset.mutate()}
-                label={
-                  <Text size="xs" fw={600}>
-                    Sell Price
-                  </Text>
-                }
+                label={<PrimaryText size="xs">Sell Price</PrimaryText>}
+                elevation={1}
               />
             </Group>
           </Group>

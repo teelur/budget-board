@@ -44,7 +44,7 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
     },
     onError: (error: any) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },
@@ -69,7 +69,7 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
       <Button
         bg={
           userSettingsQuery.data?.disableBuiltInTransactionCategories
-            ? "red"
+            ? "var(--button-color-destructive)"
             : ""
         }
         variant="primary"

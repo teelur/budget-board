@@ -60,7 +60,7 @@ const ImportTransactionsModal = () => {
         setHeaders(headers);
       } else {
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: "CSV file is missing a header row",
         });
         return;
@@ -69,7 +69,7 @@ const ImportTransactionsModal = () => {
       setCsvData(rows);
     } catch (error) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: `Error reading file: ${error}`,
       });
       resetData();
@@ -103,7 +103,10 @@ const ImportTransactionsModal = () => {
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
     },
   });
 
@@ -112,7 +115,7 @@ const ImportTransactionsModal = () => {
   ) => {
     if (filteredImportedData.length === 0) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "No transactions to import",
       });
       return;

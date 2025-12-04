@@ -56,11 +56,14 @@ const BudgetSettings = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
-      notifications.show({ message: "Settings updated", color: "green" });
+      notifications.show({
+        message: "Settings updated",
+        color: "var(--button-color-confirm)",
+      });
     },
     onError: (error: any) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },
@@ -112,7 +115,7 @@ const BudgetSettings = (): React.ReactNode => {
               onClick={() => {
                 if (budgetWarningThresholdField.error) {
                   notifications.show({
-                    color: "red",
+                    color: "var(--button-color-destructive)",
                     message: budgetWarningThresholdField.error,
                   });
                   return;

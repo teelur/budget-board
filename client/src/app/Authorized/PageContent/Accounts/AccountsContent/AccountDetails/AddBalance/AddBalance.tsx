@@ -42,10 +42,16 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
       await queryClient.invalidateQueries({
         queryKey: ["balances", props.accountId],
       });
-      notifications.show({ color: "green", message: "Balance added" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Balance added",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   return (

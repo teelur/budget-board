@@ -72,18 +72,18 @@ const Login = (props: LoginProps): React.ReactNode => {
         // so will do the error translation here.
         if ((error.response?.data as any)?.detail === "NotAllowed") {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message:
               "Please check your email for a validation email before logging in.",
           });
         } else if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: "Login failed. Check your credentials and try again.",
           });
         } else {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: translateAxiosError(error),
           });
         }
@@ -110,13 +110,13 @@ const Login = (props: LoginProps): React.ReactNode => {
           props.setUserEmail(email);
 
           notifications.show({
-            color: "green",
+            color: "var(--button-color-confirm)",
             message: "An email has been set with a reset code.",
           });
         })
         .catch(() => {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: "There was an error resetting your password.",
           });
         })
@@ -125,7 +125,7 @@ const Login = (props: LoginProps): React.ReactNode => {
         });
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Please enter your email to reset your password.",
       });
     }

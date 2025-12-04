@@ -51,7 +51,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
         props.setLoginCardState(LoginCardState.Login);
 
         notifications.show({
-          color: "green",
+          color: "var(--button-color-confirm)",
           message:
             "Account created. Check your email for a verification message.",
         });
@@ -65,14 +65,14 @@ const Register = (props: RegisterProps): React.ReactNode => {
         ) {
           notifications.show({
             title: "One or more validation errors occurred.",
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: Object.values(
               (error.response.data as ValidationError).errors
             ).join("\n"),
           });
         } else {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: translateAxiosError(error),
           });
         }

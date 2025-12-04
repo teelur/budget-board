@@ -39,14 +39,14 @@ const OidcSettings = (): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
 
       notifications.show({
-        color: "green",
+        color: "var(--button-color-confirm)",
         message:
           res?.data?.message ?? "OIDC provider disconnected successfully.",
       });
     },
     onError: (error: any) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },

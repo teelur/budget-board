@@ -7,17 +7,15 @@ import {
   Flex,
   Group,
   LoadingOverlay,
-  Popover,
-  Progress,
+  Popover as MantinePopover,
   Stack,
-  Text,
 } from "@mantine/core";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
-import { getStatusColor, StatusColorType } from "~/helpers/budgets";
+import { StatusColorType } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
@@ -33,6 +31,9 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import Popover from "~/components/core/Popover/Popover";
+import Progress from "~/components/core/Progress/Progress";
+import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -118,7 +119,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     },
     onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
       queryClient.setQueryData(["budgets"], context?.previousBudgets ?? []);
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["budgets"] }),
   });
@@ -319,23 +323,17 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 style={{ containerType: "inline-size" }}
               >
                 <Flex style={{ flex: "1 1 auto" }}>
-                  <Progress.Root size={16} radius="xl" w="100%">
-                    <Progress.Section
-                      value={percentComplete}
-                      color={getStatusColor(
-                        roundAwayFromZero(amount),
-                        limit,
-                        isIncome
-                          ? StatusColorType.Income
-                          : StatusColorType.Expense,
-                        userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                      )}
-                    >
-                      <Progress.Label>
-                        {percentComplete.toFixed(0)}%
-                      </Progress.Label>
-                    </Progress.Section>
-                  </Progress.Root>
+                  <Progress
+                    size={16}
+                    percentComplete={percentComplete}
+                    amount={amount}
+                    limit={limit}
+                    type={isIncome ? ProgressType.Income : ProgressType.Expense}
+                    warningThreshold={
+                      userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                    }
+                    elevation={2}
+                  />
                 </Flex>
                 {userSettingsQuery.isPending ? null : (
                   <StatusText
@@ -367,22 +365,22 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <Popover>
-                  <Popover.Target>
+                  <MantinePopover.Target>
                     <ActionIcon
                       color="var(--button-color-destructive)"
                       h="100%"
                     >
                       <TrashIcon size="1rem" />
                     </ActionIcon>
-                  </Popover.Target>
-                  <Popover.Dropdown p="0.5rem" maw={200}>
+                  </MantinePopover.Target>
+                  <MantinePopover.Dropdown p="0.5rem" maw={200}>
                     <Stack gap={5}>
-                      <Text size="sm" fw={500}>
+                      <PrimaryText size="sm">
                         Are you sure you want to delete this budget?
-                      </Text>
-                      <Text size="sm" fw={500}>
+                      </PrimaryText>
+                      <DimmedText size="xs">
                         All children will also be deleted.
-                      </Text>
+                      </DimmedText>
                       <Button
                         color="var(--button-color-destructive)"
                         size="compact-xs"
@@ -394,7 +392,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         Delete
                       </Button>
                     </Stack>
-                  </Popover.Dropdown>
+                  </MantinePopover.Dropdown>
                 </Popover>
               </Flex>
             )}

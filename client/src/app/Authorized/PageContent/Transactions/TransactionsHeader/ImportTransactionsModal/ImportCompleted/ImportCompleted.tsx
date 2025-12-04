@@ -1,5 +1,6 @@
-import { Button, Group, Stack, Text } from "@mantine/core";
+import { Button, Group, Stack } from "@mantine/core";
 import { MoveLeftIcon } from "lucide-react";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface ImportCompletedProps {
   goBackToPreviousDialog: () => void;
@@ -9,9 +10,9 @@ interface ImportCompletedProps {
 const ImportCompleted = (props: ImportCompletedProps) => {
   return (
     <Stack justify="center" align="center" gap="0.5rem" w={600} maw="100%">
-      <Text fw={600} size="md" py="1rem">
+      <PrimaryText size="md" py="1rem">
         Import Completed!
-      </Text>
+      </PrimaryText>
       <Group w="100%">
         <Button
           onClick={props.goBackToPreviousDialog}

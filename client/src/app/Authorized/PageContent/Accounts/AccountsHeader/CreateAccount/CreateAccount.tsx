@@ -62,7 +62,7 @@ const CreateAccount = () => {
 
       notifications.show({
         message: translateAxiosError(error),
-        color: "red",
+        color: "var(--button-color-destructive)",
       });
     },
   });
@@ -78,13 +78,19 @@ const CreateAccount = () => {
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
-      notifications.show({ message: "Account created", color: "green" });
+      notifications.show({
+        message: "Account created",
+        color: "var(--button-color-confirm)",
+      });
 
       accountNameField.reset();
       institutionField.reset();
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 
@@ -107,7 +113,7 @@ const CreateAccount = () => {
       if (institutionForAccount === undefined) {
         notifications.show({
           message: "Failed to create institution for account",
-          color: "red",
+          color: "var(--button-color-destructive)",
         });
         return;
       }

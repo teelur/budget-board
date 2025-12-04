@@ -21,13 +21,19 @@ const SyncButton = (): React.ReactNode => {
       if ((data.data?.length ?? 0) > 0) {
         {
           data.data.map((error: string) =>
-            notifications.show({ color: "red", message: error })
+            notifications.show({
+              color: "var(--button-color-destructive)",
+              message: error,
+            })
           );
         }
       }
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
     },
   });
 

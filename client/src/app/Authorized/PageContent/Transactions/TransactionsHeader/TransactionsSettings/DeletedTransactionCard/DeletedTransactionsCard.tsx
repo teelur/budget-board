@@ -36,7 +36,10 @@ const DeletedTransactionsCard = (
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
     },
   });
 

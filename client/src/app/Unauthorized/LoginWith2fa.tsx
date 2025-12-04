@@ -39,7 +39,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
 
     if (!authenticationCodeField.getValue()) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Please enter the authentication code.",
       });
       setLoading(false);
@@ -63,12 +63,12 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         // so will do the error translation here.
         if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: "Login failed. Check your credentials and try again.",
           });
         } else {
           notifications.show({
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: translateAxiosError(error),
           });
         }

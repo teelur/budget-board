@@ -26,11 +26,11 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
 
       switch (cashFlowValue) {
         case CashFlowValue.Positive:
-          return "green";
+          return "var(--button-color-confirm)";
         case CashFlowValue.Neutral:
           return "var(--light-color-off)";
         case CashFlowValue.Negative:
-          return "red";
+          return "var(--button-color-destructive)";
       }
     }
     return "var(--light-color-off)";

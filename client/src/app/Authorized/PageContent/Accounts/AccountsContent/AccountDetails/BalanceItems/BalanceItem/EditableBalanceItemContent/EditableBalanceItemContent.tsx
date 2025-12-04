@@ -65,10 +65,16 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
-      notifications.show({ color: "green", message: "Balance updated." });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Balance updated.",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   const doDeleteBalance = useMutation({
@@ -85,10 +91,16 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
-      notifications.show({ color: "green", message: "Balance deleted" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Balance deleted",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   const doRestoreBalance = useMutation({
@@ -105,10 +117,16 @@ const EditableBalanceItemContent = (
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
-      notifications.show({ color: "green", message: "Balance restored." });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Balance restored.",
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   useDidUpdate(() => {
