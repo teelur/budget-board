@@ -1,15 +1,14 @@
-import {
-  getFormattedCategoryValue,
-  getIsParentCategory,
-} from "~/helpers/category";
-import classes from "./EditableCategoryCell.module.css";
-
-import { Flex, Group, Text } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import { getTransactionCategory } from "~/helpers/transactions";
-import CategorySelectBase from "~/components/core/Select/CategorySelect/CategorySelectBase/CategorySelectBase";
+import CategorySelect from "../core/Select/CategorySelect/CategorySelect";
+import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
+import {
+  getFormattedCategoryValue,
+  getIsParentCategory,
+} from "~/helpers/category";
 
 interface EditableCategoryCellProps {
   transaction: ITransaction;
@@ -58,23 +57,24 @@ const EditableCategoryCell = (
   };
 
   return (
-    <Flex className={classes.container} w={{ base: "100%", xs: "180px" }}>
+    <Stack w={{ base: "100%", xs: "180px" }}>
       {props.isSelected ? (
         <Group onClick={(e) => e.stopPropagation()} w="100%">
-          <CategorySelectBase
+          <CategorySelect
             w="100%"
             categories={props.categories}
             value={categoryDisplayValue}
             onChange={onCategoryPick}
             withinPortal
+            elevation={1}
           />
         </Group>
       ) : (
-        <Text>
+        <PrimaryText size="md">
           {getFormattedCategoryValue(categoryDisplayValue, props.categories)}
-        </Text>
+        </PrimaryText>
       )}
-    </Flex>
+    </Stack>
   );
 };
 

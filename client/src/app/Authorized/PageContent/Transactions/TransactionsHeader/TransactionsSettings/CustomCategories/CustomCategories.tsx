@@ -1,4 +1,4 @@
-import { Flex, Group, Stack, Text } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import AddCategory from "./AddCategory/AddCategory";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -42,7 +42,7 @@ const CustomCategories = (): React.ReactNode => {
             <PrimaryText>Parent</PrimaryText>
           </Flex>
           <Flex justify="flex-end" flex="1 1 auto">
-            <Text />
+            <Flex />
           </Flex>
         </Group>
         {(transactionCategoriesQuery.data ?? []).length > 0 ? (
