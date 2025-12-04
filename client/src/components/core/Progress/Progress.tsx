@@ -14,7 +14,10 @@ export interface ProgressProps
   elevation?: number;
 }
 
-const Progress = ({ elevation, ...props }: ProgressProps): React.ReactNode => {
+const Progress = ({
+  elevation = 0,
+  ...props
+}: ProgressProps): React.ReactNode => {
   switch (elevation) {
     case 0:
       return <BaseProgress {...props} />;
