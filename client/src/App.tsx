@@ -76,12 +76,12 @@ const resolver: CSSVariablesResolver = () => ({
     "--background-color-sidebar": backgroundEggshell[2],
     "--background-color-header": backgroundEggshell[1],
     // Surface colors
-    "--background-color-surface": backgroundEggshell[1],
+    "--background-color-surface": backgroundEggshell[2],
     "--surface-color-border": borderEggshell[2],
     "--surface-color-text-primary": textBlack[1],
     "--surface-color-text-dimmed": textEggshellDimmed[6],
-    "--surface-color-input-background": backgroundEggshell[4],
-    "--surface-color-input-border": backgroundEggshell[7],
+    "--surface-color-input-background": backgroundEggshell[5],
+    "--surface-color-input-border": backgroundEggshell[8],
     "--surface-color-progress": backgroundEggshell[5],
     // Elevated colors
     "--background-color-elevated": backgroundEggshell[3],
@@ -101,7 +101,7 @@ const resolver: CSSVariablesResolver = () => ({
     "--button-color-warning": orange[6],
     "--button-color-destructive": red[5],
     // Other
-    "--light-color-off": backgroundEggshell[4],
+    "--light-color-off": backgroundEggshell[7],
   },
   dark: {
     // Base colors
