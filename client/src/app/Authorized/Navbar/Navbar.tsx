@@ -21,12 +21,36 @@ import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 
 const sidebarItems = [
-  { icon: <LayoutDashboardIcon />, page: Pages.Dashboard, label: "Dashboard" },
-  { icon: <LandmarkIcon />, page: Pages.Accounts, label: "Accounts" },
-  { icon: <HouseIcon />, page: Pages.Assets, label: "Assets" },
-  { icon: <BanknoteIcon />, page: Pages.Transactions, label: "Transactions" },
-  { icon: <CalculatorIcon />, page: Pages.Budgets, label: "Budgets" },
-  { icon: <GoalIcon />, page: Pages.Goals, label: "Goals" },
+  {
+    icon: <LayoutDashboardIcon color="var(--base-color-text-primary)" />,
+    page: Pages.Dashboard,
+    label: "Dashboard",
+  },
+  {
+    icon: <LandmarkIcon color="var(--base-color-text-primary)" />,
+    page: Pages.Accounts,
+    label: "Accounts",
+  },
+  {
+    icon: <HouseIcon color="var(--base-color-text-primary)" />,
+    page: Pages.Assets,
+    label: "Assets",
+  },
+  {
+    icon: <BanknoteIcon color="var(--base-color-text-primary)" />,
+    page: Pages.Transactions,
+    label: "Transactions",
+  },
+  {
+    icon: <CalculatorIcon color="var(--base-color-text-primary)" />,
+    page: Pages.Budgets,
+    label: "Budgets",
+  },
+  {
+    icon: <GoalIcon color="var(--base-color-text-primary)" />,
+    page: Pages.Goals,
+    label: "Goals",
+  },
   {
     icon: <ChartNoAxesColumnIncreasingIcon />,
     page: Pages.Trends,
@@ -87,12 +111,16 @@ const Navbar = (props: NavbarProps) => {
       </Stack>
       <Stack justify="center" align="center" gap={5}>
         <NavbarLink
-          icon={<SettingsIcon />}
+          icon={<SettingsIcon color="var(--base-color-text-primary)" />}
           label="Settings"
           active={props.currentPage === Pages.Settings}
           onClick={() => props.setCurrentPage(Pages.Settings)}
         />
-        <NavbarLink icon={<LogOutIcon />} label="Logout" onClick={Logout} />
+        <NavbarLink
+          icon={<LogOutIcon color="var(--base-color-text-primary)" />}
+          label="Logout"
+          onClick={Logout}
+        />
       </Stack>
     </Stack>
   );

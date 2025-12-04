@@ -1,6 +1,6 @@
-import { Tooltip, UnstyledButton, Text, Group } from "@mantine/core";
-
 import classes from "./Navbar.module.css";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { Tooltip, UnstyledButton, Group } from "@mantine/core";
 
 interface NavbarLinkProps {
   icon: React.ReactNode;
@@ -23,7 +23,7 @@ const NavbarLink = (props: NavbarLinkProps): React.ReactNode => {
       >
         <Group>
           {props.icon}
-          <Text hiddenFrom="xs">{props.label}</Text>
+          <PrimaryText hiddenFrom="xs">{props.label}</PrimaryText>
         </Group>
       </UnstyledButton>
     </Tooltip>
