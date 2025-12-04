@@ -69,7 +69,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                     <Flex justify="center" align="center">
                       <ActionIcon
                         size="sm"
-                        color="red"
+                        color="var(--button-color-destructive)"
                         variant="subtle"
                         onClick={() => {
                           props.delete(row.uid);

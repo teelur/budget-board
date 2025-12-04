@@ -76,7 +76,7 @@ const LinkSimpleFin = (): React.ReactNode => {
         <Group gap="1rem">
           <PrimaryText size="lg">Link SimpleFIN</PrimaryText>
           {userQuery.data?.accessToken && (
-            <Badge color="green" maw={80}>
+            <Badge color="var(--button-color-confirm)" maw={80}>
               Linked
             </Badge>
           )}
