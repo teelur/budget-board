@@ -8,7 +8,6 @@ import {
   Group,
   LoadingOverlay,
   Popover as MantinePopover,
-  Progress,
   Stack,
 } from "@mantine/core";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
@@ -16,7 +15,7 @@ import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
-import { getStatusColor, StatusColorType } from "~/helpers/budgets";
+import { StatusColorType } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
@@ -33,6 +32,8 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Popover from "~/components/core/Popover/Popover";
+import Progress from "~/components/core/Progress/Progress";
+import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -319,23 +320,17 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 style={{ containerType: "inline-size" }}
               >
                 <Flex style={{ flex: "1 1 auto" }}>
-                  <Progress.Root size={16} radius="xl" w="100%">
-                    <Progress.Section
-                      value={percentComplete}
-                      color={getStatusColor(
-                        roundAwayFromZero(amount),
-                        limit,
-                        isIncome
-                          ? StatusColorType.Income
-                          : StatusColorType.Expense,
-                        userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                      )}
-                    >
-                      <Progress.Label>
-                        {percentComplete.toFixed(0)}%
-                      </Progress.Label>
-                    </Progress.Section>
-                  </Progress.Root>
+                  <Progress
+                    size={16}
+                    percentComplete={percentComplete}
+                    amount={amount}
+                    limit={limit}
+                    type={isIncome ? ProgressType.Income : ProgressType.Expense}
+                    warningThreshold={
+                      userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                    }
+                    elevation={2}
+                  />
                 </Flex>
                 {userSettingsQuery.isPending ? null : (
                   <StatusText

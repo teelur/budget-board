@@ -1,6 +1,6 @@
 import classes from "./GoalCardContent.module.css";
 
-import { ActionIcon, Badge, Flex, Group, Progress, Stack } from "@mantine/core";
+import { ActionIcon, Badge, Flex, Group, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -15,6 +15,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
+import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
+import Progress from "~/components/core/Progress/Progress";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -91,13 +93,14 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             </PrimaryText>
           </Flex>
         </Flex>
-        <Progress.Root size={18} radius="xl">
-          <Progress.Section value={props.goal.percentComplete}>
-            <Progress.Label>
-              {props.goal.percentComplete.toFixed(0)}%
-            </Progress.Label>
-          </Progress.Section>
-        </Progress.Root>
+        <Progress
+          size={18}
+          percentComplete={props.goal.percentComplete}
+          amount={0}
+          limit={0}
+          type={ProgressType.Default}
+          elevation={1}
+        />
         <Flex className={classes.footer}>
           <Group align="center" gap="sm">
             <Flex align="center" gap="0.25rem">

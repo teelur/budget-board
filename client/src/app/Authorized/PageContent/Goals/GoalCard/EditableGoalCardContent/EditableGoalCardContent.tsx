@@ -7,7 +7,6 @@ import {
   Flex,
   Group,
   LoadingOverlay,
-  Progress,
   Stack,
 } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -32,6 +31,8 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
+import Progress from "~/components/core/Progress/Progress";
+import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -323,13 +324,14 @@ const EditableGoalCardContent = (
               </Flex>
             </Flex>
           </Flex>
-          <Progress.Root size={18} radius="xl">
-            <Progress.Section value={props.goal.percentComplete}>
-              <Progress.Label>
-                {props.goal.percentComplete.toFixed(0)}%
-              </Progress.Label>
-            </Progress.Section>
-          </Progress.Root>
+          <Progress
+            size={18}
+            percentComplete={props.goal.percentComplete}
+            amount={0}
+            limit={0}
+            type={ProgressType.Default}
+            elevation={1}
+          />
           <Flex className={classes.footer}>
             <Group align="center" gap="sm">
               <Flex align="center" gap="0.25rem">

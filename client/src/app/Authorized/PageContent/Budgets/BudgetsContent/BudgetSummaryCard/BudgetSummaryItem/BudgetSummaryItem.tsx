@@ -1,6 +1,6 @@
-import { StatusColorType, getStatusColor } from "~/helpers/budgets";
+import { StatusColorType } from "~/helpers/budgets";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { Divider, Flex, Group, Progress, Stack } from "@mantine/core";
+import { Divider, Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +8,8 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import Progress from "~/components/core/Progress/Progress";
+import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -94,19 +96,21 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         </Flex>
       </Group>
       {!props.hideProgress && (props.total ?? 0) > 0 && (
-        <Progress.Root size={16} radius="xl">
-          <Progress.Section
-            value={percentComplete > 100 ? 100 : percentComplete}
-            color={getStatusColor(
-              props.amount,
-              props.total ?? 0,
-              props.budgetValueType,
-              userSettingsQuery.data?.budgetWarningThreshold ?? 80
-            )}
-          >
-            <Progress.Label>{percentComplete.toFixed(0)}%</Progress.Label>
-          </Progress.Section>
-        </Progress.Root>
+        <Progress
+          size={16}
+          percentComplete={percentComplete}
+          amount={props.amount}
+          limit={props.total ?? 0}
+          type={
+            props.budgetValueType === StatusColorType.Income
+              ? ProgressType.Income
+              : ProgressType.Expense
+          }
+          warningThreshold={
+            userSettingsQuery.data?.budgetWarningThreshold ?? 80
+          }
+          elevation={2}
+        />
       )}
     </Stack>
   );

@@ -1,19 +1,12 @@
 import classes from "./BudgetChildCard.module.css";
 
 import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
-import {
-  ActionIcon,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Progress,
-  Stack,
-} from "@mantine/core";
+import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
-import { StatusColorType, getStatusColor } from "~/helpers/budgets";
+import { StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -27,6 +20,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import Progress from "~/components/core/Progress/Progress";
+import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 
 interface BudgetChildCardProps {
   id: string;
@@ -141,7 +136,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
           visible={doEditBudget.isPending || doDeleteBudget.isPending}
         />
         <Group gap="0.75rem" align="flex-start" wrap="nowrap">
-          <Stack gap="0.25rem" w="100%">
+          <Stack gap={0} w="100%">
             <Group
               justify="space-between"
               align="center"
@@ -219,24 +214,19 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               style={{ containerType: "inline-size" }}
             >
               <Flex style={{ flex: "1 1 auto" }}>
-                {/* TODO: Create progress wrapper */}
-                <Progress.Root size={12} radius="xl" w="100%">
-                  <Progress.Section
-                    value={percentComplete}
-                    color={getStatusColor(
-                      roundAwayFromZero(props.amount),
-                      props.limit,
-                      props.isIncome
-                        ? StatusColorType.Income
-                        : StatusColorType.Expense,
-                      userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                    )}
-                  >
-                    <Progress.Label>
-                      {percentComplete.toFixed(0)}%
-                    </Progress.Label>
-                  </Progress.Section>
-                </Progress.Root>
+                <Progress
+                  size={14}
+                  percentComplete={percentComplete}
+                  amount={props.amount}
+                  limit={props.limit}
+                  type={
+                    props.isIncome ? ProgressType.Income : ProgressType.Expense
+                  }
+                  warningThreshold={
+                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                  }
+                  elevation={2}
+                />
               </Flex>
               {userSettingsQuery.isPending ? null : (
                 <StatusText

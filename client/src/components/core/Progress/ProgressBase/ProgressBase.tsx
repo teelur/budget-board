@@ -2,11 +2,17 @@ import { Progress, ProgressRootProps } from "@mantine/core";
 import { getStatusColor, StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 
+export enum ProgressType {
+  Default,
+  Income,
+  Expense,
+}
+
 export interface ProgressBaseProps extends ProgressRootProps {
   percentComplete: number;
   amount: number;
   limit: number;
-  isIncome: boolean;
+  type: ProgressType;
   warningThreshold?: number;
 }
 
@@ -14,21 +20,34 @@ const ProgressBase = ({
   percentComplete,
   amount,
   limit,
-  isIncome,
+  type,
   warningThreshold,
   ...props
 }: ProgressBaseProps) => {
-  return (
-    <Progress.Root {...props} w="100%">
-      <Progress.Section
-        value={percentComplete}
-        color={getStatusColor(
+  const getColor = (): string | undefined => {
+    switch (type) {
+      case ProgressType.Income:
+        return getStatusColor(
           roundAwayFromZero(amount),
           limit,
-          isIncome ? StatusColorType.Income : StatusColorType.Expense,
+          StatusColorType.Income,
           warningThreshold ?? 80
-        )}
-      >
+        );
+      case ProgressType.Expense:
+        return getStatusColor(
+          roundAwayFromZero(amount),
+          limit,
+          StatusColorType.Expense,
+          warningThreshold ?? 80
+        );
+      default:
+        return undefined;
+    }
+  };
+
+  return (
+    <Progress.Root {...props} w="100%" radius="xl">
+      <Progress.Section value={percentComplete} color={getColor()}>
         <Progress.Label>{percentComplete.toFixed(0)}%</Progress.Label>
       </Progress.Section>
     </Progress.Root>
