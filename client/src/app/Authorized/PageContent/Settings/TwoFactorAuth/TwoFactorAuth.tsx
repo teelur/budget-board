@@ -188,7 +188,7 @@ const TwoFactorAuth = (): React.ReactNode => {
               Disable
             </Button>
             <Button
-              variant="default"
+              variant="outline"
               onClick={() =>
                 doSetTwoFactorAuth.mutate({
                   resetSharedKey: false,
