@@ -650,7 +650,7 @@ const ConfigureTransactions = (
       setImportedTransactionsTableData(filteredImportedTransactions ?? []);
     } catch (e) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: `Error building table data: ${
           e instanceof Error ? e.message : String(e)
         }`,

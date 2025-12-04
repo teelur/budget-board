@@ -84,17 +84,26 @@ const CreateTransactionModal = (): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 
   const onSubmit = (values: formValues) => {
     if (!values.date) {
-      notifications.show({ message: "Date is required", color: "red" });
+      notifications.show({
+        message: "Date is required",
+        color: "var(--button-color-destructive)",
+      });
       return;
     }
     if (!values.accountIds || values.accountIds.length === 0) {
-      notifications.show({ message: "Account is required", color: "red" });
+      notifications.show({
+        message: "Account is required",
+        color: "var(--button-color-destructive)",
+      });
       return;
     }
 

@@ -102,7 +102,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
 
       // Reset fields to original values on error
       accountNameField.setValue(props.account.name);

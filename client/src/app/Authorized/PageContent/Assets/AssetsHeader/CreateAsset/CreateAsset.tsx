@@ -42,7 +42,10 @@ const CreateAsset = (): React.ReactNode => {
       assetNameField.reset();
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 

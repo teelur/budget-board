@@ -106,7 +106,10 @@ const EditableTransactionCardContent = (
         ["transactions", { getHidden: false }],
         context?.previousTransactions ?? []
       );
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
@@ -136,7 +139,7 @@ const EditableTransactionCardContent = (
 
     if (!parsedDate.isValid()) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid date.",
       });
       return;

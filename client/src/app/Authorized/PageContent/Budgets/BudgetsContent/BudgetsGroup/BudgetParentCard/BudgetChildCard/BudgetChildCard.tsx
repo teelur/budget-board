@@ -85,7 +85,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     },
     onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
       queryClient.setQueryData(["budgets"], context?.previousBudgets ?? []);
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["budgets"] }),
   });

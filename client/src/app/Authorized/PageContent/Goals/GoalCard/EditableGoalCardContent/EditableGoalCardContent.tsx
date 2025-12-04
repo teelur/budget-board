@@ -118,7 +118,10 @@ const EditableGoalCardContent = (
         ["goals", { includeInterest: props.includeInterest }],
         context?.previousGoals ?? []
       );
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({
@@ -145,7 +148,7 @@ const EditableGoalCardContent = (
     },
     onError: (error: AxiosError) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },
@@ -169,7 +172,7 @@ const EditableGoalCardContent = (
     },
     onError: (error: AxiosError) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },
@@ -182,7 +185,7 @@ const EditableGoalCardContent = (
       newGoal.name = goalNameField.getValue();
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid goal name",
       });
     }
@@ -191,7 +194,7 @@ const EditableGoalCardContent = (
       newGoal.amount = goalTargetAmountField.getValue();
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid target amount",
       });
     }
@@ -200,7 +203,7 @@ const EditableGoalCardContent = (
       newGoal.monthlyContribution = goalMonthlyContributionField.getValue();
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid monthly contribution",
       });
     }
@@ -216,7 +219,7 @@ const EditableGoalCardContent = (
       goalTargetDateField.setValue(parsedDate.toDate());
     } else {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: "Invalid target date",
       });
     }

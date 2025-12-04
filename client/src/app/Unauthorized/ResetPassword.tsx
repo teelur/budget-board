@@ -59,7 +59,7 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
       })
       .catch((error: AxiosError) => {
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: translateAxiosError(error),
         });
       })

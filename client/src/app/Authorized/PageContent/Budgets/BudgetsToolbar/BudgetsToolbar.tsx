@@ -41,7 +41,10 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         queryKey: ["budgets", variables[0]?.date],
       }),
     onError: (error: AxiosError) =>
-      notifications.show({ message: translateAxiosError(error), color: "red" }),
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      }),
   });
 
   const onCopyBudgets = (): void => {
@@ -67,14 +70,14 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         } else {
           notifications.show({
             message: "Previous month has no budget!",
-            color: "red",
+            color: "var(--button-color-destructive)",
           });
         }
       })
       .catch(() => {
         notifications.show({
           message: "There was an error copying the previous month's budget.",
-          color: "red",
+          color: "var(--button-color-destructive)",
         });
       });
   };

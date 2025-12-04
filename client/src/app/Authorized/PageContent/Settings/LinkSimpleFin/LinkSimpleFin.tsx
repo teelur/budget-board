@@ -59,7 +59,7 @@ const LinkSimpleFin = (): React.ReactNode => {
     },
     onError: (error: AxiosError) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },

@@ -100,7 +100,10 @@ const EditableAssetItemContent = (
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
 
       // Reset fields to original values on error
       assetNameField.setValue(props.asset.name);
@@ -123,7 +126,10 @@ const EditableAssetItemContent = (
       });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   const doRestoreAsset = useMutation({
@@ -142,7 +148,10 @@ const EditableAssetItemContent = (
       });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   useDidUpdate(

@@ -81,7 +81,7 @@ const Navbar = (props: NavbarProps) => {
       })
       .catch((error: AxiosError) => {
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: translateAxiosError(error),
         });
       });

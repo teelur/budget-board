@@ -74,7 +74,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
     onError: (error: AxiosError) => {
       notifications.show({
         message: translateAxiosError(error),
-        color: "red",
+        color: "var(--button-color-destructive)",
       });
     },
   });

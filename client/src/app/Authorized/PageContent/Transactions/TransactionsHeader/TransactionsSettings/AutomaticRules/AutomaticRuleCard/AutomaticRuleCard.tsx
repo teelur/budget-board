@@ -67,7 +67,10 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 
@@ -86,7 +89,10 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       setIsSelected(false);
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 
@@ -109,7 +115,10 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 

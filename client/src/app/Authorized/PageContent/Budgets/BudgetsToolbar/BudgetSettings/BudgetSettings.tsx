@@ -63,7 +63,7 @@ const BudgetSettings = (): React.ReactNode => {
     },
     onError: (error: any) => {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
       });
     },
@@ -115,7 +115,7 @@ const BudgetSettings = (): React.ReactNode => {
               onClick={() => {
                 if (budgetWarningThresholdField.error) {
                   notifications.show({
-                    color: "red",
+                    color: "var(--button-color-destructive)",
                     message: budgetWarningThresholdField.error,
                   });
                   return;

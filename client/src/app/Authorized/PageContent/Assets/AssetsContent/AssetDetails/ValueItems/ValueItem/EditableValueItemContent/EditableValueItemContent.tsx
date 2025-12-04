@@ -72,7 +72,10 @@ const EditableValueItemContent = (
       });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   const doDeleteValue = useMutation({
@@ -96,7 +99,10 @@ const EditableValueItemContent = (
       });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   const doRestoreValue = useMutation({
@@ -120,7 +126,10 @@ const EditableValueItemContent = (
       });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   useDidUpdate(() => {

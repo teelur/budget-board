@@ -45,7 +45,7 @@ const Goals = (): React.ReactNode => {
   React.useEffect(() => {
     if (goalsQuery.isError) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(goalsQuery.error as AxiosError),
       });
     }

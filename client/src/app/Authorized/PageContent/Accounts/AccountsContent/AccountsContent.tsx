@@ -90,7 +90,10 @@ const AccountsContent = (props: AccountsContentProps) => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   useDidUpdate(() => {

@@ -64,13 +64,13 @@ const ResetPassword = (): React.ReactNode => {
         ) {
           notifications.show({
             title: "One or more validation errors occurred.",
-            color: "red",
+            color: "var(--button-color-destructive)",
             message: Object.values(errorData.errors).join("\n"),
           });
         }
       } else {
         notifications.show({
-          color: "red",
+          color: "var(--button-color-destructive)",
           message: translateAxiosError(error),
         });
       }

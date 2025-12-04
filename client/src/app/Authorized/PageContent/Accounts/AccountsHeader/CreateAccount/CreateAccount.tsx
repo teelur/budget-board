@@ -62,7 +62,7 @@ const CreateAccount = () => {
 
       notifications.show({
         message: translateAxiosError(error),
-        color: "red",
+        color: "var(--button-color-destructive)",
       });
     },
   });
@@ -87,7 +87,10 @@ const CreateAccount = () => {
       institutionField.reset();
     },
     onError: (error: AxiosError) => {
-      notifications.show({ message: translateAxiosError(error), color: "red" });
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
     },
   });
 
@@ -110,7 +113,7 @@ const CreateAccount = () => {
       if (institutionForAccount === undefined) {
         notifications.show({
           message: "Failed to create institution for account",
-          color: "red",
+          color: "var(--button-color-destructive)",
         });
         return;
       }
