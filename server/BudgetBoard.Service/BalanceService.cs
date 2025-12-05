@@ -86,7 +86,6 @@ public class BalanceService(
         balance.DateTime = request.DateTime;
         balance.Amount = request.Amount;
 
-        _userDataContext.Balances.Update(balance);
         await _userDataContext.SaveChangesAsync();
     }
 

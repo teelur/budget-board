@@ -41,23 +41,52 @@ public class BudgetService(
         );
 
         int newBudgetsCount = 0;
+        List<string> errors = [];
         foreach (var request in requests)
         {
-            if (TryAddBudget(userData, request, out var newBudget))
+            var error = TryAddBudget(userData, request, out var newBudget);
+            if (error == null)
             {
                 newBudgetsCount++;
 
-                if (TryAddParentBudget(userData, request, newBudget!, allCategories))
+                error = TryAddParentBudget(userData, request, newBudget!, allCategories);
+                if (error == null)
                 {
                     newBudgetsCount++;
                 }
+                else
+                {
+                    errors.Add(error);
+                }
+            }
+            else
+            {
+                errors.Add(error);
             }
         }
+
         await _userDataContext.SaveChangesAsync();
-        _logger.LogInformation(
-            "{LogMessage}",
-            _logLocalizer["BudgetCreateCompletedLog", newBudgetsCount]
-        );
+
+        if (errors.Count > 0)
+        {
+            _logger.LogWarning(
+                "{LogMessage}",
+                _logLocalizer["BudgetCreateCompletedWithErrorsLog", newBudgetsCount, errors.Count]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer[
+                    "BudgetCreateCompletedWithErrorsError",
+                    string.Join('\n', errors)
+                ]
+            );
+        }
+        else
+        {
+            _logger.LogInformation(
+                "{LogMessage}",
+                _logLocalizer["BudgetCreateCompletedLog", newBudgetsCount]
+            );
+        }
     }
 
     /// <inheritdoc />
@@ -66,19 +95,41 @@ public class BudgetService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         int newBudgetsCount = 0;
+        List<string> errors = [];
         foreach (var request in requests)
         {
-            if (TryAddBudget(userData, request, out var newBudget))
+            var error = TryAddBudget(userData, request, out var newBudget);
+            if (error == null)
             {
                 newBudgetsCount++;
+            }
+            else
+            {
+                errors.Add(error);
             }
         }
 
         await _userDataContext.SaveChangesAsync();
-        _logger.LogInformation(
-            "{LogMessage}",
-            _logLocalizer["BudgetCopyCompletedLog", newBudgetsCount]
-        );
+        if (errors.Count > 0)
+        {
+            _logger.LogWarning(
+                "{LogMessage}",
+                _logLocalizer["BudgetCreateCompletedWithErrorsLog", newBudgetsCount, errors.Count]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer[
+                    "BudgetCreateCompletedWithErrorsError",
+                    string.Join('\n', errors)
+                ]
+            );
+        }
+        else
+        {
+            _logger.LogInformation(
+                "{LogMessage}",
+                _logLocalizer["BudgetCreateCompletedLog", newBudgetsCount]
+            );
+        }
     }
 
     /// <inheritdoc />
@@ -273,6 +324,7 @@ public class BudgetService(
                 .ApplicationUsers.Include(u => u.Budgets)
                 .Include(u => u.TransactionCategories)
                 .Include(u => u.UserSettings)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
@@ -293,12 +345,20 @@ public class BudgetService(
         return foundUser;
     }
 
-    private bool TryAddBudget(
+    private string? TryAddBudget(
         ApplicationUser userData,
         IBudgetCreateRequest request,
         out Budget? newBudget
     )
     {
+        if (string.IsNullOrEmpty(request.Category))
+        {
+            _logger.LogWarning("{LogMessage}", _logLocalizer["BudgetCreateEmptyCategoryLog"]);
+
+            newBudget = null;
+            return _responseLocalizer["BudgetCreateEmptyCategoryError"];
+        }
+
         var budgetForCategoryAlreadyExists = userData.Budgets.Any(b =>
             b.Date.Month == request.Date.Month
             && b.Date.Year == request.Date.Year
@@ -317,7 +377,11 @@ public class BudgetService(
             );
 
             newBudget = null;
-            return false;
+            return _responseLocalizer[
+                "BudgetCreateDuplicateError",
+                request.Category,
+                request.Date.ToString("yyyy-MM")
+            ];
         }
 
         newBudget = new Budget
@@ -329,10 +393,10 @@ public class BudgetService(
         };
 
         _userDataContext.Budgets.Add(newBudget);
-        return true;
+        return null;
     }
 
-    private bool TryAddParentBudget(
+    private string? TryAddParentBudget(
         ApplicationUser userData,
         IBudgetCreateRequest childRequest,
         Budget childBudget,
@@ -352,7 +416,7 @@ public class BudgetService(
             )
         )
         {
-            return false;
+            return _responseLocalizer["BudgetCreateParentInvalidError", parentCategory];
         }
 
         var parentBudgetRequest = new BudgetCreateRequest
@@ -362,14 +426,14 @@ public class BudgetService(
             Limit = GetBudgetChildrenLimit(parentCategory, childRequest.Date, userData),
         };
 
-        if (!TryAddBudget(userData, parentBudgetRequest, out var newParentBudget))
+        if (TryAddBudget(userData, parentBudgetRequest, out var newParentBudget) != null)
         {
             UpdateParentBudgetLimit(parentCategory, childBudget, userData);
-            return false;
+            return null;
         }
 
         _userDataContext.Budgets.Add(newParentBudget!);
-        return true;
+        return null;
     }
 
     private void UpdateParentBudgetLimit(

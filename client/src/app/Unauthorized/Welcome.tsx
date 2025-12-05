@@ -77,7 +77,7 @@ const Welcome = (): React.ReactNode => {
       h="100vh"
       justify="center"
     >
-      <Stack w="500px" maw="100%">
+      <Stack w="500px" maw="100%" align="center">
         <Stack align="center" gap="0.25rem">
           <PrimaryText size="lg">Welcome to</PrimaryText>
           <BudgetBoardLogo
@@ -88,7 +88,12 @@ const Welcome = (): React.ReactNode => {
             A simple app for managing monthly budgets.
           </DimmedText>
         </Stack>
-        <Card p="1rem" w="100%" maw="500px" elevation={1}>
+        <Card
+          p="1rem"
+          w="100%"
+          maw={{ base: "95%", sm: "500px" }}
+          elevation={1}
+        >
           {getCardState()}
         </Card>
         {loginCardState !== LoginCardState.Register &&
