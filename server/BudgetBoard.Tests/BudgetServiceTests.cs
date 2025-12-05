@@ -5,6 +5,7 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -115,6 +116,70 @@ public class BudgetServiceTests
     }
 
     [Fact]
+    public async Task CreateBudgetsAsync_WhenDuplicateBudget_ShouldThrowExceptionWithDuplicateError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        
+        var mockResponseLocalizer = new Mock<IStringLocalizer<ResponseStrings>>();
+        var mockLogLocalizer = new Mock<IStringLocalizer<LogStrings>>();
+        
+        // Setup the localizers to return formatted strings that we can verify
+        mockResponseLocalizer.Setup(l => l[It.IsAny<string>()])
+            .Returns((string key) => new LocalizedString(key, key));
+        mockResponseLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
+            .Returns((string key, object[] args) => {
+                if (key == "BudgetCreateDuplicateError" && args.Length == 2)
+                {
+                    return new LocalizedString(key, $"A budget with the category '{args[0]}' and date '{args[1]}' already exists.");
+                }
+                else if (key == "BudgetCreateCompletedWithErrorsError" && args.Length == 1)
+                {
+                    return new LocalizedString(key, $"Budget creation completed with errors: {args[0]}");
+                }
+                return new LocalizedString(key, key);
+            });
+        mockLogLocalizer.Setup(l => l[It.IsAny<string>()])
+            .Returns((string key) => new LocalizedString(key, key));
+        mockLogLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
+            .Returns((string key, object[] args) => new LocalizedString(key, key));
+        
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            mockResponseLocalizer.Object,
+            mockLogLocalizer.Object
+        );
+
+        var today = DateTime.Today;
+        var category = "Food & Dining";
+        
+        // Create the first budget
+        var budget1 = _budgetCreateRequestFaker.Generate();
+        budget1.Category = category;
+        budget1.Date = today;
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget1]);
+
+        // Attempt to create a duplicate budget with the same category and date
+        var budget2 = _budgetCreateRequestFaker.Generate();
+        budget2.Category = category;
+        budget2.Date = today;
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget2]);
+
+        // Assert
+        var exception = await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>();
+        
+        // Verify that the error message contains the category and date
+        exception.Which.Message.Should().Contain(category);
+        exception.Which.Message.Should().Contain(today.ToString("yyyy-MM"));
+        exception.Which.Message.Should().Contain("already exists");
+    }
+
+    [Fact]
     public async Task CreateBudgetsWithParentsAsync_WhenCreateChildAndChildAlreadyExists_ShouldCreateParentWithSumOfLimits()
     {
         // Arrange
@@ -164,6 +229,70 @@ public class BudgetServiceTests
         helper
             .UserDataContext.Budgets.Should()
             .Contain(b => b.Limit == child1Budget.Limit + budget.Limit);
+    }
+
+    [Fact]
+    public async Task CreateBudgetsWithParentsAsync_WhenDuplicateBudget_ShouldThrowExceptionWithDuplicateError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        
+        var mockResponseLocalizer = new Mock<IStringLocalizer<ResponseStrings>>();
+        var mockLogLocalizer = new Mock<IStringLocalizer<LogStrings>>();
+        
+        // Setup the localizers to return formatted strings that we can verify
+        mockResponseLocalizer.Setup(l => l[It.IsAny<string>()])
+            .Returns((string key) => new LocalizedString(key, key));
+        mockResponseLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
+            .Returns((string key, object[] args) => {
+                if (key == "BudgetCreateDuplicateError" && args.Length == 2)
+                {
+                    return new LocalizedString(key, $"A budget with the category '{args[0]}' and date '{args[1]}' already exists.");
+                }
+                else if (key == "BudgetCreateCompletedWithErrorsError" && args.Length == 1)
+                {
+                    return new LocalizedString(key, $"Budget creation completed with errors: {args[0]}");
+                }
+                return new LocalizedString(key, key);
+            });
+        mockLogLocalizer.Setup(l => l[It.IsAny<string>()])
+            .Returns((string key) => new LocalizedString(key, key));
+        mockLogLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
+            .Returns((string key, object[] args) => new LocalizedString(key, key));
+        
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            mockResponseLocalizer.Object,
+            mockLogLocalizer.Object
+        );
+
+        var today = DateTime.Today;
+        var category = "Paycheck";
+        
+        // Create the first budget with parent
+        var budget1 = _budgetCreateRequestFaker.Generate();
+        budget1.Category = category;
+        budget1.Date = today;
+        await budgetService.CreateBudgetsWithParentsAsync(helper.demoUser.Id, [budget1]);
+
+        // Attempt to create a duplicate budget with the same category and date
+        var budget2 = _budgetCreateRequestFaker.Generate();
+        budget2.Category = category;
+        budget2.Date = today;
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.CreateBudgetsWithParentsAsync(helper.demoUser.Id, [budget2]);
+
+        // Assert
+        var exception = await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>();
+        
+        // Verify that the error message contains the category and date
+        exception.Which.Message.Should().Contain(category);
+        exception.Which.Message.Should().Contain(today.ToString("yyyy-MM"));
+        exception.Which.Message.Should().Contain("already exists");
     }
 
     [Fact]
