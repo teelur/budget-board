@@ -163,6 +163,18 @@
   <data name="BalanceAccountRestoreNotFoundError" xml:space="preserve">
     <value>The account you are trying to restore does not exist.</value>
   </data>
+  <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
+    <value>A budget you are trying to create has no category.</value>
+  </data>
+  <data name="BudgetCreateDuplicateError" xml:space="preserve">
+    <value>A budget with the category '{0}' and date '{1}' already exists.</value>
+  </data>
+  <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
+    <value>Budget creation completed with errors: {0}</value>
+  </data>
+  <data name="BudgetCreateParentInvalidError" xml:space="preserve">
+    <value>The budget you are trying to create has an invalid parent category: {0}</value>
+  </data>
   <data name="BudgetUpdateNotFoundError" xml:space="preserve">
     <value>The budget you are trying to update does not exist.</value>
   </data>
