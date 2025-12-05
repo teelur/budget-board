@@ -637,4 +637,54 @@ public class BudgetServiceTests
         // Assert
         helper.UserDataContext.Budgets.Should().HaveCount(1);
     }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_WhenCategoryIsNull_ShouldThrowExceptionWithErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Category = null!;
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("*BudgetCreateCompletedWithErrorsError*");
+    }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_WhenCategoryIsEmpty_ShouldThrowExceptionWithErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Category = "";
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("*BudgetCreateCompletedWithErrorsError*");
+    }
 }
