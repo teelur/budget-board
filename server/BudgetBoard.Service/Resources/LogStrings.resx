@@ -283,7 +283,7 @@
   <data name="TransactionCreateAccountNotFoundLog" xml:space="preserve">
     <value>Attempted to create a transaction for an account that does not exist.</value>
   </data>
-  <data name="TransactioNotFoundLog" xml:space="preserve">
+  <data name="TransactionNotFoundLog" xml:space="preserve">
     <value>Attempted to access a transaction that does not exist.</value>
   </data>
   <data name="TransactionUpdateNotFoundLog" xml:space="preserve">

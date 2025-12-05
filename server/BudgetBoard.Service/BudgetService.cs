@@ -114,7 +114,13 @@ public class BudgetService(
         {
             _logger.LogWarning(
                 "{LogMessage}",
-                _logLocalizer["BudgetCreateCompletedWithErrorsLog", string.Join('\n', errors)]
+                _logLocalizer["BudgetCreateCompletedWithErrorsLog", newBudgetsCount, errors.Count]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer[
+                    "BudgetCreateCompletedWithErrorsError",
+                    string.Join('\n', errors)
+                ]
             );
         }
         else
