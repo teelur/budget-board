@@ -33,6 +33,26 @@ public class BudgetServiceTests
             .RuleFor(b => b.ID, f => Guid.NewGuid())
             .RuleFor(b => b.Limit, f => f.Finance.Amount());
 
+    private static IStringLocalizer<ResponseStrings> CreateFormattingMockLocalizer()
+    {
+        var mockLocalizer = new Mock<IStringLocalizer<ResponseStrings>>();
+        mockLocalizer.Setup(l => l[It.IsAny<string>()])
+            .Returns((string key) => new LocalizedString(key, key));
+        mockLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
+            .Returns((string key, object[] args) => {
+                if (key == "BudgetCreateDuplicateError" && args.Length == 2)
+                {
+                    return new LocalizedString(key, $"A budget with the category '{args[0]}' and date '{args[1]}' already exists.");
+                }
+                else if (key == "BudgetCreateCompletedWithErrorsError" && args.Length == 1)
+                {
+                    return new LocalizedString(key, $"Budget creation completed with errors: {args[0]}");
+                }
+                return new LocalizedString(key, key);
+            });
+        return mockLocalizer.Object;
+    }
+
     [Fact]
     public async Task CreateBudgetsWithParentsAsync_WhenValidData_ShouldCreateBudgetsWithParents()
     {
@@ -120,35 +140,11 @@ public class BudgetServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        
-        var mockResponseLocalizer = new Mock<IStringLocalizer<ResponseStrings>>();
-        var mockLogLocalizer = new Mock<IStringLocalizer<LogStrings>>();
-        
-        // Setup the localizers to return formatted strings that we can verify
-        mockResponseLocalizer.Setup(l => l[It.IsAny<string>()])
-            .Returns((string key) => new LocalizedString(key, key));
-        mockResponseLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
-            .Returns((string key, object[] args) => {
-                if (key == "BudgetCreateDuplicateError" && args.Length == 2)
-                {
-                    return new LocalizedString(key, $"A budget with the category '{args[0]}' and date '{args[1]}' already exists.");
-                }
-                else if (key == "BudgetCreateCompletedWithErrorsError" && args.Length == 1)
-                {
-                    return new LocalizedString(key, $"Budget creation completed with errors: {args[0]}");
-                }
-                return new LocalizedString(key, key);
-            });
-        mockLogLocalizer.Setup(l => l[It.IsAny<string>()])
-            .Returns((string key) => new LocalizedString(key, key));
-        mockLogLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
-            .Returns((string key, object[] args) => new LocalizedString(key, key));
-        
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
             helper.UserDataContext,
-            mockResponseLocalizer.Object,
-            mockLogLocalizer.Object
+            CreateFormattingMockLocalizer(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var today = DateTime.Today;
@@ -236,35 +232,11 @@ public class BudgetServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        
-        var mockResponseLocalizer = new Mock<IStringLocalizer<ResponseStrings>>();
-        var mockLogLocalizer = new Mock<IStringLocalizer<LogStrings>>();
-        
-        // Setup the localizers to return formatted strings that we can verify
-        mockResponseLocalizer.Setup(l => l[It.IsAny<string>()])
-            .Returns((string key) => new LocalizedString(key, key));
-        mockResponseLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
-            .Returns((string key, object[] args) => {
-                if (key == "BudgetCreateDuplicateError" && args.Length == 2)
-                {
-                    return new LocalizedString(key, $"A budget with the category '{args[0]}' and date '{args[1]}' already exists.");
-                }
-                else if (key == "BudgetCreateCompletedWithErrorsError" && args.Length == 1)
-                {
-                    return new LocalizedString(key, $"Budget creation completed with errors: {args[0]}");
-                }
-                return new LocalizedString(key, key);
-            });
-        mockLogLocalizer.Setup(l => l[It.IsAny<string>()])
-            .Returns((string key) => new LocalizedString(key, key));
-        mockLogLocalizer.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
-            .Returns((string key, object[] args) => new LocalizedString(key, key));
-        
         var budgetService = new BudgetService(
             Mock.Of<ILogger<IBudgetService>>(),
             helper.UserDataContext,
-            mockResponseLocalizer.Object,
-            mockLogLocalizer.Object
+            CreateFormattingMockLocalizer(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
         var today = DateTime.Today;
