@@ -26,6 +26,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<RuleAction> RuleActions { get; set; }
     public DbSet<Asset> Assets { get; set; }
     public DbSet<Value> Values { get; set; }
+    public DbSet<WidgetSettings> WidgetSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +60,11 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
                 .IsRequired();
 
             u.HasMany(e => e.Assets).WithOne(e => e.User).HasForeignKey(e => e.UserID).IsRequired();
+
+            u.HasMany(e => e.WidgetSettings)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserID)
+                .IsRequired();
 
             u.ToTable("User");
         });
@@ -143,6 +149,12 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         });
 
         modelBuilder.Entity<Value>().ToTable("Value");
+
+        modelBuilder.Entity<WidgetSettings>(w =>
+        {
+            w.Property(e => e.Configuration).HasColumnType("jsonb");
+            w.ToTable("WidgetSettings");
+        });
 
         modelBuilder.UseIdentityColumns();
     }

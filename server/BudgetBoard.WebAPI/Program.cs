@@ -230,6 +230,7 @@ builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IValueService, ValueService>();
+builder.Services.AddScoped<IWidgetSettingsService, WidgetSettingsService>();
 
 var app = builder.Build();
 
