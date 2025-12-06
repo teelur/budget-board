@@ -20,12 +20,6 @@ public class WidgetSettingsController(
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
-    private readonly ILogger<WidgetSettingsController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IWidgetSettingsService _widgetSettingsService = widgetSettingsService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create(
@@ -34,8 +28,8 @@ public class WidgetSettingsController(
     {
         try
         {
-            await _widgetSettingsService.CreateWidgetSettingsAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await widgetSettingsService.CreateWidgetSettingsAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 newWidget
             );
             return Ok();
@@ -46,8 +40,8 @@ public class WidgetSettingsController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -58,8 +52,8 @@ public class WidgetSettingsController(
         try
         {
             return Ok(
-                await _widgetSettingsService.ReadWidgetSettingsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
+                await widgetSettingsService.ReadWidgetSettingsAsync(
+                    new Guid(userManager.GetUserId(User) ?? string.Empty)
                 )
             );
         }
@@ -69,8 +63,8 @@ public class WidgetSettingsController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -82,10 +76,7 @@ public class WidgetSettingsController(
     {
         try
         {
-            await _widgetSettingsService.UpdateWidgetSettingsAsync(
-                editedWidget.ID,
-                editedWidget
-            );
+            await widgetSettingsService.UpdateWidgetSettingsAsync(editedWidget.ID, editedWidget);
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
@@ -94,8 +85,8 @@ public class WidgetSettingsController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -105,7 +96,7 @@ public class WidgetSettingsController(
     {
         try
         {
-            await _widgetSettingsService.DeleteWidgetSettingsAsync(guid);
+            await widgetSettingsService.DeleteWidgetSettingsAsync(guid);
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
@@ -114,8 +105,8 @@ public class WidgetSettingsController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 }

@@ -376,4 +376,7 @@
   <data name="GoalNoBalanceFoundLog" xml:space="preserve">
     <value>No balance found for goal {0}</value>
   </data>
+  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
+    <value>Attempted to update a widget that does not exist.</value>
+  </data>
 </root>

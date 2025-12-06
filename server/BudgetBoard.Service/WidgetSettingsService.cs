@@ -61,8 +61,8 @@ public class WidgetSettingsService(
         var widget = await userDataContext.WidgetSettings.FindAsync(widgetID);
         if (widget == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetNotFoundError"]);
-            throw new BudgetBoardServiceException(responseLocalizer["WidgetNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["WidgetUpdateNotFoundError"]);
+            throw new BudgetBoardServiceException(responseLocalizer["WidgetUpdateNotFoundError"]);
         }
 
         widget.WidgetType = request.WidgetType;
@@ -76,11 +76,10 @@ public class WidgetSettingsService(
     public async Task DeleteWidgetSettingsAsync(Guid widgetID)
     {
         var widget = await userDataContext.WidgetSettings.FindAsync(widgetID);
-
         if (widget == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetNotFoundError"]);
-            throw new BudgetBoardServiceException(responseLocalizer["WidgetNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["WidgetDeleteNotFoundError"]);
+            throw new BudgetBoardServiceException(responseLocalizer["WidgetDeleteNotFoundError"]);
         }
 
         userDataContext.WidgetSettings.Remove(widget);
