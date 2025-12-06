@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -17,8 +16,11 @@ namespace BudgetBoard.Database.Migrations
                 {
                     ID = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    AccountID = table.Column<Guid>(type: "uuid", nullable: false)
+                    DateTime = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    AccountID = table.Column<Guid>(type: "uuid", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -28,20 +30,22 @@ namespace BudgetBoard.Database.Migrations
                         column: x => x.AccountID,
                         principalTable: "Account",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Balance_AccountID",
                 table: "Balance",
-                column: "AccountID");
+                column: "AccountID"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Balance");
+            migrationBuilder.DropTable(name: "Balance");
         }
     }
 }
