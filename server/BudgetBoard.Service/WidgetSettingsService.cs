@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
@@ -29,7 +30,7 @@ public class WidgetSettingsService(
             WidgetType = request.WidgetType,
             IsVisible = request.IsVisible,
             Configuration =
-                request.Configuration != null
+                (request.Configuration) != null
                     ? JsonSerializer.Serialize(request.Configuration)
                     : null,
             UserID = userData.Id,
@@ -43,14 +44,48 @@ public class WidgetSettingsService(
     {
         var userData = await GetCurrentUserAsync(userID.ToString());
 
-        return userData.WidgetSettings.Select(ws => new WidgetResponse
+        var widgetSettings = userData.WidgetSettings.Select(ws => new WidgetResponse
         {
             ID = ws.ID,
             WidgetType = ws.WidgetType,
             IsVisible = ws.IsVisible,
-            Configuration = ws.Configuration ?? string.Empty,
+            Configuration =
+                ws.Configuration
+                ?? JsonSerializer.Serialize(
+                    WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+                ),
             UserID = ws.UserID,
         });
+
+        // Until we add customizable dashboards, we will need to automatically create the widget settings.
+        if (!widgetSettings.Any())
+        {
+            await this.CreateWidgetSettingsAsync(
+                userID,
+                new WidgetSettingsCreateRequest<NetWorthWidgetConfiguration>
+                {
+                    WidgetType = "NetWorth",
+                    IsVisible = true,
+                    Configuration = WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration,
+                    UserID = userID,
+                }
+            );
+
+            widgetSettings = userData.WidgetSettings.Select(ws => new WidgetResponse
+            {
+                ID = ws.ID,
+                WidgetType = ws.WidgetType,
+                IsVisible = ws.IsVisible,
+                Configuration =
+                    ws.Configuration
+                    ?? JsonSerializer.Serialize(
+                        WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+                    ),
+                UserID = ws.UserID,
+            });
+        }
+
+        return widgetSettings;
     }
 
     public async Task UpdateWidgetSettingsAsync(

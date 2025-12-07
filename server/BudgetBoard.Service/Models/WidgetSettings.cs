@@ -27,9 +27,16 @@ public class NetWorthWidgetConfiguration
 public class NetWorthWidgetLine
 {
     public string Name { get; set; } = string.Empty;
-    public List<string> Categories { get; set; } = [];
-    public int Group = 0;
-    public int Index = 0;
+    public List<NetWorthWidgetCategory> Categories { get; set; } = [];
+    public int Group { get; set; } = 0;
+    public int Index { get; set; } = 0;
+}
+
+public class NetWorthWidgetCategory
+{
+    public string Value { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string Subtype { get; set; } = string.Empty;
 }
 
 public interface IWidgetResponse
