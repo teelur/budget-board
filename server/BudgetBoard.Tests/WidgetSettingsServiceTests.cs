@@ -22,7 +22,15 @@ public class WidgetSettingsServiceTests
                 new NetWorthWidgetLine
                 {
                     Name = lineName,
-                    Categories = ["Cash"],
+                    Categories =
+                    [
+                        new NetWorthWidgetCategory
+                        {
+                            Value = "Cash",
+                            Type = "Account",
+                            Subtype = "Category",
+                        },
+                    ],
                     Group = 1,
                     Index = 0,
                 },
