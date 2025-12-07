@@ -1,4 +1,4 @@
-import { Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import NetWorthItem from "./NetWorthItem/NetWorthItem";
 import { filterVisibleAccounts } from "~/helpers/accounts";
@@ -21,6 +21,7 @@ import {
   isNetWorthWidgetType,
   parseNetWorthConfiguration,
 } from "~/helpers/widgets";
+import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
 
 const NetWorthCard = (): React.ReactNode => {
   const { request } = useAuth();
@@ -202,7 +203,10 @@ const NetWorthCard = (): React.ReactNode => {
   return (
     <Card w="100%" elevation={1}>
       <Stack gap="0.5rem">
-        <PrimaryText size="xl">Net Worth</PrimaryText>
+        <Group justify="space-between">
+          <PrimaryText size="xl">Net Worth</PrimaryText>
+          <NetWorthCardSettings />
+        </Group>
         {getNetWorthLines()}
       </Stack>
     </Card>
