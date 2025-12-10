@@ -30,13 +30,13 @@ interface EditableNetWorthLineCategoryContentProps {
 const EditableNetWorthLineCategoryContent = (
   props: EditableNetWorthLineCategoryContentProps
 ): React.ReactNode => {
-  const typeField = useField<string>({
+  const typeField = useField<string | null>({
     initialValue: props.category.type,
   });
-  const subtypeField = useField<string>({
+  const subtypeField = useField<string | null>({
     initialValue: props.category.subtype,
   });
-  const valueField = useField<string>({
+  const valueField = useField<string | null>({
     initialValue: props.category.value,
   });
 
@@ -55,52 +55,26 @@ const EditableNetWorthLineCategoryContent = (
     }
   };
 
-  const getValueOptions = (type: string, subtype: string) => {
-    if (areStringsEqual(type, "account")) {
-      if (areStringsEqual(subtype, "category")) {
-        return accountCategories;
-      }
-    } else if (areStringsEqual(type, "asset")) {
-      if (areStringsEqual(subtype, "all")) {
-        return [];
-      }
-    } else if (areStringsEqual(type, "line")) {
-      return networthsettings.lineNames.filter(
-        (name) => name !== props.currentLineName
-      );
-    }
-    return [];
-  };
+  useDidUpdate(() => {
+    subtypeField.setValue(null);
+  }, [typeField.getValue()]);
 
+  useDidUpdate(() => {
+    valueField.setValue(null);
+  }, [subtypeField.getValue()]);
+
+  // Update parent when any field changes
   useDidUpdate(() => {
     const type = typeField.getValue();
     const subtype = subtypeField.getValue();
     const value = valueField.getValue();
-
-    const subtypeValues = getSubtypeOptions(type);
-    if (!subtypeValues.find((st) => areStringsEqual(st, subtype))) {
-      subtypeField.setValue("");
-      return;
-    }
-
-    const valueValues = getValueOptions(type, subtype);
-    if (
-      valueValues.length > 0 &&
-      !valueValues.find((v) => {
-        const valueString = typeof v === "string" ? v : v.value;
-        return areStringsEqual(valueString, value);
-      })
-    ) {
-      valueField.setValue("");
-      return;
-    }
 
     if (type && subtype) {
       const updatedCategory: INetWorthWidgetCategory = {
         id: props.category.id,
         type,
         subtype,
-        value,
+        value: value ?? "",
       };
       props.updateNetWorthCategory(updatedCategory, props.index);
     }
@@ -127,18 +101,19 @@ const EditableNetWorthLineCategoryContent = (
         return null;
       }
     } else if (areStringsEqual(type, "line")) {
-      // Lines can reference other lines by name; this will need to be populated elsewhere.
-      return (
-        <Select
-          w="150px"
-          size="xs"
-          data={[...new Set(networthsettings.lineNames)].filter(
-            (name) => name !== props.currentLineName
-          )}
-          {...valueField.getInputProps()}
-          elevation={2}
-        />
-      );
+      if (areStringsEqual(subtype, "name")) {
+        return (
+          <Select
+            w="150px"
+            size="xs"
+            data={[...new Set(networthsettings.lineNames)].filter(
+              (name) => name !== props.currentLineName
+            )}
+            {...valueField.getInputProps()}
+            elevation={2}
+          />
+        );
+      }
     }
 
     return null;
@@ -158,7 +133,7 @@ const EditableNetWorthLineCategoryContent = (
         <Select
           w="100px"
           size="xs"
-          data={getSubtypeOptions(typeField.getValue())}
+          data={getSubtypeOptions(typeField.getValue() ?? "")}
           {...subtypeField.getInputProps()}
           elevation={2}
         />
@@ -167,8 +142,8 @@ const EditableNetWorthLineCategoryContent = (
         </ActionIcon>
       </Group>
       {getValidNetWorthValuesForTypeAndSubtype(
-        typeField.getValue(),
-        subtypeField.getValue()
+        typeField.getValue() ?? "",
+        subtypeField.getValue() ?? ""
       )}
     </Group>
   );

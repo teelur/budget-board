@@ -24,7 +24,7 @@ import CategoryOptionText from "./CategoryOptionText/CategoryOptionText";
 
 export interface CategorySelectBaseProps extends InputBaseProps {
   categories: ICategory[];
-  value: string;
+  value: string | null;
   onChange: (value: string) => void;
   withinPortal?: boolean;
   includeUncategorized?: boolean;
