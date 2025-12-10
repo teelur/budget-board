@@ -6,11 +6,18 @@ export interface IWidgetSettingsResponse {
   userID: string;
 }
 
+export interface IWidgetSettingsUpdateRequest<T> {
+  id: string;
+  isVisible: boolean;
+  configuration: T;
+}
+
 export interface INetWorthWidgetConfiguration {
   lines: Array<INetWorthWidgetLine>;
 }
 
 export interface INetWorthWidgetLine {
+  id: string;
   name: string;
   categories: Array<INetWorthWidgetCategory>;
   group: number;
@@ -18,7 +25,16 @@ export interface INetWorthWidgetLine {
 }
 
 export interface INetWorthWidgetCategory {
+  id: string;
   value: string;
   type: string;
   subtype: string;
 }
+
+export const NET_WORTH_CATEGORY_TYPES: string[] = ["Account", "Asset", "Line"];
+
+export const NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES: string[] = ["Category"];
+
+export const NET_WORTH_CATEGORY_ASSET_SUBTYPES: string[] = ["All"];
+
+export const NET_WORTH_CATEGORY_LINE_SUBTYPES: string[] = ["Name"];

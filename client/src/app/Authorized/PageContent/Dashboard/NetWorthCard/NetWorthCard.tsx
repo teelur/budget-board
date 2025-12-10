@@ -22,6 +22,7 @@ import {
   parseNetWorthConfiguration,
 } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
+import { NetWorthSettingsProvider } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
 
 const NetWorthCard = (): React.ReactNode => {
   const { request } = useAuth();
@@ -205,7 +206,9 @@ const NetWorthCard = (): React.ReactNode => {
       <Stack gap="0.5rem">
         <Group justify="space-between">
           <PrimaryText size="xl">Net Worth</PrimaryText>
-          <NetWorthCardSettings />
+          <NetWorthSettingsProvider>
+            <NetWorthCardSettings />
+          </NetWorthSettingsProvider>
         </Group>
         {getNetWorthLines()}
       </Stack>

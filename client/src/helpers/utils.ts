@@ -6,7 +6,7 @@
  * @returns {boolean} True if the strings are equal (ignoring case), false otherwise.
  */
 export const areStringsEqual = (string1: string, string2: string): boolean =>
-  string1.toUpperCase() === string2.toUpperCase();
+  string1?.toUpperCase() === string2?.toUpperCase();
 
 /**
  * Calculates the progress percentage of an amount towards a total.

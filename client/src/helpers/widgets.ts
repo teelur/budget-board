@@ -80,6 +80,7 @@ const normalizeCategories = (
   return categories.map((category) => {
     const record = (category ?? {}) as Record<string, unknown>;
     return {
+      id: normalizeString(record.id ?? record.ID),
       value: normalizeString(record.value ?? record.Value),
       type: normalizeString(record.type ?? record.Type),
       subtype: normalizeString(record.subtype ?? record.Subtype),
@@ -101,6 +102,7 @@ const normalizeLines = (lines: unknown): INetWorthWidgetLine[] => {
   return lines.map((line) => {
     const record = (line ?? {}) as Record<string, unknown>;
     return {
+      id: normalizeString(record.id ?? record.ID),
       name: normalizeString(record.name ?? record.Name),
       group: normalizeNumber(record.group ?? record.Group),
       index: normalizeNumber(record.index ?? record.Index),

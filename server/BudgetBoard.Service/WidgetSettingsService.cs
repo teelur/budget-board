@@ -100,7 +100,6 @@ public class WidgetSettingsService(
             throw new BudgetBoardServiceException(responseLocalizer["WidgetUpdateNotFoundError"]);
         }
 
-        widget.WidgetType = request.WidgetType;
         widget.IsVisible = request.IsVisible;
         widget.Configuration =
             request.Configuration != null ? JsonSerializer.Serialize(request.Configuration) : null;

@@ -64,9 +64,24 @@ public static class WidgetSettingsHelpers
                 Name = "Liquid",
                 Categories =
                 [
-                    new NetWorthWidgetCategory { Value = "Spending", Type = "Line" },
-                    new NetWorthWidgetCategory { Value = "Loans", Type = "Line" },
-                    new NetWorthWidgetCategory { Value = "Savings", Type = "Line" },
+                    new NetWorthWidgetCategory
+                    {
+                        Value = "Spending",
+                        Type = "Line",
+                        Subtype = "Name",
+                    },
+                    new NetWorthWidgetCategory
+                    {
+                        Value = "Loans",
+                        Type = "Line",
+                        Subtype = "Name",
+                    },
+                    new NetWorthWidgetCategory
+                    {
+                        Value = "Savings",
+                        Type = "Line",
+                        Subtype = "Name",
+                    },
                 ],
                 Group = 1,
                 Index = 0,
@@ -106,9 +121,24 @@ public static class WidgetSettingsHelpers
                 Name = "Total",
                 Categories =
                 [
-                    new NetWorthWidgetCategory { Value = "Liquid", Type = "Line" },
-                    new NetWorthWidgetCategory { Value = "Investments", Type = "Line" },
-                    new NetWorthWidgetCategory { Value = "Assets", Type = "Line" },
+                    new NetWorthWidgetCategory
+                    {
+                        Value = "Liquid",
+                        Type = "Line",
+                        Subtype = "Name",
+                    },
+                    new NetWorthWidgetCategory
+                    {
+                        Value = "Investments",
+                        Type = "Line",
+                        Subtype = "Name",
+                    },
+                    new NetWorthWidgetCategory
+                    {
+                        Value = "Assets",
+                        Type = "Line",
+                        Subtype = "Name",
+                    },
                 ],
                 Group = 2,
                 Index = 0,
