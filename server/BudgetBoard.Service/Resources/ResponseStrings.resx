@@ -373,4 +373,16 @@
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
     <value>The widget you are trying to update does not exist.</value>
   </data>
+  <data name="WidgetSettingsNotFoundError" xml:space="preserve">
+    <value>The widget settings you are trying to access do not exist.</value>
+  </data>
+  <data name="WidgetConfigurationNullError" xml:space="preserve">
+    <value>The widget configuration is null or empty.</value>
+  </data>
+  <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
+    <value>Failed to deserialize the widget configuration.</value>
+  </data>
+  <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
+    <value>The net worth widget line you are trying to access does not exist.</value>
+  </data>
 </root>

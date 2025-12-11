@@ -20,6 +20,7 @@ interface NetWorthLineGroup {
 }
 
 interface NetWorthSettingsContextType {
+  settingsId: string;
   lineGroups: NetWorthLineGroup[];
   lineNames: string[];
   updateConfiguration: (
@@ -35,6 +36,7 @@ interface NetWorthSettingsContextType {
 
 export const NetWorthSettingsContext =
   React.createContext<NetWorthSettingsContextType>({
+    settingsId: "",
     lineGroups: [],
     lineNames: [],
     updateConfiguration: async () => {},
@@ -186,6 +188,7 @@ export const NetWorthSettingsProvider = (
 
   const value = React.useMemo(
     () => ({
+      settingsId: netWorthWidgetSettings?.id ?? "",
       lineGroups,
       lineNames,
       updateConfiguration,

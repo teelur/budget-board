@@ -1,9 +1,20 @@
-import { ActionIcon, Group, Stack } from "@mantine/core";
+import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { INetWorthWidgetLine } from "~/models/widgetSettings";
 import NetWorthLineCategory from "./NetWorthLineCategory/NetWorthLineCategory";
-import { PlusIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { useDisclosure } from "@mantine/hooks";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import { useField } from "@mantine/form";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { INetWorthWidgetLineUpdateRequest } from "~/models/netWorthWidgetConfiguration";
+import { notifications } from "@mantine/notifications";
+import { useNetWorthSettings } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
+import { AxiosError } from "axios";
+import { translateAxiosError } from "~/helpers/requests";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 export interface INetWorthLineItemProps {
   line: INetWorthWidgetLine;
@@ -12,34 +23,144 @@ export interface INetWorthLineItemProps {
 }
 
 const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
+  const [isEditing, { toggle }] = useDisclosure(false);
+  const nameField = useField<string>({ initialValue: props.line.name });
+
+  const { settingsId } = useNetWorthSettings();
+  const { request } = useAuth();
+
+  const queryClient = useQueryClient();
+  const doUpdateLine = useMutation({
+    mutationFn: async (updatedLine: INetWorthWidgetLineUpdateRequest) =>
+      await request({
+        url: `/api/netWorthWidgetLine`,
+        method: "PUT",
+        data: updatedLine,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Net worth settings updated successfully.",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
+  const doDeleteLine = useMutation({
+    mutationFn: async (id: string) =>
+      await request({
+        url: `/api/netWorthWidgetLine`,
+        method: "DELETE",
+        params: {
+          lineId: id,
+          widgetSettingsId: settingsId,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Net worth settings deleted successfully.",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
   return (
     <Card elevation={1}>
-      <Stack gap="0.5rem">
-        <Group justify="space-between">
-          <PrimaryText size="sm">{props.line.name}</PrimaryText>
-          <ActionIcon size="sm">
-            <PlusIcon />
-          </ActionIcon>
-        </Group>
-        <Stack gap="0.25rem">
-          {props.line.categories.map((category, index) => (
-            <NetWorthLineCategory
-              key={category.id}
-              category={category}
-              index={index}
-              currentLineName={props.line.name}
-              updateNetWorthCategory={(updatedCategory, categoryIndex) => {
-                const updatedCategories = [...props.line.categories];
-                updatedCategories[categoryIndex] = updatedCategory;
-                props.updateNetWorthLine(
-                  { ...props.line, categories: updatedCategories },
-                  props.index
-                );
-              }}
-            />
-          ))}
+      <LoadingOverlay visible={doUpdateLine.isPending} />
+      <Group gap="0.5rem">
+        <Stack flex="1 0 auto" gap="0.5rem">
+          <Group justify="space-between">
+            <Group gap="0.5rem">
+              {isEditing ? (
+                <TextInput
+                  size="xs"
+                  elevation={1}
+                  {...nameField.getInputProps()}
+                  onBlur={async () => {
+                    if (nameField.getValue() !== props.line.name) {
+                      await doUpdateLine.mutateAsync({
+                        lineId: props.line.id,
+                        name: nameField.getValue(),
+                        group: props.line.group,
+                        index: props.line.index,
+                        widgetSettingsId: settingsId,
+                      });
+                    }
+                  }}
+                />
+              ) : props.line.name.length > 0 ? (
+                <PrimaryText size="sm">{props.line.name}</PrimaryText>
+              ) : (
+                <DimmedText size="sm">No Name</DimmedText>
+              )}
+              <ActionIcon
+                size="sm"
+                variant={isEditing ? "outline" : "transparent"}
+                onClick={toggle}
+              >
+                <PencilIcon size={16} />
+              </ActionIcon>
+            </Group>
+
+            <ActionIcon size="sm">
+              <PlusIcon />
+            </ActionIcon>
+          </Group>
+          <Stack gap="0.25rem">
+            {props.line.categories.map((category, index) => (
+              <NetWorthLineCategory
+                key={category.id}
+                category={category}
+                index={index}
+                currentLineName={props.line.name}
+                updateNetWorthCategory={(updatedCategory, categoryIndex) => {
+                  const updatedCategories = [...props.line.categories];
+                  updatedCategories[categoryIndex] = updatedCategory;
+                  props.updateNetWorthLine(
+                    { ...props.line, categories: updatedCategories },
+                    props.index
+                  );
+                }}
+              />
+            ))}
+            {props.line.categories.length === 0 && (
+              <Group justify="center">
+                <DimmedText size="sm">No categories.</DimmedText>
+              </Group>
+            )}
+          </Stack>
         </Stack>
-      </Stack>
+        {isEditing && (
+          <Flex style={{ alignSelf: "stretch" }}>
+            <ActionIcon
+              color="var(--button-color-destructive)"
+              h="100%"
+              size="md"
+              loading={doDeleteLine.isPending}
+              onClick={async () =>
+                await doDeleteLine.mutateAsync(props.line.id)
+              }
+            >
+              <TrashIcon size={16} />
+            </ActionIcon>
+          </Flex>
+        )}
+      </Group>
     </Card>
   );
 };

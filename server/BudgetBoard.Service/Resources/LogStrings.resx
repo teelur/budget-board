@@ -379,4 +379,16 @@
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
     <value>Attempted to update a widget that does not exist.</value>
   </data>
+  <data name="WidgetSettingsNotFoundLog" xml:space="preserve">
+    <value>Attempted to access widget settings for a widget that does not exist.</value>
+  </data>
+  <data name="WidgetConfigurationNullLog" xml:space="preserve">
+    <value>Attempted to access widget configuration for widget but configuration is null or empty.</value>
+  </data>
+  <data name="WidgetConfigurationDeserializationLog" xml:space="preserve">
+    <value>Failed to deserialize widget configuration for widget.</value>
+  </data>
+  <data name="NetWorthWidgetLineNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a net worth widget line that does not exist.</value>
+  </data>
 </root>
