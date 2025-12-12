@@ -23,9 +23,6 @@ interface NetWorthSettingsContextType {
   settingsId: string;
   lineGroups: NetWorthLineGroup[];
   lineNames: string[];
-  updateConfiguration: (
-    updatedConfiguration: INetWorthWidgetConfiguration
-  ) => void;
   saveChanges: () => Promise<void>;
   isSavePending: boolean;
   loading: boolean;
@@ -39,7 +36,6 @@ export const NetWorthSettingsContext =
     settingsId: "",
     lineGroups: [],
     lineNames: [],
-    updateConfiguration: async () => {},
     saveChanges: async () => {},
     isSavePending: false,
     loading: true,
@@ -147,20 +143,6 @@ export const NetWorthSettingsProvider = (
     }
   }, [widgetSettingsQuery.data]);
 
-  const updateConfiguration = (
-    updatedConfiguration: INetWorthWidgetConfiguration
-  ) => {
-    if (!netWorthWidgetSettings) {
-      return;
-    }
-
-    setNetWorthWidgetSettings({
-      ...netWorthWidgetSettings,
-      configuration: updatedConfiguration,
-    });
-    setIsDirty(true);
-  };
-
   const lineGroups = React.useMemo(() => {
     if (!netWorthWidgetSettings?.configuration) {
       return [] as NetWorthLineGroup[];
@@ -191,7 +173,6 @@ export const NetWorthSettingsProvider = (
       settingsId: netWorthWidgetSettings?.id ?? "",
       lineGroups,
       lineNames,
-      updateConfiguration,
       saveChanges,
       isSavePending: doUpdateWidget.isPending,
       loading: widgetSettingsQuery.isPending,
@@ -202,7 +183,6 @@ export const NetWorthSettingsProvider = (
     [
       lineGroups,
       lineNames,
-      updateConfiguration,
       saveChanges,
       doUpdateWidget.isPending,
       widgetSettingsQuery.isPending,

@@ -15,9 +15,17 @@ const NetWorthLineCategoryContent = (
   return (
     <Group justify="space-between">
       <Group gap="0.25rem" align="center">
-        <PrimaryText size="sm">{props.category.type}</PrimaryText>
+        {props.category.type.length > 0 ? (
+          <PrimaryText size="sm">{props.category.type}</PrimaryText>
+        ) : (
+          <DimmedText size="sm">No Type</DimmedText>
+        )}
         <ChevronRightIcon size={14} />
-        <DimmedText size="sm">{props.category.subtype}</DimmedText>
+        {props.category.subtype.length > 0 ? (
+          <DimmedText size="sm">{props.category.subtype}</DimmedText>
+        ) : (
+          <DimmedText size="sm">No Subtype</DimmedText>
+        )}
         <ActionIcon variant="transparent" size="sm" onClick={props.enableEdit}>
           <PencilIcon size={14} />
         </ActionIcon>

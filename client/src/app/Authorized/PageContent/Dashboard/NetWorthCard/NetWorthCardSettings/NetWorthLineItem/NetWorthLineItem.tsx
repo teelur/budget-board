@@ -9,7 +9,10 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useField } from "@mantine/form";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { INetWorthWidgetLineUpdateRequest } from "~/models/netWorthWidgetConfiguration";
+import {
+  INetWorthWidgetCategoryCreateRequest,
+  INetWorthWidgetLineUpdateRequest,
+} from "~/models/netWorthWidgetConfiguration";
 import { notifications } from "@mantine/notifications";
 import { useNetWorthSettings } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
 import { AxiosError } from "axios";
@@ -79,6 +82,29 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
     },
   });
 
+  const doCreateCategory = useMutation({
+    mutationFn: async (categoryRequest: INetWorthWidgetCategoryCreateRequest) =>
+      await request({
+        url: `/api/netWorthWidgetCategory`,
+        method: "POST",
+        data: categoryRequest,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Net worth category created successfully.",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
   return (
     <Card elevation={1}>
       <LoadingOverlay visible={doUpdateLine.isPending} />
@@ -117,7 +143,19 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
               </ActionIcon>
             </Group>
 
-            <ActionIcon size="sm">
+            <ActionIcon
+              size="sm"
+              loading={doCreateCategory.isPending}
+              onClick={async () =>
+                await doCreateCategory.mutateAsync({
+                  lineId: props.line.id,
+                  value: "",
+                  type: "",
+                  subtype: "",
+                  widgetSettingsId: settingsId,
+                } as INetWorthWidgetCategoryCreateRequest)
+              }
+            >
               <PlusIcon />
             </ActionIcon>
           </Group>
@@ -126,6 +164,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
               <NetWorthLineCategory
                 key={category.id}
                 category={category}
+                lineId={props.line.id}
                 index={index}
                 currentLineName={props.line.name}
                 updateNetWorthCategory={(updatedCategory, categoryIndex) => {

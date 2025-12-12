@@ -1,12 +1,17 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { ActionIcon, Flex, Group } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
-import { ChevronRightIcon, PencilIcon } from "lucide-react";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { ChevronRightIcon, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import Select from "~/components/core/Select/Select/Select";
+import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { accountCategories } from "~/models/account";
+import { INetWorthWidgetCategoryUpdateRequest } from "~/models/netWorthWidgetConfiguration";
 import {
   INetWorthWidgetCategory,
   NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES,
@@ -14,16 +19,16 @@ import {
   NET_WORTH_CATEGORY_LINE_SUBTYPES,
   NET_WORTH_CATEGORY_TYPES,
 } from "~/models/widgetSettings";
-import { NetWorthSettingsContext } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import {
+  NetWorthSettingsContext,
+  useNetWorthSettings,
+} from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
 
 interface EditableNetWorthLineCategoryContentProps {
   category: INetWorthWidgetCategory;
-  index: number;
+  lineId: string;
   currentLineName: string;
-  updateNetWorthCategory: (
-    updatedCategory: INetWorthWidgetCategory,
-    index: number
-  ) => void;
   disableEdit: () => void;
 }
 
@@ -55,30 +60,105 @@ const EditableNetWorthLineCategoryContent = (
     }
   };
 
+  const { settingsId } = useNetWorthSettings();
+  const { request } = useAuth();
+
+  const queryClient = useQueryClient();
+  const doUpdateCategory = useMutation({
+    mutationFn: async (updatedCategory: INetWorthWidgetCategoryUpdateRequest) =>
+      await request({
+        url: `/api/netWorthWidgetCategory`,
+        method: "PUT",
+        data: updatedCategory,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Net worth settings updated successfully.",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
+  const doDeleteCategory = useMutation({
+    mutationFn: async () =>
+      await request({
+        url: `/api/netWorthWidgetCategory`,
+        method: "DELETE",
+        params: {
+          categoryId: props.category.id,
+          lineId: props.lineId,
+          widgetSettingsId: settingsId,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Net worth settings deleted successfully.",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
+  const type = typeField.getValue();
+  const subtype = subtypeField.getValue();
+  const value = valueField.getValue();
+
+  const isValueValid = (type: string, subtype: string, value: string) => {
+    if (
+      areStringsEqual(type, "account") &&
+      areStringsEqual(subtype, "category")
+    ) {
+      return !!value;
+    } else if (areStringsEqual(type, "asset")) {
+      if (areStringsEqual(subtype, "all")) {
+        return true;
+      } else if (areStringsEqual(subtype, "specific")) {
+        return !!value;
+      }
+    } else if (areStringsEqual(type, "line")) {
+      if (areStringsEqual(subtype, "name")) {
+        return !!value && value !== props.currentLineName;
+      }
+    }
+
+    return false;
+  };
+
   useDidUpdate(() => {
     subtypeField.setValue(null);
-  }, [typeField.getValue()]);
+  }, [type]);
 
   useDidUpdate(() => {
     valueField.setValue(null);
-  }, [subtypeField.getValue()]);
+  }, [subtype]);
 
-  // Update parent when any field changes
   useDidUpdate(() => {
-    const type = typeField.getValue();
-    const subtype = subtypeField.getValue();
-    const value = valueField.getValue();
-
-    if (type && subtype) {
-      const updatedCategory: INetWorthWidgetCategory = {
-        id: props.category.id,
+    if (type && subtype && isValueValid(type, subtype, value ?? "")) {
+      doUpdateCategory.mutate({
+        Id: props.category.id,
         type,
         subtype,
-        value: value ?? "",
-      };
-      props.updateNetWorthCategory(updatedCategory, props.index);
+        value,
+        lineId: props.lineId,
+        widgetSettingsId: settingsId,
+      } as INetWorthWidgetCategoryUpdateRequest);
     }
-  }, [typeField.getValue(), subtypeField.getValue(), valueField.getValue()]);
+  }, [type, subtype, value]);
 
   const getValidNetWorthValuesForTypeAndSubtype = (
     type: string,
@@ -141,10 +221,23 @@ const EditableNetWorthLineCategoryContent = (
           <PencilIcon size={14} />
         </ActionIcon>
       </Group>
-      {getValidNetWorthValuesForTypeAndSubtype(
-        typeField.getValue() ?? "",
-        subtypeField.getValue() ?? ""
-      )}
+      <Group gap="0.25rem">
+        {getValidNetWorthValuesForTypeAndSubtype(
+          typeField.getValue() ?? "",
+          subtypeField.getValue() ?? ""
+        )}
+        <Flex style={{ alignSelf: "stretch" }}>
+          <ActionIcon
+            color="var(--button-color-destructive)"
+            h="100%"
+            size="md"
+            loading={doDeleteCategory.isPending}
+            onClick={async () => await doDeleteCategory.mutateAsync()}
+          >
+            <TrashIcon size={16} />
+          </ActionIcon>
+        </Flex>
+      </Group>
     </Group>
   );
 };
