@@ -153,7 +153,7 @@ const EditableNetWorthLineCategoryContent = (
         Id: props.category.id,
         type,
         subtype,
-        value,
+        value: value ?? "",
         lineId: props.lineId,
         widgetSettingsId: settingsId,
       } as INetWorthWidgetCategoryUpdateRequest);
