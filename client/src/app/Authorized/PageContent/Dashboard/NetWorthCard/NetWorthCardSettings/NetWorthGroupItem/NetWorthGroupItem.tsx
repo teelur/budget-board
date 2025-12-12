@@ -13,8 +13,6 @@ import { INetWorthWidgetLineCreateRequest } from "~/models/netWorthWidgetConfigu
 
 export interface NetWorthGroupItemProps {
   lines: INetWorthWidgetLine[];
-  lineIndexOffset: number;
-  updateNetWorthLine: (updatedLine: INetWorthWidgetLine, index: number) => void;
 }
 
 const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
@@ -65,18 +63,8 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
           </ActionIcon>
         </Group>
         <Stack gap="0.25rem">
-          {props.lines.map((line, index) => (
-            <NetWorthLineItem
-              key={line.id}
-              line={line}
-              index={index}
-              updateNetWorthLine={(updatedLine, lineIndex) => {
-                props.updateNetWorthLine(
-                  updatedLine,
-                  props.lineIndexOffset + lineIndex
-                );
-              }}
-            />
+          {props.lines.map((line) => (
+            <NetWorthLineItem key={line.id} line={line} />
           ))}
         </Stack>
       </Stack>

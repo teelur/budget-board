@@ -64,6 +64,8 @@ public class NetWorthWidgetCategoryService(
             throw new BudgetBoardServiceException(responseLocalizer["WidgetCategoryNotFoundError"]);
         }
 
+        // TODO: Shouldn't allow line names that depend on this line
+
         category.Value = request.Value;
         category.Type = request.Type;
         category.Subtype = request.Subtype;

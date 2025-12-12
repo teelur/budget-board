@@ -20,10 +20,7 @@ import {
   NET_WORTH_CATEGORY_TYPES,
 } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import {
-  NetWorthSettingsContext,
-  useNetWorthSettings,
-} from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
+import { useNetWorthSettings } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
 
 interface EditableNetWorthLineCategoryContentProps {
   category: INetWorthWidgetCategory;
@@ -45,22 +42,7 @@ const EditableNetWorthLineCategoryContent = (
     initialValue: props.category.value,
   });
 
-  const networthsettings = React.useContext(NetWorthSettingsContext);
-
-  const getSubtypeOptions = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case "account":
-        return NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES;
-      case "asset":
-        return NET_WORTH_CATEGORY_ASSET_SUBTYPES;
-      case "line":
-        return NET_WORTH_CATEGORY_LINE_SUBTYPES;
-      default:
-        return [];
-    }
-  };
-
-  const { settingsId } = useNetWorthSettings();
+  const { settingsId, lines } = useNetWorthSettings();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -160,6 +142,28 @@ const EditableNetWorthLineCategoryContent = (
     }
   }, [type, subtype, value]);
 
+  const getValidLineNames = () => {
+    const linesThatUseThisName = lines.filter((line) => {
+      return line.categories.some((category) => {
+        return (
+          areStringsEqual(category.type, "line") &&
+          areStringsEqual(category.subtype, "name") &&
+          areStringsEqual(category.value, props.currentLineName)
+        );
+      });
+    });
+
+    const validLineNames = lines
+      .map((line) => line.name)
+      .filter(
+        (name) =>
+          !linesThatUseThisName.some((line) =>
+            areStringsEqual(line.name, name)
+          ) && !areStringsEqual(name, props.currentLineName)
+      );
+    return [...new Set(validLineNames)];
+  };
+
   const getValidNetWorthValuesForTypeAndSubtype = (
     type: string,
     subtype: string
@@ -186,9 +190,7 @@ const EditableNetWorthLineCategoryContent = (
           <Select
             w="150px"
             size="xs"
-            data={[...new Set(networthsettings.lineNames)].filter(
-              (name) => name !== props.currentLineName
-            )}
+            data={getValidLineNames()}
             {...valueField.getInputProps()}
             elevation={2}
           />
@@ -197,6 +199,19 @@ const EditableNetWorthLineCategoryContent = (
     }
 
     return null;
+  };
+
+  const getSubtypeOptions = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case "account":
+        return NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES;
+      case "asset":
+        return NET_WORTH_CATEGORY_ASSET_SUBTYPES;
+      case "line":
+        return NET_WORTH_CATEGORY_LINE_SUBTYPES;
+      default:
+        return [];
+    }
   };
 
   return (

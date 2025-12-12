@@ -1,5 +1,5 @@
 import React from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
@@ -12,7 +12,6 @@ import {
   isNetWorthWidgetType,
   parseNetWorthConfiguration,
 } from "~/helpers/widgets";
-import { notifications } from "@mantine/notifications";
 
 interface NetWorthLineGroup {
   groupId: number;
@@ -22,26 +21,14 @@ interface NetWorthLineGroup {
 interface NetWorthSettingsContextType {
   settingsId: string;
   lineGroups: NetWorthLineGroup[];
-  lineNames: string[];
-  saveChanges: () => Promise<void>;
-  isSavePending: boolean;
-  loading: boolean;
-  isDirty: boolean;
-  setIsDirty: (dirty: boolean) => void;
-  refresh: () => Promise<void>;
+  lines: INetWorthWidgetLine[];
 }
 
 export const NetWorthSettingsContext =
   React.createContext<NetWorthSettingsContextType>({
     settingsId: "",
     lineGroups: [],
-    lineNames: [],
-    saveChanges: async () => {},
-    isSavePending: false,
-    loading: true,
-    isDirty: false,
-    setIsDirty: () => {},
-    refresh: async () => {},
+    lines: [],
   });
 
 interface NetWorthSettingsProviderProps {
@@ -81,8 +68,6 @@ export const NetWorthSettingsProvider = (
     IWidgetSettingsUpdateRequest<INetWorthWidgetConfiguration> | undefined
   >(undefined);
 
-  const [isDirty, setIsDirty] = React.useState<boolean>(false);
-
   const { request } = useAuth();
 
   const widgetSettingsQuery = useQuery({
@@ -101,26 +86,6 @@ export const NetWorthSettingsProvider = (
     },
   });
 
-  const queryClient = useQueryClient();
-  const doUpdateWidget = useMutation({
-    mutationFn: async (
-      updatedSettings: IWidgetSettingsUpdateRequest<INetWorthWidgetConfiguration>
-    ) =>
-      await request({
-        url: `/api/widgetSettings`,
-        method: "PUT",
-        data: updatedSettings,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Widget settings updated successfully.",
-      });
-    },
-  });
-
   React.useEffect(() => {
     if (widgetSettingsQuery.data) {
       const foundWidget = widgetSettingsQuery.data.find((ws) =>
@@ -136,8 +101,6 @@ export const NetWorthSettingsProvider = (
             ...foundWidget,
             configuration,
           });
-
-          setIsDirty(false);
         }
       }
     }
@@ -151,44 +114,17 @@ export const NetWorthSettingsProvider = (
     return groupLines(netWorthWidgetSettings.configuration.lines ?? []);
   }, [netWorthWidgetSettings]);
 
-  const lineNames = React.useMemo(() => {
-    return (
-      netWorthWidgetSettings?.configuration.lines.map((line) => line.name) ?? []
-    );
-  }, [netWorthWidgetSettings]);
-
-  const saveChanges = React.useCallback(async () => {
-    if (netWorthWidgetSettings && isDirty) {
-      await doUpdateWidget.mutateAsync(netWorthWidgetSettings);
-      setIsDirty(false);
-    }
-  }, [netWorthWidgetSettings, isDirty, doUpdateWidget]);
-
-  const refresh = React.useCallback(async () => {
-    await widgetSettingsQuery.refetch();
-  }, [widgetSettingsQuery]);
-
   const value = React.useMemo(
     () => ({
       settingsId: netWorthWidgetSettings?.id ?? "",
       lineGroups,
-      lineNames,
-      saveChanges,
-      isSavePending: doUpdateWidget.isPending,
+      lines: netWorthWidgetSettings?.configuration.lines ?? [],
       loading: widgetSettingsQuery.isPending,
-      isDirty,
-      setIsDirty,
-      refresh,
     }),
     [
       lineGroups,
-      lineNames,
-      saveChanges,
-      doUpdateWidget.isPending,
+      netWorthWidgetSettings?.configuration.lines ?? [],
       widgetSettingsQuery.isPending,
-      isDirty,
-      setIsDirty,
-      refresh,
     ]
   );
 

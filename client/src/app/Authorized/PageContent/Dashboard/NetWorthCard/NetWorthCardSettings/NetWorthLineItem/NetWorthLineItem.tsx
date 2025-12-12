@@ -21,8 +21,6 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 export interface INetWorthLineItemProps {
   line: INetWorthWidgetLine;
-  index: number;
-  updateNetWorthLine: (updatedLine: INetWorthWidgetLine, index: number) => void;
 }
 
 const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
@@ -160,21 +158,12 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
             </ActionIcon>
           </Group>
           <Stack gap="0.25rem">
-            {props.line.categories.map((category, index) => (
+            {props.line.categories.map((category) => (
               <NetWorthLineCategory
                 key={category.id}
                 category={category}
                 lineId={props.line.id}
-                index={index}
                 currentLineName={props.line.name}
-                updateNetWorthCategory={(updatedCategory, categoryIndex) => {
-                  const updatedCategories = [...props.line.categories];
-                  updatedCategories[categoryIndex] = updatedCategory;
-                  props.updateNetWorthLine(
-                    { ...props.line, categories: updatedCategories },
-                    props.index
-                  );
-                }}
               />
             ))}
             {props.line.categories.length === 0 && (

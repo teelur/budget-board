@@ -8,12 +8,7 @@ import EditableNetWorthLineCategoryContent from "./EditableNetWorthLineCategoryC
 export interface NetWorthLineCategoryProps {
   category: INetWorthWidgetCategory;
   lineId: string;
-  index: number;
   currentLineName: string;
-  updateNetWorthCategory: (
-    updatedCategory: INetWorthWidgetCategory,
-    index: number
-  ) => void;
 }
 
 const NetWorthLineCategory = (
