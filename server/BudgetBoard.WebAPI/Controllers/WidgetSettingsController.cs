@@ -76,7 +76,10 @@ public class WidgetSettingsController(
     {
         try
         {
-            await widgetSettingsService.UpdateWidgetSettingsAsync(editedWidget.ID, editedWidget);
+            await widgetSettingsService.UpdateWidgetSettingsAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                editedWidget
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
@@ -92,11 +95,14 @@ public class WidgetSettingsController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid widgetGuid)
     {
         try
         {
-            await widgetSettingsService.DeleteWidgetSettingsAsync(guid);
+            await widgetSettingsService.DeleteWidgetSettingsAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                widgetGuid
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)

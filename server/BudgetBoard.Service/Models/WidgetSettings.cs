@@ -1,5 +1,12 @@
 ﻿namespace BudgetBoard.Service.Models;
 
+public static class WidgetTypes
+{
+    public const string NetWorth = "NetWorth";
+
+    public static readonly IEnumerable<string> All = [NetWorth];
+}
+
 public interface IWidgetSettingsCreateRequest<TConfiguration>
     where TConfiguration : class
 {

@@ -1,6 +1,9 @@
-using System.Text.Json;
+﻿using System.Text.Json;
+using Bogus;
 using BudgetBoard.Database.Models;
+using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
@@ -13,37 +16,15 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class WidgetSettingsServiceTests
 {
-    private static NetWorthWidgetConfiguration CreateConfiguration(string lineName)
-    {
-        return new NetWorthWidgetConfiguration
-        {
-            Lines =
-            [
-                new NetWorthWidgetLine
-                {
-                    Name = lineName,
-                    Categories =
-                    [
-                        new NetWorthWidgetCategory
-                        {
-                            Value = "Cash",
-                            Type = "Account",
-                            Subtype = "Category",
-                        },
-                    ],
-                    Group = 1,
-                    Index = 0,
-                },
-            ],
-        };
-    }
+    private static readonly string[] items = ["Checking", "Savings", "Credit Card", "Loan"];
 
     [Fact]
-    public async Task CreateWidgetSettingsAsync_WhenValidRequest_ShouldPersistWidget()
+    public async Task CreateWidgetSettingsAsync_WhenValidData_ShouldCreateSettings()
     {
         // Arrange
         var helper = new TestHelper();
-        var service = new WidgetSettingsService(
+
+        var widgetSettingsService = new WidgetSettingsService(
             Mock.Of<ILogger<IWidgetSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -52,115 +33,205 @@ public class WidgetSettingsServiceTests
 
         var request = new WidgetSettingsCreateRequest<NetWorthWidgetConfiguration>
         {
-            WidgetType = "NetWorth",
-            IsVisible = false,
-            Configuration = CreateConfiguration("Primary"),
+            WidgetType = WidgetTypes.NetWorth,
+            IsVisible = true,
+            Configuration = new NetWorthWidgetConfiguration
+            {
+                Lines = new Faker<NetWorthWidgetLine>()
+                    .RuleFor(l => l.Name, f => f.Finance.AccountName())
+                    .RuleFor(
+                        l => l.Categories,
+                        f =>
+                            [
+                                new NetWorthWidgetCategory
+                                {
+                                    ID = Guid.NewGuid(),
+                                    Value = f.PickRandom(items),
+                                    Type = "Account",
+                                    Subtype = "Category",
+                                },
+                            ]
+                    )
+                    .RuleFor(l => l.Group, f => f.Random.Int(0, 2))
+                    .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
+                    .Generate(3),
+            },
             UserID = helper.demoUser.Id,
         };
 
         // Act
-        await service.CreateWidgetSettingsAsync(helper.demoUser.Id, request);
+        await widgetSettingsService.CreateWidgetSettingsAsync(helper.demoUser.Id, request);
 
         // Assert
-        var saved = helper.UserDataContext.WidgetSettings.Single();
-        saved.WidgetType.Should().Be(request.WidgetType);
-        saved.IsVisible.Should().Be(request.IsVisible);
-        saved.UserID.Should().Be(helper.demoUser.Id);
-        saved.Configuration.Should().Be(JsonSerializer.Serialize(request.Configuration));
+        var settings = helper.UserDataContext.WidgetSettings.SingleOrDefault(ws =>
+            ws.UserID == helper.demoUser.Id
+        );
+        settings.Should().NotBeNull();
+        settings.WidgetType.Should().Be(WidgetTypes.NetWorth);
+        settings.Configuration.Should().Be(JsonSerializer.Serialize(request.Configuration));
     }
 
     [Fact]
-    public async Task ReadWidgetSettingsAsync_WhenWidgetExists_ShouldReturnConfiguration()
+    public async Task ReadWidgetSettingsAsync_WhenSettingsExist_ShouldReturnSettings()
     {
         // Arrange
         var helper = new TestHelper();
-        var service = new WidgetSettingsService(
+
+        var widgetSettingsService = new WidgetSettingsService(
             Mock.Of<ILogger<IWidgetSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var configuration = CreateConfiguration("Balances");
-        var widget = new WidgetSettings
+        var existingSettings = new WidgetSettings
         {
-            WidgetType = "NetWorth",
+            WidgetType = WidgetTypes.NetWorth,
             IsVisible = true,
-            Configuration = JsonSerializer.Serialize(configuration),
-            UserID = helper.demoUser.Id,
-        };
-
-        helper.UserDataContext.WidgetSettings.Add(widget);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        var result = await service.ReadWidgetSettingsAsync(helper.demoUser.Id);
-
-        // Assert
-        result.Should().ContainSingle();
-        result
-            .Single()
-            .Should()
-            .BeEquivalentTo(
-                new WidgetResponse
+            Configuration = JsonSerializer.Serialize(
+                new NetWorthWidgetConfiguration
                 {
-                    ID = widget.ID,
-                    WidgetType = widget.WidgetType,
-                    IsVisible = widget.IsVisible,
-                    Configuration = widget.Configuration ?? string.Empty,
-                    UserID = widget.UserID,
+                    Lines = new Faker<NetWorthWidgetLine>()
+                        .RuleFor(l => l.Name, f => f.Finance.AccountName())
+                        .RuleFor(
+                            l => l.Categories,
+                            f =>
+                                [
+                                    new NetWorthWidgetCategory
+                                    {
+                                        ID = Guid.NewGuid(),
+                                        Value = f.PickRandom(items),
+                                        Type = "Account",
+                                        Subtype = "Category",
+                                    },
+                                ]
+                        )
+                        .RuleFor(l => l.Group, f => f.Random.Int(0, 2))
+                        .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
+                        .Generate(3),
                 }
-            );
+            ),
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(existingSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var settings = await widgetSettingsService.ReadWidgetSettingsAsync(helper.demoUser.Id);
+
+        // Assert
+        settings.Should().NotBeNull();
+        settings.Count().Should().Be(1);
+        var setting = settings.First();
+        setting.ID.Should().Be(existingSettings.ID);
+        setting.WidgetType.Should().Be(WidgetTypes.NetWorth);
+        setting.IsVisible.Should().BeTrue();
+        setting.Configuration.Should().Be(existingSettings.Configuration);
+        setting.UserID.Should().Be(helper.demoUser.Id);
     }
 
     [Fact]
-    public async Task UpdateWidgetSettingsAsync_WhenWidgetExists_ShouldUpdateValues()
+    public async Task ReadWidgetSettingsAsync_WhenNoSettingsExist_ShouldCreateDefaultSettings()
     {
         // Arrange
         var helper = new TestHelper();
-        var service = new WidgetSettingsService(
+
+        var widgetSettingsService = new WidgetSettingsService(
             Mock.Of<ILogger<IWidgetSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var widget = new WidgetSettings
+        // Act
+        var settings = await widgetSettingsService.ReadWidgetSettingsAsync(helper.demoUser.Id);
+
+        // Assert
+        settings.Should().NotBeNull();
+        settings.Count().Should().Be(1);
+        var setting = settings.First();
+        setting.WidgetType.Should().Be(WidgetTypes.NetWorth);
+        setting.IsVisible.Should().BeTrue();
+        setting
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration));
+        setting.UserID.Should().Be(helper.demoUser.Id);
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenValidData_ShouldUpdateWidgetSettings()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var widgetSettingsService = new WidgetSettingsService(
+            Mock.Of<ILogger<IWidgetSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var existingSettings = new WidgetSettings
         {
-            WidgetType = "Old",
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.NetWorth,
             IsVisible = true,
-            Configuration = JsonSerializer.Serialize(CreateConfiguration("Old")),
+            Configuration = JsonSerializer.Serialize(
+                WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+            ),
             UserID = helper.demoUser.Id,
         };
 
-        helper.UserDataContext.WidgetSettings.Add(widget);
-        helper.UserDataContext.SaveChanges();
+        helper.UserDataContext.WidgetSettings.Add(existingSettings);
+        await helper.UserDataContext.SaveChangesAsync();
 
         var updateRequest = new WidgetSettingsUpdateRequest<NetWorthWidgetConfiguration>
         {
-            ID = widget.ID,
-            WidgetType = "New",
+            ID = existingSettings.ID,
             IsVisible = false,
-            Configuration = CreateConfiguration("New"),
-            UserID = helper.demoUser.Id,
+            Configuration = new NetWorthWidgetConfiguration
+            {
+                Lines = new Faker<NetWorthWidgetLine>()
+                    .RuleFor(l => l.Name, f => f.Finance.AccountName())
+                    .RuleFor(
+                        l => l.Categories,
+                        f =>
+                            [
+                                new NetWorthWidgetCategory
+                                {
+                                    ID = Guid.NewGuid(),
+                                    Value = f.PickRandom(items),
+                                    Type = "Account",
+                                    Subtype = "Category",
+                                },
+                            ]
+                    )
+                    .RuleFor(l => l.Group, f => f.Random.Int(0, 2))
+                    .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
+                    .Generate(2),
+            },
         };
 
         // Act
-        await service.UpdateWidgetSettingsAsync(widget.ID, updateRequest);
+        await widgetSettingsService.UpdateWidgetSettingsAsync(helper.demoUser.Id, updateRequest);
 
         // Assert
-        var updated = helper.UserDataContext.WidgetSettings.Single();
-        updated.WidgetType.Should().Be(updateRequest.WidgetType);
-        updated.IsVisible.Should().BeFalse();
-        updated.Configuration.Should().Be(JsonSerializer.Serialize(updateRequest.Configuration));
+        var settings = helper.UserDataContext.WidgetSettings.SingleOrDefault(ws =>
+            ws.ID == existingSettings.ID && ws.UserID == helper.demoUser.Id
+        );
+        settings.Should().NotBeNull();
+        settings.IsVisible.Should().BeFalse();
+        settings.Configuration.Should().Be(JsonSerializer.Serialize(updateRequest.Configuration));
     }
 
     [Fact]
-    public async Task UpdateWidgetSettingsAsync_WhenWidgetMissing_ShouldThrow()
+    public async Task UpdateWidgetSettingsAsync_WhenWidgetDoesNotExist_ShouldThrowError()
     {
         // Arrange
         var helper = new TestHelper();
-        var service = new WidgetSettingsService(
+
+        var widgetSettingsService = new WidgetSettingsService(
             Mock.Of<ILogger<IWidgetSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -170,69 +241,109 @@ public class WidgetSettingsServiceTests
         var updateRequest = new WidgetSettingsUpdateRequest<NetWorthWidgetConfiguration>
         {
             ID = Guid.NewGuid(),
-            WidgetType = "Missing",
-            IsVisible = true,
-            Configuration = CreateConfiguration("Missing"),
-            UserID = helper.demoUser.Id,
+            IsVisible = false,
+            Configuration = new NetWorthWidgetConfiguration
+            {
+                Lines = new Faker<NetWorthWidgetLine>()
+                    .RuleFor(l => l.Name, f => f.Finance.AccountName())
+                    .RuleFor(
+                        l => l.Categories,
+                        f =>
+                            [
+                                new NetWorthWidgetCategory
+                                {
+                                    ID = Guid.NewGuid(),
+                                    Value = f.PickRandom(items),
+                                    Type = "Account",
+                                    Subtype = "Category",
+                                },
+                            ]
+                    )
+                    .RuleFor(l => l.Group, f => f.Random.Int(0, 2))
+                    .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
+                    .Generate(2),
+            },
         };
 
         // Act
-        Func<Task> act = async () =>
-            await service.UpdateWidgetSettingsAsync(updateRequest.ID, updateRequest);
+        var action = async () =>
+            await widgetSettingsService.UpdateWidgetSettingsAsync(
+                helper.demoUser.Id,
+                updateRequest
+            );
 
         // Assert
-        await act.Should()
+        await action
+            .Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("WidgetUpdateNotFoundError");
     }
 
     [Fact]
-    public async Task DeleteWidgetSettingsAsync_WhenWidgetExists_ShouldRemoveWidget()
+    public async Task DeleteWidgetSettingsAsync_WhenValidData_ShouldDeleteWidgetSettings()
     {
         // Arrange
         var helper = new TestHelper();
-        var service = new WidgetSettingsService(
+
+        var widgetSettingsService = new WidgetSettingsService(
             Mock.Of<ILogger<IWidgetSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var widget = new WidgetSettings
+        var existingSettings = new WidgetSettings
         {
-            WidgetType = "Delete",
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.NetWorth,
             IsVisible = true,
-            Configuration = JsonSerializer.Serialize(CreateConfiguration("Delete")),
+            Configuration = JsonSerializer.Serialize(
+                WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+            ),
             UserID = helper.demoUser.Id,
         };
 
-        helper.UserDataContext.WidgetSettings.Add(widget);
-        helper.UserDataContext.SaveChanges();
+        helper.UserDataContext.WidgetSettings.Add(existingSettings);
+        await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await service.DeleteWidgetSettingsAsync(widget.ID);
+        await widgetSettingsService.DeleteWidgetSettingsAsync(
+            helper.demoUser.Id,
+            existingSettings.ID
+        );
 
         // Assert
-        helper.UserDataContext.WidgetSettings.Should().BeEmpty();
+        var settings = helper.UserDataContext.WidgetSettings.SingleOrDefault(ws =>
+            ws.ID == existingSettings.ID && ws.UserID == helper.demoUser.Id
+        );
+        settings.Should().BeNull();
     }
 
     [Fact]
-    public async Task DeleteWidgetSettingsAsync_WhenWidgetMissing_ShouldThrow()
+    public async Task DeleteWidgetSettings_WhenWidgetSettingsDoesNotExist_ShouldThrowError()
     {
         // Arrange
         var helper = new TestHelper();
-        var service = new WidgetSettingsService(
+
+        var widgetSettingsService = new WidgetSettingsService(
             Mock.Of<ILogger<IWidgetSettingsService>>(),
             helper.UserDataContext,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
+        var nonExistentWidgetId = Guid.NewGuid();
+
         // Act
-        Func<Task> act = async () => await service.DeleteWidgetSettingsAsync(Guid.NewGuid());
+        var action = async () =>
+            await widgetSettingsService.DeleteWidgetSettingsAsync(
+                helper.demoUser.Id,
+                nonExistentWidgetId
+            );
 
         // Assert
-        await act.Should()
+        await action
+            .Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("WidgetDeleteNotFoundError");
     }

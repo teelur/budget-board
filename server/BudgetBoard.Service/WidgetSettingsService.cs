@@ -40,9 +40,9 @@ public class WidgetSettingsService(
         await userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IWidgetResponse>> ReadWidgetSettingsAsync(Guid userID)
+    public async Task<IEnumerable<IWidgetResponse>> ReadWidgetSettingsAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userID.ToString());
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var widgetSettings = userData.WidgetSettings.Select(ws => new WidgetResponse
         {
@@ -61,13 +61,13 @@ public class WidgetSettingsService(
         if (!widgetSettings.Any())
         {
             await this.CreateWidgetSettingsAsync(
-                userID,
+                userGuid,
                 new WidgetSettingsCreateRequest<NetWorthWidgetConfiguration>
                 {
                     WidgetType = "NetWorth",
                     IsVisible = true,
                     Configuration = WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration,
-                    UserID = userID,
+                    UserID = userGuid,
                 }
             );
 
@@ -89,14 +89,15 @@ public class WidgetSettingsService(
     }
 
     public async Task UpdateWidgetSettingsAsync(
-        Guid widgetID,
+        Guid userGuid,
         IWidgetSettingsUpdateRequest<NetWorthWidgetConfiguration> request
     )
     {
-        var widget = await userDataContext.WidgetSettings.FindAsync(widgetID);
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == request.ID);
         if (widget == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetUpdateNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["WidgetUpdateNotFoundLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["WidgetUpdateNotFoundError"]);
         }
 
@@ -107,12 +108,14 @@ public class WidgetSettingsService(
         await userDataContext.SaveChangesAsync();
     }
 
-    public async Task DeleteWidgetSettingsAsync(Guid widgetID)
+    public async Task DeleteWidgetSettingsAsync(Guid userGuid, Guid widgetGuid)
     {
-        var widget = await userDataContext.WidgetSettings.FindAsync(widgetID);
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == widgetGuid);
         if (widget == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetDeleteNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["WidgetDeleteNotFoundLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["WidgetDeleteNotFoundError"]);
         }
 
@@ -131,13 +134,13 @@ public class WidgetSettingsService(
         }
         catch (Exception ex)
         {
-            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalError", ex.Message]);
+            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalLog", ex.Message]);
             throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidUserError"]);
+            logger.LogError("{LogMessage}", logLocalizer["InvalidUserLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
         }
 
