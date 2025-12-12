@@ -1,17 +1,49 @@
 import { ActionIcon, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { SettingsIcon } from "lucide-react";
+import { PlusIcon, SettingsIcon } from "lucide-react";
 import Modal from "~/components/core/Modal/Modal";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NetWorthGroupItem from "./NetWorthGroupItem/NetWorthGroupItem";
 import React from "react";
 import { useNetWorthSettings } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { INetWorthWidgetLineCreateRequest } from "~/models/netWorthWidgetConfiguration";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
+import { translateAxiosError } from "~/helpers/requests";
 
 const NetWorthCardSettings = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
 
-  const { lineGroups } = useNetWorthSettings();
+  const { lineGroups, settingsId } = useNetWorthSettings();
+
+  const { request } = useAuth();
+
+  const queryClient = useQueryClient();
+  const doCreateLine = useMutation({
+    mutationFn: async (newLine: INetWorthWidgetLineCreateRequest) =>
+      await request({
+        url: `/api/netWorthWidgetLine`,
+        method: "POST",
+        data: newLine,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: "Net worth settings updated successfully.",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
 
   return (
     <>
@@ -44,6 +76,21 @@ const NetWorthCardSettings = (): React.ReactNode => {
             ) : (
               <DimmedText size="sm">No lines available.</DimmedText>
             )}
+            <ActionIcon
+              w="100%"
+              loading={doCreateLine.isPending}
+              onClick={() =>
+                doCreateLine.mutate({
+                  name: "",
+                  group:
+                    Math.max(...lineGroups.map((group) => group.groupId)) + 1,
+                  index: 0,
+                  widgetSettingsId: settingsId,
+                } as INetWorthWidgetLineCreateRequest)
+              }
+            >
+              <PlusIcon />
+            </ActionIcon>
           </Stack>
         </Stack>
       </Modal>
