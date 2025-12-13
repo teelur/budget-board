@@ -42,4 +42,12 @@ public interface IWidgetSettingsService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task DeleteWidgetSettingsAsync(Guid userGuid, Guid widgetGuid);
+
+    /// <summary>
+    /// Resets the settings configuration for the specified widget to its default values for the given user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user whose widget settings configuration will be reset.</param>
+    /// <param name="widgetGuid">The unique identifier of the widget whose settings configuration will be reset.</param>
+    /// <returns>A task that represents the asynchronous reset operation.</returns>
+    Task ResetWidgetSettingsConfiguration(Guid userGuid, Guid widgetGuid);
 }

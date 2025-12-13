@@ -160,11 +160,15 @@ public class NetWorthWidgetCategoryService(
         Guid lineId
     )
     {
-        var line = configuration.Groups.FirstOrDefault()?.Lines.FirstOrDefault(l => l.ID == lineId);
+        var line = configuration
+            .Groups.SelectMany(g => g.Lines)
+            .FirstOrDefault(l => l.ID == lineId);
         if (line == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetLineNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["WidgetLineNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetLineNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["NetWorthWidgetLineNotFoundError"]
+            );
         }
         return line;
     }

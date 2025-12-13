@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Stack } from "@mantine/core";
+import { ActionIcon, Button, Group, Stack } from "@mantine/core";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { PlusIcon, SettingsIcon } from "lucide-react";
 import Modal from "~/components/core/Modal/Modal";
@@ -86,10 +86,6 @@ const NetWorthCardSettings = (): React.ReactNode => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Net worth settings updated successfully.",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -99,7 +95,27 @@ const NetWorthCardSettings = (): React.ReactNode => {
     },
   });
 
-  useDidUpdate(() => {
+  const doResetConfig = useMutation({
+    mutationFn: async () =>
+      await request({
+        url: `/api/widgetSettings/resetConfiguration`,
+        method: "POST",
+        params: {
+          widgetGuid: settingsId,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
+  React.useEffect(() => {
     if (widgetSettingsQuery.data) {
       const foundWidget = widgetSettingsQuery.data.find((ws) =>
         isNetWorthWidgetType(ws.widgetType)
@@ -125,6 +141,19 @@ const NetWorthCardSettings = (): React.ReactNode => {
     }
   }, [widgetSettingsQuery.data]);
 
+  useDidUpdate(() => {
+    if (!isSortable) {
+      const orderedGroups: string[] = sortedGroups.map((group) => group.id);
+
+      doReorderGroups.mutate({
+        widgetSettingsId: settingsId,
+        orderedGroupIds: orderedGroups,
+      });
+    }
+  }, [isSortable]);
+
+  const groupsStackRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <>
       <ActionIcon
@@ -145,13 +174,23 @@ const NetWorthCardSettings = (): React.ReactNode => {
           <DimmedText size="sm">
             Configure the data that appears in the Net Worth widget.
           </DimmedText>
-          <Button
-            size="xs"
-            bg={isSortable ? "var(--button-color-confirm)" : ""}
-            onClick={toggleIsSortable}
-          >
-            {isSortable ? "Save Changes" : "Reorder"}
-          </Button>
+          <Group w="100%">
+            <Button
+              flex="1 0 auto"
+              size="xs"
+              bg={isSortable ? "var(--button-color-confirm)" : ""}
+              onClick={toggleIsSortable}
+            >
+              {isSortable ? "Save Changes" : "Reorder"}
+            </Button>
+            <Button
+              size="xs"
+              loading={doResetConfig.isPending}
+              onClick={() => doResetConfig.mutate()}
+            >
+              Reset to Default
+            </Button>
+          </Group>
           <Stack gap="1rem">
             <DragDropProvider
               onDragEnd={(event) => {
@@ -166,16 +205,14 @@ const NetWorthCardSettings = (): React.ReactNode => {
                 setSortedGroups(updatedList);
               }}
             >
-              <Stack id="groups-stack" gap="0.75rem">
+              <Stack ref={groupsStackRef} gap="0.75rem">
                 {sortedGroups.length > 0 ? (
                   sortedGroups.map((group) => (
                     <NetWorthGroupItem
                       key={group.id}
                       group={group}
                       isSortable={isSortable}
-                      container={
-                        document.getElementById("groups-stack") as Element
-                      }
+                      container={groupsStackRef.current as Element}
                       settingsId={settingsId}
                     />
                   ))

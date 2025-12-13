@@ -160,7 +160,7 @@ const NetWorthCard = (): React.ReactNode => {
                       line,
                       validAccounts,
                       validAssets,
-                      group.lines
+                      orderedGroups.flatMap((g) => g.lines)
                     )}
                     userCurrency={userSettingsQuery.data?.currency ?? "USD"}
                   />

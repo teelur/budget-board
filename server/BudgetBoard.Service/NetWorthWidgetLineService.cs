@@ -133,6 +133,8 @@ public class NetWorthWidgetLineService(
             group.Lines = [.. group.Lines.Where(l => l.ID != lineId)];
         }
 
+        configuration.Groups = [.. configuration.Groups.Where(g => g.Lines.Any())];
+
         widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
         await userDataContext.SaveChangesAsync();
     }

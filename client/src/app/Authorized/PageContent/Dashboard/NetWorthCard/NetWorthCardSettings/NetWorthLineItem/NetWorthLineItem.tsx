@@ -133,7 +133,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
       <Group gap="0.5rem">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
-            <Button h="100%" px={0} w={30} radius="lg">
+            <Button h="100%" px={0} w={{ base: 25, xs: 30 }} radius="lg">
               <GripVertical size={25} />
             </Button>
           </Flex>

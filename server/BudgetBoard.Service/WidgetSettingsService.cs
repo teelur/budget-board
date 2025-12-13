@@ -49,11 +49,7 @@ public class WidgetSettingsService(
             ID = ws.ID,
             WidgetType = ws.WidgetType,
             IsVisible = ws.IsVisible,
-            Configuration =
-                ws.Configuration
-                ?? JsonSerializer.Serialize(
-                    WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
-                ),
+            Configuration = ws.Configuration ?? GetDefaultConfiguration(ws.WidgetType),
             UserID = ws.UserID,
         });
 
@@ -123,6 +119,21 @@ public class WidgetSettingsService(
         await userDataContext.SaveChangesAsync();
     }
 
+    public async Task ResetWidgetSettingsConfiguration(Guid userGuid, Guid widgetGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == widgetGuid);
+        if (widget == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["WidgetDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["WidgetDeleteNotFoundError"]);
+        }
+
+        widget.Configuration = GetDefaultConfiguration(widget.WidgetType);
+        await userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         ApplicationUser? foundUser;
@@ -145,5 +156,16 @@ public class WidgetSettingsService(
         }
 
         return foundUser;
+    }
+
+    private string GetDefaultConfiguration(string widgetType)
+    {
+        return widgetType switch
+        {
+            WidgetTypes.NetWorth => JsonSerializer.Serialize(
+                WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+            ),
+            _ => string.Empty,
+        };
     }
 }

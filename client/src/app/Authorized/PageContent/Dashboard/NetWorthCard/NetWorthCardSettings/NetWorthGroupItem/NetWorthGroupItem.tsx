@@ -43,6 +43,8 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
     INetWorthWidgetLine[]
   >([]);
 
+  const linesStackRef = React.useRef<HTMLDivElement>(null);
+
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -78,10 +80,6 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Net worth settings updated successfully.",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -116,7 +114,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
       } as INetWorthWidgetLineReorderRequest);
     }
     prevIsSortable.current = props.isSortable;
-  }, [props.isSortable, sortedLineItems]);
+  }, [props.isSortable]);
 
   const { ref, handleRef } = useSortable({
     id: props.group.id,
@@ -134,7 +132,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
       <Group gap="0.5rem">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
-            <Button h="100%" px={0} w={30} radius="lg">
+            <Button h="100%" px={0} w={{ base: 25, xs: 30 }} radius="lg">
               <GripVertical size={25} />
             </Button>
           </Flex>
@@ -168,11 +166,11 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
               setSortedLineItems(updatedList);
             }}
           >
-            <Stack id="lines-stack" gap="0.25rem">
+            <Stack ref={linesStackRef} gap="0.25rem">
               {sortedLineItems.map((line) => (
                 <NetWorthLineItem
                   key={line.id}
-                  container={document.getElementById("lines-stack") as Element}
+                  container={linesStackRef.current as Element}
                   line={line}
                   groupIndex={props.group.index}
                   lines={sortedLineItems}

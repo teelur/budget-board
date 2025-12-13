@@ -26,12 +26,32 @@ public static class WidgetSettingsHelpers
                             },
                             new NetWorthWidgetCategory
                             {
-                                Value = "Credit Card",
+                                Value = "Cash",
+                                Type = "Account",
+                                Subtype = "Category",
+                            },
+                            new NetWorthWidgetCategory
+                            {
+                                Value = "Other",
                                 Type = "Account",
                                 Subtype = "Category",
                             },
                         ],
                         Index = 0,
+                    },
+                    new NetWorthWidgetLine
+                    {
+                        Name = "Credit Cards",
+                        Categories =
+                        [
+                            new NetWorthWidgetCategory
+                            {
+                                Value = "Credit Card",
+                                Type = "Account",
+                                Subtype = "Category",
+                            },
+                        ],
+                        Index = 1,
                     },
                     new NetWorthWidgetLine
                     {
@@ -45,7 +65,7 @@ public static class WidgetSettingsHelpers
                                 Subtype = "Category",
                             },
                         ],
-                        Index = 1,
+                        Index = 2,
                     },
                     new NetWorthWidgetLine
                     {
@@ -59,7 +79,7 @@ public static class WidgetSettingsHelpers
                                 Subtype = "Category",
                             },
                         ],
-                        Index = 1,
+                        Index = 3,
                     },
                 ],
             },
@@ -76,6 +96,12 @@ public static class WidgetSettingsHelpers
                             new NetWorthWidgetCategory
                             {
                                 Value = "Spending",
+                                Type = "Line",
+                                Subtype = "Name",
+                            },
+                            new NetWorthWidgetCategory
+                            {
+                                Value = "Credit Cards",
                                 Type = "Line",
                                 Subtype = "Name",
                             },
