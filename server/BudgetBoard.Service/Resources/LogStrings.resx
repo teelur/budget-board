@@ -391,7 +391,10 @@
   <data name="NetWorthWidgetLineNotFoundLog" xml:space="preserve">
     <value>Attempted to access a net worth widget line that does not exist.</value>
   </data>
-  <data name="WidgetCategoryNotFoundLog" xml:space="preserve">
+  <data name="NetWorthWidgetGroupNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a net worth widget group that does not exist.</value>
+  </data>
+  <data name="NetWorthWidgetCategoryNotFoundLog" xml:space="preserve">
     <value>Attempted to access a net worth widget category that does not exist.</value>
   </data>
 </root>

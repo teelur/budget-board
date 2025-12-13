@@ -233,6 +233,7 @@ builder.Services.AddScoped<IValueService, ValueService>();
 builder.Services.AddScoped<IWidgetSettingsService, WidgetSettingsService>();
 builder.Services.AddScoped<INetWorthWidgetLineService, NetWorthWidgetLineService>();
 builder.Services.AddScoped<INetWorthWidgetCategoryService, NetWorthWidgetCategoryService>();
+builder.Services.AddScoped<INetWorthWidgetGroupService, NetWorthWidgetGroupService>();
 
 var app = builder.Build();
 

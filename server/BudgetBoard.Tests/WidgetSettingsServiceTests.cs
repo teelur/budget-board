@@ -37,24 +37,30 @@ public class WidgetSettingsServiceTests
             IsVisible = true,
             Configuration = new NetWorthWidgetConfiguration
             {
-                Lines = new Faker<NetWorthWidgetLine>()
-                    .RuleFor(l => l.Name, f => f.Finance.AccountName())
-                    .RuleFor(
-                        l => l.Categories,
-                        f =>
-                            [
-                                new NetWorthWidgetCategory
-                                {
-                                    ID = Guid.NewGuid(),
-                                    Value = f.PickRandom(items),
-                                    Type = "Account",
-                                    Subtype = "Category",
-                                },
-                            ]
-                    )
-                    .RuleFor(l => l.Group, f => f.Random.Int(0, 2))
-                    .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
-                    .Generate(3),
+                Groups =
+                [
+                    new NetWorthWidgetGroup
+                    {
+                        Index = 0,
+                        Lines = new Faker<NetWorthWidgetLine>()
+                            .RuleFor(l => l.Name, f => f.Finance.AccountName())
+                            .RuleFor(
+                                l => l.Categories,
+                                f =>
+                                    [
+                                        new NetWorthWidgetCategory
+                                        {
+                                            ID = Guid.NewGuid(),
+                                            Value = f.PickRandom(items),
+                                            Type = "Account",
+                                            Subtype = "Category",
+                                        },
+                                    ]
+                            )
+                            .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
+                            .Generate(3),
+                    },
+                ],
             },
             UserID = helper.demoUser.Id,
         };
@@ -91,24 +97,30 @@ public class WidgetSettingsServiceTests
             Configuration = JsonSerializer.Serialize(
                 new NetWorthWidgetConfiguration
                 {
-                    Lines = new Faker<NetWorthWidgetLine>()
-                        .RuleFor(l => l.Name, f => f.Finance.AccountName())
-                        .RuleFor(
-                            l => l.Categories,
-                            f =>
-                                [
-                                    new NetWorthWidgetCategory
-                                    {
-                                        ID = Guid.NewGuid(),
-                                        Value = f.PickRandom(items),
-                                        Type = "Account",
-                                        Subtype = "Category",
-                                    },
-                                ]
-                        )
-                        .RuleFor(l => l.Group, f => f.Random.Int(0, 2))
-                        .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
-                        .Generate(3),
+                    Groups =
+                    [
+                        new NetWorthWidgetGroup
+                        {
+                            Index = 0,
+                            Lines = new Faker<NetWorthWidgetLine>()
+                                .RuleFor(l => l.Name, f => f.Finance.AccountName())
+                                .RuleFor(
+                                    l => l.Categories,
+                                    f =>
+                                        [
+                                            new NetWorthWidgetCategory
+                                            {
+                                                ID = Guid.NewGuid(),
+                                                Value = f.PickRandom(items),
+                                                Type = "Account",
+                                                Subtype = "Category",
+                                            },
+                                        ]
+                                )
+                                .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
+                                .Generate(3),
+                        },
+                    ],
                 }
             ),
             UserID = helper.demoUser.Id,
@@ -192,24 +204,30 @@ public class WidgetSettingsServiceTests
             IsVisible = false,
             Configuration = new NetWorthWidgetConfiguration
             {
-                Lines = new Faker<NetWorthWidgetLine>()
-                    .RuleFor(l => l.Name, f => f.Finance.AccountName())
-                    .RuleFor(
-                        l => l.Categories,
-                        f =>
-                            [
-                                new NetWorthWidgetCategory
-                                {
-                                    ID = Guid.NewGuid(),
-                                    Value = f.PickRandom(items),
-                                    Type = "Account",
-                                    Subtype = "Category",
-                                },
-                            ]
-                    )
-                    .RuleFor(l => l.Group, f => f.Random.Int(0, 2))
-                    .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
-                    .Generate(2),
+                Groups =
+                [
+                    new NetWorthWidgetGroup
+                    {
+                        Index = 0,
+                        Lines = new Faker<NetWorthWidgetLine>()
+                            .RuleFor(l => l.Name, f => f.Finance.AccountName())
+                            .RuleFor(
+                                l => l.Categories,
+                                f =>
+                                    [
+                                        new NetWorthWidgetCategory
+                                        {
+                                            ID = Guid.NewGuid(),
+                                            Value = f.PickRandom(items),
+                                            Type = "Account",
+                                            Subtype = "Category",
+                                        },
+                                    ]
+                            )
+                            .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
+                            .Generate(3),
+                    },
+                ],
             },
         };
 
@@ -244,24 +262,30 @@ public class WidgetSettingsServiceTests
             IsVisible = false,
             Configuration = new NetWorthWidgetConfiguration
             {
-                Lines = new Faker<NetWorthWidgetLine>()
-                    .RuleFor(l => l.Name, f => f.Finance.AccountName())
-                    .RuleFor(
-                        l => l.Categories,
-                        f =>
-                            [
-                                new NetWorthWidgetCategory
-                                {
-                                    ID = Guid.NewGuid(),
-                                    Value = f.PickRandom(items),
-                                    Type = "Account",
-                                    Subtype = "Category",
-                                },
-                            ]
-                    )
-                    .RuleFor(l => l.Group, f => f.Random.Int(0, 2))
-                    .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
-                    .Generate(2),
+                Groups =
+                [
+                    new NetWorthWidgetGroup
+                    {
+                        Index = 0,
+                        Lines = new Faker<NetWorthWidgetLine>()
+                            .RuleFor(l => l.Name, f => f.Finance.AccountName())
+                            .RuleFor(
+                                l => l.Categories,
+                                f =>
+                                    [
+                                        new NetWorthWidgetCategory
+                                        {
+                                            ID = Guid.NewGuid(),
+                                            Value = f.PickRandom(items),
+                                            Type = "Account",
+                                            Subtype = "Category",
+                                        },
+                                    ]
+                            )
+                            .RuleFor(l => l.Index, f => f.Random.Int(0, 10))
+                            .Generate(3),
+                    },
+                ],
             },
         };
 

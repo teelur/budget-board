@@ -29,3 +29,14 @@ export interface INetWorthWidgetCategoryUpdateRequest {
   lineId: string;
   widgetSettingsId: string;
 }
+
+export interface INetWorthWidgetLineReorderRequest {
+  widgetSettingsId: string;
+  groupId: string;
+  orderedLineIds: string[];
+}
+
+export interface INetWorthWidgetGroupReorderRequest {
+  widgetSettingsId: string;
+  orderedGroupIds: string[];
+}

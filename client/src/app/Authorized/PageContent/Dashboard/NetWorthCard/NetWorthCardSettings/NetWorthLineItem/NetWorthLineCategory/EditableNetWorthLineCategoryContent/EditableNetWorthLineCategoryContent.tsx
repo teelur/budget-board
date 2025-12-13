@@ -14,18 +14,20 @@ import { accountCategories } from "~/models/account";
 import { INetWorthWidgetCategoryUpdateRequest } from "~/models/netWorthWidgetConfiguration";
 import {
   INetWorthWidgetCategory,
+  INetWorthWidgetLine,
   NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES,
   NET_WORTH_CATEGORY_ASSET_SUBTYPES,
   NET_WORTH_CATEGORY_LINE_SUBTYPES,
   NET_WORTH_CATEGORY_TYPES,
 } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useNetWorthSettings } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
 
 interface EditableNetWorthLineCategoryContentProps {
   category: INetWorthWidgetCategory;
   lineId: string;
   currentLineName: string;
+  lines: INetWorthWidgetLine[];
+  settingsId: string;
   disableEdit: () => void;
 }
 
@@ -42,7 +44,6 @@ const EditableNetWorthLineCategoryContent = (
     initialValue: props.category.value,
   });
 
-  const { settingsId, lines } = useNetWorthSettings();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -77,7 +78,7 @@ const EditableNetWorthLineCategoryContent = (
         params: {
           categoryId: props.category.id,
           lineId: props.lineId,
-          widgetSettingsId: settingsId,
+          widgetSettingsId: props.settingsId,
         },
       }),
     onSuccess: () => {
@@ -137,13 +138,13 @@ const EditableNetWorthLineCategoryContent = (
         subtype,
         value: value ?? "",
         lineId: props.lineId,
-        widgetSettingsId: settingsId,
+        widgetSettingsId: props.settingsId,
       } as INetWorthWidgetCategoryUpdateRequest);
     }
   }, [type, subtype, value]);
 
   const getValidLineNames = () => {
-    const linesThatUseThisName = lines.filter((line) => {
+    const linesThatUseThisName = props.lines.filter((line) => {
       return line.categories.some((category) => {
         return (
           areStringsEqual(category.type, "line") &&
@@ -153,7 +154,7 @@ const EditableNetWorthLineCategoryContent = (
       });
     });
 
-    const validLineNames = lines
+    const validLineNames = props.lines
       .map((line) => line.name)
       .filter(
         (name) =>

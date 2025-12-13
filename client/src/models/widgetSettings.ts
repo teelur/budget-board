@@ -13,6 +13,12 @@ export interface IWidgetSettingsUpdateRequest<T> {
 }
 
 export interface INetWorthWidgetConfiguration {
+  groups: Array<INetWorthWidgetGroup>;
+}
+
+export interface INetWorthWidgetGroup {
+  id: string;
+  index: number;
   lines: Array<INetWorthWidgetLine>;
 }
 
@@ -20,7 +26,6 @@ export interface INetWorthWidgetLine {
   id: string;
   name: string;
   categories: Array<INetWorthWidgetCategory>;
-  group: number;
   index: number;
 }
 

@@ -91,4 +91,28 @@ public class NetWorthWidgetLineController(
             return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
+
+    [HttpPost]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> Reorder([FromBody] NetWorthWidgetLineReorderRequest request)
+    {
+        try
+        {
+            await netWorthWidgetLineService.ReorderNetWorthWidgetLinesAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                request
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
 }

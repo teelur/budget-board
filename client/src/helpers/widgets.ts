@@ -2,6 +2,7 @@ import { areStringsEqual } from "~/helpers/utils";
 import {
   INetWorthWidgetCategory,
   INetWorthWidgetConfiguration,
+  INetWorthWidgetGroup,
   INetWorthWidgetLine,
 } from "~/models/widgetSettings";
 import { sumAssetsTotalValue } from "./assets";
@@ -88,6 +89,21 @@ const normalizeCategories = (
   });
 };
 
+const normalizeGroups = (groups: unknown): INetWorthWidgetGroup[] => {
+  if (!Array.isArray(groups)) {
+    return [];
+  }
+
+  return groups.map((group) => {
+    const record = (group ?? {}) as Record<string, unknown>;
+    return {
+      id: normalizeString(record.id ?? record.ID),
+      index: normalizeNumber(record.index ?? record.Index),
+      lines: normalizeLines(record.lines ?? record.Lines),
+    };
+  });
+};
+
 /**
  * Normalize each widget line (including PascalCase vs camelCase keys) to the expected interface.
  *
@@ -104,7 +120,6 @@ const normalizeLines = (lines: unknown): INetWorthWidgetLine[] => {
     return {
       id: normalizeString(record.id ?? record.ID),
       name: normalizeString(record.name ?? record.Name),
-      group: normalizeNumber(record.group ?? record.Group),
       index: normalizeNumber(record.index ?? record.Index),
       categories: normalizeCategories(record.categories ?? record.Categories),
     };
@@ -130,15 +145,15 @@ export const parseNetWorthConfiguration = (
     return undefined;
   }
 
-  const linesRaw = parsed.lines ?? parsed.Lines;
-  const normalizedLines = normalizeLines(linesRaw);
+  const groupsRaw = parsed.groups ?? parsed.Groups;
+  const normalizedGroups = normalizeGroups(groupsRaw);
 
-  if (normalizedLines.length === 0) {
+  if (normalizedGroups.length === 0) {
     return undefined;
   }
 
   return {
-    lines: normalizedLines,
+    groups: normalizedGroups,
   };
 };
 

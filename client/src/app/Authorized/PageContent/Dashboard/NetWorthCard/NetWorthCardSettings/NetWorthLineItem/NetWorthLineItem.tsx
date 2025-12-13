@@ -1,9 +1,16 @@
-import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Flex,
+  Group,
+  LoadingOverlay,
+  Stack,
+} from "@mantine/core";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { INetWorthWidgetLine } from "~/models/widgetSettings";
 import NetWorthLineCategory from "./NetWorthLineCategory/NetWorthLineCategory";
-import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { GripVertical, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useField } from "@mantine/form";
@@ -14,20 +21,37 @@ import {
   INetWorthWidgetLineUpdateRequest,
 } from "~/models/netWorthWidgetConfiguration";
 import { notifications } from "@mantine/notifications";
-import { useNetWorthSettings } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useSortable } from "@dnd-kit/react/sortable";
+import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
+import { RestrictToElement } from "@dnd-kit/dom/modifiers";
+import { closestCorners } from "@dnd-kit/collision";
 
 export interface INetWorthLineItemProps {
+  container: Element;
   line: INetWorthWidgetLine;
+  groupIndex: number;
+  lines: INetWorthWidgetLine[];
+  settingsId: string;
+  isSortable: boolean;
 }
 
 const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
   const [isEditing, { toggle }] = useDisclosure(false);
   const nameField = useField<string>({ initialValue: props.line.name });
 
-  const { settingsId } = useNetWorthSettings();
+  const { ref, handleRef } = useSortable({
+    id: props.line.id,
+    index: props.line.index,
+    modifiers: [
+      RestrictToElement.configure({ element: props.container }),
+      RestrictToVerticalAxis,
+    ],
+    collisionDetector: closestCorners,
+  });
+
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -61,7 +85,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
         method: "DELETE",
         params: {
           lineId: id,
-          widgetSettingsId: settingsId,
+          widgetSettingsId: props.settingsId,
         },
       }),
     onSuccess: () => {
@@ -104,9 +128,16 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
   });
 
   return (
-    <Card elevation={1}>
+    <Card ref={props.isSortable ? ref : undefined} elevation={1}>
       <LoadingOverlay visible={doUpdateLine.isPending} />
       <Group gap="0.5rem">
+        {props.isSortable && (
+          <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
+            <Button h="100%" px={0} w={30} radius="lg">
+              <GripVertical size={25} />
+            </Button>
+          </Flex>
+        )}
         <Stack flex="1 0 auto" gap="0.5rem">
           <Group justify="space-between">
             <Group gap="0.5rem">
@@ -120,9 +151,9 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                       await doUpdateLine.mutateAsync({
                         lineId: props.line.id,
                         name: nameField.getValue(),
-                        group: props.line.group,
+                        group: props.groupIndex,
                         index: props.line.index,
-                        widgetSettingsId: settingsId,
+                        widgetSettingsId: props.settingsId,
                       });
                     }
                   }}
@@ -150,7 +181,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                   value: "",
                   type: "",
                   subtype: "",
-                  widgetSettingsId: settingsId,
+                  widgetSettingsId: props.settingsId,
                 } as INetWorthWidgetCategoryCreateRequest)
               }
             >
@@ -164,6 +195,8 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                 category={category}
                 lineId={props.line.id}
                 currentLineName={props.line.name}
+                lines={props.lines}
+                settingsId={props.settingsId}
               />
             ))}
             {props.line.categories.length === 0 && (

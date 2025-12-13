@@ -15,16 +15,16 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class NetWorthWidgetCategoryService(
-    ILogger<INetWorthWidgetCategoryService> logger,
+public class NetWorthWidgetGroupService(
+    ILogger<INetWorthWidgetGroupService> logger,
     UserDataContext userDataContext,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer
-) : INetWorthWidgetCategoryService
+) : INetWorthWidgetGroupService
 {
-    public async Task CreateNetWorthWidgetCategoryAsync(
+    public async Task ReorderNetWorthWidgetGroupsAsync(
         Guid userGuid,
-        INetWorthWidgetCategoryCreateRequest request
+        INetWorthWidgetGroupReorderRequest request
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
@@ -32,65 +32,25 @@ public class NetWorthWidgetCategoryService(
         var widgetSettings = GetWidgetSettings(userData, request.WidgetSettingsId);
         var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
 
-        var newCategory = new NetWorthWidgetCategory
+        var groupDict = configuration.Groups.ToDictionary(g => g.ID, g => g);
+        var reorderedGroups = new List<NetWorthWidgetGroup>();
+        int index = 0;
+        foreach (var groupId in request.OrderedGroupIds)
         {
-            ID = Guid.NewGuid(),
-            Value = request.Value,
-            Type = request.Type,
-            Subtype = request.Subtype,
-        };
-
-        var line = GetNetWorthWidgetLine(configuration, request.LineId);
-        line.Categories.Add(newCategory);
-
-        widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
-        await userDataContext.SaveChangesAsync();
-    }
-
-    public async Task UpdateNetWorthWidgetCategoryAsync(
-        Guid userGuid,
-        INetWorthWidgetCategoryUpdateRequest request
-    )
-    {
-        var userData = await GetCurrentUserAsync(userGuid);
-
-        var widgetSettings = GetWidgetSettings(userData, request.WidgetSettingsId);
-        var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
-        var line = GetNetWorthWidgetLine(configuration, request.LineId);
-        var category = line.Categories.FirstOrDefault(c => c.ID == request.Id);
-        if (category == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetCategoryNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["NetWorthWidgetCategoryNotFoundError"]
-            );
+            if (groupDict.TryGetValue(groupId, out var foundGroup))
+            {
+                foundGroup.Index = index++;
+                reorderedGroups.Add(foundGroup);
+            }
+            else
+            {
+                logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetGroupNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["NetWorthWidgetGroupNotFoundError"]
+                );
+            }
         }
-
-        // TODO: Shouldn't allow line names that depend on this line
-
-        category.Value = request.Value;
-        category.Type = request.Type;
-        category.Subtype = request.Subtype;
-
-        widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
-        await userDataContext.SaveChangesAsync();
-    }
-
-    public async Task DeleteNetWorthWidgetCategoryAsync(
-        Guid userGuid,
-        Guid widgetSettingsId,
-        Guid lineId,
-        Guid categoryId
-    )
-    {
-        var userData = await GetCurrentUserAsync(userGuid);
-
-        var widgetSettings = GetWidgetSettings(userData, widgetSettingsId);
-        var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
-        var line = GetNetWorthWidgetLine(configuration, lineId);
-
-        line.Categories = [.. line.Categories.Where(c => c.ID != categoryId)];
-
+        configuration.Groups = reorderedGroups;
         widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
         await userDataContext.SaveChangesAsync();
     }
@@ -153,19 +113,5 @@ public class NetWorthWidgetCategoryService(
             );
         }
         return configuration;
-    }
-
-    private NetWorthWidgetLine GetNetWorthWidgetLine(
-        NetWorthWidgetConfiguration configuration,
-        Guid lineId
-    )
-    {
-        var line = configuration.Groups.FirstOrDefault()?.Lines.FirstOrDefault(l => l.ID == lineId);
-        if (line == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetLineNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["WidgetLineNotFoundError"]);
-        }
-        return line;
     }
 }

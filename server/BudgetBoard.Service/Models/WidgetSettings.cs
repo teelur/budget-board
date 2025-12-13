@@ -28,6 +28,13 @@ public class WidgetSettingsCreateRequest<TConfiguration>
 
 public class NetWorthWidgetConfiguration
 {
+    public IEnumerable<NetWorthWidgetGroup> Groups { get; set; } = [];
+}
+
+public class NetWorthWidgetGroup
+{
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public int Index { get; set; } = 0;
     public IEnumerable<NetWorthWidgetLine> Lines { get; set; } = [];
 }
 
@@ -36,7 +43,6 @@ public class NetWorthWidgetLine
     public Guid ID { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public List<NetWorthWidgetCategory> Categories { get; set; } = [];
-    public int Group { get; set; } = 0;
     public int Index { get; set; } = 0;
 }
 

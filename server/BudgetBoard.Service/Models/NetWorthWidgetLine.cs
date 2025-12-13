@@ -39,3 +39,17 @@ public class NetWorthWidgetLineUpdateRequest : INetWorthWidgetLineUpdateRequest
     public int Index { get; set; } = 0;
     public Guid WidgetSettingsId { get; set; } = Guid.Empty;
 }
+
+public interface INetWorthWidgetLineReorderRequest
+{
+    Guid WidgetSettingsId { get; }
+    Guid GroupId { get; }
+    IEnumerable<Guid> OrderedLineIds { get; }
+}
+
+public class NetWorthWidgetLineReorderRequest : INetWorthWidgetLineReorderRequest
+{
+    public Guid WidgetSettingsId { get; set; } = Guid.Empty;
+    public Guid GroupId { get; set; } = Guid.Empty;
+    public IEnumerable<Guid> OrderedLineIds { get; set; } = [];
+}

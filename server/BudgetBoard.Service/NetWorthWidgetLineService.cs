@@ -35,14 +35,20 @@ public class NetWorthWidgetLineService(
         var newLine = new NetWorthWidgetLine
         {
             Name = request.Name,
-            Group = request.Group,
             Index = request.Index,
             Categories = [],
         };
 
-        var lines = configuration.Lines.ToList();
-        lines.Add(newLine);
-        configuration.Lines = lines;
+        var group = configuration.Groups.FirstOrDefault(g => g.Index == request.Group);
+        if (group == null)
+        {
+            group = new NetWorthWidgetGroup { Index = request.Group, Lines = [newLine] };
+            configuration.Groups = [.. configuration.Groups, group];
+        }
+        else
+        {
+            group.Lines = [.. group.Lines, newLine];
+        }
 
         widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
         await userDataContext.SaveChangesAsync();
@@ -58,7 +64,19 @@ public class NetWorthWidgetLineService(
         var widgetSettings = GetWidgetSettings(userData, request.WidgetSettingsId);
         var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
 
-        var line = configuration.Lines.FirstOrDefault(l => l.ID == request.LineId);
+        NetWorthWidgetLine? line = null;
+        NetWorthWidgetGroup? currentGroup = null;
+
+        foreach (var group in configuration.Groups)
+        {
+            line = group.Lines.FirstOrDefault(l => l.ID == request.LineId);
+            if (line != null)
+            {
+                currentGroup = group;
+                break;
+            }
+        }
+
         if (line == null)
         {
             logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetLineNotFoundLog"]);
@@ -68,8 +86,24 @@ public class NetWorthWidgetLineService(
         }
 
         line.Name = request.Name;
-        line.Group = request.Group;
-        line.Index = request.Index;
+
+        if (currentGroup!.Index != request.Group)
+        {
+            currentGroup.Lines = [.. currentGroup.Lines.Where(l => l.ID != request.LineId)];
+
+            var targetGroup = configuration.Groups.FirstOrDefault(g => g.Index == request.Group);
+            if (targetGroup == null)
+            {
+                targetGroup = new NetWorthWidgetGroup { Index = request.Group, Lines = [line] };
+                configuration.Groups = [.. configuration.Groups, targetGroup];
+            }
+            else
+            {
+                targetGroup.Lines = [.. targetGroup.Lines, line];
+            }
+
+            configuration.Groups = [.. configuration.Groups.Where(g => g.Lines.Any())];
+        }
 
         widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
         await userDataContext.SaveChangesAsync();
@@ -86,8 +120,60 @@ public class NetWorthWidgetLineService(
         var widgetSettings = GetWidgetSettings(userData, widgetSettingsId);
         var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
 
-        configuration.Lines = [.. configuration.Lines.Where(l => l.ID != lineId)];
+        if (!configuration.Groups.SelectMany(g => g.Lines).Any(l => l.ID == lineId))
+        {
+            logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetLineNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["NetWorthWidgetLineNotFoundError"]
+            );
+        }
 
+        foreach (var group in configuration.Groups)
+        {
+            group.Lines = [.. group.Lines.Where(l => l.ID != lineId)];
+        }
+
+        widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
+        await userDataContext.SaveChangesAsync();
+    }
+
+    public async Task ReorderNetWorthWidgetLinesAsync(
+        Guid userGuid,
+        INetWorthWidgetLineReorderRequest request
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+
+        var widgetSettings = GetWidgetSettings(userData, request.WidgetSettingsId);
+        var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
+        var group = configuration.Groups.FirstOrDefault(g => g.ID == request.GroupId);
+        if (group == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetGroupNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["NetWorthWidgetGroupNotFoundError"]
+            );
+        }
+
+        var lineDict = group.Lines.ToDictionary(l => l.ID, l => l);
+        var reorderedLines = new List<NetWorthWidgetLine>();
+        int index = 0;
+        foreach (var lineId in request.OrderedLineIds)
+        {
+            if (lineDict.TryGetValue(lineId, out var foundLine))
+            {
+                foundLine.Index = index++;
+                reorderedLines.Add(foundLine);
+            }
+            else
+            {
+                logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetLineNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["NetWorthWidgetLineNotFoundError"]
+                );
+            }
+        }
+        group.Lines = reorderedLines;
         widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
         await userDataContext.SaveChangesAsync();
     }

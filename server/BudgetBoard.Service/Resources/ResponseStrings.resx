@@ -385,7 +385,10 @@
   <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
     <value>The net worth widget line you are trying to access does not exist.</value>
   </data>
-  <data name="WidgetCategoryNotFoundError" xml:space="preserve">
+  <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
+    <value>The net worth widget group you are trying to access does not exist.</value>
+  </data>
+  <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
     <value>The net worth widget category you are trying to access does not exist.</value>
   </data>
   </root>

@@ -39,4 +39,17 @@ public interface INetWorthWidgetLineService
     /// <param name="widgetSettingsId">The unique identifier of the widget settings.</param>
     /// <param name="lineId">The unique identifier of the line to delete.</param>
     public Task DeleteNetWorthWidgetLineAsync(Guid userGuid, Guid widgetSettingsId, Guid lineId);
+
+    /// <summary>
+    /// Reorders the lines within a specified net worth widget group according to the provided requests.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="request">
+    /// The reorder request containing the widget settings ID, group ID, and the new order of line IDs.
+    /// </param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task ReorderNetWorthWidgetLinesAsync(
+        Guid userGuid,
+        INetWorthWidgetLineReorderRequest request
+    );
 }

@@ -22,7 +22,6 @@ import {
   parseNetWorthConfiguration,
 } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
-import { NetWorthSettingsProvider } from "~/providers/NetWorthSettingsProvider/NetWorthSettingsProvider";
 
 const NetWorthCard = (): React.ReactNode => {
   const { request } = useAuth();
@@ -126,9 +125,9 @@ const NetWorthCard = (): React.ReactNode => {
       );
     }
 
-    const netWorthWidgetLines = configuration.lines ?? [];
+    const netWorthWidgetGroups = configuration.groups ?? [];
 
-    if (!netWorthWidgetLines || netWorthWidgetLines.length === 0) {
+    if (!netWorthWidgetGroups || netWorthWidgetGroups.length === 0) {
       return (
         <DimmedText size="sm">
           No items are configured for this widget.
@@ -136,41 +135,14 @@ const NetWorthCard = (): React.ReactNode => {
       );
     }
 
-    const groupedLines = netWorthWidgetLines.reduce<
-      Record<number, INetWorthWidgetLine[]>
-    >(
-      (
-        acc: Record<number, INetWorthWidgetLine[]>,
-        line: INetWorthWidgetLine
-      ) => {
-        const group = line.group ?? 0;
-        if (!acc[group]) {
-          acc[group] = [];
-        }
-        acc[group].push(line);
-        return acc;
-      },
-      {} as Record<number, INetWorthWidgetLine[]>
-    );
-
-    const orderedGroupedLines = Object.keys(groupedLines)
-      .map((key) => Number(key))
-      .sort((a, b) => a - b);
-
-    if (orderedGroupedLines.length === 0) {
-      return (
-        <DimmedText size="sm">
-          This widget does not contain any groups.
-        </DimmedText>
-      );
-    }
+    const orderedGroups = netWorthWidgetGroups
+      .slice()
+      .sort((a, b) => a.index - b.index);
 
     return (
       <Stack gap="0.5rem">
-        {orderedGroupedLines.map((groupId: number) => {
-          const groupLines = (groupedLines[groupId] ??
-            []) as INetWorthWidgetLine[];
-          const sortedGroupLines = groupLines
+        {orderedGroups.map((group) => {
+          const sortedLines = group.lines
             .slice()
             .sort(
               (a: INetWorthWidgetLine, b: INetWorthWidgetLine) =>
@@ -178,17 +150,17 @@ const NetWorthCard = (): React.ReactNode => {
             );
 
           return (
-            <Card key={`net-worth-group-${groupId}`} p="0.25rem" elevation={2}>
+            <Card key={group.id} p="0.25rem" elevation={2}>
               <Stack gap={0}>
-                {sortedGroupLines.map((line: INetWorthWidgetLine) => (
+                {sortedLines.map((line: INetWorthWidgetLine) => (
                   <NetWorthItem
-                    key={`${line.group}-${line.index}-${line.name}`}
+                    key={line.id}
                     title={line.name}
                     totalBalance={calculateLineTotal(
                       line,
                       validAccounts,
                       validAssets,
-                      netWorthWidgetLines
+                      group.lines
                     )}
                     userCurrency={userSettingsQuery.data?.currency ?? "USD"}
                   />
@@ -206,9 +178,7 @@ const NetWorthCard = (): React.ReactNode => {
       <Stack gap="0.5rem">
         <Group justify="space-between">
           <PrimaryText size="xl">Net Worth</PrimaryText>
-          <NetWorthSettingsProvider>
-            <NetWorthCardSettings />
-          </NetWorthSettingsProvider>
+          <NetWorthCardSettings />
         </Group>
         {getNetWorthLines()}
       </Stack>
