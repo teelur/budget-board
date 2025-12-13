@@ -5,8 +5,10 @@
  * @param {string} string2 - The second string to compare.
  * @returns {boolean} True if the strings are equal (ignoring case), false otherwise.
  */
-export const areStringsEqual = (string1: string, string2: string): boolean =>
-  string1.toUpperCase() === string2.toUpperCase();
+export const areStringsEqual = (
+  string1: string | null | undefined,
+  string2: string | null | undefined
+): boolean => string1?.toUpperCase() === string2?.toUpperCase();
 
 /**
  * Calculates the progress percentage of an amount towards a total.

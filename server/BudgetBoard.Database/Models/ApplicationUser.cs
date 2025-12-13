@@ -59,4 +59,9 @@ public class ApplicationUser : IdentityUser<Guid>
     /// Collection of financial assets owned by the user.
     /// </summary>
     public ICollection<Asset> Assets { get; set; } = [];
+
+    /// <summary>
+    /// Collection of widget settings for the user's dashboard.
+    /// </summary>
+    public ICollection<WidgetSettings> WidgetSettings { get; set; } = [];
 }

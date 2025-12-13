@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -15,15 +14,14 @@ namespace BudgetBoard.Database.Migrations
                 name: "Deleted",
                 table: "Balance",
                 type: "timestamp with time zone",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Deleted",
-                table: "Balance");
+            migrationBuilder.DropColumn(name: "Deleted", table: "Balance");
         }
     }
 }

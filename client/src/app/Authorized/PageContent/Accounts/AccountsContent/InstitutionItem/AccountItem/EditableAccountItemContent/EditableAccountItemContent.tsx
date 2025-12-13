@@ -28,7 +28,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import ElevatedCategorySelect from "~/components/core/Select/CategorySelect/ElevatedCategorySelect/ElevatedCategorySelect";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -203,7 +203,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
           </StatusText>
         </Group>
         <Group justify="space-between" align="center">
-          <ElevatedCategorySelect
+          <CategorySelect
             w={220}
             categories={accountCategories}
             value={
@@ -219,6 +219,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 : accountSubTypeField.setValue(val);
             }}
             withinPortal
+            elevation={2}
           />
           <DimmedText size="sm">
             Last Updated: {dayjs(props.account.balanceDate).format("L LT")}

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,13 +10,9 @@ namespace BudgetBoard.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "BalanceDate",
-                table: "Account");
+            migrationBuilder.DropColumn(name: "BalanceDate", table: "Account");
 
-            migrationBuilder.DropColumn(
-                name: "CurrentBalance",
-                table: "Account");
+            migrationBuilder.DropColumn(name: "CurrentBalance", table: "Account");
 
             migrationBuilder.AlterColumn<decimal>(
                 name: "MonthlyContribution",
@@ -26,7 +21,8 @@ namespace BudgetBoard.Database.Migrations
                 nullable: true,
                 oldClrType: typeof(float),
                 oldType: "real",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<decimal>(
                 name: "InitialAmount",
@@ -35,7 +31,8 @@ namespace BudgetBoard.Database.Migrations
                 nullable: true,
                 oldClrType: typeof(float),
                 oldType: "real",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<decimal>(
                 name: "Amount",
@@ -43,7 +40,8 @@ namespace BudgetBoard.Database.Migrations
                 type: "numeric",
                 nullable: false,
                 oldClrType: typeof(float),
-                oldType: "real");
+                oldType: "real"
+            );
         }
 
         /// <inheritdoc />
@@ -56,7 +54,8 @@ namespace BudgetBoard.Database.Migrations
                 nullable: true,
                 oldClrType: typeof(decimal),
                 oldType: "numeric",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<float>(
                 name: "InitialAmount",
@@ -65,7 +64,8 @@ namespace BudgetBoard.Database.Migrations
                 nullable: true,
                 oldClrType: typeof(decimal),
                 oldType: "numeric",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<float>(
                 name: "Amount",
@@ -73,20 +73,23 @@ namespace BudgetBoard.Database.Migrations
                 type: "real",
                 nullable: false,
                 oldClrType: typeof(decimal),
-                oldType: "numeric");
+                oldType: "numeric"
+            );
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "BalanceDate",
                 table: "Account",
                 type: "timestamp with time zone",
-                nullable: true);
+                nullable: true
+            );
 
             migrationBuilder.AddColumn<float>(
                 name: "CurrentBalance",
                 table: "Account",
                 type: "real",
                 nullable: false,
-                defaultValue: 0f);
+                defaultValue: 0f
+            );
         }
     }
 }

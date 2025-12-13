@@ -10,10 +10,10 @@ const ElevatedCategorySelect = ({
 }: CategorySelectBaseProps): React.ReactNode => {
   return (
     <CategorySelectBase
+      {...props}
       classNames={{
         input: elevatedClasses.input,
       }}
-      {...props}
     />
   );
 };
