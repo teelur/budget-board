@@ -391,4 +391,7 @@
   <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
     <value>The net worth widget category you are trying to access does not exist.</value>
   </data>
+  <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
+    <value>Cannot create a circular dependency. The target line already depends on this line.</value>
+  </data>
   </root>

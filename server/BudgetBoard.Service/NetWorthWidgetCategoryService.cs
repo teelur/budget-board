@@ -66,7 +66,39 @@ public class NetWorthWidgetCategoryService(
             );
         }
 
-        // TODO: Shouldn't allow line names that depend on this line
+        if (request.Type == "Line" && request.Subtype == "Name")
+        {
+            var targetLine = configuration
+                .Groups.SelectMany(g => g.Lines)
+                .FirstOrDefault(l =>
+                    l.Name.Equals(request.Value, StringComparison.CurrentCultureIgnoreCase)
+                );
+
+            if (targetLine == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetLineNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["NetWorthWidgetLineNotFoundError"]
+                );
+            }
+
+            if (
+                targetLine.Categories.Any(c =>
+                    c.Type == "Line"
+                    && c.Subtype == "Name"
+                    && c.Value.Equals(line.Name, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
+            {
+                logger.LogError(
+                    "{LogMessage}",
+                    logLocalizer["NetWorthWidgetCategoryTargetLineDependsOnThisLineLog"]
+                );
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["NetWorthWidgetCategoryTargetLineDependsOnThisLineError"]
+                );
+            }
+        }
 
         category.Value = request.Value;
         category.Type = request.Type;
