@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
-namespace BudgetBoard.Controllers;
+namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
