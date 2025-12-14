@@ -2,7 +2,7 @@ import { ICategory } from "./category";
 
 export interface ITransactionImport {
   date: Date | null;
-  description: string | null;
+  merchantName: string | null;
   category: string | null;
   amount: number | null;
   account: string | null;

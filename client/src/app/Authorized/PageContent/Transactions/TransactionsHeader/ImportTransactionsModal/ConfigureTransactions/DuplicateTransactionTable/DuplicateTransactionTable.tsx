@@ -99,7 +99,7 @@ const DuplicateTransactionTable = (
             <Table.Tr>
               <Table.Th />
               <Table.Th>Date</Table.Th>
-              <Table.Th>Description</Table.Th>
+              <Table.Th>Merchant Name</Table.Th>
               <Table.Th>Amount</Table.Th>
               <Table.Th>Account</Table.Th>
             </Table.Tr>
@@ -137,7 +137,7 @@ const DuplicateTransactionTable = (
                     <Table.Td>
                       {row.importedTransaction.date?.toLocaleDateString()}
                     </Table.Td>
-                    <Table.Td>{row.importedTransaction.description}</Table.Td>
+                    <Table.Td>{row.importedTransaction.merchantName}</Table.Td>
                     <Table.Td>
                       {userSettingsQuery.isPending
                         ? null

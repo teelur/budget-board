@@ -51,7 +51,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
             <Table.Tr>
               <Table.Th />
               <Table.Th>Date</Table.Th>
-              <Table.Th>Description</Table.Th>
+              <Table.Th>Merchant Name</Table.Th>
               <Table.Th>Category</Table.Th>
               <Table.Th>Amount</Table.Th>
               <Table.Th>Account</Table.Th>
@@ -80,7 +80,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                     </Flex>
                   </Table.Td>
                   <Table.Td>{row.date?.toLocaleDateString()}</Table.Td>
-                  <Table.Td>{row.description}</Table.Td>
+                  <Table.Td>{row.merchantName}</Table.Td>
                   <Table.Td>{row.category}</Table.Td>
                   <Table.Td>
                     {userSettingsQuery.isPending
