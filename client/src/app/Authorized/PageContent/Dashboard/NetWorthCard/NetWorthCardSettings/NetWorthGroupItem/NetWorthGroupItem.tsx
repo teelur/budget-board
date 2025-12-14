@@ -3,7 +3,7 @@ import {
   INetWorthWidgetGroup,
   INetWorthWidgetLine,
 } from "~/models/widgetSettings";
-import NetWorthLineItem from "../NetWorthLineItem/NetWorthLineItem";
+import NetWorthLineItem from "./NetWorthLineItem/NetWorthLineItem";
 import {
   ActionIcon,
   Button,
