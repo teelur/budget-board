@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,29 +10,22 @@ namespace BudgetBoard.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Deleted",
-                table: "Budget");
+            migrationBuilder.DropColumn(name: "Deleted", table: "Budget");
 
-            migrationBuilder.RenameColumn(
-                name: "Created",
-                table: "Budget",
-                newName: "Date");
+            migrationBuilder.RenameColumn(name: "Created", table: "Budget", newName: "Date");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Date",
-                table: "Budget",
-                newName: "Created");
+            migrationBuilder.RenameColumn(name: "Date", table: "Budget", newName: "Created");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "Deleted",
                 table: "Budget",
                 type: "timestamp with time zone",
-                nullable: true);
+                nullable: true
+            );
         }
     }
 }

@@ -138,6 +138,7 @@ const resolver: CSSVariablesResolver = () => ({
     "--text-color-status-bad": red[4],
     // Button colors
     "--button-color-confirm": green[9],
+    "--button-color-warning": orange[5],
     "--button-color-destructive": red[4],
     // Other
     "--light-color-off": backgroundGray[3],

@@ -488,6 +488,32 @@ namespace BudgetBoard.Database.Migrations
                     b.ToTable("Value", (string)null);
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.WidgetSettings", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Configuration")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("WidgetType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("WidgetSettings", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
@@ -778,6 +804,17 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("Asset");
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.WidgetSettings", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("WidgetSettings")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -875,6 +912,8 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("TransactionCategories");
 
                     b.Navigation("UserSettings");
+
+                    b.Navigation("WidgetSettings");
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Asset", b =>

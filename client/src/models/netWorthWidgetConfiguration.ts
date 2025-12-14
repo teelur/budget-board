@@ -1,0 +1,42 @@
+export interface INetWorthWidgetLineCreateRequest {
+  name: string;
+  group: number;
+  index: number;
+  widgetSettingsId: string;
+}
+
+export interface INetWorthWidgetLineUpdateRequest {
+  lineId: string;
+  name: string;
+  group: number;
+  index: number;
+  widgetSettingsId: string;
+}
+
+export interface INetWorthWidgetCategoryCreateRequest {
+  value: string;
+  type: string;
+  subtype: string;
+  lineId: string;
+  widgetSettingsId: string;
+}
+
+export interface INetWorthWidgetCategoryUpdateRequest {
+  id: string;
+  value: string;
+  type: string;
+  subtype: string;
+  lineId: string;
+  widgetSettingsId: string;
+}
+
+export interface INetWorthWidgetLineReorderRequest {
+  widgetSettingsId: string;
+  groupId: string;
+  orderedLineIds: string[];
+}
+
+export interface INetWorthWidgetGroupReorderRequest {
+  widgetSettingsId: string;
+  orderedGroupIds: string[];
+}

@@ -1,5 +1,4 @@
-﻿using System;
-using BudgetBoard.Database.Models;
+﻿using BudgetBoard.Database.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -12,7 +11,8 @@ namespace BudgetBoard.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
+            migrationBuilder
+                .AlterDatabase()
                 .Annotation("Npgsql:Enum:currency", "aud,cad,chf,cny,eur,gbp,inr,jpy,nzd,sek,usd");
 
             migrationBuilder.CreateTable(
@@ -21,7 +21,7 @@ namespace BudgetBoard.Database.Migrations
                 {
                     ID = table.Column<Guid>(type: "uuid", nullable: false),
                     Currency = table.Column<Currency>(type: "currency", nullable: false),
-                    UserID = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserID = table.Column<Guid>(type: "uuid", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -31,24 +31,30 @@ namespace BudgetBoard.Database.Migrations
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserSettings_UserID",
                 table: "UserSettings",
                 column: "UserID",
-                unique: true);
+                unique: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "UserSettings");
+            migrationBuilder.DropTable(name: "UserSettings");
 
-            migrationBuilder.AlterDatabase()
-                .OldAnnotation("Npgsql:Enum:currency", "aud,cad,chf,cny,eur,gbp,inr,jpy,nzd,sek,usd");
+            migrationBuilder
+                .AlterDatabase()
+                .OldAnnotation(
+                    "Npgsql:Enum:currency",
+                    "aud,cad,chf,cny,eur,gbp,inr,jpy,nzd,sek,usd"
+                );
         }
     }
 }

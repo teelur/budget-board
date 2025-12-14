@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BudgetBoard.Service.Models;
+
+public interface INetWorthWidgetGroupReorderRequest
+{
+    Guid WidgetSettingsId { get; }
+    IEnumerable<Guid> OrderedGroupIds { get; }
+}
+
+public class NetWorthWidgetGroupReorderRequest : INetWorthWidgetGroupReorderRequest
+{
+    public Guid WidgetSettingsId { get; set; } = Guid.Empty;
+    public IEnumerable<Guid> OrderedGroupIds { get; set; } = [];
+}

@@ -24,7 +24,7 @@ import CategoryOptionText from "./CategoryOptionText/CategoryOptionText";
 
 export interface CategorySelectBaseProps extends InputBaseProps {
   categories: ICategory[];
-  value: string;
+  value: string | null;
   onChange: (value: string) => void;
   withinPortal?: boolean;
   includeUncategorized?: boolean;
@@ -162,7 +162,7 @@ const CategorySelectBase = ({
           {...props}
         >
           {value ? (
-            <PrimaryText size="sm">
+            <PrimaryText size={props.size || "sm"}>
               {getFormattedCategoryValue(value, categories)}
             </PrimaryText>
           ) : (

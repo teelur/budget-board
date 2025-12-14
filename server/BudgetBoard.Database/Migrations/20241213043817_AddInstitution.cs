@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,15 +10,14 @@ namespace BudgetBoard.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Institution",
-                table: "Account");
+            migrationBuilder.DropColumn(name: "Institution", table: "Account");
 
             migrationBuilder.AddColumn<Guid>(
                 name: "InstitutionID",
                 table: "Account",
                 type: "uuid",
-                nullable: true);
+                nullable: true
+            );
 
             migrationBuilder.CreateTable(
                 name: "Institution",
@@ -28,7 +26,7 @@ namespace BudgetBoard.Database.Migrations
                     ID = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Index = table.Column<int>(type: "integer", nullable: false),
-                    UserID = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserID = table.Column<Guid>(type: "uuid", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -38,25 +36,30 @@ namespace BudgetBoard.Database.Migrations
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Account_InstitutionID",
                 table: "Account",
-                column: "InstitutionID");
+                column: "InstitutionID"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Institution_UserID",
                 table: "Institution",
-                column: "UserID");
+                column: "UserID"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Account_Institution_InstitutionID",
                 table: "Account",
                 column: "InstitutionID",
                 principalTable: "Institution",
-                principalColumn: "ID");
+                principalColumn: "ID"
+            );
         }
 
         /// <inheritdoc />
@@ -64,25 +67,22 @@ namespace BudgetBoard.Database.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Account_Institution_InstitutionID",
-                table: "Account");
+                table: "Account"
+            );
 
-            migrationBuilder.DropTable(
-                name: "Institution");
+            migrationBuilder.DropTable(name: "Institution");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Account_InstitutionID",
-                table: "Account");
+            migrationBuilder.DropIndex(name: "IX_Account_InstitutionID", table: "Account");
 
-            migrationBuilder.DropColumn(
-                name: "InstitutionID",
-                table: "Account");
+            migrationBuilder.DropColumn(name: "InstitutionID", table: "Account");
 
             migrationBuilder.AddColumn<string>(
                 name: "Institution",
                 table: "Account",
                 type: "text",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: ""
+            );
         }
     }
 }

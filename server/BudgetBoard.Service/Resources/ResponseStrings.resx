@@ -370,4 +370,28 @@
   <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
     <value>Unsupported operator '{0}' in rule action.</value>
   </data>
-</root>
+  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
+    <value>The widget you are trying to update does not exist.</value>
+  </data>
+  <data name="WidgetSettingsNotFoundError" xml:space="preserve">
+    <value>The widget settings you are trying to access do not exist.</value>
+  </data>
+  <data name="WidgetConfigurationNullError" xml:space="preserve">
+    <value>The widget configuration is null or empty.</value>
+  </data>
+  <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
+    <value>Failed to deserialize the widget configuration.</value>
+  </data>
+  <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
+    <value>The net worth widget line you are trying to access does not exist.</value>
+  </data>
+  <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
+    <value>The net worth widget group you are trying to access does not exist.</value>
+  </data>
+  <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
+    <value>The net worth widget category you are trying to access does not exist.</value>
+  </data>
+  <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
+    <value>Cannot create a circular dependency. The target line already depends on this line.</value>
+  </data>
+  </root>
