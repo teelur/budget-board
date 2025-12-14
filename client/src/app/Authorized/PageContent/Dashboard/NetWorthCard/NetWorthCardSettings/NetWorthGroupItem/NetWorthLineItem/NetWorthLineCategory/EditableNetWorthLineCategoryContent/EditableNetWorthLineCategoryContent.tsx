@@ -144,24 +144,53 @@ const EditableNetWorthLineCategoryContent = (
   }, [type, subtype, value]);
 
   const getValidLineNames = () => {
-    const linesThatUseThisName = props.lines.filter((line) => {
-      return line.categories.some((category) => {
-        return (
-          areStringsEqual(category.type, "line") &&
-          areStringsEqual(category.subtype, "name") &&
-          areStringsEqual(category.value, props.currentLineName)
-        );
-      });
-    });
+    const wouldCreateCircularDependency = (targetLineName: string): boolean => {
+      const visited = new Set<string>();
 
+      const hasCircularReference = (lineName: string): boolean => {
+        if (areStringsEqual(lineName, props.currentLineName)) {
+          return true;
+        }
+
+        if (visited.has(lineName.toLowerCase())) {
+          return false;
+        }
+
+        visited.add(lineName.toLowerCase());
+
+        const line = props.lines.find((l) => areStringsEqual(l.name, lineName));
+        if (!line) {
+          return false;
+        }
+
+        for (const category of line.categories) {
+          if (
+            areStringsEqual(category.type, "line") &&
+            areStringsEqual(category.subtype, "name") &&
+            category.value
+          ) {
+            if (hasCircularReference(category.value)) {
+              return true;
+            }
+          }
+        }
+
+        visited.delete(lineName.toLowerCase());
+        return false;
+      };
+
+      return hasCircularReference(targetLineName);
+    };
+
+    // We want to filter out any line names that would create a circular dependency
     const validLineNames = props.lines
       .map((line) => line.name)
       .filter(
         (name) =>
-          !linesThatUseThisName.some((line) =>
-            areStringsEqual(line.name, name)
-          ) && !areStringsEqual(name, props.currentLineName)
+          !areStringsEqual(name, props.currentLineName) &&
+          !wouldCreateCircularDependency(name)
       );
+
     return [...new Set(validLineNames)];
   };
 
