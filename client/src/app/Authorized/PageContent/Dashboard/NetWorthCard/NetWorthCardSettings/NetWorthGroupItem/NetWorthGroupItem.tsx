@@ -36,6 +36,7 @@ export interface NetWorthGroupItemProps {
   isSortable: boolean;
   container: Element;
   settingsId: string;
+  onReorder: boolean;
 }
 
 const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
@@ -101,10 +102,8 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
     );
   }, [props.group.lines]);
 
-  const prevIsSortable = React.useRef(props.isSortable);
-
   useDidUpdate(() => {
-    if (prevIsSortable.current && !props.isSortable) {
+    if (!props.isSortable) {
       const orderedLines: string[] = sortedLineItems.map((line) => line.id);
 
       doReorderLines.mutate({
@@ -113,8 +112,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
         orderedLineIds: orderedLines,
       } as INetWorthWidgetLineReorderRequest);
     }
-    prevIsSortable.current = props.isSortable;
-  }, [props.isSortable]);
+  }, [props.onReorder]);
 
   const { ref, handleRef } = useSortable({
     id: props.group.id,

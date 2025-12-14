@@ -28,6 +28,7 @@ import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import { closestCorners } from "@dnd-kit/collision";
+import React from "react";
 
 export interface INetWorthLineItemProps {
   container: Element;

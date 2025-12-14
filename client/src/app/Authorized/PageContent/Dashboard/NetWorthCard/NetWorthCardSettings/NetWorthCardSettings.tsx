@@ -34,6 +34,8 @@ const NetWorthCardSettings = (): React.ReactNode => {
     INetWorthWidgetGroup[]
   >([]);
   const [settingsId, setSettingsId] = React.useState<string>("");
+  const [onReorderCompleted, setOnReorderCompleted] =
+    React.useState<boolean>(false);
 
   const { request } = useAuth();
 
@@ -85,7 +87,7 @@ const NetWorthCardSettings = (): React.ReactNode => {
         data: reorderRequest,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      setOnReorderCompleted((prev) => !prev);
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -214,6 +216,7 @@ const NetWorthCardSettings = (): React.ReactNode => {
                       isSortable={isSortable}
                       container={groupsStackRef.current as Element}
                       settingsId={settingsId}
+                      onReorder={onReorderCompleted}
                     />
                   ))
                 ) : (
