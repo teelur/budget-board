@@ -461,10 +461,7 @@ const ConfigureTransactions = (
       }
       if (filterOpts.merchantName) {
         parts.push(
-          ((t as any).merchantName ?? (t as any).merchantName ?? "")
-            .toString()
-            .trim()
-            .toLowerCase()
+          ((t as any).merchantName ?? "").toString().trim().toLowerCase()
         );
       }
       if (filterOpts.category) {
