@@ -143,7 +143,7 @@ const EditableNetWorthLineCategoryContent = (
     }
   }, [type, subtype, value]);
 
-  const getValidLineNames = () => {
+  const validLineNames = React.useMemo(() => {
     const wouldCreateCircularDependency = (targetLineName: string): boolean => {
       // Track nodes in the current DFS path to detect back edges (circular references)
       const visited = new Set<string>();
@@ -200,7 +200,7 @@ const EditableNetWorthLineCategoryContent = (
       );
 
     return [...new Set(validLineNames)];
-  };
+  }, [props.lines, props.currentLineName]);
 
   const getValidNetWorthValuesForTypeAndSubtype = (
     type: string,
@@ -228,7 +228,7 @@ const EditableNetWorthLineCategoryContent = (
           <Select
             w="150px"
             size="xs"
-            data={getValidLineNames()}
+            data={validLineNames}
             {...valueField.getInputProps()}
             elevation={2}
           />
