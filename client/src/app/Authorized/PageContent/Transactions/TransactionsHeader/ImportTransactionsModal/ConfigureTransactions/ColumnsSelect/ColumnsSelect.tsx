@@ -6,7 +6,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export interface ISelectedColumns {
   date: string | null;
-  description: string | null;
+  merchantName: string | null;
   category: string | null;
   amount: string | null;
   account: string | null;
@@ -25,8 +25,8 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
   const dateColumnField = useField<string | null>({
     initialValue: props.selectedColumns.date,
   });
-  const descriptionColumnField = useField<string | null>({
-    initialValue: props.selectedColumns.description,
+  const merchantNameColumnField = useField<string | null>({
+    initialValue: props.selectedColumns.merchantName,
   });
   const categoryColumnField = useField<string | null>({
     initialValue: props.selectedColumns.category,
@@ -47,7 +47,7 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
   React.useEffect(() => {
     props.applySelectedColumns({
       date: dateColumnField.getValue(),
-      description: descriptionColumnField.getValue(),
+      merchantName: merchantNameColumnField.getValue(),
       category: categoryColumnField.getValue(),
       amount: amountColumnField.getValue(),
       account: accountColumnField.getValue(),
@@ -56,7 +56,7 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
     });
   }, [
     dateColumnField.getValue(),
-    descriptionColumnField.getValue(),
+    merchantNameColumnField.getValue(),
     categoryColumnField.getValue(),
     amountColumnField.getValue(),
     accountColumnField.getValue(),
@@ -76,10 +76,10 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
           elevation={0}
         />
         <Select
-          label={<PrimaryText size="sm">Description</PrimaryText>}
+          label={<PrimaryText size="sm">Merchant Name</PrimaryText>}
           data={props.csvHeaders}
           clearable
-          {...descriptionColumnField.getInputProps()}
+          {...merchantNameColumnField.getInputProps()}
           elevation={0}
         />
         <Select

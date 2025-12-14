@@ -45,8 +45,8 @@ const AccountsSelectHeader = (
         elevation={1}
       />
       <AccountSelect
-        selectedAccountIds={props.selectedAccountIds}
-        setSelectedAccountIds={props.setSelectedAccountIds}
+        value={props.selectedAccountIds}
+        onChange={props.setSelectedAccountIds}
         hideHidden
         filterTypes={props.filters}
         miw="230px"

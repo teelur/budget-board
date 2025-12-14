@@ -52,9 +52,9 @@ const ConfigureTransactions = (
       props.csvHeaders.find((header) =>
         areStringsEqual(header.toLowerCase(), "date")
       ) ?? null,
-    description:
+    merchantName:
       props.csvHeaders.find((header) =>
-        areStringsEqual(header.toLowerCase(), "description")
+        areStringsEqual(header.toLowerCase(), "merchant name")
       ) ?? null,
     category:
       props.csvHeaders.find((header) =>
@@ -83,7 +83,7 @@ const ConfigureTransactions = (
     filterDuplicates: false,
     filterByOptions: {
       date: false,
-      description: false,
+      merchantName: false,
       category: false,
       amount: false,
       account: false,
@@ -145,19 +145,19 @@ const ConfigureTransactions = (
 
     if (
       !columnsSelect.date &&
-      !columnsSelect.description &&
+      !columnsSelect.merchantName &&
       !columnsSelect.category
     ) {
       if (columnsOptions.splitAmountColumn) {
         if (!columnsSelect.incomeAmount && !columnsSelect.expenseAmount) {
           setAlertDetails(
-            "One or more of Date, Description, Category, Income Amount, or Expense Amount columns are required."
+            "One or more of Date, Merchant Name, Category, Income Amount, or Expense Amount columns are required."
           );
           return;
         }
       } else if (!columnsSelect.amount) {
         setAlertDetails(
-          "One or more of Date, Description, Category, or Amount columns are required."
+          "One or more of Date, Merchant Name, Category, or Amount columns are required."
         );
         return;
       }
@@ -342,8 +342,8 @@ const ConfigureTransactions = (
         date: columnsSelect.date
           ? dayjs(row[columnsSelect.date], columnsOptions.dateFormat).toDate()
           : null,
-        description: columnsSelect.description
-          ? row[columnsSelect.description]
+        merchantName: columnsSelect.merchantName
+          ? row[columnsSelect.merchantName]
           : null,
         category: columnsSelect.category ? row[columnsSelect.category] : null,
         amount: getImportedTransactionAmount(row),
@@ -424,7 +424,7 @@ const ConfigureTransactions = (
     const filterOpts = columnsOptions.filterByOptions;
     if (
       !filterOpts?.date &&
-      !filterOpts?.description &&
+      !filterOpts?.merchantName &&
       !filterOpts?.category &&
       !filterOpts?.amount &&
       !filterOpts?.account
@@ -459,12 +459,9 @@ const ConfigureTransactions = (
           .valueOf();
         parts.push(String(d));
       }
-      if (filterOpts.description) {
+      if (filterOpts.merchantName) {
         parts.push(
-          ((t as any).merchantName ?? (t as any).description ?? "")
-            .toString()
-            .trim()
-            .toLowerCase()
+          ((t as any).merchantName ?? "").toString().trim().toLowerCase()
         );
       }
       if (filterOpts.category) {
@@ -546,10 +543,10 @@ const ConfigureTransactions = (
           if (filterOpts.date) {
             ok = ok && dayjs(c.date).isSame(imp.date, "day");
           }
-          if (ok && filterOpts.description) {
+          if (ok && filterOpts.merchantName) {
             ok =
               ok &&
-              areStringsEqual(c.merchantName ?? "", imp.description ?? "");
+              areStringsEqual(c.merchantName ?? "", imp.merchantName ?? "");
           }
           if (ok && filterOpts.category) {
             const importedParent = getParentCategory(
@@ -616,7 +613,7 @@ const ConfigureTransactions = (
       // fresh when the user maps new columns.
       if (
         (!columnsSelect.date &&
-          !columnsSelect.description &&
+          !columnsSelect.merchantName &&
           !columnsSelect.category &&
           !columnsSelect.amount &&
           !columnsSelect.account) ||

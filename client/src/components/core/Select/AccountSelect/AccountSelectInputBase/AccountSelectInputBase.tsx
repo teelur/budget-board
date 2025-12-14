@@ -6,8 +6,6 @@ import { AccountSource, IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
 
 export interface AccountSelectInputBaseProps extends MultiSelectProps {
-  selectedAccountIds?: string[];
-  setSelectedAccountIds?: (accountIds: string[]) => void;
   hideHidden?: boolean;
   filterTypes?: string[];
   manualOnly?: boolean;
@@ -15,8 +13,6 @@ export interface AccountSelectInputBaseProps extends MultiSelectProps {
 }
 
 const AccountSelectInputBase = ({
-  selectedAccountIds,
-  setSelectedAccountIds,
   hideHidden = false,
   filterTypes = [],
   manualOnly = false,
@@ -71,8 +67,6 @@ const AccountSelectInputBase = ({
         return { value: a.id, label: a.name };
       })}
       placeholder="Select accounts"
-      value={selectedAccountIds}
-      onChange={setSelectedAccountIds}
       clearable
       maxValues={maxSelectedValues}
       {...props}

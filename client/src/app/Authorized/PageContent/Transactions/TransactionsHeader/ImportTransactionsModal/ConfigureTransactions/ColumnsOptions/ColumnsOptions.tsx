@@ -8,7 +8,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export interface IFilterByOptions {
   date: boolean;
-  description: boolean;
+  merchantName: boolean;
   category: boolean;
   amount: boolean;
   account: boolean;
@@ -68,8 +68,8 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
   const filterByDateField = useField<boolean>({
     initialValue: props.columnsOptions.filterByOptions?.date ?? false,
   });
-  const filterByDescriptionField = useField<boolean>({
-    initialValue: props.columnsOptions.filterByOptions?.description ?? false,
+  const filterByMerchantNameField = useField<boolean>({
+    initialValue: props.columnsOptions.filterByOptions?.merchantName ?? false,
   });
   const filterByCategoryField = useField<boolean>({
     initialValue: props.columnsOptions.filterByOptions?.category ?? false,
@@ -105,14 +105,14 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
       filterByOptions: filterDuplicatesField.getValue()
         ? {
             date: filterByDateField.getValue(),
-            description: filterByDescriptionField.getValue(),
+            merchantName: filterByMerchantNameField.getValue(),
             category: filterByCategoryField.getValue(),
             amount: filterByAmountField.getValue(),
             account: filterByAccountField.getValue(),
           }
         : {
             date: false,
-            description: false,
+            merchantName: false,
             category: false,
             amount: false,
             account: false,
@@ -125,7 +125,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
     expensesColumnValueField.getValue(),
     filterDuplicatesField.getValue(),
     filterByDateField.getValue(),
-    filterByDescriptionField.getValue(),
+    filterByMerchantNameField.getValue(),
     filterByCategoryField.getValue(),
     filterByAmountField.getValue(),
     filterByAccountField.getValue(),
@@ -234,13 +234,13 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                     elevation={1}
                   />
                   <Checkbox
-                    checked={filterByDescriptionField.getValue()}
+                    checked={filterByMerchantNameField.getValue()}
                     onChange={(event) =>
-                      filterByDescriptionField.setValue(
+                      filterByMerchantNameField.setValue(
                         event.currentTarget.checked
                       )
                     }
-                    label={<PrimaryText size="sm">Description</PrimaryText>}
+                    label={<PrimaryText size="sm">Merchant Name</PrimaryText>}
                     elevation={1}
                   />
                   <Checkbox
