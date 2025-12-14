@@ -152,7 +152,6 @@ const CategorySelectBase = ({
     >
       <Combobox.Target>
         <InputBase
-          {...props}
           component="button"
           type="button"
           rightSection={<Combobox.Chevron />}
@@ -160,6 +159,7 @@ const CategorySelectBase = ({
           rightSectionPointerEvents="none"
           multiline
           pointer
+          {...props}
         >
           {value ? (
             <PrimaryText size={props.size || "sm"}>
