@@ -145,17 +145,22 @@ const EditableNetWorthLineCategoryContent = (
 
   const getValidLineNames = () => {
     const wouldCreateCircularDependency = (targetLineName: string): boolean => {
+      // Track nodes in the current DFS path to detect back edges (circular references)
       const visited = new Set<string>();
 
       const hasCircularReference = (lineName: string): boolean => {
+        // Base case: if we encounter the line being edited, we've found a circular dependency
+        // This detects when a dependency chain would circle back to the current line
         if (areStringsEqual(lineName, props.currentLineName)) {
           return true;
         }
 
+        // If already in current path, we've already explored this branch
         if (visited.has(lineName.toLowerCase())) {
           return false;
         }
 
+        // Add to current path
         visited.add(lineName.toLowerCase());
 
         const line = props.lines.find((l) => areStringsEqual(l.name, lineName));
@@ -163,6 +168,7 @@ const EditableNetWorthLineCategoryContent = (
           return false;
         }
 
+        // Recursively check all dependencies of this line
         for (const category of line.categories) {
           if (
             areStringsEqual(category.type, "line") &&
@@ -175,6 +181,8 @@ const EditableNetWorthLineCategoryContent = (
           }
         }
 
+        // Backtrack: remove from current path to allow exploring other dependency paths
+        // This enables checking multiple paths from the same node in different contexts
         visited.delete(lineName.toLowerCase());
         return false;
       };
