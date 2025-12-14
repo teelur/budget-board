@@ -22,7 +22,7 @@ export interface INetWorthWidgetCategoryCreateRequest {
 }
 
 export interface INetWorthWidgetCategoryUpdateRequest {
-  Id: string;
+  id: string;
   value: string;
   type: string;
   subtype: string;

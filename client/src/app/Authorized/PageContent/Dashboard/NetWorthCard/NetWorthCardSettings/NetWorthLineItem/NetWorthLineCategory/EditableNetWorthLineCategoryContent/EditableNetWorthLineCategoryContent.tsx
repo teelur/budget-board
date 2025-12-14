@@ -133,7 +133,7 @@ const EditableNetWorthLineCategoryContent = (
   useDidUpdate(() => {
     if (type && subtype && isValueValid(type, subtype, value ?? "")) {
       doUpdateCategory.mutate({
-        Id: props.category.id,
+        id: props.category.id,
         type,
         subtype,
         value: value ?? "",
