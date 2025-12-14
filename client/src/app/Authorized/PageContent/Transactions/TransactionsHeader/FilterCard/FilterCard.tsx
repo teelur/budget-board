@@ -52,8 +52,8 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
           />
           <AccountSelect
             w={{ base: "100%", sm: "50%" }}
-            selectedAccountIds={transactionFilters.accounts}
-            setSelectedAccountIds={(newAccountIds: string[]) => {
+            value={transactionFilters.accounts}
+            onChange={(newAccountIds: string[]) => {
               const newFilters = new Filters();
               newFilters.accounts = newAccountIds;
               newFilters.category = transactionFilters.category;
