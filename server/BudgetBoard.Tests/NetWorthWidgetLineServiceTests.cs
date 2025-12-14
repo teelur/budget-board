@@ -44,10 +44,6 @@ public class NetWorthWidgetLineServiceTests
         helper.UserDataContext.WidgetSettings.Add(widgetSettings);
         await helper.UserDataContext.SaveChangesAsync();
 
-        var configuration = JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
-            helper.demoUser.WidgetSettings.First().Configuration!
-        )!;
-
         var request = new NetWorthWidgetLineCreateRequest
         {
             Name = "Test",
@@ -99,10 +95,6 @@ public class NetWorthWidgetLineServiceTests
 
         helper.UserDataContext.WidgetSettings.Add(widgetSettings);
         await helper.UserDataContext.SaveChangesAsync();
-
-        var configuration = JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
-            helper.demoUser.WidgetSettings.First().Configuration!
-        )!;
 
         var request = new NetWorthWidgetLineCreateRequest
         {
