@@ -37,6 +37,7 @@ export interface NetWorthGroupItemProps {
   container: Element;
   settingsId: string;
   onReorder: boolean;
+  allLines: INetWorthWidgetLine[];
 }
 
 const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
@@ -171,7 +172,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
                   container={linesStackRef.current as Element}
                   line={line}
                   groupIndex={props.group.index}
-                  lines={sortedLineItems}
+                  lines={props.allLines}
                   settingsId={props.settingsId}
                   isSortable={props.isSortable}
                 />

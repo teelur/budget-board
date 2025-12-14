@@ -19,6 +19,7 @@ import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import {
   INetWorthWidgetGroup,
+  INetWorthWidgetLine,
   IWidgetSettingsResponse,
 } from "~/models/widgetSettings";
 import {
@@ -143,6 +144,12 @@ const NetWorthCardSettings = (): React.ReactNode => {
     }
   }, [widgetSettingsQuery.data]);
 
+  const allLines = React.useMemo(() => {
+    return sortedGroups.reduce<INetWorthWidgetLine[]>((acc, group) => {
+      return [...acc, ...group.lines];
+    }, []);
+  }, [sortedGroups]);
+
   useDidUpdate(() => {
     if (!isSortable) {
       const orderedGroups: string[] = sortedGroups.map((group) => group.id);
@@ -217,6 +224,7 @@ const NetWorthCardSettings = (): React.ReactNode => {
                       container={groupsStackRef.current as Element}
                       settingsId={settingsId}
                       onReorder={onReorderCompleted}
+                      allLines={allLines}
                     />
                   ))
                 ) : (

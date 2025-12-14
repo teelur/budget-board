@@ -143,27 +143,64 @@ const EditableNetWorthLineCategoryContent = (
     }
   }, [type, subtype, value]);
 
-  const getValidLineNames = () => {
-    const linesThatUseThisName = props.lines.filter((line) => {
-      return line.categories.some((category) => {
-        return (
-          areStringsEqual(category.type, "line") &&
-          areStringsEqual(category.subtype, "name") &&
-          areStringsEqual(category.value, props.currentLineName)
-        );
-      });
-    });
+  const validLineNames = React.useMemo(() => {
+    const wouldCreateCircularDependency = (targetLineName: string): boolean => {
+      // Track nodes in the current DFS path to detect back edges (circular references)
+      const visited = new Set<string>();
 
+      const hasCircularReference = (lineName: string): boolean => {
+        // Base case: if we encounter the line being edited, we've found a circular dependency
+        // This detects when a dependency chain would circle back to the current line
+        if (areStringsEqual(lineName, props.currentLineName)) {
+          return true;
+        }
+
+        // If already in current path, we've already explored this branch
+        if (visited.has(lineName.toLowerCase())) {
+          return false;
+        }
+
+        // Add to current path
+        visited.add(lineName.toLowerCase());
+
+        const line = props.lines.find((l) => areStringsEqual(l.name, lineName));
+        if (!line) {
+          return false;
+        }
+
+        // Recursively check all dependencies of this line
+        for (const category of line.categories) {
+          if (
+            areStringsEqual(category.type, "line") &&
+            areStringsEqual(category.subtype, "name") &&
+            category.value
+          ) {
+            if (hasCircularReference(category.value)) {
+              return true;
+            }
+          }
+        }
+
+        // Backtrack: remove from current path to allow exploring other dependency paths
+        // This enables checking multiple paths from the same node in different contexts
+        visited.delete(lineName.toLowerCase());
+        return false;
+      };
+
+      return hasCircularReference(targetLineName);
+    };
+
+    // We want to filter out any line names that would create a circular dependency
     const validLineNames = props.lines
       .map((line) => line.name)
       .filter(
         (name) =>
-          !linesThatUseThisName.some((line) =>
-            areStringsEqual(line.name, name)
-          ) && !areStringsEqual(name, props.currentLineName)
+          !areStringsEqual(name, props.currentLineName) &&
+          !wouldCreateCircularDependency(name)
       );
+
     return [...new Set(validLineNames)];
-  };
+  }, [props.lines, props.currentLineName]);
 
   const getValidNetWorthValuesForTypeAndSubtype = (
     type: string,
@@ -191,7 +228,7 @@ const EditableNetWorthLineCategoryContent = (
           <Select
             w="150px"
             size="xs"
-            data={getValidLineNames()}
+            data={validLineNames}
             {...valueField.getInputProps()}
             elevation={2}
           />
