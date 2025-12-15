@@ -9,7 +9,7 @@ import { getSeriesLabels } from "~/helpers/get-series-labels";
 
 interface ChartTooltipProps {
   label: string | number | undefined;
-  payload: Record<string, any>[] | undefined;
+  payload: readonly Record<string, any>[] | undefined;
   series: ChartSeries[];
   valueFormatter?: (value: number) => string;
   includeTotal?: boolean;
@@ -20,7 +20,7 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
 
   const labels = getSeriesLabels(props.series);
 
-  const filteredPayload = getFilteredChartTooltipPayload(props.payload ?? []);
+  const filteredPayload = getFilteredChartTooltipPayload([...(props.payload ?? [])]);
 
   if (filteredPayload.length === 0) {
     return null;
