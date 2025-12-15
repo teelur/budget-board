@@ -11,6 +11,7 @@ import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -21,16 +22,22 @@ interface LoginProps {
 const Login = (props: LoginProps): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
 
+  const { t } = useTranslation();
+
   const { envVariables } = getProjectEnvVariables();
 
   const emailField = useField<string>({
     initialValue: "",
-    validate: isEmail("Invalid email"),
+    validate: isEmail(t("login.error_invalid_email")),
   });
 
+  const passwordMinLength = 3;
   const passwordField = useField<string>({
     initialValue: "",
-    validate: hasLength({ min: 3 }, "Must be at least 3 characters"),
+    validate: hasLength(
+      { min: passwordMinLength },
+      t("login.error_password_min_length", { minLength: passwordMinLength })
+    ),
   });
 
   const { request, setIsUserAuthenticated, startOidcLogin, oidcLoading } =
@@ -41,10 +48,10 @@ const Login = (props: LoginProps): React.ReactNode => {
   const doLogin = async (): Promise<void> => {
     setLoading(true);
 
-    const isEmailValid = emailField.validate();
-    const isPasswordValid = passwordField.validate();
+    emailField.validate();
+    passwordField.validate();
 
-    if (!isEmailValid || !isPasswordValid) {
+    if (emailField.error || passwordField.error) {
       setLoading(false);
       return;
     }
@@ -73,13 +80,12 @@ const Login = (props: LoginProps): React.ReactNode => {
         if ((error.response?.data as any)?.detail === "NotAllowed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message:
-              "Please check your email for a validation email before logging in.",
+            message: t("login.error_account_not_verified"),
           });
         } else if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: "Login failed. Check your credentials and try again.",
+            message: t("login.error_login_failed"),
           });
         } else {
           notifications.show({
@@ -89,7 +95,6 @@ const Login = (props: LoginProps): React.ReactNode => {
         }
       })
       .finally(() => {
-        // Invalidate all old queries, so we refetch for new user.
         queryClient.invalidateQueries();
         setLoading(false);
       });
@@ -111,13 +116,13 @@ const Login = (props: LoginProps): React.ReactNode => {
 
           notifications.show({
             color: "var(--button-color-confirm)",
-            message: "An email has been set with a reset code.",
+            message: t("login.message_reset_password_success"),
           });
         })
         .catch(() => {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: "There was an error resetting your password.",
+            message: t("login.error_reset_password"),
           });
         })
         .finally(() => {
@@ -126,7 +131,7 @@ const Login = (props: LoginProps): React.ReactNode => {
     } else {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Please enter your email to reset your password.",
+        message: t("login.error_reset_password_no_email"),
       });
     }
   };
@@ -142,31 +147,37 @@ const Login = (props: LoginProps): React.ReactNode => {
         <Stack w="100%" align="center" gap="0.75rem">
           <TextInput
             {...emailField.getInputProps()}
-            label={<PrimaryText size="sm">Email Address</PrimaryText>}
+            label={
+              <PrimaryText size="sm">
+                {t("login.label_email_address")}
+              </PrimaryText>
+            }
             w="100%"
             elevation={1}
           />
           <PasswordInput
             {...passwordField.getInputProps()}
-            label={<PrimaryText size="sm">Password</PrimaryText>}
+            label={
+              <PrimaryText size="sm">{t("login.label_password")}</PrimaryText>
+            }
             w="100%"
             elevation={1}
           />
           <Button variant="filled" fullWidth onClick={doLogin}>
-            Login
+            {t("login.button_login")}
           </Button>
           <Anchor
             size="sm"
             fw={600}
             onClick={submitPasswordReset.bind(null, emailField.getValue())}
           >
-            Reset Password
+            {t("login.button_reset_password")}
           </Anchor>
         </Stack>
       )}
       {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" &&
         envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-          <Divider w="100%" label="or" />
+          <Divider w="100%" label={t("login.divider_or")} />
         )}
       {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" && (
         <Button
@@ -175,7 +186,7 @@ const Login = (props: LoginProps): React.ReactNode => {
           onClick={() => startOidcLogin && startOidcLogin()}
           loading={oidcLoading}
         >
-          Sign in with OIDC
+          {t("login.button_log_in_with_oidc")}
         </Button>
       )}
     </Stack>
