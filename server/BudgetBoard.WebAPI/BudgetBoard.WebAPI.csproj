@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BudgetBoard</RootNamespace>
@@ -15,28 +15,31 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+    <PackageReference
+      Include="Microsoft.AspNetCore.Authentication.OpenIdConnect"
+      Version="10.0.1"
+    />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.10" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     <PackageReference Include="Serilog" Version="4.3.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.10" />
-    <PackageReference Include="Quartz.AspNetCore" Version="3.15.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.1" />
+    <PackageReference Include="Quartz.AspNetCore" Version="3.15.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BudgetBoard.Database\BudgetBoard.Database.csproj" />
