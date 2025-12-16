@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 import { Navigate } from "react-router";
-import { Center, Loader } from "@mantine/core";
+import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
 
 interface UnauthorizedRouteProps {
   children: React.ReactNode;
@@ -11,11 +11,7 @@ const UnauthorizedRoute = (props: UnauthorizedRouteProps): React.ReactNode => {
   const { isUserAuthenticated, loading } = useContext(AuthContext);
 
   if (loading) {
-    return (
-      <Center bg="var(--background-color-base)" h="100vh">
-        <Loader size={100} />
-      </Center>
-    );
+    return <LoadingScreen />;
   }
 
   if (!isUserAuthenticated) {

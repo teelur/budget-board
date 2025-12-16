@@ -4,10 +4,11 @@ import "./index.css";
 import App from "~/App";
 import "~/shared/dayjs.ts";
 import "~/i18n/config.ts";
+import SuspenseLoadingScreen from "./components/SuspenseLoadingScreen/SuspenseLoadingScreen";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<SuspenseLoadingScreen />}>
       <App />
     </Suspense>
   </StrictMode>

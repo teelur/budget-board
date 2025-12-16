@@ -7,8 +7,8 @@ import {
   AuthContextValue,
 } from "~/providers/AuthProvider/AuthProvider";
 import { useNavigate } from "react-router";
-import { Center, Loader } from "@mantine/core";
 import { IOidcCallbackRequest, IOidcCallbackResponse } from "~/models/oidc";
+import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
 
 const OidcCallback = (): React.ReactNode => {
   const { request, setIsUserAuthenticated } =
@@ -111,11 +111,7 @@ const OidcCallback = (): React.ReactNode => {
     })();
   }, []);
 
-  return (
-    <Center bg="var(--background-color-base)" h="100vh">
-      <Loader size={100} />
-    </Center>
-  );
+  return <LoadingScreen />;
 };
 
 export default OidcCallback;
