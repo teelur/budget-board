@@ -1,11 +1,11 @@
 import React from "react";
 import BudgetBoardLogo from "~/assets/budget-board-logo";
 import { Stack, Group, Anchor, useComputedColorScheme } from "@mantine/core";
-import Register from "./Register";
-import Login from "./Login";
-import ResetPassword from "./ResetPassword";
-import LoginWith2fa from "./LoginWith2fa";
-import LoginWithRecovery from "./LoginWithRecovery";
+import Register from "./Register/Register";
+import Login from "./Login/Login";
+import ResetPassword from "./ResetPassword/ResetPassword";
+import LoginWith2fa from "./LoginWith2fa/LoginWith2fa";
+import LoginWithRecovery from "./LoginWithRecovery/LoginWithRecovery";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";

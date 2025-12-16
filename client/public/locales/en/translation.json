@@ -10,10 +10,47 @@
       "error_reset_password_no_email": "Please enter your email address to reset your password.",
       "error_reset_password": "An error occurred while attempting to reset your password. Please try again later.",
       "message_reset_password_success": "If an account with that email exists, a password reset link has been sent.",
-      "error_login_failed": "Login failed. Please check your email and password and try again.",
       "error_account_not_verified": "Your account is not verified. Please check your email for a verification link.",
+      "error_invalid_email": "Please enter a valid email address."
+    },
+    "login_with_2fa": {
+      "title": "Two-Factor Authentication",
+      "subtitle": "Enter the 6-digit security code from your authenticator app.",
+      "submit_button": "Submit",
+      "use_recovery_code_button": "Use Recovery Code",
+      "return_to_login_button": "Return to Login",
+      "error_missing_authentication_code": "Please enter your authentication code."
+    },
+    "login_with_recovery": {
+      "title": "Use a Recovery Code",
+      "subtitle": "Enter one of your recovery codes for a one-time password authentication.",
+      "submit_button": "Submit",
+      "return_to_login_button": "Return to Login",
+      "error_missing_recovery_code": "Please enter your recovery code."
+    },
+    "register": {
+      "label_email_address": "Email Address",
+      "label_password": "Password",
+      "label_confirm_password": "Confirm Password",
+      "button_register": "Register",
+      "button_back_to_login": "Back to Login",
       "error_invalid_email": "Please enter a valid email address.",
-      "error_password_min_length": "Password must be at least {{minLength}} characters long."
+      "message_account_created_email_verification": "Account created. Check your email for a verification message.",
+      "error_validation": "One or more validation errors occurred. Please check your input and try again."
+    },
+    "reset_password": {
+      "label_reset_code": "Reset Code",
+      "label_new_password": "New Password",
+      "label_confirm_password": "Confirm Password",
+      "button_reset_password": "Reset Password",
+      "button_return_to_login": "Return to Login",
+      "message_password_reset_success": "Your password has been successfully reset. You can now log in with your new password.",
+      "error_reset_code_required": "Reset code is required."
+    },
+    "oidc_callback": {
+      "error_missing_code": "Authorization code is missing from the callback URL.",
+      "error_invalid_state": "The state parameter is invalid or does not match.",
+      "error_authentication_failed": "OIDC authentication failed. Please try logging in again."
     },
     "welcome": {
       "header": "Welcome to",
@@ -21,6 +58,11 @@
       "no_account": "Don't have an account?",
       "register_here": "Register here",
       "error_loading_page": "An error occurred while loading the page. Please try again later."
+    },
+    "common": {
+      "error_login_failed": "Login failed. Please check your email and password and try again.",
+      "error_password_min_length": "Password must be at least {{minLength}} characters long.",
+      "error_passwords_do_not_match": "Passwords do not match."
     }
   }
 }

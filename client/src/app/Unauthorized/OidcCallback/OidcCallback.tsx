@@ -9,8 +9,11 @@ import {
 import { useNavigate } from "react-router";
 import { IOidcCallbackRequest, IOidcCallbackResponse } from "~/models/oidc";
 import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
+import { useTranslation } from "react-i18next";
 
 const OidcCallback = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   const { request, setIsUserAuthenticated } =
     React.useContext<AuthContextValue>(AuthContext);
   const navigate = useNavigate();
@@ -53,7 +56,7 @@ const OidcCallback = (): React.ReactNode => {
         }
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: "OIDC callback missing code.",
+          message: t("unauthorized.oidc_callback.error_missing_code"),
         });
         navigate("/");
         return;
@@ -65,7 +68,7 @@ const OidcCallback = (): React.ReactNode => {
         }
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: "Invalid OIDC state.",
+          message: t("unauthorized.oidc_callback.error_invalid_state"),
         });
         navigate("/");
         return;
@@ -90,7 +93,9 @@ const OidcCallback = (): React.ReactNode => {
         if (!response.data?.success) {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: "Authentication failed.",
+            message: t(
+              "unauthorized.oidc_callback.error_authentication_failed"
+            ),
           });
           navigate("/");
           return;

@@ -1,7 +1,7 @@
 import { Anchor, Button, LoadingOverlay, Stack, Divider } from "@mantine/core";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
-import { LoginCardState } from "./Welcome";
+import { LoginCardState } from "../Welcome";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
@@ -36,7 +36,7 @@ const Login = (props: LoginProps): React.ReactNode => {
     initialValue: "",
     validate: hasLength(
       { min: passwordMinLength },
-      t("unauthorized.login.error_password_min_length", {
+      t("unauthorized.common.error_password_min_length", {
         minLength: passwordMinLength,
       })
     ),
@@ -87,7 +87,7 @@ const Login = (props: LoginProps): React.ReactNode => {
         } else if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: t("unauthorized.login.error_login_failed"),
+            message: t("unauthorized.common.error_login_failed"),
           });
         } else {
           notifications.show({

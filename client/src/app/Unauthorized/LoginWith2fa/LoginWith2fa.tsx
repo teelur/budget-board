@@ -1,7 +1,6 @@
-import { Button, LoadingOverlay, Stack } from "@mantine/core";
+import { Button, LoadingOverlay, Stack, Group } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
-import { LoginCardState } from "./Welcome";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -9,7 +8,9 @@ import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PinInput from "~/components/core/Input/PinInput/PinInput";
+import { useTranslation } from "react-i18next";
+import { LoginCardState } from "../Welcome";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -17,17 +18,13 @@ interface LoginProps {
   userPassword: string;
 }
 
-const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
+const LoginWith2fa = (props: LoginProps): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
 
-  const recoveryCodeField = useField<string>({
+  const { t } = useTranslation();
+
+  const authenticationCodeField = useField<string>({
     initialValue: "",
-    validate: (value) => {
-      if (!value) {
-        return "Recovery code is required";
-      }
-      return null;
-    },
   });
 
   const { request, setIsUserAuthenticated } = useAuth();
@@ -37,10 +34,12 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
   const submitUserLogin = async (): Promise<void> => {
     setLoading(true);
 
-    if (!recoveryCodeField.getValue()) {
+    if (!authenticationCodeField.getValue()) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Please enter the recovery code.",
+        message: t(
+          "unauthorized.login_with_2fa.error_missing_authentication_code"
+        ),
       });
       setLoading(false);
       return;
@@ -52,7 +51,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
       data: {
         email: props.userEmail,
         password: props.userPassword,
-        recoveryCode: recoveryCodeField.getValue(),
+        twoFactorCode: authenticationCodeField.getValue(),
       },
     })
       .then(() => {
@@ -64,7 +63,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
         if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: "Login failed. Check your credentials and try again.",
+            message: t("unauthorized.common.error_login_failed"),
           });
         } else {
           notifications.show({
@@ -81,40 +80,52 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center">
+    <Stack gap="md" align="center" w="100%">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <Stack align="center" gap={5} w="100%">
-        <PrimaryText size="md" ta="center">
-          Use a Recovery Code
+        <PrimaryText size="lg" ta="center">
+          {t("unauthorized.login_with_2fa.title")}
         </PrimaryText>
         <DimmedText size="sm" ta="center">
-          Enter one of your recovery codes for a one-time password
-          authentication.
+          {t("unauthorized.login_with_2fa.subtitle")}
         </DimmedText>
       </Stack>
-      <TextInput
-        {...recoveryCodeField.getInputProps()}
-        w="100%"
+      <PinInput
+        length={6}
+        type="number"
+        oneTimeCode
+        autoFocus
+        value={authenticationCodeField.getValue()}
+        onChange={(value) => authenticationCodeField.setValue(value)}
         elevation={1}
       />
-      <Stack gap="0.5rem" w="100%">
-        <Button variant="filled" fullWidth onClick={submitUserLogin}>
-          Submit
+      <Button variant="filled" fullWidth onClick={submitUserLogin}>
+        {t("unauthorized.login_with_2fa.submit_button")}
+      </Button>
+      <Group wrap="nowrap" gap="md" w="100%">
+        <Button
+          variant="default"
+          fullWidth
+          onClick={() =>
+            props.setLoginCardState(LoginCardState.LoginWithRecovery)
+          }
+        >
+          {t("unauthorized.login_with_2fa.use_recovery_code_button")}
         </Button>
         <Button
           variant="default"
           fullWidth
           onClick={() => props.setLoginCardState(LoginCardState.Login)}
         >
-          Return to Login
+          {t("unauthorized.login_with_2fa.return_to_login_button")}
         </Button>
-      </Stack>
+      </Group>
     </Stack>
   );
 };
 
-export default LoginWithRecovery;
+export default LoginWith2fa;
