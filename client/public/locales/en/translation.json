@@ -1,17 +1,26 @@
 {
-  "login": {
-    "label_email_address": "Email Address",
-    "label_password": "Password",
-    "button_login": "Log In",
-    "button_reset_password": "Reset Password",
-    "divider_or": "or",
-    "button_log_in_with_oidc": "Log in with OIDC",
-    "error_reset_password_no_email": "Please enter your email address to reset your password.",
-    "error_reset_password": "An error occurred while attempting to reset your password. Please try again later.",
-    "message_reset_password_success": "If an account with that email exists, a password reset link has been sent.",
-    "error_login_failed": "Login failed. Please check your email and password and try again.",
-    "error_account_not_verified": "Your account is not verified. Please check your email for a verification link.",
-    "error_invalid_email": "Please enter a valid email address.",
-    "error_password_min_length": "Password must be at least {{minLength}} characters long."
+  "unauthorized": {
+    "login": {
+      "label_email_address": "Email Address",
+      "label_password": "Password",
+      "button_login": "Log In",
+      "button_reset_password": "Reset Password",
+      "divider_or": "or",
+      "button_log_in_with_oidc": "Log in with OIDC",
+      "error_reset_password_no_email": "Please enter your email address to reset your password.",
+      "error_reset_password": "An error occurred while attempting to reset your password. Please try again later.",
+      "message_reset_password_success": "If an account with that email exists, a password reset link has been sent.",
+      "error_login_failed": "Login failed. Please check your email and password and try again.",
+      "error_account_not_verified": "Your account is not verified. Please check your email for a verification link.",
+      "error_invalid_email": "Please enter a valid email address.",
+      "error_password_min_length": "Password must be at least {{minLength}} characters long."
+    },
+    "welcome": {
+      "header": "Welcome to",
+      "subtitle": "A simple app for managing monthly budgets.",
+      "no_account": "Don't have an account?",
+      "register_here": "Register here",
+      "error_loading_page": "An error occurred while loading the page. Please try again later."
+    }
   }
 }
