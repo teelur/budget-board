@@ -28,7 +28,7 @@ const Login = (props: LoginProps): React.ReactNode => {
 
   const emailField = useField<string>({
     initialValue: "",
-    validate: isEmail(t("unauthorized.login.error_invalid_email")),
+    validate: isEmail(t("invalid_email_message")),
   });
 
   const passwordMinLength = 3;
@@ -36,7 +36,7 @@ const Login = (props: LoginProps): React.ReactNode => {
     initialValue: "",
     validate: hasLength(
       { min: passwordMinLength },
-      t("unauthorized.common.error_password_min_length", {
+      t("password_min_length_message", {
         minLength: passwordMinLength,
       })
     ),
@@ -82,12 +82,12 @@ const Login = (props: LoginProps): React.ReactNode => {
         if ((error.response?.data as any)?.detail === "NotAllowed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: t("unauthorized.login.error_account_not_verified"),
+            message: t("login_account_not_verified_message"),
           });
         } else if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: t("unauthorized.common.error_login_failed"),
+            message: t("login_failed_message"),
           });
         } else {
           notifications.show({
@@ -118,13 +118,13 @@ const Login = (props: LoginProps): React.ReactNode => {
 
           notifications.show({
             color: "var(--button-color-confirm)",
-            message: t("unauthorized.login.message_reset_password_success"),
+            message: t("reset_password_request_message"),
           });
         })
         .catch(() => {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: t("unauthorized.login.error_reset_password"),
+            message: t("reset_password_generic_error_message"),
           });
         })
         .finally(() => {
@@ -133,7 +133,7 @@ const Login = (props: LoginProps): React.ReactNode => {
     } else {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: t("unauthorized.login.error_reset_password_no_email"),
+        message: t("reset_password_missing_email_message"),
       });
     }
   };
@@ -149,39 +149,31 @@ const Login = (props: LoginProps): React.ReactNode => {
         <Stack w="100%" align="center" gap="0.75rem">
           <TextInput
             {...emailField.getInputProps()}
-            label={
-              <PrimaryText size="sm">
-                {t("unauthorized.login.label_email_address")}
-              </PrimaryText>
-            }
+            label={<PrimaryText size="sm">{t("email_address")}</PrimaryText>}
             w="100%"
             elevation={1}
           />
           <PasswordInput
             {...passwordField.getInputProps()}
-            label={
-              <PrimaryText size="sm">
-                {t("unauthorized.login.label_password")}
-              </PrimaryText>
-            }
+            label={<PrimaryText size="sm">{t("password")}</PrimaryText>}
             w="100%"
             elevation={1}
           />
           <Button variant="filled" fullWidth onClick={doLogin}>
-            {t("unauthorized.login.button_login")}
+            {t("login")}
           </Button>
           <Anchor
             size="sm"
             fw={600}
             onClick={submitPasswordReset.bind(null, emailField.getValue())}
           >
-            {t("unauthorized.login.button_reset_password")}
+            {t("reset_password")}
           </Anchor>
         </Stack>
       )}
       {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" &&
         envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-          <Divider w="100%" label={t("unauthorized.login.divider_or")} />
+          <Divider w="100%" label={t("or")} />
         )}
       {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" && (
         <Button
@@ -190,7 +182,7 @@ const Login = (props: LoginProps): React.ReactNode => {
           onClick={() => startOidcLogin && startOidcLogin()}
           loading={oidcLoading}
         >
-          {t("unauthorized.login.button_log_in_with_oidc")}
+          {t("login_with_oidc")}
         </Button>
       )}
     </Stack>

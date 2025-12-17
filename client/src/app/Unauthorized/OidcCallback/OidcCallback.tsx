@@ -56,7 +56,7 @@ const OidcCallback = (): React.ReactNode => {
         }
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: t("unauthorized.oidc_callback.error_missing_code"),
+          message: t("authorization_code_missing_message"),
         });
         navigate("/");
         return;
@@ -68,7 +68,7 @@ const OidcCallback = (): React.ReactNode => {
         }
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: t("unauthorized.oidc_callback.error_invalid_state"),
+          message: t("state_parameter_invalid_message"),
         });
         navigate("/");
         return;
@@ -93,9 +93,7 @@ const OidcCallback = (): React.ReactNode => {
         if (!response.data?.success) {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: t(
-              "unauthorized.oidc_callback.error_authentication_failed"
-            ),
+            message: t("oidc_authentication_failed_message"),
           });
           navigate("/");
           return;

@@ -37,9 +37,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
     if (!recoveryCodeField.getValue()) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: t(
-          "unauthorized.login_with_recovery.error_missing_recovery_code"
-        ),
+        message: t("enter_recovery_code_message"),
       });
       setLoading(false);
       return;
@@ -63,7 +61,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
         if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: t("unauthorized.common.error_login_failed"),
+            message: t("login_failed_message"),
           });
         } else {
           notifications.show({
@@ -88,10 +86,10 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
       />
       <Stack align="center" gap={5} w="100%">
         <PrimaryText size="md" ta="center">
-          {t("unauthorized.login_with_recovery.title")}
+          {t("use_a_recovery_code")}
         </PrimaryText>
         <DimmedText size="sm" ta="center">
-          {t("unauthorized.login_with_recovery.subtitle")}
+          {t("enter_recovery_code_subheading")}
         </DimmedText>
       </Stack>
       <TextInput
@@ -101,14 +99,14 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
       />
       <Stack gap="0.5rem" w="100%">
         <Button variant="filled" fullWidth onClick={submitUserLogin}>
-          {t("unauthorized.login_with_recovery.submit_button")}
+          {t("submit")}
         </Button>
         <Button
           variant="default"
           fullWidth
           onClick={() => props.setLoginCardState(LoginCardState.Login)}
         >
-          {t("unauthorized.login_with_recovery.return_to_login_button")}
+          {t("return_to_login")}
         </Button>
       </Stack>
     </Stack>

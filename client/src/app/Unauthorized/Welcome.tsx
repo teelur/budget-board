@@ -69,7 +69,7 @@ const Welcome = (): React.ReactNode => {
       case LoginCardState.Register:
         return <Register setLoginCardState={setLoginCardState} />;
       default:
-        return <>{t("unauthorized.welcome.error_loading_page")}</>;
+        return <>{t("error_occurred_while_loading_message")}</>;
     }
   };
 
@@ -82,15 +82,13 @@ const Welcome = (): React.ReactNode => {
     >
       <Stack w="500px" maw="100%" align="center">
         <Stack align="center" gap="0.25rem">
-          <PrimaryText size="lg">
-            {t("unauthorized.welcome.header")}
-          </PrimaryText>
+          <PrimaryText size="lg">{t("welcome_to")}</PrimaryText>
           <BudgetBoardLogo
             width={340}
             darkMode={computedColorScheme === "dark"}
           />
           <DimmedText size="md">
-            {t("unauthorized.welcome.subtitle")}
+            {t("a_simple_app_for_managing_monthly_budgets")}
           </DimmedText>
         </Stack>
         <Card
@@ -105,15 +103,13 @@ const Welcome = (): React.ReactNode => {
           envVariables.VITE_DISABLE_NEW_USERS?.toLowerCase() !== "true" &&
           envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
             <Group mt="xl" justify="center">
-              <DimmedText size="sm">
-                {t("unauthorized.welcome.no_account")}
-              </DimmedText>
+              <DimmedText size="sm">{t("dont_have_an_account")}</DimmedText>
               <Anchor
                 size="sm"
                 fw={600}
                 onClick={() => setLoginCardState(LoginCardState.Register)}
               >
-                {t("unauthorized.welcome.register_here")}
+                {t("register_here")}
               </Anchor>
             </Group>
           )}

@@ -21,7 +21,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
 
   const emailField = useField<string>({
     initialValue: "",
-    validate: isEmail(t("unauthorized.login.error_invalid_email")),
+    validate: isEmail(t("invalid_email_message")),
   });
 
   const passwordMinLength = 3;
@@ -29,7 +29,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
     initialValue: "",
     validate: hasLength(
       { min: passwordMinLength },
-      t("unauthorized.common.error_password_min_length", {
+      t("password_min_length_message", {
         minLength: passwordMinLength,
       })
     ),
@@ -37,9 +37,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
   const confirmPasswordField = useField<string>({
     initialValue: "",
     validate: (value) =>
-      value !== passwordField.getValue()
-        ? t("unauthorized.common.error_passwords_do_not_match")
-        : null,
+      value !== passwordField.getValue() ? t("passwords_do_not_match") : null,
   });
 
   const { request } = useAuth();
@@ -70,9 +68,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: t(
-          "unauthorized.register.message_account_created_email_verification"
-        ),
+        message: t("account_created_email_verification_message"),
       });
     } catch (error: any) {
       if (
@@ -82,7 +78,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
           "One or more validation errors occurred."
       ) {
         notifications.show({
-          title: t("unauthorized.register.error_validation"),
+          title: t("validation_errors_occurred_message"),
           color: "var(--button-color-destructive)",
           message: Object.values(
             (error.response.data as ValidationError).errors
@@ -108,37 +104,25 @@ const Register = (props: RegisterProps): React.ReactNode => {
       />
       <Stack align="center" gap="0.5rem" w="100%">
         <TextInput
-          label={
-            <PrimaryText size="sm">
-              {t("unauthorized.register.label_email_address")}
-            </PrimaryText>
-          }
+          label={<PrimaryText size="sm">{t("email_address")}</PrimaryText>}
           w="100%"
           {...emailField.getInputProps()}
           elevation={1}
         />
         <PasswordInput
-          label={
-            <PrimaryText size="sm">
-              {t("unauthorized.register.label_password")}
-            </PrimaryText>
-          }
+          label={<PrimaryText size="sm">{t("password")}</PrimaryText>}
           w="100%"
           {...passwordField.getInputProps()}
           elevation={1}
         />
         <PasswordInput
-          label={
-            <PrimaryText size="sm">
-              {t("unauthorized.register.label_confirm_password")}
-            </PrimaryText>
-          }
+          label={<PrimaryText size="sm">{t("confirm_password")}</PrimaryText>}
           w="100%"
           {...confirmPasswordField.getInputProps()}
           elevation={1}
         />
         <Button variant="filled" fullWidth onClick={registerUser}>
-          {t("unauthorized.register.button_register")}
+          {t("register")}
         </Button>
       </Stack>
       <Button
@@ -146,7 +130,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
         fullWidth
         onClick={() => props.setLoginCardState(LoginCardState.Login)}
       >
-        {t("unauthorized.register.button_back_to_login")}
+        {t("back_to_login")}
       </Button>
     </Stack>
   );

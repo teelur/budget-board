@@ -37,9 +37,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
     if (!authenticationCodeField.getValue()) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: t(
-          "unauthorized.login_with_2fa.error_missing_authentication_code"
-        ),
+        message: t("enter_authentication_code_message"),
       });
       setLoading(false);
       return;
@@ -63,7 +61,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: t("unauthorized.common.error_login_failed"),
+            message: t("login_failed_message"),
           });
         } else {
           notifications.show({
@@ -88,10 +86,10 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
       />
       <Stack align="center" gap={5} w="100%">
         <PrimaryText size="lg" ta="center">
-          {t("unauthorized.login_with_2fa.title")}
+          {t("two_factor_authentication")}
         </PrimaryText>
         <DimmedText size="sm" ta="center">
-          {t("unauthorized.login_with_2fa.subtitle")}
+          {t("enter_security_code_message")}
         </DimmedText>
       </Stack>
       <PinInput
@@ -104,7 +102,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         elevation={1}
       />
       <Button variant="filled" fullWidth onClick={submitUserLogin}>
-        {t("unauthorized.login_with_2fa.submit_button")}
+        {t("submit")}
       </Button>
       <Group wrap="nowrap" gap="md" w="100%">
         <Button
@@ -114,14 +112,14 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
             props.setLoginCardState(LoginCardState.LoginWithRecovery)
           }
         >
-          {t("unauthorized.login_with_2fa.use_recovery_code_button")}
+          {t("use_recovery_code")}
         </Button>
         <Button
           variant="default"
           fullWidth
           onClick={() => props.setLoginCardState(LoginCardState.Login)}
         >
-          {t("unauthorized.login_with_2fa.return_to_login_button")}
+          {t("return_to_login")}
         </Button>
       </Group>
     </Stack>
