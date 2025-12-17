@@ -13,7 +13,7 @@ const Header = (props: HeaderProps): React.ReactNode => {
   const computedColorScheme = useComputedColorScheme();
   return (
     <Group className={classes.header}>
-      <Flex className={classes.logo}>
+      <Group gap="0.5rem">
         <Burger
           opened={props.isNavbarOpen}
           className={classes.burger}
@@ -25,7 +25,7 @@ const Header = (props: HeaderProps): React.ReactNode => {
           height={40}
           darkMode={computedColorScheme === "dark"}
         />
-      </Flex>
+      </Group>
       <Flex className={classes.syncButton}>
         <SyncButton />
       </Flex>

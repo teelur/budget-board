@@ -19,46 +19,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
-
-const sidebarItems = [
-  {
-    icon: <LayoutDashboardIcon color="var(--base-color-text-primary)" />,
-    page: Pages.Dashboard,
-    label: "Dashboard",
-  },
-  {
-    icon: <LandmarkIcon color="var(--base-color-text-primary)" />,
-    page: Pages.Accounts,
-    label: "Accounts",
-  },
-  {
-    icon: <HouseIcon color="var(--base-color-text-primary)" />,
-    page: Pages.Assets,
-    label: "Assets",
-  },
-  {
-    icon: <BanknoteIcon color="var(--base-color-text-primary)" />,
-    page: Pages.Transactions,
-    label: "Transactions",
-  },
-  {
-    icon: <CalculatorIcon color="var(--base-color-text-primary)" />,
-    page: Pages.Budgets,
-    label: "Budgets",
-  },
-  {
-    icon: <GoalIcon color="var(--base-color-text-primary)" />,
-    page: Pages.Goals,
-    label: "Goals",
-  },
-  {
-    icon: (
-      <ChartNoAxesColumnIncreasingIcon color="var(--base-color-text-primary)" />
-    ),
-    page: Pages.Trends,
-    label: "Trends",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 interface NavbarProps {
   currentPage: Pages;
@@ -68,6 +29,48 @@ interface NavbarProps {
 }
 
 const Navbar = (props: NavbarProps) => {
+  const { t } = useTranslation();
+
+  const sidebarItems = [
+    {
+      icon: <LayoutDashboardIcon color="var(--base-color-text-primary)" />,
+      page: Pages.Dashboard,
+      label: t("dashboard"),
+    },
+    {
+      icon: <LandmarkIcon color="var(--base-color-text-primary)" />,
+      page: Pages.Accounts,
+      label: t("accounts"),
+    },
+    {
+      icon: <HouseIcon color="var(--base-color-text-primary)" />,
+      page: Pages.Assets,
+      label: t("assets"),
+    },
+    {
+      icon: <BanknoteIcon color="var(--base-color-text-primary)" />,
+      page: Pages.Transactions,
+      label: t("transactions"),
+    },
+    {
+      icon: <CalculatorIcon color="var(--base-color-text-primary)" />,
+      page: Pages.Budgets,
+      label: t("budgets"),
+    },
+    {
+      icon: <GoalIcon color="var(--base-color-text-primary)" />,
+      page: Pages.Goals,
+      label: t("goals"),
+    },
+    {
+      icon: (
+        <ChartNoAxesColumnIncreasingIcon color="var(--base-color-text-primary)" />
+      ),
+      page: Pages.Trends,
+      label: t("trends"),
+    },
+  ];
+
   const { request, setIsUserAuthenticated } = useAuth();
 
   const queryClient = useQueryClient();
@@ -104,7 +107,7 @@ const Navbar = (props: NavbarProps) => {
         <Burger
           opened={props.isNavbarOpen}
           className={classes.burger}
-          mb={10}
+          m="0.25rem"
           onClick={props.toggleNavbar}
           hiddenFrom="xs"
           size="md"
@@ -114,13 +117,13 @@ const Navbar = (props: NavbarProps) => {
       <Stack justify="center" align="center" gap={5}>
         <NavbarLink
           icon={<SettingsIcon color="var(--base-color-text-primary)" />}
-          label="Settings"
+          label={t("settings")}
           active={props.currentPage === Pages.Settings}
           onClick={() => props.setCurrentPage(Pages.Settings)}
         />
         <NavbarLink
           icon={<LogOutIcon color="var(--base-color-text-primary)" />}
-          label="Logout"
+          label={t("logout")}
           onClick={Logout}
         />
       </Stack>

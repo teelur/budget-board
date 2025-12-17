@@ -6,10 +6,6 @@
   flex-wrap: nowrap;
 }
 
-.logo {
-  flex: 0 1 auto;
-}
-
 .syncButton {
   flex: 1 0 auto;
   justify-content: flex-end;
