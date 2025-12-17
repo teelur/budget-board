@@ -1,4 +1,4 @@
-import classes from "./Navbar.module.css";
+import classes from "../Navbar.module.css";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { Tooltip, UnstyledButton, Group } from "@mantine/core";
 
@@ -18,6 +18,7 @@ const NavbarLink = (props: NavbarLinkProps): React.ReactNode => {
     >
       <UnstyledButton
         onClick={props.onClick}
+        p="0.75rem 0.5rem"
         className={classes.link}
         data-active={props.active || undefined}
       >

@@ -12,7 +12,7 @@ import {
   LogOutIcon,
   SettingsIcon,
 } from "lucide-react";
-import NavbarLink from "./NavbarLink";
+import NavbarLink from "./NavbarLink/NavbarLink";
 import { Pages } from "../PageContent/PageContent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
