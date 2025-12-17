@@ -1,8 +1,9 @@
 import BudgetBoardLogo from "~/assets/budget-board-logo";
 import classes from "./Header.module.css";
 
-import { Burger, Flex, Group, useComputedColorScheme } from "@mantine/core";
+import { Burger, Group, useComputedColorScheme } from "@mantine/core";
 import SyncButton from "./SyncButton/SyncButton";
+import { areStringsEqual } from "~/helpers/utils";
 
 interface HeaderProps {
   isNavbarOpen: boolean;
@@ -12,8 +13,14 @@ interface HeaderProps {
 const Header = (props: HeaderProps): React.ReactNode => {
   const computedColorScheme = useComputedColorScheme();
   return (
-    <Group className={classes.header}>
-      <Group gap="0.5rem">
+    <Group
+      p="0.5rem"
+      h="100%"
+      justify="space-between"
+      align="center"
+      wrap="nowrap"
+    >
+      <Group gap="0.5rem" wrap="nowrap">
         <Burger
           opened={props.isNavbarOpen}
           className={classes.burger}
@@ -23,12 +30,12 @@ const Header = (props: HeaderProps): React.ReactNode => {
         />
         <BudgetBoardLogo
           height={40}
-          darkMode={computedColorScheme === "dark"}
+          darkMode={areStringsEqual(computedColorScheme, "dark")}
         />
       </Group>
-      <Flex className={classes.syncButton}>
+      <Group justify="flex-end" flex="1 0 auto">
         <SyncButton />
-      </Flex>
+      </Group>
     </Group>
   );
 };

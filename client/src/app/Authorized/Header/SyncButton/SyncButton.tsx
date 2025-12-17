@@ -5,8 +5,11 @@ import { AxiosResponse, AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
+import { useTranslation } from "react-i18next";
 
 const SyncButton = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -42,7 +45,7 @@ const SyncButton = (): React.ReactNode => {
       onClick={() => doSyncMutation.mutate()}
       loading={doSyncMutation.isPending}
     >
-      Sync
+      {t("sync")}
     </Button>
   );
 };

@@ -41,6 +41,7 @@
   "settings": "Settings",
   "state_parameter_invalid_message": "The state parameter is invalid or does not match.",
   "submit": "Submit",
+  "sync": "Sync",
   "transactions": "Transactions",
   "trends": "Trends",
   "two_factor_authentication": "Two-Factor Authentication",
