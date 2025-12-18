@@ -12,11 +12,13 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
+import { useTranslation } from "react-i18next";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;
   const [activePage, setPage] = React.useState(1);
 
+  const { t } = useTranslation();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
@@ -51,7 +53,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   return (
     <Card w="100%" elevation={1}>
       <Stack gap="0.5rem" align="center" w="100%">
-        <PrimaryText size="xl">Uncategorized Transactions</PrimaryText>
+        <PrimaryText size="xl">{t("uncategorized_transactions")}</PrimaryText>
         {transactionsQuery.isPending ? (
           <Skeleton height={350} radius="lg" />
         ) : (

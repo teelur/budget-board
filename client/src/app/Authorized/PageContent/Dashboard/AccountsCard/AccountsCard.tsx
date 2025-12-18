@@ -9,8 +9,11 @@ import { IAccountResponse } from "~/models/account";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 const AccountsCard = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   const { request } = useAuth();
   const institutionQuery = useQuery({
     queryKey: ["institutions"],
@@ -66,7 +69,7 @@ const AccountsCard = (): React.ReactNode => {
   return (
     <Card w="100%" elevation={1}>
       <Stack gap="0.5rem">
-        <PrimaryText size="xl">Accounts</PrimaryText>
+        <PrimaryText size="xl">{t("accounts")}</PrimaryText>
         <Stack align="center" gap="0.5rem">
           {institutionQuery.isPending || accountsQuery.isPending ? (
             <Skeleton height={600} radius="lg" />
@@ -80,7 +83,7 @@ const AccountsCard = (): React.ReactNode => {
               )
             )
           ) : (
-            <DimmedText size="sm">No accounts found</DimmedText>
+            <DimmedText size="sm">{t("no_accounts_found")}</DimmedText>
           )}
         </Stack>
       </Stack>

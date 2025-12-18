@@ -9,6 +9,7 @@ import { sumAssetsTotalValue } from "./assets";
 import { getAccountsOfTypes, sumAccountsTotalBalance } from "./accounts";
 import { IAccountResponse } from "~/models/account";
 import { IAssetResponse } from "~/models/asset";
+import { ComboboxItem } from "@mantine/core";
 
 /**
  * Return a string representation for the supplied value, defaulting to an empty string.
@@ -269,4 +270,41 @@ export const calculateLineTotal = (
     },
     0
   );
+};
+
+export const NET_WORTH_CATEGORY_TYPES: ComboboxItem[] = [
+  { value: "account", label: "account" },
+  { value: "asset", label: "asset" },
+  { value: "line", label: "line" },
+];
+
+export const NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES: ComboboxItem[] = [
+  { value: "category", label: "category" },
+];
+
+export const NET_WORTH_CATEGORY_ASSET_SUBTYPES: ComboboxItem[] = [
+  { value: "all", label: "all" },
+];
+
+export const NET_WORTH_CATEGORY_LINE_SUBTYPES: ComboboxItem[] = [
+  { value: "name", label: "name" },
+];
+
+/**
+ * Get the subtype options for a given category type.
+ *
+ * @param type - The category type.
+ * @returns An array of subtype options.
+ */
+export const getSubtypeOptions = (type: string) => {
+  switch (type?.toLowerCase()) {
+    case "account":
+      return NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES;
+    case "asset":
+      return NET_WORTH_CATEGORY_ASSET_SUBTYPES;
+    case "line":
+      return NET_WORTH_CATEGORY_LINE_SUBTYPES;
+    default:
+      return [];
+  }
 };

@@ -29,6 +29,7 @@ import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import { closestCorners } from "@dnd-kit/collision";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export interface INetWorthLineItemProps {
   container: Element;
@@ -53,6 +54,8 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
     collisionDetector: closestCorners,
   });
 
+  const { t } = useTranslation();
+
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -65,11 +68,6 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Net worth settings updated successfully.",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -94,7 +92,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Net worth settings deleted successfully.",
+        message: t("net_worth_setting_deleted_successfully_message"),
       });
     },
     onError: (error: AxiosError) => {
@@ -114,11 +112,6 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Net worth category created successfully.",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -162,7 +155,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
               ) : props.line.name.length > 0 ? (
                 <PrimaryText size="sm">{props.line.name}</PrimaryText>
               ) : (
-                <DimmedText size="sm">No Name</DimmedText>
+                <DimmedText size="sm">{t("no_name")}</DimmedText>
               )}
               <ActionIcon
                 size="sm"
@@ -202,7 +195,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
             ))}
             {props.line.categories.length === 0 && (
               <Group justify="center">
-                <DimmedText size="sm">No categories.</DimmedText>
+                <DimmedText size="sm">{t("no_categories")}</DimmedText>
               </Group>
             )}
           </Stack>

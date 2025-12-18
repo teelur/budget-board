@@ -6,19 +6,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { ChevronRightIcon, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import Select from "~/components/core/Select/Select/Select";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
+import { getSubtypeOptions, NET_WORTH_CATEGORY_TYPES } from "~/helpers/widgets";
 import { accountCategories } from "~/models/account";
 import { INetWorthWidgetCategoryUpdateRequest } from "~/models/netWorthWidgetConfiguration";
 import {
   INetWorthWidgetCategory,
   INetWorthWidgetLine,
-  NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES,
-  NET_WORTH_CATEGORY_ASSET_SUBTYPES,
-  NET_WORTH_CATEGORY_LINE_SUBTYPES,
-  NET_WORTH_CATEGORY_TYPES,
 } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
@@ -44,6 +42,8 @@ const EditableNetWorthLineCategoryContent = (
     initialValue: props.category.value,
   });
 
+  const { t } = useTranslation();
+
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -56,11 +56,6 @@ const EditableNetWorthLineCategoryContent = (
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Net worth settings updated successfully.",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -86,7 +81,7 @@ const EditableNetWorthLineCategoryContent = (
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Net worth settings deleted successfully.",
+        message: t("net_worth_setting_deleted_successfully_message"),
       });
     },
     onError: (error: AxiosError) => {
@@ -228,7 +223,7 @@ const EditableNetWorthLineCategoryContent = (
           <Select
             w="150px"
             size="xs"
-            data={validLineNames}
+            data={validLineNames.map((n) => ({ value: n, label: n }))}
             {...valueField.getInputProps()}
             elevation={2}
           />
@@ -239,26 +234,16 @@ const EditableNetWorthLineCategoryContent = (
     return null;
   };
 
-  const getSubtypeOptions = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case "account":
-        return NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES;
-      case "asset":
-        return NET_WORTH_CATEGORY_ASSET_SUBTYPES;
-      case "line":
-        return NET_WORTH_CATEGORY_LINE_SUBTYPES;
-      default:
-        return [];
-    }
-  };
-
   return (
     <Group justify="space-between">
       <Group gap="0.25rem">
         <Select
           w="100px"
           size="xs"
-          data={NET_WORTH_CATEGORY_TYPES}
+          data={NET_WORTH_CATEGORY_TYPES.map((i) => ({
+            ...i,
+            label: t(i.label),
+          }))}
           {...typeField.getInputProps()}
           elevation={2}
         />
@@ -266,7 +251,10 @@ const EditableNetWorthLineCategoryContent = (
         <Select
           w="100px"
           size="xs"
-          data={getSubtypeOptions(typeField.getValue() ?? "")}
+          data={getSubtypeOptions(typeField.getValue() ?? "").map((i) => ({
+            ...i,
+            label: t(i.label),
+          }))}
           {...subtypeField.getInputProps()}
           elevation={2}
         />

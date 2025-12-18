@@ -59,11 +59,6 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Net worth settings updated successfully.",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
