@@ -7,6 +7,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
+import { useTranslation } from "react-i18next";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface DeleteAccountPopoverProps {
   accountId: string;
@@ -17,6 +19,7 @@ const DeleteAccountPopover = (
 ): React.ReactNode => {
   const [deleteTransactions, { toggle }] = useDisclosure(false);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -52,14 +55,16 @@ const DeleteAccountPopover = (
           <Checkbox
             checked={deleteTransactions}
             onChange={toggle}
-            label="Delete Transactions?"
+            label={
+              <PrimaryText size="sm">{t("delete_transactions")}</PrimaryText>
+            }
           />
           <Button
             color="var(--button-color-destructive)"
             loading={doDeleteAccount.isPending}
             onClick={() => doDeleteAccount.mutate()}
           >
-            Delete
+            {t("delete_account")}
           </Button>
         </Stack>
       </Popover.Dropdown>

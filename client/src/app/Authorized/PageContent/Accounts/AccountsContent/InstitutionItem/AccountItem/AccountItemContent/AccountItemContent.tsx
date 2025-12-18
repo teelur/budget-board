@@ -1,6 +1,7 @@
 import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
 import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
@@ -14,11 +15,16 @@ interface IAccountItemContentProps {
 }
 
 const AccountItemContent = (props: IAccountItemContentProps) => {
+  const { t } = useTranslation();
   return (
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
         <Group gap="0.5rem" align="center">
-          <PrimaryText size="md">{props.account.name}</PrimaryText>
+          <PrimaryText size="md">
+            {props.account.name && props.account.name.length > 0
+              ? props.account.name
+              : t("no_name")}
+          </PrimaryText>
           <ActionIcon
             variant="transparent"
             size="md"
@@ -30,16 +36,19 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
             <PencilIcon size={16} />
           </ActionIcon>
           <Badge>
-            Interest Rate:{" "}
-            {((props.account.interestRate ?? 0) * 100).toFixed(2)}%
+            {t("interest_rate_message", {
+              rate: ((props.account.interestRate ?? 0) * 100).toFixed(2),
+            })}
           </Badge>
           {props.account.hideAccount && (
-            <Badge bg="var(--button-color-warning)">Hidden</Badge>
+            <Badge bg="var(--button-color-warning)">{t("hidden")}</Badge>
           )}
           {props.account.hideTransactions && (
-            <Badge bg="purple">Hidden Transactions</Badge>
+            <Badge bg="purple">{t("hidden_transactions")}</Badge>
           )}
-          {props.account.syncID !== null && <Badge bg="blue">SimpleFIN</Badge>}
+          {props.account.syncID !== null && (
+            <Badge bg="blue">{t("simplefin")}</Badge>
+          )}
         </Group>
         <StatusText amount={props.account.currentBalance} size="md">
           {convertNumberToCurrency(
@@ -54,11 +63,11 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           {props.account.subtype ? props.account.subtype : props.account.type}
         </DimmedText>
         <DimmedText size="sm">
-          Last Updated:{" "}
-          {(() => {
-            const parsedDate = dayjs(props.account.balanceDate);
-            return parsedDate.isValid() ? parsedDate.format("L LT") : "Never!";
-          })()}
+          {t("last_updated", {
+            date: dayjs(props.account.balanceDate).isValid()
+              ? dayjs(props.account.balanceDate).format("L LT")
+              : t("never"),
+          })}
         </DimmedText>
       </Group>
     </Stack>

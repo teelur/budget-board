@@ -57,14 +57,13 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
         )}
       </Group>
       {props.account.source !== AccountSource.Manual && (
-        <Group gap="0.25rem">
-          <DimmedText size="sm">{t("last_updated")}</DimmedText>
-          <DimmedText size="sm">
-            {props.account.balanceDate
+        <DimmedText size="sm">
+          {t("last_updated", {
+            date: props.account.balanceDate
               ? new Date(props.account.balanceDate).toLocaleString()
-              : t("never")}
-          </DimmedText>
-        </Group>
+              : t("never"),
+          })}
+        </DimmedText>
       )}
     </Stack>
   );

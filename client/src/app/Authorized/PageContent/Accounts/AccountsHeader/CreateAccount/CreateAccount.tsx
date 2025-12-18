@@ -13,21 +13,25 @@ import { IInstitution, IInstitutionCreateRequest } from "~/models/institution";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import BaseTextInput from "~/components/core/Input/Base/BaseTextInput/BaseTextInput";
+import { useTranslation } from "react-i18next";
 
 const CreateAccount = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
+  const { t } = useTranslation();
+
   const accountNameField = useField<string>({
     initialValue: "",
-    validate: isNotEmpty("Name is required"),
+    validate: isNotEmpty(t("name_is_required")),
   });
 
   const institutionField = useField<string>({
     initialValue: "",
-    validate: isNotEmpty("Institution is required"),
+    validate: isNotEmpty(t("institution_is_required")),
   });
 
   const { request } = useAuth();
+
   const institutionQuery = useQuery({
     queryKey: ["institutions"],
     queryFn: async (): Promise<IInstitution[]> => {
@@ -54,12 +58,6 @@ const CreateAccount = () => {
       }),
     // Purposely not refeching here since we will refetch in the account creation flow
     onError: (error: AxiosError) => {
-      if (
-        error.message.includes("An institution with this name already exists.")
-      ) {
-        return;
-      }
-
       notifications.show({
         message: translateAxiosError(error),
         color: "var(--button-color-destructive)",
@@ -79,7 +77,7 @@ const CreateAccount = () => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
 
       notifications.show({
-        message: "Account created",
+        message: t("account_created_successfully_message"),
         color: "var(--button-color-confirm)",
       });
 
@@ -95,6 +93,16 @@ const CreateAccount = () => {
   });
 
   const onCreateAccount = async () => {
+    await accountNameField.validate();
+    await institutionField.validate();
+
+    if (
+      accountNameField.getValue().length === 0 ||
+      institutionField.getValue().length === 0
+    ) {
+      return;
+    }
+
     let institutionForAccount = institutionQuery.data?.find((i) =>
       areStringsEqual(i.name, institutionField.getValue())
     );
@@ -112,7 +120,7 @@ const CreateAccount = () => {
 
       if (institutionForAccount === undefined) {
         notifications.show({
-          message: "Failed to create institution for account",
+          message: t("institution_creation_failed_message"),
           color: "var(--button-color-destructive)",
         });
         return;
@@ -138,23 +146,22 @@ const CreateAccount = () => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryText size="md">Create Account</PrimaryText>}
+        title={<PrimaryText size="md">{t("create_account")}</PrimaryText>}
       >
         <Stack gap="0.5rem">
           <BaseTextInput
             {...accountNameField.getInputProps()}
-            label={<PrimaryText size="sm">Account Name</PrimaryText>}
+            label={<PrimaryText size="sm">{t("account_name")}</PrimaryText>}
           />
           <BaseTextInput
             {...institutionField.getInputProps()}
-            label={<PrimaryText size="sm">Institution</PrimaryText>}
+            label={<PrimaryText size="sm">{t("institution")}</PrimaryText>}
           />
           <Button
-            type="submit"
             loading={doCreateAccount.isPending || doCreateInstitution.isPending}
             onClick={onCreateAccount}
           >
-            Submit
+            {t("submit")}
           </Button>
         </Stack>
       </Modal>

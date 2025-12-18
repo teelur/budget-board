@@ -29,6 +29,7 @@ import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumber
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import { useTranslation } from "react-i18next";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -70,6 +71,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     initialValue: props.account.hideTransactions ?? false,
   });
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -95,11 +97,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Account updated",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -139,7 +136,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
           <Group gap="0.5rem" align="flex-end">
             <ElevatedTextInput
               {...accountNameField.getInputProps()}
-              label={<PrimaryText size="xs">Name</PrimaryText>}
+              label={<PrimaryText size="xs">{t("name")}</PrimaryText>}
               onBlur={() => doUpdateAccount.mutate()}
             />
             <Flex style={{ alignSelf: "stretch" }}>
@@ -157,7 +154,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             </Flex>
             <ElevatedNumberInput
               {...interestRateField.getInputProps()}
-              label={<PrimaryText size="xs">Interest Rate</PrimaryText>}
+              label={<PrimaryText size="xs">{t("interest_rate")}</PrimaryText>}
               decimalScale={2}
               min={0}
               step={1}
@@ -177,7 +174,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                   hideAccountField.setValue(!hideAccountField.getValue())
                 }
               >
-                Hide Account
+                {t("hide_account")}
               </Button>
               <Button
                 bg={hideTransactionsField.getValue() ? "purple" : undefined}
@@ -190,7 +187,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                   )
                 }
               >
-                Hide Transactions
+                {t("hide_transactions")}
               </Button>
             </Group>
           </Group>
@@ -222,7 +219,11 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             elevation={2}
           />
           <DimmedText size="sm">
-            Last Updated: {dayjs(props.account.balanceDate).format("L LT")}
+            {t("last_updated", {
+              date: dayjs(props.account.balanceDate).isValid()
+                ? dayjs(props.account.balanceDate).format("L LT")
+                : t("never"),
+            })}
           </DimmedText>
         </Group>
       </Stack>
