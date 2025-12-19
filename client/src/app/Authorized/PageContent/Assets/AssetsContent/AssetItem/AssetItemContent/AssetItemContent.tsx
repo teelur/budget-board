@@ -6,6 +6,7 @@ import { IAssetResponse } from "~/models/asset";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { useTranslation } from "react-i18next";
 
 interface AssetItemContentProps {
   asset: IAssetResponse;
@@ -14,6 +15,8 @@ interface AssetItemContentProps {
 }
 
 const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
+  const { t } = useTranslation();
+
   return (
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
@@ -30,10 +33,10 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             <PencilIcon size={16} />
           </ActionIcon>
           {props.asset.sellDate && props.asset.sellPrice && (
-            <Badge bg="var(--button-color-confirm)">Sold</Badge>
+            <Badge bg="var(--button-color-confirm)">{t("sold")}</Badge>
           )}
           {props.asset.hide && (
-            <Badge bg="var(--button-color-warning)">Hidden</Badge>
+            <Badge bg="var(--button-color-warning)">{t("hidden")}</Badge>
           )}
         </Group>
         <StatusText amount={props.asset.currentValue ?? 0} size="md">
@@ -47,23 +50,24 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
       <Group justify="space-between" align="center">
         {props.asset.purchaseDate && props.asset.purchasePrice ? (
           <DimmedText size="sm">
-            Purchased on{" "}
-            {new Date(props.asset.purchaseDate).toLocaleDateString()} for{" "}
-            {convertNumberToCurrency(
-              props.asset.purchasePrice ?? 0,
-              true,
-              props.userCurrency
-            )}
-            .
+            {t("purchased_on_for", {
+              date: new Date(props.asset.purchaseDate).toLocaleDateString(),
+              price: convertNumberToCurrency(
+                props.asset.purchasePrice ?? 0,
+                true,
+                props.userCurrency
+              ),
+            })}
           </DimmedText>
         ) : (
-          <DimmedText size="sm">No purchase info available.</DimmedText>
+          <DimmedText size="sm">{t("no_purchase_info_available")}</DimmedText>
         )}
         <DimmedText size="sm">
-          Last Updated:{" "}
-          {props.asset.valueDate
-            ? new Date(props.asset.valueDate).toLocaleDateString()
-            : "Never!"}
+          {t("last_updated", {
+            date: props.asset.valueDate
+              ? new Date(props.asset.valueDate).toLocaleDateString()
+              : t("never"),
+          })}
         </DimmedText>
       </Group>
     </Stack>

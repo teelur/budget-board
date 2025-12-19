@@ -2,7 +2,7 @@ import React from "react";
 import { Text, TextProps } from "@mantine/core";
 
 interface DimmedTextProps extends TextProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const DimmedText = ({

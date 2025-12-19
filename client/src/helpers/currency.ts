@@ -19,14 +19,16 @@
 export const convertNumberToCurrency = (
   number: number,
   shouldIncludeCents: boolean,
-  currency: string
-) => {
+  currency: string,
+  signDisplay?: "auto" | "always" | "never" | "exceptZero"
+): string => {
   // Adding 0 to avoid -0 for the output.
   return new Intl.NumberFormat(undefined, {
     style: "currency",
     currency,
     maximumFractionDigits: shouldIncludeCents ? 2 : 0,
     minimumFractionDigits: shouldIncludeCents ? 2 : 0,
+    signDisplay: signDisplay ?? "auto",
   }).format(number + 0);
 };
 

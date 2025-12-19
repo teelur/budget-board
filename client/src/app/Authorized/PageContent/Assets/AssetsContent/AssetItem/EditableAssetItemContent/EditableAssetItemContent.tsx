@@ -24,6 +24,7 @@ import SurfaceTextInput from "~/components/core/Input/Surface/SurfaceTextInput/S
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { useTranslation } from "react-i18next";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -36,13 +37,6 @@ const EditableAssetItemContent = (
 ): React.ReactNode => {
   const assetNameField = useField<string>({
     initialValue: props.asset.name,
-    validateOnBlur: true,
-    validate: (value) => {
-      if (value.trim().length === 0) {
-        return "Asset name cannot be empty";
-      }
-      return null;
-    },
   });
   const purchaseDate = useField<string | null>({
     initialValue: props.asset.purchaseDate
@@ -64,6 +58,7 @@ const EditableAssetItemContent = (
     initialValue: props.asset.hide,
   });
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -93,11 +88,6 @@ const EditableAssetItemContent = (
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Asset updated",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -122,7 +112,7 @@ const EditableAssetItemContent = (
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Asset deleted",
+        message: t("asset_deleted_successfully_message"),
       });
     },
     onError: (error: AxiosError) =>
@@ -144,7 +134,7 @@ const EditableAssetItemContent = (
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Asset restored",
+        message: t("asset_restored_successfully_message"),
       });
     },
     onError: (error: AxiosError) =>
@@ -193,7 +183,7 @@ const EditableAssetItemContent = (
                 hideAssetField.setValue(!hideAssetField.getValue())
               }
             >
-              Hide Asset
+              {t("hide_asset")}
             </Button>
           </Group>
           <StatusText size="md" amount={props.asset.currentValue}>
@@ -209,53 +199,58 @@ const EditableAssetItemContent = (
             <Group gap="0.5rem">
               <DateInput
                 {...purchaseDate.getInputProps()}
-                placeholder="Enter Date"
+                placeholder={t("enter_date")}
                 maw={400}
                 clearable
-                label={<PrimaryText size="xs">Purchase Date</PrimaryText>}
+                label={
+                  <PrimaryText size="xs">{t("purchase_date")}</PrimaryText>
+                }
                 elevation={1}
               />
               <NumberInput
                 {...purchasePrice.getInputProps()}
-                placeholder="Enter Price"
+                placeholder={t("enter_price")}
                 maw={150}
                 prefix={getCurrencySymbol(props.userCurrency)}
                 thousandSeparator=","
                 decimalScale={2}
                 fixedDecimalScale
                 onBlur={() => doUpdateAsset.mutate()}
-                label={<PrimaryText size="xs">Purchase Price</PrimaryText>}
+                label={
+                  <PrimaryText size="xs">{t("purchase_price")}</PrimaryText>
+                }
                 elevation={1}
               />
             </Group>
             <Group gap="0.5rem">
               <DateInput
                 {...sellDate.getInputProps()}
-                placeholder="Enter Date"
+                placeholder={t("enter_date")}
                 maw={400}
                 clearable
-                label={<PrimaryText size="xs">Sell Date</PrimaryText>}
+                label={<PrimaryText size="xs">{t("sell_date")}</PrimaryText>}
                 elevation={1}
               />
               <NumberInput
                 {...sellPrice.getInputProps()}
-                placeholder="Enter Price"
+                placeholder={t("enter_price")}
                 maw={150}
                 prefix={getCurrencySymbol(props.userCurrency)}
                 thousandSeparator=","
                 decimalScale={2}
                 fixedDecimalScale
                 onBlur={() => doUpdateAsset.mutate()}
-                label={<PrimaryText size="xs">Sell Price</PrimaryText>}
+                label={<PrimaryText size="xs">{t("sell_price")}</PrimaryText>}
                 elevation={1}
               />
             </Group>
           </Group>
           <DimmedText size="sm">
-            Last Updated:{" "}
-            {props.asset.valueDate
-              ? new Date(props.asset.valueDate).toLocaleDateString()
-              : "Never!"}
+            {t("last_updated", {
+              date: props.asset.valueDate
+                ? new Date(props.asset.valueDate).toLocaleDateString()
+                : t("never"),
+            })}
           </DimmedText>
         </Group>
       </Stack>

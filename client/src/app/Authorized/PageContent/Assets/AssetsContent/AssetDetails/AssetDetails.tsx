@@ -22,6 +22,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Accordion from "~/components/core/Accordion/Accordion";
+import { useTranslation, Trans } from "react-i18next";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -33,7 +34,9 @@ interface AssetDetailsProps {
 const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
+
   const valuesQuery = useQuery({
     queryKey: ["values", props.asset?.id],
     queryFn: async (): Promise<IValueResponse[]> => {
@@ -74,31 +77,36 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryText size="lg">Asset Details</PrimaryText>}
+      title={<PrimaryText size="lg">{t("asset_details")}</PrimaryText>}
     >
       {!props.asset ? (
         <Skeleton height={425} radius="lg" />
       ) : (
         <Stack gap="1rem">
           <Stack gap={0}>
-            <DimmedText size="xs">Asset Name</DimmedText>
+            <DimmedText size="xs">{t("asset_name")}</DimmedText>
             <PrimaryText size="xl">{props.asset?.name}</PrimaryText>
           </Stack>
           <Group justify="space-between">
             {props.asset?.purchaseDate && props.asset.purchasePrice && (
               <Stack gap={0} justify="center" align="center">
-                <DimmedText size="xs">Purchased on</DimmedText>
-                <PrimaryText size="md" fw={600}>
-                  {new Date(props.asset.purchaseDate).toLocaleDateString()}
-                </PrimaryText>
-                <DimmedText size="xs">for</DimmedText>
-                <PrimaryText size="md" fw={600}>
-                  {convertNumberToCurrency(
-                    props.asset.purchasePrice,
-                    true,
-                    props.userCurrency
-                  )}
-                </PrimaryText>
+                <Trans
+                  i18nKey="purchased_on_for_styled"
+                  values={{
+                    date: new Date(
+                      props.asset.purchaseDate
+                    ).toLocaleDateString(),
+                    price: convertNumberToCurrency(
+                      props.asset.purchasePrice,
+                      true,
+                      props.userCurrency
+                    ),
+                  }}
+                  components={[
+                    <DimmedText size="xs" key="purchased-label" />,
+                    <PrimaryText size="md" key="purchased-value" />,
+                  ]}
+                />
               </Stack>
             )}
             {props.asset?.purchaseDate &&
@@ -111,31 +119,32 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     amount={props.asset.sellPrice - props.asset.purchasePrice}
                     size="xs"
                   >
-                    {props.asset.sellPrice - props.asset.purchasePrice >= 0
-                      ? "+"
-                      : ""}
                     {convertNumberToCurrency(
                       props.asset.sellPrice - props.asset.purchasePrice,
                       true,
-                      props.userCurrency
+                      props.userCurrency,
+                      "always"
                     )}
                   </StatusText>
                 </Stack>
               )}
             {props.asset?.sellDate && props.asset.sellPrice && (
               <Stack gap={0} justify="center" align="center">
-                <DimmedText size="xs">Sold on</DimmedText>
-                <PrimaryText size="md" fw={600}>
-                  {new Date(props.asset.sellDate).toLocaleDateString()}
-                </PrimaryText>
-                <DimmedText size="xs">for</DimmedText>
-                <PrimaryText size="md" fw={600}>
-                  {convertNumberToCurrency(
-                    props.asset.sellPrice,
-                    true,
-                    props.userCurrency
-                  )}
-                </PrimaryText>
+                <Trans
+                  i18nKey="sold_on_for_styled"
+                  values={{
+                    date: new Date(props.asset.sellDate).toLocaleDateString(),
+                    price: convertNumberToCurrency(
+                      props.asset.sellPrice,
+                      true,
+                      props.userCurrency
+                    ),
+                  }}
+                  components={[
+                    <DimmedText size="xs" key="sold-label" />,
+                    <PrimaryText size="md" key="sold-value" />,
+                  ]}
+                />
               </Stack>
             )}
           </Group>
@@ -145,7 +154,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
           >
             <MantineAccordion.Item value="add-value">
               <MantineAccordion.Control>
-                <PrimaryText>Add Value</PrimaryText>
+                <PrimaryText>{t("add_value")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <AddValue
@@ -156,7 +165,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="chart">
               <MantineAccordion.Control>
-                <PrimaryText>Value Trends</PrimaryText>
+                <PrimaryText>{t("value_trends")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Group>
@@ -165,21 +174,21 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     size="xs"
                     onClick={() => setChartLookbackMonths(3)}
                   >
-                    3 months
+                    {t("3_months")}
                   </Button>
                   <Button
                     variant={chartLookbackMonths === 6 ? "filled" : "outline"}
                     size="xs"
                     onClick={() => setChartLookbackMonths(6)}
                   >
-                    6 months
+                    {t("6_months")}
                   </Button>
                   <Button
                     variant={chartLookbackMonths === 12 ? "filled" : "outline"}
                     size="xs"
                     onClick={() => setChartLookbackMonths(12)}
                   >
-                    12 months
+                    {t("12_months")}
                   </Button>
                 </Group>
                 <ValueChart
@@ -202,7 +211,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="values">
               <MantineAccordion.Control>
-                <PrimaryText>Value History</PrimaryText>
+                <PrimaryText>{t("value_history")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
@@ -211,7 +220,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   )}
                   {sortedValues.length === 0 ? (
                     <Group justify="center">
-                      <DimmedText size="sm">No value entries.</DimmedText>
+                      <DimmedText size="sm">{t("no_value_entries")}</DimmedText>
                     </Group>
                   ) : (
                     <ValueItems
@@ -224,7 +233,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="deleted-values">
               <MantineAccordion.Control>
-                <PrimaryText>Deleted Values</PrimaryText>
+                <PrimaryText>{t("deleted_values")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
@@ -232,7 +241,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     <Skeleton height={20} radius="lg" />
                   )}
                   {sortedDeletedValues.length === 0 ? (
-                    <DimmedText size="sm">No deleted values.</DimmedText>
+                    <DimmedText size="sm">{t("no_deleted_values")}</DimmedText>
                   ) : (
                     <ValueItems
                       values={sortedDeletedValues}
