@@ -19,10 +19,13 @@ import { useDisclosure } from "@mantine/hooks";
 import ImportCompleted from "./ImportCompleted/ImportCompleted";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [activeStep, setActiveStep] = React.useState(0);
+
+  const { t } = useTranslation();
 
   // Load CSV Dialog Data
   const [headers, setHeaders] = React.useState<string[]>([]);
@@ -61,7 +64,7 @@ const ImportTransactionsModal = () => {
       } else {
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: "CSV file is missing a header row",
+          message: t("csv_file_missing_header_row_message"),
         });
         return;
       }
@@ -70,7 +73,7 @@ const ImportTransactionsModal = () => {
     } catch (error) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: `Error reading file: ${error}`,
+        message: t("error_reading_file_message", { error }),
       });
       resetData();
     }
@@ -116,7 +119,7 @@ const ImportTransactionsModal = () => {
     if (filteredImportedData.length === 0) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "No transactions to import",
+        message: t("no_transactions_to_import_message"),
       });
       return;
     }
@@ -158,13 +161,13 @@ const ImportTransactionsModal = () => {
           open();
         }}
       >
-        Import
+        {t("import_transactions")}
       </Button>
       <Modal
         opened={opened}
         onClose={close}
         size="auto"
-        title={<PrimaryText>Import Transactions</PrimaryText>}
+        title={<PrimaryText>{t("import_transactions")}</PrimaryText>}
       >
         <Stepper
           active={activeStep}
@@ -172,13 +175,16 @@ const ImportTransactionsModal = () => {
           w="100%"
           mb="1rem"
         >
-          <Stepper.Step label="Step 1" description="Load CSV">
+          <Stepper.Step label={t("step_1")} description={t("load_csv")}>
             <LoadCsv
               loadCsv={importCsvData}
               launchNextDialog={() => setActiveStep(1)}
             />
           </Stepper.Step>
-          <Stepper.Step label="Step 2" description="Configure Transactions">
+          <Stepper.Step
+            label={t("step_2")}
+            description={t("configure_transactions")}
+          >
             <ConfigureTransactions
               csvData={csvData}
               csvHeaders={headers}
@@ -186,7 +192,7 @@ const ImportTransactionsModal = () => {
               goBackToPreviousDialog={() => setActiveStep(0)}
             />
           </Stepper.Step>
-          <Stepper.Step label="Step 3" description="Map Accounts">
+          <Stepper.Step label={t("step_3")} description={t("map_accounts")}>
             <AccountMapping
               importedTransactions={importData}
               accountNameToAccountIdMap={accountNameToAccountIdMap}

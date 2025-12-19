@@ -20,6 +20,7 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
 import Card from "~/components/core/Card/Card";
+import { useTranslation } from "react-i18next";
 
 export interface ActionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -31,6 +32,7 @@ export interface ActionItemProps {
 }
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -54,7 +56,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
       return (
         <TextInput
           flex="1 1 auto"
-          placeholder="Enter merchant"
+          placeholder={t("enter_merchant_name")}
           value={props.ruleParameter.value}
           onChange={(event) =>
             props.setRuleParameter({
@@ -69,7 +71,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
       return (
         <NumberInput
           flex="1 1 auto"
-          placeholder="Enter amount"
+          placeholder={t("enter_amount")}
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({
@@ -87,7 +89,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
       return (
         <DateInput
           flex="1 1 auto"
-          placeholder="Select date"
+          placeholder={t("select_a_date")}
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({
@@ -120,18 +122,19 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
   };
 
   const getCardContent = (): React.ReactNode => {
-    if (props.ruleParameter.operator === "delete") {
-      return <PrimaryText size="sm">the transaction</PrimaryText>;
-    } else if (props.ruleParameter.operator === "set") {
+    if (props.ruleParameter.operator === "set") {
       return (
         <>
           <Select
             w="110px"
-            data={TransactionFields.map((field) => field.label)}
+            data={TransactionFields.map((i) => ({
+              ...i,
+              label: t(i.label),
+            }))}
             value={
               TransactionFields.find(
                 (field) => field.value === props.ruleParameter.field
-              )?.label ?? ""
+              )?.value
             }
             onChange={(value) =>
               props.setRuleParameter({
@@ -147,7 +150,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
             }
             elevation={2}
           />
-          <PrimaryText size="sm">to</PrimaryText>
+          <PrimaryText size="sm">{t("to")}</PrimaryText>
           {getValueInput()}
         </>
       );
@@ -159,18 +162,21 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
     <Card elevation={2}>
       <Group gap="0.5rem">
         <Select
-          w="90px"
-          data={ActionOperators.map((op) => op.label)}
+          w="170px"
+          data={ActionOperators.map((op) => ({
+            value: op.value,
+            label: t(op.label),
+          }))}
           value={
             ActionOperators.find(
               (op) => op.value === props.ruleParameter.operator
-            )?.label ?? ""
+            )?.value
           }
           onChange={(value) => {
             props.setRuleParameter({
               ...props.ruleParameter,
               operator:
-                ActionOperators.find((op) => op.label === value)?.value ??
+                ActionOperators.find((op) => op.value === value)?.value ??
                 ActionOperators[0]!.value,
             });
           }}

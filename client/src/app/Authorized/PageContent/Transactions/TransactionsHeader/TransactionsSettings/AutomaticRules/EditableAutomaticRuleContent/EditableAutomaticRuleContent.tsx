@@ -13,6 +13,7 @@ import ActionItem from "./ActionItem/ActionItem";
 import ConditionItem from "./ConditionItem/ConditionItem";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 interface EditableAutomaticRuleContentProps {
   conditionItems: IRuleParameterEdit[];
@@ -27,6 +28,7 @@ const EditableAutomaticRuleContent = (
   const defaultField =
     TransactionFields.find((field) => field.value === "merchant")?.value ?? "";
 
+  const { t } = useTranslation();
   const { transactionCategories } = useTransactionCategories();
 
   const addNewCondition = () => {
@@ -72,7 +74,7 @@ const EditableAutomaticRuleContent = (
     <Stack gap="0.5rem">
       <Stack gap="0.5rem">
         <Group align="center" justify="space-between">
-          <PrimaryText size="sm">If</PrimaryText>
+          <PrimaryText size="sm">{t("if")}</PrimaryText>
           <ActionIcon size="sm" onClick={addNewCondition}>
             <PlusIcon size={16} />
           </ActionIcon>
@@ -96,7 +98,7 @@ const EditableAutomaticRuleContent = (
       </Stack>
       <Stack gap="0.5rem">
         <Group align="center" justify="space-between">
-          <PrimaryText size="sm">Then</PrimaryText>
+          <PrimaryText size="sm">{t("then")}</PrimaryText>
           <ActionIcon size="sm" onClick={addNewAction}>
             <PlusIcon size={16} />
           </ActionIcon>

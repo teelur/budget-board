@@ -18,6 +18,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -33,6 +34,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
     props.rule.actions ?? []
   );
 
+  const { t } = useTranslation();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
@@ -109,8 +111,8 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       });
 
       notifications.show({
-        title: "Rule Executed",
-        message: data?.data ?? "Rule run successfully",
+        title: t("rule_executed"),
+        message: data?.data ?? t("rule_run_successfully"),
         color: "var(--button-color-confirm)",
       });
     },
@@ -156,14 +158,14 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
               }}
               loading={doUpdateAutomaticRule.isPending}
             >
-              Save
+              {t("save")}
             </Button>
             <Button
               flex="1 1 auto"
               variant="outline"
               onClick={() => setIsSelected(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
           </Group>
         </Stack>
@@ -177,7 +179,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
         <Stack>
           <Group gap="0.25rem">
             <DimmedText size="sm" pr="0.5rem">
-              If
+              {t("if")}
             </DimmedText>
             {(props.rule.conditions ?? []).map((condition) => (
               <ConditionItem
@@ -190,7 +192,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
           </Group>
           <Group gap="0.25rem">
             <DimmedText size="sm" pr="0.5rem">
-              Then
+              {t("then")}
             </DimmedText>
             {(props.rule.actions ?? []).map((action) => (
               <ActionItem

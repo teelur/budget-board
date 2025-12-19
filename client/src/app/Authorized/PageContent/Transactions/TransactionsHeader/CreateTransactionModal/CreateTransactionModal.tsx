@@ -21,12 +21,16 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
+import { useTranslation } from "react-i18next";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
 
+  const { t } = useTranslation();
+
   const dateField = useField<Date | null>({
     initialValue: new Date(),
+    validate: (value) => (value ? null : t("date_is_required")),
   });
   const merchantNameField = useField<string>({
     initialValue: "",
@@ -39,6 +43,8 @@ const CreateTransactionModal = (): React.ReactNode => {
   });
   const accountIdsField = useField<string[]>({
     initialValue: [],
+    validate: (value) =>
+      value && value.length > 0 ? null : t("account_is_required"),
   });
 
   const { transactionCategories } = useTransactionCategories();
@@ -83,21 +89,14 @@ const CreateTransactionModal = (): React.ReactNode => {
   });
 
   const onSubmit = () => {
-    if (!dateField.getValue()) {
-      notifications.show({
-        message: "Date is required",
-        color: "var(--button-color-destructive)",
-      });
-      return;
-    }
+    dateField.validate();
+    accountIdsField.validate();
+
     if (
+      !dateField.getValue() ||
       !accountIdsField.getValue() ||
       accountIdsField.getValue().length === 0
     ) {
-      notifications.show({
-        message: "Account is required",
-        color: "var(--button-color-destructive)",
-      });
       return;
     }
 
@@ -130,31 +129,31 @@ const CreateTransactionModal = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryText>Create Transaction</PrimaryText>}
+        title={<PrimaryText>{t("create_transaction")}</PrimaryText>}
       >
         <Stack gap="0.25rem">
           <DateInput
-            label={<PrimaryText size="sm">Date</PrimaryText>}
-            placeholder="Pick date"
+            label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
+            placeholder={t("select_a_date")}
             {...dateField.getInputProps()}
             elevation={0}
           />
           <TextInput
-            label={<PrimaryText size="sm">Merchant Name</PrimaryText>}
-            placeholder="Enter merchant name"
+            label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+            placeholder={t("enter_merchant_name")}
             {...merchantNameField.getInputProps()}
             elevation={0}
           />
           <CategorySelect
-            label={<PrimaryText size="sm">Category</PrimaryText>}
+            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
             categories={transactionCategories}
             {...categoryField.getInputProps()}
             withinPortal
             elevation={0}
           />
           <NumberInput
-            label={<PrimaryText size="sm">Amount</PrimaryText>}
-            placeholder="Enter amount"
+            label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+            placeholder={t("enter_amount")}
             prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
             decimalScale={2}
             thousandSeparator=","
@@ -162,7 +161,7 @@ const CreateTransactionModal = (): React.ReactNode => {
             elevation={0}
           />
           <AccountSelect
-            label={<PrimaryText size="sm">Account</PrimaryText>}
+            label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
             {...accountIdsField.getInputProps()}
             maxSelectedValues={1}
             elevation={0}
@@ -172,7 +171,7 @@ const CreateTransactionModal = (): React.ReactNode => {
             onClick={onSubmit}
             loading={doCreateTransaction.isPending}
           >
-            Submit
+            {t("submit")}
           </Button>
         </Stack>
       </Modal>

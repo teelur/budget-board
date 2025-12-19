@@ -23,6 +23,7 @@ import { IAccountResponse } from "~/models/account";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -38,6 +39,8 @@ const ConfigureTransactions = (
 
   const [alertDetails, setAlertDetails] = React.useState<string | null>(null);
 
+  const { t } = useTranslation();
+
   // The raw CSV data imported from the user's file.
   const [csvData, setCsvData] = React.useState<CsvRow[]>(props.csvData);
 
@@ -49,24 +52,22 @@ const ConfigureTransactions = (
   // Column selections made by the user to map CSV columns to transaction fields.
   const [columnsSelect, setColumnsSelect] = React.useState<ISelectedColumns>({
     date:
-      props.csvHeaders.find((header) =>
-        areStringsEqual(header.toLowerCase(), "date")
-      ) ?? null,
+      props.csvHeaders.find((header) => areStringsEqual(header, t("date"))) ??
+      null,
     merchantName:
       props.csvHeaders.find((header) =>
-        areStringsEqual(header.toLowerCase(), "merchant name")
+        areStringsEqual(header, t("merchant_name"))
       ) ?? null,
     category:
       props.csvHeaders.find((header) =>
-        areStringsEqual(header.toLowerCase(), "category")
+        areStringsEqual(header, t("category"))
       ) ?? null,
     amount:
-      props.csvHeaders.find((header) =>
-        areStringsEqual(header.toLowerCase(), "amount")
-      ) ?? null,
+      props.csvHeaders.find((header) => areStringsEqual(header, t("amount"))) ??
+      null,
     account:
       props.csvHeaders.find((header) =>
-        areStringsEqual(header.toLowerCase(), "account")
+        areStringsEqual(header, t("account"))
       ) ?? null,
     incomeAmount: null,
     expenseAmount: null,
@@ -133,13 +134,13 @@ const ConfigureTransactions = (
   const disableNextButton = () => {
     // Cannot proceed if there are no imported transactions.
     if (importedTransactionsTableData.length === 0) {
-      setAlertDetails("No transactions to import.");
+      setAlertDetails(t("no_transactions_to_import_message"));
       return;
     }
 
     // The account column is required to add transactions.
     if (!columnsSelect.account) {
-      setAlertDetails("Account column is required.");
+      setAlertDetails(t("account_column_is_required_message"));
       return;
     }
 
@@ -151,14 +152,12 @@ const ConfigureTransactions = (
       if (columnsOptions.splitAmountColumn) {
         if (!columnsSelect.incomeAmount && !columnsSelect.expenseAmount) {
           setAlertDetails(
-            "One or more of Date, Merchant Name, Category, Income Amount, or Expense Amount columns are required."
+            t("transaction_import_columns_required_split_amount_message")
           );
           return;
         }
       } else if (!columnsSelect.amount) {
-        setAlertDetails(
-          "One or more of Date, Merchant Name, Category, or Amount columns are required."
-        );
+        setAlertDetails(t("transaction_import_columns_required_message"));
         return;
       }
     }
@@ -294,7 +293,9 @@ const ConfigureTransactions = (
       if (incomeValue && expenseValue) {
         notifications.show({
           color: "var(--button-color-warning)",
-          message: `Row has both income and expense values, defaulting to income. Row UID: ${row.uid}`,
+          message: t("both_income_and_expense_values_present_message", {
+            uid: row.uid,
+          }),
         });
       }
 
@@ -648,9 +649,9 @@ const ConfigureTransactions = (
     } catch (e) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: `Error building table data: ${
-          e instanceof Error ? e.message : String(e)
-        }`,
+        message: t("error_building_imported_transactions_table_message", {
+          error: (e as Error).message,
+        }),
       });
       setImportedTransactionsTableData([]);
       setDuplicateTransactions(
@@ -689,7 +690,7 @@ const ConfigureTransactions = (
         <Alert
           variant="outline"
           color="var(--text-color-status-bad)"
-          title="Missing Info"
+          title={t("missing_information")}
           icon={<InfoIcon />}
           radius="md"
           bg="var(--background-color-surface)"
@@ -732,7 +733,7 @@ const ConfigureTransactions = (
           onClick={() => props.goBackToPreviousDialog()}
           leftSection={<MoveLeftIcon size={16} />}
         >
-          Back
+          {t("back")}
         </Button>
         <Button
           flex="1 1 auto"
@@ -742,7 +743,7 @@ const ConfigureTransactions = (
           }
           rightSection={<MoveRightIcon size={16} />}
         >
-          Next
+          {t("next")}
         </Button>
       </Group>
     </Stack>

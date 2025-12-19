@@ -6,8 +6,10 @@ import { IAutomaticRuleResponse } from "~/models/automaticRule";
 import AddAutomaticRule from "./AddAutomaticRule/AddAutomaticRule";
 import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 const AutomaticRules = (): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const AutomaticRuleQuery = useQuery({
@@ -28,10 +30,7 @@ const AutomaticRules = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
-      <DimmedText size="sm">
-        Create rules that automatically update fields during sync when the
-        specified conditions are met.
-      </DimmedText>
+      <DimmedText size="sm">{t("automatic_rules_description")}</DimmedText>
       <AddAutomaticRule />
       {AutomaticRuleQuery.data?.map((rule: IAutomaticRuleResponse) => (
         <AutomaticRuleCard key={rule.id} rule={rule} />

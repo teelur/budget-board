@@ -3,6 +3,7 @@ import React from "react";
 import { ITransaction } from "~/models/transaction";
 import DeletedTransactionsCard from "../DeletedTransactionCard/DeletedTransactionsCard";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 interface DeletedTransactionCardsProps {
   transactions: ITransaction[];
@@ -13,6 +14,8 @@ const DeletedTransactionCards = (
 ): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const [itemsPerPage, _setItemsPerPage] = React.useState(15);
+
+  const { t } = useTranslation();
 
   return (
     <Stack gap="0.5rem">
@@ -30,7 +33,7 @@ const DeletedTransactionCards = (
               />
             ))
         ) : (
-          <PrimaryText size="xs">No transactions</PrimaryText>
+          <PrimaryText size="xs">{t("no_transactions")}</PrimaryText>
         )}
       </Stack>
       <Group justify="center">

@@ -9,6 +9,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 interface CustomCategoryCardProps {
   category: ICategoryResponse;
@@ -17,6 +18,7 @@ interface CustomCategoryCardProps {
 const CustomCategoryCard = (
   props: CustomCategoryCardProps
 ): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -31,7 +33,7 @@ const CustomCategoryCard = (
       queryClient.invalidateQueries({ queryKey: ["transactionCategories"] });
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Category deleted!",
+        message: t("category_deleted_successfully_message"),
       });
     },
     onError: (error: AxiosError) =>

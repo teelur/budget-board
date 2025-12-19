@@ -12,8 +12,9 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import SurfaceTransactionCard from "~/components/core/Card/TransactionCard/SurfaceTransactionCard/SurfaceTransactionCard";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
+import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   sort: Sorts;
@@ -24,6 +25,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const [itemsPerPage, _setItemsPerPage] = React.useState(25);
 
+  const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
@@ -71,14 +73,15 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                 (page - 1) * itemsPerPage + itemsPerPage
               )
               .map((transaction) => (
-                <SurfaceTransactionCard
+                <TransactionCard
                   key={transaction.id}
                   transaction={transaction}
                   categories={transactionCategories}
+                  elevation={1}
                 />
               ))
           ) : (
-            <PrimaryText>No transactions</PrimaryText>
+            <PrimaryText>{t("no_transactions")}</PrimaryText>
           )}
         </Stack>
       )}
