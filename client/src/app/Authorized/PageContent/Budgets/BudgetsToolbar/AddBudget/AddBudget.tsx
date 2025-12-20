@@ -20,6 +20,7 @@ import { getCurrencySymbol } from "~/helpers/currency";
 import Popover from "~/components/core/Popover/Popover";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { useTranslation } from "react-i18next";
 
 interface AddBudgetProps {
   date: Date;
@@ -27,6 +28,8 @@ interface AddBudgetProps {
 }
 
 const AddBudget = (props: AddBudgetProps): React.ReactNode => {
+  const { t } = useTranslation();
+
   const categoryField = useField<string>({
     initialValue: "",
   });
@@ -62,10 +65,6 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["budgets"] });
-      notifications.show({
-        message: "Budget added successfully.",
-        color: "var(--button-color-confirm)",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -93,7 +92,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
             />
             <NumberInput
               {...limitField.getInputProps()}
-              placeholder="Limit"
+              placeholder={t("limit")}
               w="100%"
               prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               min={0}
@@ -109,6 +108,9 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
           >
             <ActionIcon
               h="100%"
+              disabled={
+                categoryField.getValue() === "" || limitField.getValue() === ""
+              }
               onClick={() =>
                 doCreateBudget.mutate([
                   {

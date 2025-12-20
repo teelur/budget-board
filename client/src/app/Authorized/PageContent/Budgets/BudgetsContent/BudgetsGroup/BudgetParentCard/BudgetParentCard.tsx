@@ -34,6 +34,7 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Popover from "~/components/core/Popover/Popover";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
+import { useTranslation, Trans } from "react-i18next";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -46,6 +47,8 @@ export interface BudgetParentCardProps {
 
 const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const [isSelected, { toggle, close }] = useDisclosure(false);
+
+  const { t } = useTranslation();
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
   const limit =
@@ -63,7 +66,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
 
   const newLimitField = useField<number | string>({
     initialValue: limit ?? 0,
-    validate: (value) => (value !== "" ? null : "Invalid limit"),
+    validate: (value) => (value !== "" ? null : t("invalid_limit")),
   });
 
   const percentComplete = roundAwayFromZero(
@@ -227,6 +230,31 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
 
   const { budgetChildCards, unbudgetChildCards } = buildChildren();
 
+  const totalEditComponent = (
+    <Flex onClick={(e) => e.stopPropagation()}>
+      <NumberInput
+        {...newLimitField.getInputProps()}
+        onBlur={() => handleEdit(newLimitField.getValue())}
+        min={childLimitsTotal}
+        max={999999}
+        step={1}
+        prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+        placeholder={t("enter_limit")}
+        size="xs"
+        styles={{
+          root: {
+            maxWidth: "100px",
+          },
+          input: {
+            padding: "0 10px",
+            fontSize: "16px",
+          },
+        }}
+        elevation={2}
+      />
+    </Flex>
+  );
+
   return (
     <Card p="0.25rem" w="100%" elevation={1}>
       <Stack gap="0.25rem">
@@ -270,49 +298,48 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   </ActionIcon>
                 </Group>
                 <Group gap="0.5rem" justify="flex-end" align="center">
-                  {userSettingsQuery.isPending ? null : (
-                    <PrimaryText className={classes.text}>
-                      {convertNumberToCurrency(
-                        amount * (isIncome ? 1 : -1),
-                        false,
-                        userSettingsQuery.data?.currency ?? "USD"
-                      )}
-                    </PrimaryText>
-                  )}
-                  <DimmedText className={classes.textSmall}> of </DimmedText>
                   {isSelected ? (
-                    <Flex onClick={(e) => e.stopPropagation()}>
-                      <NumberInput
-                        {...newLimitField.getInputProps()}
-                        onBlur={() => handleEdit(newLimitField.getValue())}
-                        min={childLimitsTotal}
-                        max={999999}
-                        step={1}
-                        prefix={getCurrencySymbol(
-                          userSettingsQuery.data?.currency
-                        )}
-                        placeholder="Limit"
-                        size="xs"
-                        styles={{
-                          root: {
-                            maxWidth: "100px",
-                          },
-                          input: {
-                            padding: "0 10px",
-                            fontSize: "16px",
-                          },
-                        }}
-                        elevation={2}
-                      />
-                    </Flex>
-                  ) : userSettingsQuery.isPending ? null : (
-                    <PrimaryText className={classes.text}>
-                      {convertNumberToCurrency(
-                        limit,
-                        false,
-                        userSettingsQuery.data?.currency ?? "USD"
-                      )}
-                    </PrimaryText>
+                    <Trans
+                      i18nKey="budget_amount_fraction_editable_total_styled"
+                      values={{
+                        amount: convertNumberToCurrency(
+                          amount * (isIncome ? 1 : -1),
+                          false,
+                          userSettingsQuery.data?.currency ?? "USD"
+                        ),
+                        total: convertNumberToCurrency(
+                          limit,
+                          false,
+                          userSettingsQuery.data?.currency ?? "USD"
+                        ),
+                      }}
+                      components={[
+                        <PrimaryText className={classes.text} key="amount" />,
+                        <DimmedText size="sm" key="of" />,
+                        totalEditComponent,
+                      ]}
+                    />
+                  ) : (
+                    <Trans
+                      i18nKey="budget_amount_fraction_styled"
+                      values={{
+                        amount: convertNumberToCurrency(
+                          amount * (isIncome ? 1 : -1),
+                          false,
+                          userSettingsQuery.data?.currency ?? "USD"
+                        ),
+                        total: convertNumberToCurrency(
+                          limit,
+                          false,
+                          userSettingsQuery.data?.currency ?? "USD"
+                        ),
+                      }}
+                      components={[
+                        <PrimaryText className={classes.text} key="amount" />,
+                        <DimmedText size="sm" key="of" />,
+                        <PrimaryText className={classes.text} key="total" />,
+                      ]}
+                    />
                   )}
                 </Group>
               </Group>
@@ -335,28 +362,33 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     elevation={2}
                   />
                 </Flex>
-                {userSettingsQuery.isPending ? null : (
-                  <StatusText
-                    amount={roundAwayFromZero(amount)}
-                    total={limit}
-                    type={
-                      isIncome
-                        ? StatusColorType.Income
-                        : StatusColorType.Expense
-                    }
-                    warningThreshold={
-                      userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                    }
-                    size="md"
-                  >
-                    {convertNumberToCurrency(
+                <Trans
+                  i18nKey="budget_left_styled"
+                  values={{
+                    amount: convertNumberToCurrency(
                       roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
                       false,
                       userSettingsQuery.data?.currency ?? "USD"
-                    )}
-                  </StatusText>
-                )}
-                <DimmedText size="sm"> left</DimmedText>
+                    ),
+                  }}
+                  components={[
+                    <StatusText
+                      amount={roundAwayFromZero(amount)}
+                      total={limit}
+                      type={
+                        isIncome
+                          ? StatusColorType.Income
+                          : StatusColorType.Expense
+                      }
+                      warningThreshold={
+                        userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                      }
+                      size="md"
+                      key="amount"
+                    />,
+                    <DimmedText size="md" key="amount" />,
+                  ]}
+                />
               </Group>
             </Stack>
             {isSelected && (
@@ -376,10 +408,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   <MantinePopover.Dropdown p="0.5rem" maw={200}>
                     <Stack gap={5}>
                       <PrimaryText size="sm">
-                        Are you sure you want to delete this budget?
+                        {t("confirm_delete_budget_message")}
                       </PrimaryText>
                       <DimmedText size="xs">
-                        All children will also be deleted.
+                        {t("all_children_will_also_be_deleted")}
                       </DimmedText>
                       <Button
                         color="var(--button-color-destructive)"
@@ -389,7 +421,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                           close();
                         }}
                       >
-                        Delete
+                        {t("delete")}
                       </Button>
                     </Stack>
                   </MantinePopover.Dropdown>

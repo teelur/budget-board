@@ -21,6 +21,7 @@ import Drawer from "~/components/core/Drawer/Drawer";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
+import { useTranslation } from "react-i18next";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ interface BudgetDetailsProps {
 const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const chartLookbackMonths = 6;
 
+  const { t } = useTranslation();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
@@ -96,7 +98,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryText size="lg">Budget Details</PrimaryText>}
+      title={<PrimaryText size="lg">{t("budget_details")}</PrimaryText>}
     >
       {transactionsQuery.isPending ||
       props.month === null ||
@@ -106,13 +108,13 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
         <Stack gap="1rem">
           <Group justify="space-between" align="center">
             <Stack gap={0}>
-              <DimmedText size="xs">Category</DimmedText>
+              <DimmedText size="xs">{t("category")}</DimmedText>
               <PrimaryText size="lg">
-                {props.category ?? "No Category"}
+                {props.category ?? t("no_category")}
               </PrimaryText>
             </Stack>
             <Stack gap={0}>
-              <DimmedText size="xs">Month</DimmedText>
+              <DimmedText size="xs">{t("month")}</DimmedText>
               <PrimaryText size="lg">
                 {props.month?.toLocaleString("default", {
                   month: "long",
@@ -125,7 +127,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             <MantineAccordion.Item value="chart">
               <MantineAccordion.Control>
                 <PrimaryText size="md">
-                  {isExpenseCategory ? "Expense" : "Income"} Trends
+                  {isExpenseCategory ? t("expense_trends") : t("income_trends")}
                 </PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
@@ -139,7 +141,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="transactions">
               <MantineAccordion.Control>
-                <PrimaryText size="md">Recent Transactions</PrimaryText>
+                <PrimaryText size="md">{t("recent_transactions")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <TransactionCards

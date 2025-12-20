@@ -12,6 +12,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import BudgetSettings from "./BudgetSettings/BudgetSettings";
+import { useTranslation } from "react-i18next";
 
 interface BudgetsToolbarProps {
   categories: ICategory[];
@@ -25,6 +26,7 @@ interface BudgetsToolbarProps {
 const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   const [canSelectMultiple, { toggle }] = useDisclosure(false);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -69,14 +71,14 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
           doCopyBudget.mutate(newBudgets);
         } else {
           notifications.show({
-            message: "Previous month has no budget!",
+            message: t("budget_previous_month_no_budgets"),
             color: "var(--button-color-destructive)",
           });
         }
       })
       .catch(() => {
         notifications.show({
-          message: "There was an error copying the previous month's budget.",
+          message: t("budget_copy_failed_message"),
           color: "var(--button-color-destructive)",
         });
       });
@@ -115,12 +117,12 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
           variant="outline"
           color={canSelectMultiple ? "var(--button-color-confirm)" : ""}
         >
-          Select Multiple
+          {t("select_multiple")}
         </Button>
         <Group gap="0.5rem">
           {props.showCopy && (
             <Button onClick={onCopyBudgets} loading={doCopyBudget.isPending}>
-              Copy Previous
+              {t("copy_previous")}
             </Button>
           )}
           {props.selectedDates.length === 1 && (

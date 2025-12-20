@@ -9,6 +9,7 @@ import { sumTransactionAmounts } from "~/helpers/transactions";
 import { StatusColorType } from "~/helpers/budgets";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 interface BudgetSummaryCardProps {
   incomeCategories: ICategory[];
@@ -21,6 +22,8 @@ interface BudgetSummaryCardProps {
 }
 
 const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
+  const { t } = useTranslation();
+
   const incomeBudgetsTotal = props.budgets
     .filter((b) => areStringsEqual(b.category, "Income"))
     .reduce((acc, b) => acc + b.limit, 0);
@@ -65,7 +68,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
   return (
     <Stack gap="0.5rem">
       <PrimaryText size="md" px="0.5rem">
-        Budget Summary
+        {t("budget_summary")}
       </PrimaryText>
       <Card elevation={1}>
         <Stack gap="0.5rem">
@@ -75,19 +78,19 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
             <Card elevation={2}>
               <Stack gap="0.25rem">
                 <BudgetSummaryItem
-                  label="Income"
+                  label={t("income")}
                   amount={incomeTransactionsTotal}
                   total={incomeBudgetsTotal}
                   budgetValueType={StatusColorType.Income}
                 />
                 <BudgetSummaryItem
-                  label="Expenses"
+                  label={t("expenses")}
                   amount={expenseTransactionsTotal}
                   total={expenseBudgetsTotal}
                   budgetValueType={StatusColorType.Expense}
                 />
                 <BudgetSummaryItem
-                  label="Net Budgeted"
+                  label={t("net_expenses")}
                   amount={incomeTransactionsTotal + expenseTransactionsTotal}
                   budgetValueType={StatusColorType.Total}
                   hideProgress
@@ -102,14 +105,14 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
             <Card elevation={2}>
               <Stack gap="0.25rem">
                 <BudgetSummaryItem
-                  label="Unbudgeted"
+                  label={t("unbudgeted")}
                   amount={unbudgetedTransactionsTotal}
                   budgetValueType={StatusColorType.Total}
                   hideProgress
                   showDivider
                 />
                 <BudgetSummaryItem
-                  label="Net Cash Flow"
+                  label={t("net_cash_flow")}
                   amount={totalTransactionsTotal}
                   budgetValueType={StatusColorType.Total}
                   hideProgress

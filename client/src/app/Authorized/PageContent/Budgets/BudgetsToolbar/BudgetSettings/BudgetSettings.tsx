@@ -16,10 +16,12 @@ import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 const BudgetSettings = (): React.ReactNode => {
   const [settingsOpen, { open, close }] = useDisclosure(false);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -42,7 +44,7 @@ const BudgetSettings = (): React.ReactNode => {
     initialValue: userSettingsQuery.data?.budgetWarningThreshold ?? 80,
     validate: (value) =>
       value < 0 || value > 100
-        ? "Warning threshold must be between 0 and 100"
+        ? t("budget_warning_threshold_invalid_message")
         : null,
   });
 
@@ -56,10 +58,6 @@ const BudgetSettings = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
-      notifications.show({
-        message: "Settings updated",
-        color: "var(--button-color-confirm)",
-      });
     },
     onError: (error: any) => {
       notifications.show({
@@ -78,28 +76,25 @@ const BudgetSettings = (): React.ReactNode => {
   }, [userSettingsQuery.data]);
   return (
     <>
-      <ActionIcon
-        variant="subtle"
-        size="input-sm"
-        onClick={open}
-        aria-label="Open budget settings"
-      >
+      <ActionIcon variant="subtle" size="input-sm" onClick={open}>
         <SettingsIcon />
       </ActionIcon>
       <Modal
         opened={settingsOpen}
         onClose={close}
-        title={<PrimaryText>Budget Settings</PrimaryText>}
+        title={<PrimaryText>{t("budget_settings")}</PrimaryText>}
       >
         <Group gap="0.5rem" wrap="nowrap">
           <NumberInput
             flex="1 1 auto"
             label={
-              <PrimaryText size="sm">Budget Warning Threshold</PrimaryText>
+              <PrimaryText size="sm">
+                {t("budget_warning_threshold")}
+              </PrimaryText>
             }
             description={
               <DimmedText size="xs">
-                Set the percentage threshold at which budgets will turn yellow.
+                {t("budget_warning_threshold_description")}
               </DimmedText>
             }
             min={0}
@@ -111,7 +106,6 @@ const BudgetSettings = (): React.ReactNode => {
             <ActionIcon
               h="100%"
               size="md"
-              aria-label="Save settings"
               onClick={() => {
                 if (budgetWarningThresholdField.error) {
                   notifications.show({

@@ -10,7 +10,7 @@ interface StatusTextProps extends TextProps {
   total?: number;
   type?: StatusColorType;
   warningThreshold?: number;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const StatusText = ({

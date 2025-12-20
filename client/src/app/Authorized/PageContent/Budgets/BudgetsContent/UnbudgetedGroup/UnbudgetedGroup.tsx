@@ -10,6 +10,7 @@ import { AxiosResponse } from "axios";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
+import { useTranslation } from "react-i18next";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -20,6 +21,7 @@ interface UnbudgetedGroupProps {
 }
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -88,7 +90,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
       <MantineAccordion.Item value="unbudgeted">
         <MantineAccordion.Control>
           <Group justify="space-between" align="center" w="100%" pr="1rem">
-            <PrimaryText size="lg">Unbudgeted</PrimaryText>
+            <PrimaryText size="lg">{t("unbudgeted")}</PrimaryText>
             {userSettingsQuery.isPending ? null : (
               <PrimaryText size="lg">
                 {convertNumberToCurrency(
@@ -105,9 +107,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
             {unbudgetedCards.length > 0 ? (
               unbudgetedCards
             ) : (
-              <DimmedText size="sm">
-                No unbudgeted transactions found.
-              </DimmedText>
+              <DimmedText size="sm">{t("no_unbudgeted_categories")}</DimmedText>
             )}
           </Stack>
         </MantineAccordion.Panel>
