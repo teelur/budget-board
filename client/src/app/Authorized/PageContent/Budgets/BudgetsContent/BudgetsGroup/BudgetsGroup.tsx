@@ -8,6 +8,7 @@ import {
 } from "~/helpers/budgets";
 import BudgetParentCard from "./BudgetParentCard/BudgetParentCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface BudgetsGroupProps {
   budgets: IBudget[];
@@ -19,6 +20,8 @@ interface BudgetsGroupProps {
 }
 
 const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
+  const { t } = useTranslation();
+
   const categoryToBudgetsMap = buildCategoryToBudgetsMap(props.budgets);
   const categoryToLimitsMap = buildCategoryToLimitsMap(
     props.budgets,
@@ -52,7 +55,7 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
           return null;
         })
       ) : (
-        <DimmedText size="sm">No budgets.</DimmedText>
+        <DimmedText size="sm">{t("no_budgets")}</DimmedText>
       )}
     </Stack>
   );

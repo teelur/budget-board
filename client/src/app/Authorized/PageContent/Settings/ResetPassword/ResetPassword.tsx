@@ -9,20 +9,31 @@ import { AxiosError } from "axios";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
+import { useTranslation } from "react-i18next";
 
 const ResetPassword = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   const oldPasswordField = useField<string>({
     initialValue: "",
-    validate: hasLength({ min: 3 }, "Password must be at least 3 characters."),
+    validate: hasLength(
+      { min: 3 },
+      t("password_min_length_message", { minLength: 3 })
+    ),
   });
   const newPasswordField = useField<string>({
     initialValue: "",
-    validate: hasLength({ min: 3 }, "Password must be at least 3 characters."),
+    validate: hasLength(
+      { min: 3 },
+      t("password_min_length_message", { minLength: 3 })
+    ),
   });
   const confirmNewPasswordField = useField<string>({
     initialValue: "",
     validate: (value: string) =>
-      value !== newPasswordField.getValue() ? "Passwords did not match" : null,
+      value !== newPasswordField.getValue()
+        ? t("passwords_do_not_match")
+        : null,
   });
 
   type ResetPasswordData = {
@@ -52,7 +63,7 @@ const ResetPassword = (): React.ReactNode => {
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Password successfully updated.",
+        message: t("password_updated_successfully"),
       });
     },
     onError: (error: AxiosError) => {
@@ -63,7 +74,7 @@ const ResetPassword = (): React.ReactNode => {
           errorData.title === "One or more validation errors occurred."
         ) {
           notifications.show({
-            title: "One or more validation errors occurred.",
+            title: t("one_or_more_validation_errors_occurred"),
             color: "var(--button-color-destructive)",
             message: Object.values(errorData.errors).join("\n"),
           });
@@ -81,22 +92,24 @@ const ResetPassword = (): React.ReactNode => {
     <Card elevation={1}>
       <LoadingOverlay visible={doResetPassword.isPending} />
       <Stack gap="1rem">
-        <PrimaryText size="lg">Reset Password</PrimaryText>
+        <PrimaryText size="lg">{t("reset_password")}</PrimaryText>
         <PasswordInput
           {...oldPasswordField.getInputProps()}
-          label={<PrimaryText size="sm">Current Password</PrimaryText>}
+          label={<PrimaryText size="sm">{t("current_password")}</PrimaryText>}
           w="100%"
           elevation={1}
         />
         <PasswordInput
           {...newPasswordField.getInputProps()}
-          label={<PrimaryText size="sm">New Password</PrimaryText>}
+          label={<PrimaryText size="sm">{t("new_password")}</PrimaryText>}
           w="100%"
           elevation={1}
         />
         <PasswordInput
           {...confirmNewPasswordField.getInputProps()}
-          label={<PrimaryText size="sm">Confirm New Password</PrimaryText>}
+          label={
+            <PrimaryText size="sm">{t("confirm_new_password")}</PrimaryText>
+          }
           w="100%"
           elevation={1}
         />
@@ -118,7 +131,7 @@ const ResetPassword = (): React.ReactNode => {
             }
           }}
         >
-          Submit
+          {t("reset_password")}
         </Button>
       </Stack>
     </Card>

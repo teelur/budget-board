@@ -1,3 +1,5 @@
+import { ComboboxItem } from "@mantine/core";
+
 export interface IRuleParameterEdit {
   id?: string;
   field: string;
@@ -49,11 +51,11 @@ export interface TransactionField {
   value: string;
 }
 
-export const TransactionFields = [
-  { label: "Merchant", value: "merchant" },
-  { label: "Date", value: "date" },
-  { label: "Amount", value: "amount" },
-  { label: "Category", value: "category" },
+export const TransactionFields: ComboboxItem[] = [
+  { label: "merchant_name", value: "merchant" },
+  { label: "date", value: "date" },
+  { label: "amount", value: "amount" },
+  { label: "category", value: "category" },
 ];
 
 export enum OperatorTypes {
@@ -71,8 +73,8 @@ export const FieldToOperatorType = new Map<string, OperatorTypes>([
 ]);
 
 export const ActionOperators: Operator[] = [
-  { label: "Set", value: "set", type: [] },
-  { label: "Delete", value: "delete", type: [] },
+  { label: "set", value: "set", type: [] },
+  { label: "delete_transaction", value: "delete", type: [] },
 ];
 
 export interface Operator {
@@ -88,28 +90,28 @@ export const Operators: Operator[] = [
     type: [OperatorTypes.STRING, OperatorTypes.NUMBER],
   },
   {
-    label: "does not equal",
+    label: "does_not_equal",
     value: "notEquals",
     type: [OperatorTypes.STRING, OperatorTypes.NUMBER],
   },
   { label: "contains", value: "contains", type: [OperatorTypes.STRING] },
   {
-    label: "does not contain",
+    label: "does_not_contain",
     value: "doesNotContain",
     type: [OperatorTypes.STRING],
   },
-  { label: "starts with", value: "startsWith", type: [OperatorTypes.STRING] },
-  { label: "ends with", value: "endsWith", type: [OperatorTypes.STRING] },
+  { label: "starts_with", value: "startsWith", type: [OperatorTypes.STRING] },
+  { label: "ends_with", value: "endsWith", type: [OperatorTypes.STRING] },
   {
-    label: "matches regex",
+    label: "matches_regex",
     value: "matchesRegex",
     type: [OperatorTypes.STRING],
   },
-  { label: "greater than", value: "greaterThan", type: [OperatorTypes.NUMBER] },
-  { label: "less than", value: "lessThan", type: [OperatorTypes.NUMBER] },
+  { label: "greater_than", value: "greaterThan", type: [OperatorTypes.NUMBER] },
+  { label: "less_than", value: "lessThan", type: [OperatorTypes.NUMBER] },
   { label: "on", value: "on", type: [OperatorTypes.DATE] },
   { label: "before", value: "before", type: [OperatorTypes.DATE] },
   { label: "after", value: "after", type: [OperatorTypes.DATE] },
   { label: "is", value: "is", type: [OperatorTypes.CATEGORY] },
-  { label: "is not", value: "isNot", type: [OperatorTypes.CATEGORY] },
+  { label: "is_not", value: "isNot", type: [OperatorTypes.CATEGORY] },
 ];

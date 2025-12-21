@@ -22,6 +22,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
+import { Trans, useTranslation } from "react-i18next";
 
 interface BudgetChildCardProps {
   id: string;
@@ -36,9 +37,11 @@ interface BudgetChildCardProps {
 const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
+  const { t } = useTranslation();
+
   const newLimitField = useField<number | string>({
     initialValue: props.limit ?? 0,
-    validate: (value) => (value !== "" ? null : "Invalid limit"),
+    validate: (value) => (value !== "" ? null : t("invalid_limit")),
   });
 
   const { request } = useAuth();
@@ -121,6 +124,32 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100
   );
 
+  const totalEditComponent = (
+    <Flex onClick={(e) => e.stopPropagation()}>
+      <NumberInput
+        {...newLimitField.getInputProps()}
+        onBlur={() => handleEdit(newLimitField.getValue())}
+        min={0}
+        max={999999}
+        step={1}
+        prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+        placeholder={t("enter_limit")}
+        size="xs"
+        styles={{
+          root: {
+            maxWidth: "100px",
+          },
+          input: {
+            padding: "0 10px",
+            fontSize: "16px",
+          },
+        }}
+        key="total-edit"
+        elevation={2}
+      />
+    </Flex>
+  );
+
   return (
     <Group wrap="nowrap">
       <CornerDownRight />
@@ -164,49 +193,48 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 </ActionIcon>
               </Group>
               <Group gap="0.25rem" justify="flex-end" align="center">
-                {userSettingsQuery.isPending ? null : (
-                  <PrimaryText className={classes.text}>
-                    {convertNumberToCurrency(
-                      props.amount * (props.isIncome ? 1 : -1),
-                      false,
-                      userSettingsQuery.data?.currency ?? "USD"
-                    )}
-                  </PrimaryText>
-                )}
-                <DimmedText className={classes.textSmall}> of </DimmedText>
                 {isSelected ? (
-                  <Flex onClick={(e) => e.stopPropagation()}>
-                    <NumberInput
-                      {...newLimitField.getInputProps()}
-                      onBlur={() => handleEdit(newLimitField.getValue())}
-                      min={0}
-                      max={999999}
-                      step={1}
-                      prefix={getCurrencySymbol(
-                        userSettingsQuery.data?.currency
-                      )}
-                      placeholder="Limit"
-                      size="xs"
-                      styles={{
-                        root: {
-                          maxWidth: "100px",
-                        },
-                        input: {
-                          padding: "0 10px",
-                          fontSize: "16px",
-                        },
-                      }}
-                      elevation={2}
-                    />
-                  </Flex>
-                ) : userSettingsQuery.isPending ? null : (
-                  <PrimaryText className={classes.text}>
-                    {convertNumberToCurrency(
-                      props.limit,
-                      false,
-                      userSettingsQuery.data?.currency ?? "USD"
-                    )}
-                  </PrimaryText>
+                  <Trans
+                    i18nKey="budget_amount_fraction_editable_total_styled"
+                    values={{
+                      amount: convertNumberToCurrency(
+                        props.amount * (props.isIncome ? 1 : -1),
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD"
+                      ),
+                      total: convertNumberToCurrency(
+                        props.limit,
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD"
+                      ),
+                    }}
+                    components={[
+                      <PrimaryText className={classes.text} key="amount" />,
+                      <DimmedText size="sm" key="of" />,
+                      totalEditComponent,
+                    ]}
+                  />
+                ) : (
+                  <Trans
+                    i18nKey="budget_amount_fraction_styled"
+                    values={{
+                      amount: convertNumberToCurrency(
+                        props.amount * (props.isIncome ? 1 : -1),
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD"
+                      ),
+                      total: convertNumberToCurrency(
+                        props.limit,
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD"
+                      ),
+                    }}
+                    components={[
+                      <PrimaryText className={classes.text} key="amount" />,
+                      <DimmedText size="sm" key="of" />,
+                      <PrimaryText className={classes.text} key="total" />,
+                    ]}
+                  />
                 )}
               </Group>
             </Group>
@@ -231,33 +259,35 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   elevation={2}
                 />
               </Flex>
-              {userSettingsQuery.isPending ? null : (
-                <StatusText
-                  amount={roundAwayFromZero(props.amount)}
-                  total={props.limit}
-                  type={
-                    props.isIncome
-                      ? StatusColorType.Income
-                      : StatusColorType.Expense
-                  }
-                  warningThreshold={
-                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                  }
-                  size="sm"
-                >
-                  {convertNumberToCurrency(
+              <Trans
+                i18nKey="budget_left_styled"
+                values={{
+                  amount: convertNumberToCurrency(
                     roundAwayFromZero(
                       props.limit - props.amount * (props.isIncome ? 1 : -1)
                     ),
                     false,
                     userSettingsQuery.data?.currency ?? "USD"
-                  )}
-                </StatusText>
-              )}
-              <DimmedText size="sm" fw={600}>
-                {" "}
-                left
-              </DimmedText>
+                  ),
+                }}
+                components={[
+                  <StatusText
+                    amount={roundAwayFromZero(props.amount)}
+                    total={props.limit}
+                    type={
+                      props.isIncome
+                        ? StatusColorType.Income
+                        : StatusColorType.Expense
+                    }
+                    warningThreshold={
+                      userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                    }
+                    size="md"
+                    key="amount"
+                  />,
+                  <DimmedText size="md" key="amount" />,
+                ]}
+              />
             </Group>
           </Stack>
           {isSelected && (

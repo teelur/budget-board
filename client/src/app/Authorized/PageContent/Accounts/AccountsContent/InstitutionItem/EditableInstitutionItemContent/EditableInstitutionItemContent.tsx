@@ -8,8 +8,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
-import SurfaceTextInput from "~/components/core/Input/Surface/SurfaceTextInput/SurfaceTextInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 interface IEditableInstitutionItemContentProps {
   institution: IInstitution;
@@ -43,10 +43,6 @@ const EditableInstitutionItemContent = (
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      notifications.show({
-        message: "Institution updated",
-        color: "var(--button-color-confirm)",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -61,11 +57,12 @@ const EditableInstitutionItemContent = (
     <Group justify="space-between" align="center" gap="0.5rem">
       <LoadingOverlay visible={doUpdateInstitution.isPending} />
       <Group wrap="nowrap" gap="0.5rem">
-        <SurfaceTextInput
+        <TextInput
           w={250}
           maw="100%"
           {...institutionNameField.getInputProps()}
           onBlur={() => doUpdateInstitution.mutate()}
+          elevation={1}
         />
         <ActionIcon
           variant="outline"

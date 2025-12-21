@@ -14,6 +14,7 @@ import FixParentBudgetButton from "./FixParentBudgetButton/FixParentBudgetButton
 import BudgetDetails from "./BudgetDetails/BudgetDetails";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
+import { useTranslation } from "react-i18next";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
@@ -29,6 +30,8 @@ const BudgetsContent = (props: BudgetsContentProps) => {
     null
   );
   const [selectedMonth, setSelectedMonth] = React.useState<Date | null>(null);
+
+  const { t } = useTranslation();
 
   const categoryToTransactionsTotalMap: Map<string, number> =
     buildCategoryToTransactionsTotalMap(props.transactions);
@@ -87,7 +90,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
       />
       <Stack w={{ base: "100%", md: "70%" }}>
         <Stack gap="0.5rem">
-          <BudgetsGroupHeader groupName="Income" />
+          <BudgetsGroupHeader groupName={t("income")} />
           {props.isPending ? (
             <Skeleton h={65} radius="md" />
           ) : (
@@ -102,7 +105,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
           )}
         </Stack>
         <Stack gap="0.5rem">
-          <BudgetsGroupHeader groupName="Expenses" />
+          <BudgetsGroupHeader groupName={t("expenses")} />
           {props.isPending ? (
             <Skeleton h={65} radius="md" />
           ) : (

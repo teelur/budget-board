@@ -13,6 +13,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceResponse, IBalanceUpdateRequest } from "~/models/balance";
 import ElevatedDateInput from "~/components/core/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
 import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
+import { useTranslation } from "react-i18next";
 
 interface EditableBalanceItemContentProps {
   balance: IBalanceResponse;
@@ -44,6 +45,7 @@ const EditableBalanceItemContent = (
     },
   });
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -64,11 +66,6 @@ const EditableBalanceItemContent = (
       });
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Balance updated.",
-      });
     },
     onError: (error: AxiosError) =>
       notifications.show({
@@ -93,7 +90,7 @@ const EditableBalanceItemContent = (
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Balance deleted",
+        message: t("balance_deleted_successfully_message"),
       });
     },
     onError: (error: AxiosError) =>
@@ -119,7 +116,7 @@ const EditableBalanceItemContent = (
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Balance restored.",
+        message: t("balance_restored_successfully_message"),
       });
     },
     onError: (error: AxiosError) =>

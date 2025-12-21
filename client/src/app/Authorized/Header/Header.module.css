@@ -1,20 +1,3 @@
-.header {
-  padding: 6px 6px;
-  height: 100%;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-.logo {
-  flex: 0 1 auto;
-}
-
-.syncButton {
-  flex: 1 0 auto;
-  justify-content: flex-end;
-}
-
 .burger {
   &:hover {
     background-color: light-dark(

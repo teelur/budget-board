@@ -1,26 +1,14 @@
 .burger {
   align-self: flex-end;
-  margin: var(--mantine-spacing-sm) var(--mantine-spacing-sm);
-
   &:hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-dark-5)
-    );
+    background-color: var(--elevated-color-input-background);
   }
 }
 
 .link {
-  padding: var(--mantine-spacing-sm) var(--mantine-spacing-sm);
-  height: 50px;
   border-radius: var(--mantine-radius-md);
-  color: light-dark(var(--mantine-color-gray-9), var(--mantine-color-dark-0));
-
   &:hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-dark-5)
-    );
+    background-color: var(--elevated-color-input-background);
   }
 
   &[data-active] {

@@ -35,11 +35,3 @@ export interface INetWorthWidgetCategory {
   type: string;
   subtype: string;
 }
-
-export const NET_WORTH_CATEGORY_TYPES: string[] = ["Account", "Asset", "Line"];
-
-export const NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES: string[] = ["Category"];
-
-export const NET_WORTH_CATEGORY_ASSET_SUBTYPES: string[] = ["All"];
-
-export const NET_WORTH_CATEGORY_LINE_SUBTYPES: string[] = ["Name"];

@@ -26,6 +26,7 @@ import {
   isNetWorthWidgetType,
   parseNetWorthConfiguration,
 } from "~/helpers/widgets";
+import { useTranslation } from "react-i18next";
 
 const NetWorthCardSettings = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -38,6 +39,7 @@ const NetWorthCardSettings = (): React.ReactNode => {
   const [onReorderCompleted, setOnReorderCompleted] =
     React.useState<boolean>(false);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const widgetSettingsQuery = useQuery({
@@ -66,11 +68,6 @@ const NetWorthCardSettings = (): React.ReactNode => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Net worth settings updated successfully.",
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -177,11 +174,11 @@ const NetWorthCardSettings = (): React.ReactNode => {
         size="40rem"
         opened={opened}
         onClose={close}
-        title={<PrimaryText size="md">Net Worth Settings</PrimaryText>}
+        title={<PrimaryText size="md">{t("net_worth_settings")}</PrimaryText>}
       >
         <Stack gap="0.5rem">
           <DimmedText size="sm">
-            Configure the data that appears in the Net Worth widget.
+            {t("net_worth_settings_widget_message")}
           </DimmedText>
           <Group w="100%">
             <Button
@@ -190,14 +187,14 @@ const NetWorthCardSettings = (): React.ReactNode => {
               bg={isSortable ? "var(--button-color-confirm)" : ""}
               onClick={toggleIsSortable}
             >
-              {isSortable ? "Save Changes" : "Reorder"}
+              {isSortable ? t("save_changes") : t("reorder")}
             </Button>
             <Button
               size="xs"
               loading={doResetConfig.isPending}
               onClick={() => doResetConfig.mutate()}
             >
-              Reset to Default
+              {t("reset_to_default")}
             </Button>
           </Group>
           <Stack gap="1rem">
@@ -228,7 +225,7 @@ const NetWorthCardSettings = (): React.ReactNode => {
                     />
                   ))
                 ) : (
-                  <DimmedText size="sm">No lines available.</DimmedText>
+                  <DimmedText size="sm">{t("no_lines_found")}</DimmedText>
                 )}
               </Stack>
             </DragDropProvider>

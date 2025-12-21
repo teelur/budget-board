@@ -13,6 +13,7 @@ import { IBalanceCreateRequest } from "~/models/balance";
 import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
+import { useTranslation } from "react-i18next";
 
 interface AddBalanceProps {
   accountId: string;
@@ -27,6 +28,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
     initialValue: 0,
   });
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -42,10 +44,6 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
       await queryClient.invalidateQueries({
         queryKey: ["balances", props.accountId],
       });
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Balance added",
-      });
     },
     onError: (error: AxiosError) =>
       notifications.show({
@@ -58,17 +56,16 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
     <Stack gap={10}>
       <SurfaceDateInput
         {...dateField.getInputProps()}
-        label={<PrimaryText size="sm">Date</PrimaryText>}
+        label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
       />
       <SurfaceNumberInput
         {...amountField.getInputProps()}
-        label={<PrimaryText size="sm">Amount</PrimaryText>}
+        label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
         prefix={getCurrencySymbol(props.currency)}
         decimalScale={2}
         thousandSeparator=","
       />
       <Button
-        type="submit"
         loading={doCreateBalance.isPending}
         onClick={() =>
           doCreateBalance.mutate({
@@ -78,7 +75,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
           })
         }
       >
-        Submit
+        {t("submit")}
       </Button>
     </Stack>
   );

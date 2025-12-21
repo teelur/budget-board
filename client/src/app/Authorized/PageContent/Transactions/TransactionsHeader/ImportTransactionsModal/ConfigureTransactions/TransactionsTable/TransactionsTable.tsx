@@ -14,6 +14,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
+import { useTranslation } from "react-i18next";
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
@@ -24,6 +25,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 10;
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -44,17 +46,17 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
 
   return (
     <Stack gap={0} justify="center">
-      <Divider label="Transactions" labelPosition="center" />
+      <Divider label={t("transactions")} labelPosition="center" />
       <Table.ScrollContainer minWidth={800} maxHeight={400}>
         <Table striped>
           <Table.Thead>
             <Table.Tr>
               <Table.Th />
-              <Table.Th>Date</Table.Th>
-              <Table.Th>Merchant Name</Table.Th>
-              <Table.Th>Category</Table.Th>
-              <Table.Th>Amount</Table.Th>
-              <Table.Th>Account</Table.Th>
+              <Table.Th>{t("date")}</Table.Th>
+              <Table.Th>{t("merchant_name")}</Table.Th>
+              <Table.Th>{t("category")}</Table.Th>
+              <Table.Th>{t("amount")}</Table.Th>
+              <Table.Th>{t("account")}</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>

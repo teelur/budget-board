@@ -19,7 +19,7 @@ const PinInput = ({
     case 2:
       return <ElevatedPinInput {...props} />;
     default:
-      throw new Error("Invalid elevation level for PinInput component");
+      return null;
   }
 };
 

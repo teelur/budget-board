@@ -4,6 +4,7 @@ import { ICategory } from "~/models/category";
 import React from "react";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -14,6 +15,8 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 5;
 
+  const { t } = useTranslation();
+
   const paginatedItems: ITransaction[] = props.transactions.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
@@ -22,7 +25,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   if (props.transactions.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="sm">No transactions found.</DimmedText>
+        <DimmedText size="sm">{t("no_transactions")}</DimmedText>
       </Group>
     );
   }

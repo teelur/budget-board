@@ -3,8 +3,9 @@ import classes from "./SortMenu.module.css";
 import SortButton, { SortDirection } from "~/components/SortButton";
 import { Flex, Group } from "@mantine/core";
 import React from "react";
-import { SortOption, SortOptions, Sorts } from "./SortMenuHelpers";
+import { SortOption, Sorts } from "./SortMenuHelpers";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface SortMenuProps {
   currentSort: Sorts;
@@ -14,6 +15,27 @@ interface SortMenuProps {
 }
 
 const SortMenu = (props: SortMenuProps): React.ReactNode => {
+  const { t } = useTranslation();
+
+  const SortOptions: SortOption[] = [
+    {
+      value: Sorts.Date,
+      label: t("date"),
+    },
+    {
+      value: Sorts.Merchant,
+      label: t("merchant_name"),
+    },
+    {
+      value: Sorts.Category,
+      label: t("category"),
+    },
+    {
+      value: Sorts.Amount,
+      label: t("amount"),
+    },
+  ];
+
   const ToggleSortDirection = (sortDirection: SortDirection): SortDirection => {
     switch (sortDirection) {
       case SortDirection.None:
@@ -31,7 +53,7 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
       direction={{ base: "column", sm: "row" }}
       align={{ base: "start", sm: "center" }}
     >
-      <DimmedText size="sm">Sort By</DimmedText>
+      <DimmedText size="sm">{t("sort_by")}</DimmedText>
       <Group className={classes.sortButtons}>
         {SortOptions.map((sortOption: SortOption) => (
           <SortButton

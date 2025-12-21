@@ -19,7 +19,7 @@ const CategorySelect = ({
     case 2:
       return <ElevatedCategorySelect {...props} />;
     default:
-      throw new Error("Invalid elevation level for CategorySelect");
+      return null;
   }
 };
 

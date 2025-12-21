@@ -5,6 +5,7 @@ import { IAccountItem } from "../AccountMapping";
 import { useField } from "@mantine/form";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
+import { useTranslation } from "react-i18next";
 
 interface AccountMappingItemProps {
   accountName: string;
@@ -20,6 +21,8 @@ const AccountMappingItem = (
     initialValue:
       props.accounts.find((a) => a.value === props.accountId)?.value ?? null,
   });
+
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     props.onAccountChange(
@@ -43,7 +46,7 @@ const AccountMappingItem = (
           data={props.accounts}
           {...accountMappingField.getInputProps()}
           clearable
-          placeholder="Select account"
+          placeholder={t("select_an_account")}
           elevation={0}
         />
       </Grid.Col>

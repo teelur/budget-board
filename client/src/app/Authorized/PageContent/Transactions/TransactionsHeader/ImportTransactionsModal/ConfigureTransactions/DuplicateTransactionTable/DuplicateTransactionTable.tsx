@@ -18,6 +18,7 @@ import {
   ITransactionImportTableData,
 } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
+import { useTranslation } from "react-i18next";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -38,6 +39,7 @@ const DuplicateTransactionTable = (
     }
   }, [props.tableData]);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -92,16 +94,16 @@ const DuplicateTransactionTable = (
 
   return (
     <Stack gap={0} justify="center">
-      <Divider label="Duplicate Transactions" labelPosition="center" />
+      <Divider label={t("duplicate_transactions")} labelPosition="center" />
       <Table.ScrollContainer minWidth={800} maxHeight={400}>
         <Table striped>
           <Table.Thead>
             <Table.Tr>
               <Table.Th />
-              <Table.Th>Date</Table.Th>
-              <Table.Th>Merchant Name</Table.Th>
-              <Table.Th>Amount</Table.Th>
-              <Table.Th>Account</Table.Th>
+              <Table.Th>{t("date")}</Table.Th>
+              <Table.Th>{t("merchant_name")}</Table.Th>
+              <Table.Th>{t("amount")}</Table.Th>
+              <Table.Th>{t("account")}</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>

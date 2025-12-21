@@ -10,6 +10,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
+import { Trans } from "react-i18next";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -63,36 +65,37 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
             flex="1 0 auto"
           />
         ) : null}
-        <Flex gap="0.25rem">
-          {userSettingsQuery.isPending ? null : (
-            <StatusText
-              amount={props.amount}
-              total={props.total ?? 0}
-              type={props.budgetValueType}
-              warningThreshold={
-                userSettingsQuery.data?.budgetWarningThreshold ?? 80
-              }
-              size="md"
-              fw={600}
-            >
-              {convertNumberToCurrency(
+        <Flex gap="0.25rem" align="baseline">
+          <Trans
+            i18nKey="budget_amount_fraction_styled"
+            values={{
+              amount: convertNumberToCurrency(
                 props.amount *
                   (props.budgetValueType === StatusColorType.Expense ? -1 : 1),
                 false,
                 userSettingsQuery.data?.currency ?? "USD"
-              )}
-            </StatusText>
-          )}
-          {props.total ? <PrimaryText size="md">of</PrimaryText> : null}
-          {props.total ? (
-            <PrimaryText size="md">
-              {convertNumberToCurrency(
-                props.total,
+              ),
+              total: convertNumberToCurrency(
+                props.total ?? 0,
                 false,
                 userSettingsQuery.data?.currency ?? "USD"
-              )}
-            </PrimaryText>
-          ) : null}
+              ),
+            }}
+            components={[
+              <StatusText
+                amount={props.amount}
+                total={props.total ?? 0}
+                type={props.budgetValueType}
+                warningThreshold={
+                  userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                }
+                size="md"
+                key="amount"
+              />,
+              <DimmedText size="sm" key="of" />,
+              <PrimaryText size="md" key="total" />,
+            ]}
+          />
         </Flex>
       </Group>
       {!props.hideProgress && (props.total ?? 0) > 0 && (

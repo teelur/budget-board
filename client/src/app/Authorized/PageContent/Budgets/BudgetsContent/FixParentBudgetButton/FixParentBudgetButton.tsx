@@ -7,6 +7,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import { ICategoryNode } from "~/models/category";
+import { useTranslation } from "react-i18next";
 
 interface FixParentBudgetButtonProps {
   budgets: IBudget[];
@@ -15,6 +16,7 @@ interface FixParentBudgetButtonProps {
 }
 
 const FixParentBudgetButton = (props: FixParentBudgetButtonProps) => {
+  const { t } = useTranslation();
   const { request } = useAuth();
   const queryClient = useQueryClient();
   const doEditBudget = useMutation({
@@ -100,7 +102,7 @@ const FixParentBudgetButton = (props: FixParentBudgetButtonProps) => {
 
   return (
     <Button size="compact-sm" onClick={generateParentCateogories}>
-      Fix Parent Categories
+      {t("fix_parent_budgets")}
     </Button>
   );
 };

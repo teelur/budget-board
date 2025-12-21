@@ -1,4 +1,5 @@
 import { Badge, Group } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getFormattedValue } from "~/helpers/automaticRules";
@@ -16,17 +17,24 @@ interface ConditionItemProps {
 }
 
 const ConditionItem = (props: ConditionItemProps) => {
+  const { t } = useTranslation();
+
+  const fieldLabelKey = TransactionFields.find(
+    (field) => field.value === props.condition.field
+  )?.label;
+
+  const operatorLabelKey = Operators.find(
+    (op) => op.value === props.condition.operator
+  )?.label;
+
   return (
     <Card p="0.25rem" shadow="xs" elevation={1}>
       <Group gap="0.3rem">
         <Badge bg="purple" size="sm">
-          {TransactionFields.find(
-            (field) => field.value === props.condition.field
-          )?.label ?? props.condition.field}
+          {fieldLabelKey ? t(fieldLabelKey) : props.condition.field}
         </Badge>
         <PrimaryText size="sm">
-          {Operators.find((op) => op.value === props.condition.operator)
-            ?.label ?? props.condition.operator}
+          {operatorLabelKey ? t(operatorLabelKey) : props.condition.operator}
         </PrimaryText>
         <Badge size="sm">
           {getFormattedValue(

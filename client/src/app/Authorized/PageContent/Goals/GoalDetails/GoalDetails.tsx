@@ -20,6 +20,7 @@ import Drawer from "~/components/core/Drawer/Drawer";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Card from "~/components/core/Card/Card";
 import Accordion from "~/components/core/Accordion/Accordion";
+import { useTranslation } from "react-i18next";
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;
@@ -35,7 +36,9 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
     dayjs().toISOString(),
   ];
 
+  const { t } = useTranslation();
   const { request } = useAuth();
+
   const balancesQuery = useQueries({
     queries: (props.goal?.accounts ?? []).map((account: IAccountResponse) => ({
       queryKey: ["balances", account.id],
@@ -67,7 +70,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       onClose={props.doClose}
       position="right"
       size="md"
-      title={<PrimaryText size="lg">Goal Details</PrimaryText>}
+      title={<PrimaryText size="lg">{t("goal_details")}</PrimaryText>}
     >
       {props.goal === null ? (
         <Skeleton height={425} radius="lg" />
@@ -75,7 +78,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
         <Accordion defaultValue={["accounts", "chart"]} elevation={1}>
           <MantineAccordion.Item value="accounts">
             <MantineAccordion.Control>
-              <PrimaryText size="md">Accounts</PrimaryText>
+              <PrimaryText size="md">{t("accounts")}</PrimaryText>
             </MantineAccordion.Control>
             <MantineAccordion.Panel>
               <Stack gap="0.5rem">
@@ -89,7 +92,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
           </MantineAccordion.Item>
           <MantineAccordion.Item value="chart">
             <MantineAccordion.Control>
-              <PrimaryText size="md">Goal Trends</PrimaryText>
+              <PrimaryText size="md">{t("goal_trends")}</PrimaryText>
             </MantineAccordion.Control>
             <MantineAccordion.Panel>
               <Stack>
@@ -99,21 +102,21 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
                     size="xs"
                     onClick={() => setChartLookbackMonths(3)}
                   >
-                    3 months
+                    {t("3_months")}
                   </Button>
                   <Button
                     variant={chartLookbackMonths === 6 ? "filled" : "outline"}
                     size="xs"
                     onClick={() => setChartLookbackMonths(6)}
                   >
-                    6 months
+                    {t("6_months")}
                   </Button>
                   <Button
                     variant={chartLookbackMonths === 12 ? "filled" : "outline"}
                     size="xs"
                     onClick={() => setChartLookbackMonths(12)}
                   >
-                    12 months
+                    {t("12_months")}
                   </Button>
                 </Group>
                 <ValueChart

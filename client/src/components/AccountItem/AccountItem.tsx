@@ -11,6 +11,7 @@ import { AxiosResponse } from "axios";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import StatusText from "../core/Text/StatusText/StatusText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface AccountItemProps {
   account: IAccountResponse;
@@ -18,6 +19,7 @@ interface AccountItemProps {
 }
 
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -55,14 +57,13 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
         )}
       </Group>
       {props.account.source !== AccountSource.Manual && (
-        <Group gap="0.25rem">
-          <DimmedText size="sm">{"Last updated: "}</DimmedText>
-          <DimmedText size="sm">
-            {props.account.balanceDate
+        <DimmedText size="sm">
+          {t("last_updated", {
+            date: props.account.balanceDate
               ? new Date(props.account.balanceDate).toLocaleString()
-              : "Never!"}
-          </DimmedText>
-        </Group>
+              : t("never"),
+          })}
+        </DimmedText>
       )}
     </Stack>
   );

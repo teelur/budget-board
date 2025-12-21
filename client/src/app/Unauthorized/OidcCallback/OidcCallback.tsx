@@ -7,10 +7,13 @@ import {
   AuthContextValue,
 } from "~/providers/AuthProvider/AuthProvider";
 import { useNavigate } from "react-router";
-import { Center, Loader } from "@mantine/core";
 import { IOidcCallbackRequest, IOidcCallbackResponse } from "~/models/oidc";
+import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
+import { useTranslation } from "react-i18next";
 
 const OidcCallback = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   const { request, setIsUserAuthenticated } =
     React.useContext<AuthContextValue>(AuthContext);
   const navigate = useNavigate();
@@ -53,7 +56,7 @@ const OidcCallback = (): React.ReactNode => {
         }
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: "OIDC callback missing code.",
+          message: t("authorization_code_missing_message"),
         });
         navigate("/");
         return;
@@ -65,7 +68,7 @@ const OidcCallback = (): React.ReactNode => {
         }
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: "Invalid OIDC state.",
+          message: t("state_parameter_invalid_message"),
         });
         navigate("/");
         return;
@@ -90,7 +93,7 @@ const OidcCallback = (): React.ReactNode => {
         if (!response.data?.success) {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: "Authentication failed.",
+            message: t("oidc_authentication_failed_message"),
           });
           navigate("/");
           return;
@@ -111,11 +114,7 @@ const OidcCallback = (): React.ReactNode => {
     })();
   }, []);
 
-  return (
-    <Center bg="var(--background-color-base)" h="100vh">
-      <Loader size={100} />
-    </Center>
-  );
+  return <LoadingScreen />;
 };
 
 export default OidcCallback;

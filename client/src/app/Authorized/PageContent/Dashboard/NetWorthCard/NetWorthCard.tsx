@@ -22,9 +22,12 @@ import {
   parseNetWorthConfiguration,
 } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
+import { useTranslation } from "react-i18next";
 
 const NetWorthCard = (): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
+
   const widgetSettingsQuery = useQuery({
     queryKey: ["widgetSettings"],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
@@ -100,7 +103,9 @@ const NetWorthCard = (): React.ReactNode => {
     }
 
     if (!widgetSettingsQuery.data || widgetSettingsQuery.data.length === 0) {
-      return <DimmedText size="sm">No configuration data found.</DimmedText>;
+      return (
+        <DimmedText size="sm">{t("no_configuration_data_found")}</DimmedText>
+      );
     }
 
     const netWorthWidgetSettingsList = widgetSettingsQuery.data
@@ -109,7 +114,7 @@ const NetWorthCard = (): React.ReactNode => {
 
     if (netWorthWidgetSettingsList.length === 0) {
       return (
-        <DimmedText size="sm">There was an error loading settings.</DimmedText>
+        <DimmedText size="sm">{t("error_loading_settings_message")}</DimmedText>
       );
     }
 
@@ -120,7 +125,7 @@ const NetWorthCard = (): React.ReactNode => {
     if (!configuration) {
       return (
         <DimmedText size="sm">
-          There was an error loading the configuration.
+          {t("error_loading_configuration_message")}
         </DimmedText>
       );
     }
@@ -130,7 +135,7 @@ const NetWorthCard = (): React.ReactNode => {
     if (!netWorthWidgetGroups || netWorthWidgetGroups.length === 0) {
       return (
         <DimmedText size="sm">
-          No items are configured for this widget.
+          {t("widget_no_items_configured_message")}
         </DimmedText>
       );
     }
@@ -177,7 +182,7 @@ const NetWorthCard = (): React.ReactNode => {
     <Card w="100%" elevation={1}>
       <Stack gap="0.5rem">
         <Group justify="space-between">
-          <PrimaryText size="xl">Net Worth</PrimaryText>
+          <PrimaryText size="xl">{t("net_worth")}</PrimaryText>
           <NetWorthCardSettings />
         </Group>
         {getNetWorthLines()}

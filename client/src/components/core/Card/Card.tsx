@@ -37,7 +37,7 @@ const Card = ({
         </ElevatedCard>
       );
     default:
-      throw new Error("Invalid elevation level for Card component");
+      return null;
   }
 };
 

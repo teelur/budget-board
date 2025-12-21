@@ -9,6 +9,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -24,6 +25,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
     (a, b) => a.getTime() - b.getTime()
   );
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -87,7 +89,9 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   if (props.months.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="md">Select a month to display the chart.</DimmedText>
+        <DimmedText size="md">
+          {t("select_a_month_to_display_the_chart")}
+        </DimmedText>
       </Group>
     );
   }
@@ -96,7 +100,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
     <Stack gap="1rem">
       <Group justify="space-between" align="center">
         <DimmedText size="sm">
-          {props.invertData ? "Average Spending" : "Average Income"}
+          {props.invertData ? t("average_spending") : t("average_income")}
         </DimmedText>
         <DimmedText size="sm">
           {userSettingsQuery.isPending
@@ -114,6 +118,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
         series={[
           {
             name: "total",
+            label: t("total"),
             color: "blue.6",
           },
         ]}

@@ -6,8 +6,11 @@ import TransactionsTab from "./TransactionsTab/TransactionsTab";
 import AccountsTab from "./AccountsTab/AccountsTab";
 import AssetsTab from "./AssetsTab/AssetsTab";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 const Trends = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   return (
     <Stack className={classes.root}>
       <Tabs
@@ -18,13 +21,13 @@ const Trends = (): React.ReactNode => {
       >
         <Tabs.List grow>
           <Tabs.Tab value="transactions">
-            <PrimaryText size="sm">Transactions</PrimaryText>
+            <PrimaryText size="sm">{t("transactions")}</PrimaryText>
           </Tabs.Tab>
           <Tabs.Tab value="accounts">
-            <PrimaryText size="sm">Accounts</PrimaryText>
+            <PrimaryText size="sm">{t("accounts")}</PrimaryText>
           </Tabs.Tab>
           <Tabs.Tab value="assets">
-            <PrimaryText size="sm">Assets</PrimaryText>
+            <PrimaryText size="sm">{t("assets")}</PrimaryText>
           </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="transactions">

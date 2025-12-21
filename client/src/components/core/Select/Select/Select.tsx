@@ -16,7 +16,7 @@ const Select = ({ elevation = 0, ...props }: SelectProps): React.ReactNode => {
     case 2:
       return <ElevatedSelect {...props} />;
     default:
-      throw new Error("Invalid elevation level for Select");
+      return null;
   }
 };
 

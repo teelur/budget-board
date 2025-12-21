@@ -9,6 +9,7 @@ import AccountMappingItem from "./AccountMappingItem/AccountMappingItem";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { MoveLeftIcon } from "lucide-react";
 import { areStringsEqual } from "~/helpers/utils";
+import { useTranslation } from "react-i18next";
 
 export interface IAccountItem {
   value: string;
@@ -27,6 +28,7 @@ interface AccountMappingProps {
 }
 
 const AccountMapping = (props: AccountMappingProps) => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -68,7 +70,7 @@ const AccountMapping = (props: AccountMappingProps) => {
 
   return (
     <Stack gap="0.5rem" w={800} maw="100%">
-      <Divider label="Account Mapping" labelPosition="center" />
+      <Divider label={t("account_mapping")} labelPosition="center" />
       {Array.from(props.accountNameToAccountIdMap.entries()).map(
         ([accountName, accountId]) => (
           <AccountMappingItem
@@ -92,7 +94,7 @@ const AccountMapping = (props: AccountMappingProps) => {
           onClick={() => props.goBackToPreviousDialog()}
           leftSection={<MoveLeftIcon size={16} />}
         >
-          Back
+          {t("back")}
         </Button>
         <Button
           flex="1 1 auto"
@@ -100,7 +102,7 @@ const AccountMapping = (props: AccountMappingProps) => {
           loading={props.isSubmitting}
           disabled={filteredImportData.length === 0}
         >
-          Import {filteredImportData.length} Transactions
+          {t("import_n_transactions", { n: filteredImportData.length })}
         </Button>
       </Group>
     </Stack>

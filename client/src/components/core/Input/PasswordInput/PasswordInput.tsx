@@ -20,7 +20,7 @@ const PasswordInput = ({
     case 2:
       return <ElevatedPasswordInput {...props} />;
     default:
-      throw new Error("Invalid elevation for PasswordInput");
+      return null;
   }
 };
 

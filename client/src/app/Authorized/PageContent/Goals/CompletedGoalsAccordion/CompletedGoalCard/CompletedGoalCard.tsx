@@ -10,6 +10,7 @@ import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { Trans } from "react-i18next";
 
 interface CompletedGoalCardProps {
   goal: IGoalResponse;
@@ -49,25 +50,35 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
           w={{ base: "100%", xs: "auto" }}
         >
           <Group gap="0.25rem">
-            <DimmedText size="sm">Total:</DimmedText>
-            {userSettingsQuery.isPending ? null : (
-              <PrimaryText>
-                {convertNumberToCurrency(
+            <Trans
+              i18nKey="goal_completed_total_styled"
+              values={{
+                amount: convertNumberToCurrency(
                   getGoalTargetAmount(
                     props.goal.amount,
                     props.goal.initialAmount
                   ),
                   true,
                   userSettingsQuery.data?.currency ?? "USD"
-                )}
-              </PrimaryText>
-            )}
+                ),
+              }}
+              components={[
+                <DimmedText size="sm" key="label" />,
+                <PrimaryText size="md" key="amount" />,
+              ]}
+            />
           </Group>
           <Group gap="0.25rem">
-            <DimmedText size="sm">Completed:</DimmedText>
-            <PrimaryText>
-              {new Date(props.goal.completed ?? 0).toLocaleDateString()}
-            </PrimaryText>
+            <Trans
+              i18nKey="goal_completed_date_styled"
+              values={{
+                date: new Date(props.goal.completed ?? 0).toLocaleDateString(),
+              }}
+              components={[
+                <DimmedText size="sm" key="label" />,
+                <PrimaryText size="md" key="amount" />,
+              ]}
+            />
           </Group>
         </Flex>
       </Flex>

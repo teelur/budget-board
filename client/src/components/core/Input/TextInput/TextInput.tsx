@@ -19,7 +19,7 @@ const TextInput = ({
     case 2:
       return <ElevatedTextInput {...props} />;
     default:
-      return <BaseTextInput {...props} />;
+      return null;
   }
 };
 

@@ -13,6 +13,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface DeletedTransactionCardProps {
   deletedTransaction: ITransaction;
@@ -21,6 +22,7 @@ interface DeletedTransactionCardProps {
 const DeletedTransactionsCard = (
   props: DeletedTransactionCardProps
 ): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -34,6 +36,10 @@ const DeletedTransactionsCard = (
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      notifications.show({
+        color: "var(--button-color-success)",
+        message: t("transaction_restored_successfully_message"),
+      });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -52,9 +58,9 @@ const DeletedTransactionsCard = (
             {props.deletedTransaction.merchantName}
           </PrimaryText>
           <DimmedText size="sm">
-            {`${getDaysSinceDate(
-              props.deletedTransaction.deleted!
-            )} days since deleted`}
+            {t("days_since_deleted", {
+              days: getDaysSinceDate(props.deletedTransaction.deleted!),
+            })}
           </DimmedText>
         </Stack>
         <Group className={classes.buttonGroup}>

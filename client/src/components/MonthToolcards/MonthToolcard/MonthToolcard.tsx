@@ -1,9 +1,10 @@
-import { months } from "~/helpers/utils";
 import { Stack } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 import { CashFlowValue } from "~/models/budget";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import dayjs from "dayjs";
 
 interface MonthToolcardProps {
   date: Date;
@@ -14,6 +15,8 @@ interface MonthToolcardProps {
 }
 
 const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
+  const { i18n } = useTranslation();
+
   const getLightColor = (
     cashFlowValue: CashFlowValue,
     isSelected: boolean,
@@ -56,7 +59,7 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
           elevation={1}
         />
         <PrimaryText size="sm">
-          {months.at(props.date.getMonth())?.substring(0, 3)}
+          {dayjs(props.date).locale(i18n.language).format("MMM")}
         </PrimaryText>
         <DimmedText size="xs" c="dimmed">
           {props.date.getFullYear()}

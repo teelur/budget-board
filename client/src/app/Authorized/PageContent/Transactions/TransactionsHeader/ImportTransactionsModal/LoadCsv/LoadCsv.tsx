@@ -3,6 +3,7 @@ import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import Papa from "papaparse";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import FileInput from "~/components/core/Input/FileInput/FileInput";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -18,6 +19,8 @@ interface LoadCsvProps {
 const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
   const [isPending, startTransition] = React.useTransition();
 
+  const { t } = useTranslation();
+
   const fileField = useField<File | null>({
     initialValue: null,
     validateOnBlur: true,
@@ -28,9 +31,10 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
       const nameIsCsv = value.name?.toLowerCase().endsWith(".csv");
       if (!nameIsCsv) {
-        return `File must be a CSV file. Found type: ${
-          value.type || "unknown"
-        }; filename: ${value.name}`;
+        return t("file_must_be_csv_message", {
+          fileType: value.type || "unknown",
+          fileName: value.name,
+        });
       }
 
       return null;
@@ -44,10 +48,10 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
         return null;
       }
       if (!value) {
-        return "Delimiter is required";
+        return t("delimiter_required_message");
       }
       if (value.length > 1) {
-        return "Delimiter must be a single character";
+        return t("delimiter_must_be_single_character_message");
       }
       return null;
     },
@@ -90,7 +94,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
         uniqueErrorMessages.forEach((errorMessage) => {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: `Error parsing CSV: ${errorMessage}`,
+            message: t("error_parsing_csv_message", { errorMessage }),
           });
         });
         return false;
@@ -99,7 +103,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       if (parsedText.data.length === 0) {
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: "CSV file is empty",
+          message: t("csv_file_is_empty_message"),
         });
         return false;
       }
@@ -112,7 +116,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
     } catch (error) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: `Error reading file: ${error}`,
+        message: t("error_reading_file_message", { error }),
       });
       return false;
     }
@@ -124,14 +128,14 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       <FileInput
         {...fileField.getInputProps()}
         accept="text/csv"
-        placeholder={<DimmedText size="sm">Select a CSV file</DimmedText>}
+        placeholder={<DimmedText size="sm">{t("select_csv_file")}</DimmedText>}
         elevation={0}
       />
       <Group align="center" w="100%" wrap="wrap" gap="0.5rem">
         <Switch
           label={
             <PrimaryText size="sm" style={{ whiteSpace: "nowrap" }}>
-              Specify delimiter
+              {t("use_custom_delimiter")}
             </PrimaryText>
           }
           checked={useDelimiter.getValue()}
@@ -159,7 +163,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
             if (!file || fileField.error) {
               notifications.show({
                 color: "var(--button-color-destructive)",
-                message: "Please provide a valid CSV file",
+                message: t("please_select_valid_csv_file_message"),
               });
               return;
             }
@@ -167,7 +171,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
             if (useDelimiter.getValue() && delimiterField.error) {
               notifications.show({
                 color: "var(--button-color-destructive)",
-                message: "Please provide a valid delimiter",
+                message: t("please_provide_valid_delimiter_message"),
               });
               return;
             }
@@ -187,7 +191,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
           isPending
         }
       >
-        Load CSV
+        {t("load_csv")}
       </Button>
     </Stack>
   );

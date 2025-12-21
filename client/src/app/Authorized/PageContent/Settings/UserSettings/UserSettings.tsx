@@ -14,12 +14,14 @@ import {
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
+import { useTranslation } from "react-i18next";
 
 const UserSettings = (): React.ReactNode => {
   const currencyField = useField({
     initialValue: "",
   });
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -67,16 +69,18 @@ const UserSettings = (): React.ReactNode => {
     <Card elevation={1}>
       <LoadingOverlay visible={doUpdateUserSettings.isPending} />
       <Stack gap="0.5rem">
-        <PrimaryText size="lg">User Settings</PrimaryText>
+        <PrimaryText size="lg">{t("user_settings")}</PrimaryText>
         <Stack gap="0.5rem">
           {userSettingsQuery.isPending ? (
             <Skeleton h={60} radius="md" />
           ) : (
             <Select
-              label={<PrimaryText size="sm">Preferred Currency</PrimaryText>}
-              placeholder="Select currency"
+              label={
+                <PrimaryText size="sm">{t("preferred_currency")}</PrimaryText>
+              }
+              placeholder={t("select_currency")}
               searchable
-              nothingFoundMessage="No currencies found"
+              nothingFoundMessage={t("no_currencies_found")}
               data={Intl.supportedValuesOf("currency")}
               {...currencyField.getInputProps()}
               onChange={(value) => {

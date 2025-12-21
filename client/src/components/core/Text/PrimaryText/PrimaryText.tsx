@@ -2,7 +2,7 @@ import React from "react";
 import { Text, TextProps } from "@mantine/core";
 
 interface PrimaryTextProps extends TextProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const PrimaryText = ({

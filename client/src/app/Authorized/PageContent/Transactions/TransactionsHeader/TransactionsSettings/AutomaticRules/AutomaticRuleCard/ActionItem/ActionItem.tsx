@@ -1,4 +1,5 @@
 import { Badge, Group } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getFormattedValue } from "~/helpers/automaticRules";
@@ -16,10 +17,10 @@ interface ActionItemProps {
 }
 
 const ActionItem = (props: ActionItemProps) => {
+  const { t } = useTranslation();
+
   const getCardContent = (): React.ReactNode => {
-    if (props.action.operator === "delete") {
-      return <PrimaryText size="sm">the transaction</PrimaryText>;
-    } else if (props.action.operator === "set") {
+    if (props.action.operator === "set") {
       return (
         <>
           <Badge bg="purple" size="sm">
@@ -27,7 +28,7 @@ const ActionItem = (props: ActionItemProps) => {
               (field) => field.value === props.action.field
             )?.label ?? props.action.field}
           </Badge>
-          <PrimaryText size="sm">to</PrimaryText>
+          <PrimaryText size="sm">{t("to")}</PrimaryText>
           <Badge size="sm">
             {getFormattedValue(
               props.action.field,
@@ -42,12 +43,15 @@ const ActionItem = (props: ActionItemProps) => {
     return null;
   };
 
+  const operatorLabelKey = ActionOperators.find(
+    (op) => op.value === props.action.operator
+  )?.label;
+
   return (
     <Card p="0.25rem" shadow="xs" elevation={1}>
       <Group gap="0.3rem">
         <PrimaryText size="sm">
-          {ActionOperators.find((op) => op.value === props.action.operator)
-            ?.label ?? props.action.operator}
+          {operatorLabelKey ? t(operatorLabelKey) : props.action.operator}
         </PrimaryText>
         {getCardContent()}
       </Group>

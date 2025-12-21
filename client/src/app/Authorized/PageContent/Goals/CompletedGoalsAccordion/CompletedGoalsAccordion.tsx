@@ -4,6 +4,7 @@ import { IGoalResponse } from "~/models/goal";
 import CompletedGoalCard from "./CompletedGoalCard/CompletedGoalCard";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Accordion from "~/components/core/Accordion/Accordion";
+import { useTranslation } from "react-i18next";
 
 interface CompletedGoalsAccordionProps {
   compeltedGoals: IGoalResponse[];
@@ -12,11 +13,12 @@ interface CompletedGoalsAccordionProps {
 const CompletedGoalsAccordion = (
   props: CompletedGoalsAccordionProps
 ): React.ReactNode => {
+  const { t } = useTranslation();
   return (
     <Accordion elevation={1}>
       <MantineAccordion.Item value="completed-goals">
         <MantineAccordion.Control>
-          <PrimaryText>Completed Goals</PrimaryText>
+          <PrimaryText>{t("completed_goals")}</PrimaryText>
         </MantineAccordion.Control>
         <MantineAccordion.Panel>
           <Stack gap="0.5rem">

@@ -20,6 +20,7 @@ import { ICategory } from "~/models/category";
 import CreateTransactionModal from "./CreateTransactionModal/CreateTransactionModal";
 import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransactionsModal";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
+import { useTranslation } from "react-i18next";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
@@ -34,6 +35,7 @@ const TransactionsHeader = (
 ): React.ReactNode => {
   const [settingsOpen, { open, close }] = useDisclosure(false);
 
+  const { t } = useTranslation();
   const { isFiltersPanelOpen, toggleFiltersPanel } = useTransactionFilters();
 
   return (
@@ -53,7 +55,7 @@ const TransactionsHeader = (
             rightSection={<FilterIcon size="1rem" />}
             onClick={toggleFiltersPanel}
           >
-            Filter
+            {t("filters")}
           </Button>
           <CreateTransactionModal />
           <ActionIcon variant="subtle" size="input-sm" onClick={open}>

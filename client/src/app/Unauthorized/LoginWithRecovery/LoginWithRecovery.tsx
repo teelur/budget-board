@@ -1,7 +1,7 @@
 import { Button, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
-import { LoginCardState } from "./Welcome";
+import { LoginCardState } from "../Welcome";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -10,6 +10,7 @@ import { notifications } from "@mantine/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import { useTranslation } from "react-i18next";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -20,14 +21,10 @@ interface LoginProps {
 const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
 
+  const { t } = useTranslation();
+
   const recoveryCodeField = useField<string>({
     initialValue: "",
-    validate: (value) => {
-      if (!value) {
-        return "Recovery code is required";
-      }
-      return null;
-    },
   });
 
   const { request, setIsUserAuthenticated } = useAuth();
@@ -40,7 +37,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
     if (!recoveryCodeField.getValue()) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Please enter the recovery code.",
+        message: t("enter_recovery_code_message"),
       });
       setLoading(false);
       return;
@@ -64,7 +61,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
         if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: "Login failed. Check your credentials and try again.",
+            message: t("login_failed_message"),
           });
         } else {
           notifications.show({
@@ -89,11 +86,10 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
       />
       <Stack align="center" gap={5} w="100%">
         <PrimaryText size="md" ta="center">
-          Use a Recovery Code
+          {t("use_a_recovery_code")}
         </PrimaryText>
         <DimmedText size="sm" ta="center">
-          Enter one of your recovery codes for a one-time password
-          authentication.
+          {t("enter_recovery_code_subheading")}
         </DimmedText>
       </Stack>
       <TextInput
@@ -103,14 +99,14 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
       />
       <Stack gap="0.5rem" w="100%">
         <Button variant="filled" fullWidth onClick={submitUserLogin}>
-          Submit
+          {t("submit")}
         </Button>
         <Button
           variant="default"
           fullWidth
           onClick={() => props.setLoginCardState(LoginCardState.Login)}
         >
-          Return to Login
+          {t("return_to_login")}
         </Button>
       </Stack>
     </Stack>

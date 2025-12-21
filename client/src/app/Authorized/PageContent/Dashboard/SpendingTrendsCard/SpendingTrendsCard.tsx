@@ -15,10 +15,12 @@ import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 const SpendingTrendsCard = (): React.ReactNode => {
   const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -117,36 +119,32 @@ const SpendingTrendsCard = (): React.ReactNode => {
     const spendingComparisonNumber =
       Math.round((getSpendingComparison() + Number.EPSILON) * 100) / 100;
 
+    const amount = convertNumberToCurrency(
+      Math.abs(spendingComparisonNumber),
+      true,
+      userSettingsQuery.data?.currency ?? "USD"
+    );
+
     if (spendingComparisonNumber < 0) {
       if (userSettingsQuery.isPending) {
-        return "loading...";
+        return "";
       }
-      return `${convertNumberToCurrency(
-        Math.abs(spendingComparisonNumber),
-        true,
-        userSettingsQuery.data?.currency ?? "USD"
-      )} less than`;
+      return t("spending_trends_less_than_last_month", { amount });
     } else if (spendingComparisonNumber > 0) {
       if (userSettingsQuery.isPending) {
-        return "loading...";
+        return "";
       }
-      return `${convertNumberToCurrency(
-        Math.abs(spendingComparisonNumber),
-        true,
-        userSettingsQuery.data?.currency ?? "USD"
-      )} more than`;
+      return t("spending_trends_more_than_last_month", { amount });
     }
 
-    return "the same as";
+    return t("spending_trends_same_as_last_month");
   };
 
   return (
     <Card w="100%" elevation={1}>
       <Stack align="center" gap={0}>
-        <PrimaryText size="xl">Spending Trends</PrimaryText>
-        <DimmedText size="sm">
-          You have spent {getSpendingComparisonString()} last month.
-        </DimmedText>
+        <PrimaryText size="xl">{t("spending_trends")}</PrimaryText>
+        <DimmedText size="sm">{getSpendingComparisonString()}</DimmedText>
       </Stack>
       <SpendingChart
         months={months}

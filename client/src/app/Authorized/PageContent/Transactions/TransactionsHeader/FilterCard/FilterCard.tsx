@@ -10,6 +10,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
 import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
+import { useTranslation } from "react-i18next";
 
 interface FilterCardProps {
   categories: ICategory[];
@@ -17,12 +18,13 @@ interface FilterCardProps {
 }
 
 const FilterCard = (props: FilterCardProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
 
   return (
     <Card elevation={1} style={props.style}>
       <Stack gap={0}>
-        <PrimaryText size="lg">Filters</PrimaryText>
+        <PrimaryText size="lg">{t("filters")}</PrimaryText>
         <Flex
           justify="space-between"
           align="center"
@@ -33,7 +35,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
           <DatePickerInput
             w={{ base: "100%", sm: "25%" }}
             type="range"
-            placeholder="Pick a date range"
+            placeholder={t("select_a_date_range")}
             value={transactionFilters.dateRange}
             onChange={(dateRange: DatesRangeValue<string>) => {
               const parsedDateRange: [Date | null, Date | null] = [
@@ -47,7 +49,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
               setTransactionFilters(newFilters);
             }}
             clearable
-            label={<PrimaryText size="sm">Date Range</PrimaryText>}
+            label={<PrimaryText size="sm">{t("date_range")}</PrimaryText>}
             elevation={1}
           />
           <AccountSelect
@@ -61,7 +63,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
               setTransactionFilters(newFilters);
             }}
             hideHidden
-            label={<PrimaryText size="sm">Accounts</PrimaryText>}
+            label={<PrimaryText size="sm">{t("accounts")}</PrimaryText>}
             elevation={1}
           />
           <CategorySelect
@@ -77,7 +79,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
             }}
             withinPortal
             includeUncategorized
-            label={<PrimaryText size="sm">Category</PrimaryText>}
+            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
             elevation={1}
           />
           <Button
@@ -89,7 +91,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
               setTransactionFilters(new Filters());
             }}
           >
-            Clear Filters
+            {t("clear_filters")}
           </Button>
         </Flex>
       </Stack>

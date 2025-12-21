@@ -17,6 +17,7 @@ import {
 
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useTranslation } from "react-i18next";
 
 const AddAutomaticRule = (): React.ReactNode => {
   const defaultField =
@@ -47,6 +48,7 @@ const AddAutomaticRule = (): React.ReactNode => {
     },
   ]);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -60,10 +62,6 @@ const AddAutomaticRule = (): React.ReactNode => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["automaticRule"],
-      });
-      notifications.show({
-        message: "Rule added successfully",
-        color: "var(--button-color-confirm)",
       });
     },
     onError: (error: AxiosError) => {
@@ -87,8 +85,8 @@ const AddAutomaticRule = (): React.ReactNode => {
       });
 
       notifications.show({
-        title: "Rule Executed",
-        message: data?.data ?? "Rule run successfully",
+        title: t("rule_executed"),
+        message: data?.data ?? t("rule_run_successfully"),
         color: "var(--button-color-confirm)",
       });
     },
@@ -159,7 +157,7 @@ const AddAutomaticRule = (): React.ReactNode => {
             ]);
           }}
         >
-          Add Rule
+          {t("add_rule")}
         </Button>
         <Button
           variant="outline"
@@ -182,7 +180,7 @@ const AddAutomaticRule = (): React.ReactNode => {
             });
           }}
         >
-          Run Rule
+          {t("run_rule")}
         </Button>
       </Group>
     </Stack>

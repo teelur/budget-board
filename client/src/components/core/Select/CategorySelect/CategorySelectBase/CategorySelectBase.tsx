@@ -21,6 +21,7 @@ import { uncategorizedTransactionCategory } from "~/models/transaction";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategoryOptionText from "./CategoryOptionText/CategoryOptionText";
+import { useTranslation } from "react-i18next";
 
 export interface CategorySelectBaseProps extends InputBaseProps {
   categories: ICategory[];
@@ -39,6 +40,8 @@ const CategorySelectBase = ({
   ...props
 }: CategorySelectBaseProps): React.ReactNode => {
   const [search, setSearch] = React.useState("");
+
+  const { t } = useTranslation();
 
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -167,7 +170,7 @@ const CategorySelectBase = ({
             </PrimaryText>
           ) : (
             <Input.Placeholder>
-              <DimmedText size="sm">Pick value</DimmedText>
+              <DimmedText size="sm">{t("select_a_category")}</DimmedText>
             </Input.Placeholder>
           )}
         </InputBase>
@@ -176,7 +179,7 @@ const CategorySelectBase = ({
         <Combobox.Search
           value={search}
           onChange={(event) => setSearch(event.currentTarget.value)}
-          placeholder="Search Categories"
+          placeholder={t("search_categories")}
           size="sm"
         />
         <Combobox.Options mah={300} style={{ overflowY: "auto" }}>

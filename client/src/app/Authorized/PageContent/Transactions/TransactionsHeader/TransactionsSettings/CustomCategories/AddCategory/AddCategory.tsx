@@ -13,14 +13,17 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import { useTranslation } from "react-i18next";
 
 const AddCategory = (): React.ReactNode => {
   const [isChildCategory, setIsChildCategory] = React.useState(false);
 
+  const { t } = useTranslation();
   const { transactionCategories } = useTransactionCategories();
 
   const nameField = useField<string>({
     initialValue: "",
+    validate: (value) => (value.length === 0 ? t("name_is_required") : null),
   });
   const parentField = useField<string>({
     initialValue: "",
@@ -38,10 +41,6 @@ const AddCategory = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["transactionCategories"] });
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Category added!",
-      });
     },
     onError: (error: AxiosError) =>
       notifications.show({
@@ -60,13 +59,13 @@ const AddCategory = (): React.ReactNode => {
       <Stack>
         <TextInput
           {...nameField.getInputProps()}
-          label={<PrimaryText size="sm">Category Name</PrimaryText>}
+          label={<PrimaryText size="sm">{t("category_name")}</PrimaryText>}
           elevation={2}
         />
         <Stack gap="0.5rem" justify="center">
-          <PrimaryText size="sm">Category Type</PrimaryText>
+          <PrimaryText size="sm">{t("category_type")}</PrimaryText>
           <Group gap="0.5rem">
-            <DimmedText size="sm">Parent</DimmedText>
+            <DimmedText size="sm">{t("parent")}</DimmedText>
             <Switch
               checked={isChildCategory}
               onChange={(event) =>
@@ -74,12 +73,12 @@ const AddCategory = (): React.ReactNode => {
               }
               size="md"
             />
-            <DimmedText size="sm">Child</DimmedText>
+            <DimmedText size="sm">{t("child")}</DimmedText>
           </Group>
         </Stack>
         {isChildCategory && (
           <Stack gap="0.25rem">
-            <PrimaryText size="sm">Parent Category</PrimaryText>
+            <PrimaryText size="sm">{t("parent_category")}</PrimaryText>
             <CategorySelect
               w="100%"
               categories={parentCategories}
@@ -98,7 +97,7 @@ const AddCategory = (): React.ReactNode => {
             })
           }
         >
-          Add Category
+          {t("add_category")}
         </Button>
       </Stack>
     </Card>

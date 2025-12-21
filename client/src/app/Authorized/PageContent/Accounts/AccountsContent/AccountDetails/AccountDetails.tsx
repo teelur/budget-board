@@ -19,6 +19,7 @@ import Drawer from "~/components/core/Drawer/Drawer";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
+import { useTranslation } from "react-i18next";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -30,7 +31,9 @@ interface AccountDetailsProps {
 const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
+
   const balancesQuery = useQuery({
     queryKey: ["balances", props.account?.id],
     queryFn: async (): Promise<IBalanceResponse[]> => {
@@ -71,14 +74,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryText size="lg">Account Details</PrimaryText>}
-      styles={{
-        inner: {
-          left: "0",
-          right: "0",
-          padding: "0 !important",
-        },
-      }}
+      title={<PrimaryText size="lg">{t("account_details")}</PrimaryText>}
     >
       {!props.account ? (
         <Skeleton height={425} radius="lg" />
@@ -86,11 +82,11 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
         <Stack gap="1rem">
           <Group justify="space-between" align="center">
             <Stack gap={0}>
-              <DimmedText size="xs">Account Name</DimmedText>
+              <DimmedText size="xs">{t("account_name")}</DimmedText>
               <PrimaryText size="lg">{props.account.name}</PrimaryText>
             </Stack>
             <Stack gap={0}>
-              <DimmedText size="xs">Account Type</DimmedText>
+              <DimmedText size="xs">{t("account_type")}</DimmedText>
               <PrimaryText size="lg">
                 {props.account.subtype || props.account.type}
               </PrimaryText>
@@ -102,7 +98,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
           >
             <MantineAccordion.Item value="add-balance">
               <MantineAccordion.Control>
-                <PrimaryText>Add Balance</PrimaryText>
+                <PrimaryText>{t("add_balance")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <AddBalance
@@ -113,7 +109,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="chart">
               <MantineAccordion.Control>
-                <PrimaryText>Account Trends</PrimaryText>
+                <PrimaryText>{t("account_trends")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Group>
@@ -122,21 +118,21 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     size="xs"
                     onClick={() => setChartLookbackMonths(3)}
                   >
-                    3 months
+                    {t("3_months")}
                   </Button>
                   <Button
                     variant={chartLookbackMonths === 6 ? "filled" : "outline"}
                     size="xs"
                     onClick={() => setChartLookbackMonths(6)}
                   >
-                    6 months
+                    {t("6_months")}
                   </Button>
                   <Button
                     variant={chartLookbackMonths === 12 ? "filled" : "outline"}
                     size="xs"
                     onClick={() => setChartLookbackMonths(12)}
                   >
-                    12 months
+                    {t("12_months")}
                   </Button>
                 </Group>
                 <ValueChart
@@ -159,7 +155,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="balances">
               <MantineAccordion.Control>
-                <PrimaryText>Recent Balances</PrimaryText>
+                <PrimaryText>{t("recent_balances")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
@@ -168,7 +164,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   )}
                   {sortedBalances.length === 0 ? (
                     <Group justify="center">
-                      <DimmedText size="sm">No balance entries.</DimmedText>
+                      <DimmedText size="sm">
+                        {t("no_balance_entries")}
+                      </DimmedText>
                     </Group>
                   ) : (
                     <BalanceItems
@@ -181,7 +179,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="deleted-balances">
               <MantineAccordion.Control>
-                <PrimaryText>Deleted Balances</PrimaryText>
+                <PrimaryText>{t("deleted_balances")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
@@ -191,7 +189,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   {sortedDeletedBalances.length === 0 ? (
                     <Group justify="center">
                       <DimmedText size="sm">
-                        No deleted balance entries.
+                        {t("no_deleted_balance_entries")}
                       </DimmedText>
                     </Group>
                   ) : (

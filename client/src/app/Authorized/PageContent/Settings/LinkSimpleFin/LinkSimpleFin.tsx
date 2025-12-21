@@ -17,11 +17,14 @@ import { isNotEmpty, useField } from "@mantine/form";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
+import { useTranslation } from "react-i18next";
 
 const LinkSimpleFin = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   const simpleFinKeyField = useField<string>({
     initialValue: "",
-    validate: isNotEmpty("SimpleFin key is required"),
+    validate: isNotEmpty(t("simplefin_key_is_required")),
   });
 
   const { request } = useAuth();
@@ -54,7 +57,7 @@ const LinkSimpleFin = (): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "SimpleFin account linked!",
+        message: t("simplefin_access_token_updated_successfully"),
       });
     },
     onError: (error: AxiosError) => {
@@ -74,17 +77,19 @@ const LinkSimpleFin = (): React.ReactNode => {
       <LoadingOverlay visible={doSetAccessToken.isPending} zIndex={1000} />
       <Stack gap="1rem">
         <Group gap="1rem">
-          <PrimaryText size="lg">Link SimpleFIN</PrimaryText>
+          <PrimaryText size="lg">{t("link_simplefin")}</PrimaryText>
           {userQuery.data?.accessToken && (
             <Badge color="var(--button-color-confirm)" maw={80}>
-              Linked
+              {t("linked")}
             </Badge>
           )}
         </Group>
         <Stack gap="0.5rem">
           <PasswordInput
             {...simpleFinKeyField.getInputProps()}
-            label={<PrimaryText size="sm">SimpleFin Access Token</PrimaryText>}
+            label={
+              <PrimaryText size="sm">{t("simplefin_access_token")}</PrimaryText>
+            }
             elevation={1}
           />
           <Button
@@ -95,7 +100,7 @@ const LinkSimpleFin = (): React.ReactNode => {
               }
             }}
           >
-            Save Changes
+            {t("set_access_token")}
           </Button>
         </Stack>
       </Stack>

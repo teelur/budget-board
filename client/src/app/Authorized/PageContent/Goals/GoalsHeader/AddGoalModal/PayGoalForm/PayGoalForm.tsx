@@ -15,6 +15,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
+import { useTranslation } from "react-i18next";
 
 interface FormValues {
   goalName: string;
@@ -38,6 +39,7 @@ const PayGoalForm = (): React.ReactNode => {
     },
   });
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -99,34 +101,37 @@ const PayGoalForm = (): React.ReactNode => {
       <LoadingOverlay visible={doAddGoal.isPending} />
       <Stack gap="sm">
         <TextInput
-          label={<PrimaryText size="sm">Goal Name</PrimaryText>}
-          placeholder="Enter goal name"
+          label={<PrimaryText size="sm">{t("goal_name")}</PrimaryText>}
+          placeholder={t("enter_goal_name")}
           key={form.key("goalName")}
           {...form.getInputProps("goalName")}
           elevation={1}
         />
         <AccountSelect
-          label={<PrimaryText size="sm">Accounts</PrimaryText>}
-          placeholder="Select account"
+          label={<PrimaryText size="sm">{t("accounts")}</PrimaryText>}
           key={form.key("goalAccounts")}
           {...form.getInputProps("goalAccounts")}
           elevation={1}
         />
         <Stack gap="0.5rem">
-          <PrimaryText size="sm">Create a goal with a specified:</PrimaryText>
+          <PrimaryText size="sm">
+            {t("create_a_goal_with_a_specified")}
+          </PrimaryText>
           <Tabs variant="outline" defaultValue="completeDate">
             <Tabs.List>
               <Tabs.Tab value="completeDate">
-                <PrimaryText size="sm">Complete Date</PrimaryText>
+                <PrimaryText size="sm">{t("complete_date")}</PrimaryText>
               </Tabs.Tab>
               <Tabs.Tab value="monthlyContribution">
-                <PrimaryText size="sm">Monthly Contribution</PrimaryText>
+                <PrimaryText size="sm">{t("monthly_contribution")}</PrimaryText>
               </Tabs.Tab>
             </Tabs.List>
             <Tabs.Panel value="completeDate">
               <DateInput
-                label={<PrimaryText size="sm">Complete Date</PrimaryText>}
-                placeholder="Choose an end date"
+                label={
+                  <PrimaryText size="sm">{t("complete_date")}</PrimaryText>
+                }
+                placeholder={t("select_a_completion_date")}
                 clearable
                 key={form.key("goalCompleteDate")}
                 {...form.getInputProps("goalCompleteDate")}
@@ -136,9 +141,11 @@ const PayGoalForm = (): React.ReactNode => {
             <Tabs.Panel value="monthlyContribution">
               <NumberInput
                 label={
-                  <PrimaryText size="sm">Monthly Contribution</PrimaryText>
+                  <PrimaryText size="sm">
+                    {t("monthly_contribution")}
+                  </PrimaryText>
                 }
-                placeholder="Enter monthly contribution"
+                placeholder={t("enter_monthly_contribution")}
                 prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
                 min={0}
                 decimalScale={2}
@@ -150,7 +157,7 @@ const PayGoalForm = (): React.ReactNode => {
             </Tabs.Panel>
           </Tabs>
         </Stack>
-        <Button type="submit">Create Goal</Button>
+        <Button type="submit">{t("create_goal")}</Button>
       </Stack>
     </form>
   );

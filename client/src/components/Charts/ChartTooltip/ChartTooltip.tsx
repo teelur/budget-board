@@ -2,6 +2,7 @@ import { ChartSeries, getFilteredChartTooltipPayload } from "@mantine/charts";
 import { getThemeColor, Group, Stack, useMantineTheme } from "@mantine/core";
 import { Square } from "lucide-react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -16,11 +17,14 @@ interface ChartTooltipProps {
 }
 
 const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
+  const { t } = useTranslation();
   const theme = useMantineTheme();
 
   const labels = getSeriesLabels(props.series);
 
-  const filteredPayload = getFilteredChartTooltipPayload([...(props.payload ?? [])]);
+  const filteredPayload = getFilteredChartTooltipPayload([
+    ...(props.payload ?? []),
+  ]);
 
   if (filteredPayload.length === 0) {
     return null;
@@ -66,7 +70,7 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
                 width={18}
                 height={18}
               />
-              <DimmedText size="sm">Total</DimmedText>
+              <DimmedText size="sm">{t("total")}</DimmedText>
             </Group>
             <PrimaryText size="sm">
               {typeof props.valueFormatter === "function"

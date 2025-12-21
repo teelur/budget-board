@@ -11,14 +11,17 @@ import { translateAxiosError } from "~/helpers/requests";
 import { IAssetCreateRequest } from "~/models/asset";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import BaseTextInput from "~/components/core/Input/Base/BaseTextInput/BaseTextInput";
+import { useTranslation } from "react-i18next";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 const CreateAsset = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
 
+  const { t } = useTranslation();
+
   const assetNameField = useField<string>({
     initialValue: "",
-    validate: isNotEmpty("Name is required"),
+    validate: isNotEmpty(t("name_is_required")),
   });
 
   const { request } = useAuth();
@@ -33,11 +36,6 @@ const CreateAsset = (): React.ReactNode => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["assets"] });
       await queryClient.invalidateQueries({ queryKey: ["values"] });
-
-      notifications.show({
-        message: "Asset created",
-        color: "var(--button-color-confirm)",
-      });
 
       assetNameField.reset();
     },
@@ -57,16 +55,16 @@ const CreateAsset = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryText>Create Asset</PrimaryText>}
+        title={<PrimaryText>{t("create_asset")}</PrimaryText>}
       >
         <Stack gap="0.5rem">
-          <BaseTextInput
+          <TextInput
             {...assetNameField.getInputProps()}
-            label={<PrimaryText size="sm">Name</PrimaryText>}
-            placeholder="Enter asset name"
+            label={<PrimaryText size="sm">{t("name")}</PrimaryText>}
+            placeholder={t("enter_asset_name")}
+            elevation={0}
           />
           <Button
-            type="submit"
             loading={doCreateAsset.isPending}
             onClick={() =>
               doCreateAsset.mutate({
@@ -74,7 +72,7 @@ const CreateAsset = (): React.ReactNode => {
               } as IAssetCreateRequest)
             }
           >
-            Submit
+            {t("submit")}
           </Button>
         </Stack>
       </Modal>

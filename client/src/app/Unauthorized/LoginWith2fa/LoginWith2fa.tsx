@@ -6,10 +6,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
-import { LoginCardState } from "./Welcome";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PinInput from "~/components/core/Input/PinInput/PinInput";
+import { useTranslation } from "react-i18next";
+import { LoginCardState } from "../Welcome";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -20,14 +21,10 @@ interface LoginProps {
 const LoginWith2fa = (props: LoginProps): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
 
+  const { t } = useTranslation();
+
   const authenticationCodeField = useField<string>({
     initialValue: "",
-    validate: (value) => {
-      if (!value) {
-        return "Authentication code is required";
-      }
-      return null;
-    },
   });
 
   const { request, setIsUserAuthenticated } = useAuth();
@@ -40,7 +37,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
     if (!authenticationCodeField.getValue()) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Please enter the authentication code.",
+        message: t("enter_authentication_code_message"),
       });
       setLoading(false);
       return;
@@ -64,7 +61,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         if ((error.response?.data as any)?.detail === "Failed") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: "Login failed. Check your credentials and try again.",
+            message: t("login_failed_message"),
           });
         } else {
           notifications.show({
@@ -89,10 +86,10 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
       />
       <Stack align="center" gap={5} w="100%">
         <PrimaryText size="lg" ta="center">
-          2-Factor Authentication
+          {t("two_factor_authentication")}
         </PrimaryText>
         <DimmedText size="sm" ta="center">
-          Enter the 6-digit security code from your authenticator app.
+          {t("enter_security_code_message")}
         </DimmedText>
       </Stack>
       <PinInput
@@ -105,7 +102,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         elevation={1}
       />
       <Button variant="filled" fullWidth onClick={submitUserLogin}>
-        Submit
+        {t("submit")}
       </Button>
       <Group wrap="nowrap" gap="md" w="100%">
         <Button
@@ -115,14 +112,14 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
             props.setLoginCardState(LoginCardState.LoginWithRecovery)
           }
         >
-          Use Recovery Code
+          {t("use_recovery_code")}
         </Button>
         <Button
           variant="default"
           fullWidth
           onClick={() => props.setLoginCardState(LoginCardState.Login)}
         >
-          Return to Login
+          {t("return_to_login")}
         </Button>
       </Group>
     </Stack>

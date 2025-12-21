@@ -1,4 +1,4 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { ActionIcon, ComboboxItem, Group } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { Trash2Icon } from "lucide-react";
@@ -21,6 +21,7 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import Select from "~/components/core/Select/Select/Select";
+import { useTranslation } from "react-i18next";
 
 export interface ConditionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -32,6 +33,7 @@ export interface ConditionItemProps {
 }
 
 const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -55,7 +57,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
       return (
         <TextInput
           flex="1 1 auto"
-          placeholder="Enter merchant"
+          placeholder={t("enter_merchant_name")}
           value={props.ruleParameter.value}
           onChange={(event) =>
             props.setRuleParameter({
@@ -70,7 +72,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
       return (
         <NumberInput
           flex="1 1 auto"
-          placeholder="Enter amount"
+          placeholder={t("enter_amount")}
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({
@@ -88,7 +90,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
       return (
         <DateInput
           flex="1 1 auto"
-          placeholder="Select date"
+          placeholder={t("select_a_date")}
           value={props.ruleParameter.value}
           onChange={(value) =>
             props.setRuleParameter({
@@ -125,11 +127,14 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
       <Group gap="0.5rem">
         <Select
           w="110px"
-          data={TransactionFields.map((field) => field.label)}
+          data={TransactionFields.map((i) => ({
+            ...i,
+            label: t(i.label),
+          }))}
           value={
             TransactionFields.find(
               (field) => field.value === props.ruleParameter.field
-            )?.label ?? ""
+            )?.value
           }
           onChange={(value) =>
             props.setRuleParameter({
@@ -150,7 +155,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
                 TransactionFields.find((field) => field.label === value)
                   ?.value ?? ""
               ),
-            })
+            } as IRuleParameterEdit)
           }
           allowDeselect={false}
           elevation={2}
@@ -162,7 +167,13 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               FieldToOperatorType.get(props.ruleParameter.field) ??
                 OperatorTypes.STRING
             )
-          ).map((op) => op.label)}
+          ).map(
+            (op) =>
+              ({
+                value: op.value,
+                label: t(op.label),
+              } as ComboboxItem)
+          )}
           value={
             Operators.find((op) => op.value === props.ruleParameter.operator)
               ?.label ?? ""

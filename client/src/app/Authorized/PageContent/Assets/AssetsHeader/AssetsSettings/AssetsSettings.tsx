@@ -15,10 +15,12 @@ import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
+import { useTranslation } from "react-i18next";
 
 const AssetsSettings = (): React.ReactNode => {
   const [isOpened, { open, close }] = useDisclosure(false);
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const assetsQuery = useQuery({
@@ -48,19 +50,19 @@ const AssetsSettings = (): React.ReactNode => {
       <Modal
         opened={isOpened}
         onClose={close}
-        title={<PrimaryText>Assets Settings</PrimaryText>}
+        title={<PrimaryText>{t("assets_settings")}</PrimaryText>}
         size="40rem"
       >
         <Stack gap="1rem">
           <Accordion defaultValue={[]} elevation={1}>
             <MantineAccordion.Item value="deleted-assets">
               <MantineAccordion.Control>
-                <PrimaryText size="md">Deleted Assets</PrimaryText>
+                <PrimaryText size="md">{t("deleted_assets")}</PrimaryText>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Stack gap="0.5rem">
                   <DimmedText size="sm">
-                    View and restore deleted assets.
+                    {t("view_and_restore_deleted_assets")}
                   </DimmedText>
                   {deletedAssets.length !== 0 ? (
                     deletedAssets.map((asset) => (
@@ -68,7 +70,9 @@ const AssetsSettings = (): React.ReactNode => {
                     ))
                   ) : (
                     <Group justify="center">
-                      <DimmedText size="xs">No deleted assets.</DimmedText>
+                      <DimmedText size="xs">
+                        {t("no_deleted_assets")}
+                      </DimmedText>
                     </Group>
                   )}
                 </Stack>
