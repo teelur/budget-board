@@ -19,7 +19,7 @@ const TransactionCard = ({
     case 2:
       return <ElevatedTransactionCard {...props} />;
     default:
-      throw new Error("Invalid elevation level for TransactionCard");
+      return null;
   }
 };
 

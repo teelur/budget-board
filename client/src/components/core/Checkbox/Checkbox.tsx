@@ -19,7 +19,7 @@ const Checkbox = ({
     case 2:
       return <ElevatedCheckbox {...props} />;
     default:
-      throw new Error("Invalid elevation level for Checkbox");
+      return null;
   }
 };
 export default Checkbox;

@@ -138,7 +138,6 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
               {isEditing ? (
                 <TextInput
                   size="xs"
-                  elevation={1}
                   {...nameField.getInputProps()}
                   onBlur={async () => {
                     if (nameField.getValue() !== props.line.name) {
@@ -151,6 +150,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                       });
                     }
                   }}
+                  elevation={1}
                 />
               ) : props.line.name.length > 0 ? (
                 <PrimaryText size="sm">{props.line.name}</PrimaryText>

@@ -19,7 +19,7 @@ const DateInput = ({
     case 2:
       return <ElevatedDateInput {...props} />;
     default:
-      throw new Error("Invalid elevation level for DateInput");
+      return null;
   }
 };
 

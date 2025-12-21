@@ -12,6 +12,7 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface ChartDatum {
   month: string;
@@ -29,6 +30,7 @@ interface NetCashFlowChartProps {
 }
 
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -87,9 +89,9 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   };
 
   const chartSeries: CompositeChartSeries[] = [
-    { name: "Income", color: "green.6", type: "bar" },
-    { name: "Spending", color: "red.6", type: "bar" },
-    { name: "Net", color: "gray.0", type: "line" },
+    { name: "Income", label: t("income"), color: "green.6", type: "bar" },
+    { name: "Spending", label: t("spending"), color: "red.6", type: "bar" },
+    { name: "Net", label: t("net"), color: "gray.0", type: "line" },
   ];
 
   const chartValueFormatter = (value: number): string => {
@@ -109,7 +111,9 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   if (props.months.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="sm">Select a month to display the chart.</DimmedText>
+        <DimmedText size="sm">
+          {t("select_a_month_to_display_the_chart")}
+        </DimmedText>
       </Group>
     );
   }

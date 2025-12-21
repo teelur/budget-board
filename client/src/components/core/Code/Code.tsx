@@ -16,7 +16,7 @@ const Code = ({ elevation = 0, ...props }: CodeProps): React.ReactNode => {
     case 2:
       return <ElevatedCode {...props} />;
     default:
-      throw new Error("Invalid elevation level for Code component");
+      return null;
   }
 };
 

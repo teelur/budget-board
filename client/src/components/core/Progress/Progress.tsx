@@ -26,7 +26,7 @@ const Progress = ({
     case 2:
       return <ElevatedProgress {...props} />;
     default:
-      throw new Error("Invalid elevation level for Progress component");
+      return null;
   }
 };
 

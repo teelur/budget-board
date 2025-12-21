@@ -12,8 +12,8 @@ import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import { IInstitution, IInstitutionCreateRequest } from "~/models/institution";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import BaseTextInput from "~/components/core/Input/Base/BaseTextInput/BaseTextInput";
 import { useTranslation } from "react-i18next";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 const CreateAccount = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -149,13 +149,15 @@ const CreateAccount = () => {
         title={<PrimaryText size="md">{t("create_account")}</PrimaryText>}
       >
         <Stack gap="0.5rem">
-          <BaseTextInput
+          <TextInput
             {...accountNameField.getInputProps()}
             label={<PrimaryText size="sm">{t("account_name")}</PrimaryText>}
+            elevation={0}
           />
-          <BaseTextInput
+          <TextInput
             {...institutionField.getInputProps()}
             label={<PrimaryText size="sm">{t("institution")}</PrimaryText>}
+            elevation={0}
           />
           <Button
             loading={doCreateAccount.isPending || doCreateInstitution.isPending}

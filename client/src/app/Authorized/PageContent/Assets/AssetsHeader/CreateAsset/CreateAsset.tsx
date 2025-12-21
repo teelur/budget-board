@@ -11,8 +11,8 @@ import { translateAxiosError } from "~/helpers/requests";
 import { IAssetCreateRequest } from "~/models/asset";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import BaseTextInput from "~/components/core/Input/Base/BaseTextInput/BaseTextInput";
 import { useTranslation } from "react-i18next";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 const CreateAsset = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -58,10 +58,11 @@ const CreateAsset = (): React.ReactNode => {
         title={<PrimaryText>{t("create_asset")}</PrimaryText>}
       >
         <Stack gap="0.5rem">
-          <BaseTextInput
+          <TextInput
             {...assetNameField.getInputProps()}
             label={<PrimaryText size="sm">{t("name")}</PrimaryText>}
             placeholder={t("enter_asset_name")}
+            elevation={0}
           />
           <Button
             loading={doCreateAsset.isPending}

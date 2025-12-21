@@ -17,7 +17,7 @@ const FileInput = ({
     case 2:
       throw new Error("Elevated FileInput not implemented yet");
     default:
-      return <BaseFileInput {...props} />;
+      return null;
   }
 };
 

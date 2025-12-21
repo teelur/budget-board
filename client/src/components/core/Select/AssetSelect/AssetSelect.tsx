@@ -17,8 +17,10 @@ const AssetSelect = ({
       return <BaseAssetSelectInput {...props} />;
     case 1:
       return <SurfaceAssetSelectInput {...props} />;
-    default:
+    case 2:
       return <ElevatedAssetSelectInput {...props} />;
+    default:
+      return null;
   }
 };
 

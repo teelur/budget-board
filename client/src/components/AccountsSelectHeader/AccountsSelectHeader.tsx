@@ -7,6 +7,7 @@ import { AxiosResponse } from "axios";
 import React from "react";
 import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import AccountSelect from "../core/Select/AccountSelect/AccountSelect";
+import { useTranslation } from "react-i18next";
 
 interface AccountsSelectHeaderProps {
   selectedAccountIds: string[];
@@ -19,7 +20,9 @@ interface AccountsSelectHeaderProps {
 const AccountsSelectHeader = (
   props: AccountsSelectHeaderProps
 ): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
+
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
     queryFn: async (): Promise<IAccountResponse[]> => {
@@ -67,9 +70,11 @@ const AccountsSelectHeader = (
           );
         }}
       >
-        Select All
+        {t("select_all")}
       </Button>
-      <Button onClick={() => props.setSelectedAccountIds([])}>Clear All</Button>
+      <Button onClick={() => props.setSelectedAccountIds([])}>
+        {t("clear_all")}
+      </Button>
     </Group>
   );
 };

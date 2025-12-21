@@ -4,6 +4,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IAssetResponse } from "~/models/asset";
+import { useTranslation } from "react-i18next";
 
 export interface AssetSelectInputBaseProps extends MultiSelectProps {
   selectedAssetIds?: string[];
@@ -19,6 +20,7 @@ const AssetSelectInputBase = ({
   maxSelectedValues = undefined,
   ...props
 }: AssetSelectInputBaseProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const assetsQuery = useQuery({
@@ -54,7 +56,7 @@ const AssetSelectInputBase = ({
       data={getFilteredAssets().map((a) => {
         return { value: a.id, label: a.name };
       })}
-      placeholder="Select assets"
+      placeholder={t("select_assets")}
       value={selectedAssetIds}
       onChange={setSelectedAssetIds}
       clearable

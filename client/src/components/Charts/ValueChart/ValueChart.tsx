@@ -18,6 +18,7 @@ import {
   IValue,
 } from "./helpers/valueChart";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface ValueChartProps {
   items: IItem[];
@@ -28,6 +29,7 @@ interface ValueChartProps {
 }
 
 const ValueChart = (props: ValueChartProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -65,7 +67,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   if (props.items?.length === 0 || props.values?.length === 0) {
     return (
       <Group justify="center" p="0.5rem">
-        <DimmedText size="sm">No data available.</DimmedText>
+        <DimmedText size="sm">{t("no_data_available")}</DimmedText>
       </Group>
     );
   }

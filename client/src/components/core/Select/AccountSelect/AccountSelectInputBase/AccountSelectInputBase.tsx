@@ -4,6 +4,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
+import { useTranslation } from "react-i18next";
 
 export interface AccountSelectInputBaseProps extends MultiSelectProps {
   hideHidden?: boolean;
@@ -19,6 +20,7 @@ const AccountSelectInputBase = ({
   maxSelectedValues = undefined,
   ...props
 }: AccountSelectInputBaseProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -66,7 +68,7 @@ const AccountSelectInputBase = ({
       data={getFilteredAccounts().map((a) => {
         return { value: a.id, label: a.name };
       })}
-      placeholder="Select accounts"
+      placeholder={t("select_accounts")}
       clearable
       maxValues={maxSelectedValues}
       {...props}

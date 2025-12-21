@@ -23,13 +23,13 @@ import {
   IAccountUpdateRequest,
 } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
-import ElevatedTextInput from "~/components/core/Input/Elevated/ElevatedTextInput/ElevatedTextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -134,10 +134,11 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
         <LoadingOverlay visible={doUpdateAccount.isPending} />
         <Group justify="space-between" align="flex-end">
           <Group gap="0.5rem" align="flex-end">
-            <ElevatedTextInput
+            <TextInput
               {...accountNameField.getInputProps()}
               label={<PrimaryText size="xs">{t("name")}</PrimaryText>}
               onBlur={() => doUpdateAccount.mutate()}
+              elevation={2}
             />
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon

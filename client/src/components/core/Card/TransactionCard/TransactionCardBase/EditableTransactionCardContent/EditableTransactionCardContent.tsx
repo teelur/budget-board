@@ -20,6 +20,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import { useTranslation } from "react-i18next";
 
 interface EditableTransactionCardProps {
   transaction: ITransaction;
@@ -46,6 +47,7 @@ const EditableTransactionCardContent = (
     initialValue: props.transaction.amount,
   });
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -111,11 +113,11 @@ const EditableTransactionCardContent = (
         message: translateAxiosError(error),
       });
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["balances"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: ["balances"] });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
     },
   });
 
@@ -128,9 +130,9 @@ const EditableTransactionCardContent = (
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["balances"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: ["balances"] });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
     },
   });
 
@@ -140,7 +142,7 @@ const EditableTransactionCardContent = (
     if (!parsedDate.isValid()) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Invalid date.",
+        message: t("invalid_date"),
       });
       return;
     }

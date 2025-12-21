@@ -2,6 +2,7 @@ import React from "react";
 import SurfaceAccountSelectInput from "./SurfaceAccountSelectInput/SurfaceAccountSelectInput";
 import BaseAccountSelectInput from "./BaseAccountSelectInput/BaseAccountSelectInput";
 import { AccountSelectInputBaseProps } from "./AccountSelectInputBase/AccountSelectInputBase";
+import ElevatedAccountSelectInput from "./ElevatedAccountSelectInput/ElevatedAccountSelectInput";
 
 export interface AccountSelectInputProps extends AccountSelectInputBaseProps {
   elevation?: number;
@@ -17,9 +18,9 @@ const AccountSelect = ({
     case 1:
       return <SurfaceAccountSelectInput {...props} />;
     case 2:
-      throw new Error("Elevated is not supported for AccountSelectInput");
+      return <ElevatedAccountSelectInput {...props} />;
     default:
-      throw new Error("Invalid elevation level for AccountSelectInput");
+      return null;
   }
 };
 

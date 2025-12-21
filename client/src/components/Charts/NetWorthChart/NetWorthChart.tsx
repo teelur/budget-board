@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { BuildNetWorthChartData } from "./helpers/netWorthChart";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface NetWorthChartProps {
   accounts: IAccountResponse[];
@@ -25,6 +26,7 @@ interface NetWorthChartProps {
 }
 
 const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -44,14 +46,14 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   });
 
   const chartSeries: CompositeChartSeries[] = [
-    { name: "assets", label: "Assets", color: "green.6", type: "bar" },
+    { name: "assets", label: t("assets"), color: "green.6", type: "bar" },
     {
       name: "liabilities",
-      label: "Liabilities",
+      label: t("liabilities"),
       color: "red.6",
       type: "bar",
     },
-    { name: "net", label: "Net", color: "gray.0", type: "line" },
+    { name: "net", label: t("net"), color: "gray.0", type: "line" },
   ];
 
   const chartValueFormatter = (value: number): string => {
@@ -72,7 +74,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
     return (
       <Group justify="center">
         <DimmedText size="sm">
-          Select an account to display the chart.
+          {t("select_an_account_to_display_the_chart")}
         </DimmedText>
       </Group>
     );

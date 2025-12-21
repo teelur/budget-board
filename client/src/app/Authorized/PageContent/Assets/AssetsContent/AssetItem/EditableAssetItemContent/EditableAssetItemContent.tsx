@@ -20,11 +20,11 @@ import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import SurfaceTextInput from "~/components/core/Input/Surface/SurfaceTextInput/SurfaceTextInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -155,9 +155,10 @@ const EditableAssetItemContent = (
         <LoadingOverlay visible={doUpdateAsset.isPending} />
         <Group justify="space-between" align="flex-end">
           <Group gap="0.5rem" align="flex-end">
-            <SurfaceTextInput
+            <TextInput
               {...assetNameField.getInputProps()}
               onBlur={() => doUpdateAsset.mutate()}
+              elevation={1}
             />
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon

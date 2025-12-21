@@ -21,6 +21,7 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import Popover from "~/components/core/Popover/Popover";
+import { useTranslation } from "react-i18next";
 
 interface SplitTransactionProps {
   id: string;
@@ -38,6 +39,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
     initialValue: "",
   });
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -67,7 +69,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
       notifications.show({
-        message: "Transaction split successfully.",
+        message: t("transaction_split_successfully"),
         color: "var(--button-color-confirm)",
       });
     },
@@ -88,26 +90,21 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
       </MantinePopover.Target>
       <MantinePopover.Dropdown style={{ padding: "0.5rem" }}>
         <Stack gap="0.5rem">
-          <PrimaryText size="md">Split Transaction</PrimaryText>
-          <Stack gap="0.25rem">
-            <PrimaryText size="sm">Amount</PrimaryText>
-            <NumberInput
-              {...amountField.getInputProps()}
-              prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
-              decimalScale={2}
-              thousandSeparator=","
-              maw={200}
-              elevation={props.elevation}
-            />
-          </Stack>
-          <Stack gap="0.25rem">
-            <PrimaryText size="sm">Category</PrimaryText>
-            <CategorySelect
-              {...categoryField.getInputProps()}
-              categories={props.categories}
-              elevation={props.elevation}
-            />
-          </Stack>
+          <NumberInput
+            label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+            {...amountField.getInputProps()}
+            prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+            decimalScale={2}
+            thousandSeparator=","
+            maw={200}
+            elevation={props.elevation}
+          />
+          <CategorySelect
+            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+            {...categoryField.getInputProps()}
+            categories={props.categories}
+            elevation={props.elevation}
+          />
           <Button
             size="compact-sm"
             loading={doSplitTransaction.isPending}
@@ -131,7 +128,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
               });
             }}
           >
-            Submit
+            {t("split_transaction")}
           </Button>
         </Stack>
       </MantinePopover.Dropdown>

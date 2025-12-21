@@ -13,6 +13,7 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -25,6 +26,7 @@ interface SpendingChartProps {
 const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
 
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -70,7 +72,9 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   if (props.months.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="sm">Select a month to display the chart.</DimmedText>
+        <DimmedText size="sm">
+          {t("select_a_month_to_display_the_chart")}
+        </DimmedText>
       </Group>
     );
   }

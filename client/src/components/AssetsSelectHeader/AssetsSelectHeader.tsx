@@ -7,6 +7,7 @@ import React from "react";
 import { IAssetResponse } from "~/models/asset";
 import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import AssetSelect from "../core/Select/AssetSelect/AssetSelect";
+import { useTranslation } from "react-i18next";
 
 interface AssetsSelectHeaderProps {
   selectedAssetIds: string[];
@@ -19,7 +20,9 @@ interface AssetsSelectHeaderProps {
 const AssetsSelectHeader = (
   props: AssetsSelectHeaderProps
 ): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
+
   const assetsQuery = useQuery({
     queryKey: ["assets"],
     queryFn: async (): Promise<IAssetResponse[]> => {
@@ -61,9 +64,11 @@ const AssetsSelectHeader = (
           );
         }}
       >
-        Select All
+        {t("select_all")}
       </Button>
-      <Button onClick={() => props.setSelectedAssetIds([])}>Clear All</Button>
+      <Button onClick={() => props.setSelectedAssetIds([])}>
+        {t("clear_all")}
+      </Button>
     </Group>
   );
 };
