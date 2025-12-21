@@ -8,8 +8,10 @@ import { translateAxiosError } from "~/helpers/requests";
 import { IApplicationUser } from "~/models/applicationUser";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 const OidcSettings = (): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userQuery = useQuery({
@@ -41,7 +43,7 @@ const OidcSettings = (): React.ReactNode => {
       notifications.show({
         color: "var(--button-color-confirm)",
         message:
-          res?.data?.message ?? "OIDC provider disconnected successfully.",
+          res?.data?.message ?? t("oidc_provider_disconnected_successfully"),
       });
     },
     onError: (error: any) => {
@@ -59,13 +61,13 @@ const OidcSettings = (): React.ReactNode => {
   return (
     <Card elevation={1}>
       <Stack gap="1rem">
-        <PrimaryText size="lg">OIDC Settings</PrimaryText>
+        <PrimaryText size="lg">{t("oidc_settings")}</PrimaryText>
         <Button
           color="var(--button-color-destructive)"
           onClick={() => doDisconnectOidc.mutate()}
           loading={doDisconnectOidc.isPending}
         >
-          Disconnect OIDC Provider
+          {t("disconnect_oidc_provider")}
         </Button>
       </Stack>
     </Card>

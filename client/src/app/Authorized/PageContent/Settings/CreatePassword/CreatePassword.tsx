@@ -9,16 +9,24 @@ import { translateAxiosError, ValidationError } from "~/helpers/requests";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
+import { useTranslation } from "react-i18next";
 
 const CreatePassword = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   const newPasswordField = useField<string>({
     initialValue: "",
-    validate: hasLength({ min: 3 }, "Password must be at least 3 characters."),
+    validate: hasLength(
+      { min: 3 },
+      t("password_min_length_message", { minLength: 3 })
+    ),
   });
   const confirmNewPasswordField = useField<string>({
     initialValue: "",
     validate: (value: string) =>
-      value !== newPasswordField.getValue() ? "Passwords did not match" : null,
+      value !== newPasswordField.getValue()
+        ? t("passwords_do_not_match")
+        : null,
   });
 
   const { request } = useAuth();
@@ -37,7 +45,7 @@ const CreatePassword = (): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Password successfully updated.",
+        message: t("password_updated_successfully"),
       });
     },
     onError: (error: AxiosError) => {
@@ -48,7 +56,7 @@ const CreatePassword = (): React.ReactNode => {
           errorData.title === "One or more validation errors occurred."
         ) {
           notifications.show({
-            title: "One or more validation errors occurred.",
+            title: t("one_or_more_validation_errors_occurred"),
             color: "var(--button-color-destructive)",
             message: Object.values(errorData.errors).join("\n"),
           });
@@ -65,22 +73,27 @@ const CreatePassword = (): React.ReactNode => {
   return (
     <Card elevation={1}>
       <Stack gap="1rem">
-        <PrimaryText size="lg">Create Password</PrimaryText>
+        <PrimaryText size="lg">{t("create_password")}</PrimaryText>
         <PasswordInput
           {...newPasswordField.getInputProps()}
-          label={<PrimaryText size="sm">New Password</PrimaryText>}
+          label={<PrimaryText size="sm">{t("new_password")}</PrimaryText>}
           w="100%"
         />
         <PasswordInput
           {...confirmNewPasswordField.getInputProps()}
-          label="Confirm Password"
+          label={<PrimaryText size="sm">{t("confirm_password")}</PrimaryText>}
           w="100%"
         />
         <Button
-          onClick={() => doCreatePassword.mutate()}
+          onClick={() => {
+            newPasswordField.validate();
+            confirmNewPasswordField.validate();
+
+            doCreatePassword.mutate();
+          }}
           loading={doCreatePassword.isPending}
         >
-          Submit
+          {t("create_password")}
         </Button>
       </Stack>
     </Card>

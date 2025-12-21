@@ -21,6 +21,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PinInput from "~/components/core/Input/PinInput/PinInput";
 import Code from "~/components/core/Code/Code";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 type TwoFactorAuthResponse = {
   sharedKey: string;
@@ -42,11 +43,13 @@ const TwoFactorAuth = (): React.ReactNode => {
   const [recoveryCodes, setRecoveryCodes] = React.useState<string[]>([]);
   const [showAuthenticatorSetup, { toggle }] = useDisclosure();
 
+  const { t } = useTranslation();
+
   const validationCodeField = useField<string>({
     initialValue: "",
     validate: (value) => {
       if (!value) {
-        return "Validation code is required";
+        return t("validation_code_is_required");
       }
       return null;
     },
@@ -86,14 +89,14 @@ const TwoFactorAuth = (): React.ReactNode => {
       if (!data) {
         notifications.show({
           color: "var(--button-color-destructive)",
-          message: "No data returned from the server.",
+          message: t("no_data_returned_from_server"),
         });
         return;
       }
 
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "2FA successfully updated.",
+        message: t("two_factor_auth_successfully_updated"),
       });
 
       if (data.recoveryCodes) {
@@ -110,7 +113,7 @@ const TwoFactorAuth = (): React.ReactNode => {
           errorData.title === "One or more validation errors occurred."
         ) {
           notifications.show({
-            title: "One or more validation errors occurred.",
+            title: t("one_or_more_validation_errors_occurred"),
             color: "var(--button-color-destructive)",
             message: Object.values(errorData.errors).join("\n"),
           });
@@ -141,10 +144,9 @@ const TwoFactorAuth = (): React.ReactNode => {
         <Stack gap="1rem">
           {recoveryCodes.length > 0 && (
             <Stack gap="0.5rem" align="center">
-              <PrimaryText size="md">Recovery Codes</PrimaryText>
+              <PrimaryText size="md">{t("recovery_codes")}</PrimaryText>
               <DimmedText size="sm">
-                Keep these codes safe. They can be used to access your account
-                if you lose access to your authenticator app.
+                {t("two_factor_auth_recovery_codes_info")}
               </DimmedText>
               <Group gap="0.5rem" align="center" justify="center">
                 {recoveryCodes.map((code, index) => (
@@ -162,11 +164,11 @@ const TwoFactorAuth = (): React.ReactNode => {
                       copy();
                       notifications.show({
                         color: "teal",
-                        message: "Recovery codes copied to clipboard",
+                        message: t("recovery_codes_copied_to_clipboard"),
                       });
                     }}
                   >
-                    Copy
+                    {t("copy_recovery_codes")}
                   </Button>
                 )}
               </CopyButton>
@@ -185,7 +187,7 @@ const TwoFactorAuth = (): React.ReactNode => {
                 } as TwoFactorAuthRequest)
               }
             >
-              Disable
+              {t("disable")}
             </Button>
             <Button
               variant="outline"
@@ -197,7 +199,7 @@ const TwoFactorAuth = (): React.ReactNode => {
                 } as TwoFactorAuthRequest)
               }
             >
-              Reset Recovery Codes
+              {t("generate_new_recovery_codes")}
             </Button>
           </Stack>
         </Stack>
@@ -209,8 +211,7 @@ const TwoFactorAuth = (): React.ReactNode => {
         <Stack>
           <Stack gap="0.5rem" align="center">
             <PrimaryText size="sm">
-              Scan this code with your authenticator app or enter the manual
-              code below.
+              {t("scan_the_qr_code_with_your_authenticator_app")}
             </PrimaryText>
             <QRCodeSVG
               value={buildAuthenticatorUrl(
@@ -234,11 +235,11 @@ const TwoFactorAuth = (): React.ReactNode => {
                       copy();
                       notifications.show({
                         color: "teal",
-                        message: "Code copied to clipboard",
+                        message: t("code_copied_to_clipboard"),
                       });
                     }}
                   >
-                    Copy
+                    {t("copy_key")}
                   </Button>
                 )}
               </CopyButton>
@@ -246,7 +247,7 @@ const TwoFactorAuth = (): React.ReactNode => {
           </Stack>
           <Stack justify="center" align="center" gap="0.5rem">
             <PrimaryText size="sm">
-              Then, enter the 6-digit code from your authenticator app.
+              {t("enter_the_verification_code_from_your_authenticator_app")}
             </PrimaryText>
             <PinInput
               length={6}
@@ -268,13 +269,13 @@ const TwoFactorAuth = (): React.ReactNode => {
               } as TwoFactorAuthRequest)
             }
           >
-            Enable 2FA
+            {t("enable")}
           </Button>
         </Stack>
       );
     }
 
-    return <Button onClick={toggle}>Setup 2FA</Button>;
+    return <Button onClick={toggle}>{t("setup_2fa")}</Button>;
   };
 
   if (twoFactorAuthQuery.isPending) {
@@ -286,14 +287,14 @@ const TwoFactorAuth = (): React.ReactNode => {
       <LoadingOverlay visible={doSetTwoFactorAuth.isPending} />
       <Stack gap="1rem">
         <Group gap="1rem">
-          <PrimaryText size="lg">Two Factor Authentication</PrimaryText>
+          <PrimaryText size="lg">{t("two_factor_authentication")}</PrimaryText>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
             <Badge color="var(--button-color-confirm)" maw={80}>
-              Enabled
+              {t("enabled")}
             </Badge>
           ) : (
             <Badge color="var(--button-color-destructive)" maw={85}>
-              Disabled
+              {t("disabled")}
             </Badge>
           )}
         </Group>
