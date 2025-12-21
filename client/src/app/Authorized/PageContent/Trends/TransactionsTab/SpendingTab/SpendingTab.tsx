@@ -17,12 +17,15 @@ import { ITransaction } from "~/models/transaction";
 import { useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const SpendingTab = (): React.ReactNode => {
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
     getDateFromMonthsAgo(1),
     initCurrentMonth(),
   ]);
+
+  const { t } = useTranslation();
 
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
@@ -75,7 +78,7 @@ const SpendingTab = (): React.ReactNode => {
           variant="primary"
           onClick={() => setSelectedMonths([])}
         >
-          Clear Selection
+          {t("clear_selection")}
         </Button>
       </Group>
       <SpendingChart

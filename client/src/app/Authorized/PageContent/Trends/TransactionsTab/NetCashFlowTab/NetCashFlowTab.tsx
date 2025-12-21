@@ -17,6 +17,7 @@ import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import NetCashFlowChart from "~/components/Charts/NetCashFlowChart/NetCashFlowChart";
 import { Button, Group, Stack } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 
 const NetCashFlowTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];
@@ -25,6 +26,8 @@ const NetCashFlowTab = (): React.ReactNode => {
     getDateFromMonthsAgo(1),
     initCurrentMonth(),
   ]);
+
+  const { t } = useTranslation();
 
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
@@ -89,7 +92,7 @@ const NetCashFlowTab = (): React.ReactNode => {
               }
             }}
           >
-            Last {months} Months
+            {t("last_n_months", { count: months })}
           </Button>
         ))}
         <Button
@@ -97,7 +100,7 @@ const NetCashFlowTab = (): React.ReactNode => {
           variant="primary"
           onClick={() => setSelectedMonths([])}
         >
-          Clear Selection
+          {t("clear_selection")}
         </Button>
       </Group>
       <NetCashFlowChart

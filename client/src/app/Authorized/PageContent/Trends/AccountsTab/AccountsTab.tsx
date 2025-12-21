@@ -4,8 +4,11 @@ import LiabilitiesTab from "./LiabilitiesTab/LiabilitiesTab";
 import NetWorthTab from "./NetWorthTab/NetWorthTab";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Card from "~/components/core/Card/Card";
+import { useTranslation } from "react-i18next";
 
 const AccountsTab = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   return (
     <Card mt="0.5rem" elevation={1}>
       <Tabs
@@ -16,13 +19,13 @@ const AccountsTab = (): React.ReactNode => {
       >
         <Tabs.List grow>
           <Tabs.Tab value="assets">
-            <PrimaryText size="sm">Assets</PrimaryText>
+            <PrimaryText size="sm">{t("assets")}</PrimaryText>
           </Tabs.Tab>
           <Tabs.Tab value="liabilities">
-            <PrimaryText size="sm">Liabilities</PrimaryText>
+            <PrimaryText size="sm">{t("liabilities")}</PrimaryText>
           </Tabs.Tab>
           <Tabs.Tab value="netWorth">
-            <PrimaryText size="sm">Net Worth</PrimaryText>
+            <PrimaryText size="sm">{t("net_worth")}</PrimaryText>
           </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="assets">
