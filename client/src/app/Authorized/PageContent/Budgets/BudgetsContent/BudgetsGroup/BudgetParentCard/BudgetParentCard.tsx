@@ -307,11 +307,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                           false,
                           userSettingsQuery.data?.currency ?? "USD"
                         ),
-                        total: convertNumberToCurrency(
-                          limit,
-                          false,
-                          userSettingsQuery.data?.currency ?? "USD"
-                        ),
                       }}
                       components={[
                         <PrimaryText className={classes.text} key="amount" />,

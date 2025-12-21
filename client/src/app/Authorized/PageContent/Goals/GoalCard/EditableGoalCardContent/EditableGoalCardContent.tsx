@@ -33,6 +33,7 @@ import { StatusColorType } from "~/helpers/budgets";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
+import { Trans, useTranslation } from "react-i18next";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -43,6 +44,7 @@ interface GoalCardContentProps {
 const EditableGoalCardContent = (
   props: GoalCardContentProps
 ): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const goalNameField = useField<string>({
@@ -143,7 +145,7 @@ const EditableGoalCardContent = (
       });
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Goal successfully marked as completed",
+        message: t("goal_successfully_marked_complete"),
       });
     },
     onError: (error: AxiosError) => {
@@ -167,7 +169,7 @@ const EditableGoalCardContent = (
       });
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: "Goal deleted successfully",
+        message: t("goal_deleted_successfully"),
       });
     },
     onError: (error: AxiosError) => {
@@ -186,7 +188,7 @@ const EditableGoalCardContent = (
     } else {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Invalid goal name",
+        message: t("invalid_goal_name"),
       });
     }
 
@@ -195,7 +197,7 @@ const EditableGoalCardContent = (
     } else {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Invalid target amount",
+        message: t("invalid_target_amount"),
       });
     }
 
@@ -204,7 +206,7 @@ const EditableGoalCardContent = (
     } else {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Invalid monthly contribution",
+        message: t("invalid_monthly_contribution"),
       });
     }
 
@@ -220,7 +222,7 @@ const EditableGoalCardContent = (
     } else {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Invalid target date",
+        message: t("invalid_target_date"),
       });
     }
 
@@ -231,6 +233,53 @@ const EditableGoalCardContent = (
 
     doEditGoal.mutate(newGoal);
   };
+
+  const totalEditComponent = (
+    <Flex
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <NumberInput
+        maw={100}
+        min={0}
+        prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+        thousandSeparator=","
+        {...goalTargetAmountField.getInputProps()}
+        onBlur={submitChanges}
+        elevation={1}
+      />
+    </Flex>
+  );
+
+  const monthlyTotalEditComponent = (
+    <Flex onClick={(e) => e.stopPropagation()}>
+      <NumberInput
+        size="sm"
+        maw={100}
+        min={0}
+        prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+        thousandSeparator=","
+        {...goalMonthlyContributionField.getInputProps()}
+        onBlur={submitChanges}
+        elevation={1}
+      />
+    </Flex>
+  );
+
+  const projectedDateEditComponent = (
+    <Flex
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <DateInput
+        className="h-8"
+        {...goalTargetDateField.getInputProps()}
+        onChange={submitTargetDateChanges}
+      />
+    </Flex>
+  );
 
   return (
     <>
@@ -253,11 +302,12 @@ const EditableGoalCardContent = (
               />
               {props.includeInterest && props.goal.interestRate && (
                 <Badge variant="light">
-                  {props.goal.interestRate.toLocaleString(undefined, {
-                    style: "percent",
-                    minimumFractionDigits: 2,
-                  })}{" "}
-                  APR
+                  {t("interest_rate_apr", {
+                    rate: props.goal.interestRate.toLocaleString(undefined, {
+                      style: "percent",
+                      minimumFractionDigits: 2,
+                    }),
+                  })}
                 </Badge>
               )}
               {/* This is an escape hatch in case the sync does not catch it */}
@@ -271,7 +321,7 @@ const EditableGoalCardContent = (
                   }}
                   loading={doCompleteGoal.isPending}
                 >
-                  Complete Goal
+                  {t("mark_as_complete")}
                 </Button>
               )}
               <ActionIcon
@@ -286,45 +336,49 @@ const EditableGoalCardContent = (
               </ActionIcon>
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
-              {userSettingsQuery.isPending ? null : (
-                <PrimaryText size="lg">
-                  {convertNumberToCurrency(
-                    sumAccountsTotalBalance(props.goal.accounts) -
-                      props.goal.initialAmount,
-                    false,
-                    userSettingsQuery.data?.currency ?? "USD"
-                  )}
-                </PrimaryText>
-              )}
-              <DimmedText size="md">of</DimmedText>
-              <Flex
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                {props.goal.amount !== 0 ? (
-                  <NumberInput
-                    maw={100}
-                    min={0}
-                    prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
-                    thousandSeparator=","
-                    {...goalTargetAmountField.getInputProps()}
-                    onBlur={submitChanges}
-                    elevation={1}
-                  />
-                ) : (
-                  <PrimaryText size="lg">
-                    {convertNumberToCurrency(
+              {props.goal.amount !== 0 ? (
+                <Trans
+                  i18nKey="budget_amount_fraction_editable_total_styled"
+                  values={{
+                    amount: convertNumberToCurrency(
+                      sumAccountsTotalBalance(props.goal.accounts) -
+                        props.goal.initialAmount,
+                      false,
+                      userSettingsQuery.data?.currency ?? "USD"
+                    ),
+                  }}
+                  components={[
+                    <PrimaryText size="lg" key="amount" />,
+                    <DimmedText size="sm" key="of" />,
+                    totalEditComponent,
+                  ]}
+                />
+              ) : (
+                <Trans
+                  i18nKey="budget_amount_fraction_styled"
+                  values={{
+                    amount: convertNumberToCurrency(
+                      sumAccountsTotalBalance(props.goal.accounts) -
+                        props.goal.initialAmount,
+                      false,
+                      userSettingsQuery.data?.currency ?? "USD"
+                    ),
+                    total: convertNumberToCurrency(
                       getGoalTargetAmount(
                         props.goal.amount,
                         props.goal.initialAmount
                       ),
                       false,
                       userSettingsQuery.data?.currency ?? "USD"
-                    )}
-                  </PrimaryText>
-                )}
-              </Flex>
+                    ),
+                  }}
+                  components={[
+                    <PrimaryText size="lg" key="amount" />,
+                    <DimmedText size="md" key="of" />,
+                    <PrimaryText size="lg" key="total" />,
+                  ]}
+                />
+              )}
             </Flex>
           </Flex>
           <Progress
@@ -338,71 +392,93 @@ const EditableGoalCardContent = (
           <Flex className={classes.footer}>
             <Group align="center" gap="sm">
               <Flex align="center" gap="0.25rem">
-                <DimmedText size="sm">{"Projected: "}</DimmedText>
                 {props.goal.isCompleteDateEditable ? (
-                  <Flex
-                    onClick={(e) => {
-                      e.stopPropagation();
+                  <Trans
+                    i18nKey="budget_projected_editable_styled"
+                    values={{
+                      amount: convertNumberToCurrency(
+                        sumAccountsTotalBalance(props.goal.accounts) -
+                          props.goal.initialAmount,
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD"
+                      ),
                     }}
-                  >
-                    <DateInput
-                      className="h-8"
-                      {...goalTargetDateField.getInputProps()}
-                      onChange={submitTargetDateChanges}
-                    />
-                  </Flex>
+                    components={[
+                      <DimmedText size="sm" key="label" />,
+                      projectedDateEditComponent,
+                    ]}
+                  />
                 ) : (
-                  <PrimaryText size="sm">
-                    {new Date(props.goal.completeDate).toLocaleDateString(
-                      "en-US",
-                      {
+                  <Trans
+                    i18nKey="budget_projected_styled"
+                    values={{
+                      amount: new Date(
+                        props.goal.completeDate
+                      ).toLocaleDateString(undefined, {
                         year: "numeric",
                         month: "long",
-                      }
-                    )}
-                  </PrimaryText>
+                      }),
+                    }}
+                    components={[
+                      <DimmedText size="sm" key="label" />,
+                      <PrimaryText size="sm" key="date-not-edit" />,
+                    ]}
+                  />
                 )}
               </Flex>
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
-              {userSettingsQuery.isPending ? null : (
-                <StatusText
-                  amount={props.goal.monthlyContributionProgress}
-                  total={props.goal.monthlyContribution}
-                  type={StatusColorType.Target}
-                  size="md"
-                >
-                  {convertNumberToCurrency(
-                    props.goal.monthlyContributionProgress,
-                    false,
-                    userSettingsQuery.data?.currency ?? "USD"
-                  )}
-                </StatusText>
-              )}
-              <DimmedText size="sm">of</DimmedText>
               {props.goal.isMonthlyContributionEditable ? (
-                <Flex onClick={(e) => e.stopPropagation()}>
-                  <NumberInput
-                    size="sm"
-                    maw={100}
-                    min={0}
-                    prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
-                    thousandSeparator=","
-                    {...goalMonthlyContributionField.getInputProps()}
-                    onBlur={submitChanges}
-                    elevation={1}
-                  />
-                </Flex>
-              ) : userSettingsQuery.isPending ? null : (
-                <PrimaryText size="md">
-                  {convertNumberToCurrency(
-                    props.goal.monthlyContribution,
-                    false,
-                    userSettingsQuery.data?.currency ?? "USD"
-                  )}
-                </PrimaryText>
+                <Trans
+                  i18nKey="budget_monthly_amount_fraction_editable_styled"
+                  values={{
+                    amount: convertNumberToCurrency(
+                      sumAccountsTotalBalance(props.goal.accounts) -
+                        props.goal.initialAmount,
+                      false,
+                      userSettingsQuery.data?.currency ?? "USD"
+                    ),
+                  }}
+                  components={[
+                    <StatusText
+                      amount={props.goal.monthlyContributionProgress}
+                      total={props.goal.monthlyContribution}
+                      type={StatusColorType.Target}
+                      size="md"
+                      key="amount"
+                    />,
+                    <DimmedText size="sm" key="of" />,
+                    monthlyTotalEditComponent,
+                  ]}
+                />
+              ) : (
+                <Trans
+                  i18nKey="budget_monthly_amount_fraction_styled"
+                  values={{
+                    amount: convertNumberToCurrency(
+                      props.goal.monthlyContributionProgress,
+                      false,
+                      userSettingsQuery.data?.currency ?? "USD"
+                    ),
+                    total: convertNumberToCurrency(
+                      props.goal.monthlyContribution,
+                      false,
+                      userSettingsQuery.data?.currency ?? "USD"
+                    ),
+                  }}
+                  components={[
+                    <StatusText
+                      amount={props.goal.monthlyContributionProgress}
+                      total={props.goal.monthlyContribution}
+                      type={StatusColorType.Target}
+                      size="md"
+                      key="amount"
+                    />,
+                    <DimmedText size="sm" key="of" />,
+                    <PrimaryText size="md" key="total-not-edit" />,
+                  ]}
+                />
               )}
-              <DimmedText size="sm">this month</DimmedText>
             </Flex>
           </Flex>
         </Stack>

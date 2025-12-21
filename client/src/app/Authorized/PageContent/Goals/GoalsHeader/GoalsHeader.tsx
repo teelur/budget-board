@@ -3,6 +3,7 @@ import classes from "./GoalsHeader.module.css";
 import { Button, Group } from "@mantine/core";
 import React from "react";
 import AddGoalModal from "./AddGoalModal/AddGoalModal";
+import { useTranslation } from "react-i18next";
 
 interface GoalsHeaderProps {
   includeInterest: boolean;
@@ -10,6 +11,7 @@ interface GoalsHeaderProps {
 }
 
 const GoalsHeader = (props: GoalsHeaderProps): React.ReactNode => {
+  const { t } = useTranslation();
   return (
     <Group className={classes.root}>
       <Button
@@ -21,7 +23,7 @@ const GoalsHeader = (props: GoalsHeaderProps): React.ReactNode => {
         }
         onClick={props.toggleIncludeInterest}
       >
-        Include Interest
+        {t("include_interest")}
       </Button>
       <AddGoalModal />
     </Group>

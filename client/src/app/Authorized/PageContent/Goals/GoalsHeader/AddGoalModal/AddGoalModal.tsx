@@ -8,11 +8,7 @@ import { useDisclosure } from "@mantine/hooks";
 import Modal from "~/components/core/Modal/Modal";
 import Select from "~/components/core/Select/Select/Select";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-
-const goalTypes: { label: string; value: string }[] = [
-  { label: "Grow my funds", value: GoalType.SaveGoal },
-  { label: "Pay off debt", value: GoalType.PayGoal },
-];
+import { useTranslation } from "react-i18next";
 
 const AddGoalModal = (): React.ReactNode => {
   const [selectedGoalType, setSelectedGoalType] = React.useState<string | null>(
@@ -20,6 +16,13 @@ const AddGoalModal = (): React.ReactNode => {
   );
 
   const [isOpen, { open, close }] = useDisclosure();
+
+  const { t } = useTranslation();
+
+  const goalTypes: { label: string; value: string }[] = [
+    { label: t("grow_my_funds"), value: GoalType.SaveGoal },
+    { label: t("pay_off_debt"), value: GoalType.PayGoal },
+  ];
 
   return (
     <>
@@ -29,11 +32,11 @@ const AddGoalModal = (): React.ReactNode => {
       <Modal
         opened={isOpen}
         onClose={close}
-        title={<PrimaryText size="md">Add Goal</PrimaryText>}
+        title={<PrimaryText size="md">{t("add_goal")}</PrimaryText>}
       >
         <Select
           data={goalTypes}
-          placeholder="I want to set a goal to..."
+          placeholder={t("i_want_to_set_a_goal_to")}
           value={selectedGoalType}
           onChange={(value) => setSelectedGoalType(value)}
           elevation={1}

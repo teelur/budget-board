@@ -17,6 +17,7 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import Progress from "~/components/core/Progress/Progress";
+import { Trans, useTranslation } from "react-i18next";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -25,6 +26,7 @@ interface GoalCardContentProps {
 }
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -51,11 +53,12 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             <PrimaryText size="lg">{props.goal.name}</PrimaryText>
             {props.includeInterest && props.goal.interestRate && (
               <Badge variant="light" flex="0 0 auto">
-                {props.goal.interestRate.toLocaleString(undefined, {
-                  style: "percent",
-                  minimumFractionDigits: 2,
-                })}{" "}
-                APR
+                {t("interest_rate_apr", {
+                  rate: props.goal.interestRate.toLocaleString(undefined, {
+                    style: "percent",
+                    minimumFractionDigits: 2,
+                  }),
+                })}
               </Badge>
             )}
             <ActionIcon
@@ -70,27 +73,30 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             </ActionIcon>
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
-            {userSettingsQuery.isPending ? null : (
-              <PrimaryText size="lg">
-                {convertNumberToCurrency(
+            <Trans
+              i18nKey="budget_amount_fraction_styled"
+              values={{
+                amount: convertNumberToCurrency(
                   sumAccountsTotalBalance(props.goal.accounts) -
                     props.goal.initialAmount,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
-                )}
-              </PrimaryText>
-            )}
-            <DimmedText size="md">of</DimmedText>
-            <PrimaryText size="lg">
-              {convertNumberToCurrency(
-                getGoalTargetAmount(
-                  props.goal.amount,
-                  props.goal.initialAmount
                 ),
-                false,
-                userSettingsQuery.data?.currency ?? "USD"
-              )}
-            </PrimaryText>
+                total: convertNumberToCurrency(
+                  getGoalTargetAmount(
+                    props.goal.amount,
+                    props.goal.initialAmount
+                  ),
+                  false,
+                  userSettingsQuery.data?.currency ?? "USD"
+                ),
+              }}
+              components={[
+                <PrimaryText size="lg" key="amount" />,
+                <DimmedText size="md" key="of" />,
+                <PrimaryText size="lg" key="total" />,
+              ]}
+            />
           </Flex>
         </Flex>
         <Progress
@@ -104,41 +110,51 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
         <Flex className={classes.footer}>
           <Group align="center" gap="sm">
             <Flex align="center" gap="0.25rem">
-              <DimmedText size="sm">{"Projected: "}</DimmedText>
-              <PrimaryText size="sm">
-                {new Date(props.goal.completeDate).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                })}
-              </PrimaryText>
+              <Trans
+                i18nKey="budget_projected_styled"
+                values={{
+                  amount: new Date(props.goal.completeDate).toLocaleDateString(
+                    undefined,
+                    {
+                      year: "numeric",
+                      month: "long",
+                    }
+                  ),
+                }}
+                components={[
+                  <DimmedText size="sm" key="label" />,
+                  <PrimaryText size="sm" key="date-not-edit" />,
+                ]}
+              />
             </Flex>
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
-            {userSettingsQuery.isPending ? null : (
-              <StatusText
-                amount={props.goal.monthlyContributionProgress}
-                total={props.goal.monthlyContribution}
-                type={StatusColorType.Target}
-                size="md"
-              >
-                {convertNumberToCurrency(
+            <Trans
+              i18nKey="budget_monthly_amount_fraction_styled"
+              values={{
+                amount: convertNumberToCurrency(
                   props.goal.monthlyContributionProgress,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
-                )}
-              </StatusText>
-            )}
-            <DimmedText size="sm">of</DimmedText>
-            {userSettingsQuery.isPending ? null : (
-              <PrimaryText size="md">
-                {convertNumberToCurrency(
+                ),
+                total: convertNumberToCurrency(
                   props.goal.monthlyContribution,
                   false,
                   userSettingsQuery.data?.currency ?? "USD"
-                )}
-              </PrimaryText>
-            )}
-            <DimmedText size="sm">this month</DimmedText>
+                ),
+              }}
+              components={[
+                <StatusText
+                  amount={props.goal.monthlyContributionProgress}
+                  total={props.goal.monthlyContribution}
+                  type={StatusColorType.Target}
+                  size="md"
+                  key="amount"
+                />,
+                <DimmedText size="sm" key="of" />,
+                <PrimaryText size="md" key="total-not-edit" />,
+              ]}
+            />
           </Flex>
         </Flex>
       </Stack>
