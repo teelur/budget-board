@@ -48,16 +48,22 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
       100
   );
 
-  // Extract common values
   const currency = userSettingsQuery.data?.currency ?? "USD";
   const warningThreshold = userSettingsQuery.data?.budgetWarningThreshold ?? 80;
-  const signedAmount = props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
-  
-  // Convert amounts to currency strings
-  const formattedAmount = convertNumberToCurrency(signedAmount, false, currency);
-  const formattedTotal = convertNumberToCurrency(props.total ?? 0, false, currency);
+  const signedAmount =
+    props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
 
-  // Common StatusText component props
+  const formattedAmount = convertNumberToCurrency(
+    signedAmount,
+    false,
+    currency
+  );
+  const formattedTotal = convertNumberToCurrency(
+    props.total ?? 0,
+    false,
+    currency
+  );
+
   const statusTextProps = {
     amount: props.amount,
     total: props.total ?? 0,
@@ -67,11 +73,10 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     key: "amount",
   };
 
-  // Build Trans component based on whether total exists
-  const i18nKey = props.total 
-    ? "budget_amount_fraction_styled" 
+  const i18nKey = props.total
+    ? "budget_amount_fraction_styled"
     : "budget_amount_fraction_no_total_styled";
-  
+
   const transValues = props.total
     ? { amount: formattedAmount, total: formattedTotal }
     : { amount: formattedAmount };
