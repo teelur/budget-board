@@ -58,6 +58,7 @@
   "before": "Before",
   "both_income_and_expense_values_present_message": "Both income and expense values are present for row {{uid}}.",
   "budget_amount_fraction_editable_total_styled": "<0>{{amount}}</0> <1>of</1> <2 />",
+  "budget_amount_fraction_no_total_styled": "<0>{{amount}}</0>",
   "budget_amount_fraction_styled": "<0>{{amount}}</0> <1>of</1> <2>{{total}}</2>",
   "budget_copy_failed_message": "There was an error copying the previous month's budget.",
   "budget_details": "Budget Details",

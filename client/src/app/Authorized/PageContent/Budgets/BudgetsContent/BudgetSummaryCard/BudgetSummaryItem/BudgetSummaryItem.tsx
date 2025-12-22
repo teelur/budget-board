@@ -66,36 +66,66 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
           />
         ) : null}
         <Flex gap="0.25rem" align="baseline">
-          <Trans
-            i18nKey="budget_amount_fraction_styled"
-            values={{
-              amount: convertNumberToCurrency(
-                props.amount *
-                  (props.budgetValueType === StatusColorType.Expense ? -1 : 1),
-                false,
-                userSettingsQuery.data?.currency ?? "USD"
-              ),
-              total: convertNumberToCurrency(
-                props.total ?? 0,
-                false,
-                userSettingsQuery.data?.currency ?? "USD"
-              ),
-            }}
-            components={[
-              <StatusText
-                amount={props.amount}
-                total={props.total ?? 0}
-                type={props.budgetValueType}
-                warningThreshold={
-                  userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                }
-                size="md"
-                key="amount"
-              />,
-              <DimmedText size="sm" key="of" />,
-              <PrimaryText size="md" key="total" />,
-            ]}
-          />
+          {props.total ? (
+            <Trans
+              i18nKey="budget_amount_fraction_styled"
+              values={{
+                amount: convertNumberToCurrency(
+                  props.amount *
+                    (props.budgetValueType === StatusColorType.Expense
+                      ? -1
+                      : 1),
+                  false,
+                  userSettingsQuery.data?.currency ?? "USD"
+                ),
+                total: convertNumberToCurrency(
+                  props.total ?? 0,
+                  false,
+                  userSettingsQuery.data?.currency ?? "USD"
+                ),
+              }}
+              components={[
+                <StatusText
+                  amount={props.amount}
+                  total={props.total ?? 0}
+                  type={props.budgetValueType}
+                  warningThreshold={
+                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                  }
+                  size="md"
+                  key="amount"
+                />,
+                <DimmedText size="sm" key="of" />,
+                <PrimaryText size="md" key="total" />,
+              ]}
+            />
+          ) : (
+            <Trans
+              i18nKey="budget_amount_fraction_no_total_styled"
+              values={{
+                amount: convertNumberToCurrency(
+                  props.amount *
+                    (props.budgetValueType === StatusColorType.Expense
+                      ? -1
+                      : 1),
+                  false,
+                  userSettingsQuery.data?.currency ?? "USD"
+                ),
+              }}
+              components={[
+                <StatusText
+                  amount={props.amount}
+                  total={props.total ?? 0}
+                  type={props.budgetValueType}
+                  warningThreshold={
+                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                  }
+                  size="md"
+                  key="amount"
+                />,
+              ]}
+            />
+          )}
         </Flex>
       </Group>
       {!props.hideProgress && (props.total ?? 0) > 0 && (
