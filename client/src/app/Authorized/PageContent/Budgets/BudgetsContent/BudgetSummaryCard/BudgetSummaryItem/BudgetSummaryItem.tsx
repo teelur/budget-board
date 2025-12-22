@@ -48,6 +48,42 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
       100
   );
 
+  // Extract common values
+  const currency = userSettingsQuery.data?.currency ?? "USD";
+  const warningThreshold = userSettingsQuery.data?.budgetWarningThreshold ?? 80;
+  const signedAmount = props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
+  
+  // Convert amounts to currency strings
+  const formattedAmount = convertNumberToCurrency(signedAmount, false, currency);
+  const formattedTotal = convertNumberToCurrency(props.total ?? 0, false, currency);
+
+  // Common StatusText component props
+  const statusTextProps = {
+    amount: props.amount,
+    total: props.total ?? 0,
+    type: props.budgetValueType,
+    warningThreshold,
+    size: "md" as const,
+    key: "amount",
+  };
+
+  // Build Trans component based on whether total exists
+  const i18nKey = props.total 
+    ? "budget_amount_fraction_styled" 
+    : "budget_amount_fraction_no_total_styled";
+  
+  const transValues = props.total
+    ? { amount: formattedAmount, total: formattedTotal }
+    : { amount: formattedAmount };
+
+  const transComponents = props.total
+    ? [
+        <StatusText {...statusTextProps} />,
+        <DimmedText size="sm" key="of" />,
+        <PrimaryText size="md" key="total" />,
+      ]
+    : [<StatusText {...statusTextProps} />];
+
   return (
     <Stack gap={0}>
       <Group
@@ -66,66 +102,11 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
           />
         ) : null}
         <Flex gap="0.25rem" align="baseline">
-          {props.total ? (
-            <Trans
-              i18nKey="budget_amount_fraction_styled"
-              values={{
-                amount: convertNumberToCurrency(
-                  props.amount *
-                    (props.budgetValueType === StatusColorType.Expense
-                      ? -1
-                      : 1),
-                  false,
-                  userSettingsQuery.data?.currency ?? "USD"
-                ),
-                total: convertNumberToCurrency(
-                  props.total ?? 0,
-                  false,
-                  userSettingsQuery.data?.currency ?? "USD"
-                ),
-              }}
-              components={[
-                <StatusText
-                  amount={props.amount}
-                  total={props.total ?? 0}
-                  type={props.budgetValueType}
-                  warningThreshold={
-                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                  }
-                  size="md"
-                  key="amount"
-                />,
-                <DimmedText size="sm" key="of" />,
-                <PrimaryText size="md" key="total" />,
-              ]}
-            />
-          ) : (
-            <Trans
-              i18nKey="budget_amount_fraction_no_total_styled"
-              values={{
-                amount: convertNumberToCurrency(
-                  props.amount *
-                    (props.budgetValueType === StatusColorType.Expense
-                      ? -1
-                      : 1),
-                  false,
-                  userSettingsQuery.data?.currency ?? "USD"
-                ),
-              }}
-              components={[
-                <StatusText
-                  amount={props.amount}
-                  total={props.total ?? 0}
-                  type={props.budgetValueType}
-                  warningThreshold={
-                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                  }
-                  size="md"
-                  key="amount"
-                />,
-              ]}
-            />
-          )}
+          <Trans
+            i18nKey={i18nKey}
+            values={transValues}
+            components={transComponents}
+          />
         </Flex>
       </Group>
       {!props.hideProgress && (props.total ?? 0) > 0 && (
@@ -139,9 +120,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
               ? ProgressType.Income
               : ProgressType.Expense
           }
-          warningThreshold={
-            userSettingsQuery.data?.budgetWarningThreshold ?? 80
-          }
+          warningThreshold={warningThreshold}
           elevation={2}
         />
       )}
