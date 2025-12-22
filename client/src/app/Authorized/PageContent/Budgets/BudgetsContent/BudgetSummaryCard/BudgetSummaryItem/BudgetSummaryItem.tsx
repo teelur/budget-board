@@ -48,6 +48,46 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
       100
   );
 
+  const currency = userSettingsQuery.data?.currency ?? "USD";
+  const warningThreshold = userSettingsQuery.data?.budgetWarningThreshold ?? 80;
+  const signedAmount =
+    props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
+
+  const formattedAmount = convertNumberToCurrency(
+    signedAmount,
+    false,
+    currency
+  );
+  const formattedTotal = convertNumberToCurrency(
+    props.total ?? 0,
+    false,
+    currency
+  );
+
+  const statusTextProps = {
+    amount: props.amount,
+    total: props.total ?? 0,
+    type: props.budgetValueType,
+    warningThreshold,
+    size: "md" as const,
+  };
+
+  const i18nKey = props.total
+    ? "budget_amount_fraction_styled"
+    : "budget_amount_fraction_no_total_styled";
+
+  const transValues = props.total
+    ? { amount: formattedAmount, total: formattedTotal }
+    : { amount: formattedAmount };
+
+  const transComponents = props.total
+    ? [
+        <StatusText {...statusTextProps} key="amount" />,
+        <DimmedText size="sm" key="of" />,
+        <PrimaryText size="md" key="total" />,
+      ]
+    : [<StatusText {...statusTextProps} key="amount" />];
+
   return (
     <Stack gap={0}>
       <Group
@@ -67,34 +107,9 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         ) : null}
         <Flex gap="0.25rem" align="baseline">
           <Trans
-            i18nKey="budget_amount_fraction_styled"
-            values={{
-              amount: convertNumberToCurrency(
-                props.amount *
-                  (props.budgetValueType === StatusColorType.Expense ? -1 : 1),
-                false,
-                userSettingsQuery.data?.currency ?? "USD"
-              ),
-              total: convertNumberToCurrency(
-                props.total ?? 0,
-                false,
-                userSettingsQuery.data?.currency ?? "USD"
-              ),
-            }}
-            components={[
-              <StatusText
-                amount={props.amount}
-                total={props.total ?? 0}
-                type={props.budgetValueType}
-                warningThreshold={
-                  userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                }
-                size="md"
-                key="amount"
-              />,
-              <DimmedText size="sm" key="of" />,
-              <PrimaryText size="md" key="total" />,
-            ]}
+            i18nKey={i18nKey}
+            values={transValues}
+            components={transComponents}
           />
         </Flex>
       </Group>
@@ -109,9 +124,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
               ? ProgressType.Income
               : ProgressType.Expense
           }
-          warningThreshold={
-            userSettingsQuery.data?.budgetWarningThreshold ?? 80
-          }
+          warningThreshold={warningThreshold}
           elevation={2}
         />
       )}
