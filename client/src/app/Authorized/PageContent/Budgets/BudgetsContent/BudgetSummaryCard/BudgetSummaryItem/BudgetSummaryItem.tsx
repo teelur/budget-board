@@ -70,7 +70,6 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     type: props.budgetValueType,
     warningThreshold,
     size: "md" as const,
-    key: "amount",
   };
 
   const i18nKey = props.total
@@ -83,11 +82,11 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
 
   const transComponents = props.total
     ? [
-        <StatusText {...statusTextProps} />,
+        <StatusText {...statusTextProps} key="amount" />,
         <DimmedText size="sm" key="of" />,
         <PrimaryText size="md" key="total" />,
       ]
-    : [<StatusText {...statusTextProps} />];
+    : [<StatusText {...statusTextProps} key="amount" />];
 
   return (
     <Stack gap={0}>
