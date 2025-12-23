@@ -39,6 +39,7 @@ public class UserSettingsResponse : IUserSettingsResponse
 public interface IUserSettingsUpdateRequest
 {
     public string? Currency { get; }
+    public string? Language { get; }
     public int? BudgetWarningThreshold { get; }
     public int? ForceSyncLookbackMonths { get; }
     public bool? DisableBuiltInTransactionCategories { get; }
@@ -48,6 +49,7 @@ public interface IUserSettingsUpdateRequest
 public class UserSettingsUpdateRequest() : IUserSettingsUpdateRequest
 {
     public string? Currency { get; set; } = null;
+    public string? Language { get; set; } = null;
     public int? BudgetWarningThreshold { get; set; } = null;
     public int? ForceSyncLookbackMonths { get; set; } = null;
     public bool? DisableBuiltInTransactionCategories { get; set; } = null;

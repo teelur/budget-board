@@ -295,7 +295,11 @@ app.UseCors(MyAllowSpecificOrigins);
 var supportedCultures = new[] { "en-US" };
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
-    .AddSupportedCultures(supportedCultures);
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+// Insert custom user language provider at the beginning of the list
+localizationOptions.RequestCultureProviders.Insert(0, new UserLanguageCultureProvider());
 
 app.UseRequestLocalization(localizationOptions);
 
