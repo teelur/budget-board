@@ -114,6 +114,7 @@ public class UserSettingsServiceTests
         helper.UserDataContext.SaveChanges();
 
         var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
+        userSettingsUpdateRequest.Language = "en-US";
         userSettingsUpdateRequest.DisableBuiltInTransactionCategories = true;
         userSettingsUpdateRequest.BudgetWarningThreshold = 50;
         userSettingsUpdateRequest.ForceSyncLookbackMonths = 6;
