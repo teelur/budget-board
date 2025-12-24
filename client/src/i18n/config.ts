@@ -24,7 +24,7 @@ i18n
 
     // Enables useful output in the browser’s
     // dev console.
-    debug: true,
+    debug: false,
 
     // Load fallback language
     load: "all",
