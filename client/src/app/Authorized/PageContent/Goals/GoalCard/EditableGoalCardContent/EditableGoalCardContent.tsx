@@ -446,7 +446,9 @@ const EditableGoalCardContent = (
                       elevation={1}
                     />
                   </Flex>
-                  <DimmedText size="sm">{t("this_month")}</DimmedText>
+                  <DimmedText size="sm">
+                    {t("editable_amount_fraction_this_month")}
+                  </DimmedText>
                 </>
               ) : (
                 <Trans
