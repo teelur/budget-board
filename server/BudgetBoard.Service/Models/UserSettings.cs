@@ -6,6 +6,7 @@ namespace BudgetBoard.Service.Models;
 public interface IUserSettingsResponse
 {
     string Currency { get; }
+    string Language { get; }
     int BudgetWarningThreshold { get; }
     int ForceSyncLookbackMonths { get; }
     bool DisableBuiltInTransactionCategories { get; }
@@ -14,6 +15,7 @@ public interface IUserSettingsResponse
 public class UserSettingsResponse : IUserSettingsResponse
 {
     public string Currency { get; set; }
+    public string Language { get; set; }
     public int BudgetWarningThreshold { get; set; }
     public int ForceSyncLookbackMonths { get; set; }
     public bool DisableBuiltInTransactionCategories { get; set; }
@@ -22,6 +24,7 @@ public class UserSettingsResponse : IUserSettingsResponse
     public UserSettingsResponse()
     {
         Currency = "USD";
+        Language = "default";
         BudgetWarningThreshold = 80;
         ForceSyncLookbackMonths = 0;
         DisableBuiltInTransactionCategories = false;
@@ -30,6 +33,7 @@ public class UserSettingsResponse : IUserSettingsResponse
     public UserSettingsResponse(UserSettings userSettings)
     {
         Currency = userSettings.Currency.ToString();
+        Language = userSettings.Language.ToString();
         BudgetWarningThreshold = userSettings.BudgetWarningThreshold;
         ForceSyncLookbackMonths = userSettings.ForceSyncLookbackMonths;
         DisableBuiltInTransactionCategories = userSettings.DisableBuiltInTransactionCategories;

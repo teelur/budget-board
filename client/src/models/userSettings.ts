@@ -1,5 +1,6 @@
 export interface IUserSettings {
   currency: string;
+  language: string;
   budgetWarningThreshold: number;
   forceSyncLookbackMonths: number;
   disableBuiltInTransactionCategories: boolean;
@@ -7,20 +8,18 @@ export interface IUserSettings {
 
 export interface IUserSettingsUpdateRequest {
   currency?: string;
+  language?: string;
   budgetWarningThreshold?: number;
   forceSyncLookbackMonths?: number;
   disableBuiltInTransactionCategories?: boolean;
 }
 
-export enum Currency {
-  USD = "USD",
-  EUR = "EUR",
-  GBP = "GBP",
-  JPY = "JPY",
-  AUD = "AUD",
-  CAD = "CAD",
-  CHF = "CHF",
-  CNY = "CNY",
-  SEK = "SEK",
-  NZD = "NZD",
+export class LanguageItem {
+  value: string = "";
+  label: string = "";
 }
+
+export const Languages: LanguageItem[] = [
+  { value: "default", label: "system_default" },
+  { value: "en-us", label: "en_us" },
+];

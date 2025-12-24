@@ -22,7 +22,7 @@ public enum Currency
 public static class SupportedLanguages
 {
     public const string SystemDefault = "default";
-    public const string EnglishUnitedStates = "en-US";
+    public const string EnglishUnitedStates = "en-us";
     public static List<string> AllLanguages { get; } = [SystemDefault, EnglishUnitedStates];
 }
 

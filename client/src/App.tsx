@@ -32,6 +32,7 @@ import {
   borderEggshell,
   textEggshellDimmed,
 } from "./shared/colors";
+import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
 
 // Your theme configuration is merged with default theme
 const theme = createTheme({
@@ -162,36 +163,38 @@ function App() {
     >
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <Notifications />
-          <BrowserRouter>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <UnauthorizedRoute>
-                    <Welcome />
-                  </UnauthorizedRoute>
-                }
-              />
-              <Route
-                path="/oidc-callback"
-                element={
-                  <UnauthorizedRoute>
-                    <OidcCallback />
-                  </UnauthorizedRoute>
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <AuthorizedRoute>
-                    <Authorized />
-                  </AuthorizedRoute>
-                }
-              />
-            </Routes>
-          </BrowserRouter>
-          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          <UserSettingsProvider>
+            <Notifications />
+            <BrowserRouter>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <UnauthorizedRoute>
+                      <Welcome />
+                    </UnauthorizedRoute>
+                  }
+                />
+                <Route
+                  path="/oidc-callback"
+                  element={
+                    <UnauthorizedRoute>
+                      <OidcCallback />
+                    </UnauthorizedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <AuthorizedRoute>
+                      <Authorized />
+                    </AuthorizedRoute>
+                  }
+                />
+              </Routes>
+            </BrowserRouter>
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          </UserSettingsProvider>
         </QueryClientProvider>
       </AuthProvider>
     </MantineProvider>

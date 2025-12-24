@@ -5,6 +5,7 @@ using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -61,6 +62,31 @@ public class UserSettingsController(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
                 userSettingsUpdateRequest
             );
+
+            // If language was updated, apply it to the current request context
+            if (
+                userSettingsUpdateRequest.Language != null
+                && userSettingsUpdateRequest.Language != "default"
+            )
+            {
+                var culture = new System.Globalization.CultureInfo(
+                    userSettingsUpdateRequest.Language
+                );
+                HttpContext.Features.Set<IRequestCultureFeature>(
+                    new RequestCultureFeature(new RequestCulture(culture), null)
+                );
+
+                _logger.LogInformation(
+                    "{LogMessage}",
+                    _logLocalizer[
+                        "SettingCurrentLocaleLog",
+                        $"{culture.Name} ({culture.DisplayName})"
+                    ]
+                );
+                System.Globalization.CultureInfo.CurrentCulture = culture;
+                System.Globalization.CultureInfo.CurrentUICulture = culture;
+            }
+
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)

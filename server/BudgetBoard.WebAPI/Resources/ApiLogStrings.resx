@@ -199,4 +199,7 @@
   <data name="AddingLoginErrorLog" xml:space="preserve">
     <value>Failed to add an external login to user {0}: {1}</value>
   </data>
+  <data name="SettingCurrentLocaleLog" xml:space="preserve">
+    <value>Setting current locale to '{0}'</value>
+  </data>
 </root>

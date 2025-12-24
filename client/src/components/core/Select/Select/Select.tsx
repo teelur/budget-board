@@ -7,7 +7,7 @@ export interface SelectProps extends MantineSelectProps {
   elevation?: number;
 }
 
-const Select = ({ elevation = 0, ...props }: SelectProps): React.ReactNode => {
+const Select = ({ elevation, ...props }: SelectProps): React.ReactNode => {
   switch (elevation) {
     case 0:
       return <BaseSelect {...props} />;
