@@ -71,7 +71,12 @@ const UserSettings = (): React.ReactNode => {
     if (userSettingsQuery.data?.language) {
       languageField.setValue(userSettingsQuery.data.language);
     }
-  }, [userSettingsQuery.data?.currency, userSettingsQuery.data?.language]);
+  }, [
+    userSettingsQuery.data?.currency,
+    userSettingsQuery.data?.language,
+    currencyField.setValue,
+    languageField.setValue,
+  ]);
 
   return (
     <Card elevation={1}>

@@ -51,7 +51,7 @@ export const UserSettingsProvider = ({
         i18n.changeLanguage(userSettingsQuery.data.language);
       }
     }
-  }, [userSettingsQuery.data?.language]);
+  }, [userSettingsQuery.data?.language, i18n]);
 
   const userSettingsValue: UserSettingsContextValue = {
     preferredCurrency: userSettingsQuery.data?.currency ?? "USD",
