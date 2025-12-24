@@ -15,6 +15,9 @@ i18n
   .init({
     // Config options
 
+    // Detect user's language from browser
+    lng: typeof window !== "undefined" ? window.navigator.language : "en-us",
+
     // Fallback locale used when a translation is
     // missing in the active locale.
     fallbackLng: "en-us",
