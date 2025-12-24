@@ -21,13 +21,26 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 
 #### Data Aggregation
 
+- Manage your financial accounts and assets in one place.
 - Automatically sync your bank account data (accounts, transactions, balances) with [SimpleFIN](https://www.simplefin.org/).
 - Import transactions via CSV files.
-- Manually add accounts and transactions.
+- Manually add accounts, assets and transactions.
 
 #### Dashboard View
 
-- Dashboard to view account data at a glance
+- Dashboard to view data at a glance
+
+#### Accounts View
+
+- View all your financial accounts in one place.
+- View account balances and recent transactions.
+- Update account balances manually or via sync with SimpleFIN.
+
+#### Assets View
+
+- View all your assets in one place.
+- View asset values and recent changes.
+- Update asset values manually.
 
 #### Transactions View
 
@@ -62,10 +75,16 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 - [Have any feedback?](https://github.com/teelur/budget-board/discussions/categories/feedback)
 - [Have a question?](https://github.com/teelur/budget-board/discussions/categories/q-a)
 
+### Translations
+
+- Help translate Budget Board into other languages at [Weblate](https://hosted.weblate.org/projects/budget-board/).
+
 ### Screenshots
 
-<img width="45%" alt="dash" src="img/budget-board-dashboard.png" />
-<img width="45%" alt="dash" src="img/budget-board-transactions.png" />
-<img width="45%" alt="dash" src="img/budget-board-budgets.png" />
-<img width="45%" alt="dash" src="img/budget-board-goals.png" />
-<img width="45%" alt="dash" src="img/budget-board-charts.png" />
+<img width="45%" alt="dashboard" src="img/budget-board-dashboard.png" />
+<img width="45%" alt="accounts" src="img/budget-board-accounts.png" />
+<img width="45%" alt="assets" src="img/budget-board-assets.png" />
+<img width="45%" alt="transactions" src="img/budget-board-transactions.png" />
+<img width="45%" alt="budgets" src="img/budget-board-budgets.png" />
+<img width="45%" alt="goals" src="img/budget-board-goals.png" />
+<img width="45%" alt="trends" src="img/budget-board-trends.png" />
