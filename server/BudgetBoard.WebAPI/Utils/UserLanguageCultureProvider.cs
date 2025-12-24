@@ -3,6 +3,7 @@ using BudgetBoard.Database.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.WebAPI.Utils;
 
@@ -49,8 +50,17 @@ public class UserLanguageCultureProvider : RequestCultureProvider
                 return new ProviderCultureResult(userSettings.Language);
             }
         }
-        catch
+        catch (Exception ex)
         {
+            var logger = httpContext.RequestServices.GetService<
+                ILogger<UserLanguageCultureProvider>
+            >();
+            logger?.LogError(
+                ex,
+                "Error determining culture from user settings for user {UserId}",
+                userId
+            );
+
             // If there's any error reading the database, fall through to the next provider
         }
 
