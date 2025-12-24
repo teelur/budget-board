@@ -363,7 +363,6 @@
   "system_default": "System Default",
   "target_amount": "Target Amount",
   "then": "Then",
-  "this month": "this month",
   "to": "to",
   "total": "Total",
   "transaction_import_columns_required_message": "At least one of Date, Merchant Name, Category, or Amount columns are required.",
