@@ -69,20 +69,35 @@ public class UserSettingsController(
                 && userSettingsUpdateRequest.Language != "default"
             )
             {
-                var culture = new System.Globalization.CultureInfo(
-                    userSettingsUpdateRequest.Language
-                );
-                _logger.LogInformation(
-                    "{LogMessage}",
-                    _logLocalizer[
-                        "SettingCurrentLocaleLog",
-                        $"{culture.Name} ({culture.DisplayName})"
-                    ]
-                );
+                try
+                {
+                    var culture = new System.Globalization.CultureInfo(
+                        userSettingsUpdateRequest.Language
+                    );
+                    _logger.LogInformation(
+                        "{LogMessage}",
+                        _logLocalizer[
+                            "SettingCurrentLocaleLog",
+                            $"{culture.Name} ({culture.DisplayName})"
+                        ]
+                    );
 
-                HttpContext.Features.Set<IRequestCultureFeature>(
-                    new RequestCultureFeature(new RequestCulture(culture), null)
-                );
+                    HttpContext.Features.Set<IRequestCultureFeature>(
+                        new RequestCultureFeature(new RequestCulture(culture), null)
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "{LogMessage}",
+                        _logLocalizer[
+                            "SettingCurrentLocaleErrorLog",
+                            userSettingsUpdateRequest.Language
+                        ]
+                    );
+                    return Helpers.BuildErrorResponse(_responseLocalizer["InvalidLanguageError"]);
+                }
             }
 
             return Ok();

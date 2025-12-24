@@ -202,4 +202,7 @@
   <data name="SettingCurrentLocaleLog" xml:space="preserve">
     <value>Setting current locale to '{0}'</value>
   </data>
+  <data name="SettingCurrentLocaleErrorLog" xml:space="preserve">
+    <value>Error setting current locale to '{0}'</value>
+    </data>
 </root>

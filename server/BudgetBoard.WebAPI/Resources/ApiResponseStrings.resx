@@ -109,4 +109,7 @@
   <data name="EndpointNotFoundError" xml:space="preserve">
     <value>Could not find the endpoint named '{0}'.</value>
   </data>
+  <data name="InvalidLanguageError" xml:space="preserve">
+    <value>The specified language '{0}' is not supported.</value>
+  </data>
 </root>
