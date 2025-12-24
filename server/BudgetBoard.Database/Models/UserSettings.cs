@@ -19,6 +19,13 @@ public enum Currency
     NZD, // New Zealand Dollar
 }
 
+public static class SupportedLanguages
+{
+    public const string SystemDefault = "default";
+    public const string EnglishUnitedStates = "en-us";
+    public static List<string> AllLanguages { get; } = [SystemDefault, EnglishUnitedStates];
+}
+
 public class UserSettings
 {
     /// <summary>
@@ -30,6 +37,11 @@ public class UserSettings
     /// The preferred currency code for the user.
     /// </summary>
     public string Currency { get; set; } = "USD";
+
+    /// <summary>
+    /// Gets or sets the language used for the user.
+    /// </summary>
+    public string Language { get; set; } = "default";
 
     /// <summary>
     /// The percentage threshold for budget warnings.

@@ -32,6 +32,7 @@ import {
   borderEggshell,
   textEggshellDimmed,
 } from "./shared/colors";
+import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
 
 // Your theme configuration is merged with default theme
 const theme = createTheme({
@@ -185,7 +186,9 @@ function App() {
                 path="/dashboard"
                 element={
                   <AuthorizedRoute>
-                    <Authorized />
+                    <UserSettingsProvider>
+                      <Authorized />
+                    </UserSettingsProvider>
                   </AuthorizedRoute>
                 }
               />

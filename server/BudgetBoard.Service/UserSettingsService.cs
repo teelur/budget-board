@@ -67,6 +67,22 @@ public class UserSettingsService(
             userSettings.Currency = request.Currency;
         }
 
+        if (request.Language != null)
+        {
+            var isValidLanguage = SupportedLanguages.AllLanguages.Contains(
+                request.Language.ToLower()
+            );
+            if (!isValidLanguage)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["InvalidLanguageCodeLog"]);
+                throw new BudgetBoardServiceException(
+                    _responseLocalizer["InvalidLanguageCodeError"]
+                );
+            }
+
+            userSettings.Language = request.Language.ToLower();
+        }
+
         if (request.BudgetWarningThreshold != null)
         {
             if (request.BudgetWarningThreshold < 0 || request.BudgetWarningThreshold > 100)

@@ -313,6 +313,9 @@
   <data name="InvalidCurrencyCodeLog" xml:space="preserve">
     <value>Attempted to update user settings with an invalid currency code.</value>
   </data>
+  <data name="InvalidLanguageCodeLog" xml:space="preserve">
+    <value>Attempted to update user settings with an invalid language code.</value>
+  </data>
   <data name="InvalidBudgetWarningThresholdLog" xml:space="preserve">
     <value>Attempted to update user settings with an invalid budget threshold value.</value>
   </data>

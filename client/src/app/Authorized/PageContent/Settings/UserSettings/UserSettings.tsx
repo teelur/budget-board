@@ -7,9 +7,10 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
-  Currency,
   IUserSettings,
   IUserSettingsUpdateRequest,
+  LanguageItem,
+  Languages,
 } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -18,6 +19,9 @@ import { useTranslation } from "react-i18next";
 
 const UserSettings = (): React.ReactNode => {
   const currencyField = useField({
+    initialValue: "",
+  });
+  const languageField = useField({
     initialValue: "",
   });
 
@@ -49,7 +53,8 @@ const UserSettings = (): React.ReactNode => {
         data: updatedUserSettings,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      // Need to explicitly refetch to get updated settings
+      await queryClient.refetchQueries({ queryKey: ["userSettings"] });
     },
     onError: (error: any) => {
       notifications.show({
@@ -60,10 +65,18 @@ const UserSettings = (): React.ReactNode => {
   });
 
   React.useEffect(() => {
-    if (userSettingsQuery.data) {
+    if (userSettingsQuery.data?.currency) {
       currencyField.setValue(userSettingsQuery.data.currency);
     }
-  }, [userSettingsQuery.data]);
+    if (userSettingsQuery.data?.language) {
+      languageField.setValue(userSettingsQuery.data.language);
+    }
+  }, [
+    userSettingsQuery.data?.currency,
+    userSettingsQuery.data?.language,
+    currencyField.setValue,
+    languageField.setValue,
+  ]);
 
   return (
     <Card elevation={1}>
@@ -74,24 +87,45 @@ const UserSettings = (): React.ReactNode => {
           {userSettingsQuery.isPending ? (
             <Skeleton h={60} radius="md" />
           ) : (
-            <Select
-              label={
-                <PrimaryText size="sm">{t("preferred_currency")}</PrimaryText>
-              }
-              placeholder={t("select_currency")}
-              searchable
-              nothingFoundMessage={t("no_currencies_found")}
-              data={Intl.supportedValuesOf("currency")}
-              {...currencyField.getInputProps()}
-              onChange={(value) => {
-                if (value) {
-                  doUpdateUserSettings.mutate({
-                    currency: value as Currency,
-                  });
+            <Stack gap="0.25rem">
+              <Select
+                label={
+                  <PrimaryText size="sm">{t("preferred_currency")}</PrimaryText>
                 }
-              }}
-              elevation={1}
-            />
+                placeholder={t("select_currency")}
+                searchable
+                nothingFoundMessage={t("no_currencies_found")}
+                data={Intl.supportedValuesOf("currency")}
+                {...currencyField.getInputProps()}
+                onChange={(value) => {
+                  if (value) {
+                    doUpdateUserSettings.mutate({
+                      currency: value,
+                    });
+                  }
+                }}
+                elevation={1}
+              />
+              <Select
+                label={
+                  <PrimaryText size="sm">{t("preferred_language")}</PrimaryText>
+                }
+                placeholder={t("select_your_preferred_language")}
+                data={Languages.map((lang: LanguageItem) => ({
+                  value: lang.value,
+                  label: t(lang.label),
+                }))}
+                {...languageField.getInputProps()}
+                onChange={(value) => {
+                  if (value) {
+                    doUpdateUserSettings.mutate({
+                      language: value,
+                    });
+                  }
+                }}
+                elevation={1}
+              />
+            </Stack>
           )}
         </Stack>
       </Stack>
