@@ -15,15 +15,14 @@ namespace BudgetBoard.Database.Migrations
                 table: "UserSettings",
                 type: "text",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: "default"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Language",
-                table: "UserSettings");
+            migrationBuilder.DropColumn(name: "Language", table: "UserSettings");
         }
     }
 }
