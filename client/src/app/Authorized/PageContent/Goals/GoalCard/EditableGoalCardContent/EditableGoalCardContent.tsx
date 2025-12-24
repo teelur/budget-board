@@ -234,53 +234,6 @@ const EditableGoalCardContent = (
     doEditGoal.mutate(newGoal);
   };
 
-  const totalEditComponent = (
-    <Flex
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    >
-      <NumberInput
-        maw={100}
-        min={0}
-        prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
-        thousandSeparator=","
-        {...goalTargetAmountField.getInputProps()}
-        onBlur={submitChanges}
-        elevation={1}
-      />
-    </Flex>
-  );
-
-  const monthlyTotalEditComponent = (
-    <Flex onClick={(e) => e.stopPropagation()}>
-      <NumberInput
-        size="sm"
-        maw={100}
-        min={0}
-        prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
-        thousandSeparator=","
-        {...goalMonthlyContributionField.getInputProps()}
-        onBlur={submitChanges}
-        elevation={1}
-      />
-    </Flex>
-  );
-
-  const projectedDateEditComponent = (
-    <Flex
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    >
-      <DateInput
-        className="h-8"
-        {...goalTargetDateField.getInputProps()}
-        onChange={submitTargetDateChanges}
-      />
-    </Flex>
-  );
-
   return (
     <>
       <LoadingOverlay
@@ -337,22 +290,40 @@ const EditableGoalCardContent = (
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
               {props.goal.amount !== 0 ? (
-                <Trans
-                  i18nKey="budget_amount_fraction_editable_total_styled"
-                  values={{
-                    amount: convertNumberToCurrency(
-                      sumAccountsTotalBalance(props.goal.accounts) -
-                        props.goal.initialAmount,
-                      false,
-                      userSettingsQuery.data?.currency ?? "USD"
-                    ),
-                  }}
-                  components={[
-                    <PrimaryText size="lg" key="amount" />,
-                    <DimmedText size="sm" key="of" />,
-                    totalEditComponent,
-                  ]}
-                />
+                <>
+                  <Trans
+                    i18nKey="budget_amount_fraction_editable_total_styled"
+                    values={{
+                      amount: convertNumberToCurrency(
+                        sumAccountsTotalBalance(props.goal.accounts) -
+                          props.goal.initialAmount,
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD"
+                      ),
+                    }}
+                    components={[
+                      <PrimaryText size="lg" key="amount" />,
+                      <DimmedText size="sm" key="of" />,
+                    ]}
+                  />
+                  <Flex
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <NumberInput
+                      maw={100}
+                      min={0}
+                      prefix={getCurrencySymbol(
+                        userSettingsQuery.data?.currency
+                      )}
+                      thousandSeparator=","
+                      {...goalTargetAmountField.getInputProps()}
+                      onBlur={submitChanges}
+                      elevation={1}
+                    />
+                  </Flex>
+                </>
               ) : (
                 <Trans
                   i18nKey="budget_amount_fraction_styled"
@@ -393,21 +364,31 @@ const EditableGoalCardContent = (
             <Group align="center" gap="sm">
               <Flex align="center" gap="0.25rem">
                 {props.goal.isCompleteDateEditable ? (
-                  <Trans
-                    i18nKey="budget_projected_editable_styled"
-                    values={{
-                      amount: convertNumberToCurrency(
-                        sumAccountsTotalBalance(props.goal.accounts) -
-                          props.goal.initialAmount,
-                        false,
-                        userSettingsQuery.data?.currency ?? "USD"
-                      ),
-                    }}
-                    components={[
-                      <DimmedText size="sm" key="label" />,
-                      projectedDateEditComponent,
-                    ]}
-                  />
+                  <>
+                    <Trans
+                      i18nKey="budget_projected_editable_styled"
+                      values={{
+                        amount: convertNumberToCurrency(
+                          sumAccountsTotalBalance(props.goal.accounts) -
+                            props.goal.initialAmount,
+                          false,
+                          userSettingsQuery.data?.currency ?? "USD"
+                        ),
+                      }}
+                      components={[<DimmedText size="sm" key="label" />]}
+                    />
+                    <Flex
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <DateInput
+                        className="h-8"
+                        {...goalTargetDateField.getInputProps()}
+                        onChange={submitTargetDateChanges}
+                      />
+                    </Flex>
+                  </>
                 ) : (
                   <Trans
                     i18nKey="budget_projected_styled"
@@ -429,28 +410,46 @@ const EditableGoalCardContent = (
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
               {props.goal.isMonthlyContributionEditable ? (
-                <Trans
-                  i18nKey="budget_monthly_amount_fraction_editable_styled"
-                  values={{
-                    amount: convertNumberToCurrency(
-                      sumAccountsTotalBalance(props.goal.accounts) -
-                        props.goal.initialAmount,
-                      false,
-                      userSettingsQuery.data?.currency ?? "USD"
-                    ),
-                  }}
-                  components={[
-                    <StatusText
-                      amount={props.goal.monthlyContributionProgress}
-                      total={props.goal.monthlyContribution}
-                      type={StatusColorType.Target}
-                      size="md"
-                      key="amount"
-                    />,
-                    <DimmedText size="sm" key="of" />,
-                    monthlyTotalEditComponent,
-                  ]}
-                />
+                <>
+                  <Trans
+                    i18nKey="budget_monthly_amount_fraction_editable_styled"
+                    values={{
+                      amount: convertNumberToCurrency(
+                        sumAccountsTotalBalance(props.goal.accounts) -
+                          props.goal.initialAmount,
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD"
+                      ),
+                    }}
+                    components={[
+                      <StatusText
+                        amount={props.goal.monthlyContributionProgress}
+                        total={props.goal.monthlyContribution}
+                        type={StatusColorType.Target}
+                        size="md"
+                        key="amount"
+                      />,
+                      <DimmedText size="sm" key="of" />,
+                    ]}
+                  />
+                  <Flex onClick={(e) => e.stopPropagation()}>
+                    <NumberInput
+                      size="sm"
+                      maw={100}
+                      min={0}
+                      prefix={getCurrencySymbol(
+                        userSettingsQuery.data?.currency
+                      )}
+                      thousandSeparator=","
+                      {...goalMonthlyContributionField.getInputProps()}
+                      onBlur={submitChanges}
+                      elevation={1}
+                    />
+                  </Flex>
+                  <DimmedText size="sm">
+                    {t("editable_amount_fraction_this_month")}
+                  </DimmedText>
+                </>
               ) : (
                 <Trans
                   i18nKey="budget_monthly_amount_fraction_styled"

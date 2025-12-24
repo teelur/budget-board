@@ -132,7 +132,7 @@ public class TransactionSplitRequest : ITransactionSplitRequest
 public class TransactionImport
 {
     public DateTime? Date { get; set; }
-    public string? Description { get; set; }
+    public string? MerchantName { get; set; }
     public string? Category { get; set; }
     public decimal? Amount { get; set; }
     public string Account { get; set; }
@@ -141,7 +141,7 @@ public class TransactionImport
     public TransactionImport()
     {
         Date = DateTime.MinValue;
-        Description = string.Empty;
+        MerchantName = string.Empty;
         Category = null;
         Amount = 0.0M;
         Account = string.Empty;
