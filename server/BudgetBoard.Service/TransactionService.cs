@@ -315,7 +315,7 @@ public class TransactionService(
                 Date = transaction.Date ?? _nowProvider.UtcNow,
                 Category = parentCategory,
                 Subcategory = childCategory,
-                MerchantName = transaction.Description,
+                MerchantName = transaction.MerchantName,
                 Source = TransactionSource.Manual.Value,
                 AccountID = account.ID,
             };
@@ -366,8 +366,7 @@ public class TransactionService(
                 .Balances.Where(b => b.DateTime <= transaction.Date.ToUniversalTime())
                 .OrderByDescending(b => b.DateTime)
                 .FirstOrDefault()
-                ?.Amount
-            ?? 0;
+                ?.Amount ?? 0;
 
         // First, add the new balance for the new transaction.
         var newBalance = new Balance
