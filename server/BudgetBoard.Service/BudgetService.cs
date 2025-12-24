@@ -416,7 +416,8 @@ public class BudgetService(
             )
         )
         {
-            return _responseLocalizer["BudgetCreateParentInvalidError", parentCategory];
+            // Current category is a parent, so ignore.
+            return null;
         }
 
         var parentBudgetRequest = new BudgetCreateRequest
