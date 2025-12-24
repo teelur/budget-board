@@ -46,7 +46,7 @@ public class GoalService(
         if (request.CompleteDate.HasValue && request.CompleteDate.Value < _nowProvider.UtcNow)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["GoalCreatePastDateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["GoalCreatePastDateError"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalCreateInPastError"]);
         }
 
         if (!request.AccountIds.Any())
