@@ -53,7 +53,8 @@ const UserSettings = (): React.ReactNode => {
         data: updatedUserSettings,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      // Need to explicitly refetch to get updated settings
+      await queryClient.refetchQueries({ queryKey: ["userSettings"] });
     },
     onError: (error: any) => {
       notifications.show({

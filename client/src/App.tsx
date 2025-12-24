@@ -163,38 +163,38 @@ function App() {
     >
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <UserSettingsProvider>
-            <Notifications />
-            <BrowserRouter>
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <UnauthorizedRoute>
-                      <Welcome />
-                    </UnauthorizedRoute>
-                  }
-                />
-                <Route
-                  path="/oidc-callback"
-                  element={
-                    <UnauthorizedRoute>
-                      <OidcCallback />
-                    </UnauthorizedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <AuthorizedRoute>
+          <Notifications />
+          <BrowserRouter>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <UnauthorizedRoute>
+                    <Welcome />
+                  </UnauthorizedRoute>
+                }
+              />
+              <Route
+                path="/oidc-callback"
+                element={
+                  <UnauthorizedRoute>
+                    <OidcCallback />
+                  </UnauthorizedRoute>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <AuthorizedRoute>
+                    <UserSettingsProvider>
                       <Authorized />
-                    </AuthorizedRoute>
-                  }
-                />
-              </Routes>
-            </BrowserRouter>
-            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-          </UserSettingsProvider>
+                    </UserSettingsProvider>
+                  </AuthorizedRoute>
+                }
+              />
+            </Routes>
+          </BrowserRouter>
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
       </AuthProvider>
     </MantineProvider>
