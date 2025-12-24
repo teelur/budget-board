@@ -126,8 +126,19 @@ public class UserSettingsServiceTests
         );
 
         // Assert
-        helper.demoUser.UserSettings.Should().NotBeNull();
-        helper.demoUser.UserSettings.Should().BeEquivalentTo(userSettingsUpdateRequest);
+        var settings = helper.demoUser.UserSettings;
+        settings.Should().NotBeNull();
+        settings!.Currency.Should().Be(userSettingsUpdateRequest.Currency);
+        settings.Language.Should().Be(userSettingsUpdateRequest.Language.ToLower());
+        settings
+            .DisableBuiltInTransactionCategories.Should()
+            .Be((bool)userSettingsUpdateRequest.DisableBuiltInTransactionCategories);
+        settings
+            .BudgetWarningThreshold.Should()
+            .Be(userSettingsUpdateRequest.BudgetWarningThreshold);
+        settings
+            .ForceSyncLookbackMonths.Should()
+            .Be(userSettingsUpdateRequest.ForceSyncLookbackMonths);
     }
 
     [Fact]
