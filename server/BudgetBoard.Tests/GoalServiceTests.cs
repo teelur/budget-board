@@ -155,7 +155,7 @@ public class GoalServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("GoalCreatePastDateError");
+            .WithMessage("GoalCreateInPastError");
     }
 
     [Fact]
