@@ -72,10 +72,6 @@ public class UserSettingsController(
                 var culture = new System.Globalization.CultureInfo(
                     userSettingsUpdateRequest.Language
                 );
-                HttpContext.Features.Set<IRequestCultureFeature>(
-                    new RequestCultureFeature(new RequestCulture(culture), null)
-                );
-
                 _logger.LogInformation(
                     "{LogMessage}",
                     _logLocalizer[
@@ -83,8 +79,10 @@ public class UserSettingsController(
                         $"{culture.Name} ({culture.DisplayName})"
                     ]
                 );
-                System.Globalization.CultureInfo.CurrentCulture = culture;
-                System.Globalization.CultureInfo.CurrentUICulture = culture;
+
+                HttpContext.Features.Set<IRequestCultureFeature>(
+                    new RequestCultureFeature(new RequestCulture(culture), null)
+                );
             }
 
             return Ok();
