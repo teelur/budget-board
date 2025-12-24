@@ -80,7 +80,7 @@ public class UserSettingsService(
                 );
             }
 
-            userSettings.Language = request.Language;
+            userSettings.Language = request.Language.ToLower();
         }
 
         if (request.BudgetWarningThreshold != null)
