@@ -230,31 +230,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
 
   const { budgetChildCards, unbudgetChildCards } = buildChildren();
 
-  const totalEditComponent = (
-    <Flex onClick={(e) => e.stopPropagation()}>
-      <NumberInput
-        {...newLimitField.getInputProps()}
-        onBlur={() => handleEdit(newLimitField.getValue())}
-        min={childLimitsTotal}
-        max={999999}
-        step={1}
-        prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
-        placeholder={t("enter_limit")}
-        size="xs"
-        styles={{
-          root: {
-            maxWidth: "100px",
-          },
-          input: {
-            padding: "0 10px",
-            fontSize: "16px",
-          },
-        }}
-        elevation={2}
-      />
-    </Flex>
-  );
-
   return (
     <Card p="0.25rem" w="100%" elevation={1}>
       <Stack gap="0.25rem">
@@ -299,21 +274,46 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 </Group>
                 <Group gap="0.5rem" justify="flex-end" align="center">
                   {isSelected ? (
-                    <Trans
-                      i18nKey="budget_amount_fraction_editable_total_styled"
-                      values={{
-                        amount: convertNumberToCurrency(
-                          amount * (isIncome ? 1 : -1),
-                          false,
-                          userSettingsQuery.data?.currency ?? "USD"
-                        ),
-                      }}
-                      components={[
-                        <PrimaryText className={classes.text} key="amount" />,
-                        <DimmedText size="sm" key="of" />,
-                        totalEditComponent,
-                      ]}
-                    />
+                    <>
+                      <Trans
+                        i18nKey="budget_amount_fraction_editable_total_styled"
+                        values={{
+                          amount: convertNumberToCurrency(
+                            amount * (isIncome ? 1 : -1),
+                            false,
+                            userSettingsQuery.data?.currency ?? "USD"
+                          ),
+                        }}
+                        components={[
+                          <PrimaryText className={classes.text} key="amount" />,
+                          <DimmedText size="sm" key="of" />,
+                        ]}
+                      />
+                      <Flex onClick={(e) => e.stopPropagation()}>
+                        <NumberInput
+                          {...newLimitField.getInputProps()}
+                          onBlur={() => handleEdit(newLimitField.getValue())}
+                          min={childLimitsTotal}
+                          max={999999}
+                          step={1}
+                          prefix={getCurrencySymbol(
+                            userSettingsQuery.data?.currency
+                          )}
+                          placeholder={t("enter_limit")}
+                          size="xs"
+                          styles={{
+                            root: {
+                              maxWidth: "100px",
+                            },
+                            input: {
+                              padding: "0 10px",
+                              fontSize: "16px",
+                            },
+                          }}
+                          elevation={2}
+                        />
+                      </Flex>
+                    </>
                   ) : (
                     <Trans
                       i18nKey="budget_amount_fraction_styled"
