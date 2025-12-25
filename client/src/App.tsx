@@ -85,7 +85,7 @@ const resolver: CSSVariablesResolver = () => ({
     "--surface-color-input-border": backgroundEggshell[8],
     "--surface-color-progress": backgroundEggshell[5],
     // Elevated colors
-    "--background-color-elevated": backgroundEggshell[3],
+    "--background-color-elevated": backgroundEggshell[4],
     "--elevated-color-border": borderEggshell[3],
     "--elevated-color-text-primary": textBlack[1],
     "--elevated-color-text-dimmed": textEggshellDimmed[7],
