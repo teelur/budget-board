@@ -126,7 +126,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
     <Card elevation={2}>
       <Group gap="0.5rem">
         <Select
-          w="110px"
           data={TransactionFields.map((i) => ({
             ...i,
             label: t(i.label),
@@ -136,32 +135,32 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               (field) => field.value === props.ruleParameter.field
             )?.value
           }
-          onChange={(value) =>
+          onChange={(value) => {
+            const foundField = TransactionFields.find(
+              (field) => field.value === value
+            );
+
+            if (!foundField) {
+              return;
+            }
+
             props.setRuleParameter({
               ...props.ruleParameter,
-              field:
-                TransactionFields.find((field) => field.label === value)
-                  ?.value ?? "",
+              field: foundField.value,
               operator:
                 Operators.filter((op) =>
                   op.type.includes(
-                    FieldToOperatorType.get(
-                      TransactionFields.find((field) => field.label === value)
-                        ?.value ?? ""
-                    ) ?? OperatorTypes.STRING
+                    FieldToOperatorType.get(foundField.value) ??
+                      OperatorTypes.STRING
                   )
                 ).at(0)?.value ?? "",
-              value: getDefaultValue(
-                TransactionFields.find((field) => field.label === value)
-                  ?.value ?? ""
-              ),
-            } as IRuleParameterEdit)
-          }
+              value: getDefaultValue(foundField.value),
+            } as IRuleParameterEdit);
+          }}
           allowDeselect={false}
           elevation={2}
         />
         <Select
-          w="160px"
           data={Operators.filter((op) =>
             op.type.includes(
               FieldToOperatorType.get(props.ruleParameter.field) ??
@@ -176,14 +175,20 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           )}
           value={
             Operators.find((op) => op.value === props.ruleParameter.operator)
-              ?.label ?? ""
+              ?.value ?? ""
           }
-          onChange={(value) =>
+          onChange={(value) => {
+            const foundValue = Operators.find((op) => op.value === value);
+
+            if (!foundValue) {
+              return;
+            }
+
             props.setRuleParameter({
               ...props.ruleParameter,
-              operator: Operators.find((op) => op.label === value)?.value ?? "",
-            })
-          }
+              operator: foundValue.value,
+            });
+          }}
           allowDeselect={false}
           elevation={2}
         />

@@ -126,7 +126,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
       return (
         <>
           <Select
-            w="110px"
             data={TransactionFields.map((i) => ({
               ...i,
               label: t(i.label),
@@ -136,18 +135,21 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
                 (field) => field.value === props.ruleParameter.field
               )?.value
             }
-            onChange={(value) =>
+            onChange={(value) => {
+              const foundValue = TransactionFields.find(
+                (field) => field.value === value
+              );
+
+              if (!foundValue) {
+                return;
+              }
+
               props.setRuleParameter({
                 ...props.ruleParameter,
-                field:
-                  TransactionFields.find((field) => field.label === value)
-                    ?.value ?? "",
-                value: getDefaultValue(
-                  TransactionFields.find((field) => field.label === value)
-                    ?.value ?? ""
-                ),
-              })
-            }
+                field: foundValue.value,
+                value: getDefaultValue(foundValue.value),
+              });
+            }}
             elevation={2}
           />
           <PrimaryText size="sm">{t("to")}</PrimaryText>
@@ -162,7 +164,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
     <Card elevation={2}>
       <Group gap="0.5rem">
         <Select
-          w="170px"
           data={ActionOperators.map((op) => ({
             value: op.value,
             label: t(op.label),
