@@ -85,13 +85,13 @@ public class RuleParameterUpdateRequest() : IRuleParameterRequest
 public interface IAutomaticRuleUpdateRequest
 {
     Guid ID { get; }
-    ICollection<IRuleParameterRequest> Conditions { get; }
-    ICollection<IRuleParameterRequest> Actions { get; }
+    ICollection<RuleParameterUpdateRequest> Conditions { get; }
+    ICollection<RuleParameterUpdateRequest> Actions { get; }
 }
 
 public class AutomaticRuleUpdateRequest() : IAutomaticRuleUpdateRequest
 {
     public required Guid ID { get; set; }
-    public ICollection<IRuleParameterRequest> Conditions { get; set; } = [];
-    public ICollection<IRuleParameterRequest> Actions { get; set; } = [];
+    public ICollection<RuleParameterUpdateRequest> Conditions { get; set; } = [];
+    public ICollection<RuleParameterUpdateRequest> Actions { get; set; } = [];
 }
