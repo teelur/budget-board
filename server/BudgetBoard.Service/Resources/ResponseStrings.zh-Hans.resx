@@ -203,7 +203,7 @@
     <value>目标的目标日期不能是过去的日期。</value>
   </data>
   <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
-    <value>目标的每月存入金额必须大于0。</value>
+    <value>目标的每月存入金额必须大于 0。</value>
   </data>
   <data name="GoalDeleteNotFoundError" xml:space="preserve">
     <value>您尝试删除的目标不存在。</value>
@@ -281,7 +281,7 @@
     <value>您尝试删除的交易类别不存在。</value>
   </data>
   <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
-    <value>您尝试添加交易的账户不存在。</value>
+    <value>您尝试向其添加交易的账户不存在。</value>
   </data>
   <data name="TransactionNotFoundError" xml:space="preserve">
     <value>您尝试访问的交易不存在。</value>
@@ -305,7 +305,7 @@
     <value>您尝试拆分的交易未关联任何账户。</value>
   </data>
   <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
-    <value>您尝试添加交易的账户不存在。</value>
+    <value>您尝试向其添加交易的账户不存在。</value>
   </data>
   <data name="UserSettingsNotFoundError" xml:space="preserve">
     <value>您尝试访问的用户设置不存在。</value>
@@ -317,10 +317,10 @@
     <value>提供的语言代码无效。</value>
   </data>
   <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
-    <value>预算警告阈值必须在0%到100%之间。</value>
+    <value>预算警告阈值必须在 0% 到 100% 之间。</value>
   </data>
   <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
-    <value>强制同步回溯期必须在0到12个月之间。</value>
+    <value>强制同步回溯期必须在 0 到 12 个月之间。</value>
   </data>
   <data name="ValueCreateAssetNotFoundError" xml:space="preserve">
     <value>您尝试为其添加数值的资产不存在。</value>
@@ -338,22 +338,22 @@
     <value>您尝试恢复的值不存在。</value>
   </data>
   <data name="SimpleFinDataNotFoundError" xml:space="preserve">
-    <value>未找到SimpleFIN数据。</value>
+    <value>未找到 SimpleFIN 数据。</value>
   </data>
   <data name="SimpleFinDataRetrievalError" xml:space="preserve">
-    <value>检索SimpleFIN数据时发生错误。</value>
+    <value>检索 SimpleFIN 数据时发生错误。</value>
   </data>
   <data name="SimpleFinOrganizationMissingIdError" xml:space="preserve">
-    <value>账户 '{0}' 的机构缺少ID。跳过账户同步。</value>
+    <value>账户 '{0}' 的机构缺少 ID。跳过账户同步。</value>
   </data>
   <data name="SyncInstitutionCreationError" xml:space="preserve">
     <value>为账户 '{0}' 创建机构时出错。跳过账户同步。</value>
   </data>
   <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
-    <value>未找到与同步ID '{0}' 的交易匹配的账户。</value>
+    <value>未找到与同步 ID '{0}' 的交易匹配的账户。</value>
   </data>
   <data name="SimpleFinAccountNotFoundForBalanceError" xml:space="preserve">
-    <value>未找到与同步ID '{0}' 的余额匹配的账户。</value>
+    <value>未找到与同步 ID '{0}' 的余额匹配的账户。</value>
   </data>
   <data name="SimpleFinDecodeTokenError" xml:space="preserve">
     <value>解码设置令牌时发生错误。</value>
