@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -58,4 +58,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="UnexpectedServerError" xml:space="preserve">
+    <value>发生意外错误。</value>
+  </data>
+  <data name="AuthCodeRequired" xml:space="preserve">
+    <value>需要授权码。</value>
+  </data>
+  <data name="AuthFailed" xml:space="preserve">
+    <value>身份验证失败。</value>
+  </data>
+  <data name="LoginFailed" xml:space="preserve">
+    <value>无法完成登录。</value>
+  </data>
+  <data name="UserNotAuthenticated" xml:space="preserve">
+    <value>用户未通过身份验证。</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>未找到该用户。</value>
+  </data>
+  <data name="NoOidcLoginFound" xml:space="preserve">
+    <value>未找到此用户的 OIDC 登录信息。</value>
+  </data>
+  <data name="RemoveOidcNoPassword" xml:space="preserve">
+    <value>无法移除 OIDC 登录。用户必须先设置本地密码以保持账户访问权限。</value>
+  </data>
+  <data name="RemoveOidcFailed" xml:space="preserve">
+    <value>移除 OIDC 登录失败。</value>
+  </data>
+  <data name="RemoveOidcSuccess" xml:space="preserve">
+    <value>OIDC 登录已成功断开连接。</value>
+  </data>
+  <data name="UserIdNotFound" xml:space="preserve">
+    <value>未找到用户 ID。</value>
+  </data>
+  <data name="InvalidJsonType" xml:space="preserve">
+    <value>提供的 JSON 令牌类型无效。</value>
+  </data>
+  <data name="LocalAccountProviderName" xml:space="preserve">
+    <value>本地账户</value>
+  </data>
+  <data name="RegistrationDisabledError" xml:space="preserve">
+    <value>注册已禁用。</value>
+  </data>
+  <data name="NoEmailConfirmationEndpointError" xml:space="preserve">
+    <value>未注册电子邮件确认端点！</value>
+  </data>
+  <data name="UserEmailRequiredError" xml:space="preserve">
+    <value>用户必须拥有电子邮件地址。</value>
+  </data>
+  <data name="EndpointNotFoundError" xml:space="preserve">
+    <value>未找到名为“{0}”的端点。</value>
+  </data>
+  <data name="InvalidLanguageError" xml:space="preserve">
+    <value>不支持指定的语言“{0}”。</value>
+  </data>
 </root>
