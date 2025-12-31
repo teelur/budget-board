@@ -365,22 +365,24 @@ public class TransactionService(
             account
                 .Balances.Where(b => b.DateTime <= transaction.Date.ToUniversalTime())
                 .OrderByDescending(b => b.DateTime)
-                .FirstOrDefault()
-                ?.Amount ?? 0;
+                .FirstOrDefault();
 
-        // First, add the new balance for the new transaction.
-        var newBalance = new Balance
+        // First, add the new balance for the new transaction if no balance exists for that date.
+        if (currentBalance == null || currentBalance.DateTime != transaction.Date.ToUniversalTime())
         {
-            Amount = transaction.Amount + currentBalance,
-            DateTime = transaction.Date.ToUniversalTime(),
-            AccountID = account.ID,
-        };
+            var newBalance = new Balance
+            {
+                Amount = currentBalance?.Amount ?? 0,
+                DateTime = transaction.Date.ToUniversalTime(),
+                AccountID = account.ID,
+            };
 
-        _userDataContext.Balances.Add(newBalance);
+            _userDataContext.Balances.Add(newBalance);
+        }
 
         // Then, update all following balances to include the new transaction.
         var balancesAfterNew = account
-            .Balances.Where(b => b.DateTime > transaction.Date.ToUniversalTime())
+            .Balances.Where(b => b.DateTime >= transaction.Date.ToUniversalTime())
             .ToList();
         foreach (var balance in balancesAfterNew)
         {
