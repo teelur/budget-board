@@ -361,19 +361,21 @@ public class TransactionService(
         ITransactionCreateRequest transaction
     )
     {
-        var currentBalance =
-            account
-                .Balances.Where(b => b.DateTime <= transaction.Date.ToUniversalTime())
-                .OrderByDescending(b => b.DateTime)
-                .FirstOrDefault();
+        var currentBalance = account
+            .Balances.Where(b => b.DateTime.Date <= transaction.Date.ToUniversalTime().Date)
+            .OrderByDescending(b => b.DateTime)
+            .FirstOrDefault();
 
         // First, add the new balance for the new transaction if no balance exists for that date.
-        if (currentBalance == null || currentBalance.DateTime != transaction.Date.ToUniversalTime())
+        if (
+            currentBalance == null
+            || currentBalance.DateTime.Date != transaction.Date.ToUniversalTime().Date
+        )
         {
             var newBalance = new Balance
             {
                 Amount = currentBalance?.Amount ?? 0,
-                DateTime = transaction.Date.ToUniversalTime(),
+                DateTime = transaction.Date.ToUniversalTime().Date,
                 AccountID = account.ID,
             };
 
@@ -382,7 +384,7 @@ public class TransactionService(
 
         // Then, update all following balances to include the new transaction.
         var balancesAfterNew = account
-            .Balances.Where(b => b.DateTime >= transaction.Date.ToUniversalTime())
+            .Balances.Where(b => b.DateTime.Date >= transaction.Date.ToUniversalTime().Date)
             .ToList();
         foreach (var balance in balancesAfterNew)
         {
