@@ -139,7 +139,7 @@ public class TransactionServiceTests
         helper
             .UserDataContext.Balances.Single()
             .DateTime.Should()
-            .Be(transaction.Date.ToUniversalTime());
+            .Be(transaction.Date.ToUniversalTime().Date);
         helper.UserDataContext.Balances.Single().Amount.Should().Be(transaction.Amount);
     }
 
