@@ -30,12 +30,6 @@ public class AccountService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (userData.Accounts.Any(a => request.SyncID != null && a.SyncID == request.SyncID))
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["DuplicateSyncIDLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["DuplicateSyncIDError"]);
-        }
-
         var institution = userData.Institutions.SingleOrDefault(i => i.ID == request.InstitutionID);
         if (institution == null)
         {
@@ -48,7 +42,6 @@ public class AccountService(
 
         var newAccount = new Account
         {
-            SyncID = request.SyncID,
             Name = request.Name,
             InstitutionID = request.InstitutionID,
             Type = request.Type,

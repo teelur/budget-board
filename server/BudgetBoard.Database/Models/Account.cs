@@ -11,11 +11,6 @@ public class Account
     public Guid ID { get; set; } = Guid.NewGuid();
 
     /// <summary>
-    /// Optional external sync identifier for the account.
-    /// </summary>
-    public string? SyncID { get; set; } = null;
-
-    /// <summary>
     /// Name of the account.
     /// </summary>
     public required string Name { get; set; }
@@ -66,7 +61,7 @@ public class Account
     public decimal? InterestRate { get; set; } = null;
 
     /// <summary>
-    /// Source of the account data (e.g., manual, imported).
+    /// Source of the account data (e.g., manual, simplefin).
     /// </summary>
     public string Source { get; set; } = string.Empty;
 
@@ -84,6 +79,16 @@ public class Account
     /// Collection of balance records for the account.
     /// </summary>
     public ICollection<Balance> Balances { get; set; } = [];
+
+    /// <summary>
+    /// Identifier for the associated SimpleFIN account, if any.
+    /// </summary>
+    public Guid? SimpleFinAccountId { get; set; } = null;
+
+    /// <summary>
+    /// Reference to the associated SimpleFIN account, if any.
+    /// </summary>
+    public SimpleFinAccount? SimpleFinAccount { get; set; } = null;
 
     /// <summary>
     /// Identifier for the user who owns the account.

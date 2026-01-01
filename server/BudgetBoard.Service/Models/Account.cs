@@ -11,7 +11,6 @@ public static class AccountSource
 
 public interface IAccountCreateRequest
 {
-    public string? SyncID { get; }
     public string Name { get; }
     public Guid? InstitutionID { get; }
     public string Type { get; }
@@ -23,7 +22,6 @@ public interface IAccountCreateRequest
 
 public class AccountCreateRequest() : IAccountCreateRequest
 {
-    public string? SyncID { get; set; }
     public string Name { get; set; } = string.Empty;
     public Guid? InstitutionID { get; set; }
     public string Type { get; set; } = string.Empty;
@@ -82,7 +80,6 @@ public class AccountIndexRequest : IAccountIndexRequest
 public interface IAccountResponse
 {
     public Guid ID { get; }
-    public string? SyncID { get; }
     public string Name { get; }
     public Guid? InstitutionID { get; }
     public string Type { get; }
@@ -101,7 +98,6 @@ public interface IAccountResponse
 public class AccountResponse : IAccountResponse
 {
     public Guid ID { get; set; }
-    public string? SyncID { get; set; }
     public string Name { get; set; }
     public Guid? InstitutionID { get; set; }
     public string Type { get; set; }
@@ -120,7 +116,6 @@ public class AccountResponse : IAccountResponse
     public AccountResponse()
     {
         ID = Guid.NewGuid();
-        SyncID = string.Empty;
         Name = string.Empty;
         InstitutionID = null;
         Type = string.Empty;
@@ -138,7 +133,6 @@ public class AccountResponse : IAccountResponse
     public AccountResponse(Account account)
     {
         ID = account.ID;
-        SyncID = account.SyncID;
         Name = account.Name;
         InstitutionID = account.InstitutionID;
         Type = account.Type;
@@ -146,14 +140,12 @@ public class AccountResponse : IAccountResponse
         CurrentBalance =
             account
                 .Balances.OrderByDescending(b => b.DateTime)
-                .Where(b => b.Deleted == null)
-                .FirstOrDefault()
+                .FirstOrDefault(b => b.Deleted == null)
                 ?.Amount
             ?? 0;
         BalanceDate = account
             .Balances.OrderByDescending(b => b.DateTime)
-            .Where(b => b.Deleted == null)
-            .FirstOrDefault()
+            .FirstOrDefault(b => b.Deleted == null)
             ?.DateTime;
         HideTransactions = account.HideTransactions;
         HideAccount = account.HideAccount;
