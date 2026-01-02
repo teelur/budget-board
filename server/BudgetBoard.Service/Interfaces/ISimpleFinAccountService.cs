@@ -37,4 +37,17 @@ public interface ISimpleFinAccountService
     /// <param name="accountGuid">The unique identifier of the SimpleFIN account.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task DeleteAccountAsync(Guid userGuid, Guid accountGuid);
+
+    /// <summary>
+    /// Updates the linked account for a SimpleFIN account.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="simpleFinAccountGuid">The unique identifier of the SimpleFIN account.</param>
+    /// <param name="linkedAccountGuid">The unique identifier of the linked account.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task UpdateLinkedAccountAsync(
+        Guid userGuid,
+        Guid simpleFinAccountGuid,
+        Guid? linkedAccountGuid
+    );
 }

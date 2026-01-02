@@ -84,8 +84,6 @@ public class SimpleFinAccountService(
         accountToUpdate.BalanceDate = (int)
             new DateTimeOffset(request.BalanceDate).ToUnixTimeSeconds();
         accountToUpdate.LastSync = request.LastSync;
-        accountToUpdate.OrganizationId = request.OrganizationId;
-        accountToUpdate.LinkedAccountId = request.LinkedAccountId;
 
         await userDataContext.SaveChangesAsync();
     }
@@ -110,6 +108,37 @@ public class SimpleFinAccountService(
         await userDataContext.SaveChangesAsync();
     }
 
+    public async Task UpdateLinkedAccountAsync(
+        Guid userGuid,
+        Guid simpleFinAccountGuid,
+        Guid? linkedAccountGuid
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var accountToUpdate = userData.SimpleFinAccounts.SingleOrDefault(o =>
+            o.ID == simpleFinAccountGuid
+        );
+        if (accountToUpdate == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinAccountUpdateNotFoundError"]
+            );
+        }
+
+        if (linkedAccountGuid != null && !userData.Accounts.Any(a => a.ID == linkedAccountGuid))
+        {
+            logger.LogError("{LogMessage}", logLocalizer["InvalidLinkedAccountIDLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["InvalidLinkedAccountIDError"]);
+        }
+
+        accountToUpdate.LinkedAccountId = linkedAccountGuid;
+        accountToUpdate.LastSync = null;
+
+        await userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         ApplicationUser? foundUser;
@@ -118,6 +147,7 @@ public class SimpleFinAccountService(
             foundUser = await userDataContext
                 .ApplicationUsers.Include(u => u.SimpleFinOrganizations)
                 .ThenInclude(i => i.Accounts)
+                .Include(u => u.Accounts)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }

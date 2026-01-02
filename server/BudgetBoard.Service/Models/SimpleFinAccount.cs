@@ -42,7 +42,7 @@ public class SimpleFinAccountResponse(Database.Models.SimpleFinAccount simpleFin
     public string Currency { get; init; } = simpleFinAccount.Currency;
     public decimal Balance { get; init; } = simpleFinAccount.Balance;
     public DateTime BalanceDate { get; init; } =
-        new DateTime(simpleFinAccount.BalanceDate).ToUniversalTime();
+        DateTimeOffset.FromUnixTimeSeconds(simpleFinAccount.BalanceDate).UtcDateTime;
     public DateTime? LastSync { get; init; } = simpleFinAccount.LastSync;
     public Guid? OrganizationId { get; init; } = simpleFinAccount.OrganizationId;
     public Guid? LinkedAccountId { get; init; } = simpleFinAccount.LinkedAccountId;
@@ -57,8 +57,6 @@ public interface ISimpleFinAccountUpdateRequest
     public decimal Balance { get; }
     public DateTime BalanceDate { get; }
     public DateTime? LastSync { get; }
-    public Guid? OrganizationId { get; }
-    public Guid? LinkedAccountId { get; }
 }
 
 public class SimpleFinAccountUpdateRequest : ISimpleFinAccountUpdateRequest

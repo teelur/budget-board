@@ -152,6 +152,8 @@ public class SimpleFinService(
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
                 .Include(u => u.Institutions)
+                .Include(u => u.SimpleFinOrganizations)
+                .ThenInclude(o => o.Accounts)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
