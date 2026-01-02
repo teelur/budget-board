@@ -95,7 +95,7 @@ const SimpleFinAccountCard = (
     );
   }, [props.simpleFinAccount.linkedAccountId]);
 
-  const getBadgeForAccountName = (): React.ReactNode => {
+  const getBadgeForAccountName = (): React.ReactElement => {
     return props.simpleFinAccount.linkedAccountId ? (
       <Badge key="value" size="sm" />
     ) : (
