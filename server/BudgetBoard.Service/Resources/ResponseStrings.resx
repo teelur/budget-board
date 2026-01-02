@@ -397,4 +397,22 @@
   <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
     <value>Cannot create a circular dependency. The target line already depends on this line.</value>
   </data>
+  <data name="InvalidOrganizationIDError" xml:space="preserve">
+    <value>The provided organization ID is invalid.</value>
+  </data>
+  <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
+    <value>The SimpleFIN account you are trying to update does not exist.</value>
+  </data>
+  <data name="DuplicateOrganizationCreateError" xml:space="preserve">
+    <value>An organization with this domain already exists.</value>
+  </data>
+  <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
+    <value>The SimpleFIN organization you are trying to update does not exist.</value>
+  </data>
+  <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
+    <value>The SimpleFIN organization you are trying to delete does not exist.</value>
+  </data>
+  <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
+    <value>Failed to create SimpleFIN organization for account {0}.</value>
+  </data>
   </root>

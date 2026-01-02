@@ -27,15 +27,21 @@ public interface ISimpleFinOrganization
     string? Domain { get; }
     string SimpleFinUrl { get; }
     string? Name { get; }
+    string? Url { get; }
+    string? SyncID { get; }
 }
 
 public class SimpleFinOrganization : ISimpleFinOrganization
 {
-    public string? Domain { get; init; }
+    public string? Domain { get; init; } = null;
 
     [JsonPropertyName("sfin-url")]
     public string SimpleFinUrl { get; init; } = string.Empty;
-    public string? Name { get; init; }
+    public string? Name { get; init; } = null;
+    public string? Url { get; init; } = null;
+
+    [JsonPropertyName("id")]
+    public string? SyncID { get; init; } = null;
 }
 
 public interface ISimpleFinTransaction

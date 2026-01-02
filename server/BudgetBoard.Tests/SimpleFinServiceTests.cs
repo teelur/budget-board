@@ -67,6 +67,8 @@ public class SimpleFinServiceTests
             institutionService,
             transactionService,
             balanceService,
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
@@ -108,6 +110,8 @@ public class SimpleFinServiceTests
             Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<IBalanceService>(),
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );

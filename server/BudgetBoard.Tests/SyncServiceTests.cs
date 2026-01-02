@@ -22,18 +22,16 @@ public class SyncServiceTests
         var nowProviderMock = Mock.Of<INowProvider>();
         Mock.Get(nowProviderMock).Setup(_ => _.UtcNow).Returns(DateTime.UtcNow);
 
-        var simpleFinServiceMock = new Mock<ISyncProvider>();
+        var simpleFinServiceMock = new Mock<ISimpleFinService>();
         simpleFinServiceMock
             .Setup(_ => _.SyncDataAsync(It.IsAny<Guid>()))
             .ReturnsAsync([])
             .Verifiable();
 
         var syncService = new SyncService(
-            Mock.Of<IHttpClientFactory>(),
             Mock.Of<ILogger<ISyncService>>(),
             helper.UserDataContext,
             simpleFinServiceMock.Object,
-            Mock.Of<ITransactionService>(),
             Mock.Of<IGoalService>(),
             Mock.Of<IApplicationUserService>(),
             Mock.Of<IAutomaticRuleService>(),
@@ -44,12 +42,10 @@ public class SyncServiceTests
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accountWithoutSource = accountFaker.Generate();
-        accountWithoutSource.SyncID = null;
         accountWithoutSource.Source = string.Empty;
         helper.UserDataContext.Accounts.Add(accountWithoutSource);
 
         var accountWithSyncID = accountFaker.Generate();
-        accountWithSyncID.SyncID = "existing-sync-id";
         accountWithSyncID.Source = string.Empty;
         helper.UserDataContext.Accounts.Add(accountWithSyncID);
 
@@ -94,18 +90,16 @@ public class SyncServiceTests
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock.Setup(_ => _.CreateClient(string.Empty)).Returns(httpClient);
 
-        var syncProviderMock = new Mock<ISyncProvider>();
+        var syncProviderMock = new Mock<ISimpleFinService>();
         syncProviderMock
             .Setup(_ => _.SyncDataAsync(It.IsAny<Guid>()))
             .ReturnsAsync([])
             .Verifiable();
 
         var syncService = new SyncService(
-            httpClientFactoryMock.Object,
             Mock.Of<ILogger<ISyncService>>(),
             helper.UserDataContext,
             syncProviderMock.Object,
-            Mock.Of<ITransactionService>(),
             Mock.Of<IGoalService>(),
             applicationUserServiceMock.Object,
             Mock.Of<IAutomaticRuleService>(),

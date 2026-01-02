@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    [Migration("20260101223515_AddSimpleFinData")]
-    partial class AddSimpleFinData
+    [Migration("20260102175717_RemoveOrgLastSync")]
+    partial class RemoveOrgLastSync
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -401,8 +401,8 @@ namespace BudgetBoard.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Balance")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("BalanceDate")
                         .HasColumnType("integer");
@@ -451,9 +451,6 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<string>("Domain")
                         .HasColumnType("text");
-
-                    b.Property<DateTime?>("LastSync")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -872,7 +869,7 @@ namespace BudgetBoard.Database.Migrations
                         .HasForeignKey("OrganizationId");
 
                     b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("SimpleFinAccounts")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -887,7 +884,7 @@ namespace BudgetBoard.Database.Migrations
             modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinOrganization", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("SimpleFinOrganizations")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1034,6 +1031,10 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("Goals");
 
                     b.Navigation("Institutions");
+
+                    b.Navigation("SimpleFinAccounts");
+
+                    b.Navigation("SimpleFinOrganizations");
 
                     b.Navigation("TransactionCategories");
 

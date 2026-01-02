@@ -64,4 +64,14 @@ public class ApplicationUser : IdentityUser<Guid>
     /// Collection of widget settings for the user's dashboard.
     /// </summary>
     public ICollection<WidgetSettings> WidgetSettings { get; set; } = [];
+
+    /// <summary>
+    /// Collection of SimpleFin organizations associated with the user.
+    /// </summary>
+    public ICollection<SimpleFinOrganization> SimpleFinOrganizations { get; set; } = [];
+
+    /// <summary>
+    /// Collection of SimpleFin accounts linked to the user.
+    /// </summary>
+    public ICollection<SimpleFinAccount> SimpleFinAccounts { get; set; } = [];
 }

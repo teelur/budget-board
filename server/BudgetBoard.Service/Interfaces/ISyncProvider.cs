@@ -6,6 +6,13 @@ namespace BudgetBoard.Service.Interfaces;
 public interface ISyncProvider
 {
     /// <summary>
+    /// Update the local cache with data from the external provider.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user whose data is being updated.</param>
+    /// <returns>A list of error messages encountered during the update process, if any.</returns>
+    Task<IList<string>> UpdateDataAsync(Guid userGuid);
+
+    /// <summary>
     /// Sync data from the external provider.
     /// </summary>
     /// <param name="userGuid">
@@ -15,18 +22,4 @@ public interface ISyncProvider
     /// A list of error messages encountered during the sync process, if any.
     /// </returns>
     Task<IList<string>> SyncDataAsync(Guid userGuid);
-
-    /// <summary>
-    /// Configure the access token for the external provider.
-    /// </summary>
-    /// <param name="userGuid">
-    /// The unique identifier of the user whose access token is being configured.
-    /// </param>
-    /// <param name="token">
-    /// The access token to be configured for the user.
-    /// </param>
-    /// <returns>
-    /// A task that represents the asynchronous operation.
-    /// </returns>
-    Task ConfigureAccessTokenAsync(Guid userGuid, string token);
 }

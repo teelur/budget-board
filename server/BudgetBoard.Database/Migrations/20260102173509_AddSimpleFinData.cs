@@ -53,7 +53,7 @@ namespace BudgetBoard.Database.Migrations
                     SyncID = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: false),
-                    Balance = table.Column<int>(type: "integer", nullable: false),
+                    Balance = table.Column<decimal>(type: "numeric", nullable: false),
                     BalanceDate = table.Column<int>(type: "integer", nullable: false),
                     LastSync = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     OrganizationId = table.Column<Guid>(type: "uuid", nullable: true),

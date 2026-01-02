@@ -38,11 +38,6 @@ public class SimpleFinOrganization
     public string? SyncID { get; set; } = null;
 
     /// <summary>
-    /// The date and time when the account was last synchronized; null if never synchronized.
-    /// </summary>
-    public DateTime? LastSync { get; set; } = null;
-
-    /// <summary>
     /// Collection of SimpleFIN accounts associated with the organization.
     /// </summary>
     public ICollection<SimpleFinAccount> Accounts { get; set; } = [];

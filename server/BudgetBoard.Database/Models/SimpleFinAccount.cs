@@ -32,7 +32,7 @@ public class SimpleFinAccount
     /// <summary>
     /// The balance of the account as of balance-date.
     /// </summary>
-    public int Balance { get; set; } = 0;
+    public decimal Balance { get; set; } = 0;
 
     /// <summary>
     /// The timestamp when the balance and available-balance became what they are.

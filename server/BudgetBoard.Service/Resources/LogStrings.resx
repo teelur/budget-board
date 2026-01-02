@@ -403,4 +403,22 @@
   <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineLog" xml:space="preserve">
     <value>Attempted to create a circular dependency between net worth widget lines.</value>
   </data>
+  <data name="InvalidOrganizationIDLog" xml:space="preserve">
+    <value>Attempted to create an account with an invalid organization ID.</value>
+  </data>
+  <data name="SimpleFinAccountIDUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a SimpleFIN account that does not exist.</value>
+  </data>
+  <data name="DuplicateOrganizationCreateLog" xml:space="preserve">
+    <value>Attempted to create a duplicate organization for {Domain}.</value>
+  </data>
+  <data name="SimpleFinOrganizationUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a SimpleFIN organization that does not exist.</value>
+  </data>
+  <data name="SimpleFinOrganizationDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a SimpleFIN organization that does not exist.</value>
+  </data>
+  <data name="SyncSimpleFinOrganizationCreationErrorLog" xml:space="preserve">
+    <value>Failed to create SimpleFIN organization during sync for account {0}.</value>
+  </data>
 </root>
