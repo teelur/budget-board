@@ -227,6 +227,7 @@
   "line": "Line",
   "link_simplefin": "Link SimpleFIN",
   "linked": "Linked",
+  "linked_account_input": "Linked Account:",
   "linked_account_styled": "<0>Linked Account:</0><1>{{accountName}}</1>",
   "load_csv": "Load CSV",
   "login": "Login",

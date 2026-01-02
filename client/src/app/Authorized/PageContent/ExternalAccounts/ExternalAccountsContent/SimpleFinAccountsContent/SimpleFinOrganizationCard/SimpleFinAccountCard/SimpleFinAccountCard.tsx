@@ -1,4 +1,4 @@
-import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -95,10 +95,22 @@ const SimpleFinAccountCard = (
     );
   }, [props.simpleFinAccount.linkedAccountId]);
 
+  const getBadgeForAccountName = (): React.ReactNode => {
+    return props.simpleFinAccount.linkedAccountId ? (
+      <Badge key="value" size="sm" />
+    ) : (
+      <Badge
+        key="value"
+        size="sm"
+        color="var(--elevated-color-input-background)"
+      />
+    );
+  };
+
   return (
     <Card elevation={2}>
       <LoadingOverlay visible={doUpdateLinkedAccount.isPending} />
-      <Stack gap="0.25rem">
+      <Stack gap={0}>
         <Group justify="space-between" align="center">
           <Group gap="0.5rem">
             <PrimaryText size="sm">{props.simpleFinAccount.name}</PrimaryText>
@@ -125,9 +137,7 @@ const SimpleFinAccountCard = (
           <Group gap="0.5rem">
             {isEditable ? (
               <Group gap="0.5rem">
-                <PrimaryText size="xs">
-                  {t("linked_account_input")}:
-                </PrimaryText>
+                <PrimaryText size="xs">{t("linked_account_input")}</PrimaryText>
                 <AccountSelect
                   size="xs"
                   {...linkedAccountIdField.getInputProps()}
@@ -156,7 +166,7 @@ const SimpleFinAccountCard = (
                   }}
                   components={[
                     <DimmedText size="xs" key="label" />,
-                    <PrimaryText size="sm" key="value" />,
+                    getBadgeForAccountName(),
                   ]}
                 />
               </Group>

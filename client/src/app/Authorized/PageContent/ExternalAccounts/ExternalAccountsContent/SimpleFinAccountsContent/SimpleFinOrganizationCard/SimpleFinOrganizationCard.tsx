@@ -25,7 +25,7 @@ const SimpleFinOrganizationCard = (
               {props.simpleFinOrganization.domain}
             </PrimaryText>
           )}
-          {props.simpleFinOrganization.domain && (
+          {props.simpleFinOrganization.simpleFinUrl && (
             <DimmedText size="sm">
               {props.simpleFinOrganization.simpleFinUrl}
             </DimmedText>
