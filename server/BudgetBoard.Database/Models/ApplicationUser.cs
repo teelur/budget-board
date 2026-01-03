@@ -11,9 +11,9 @@ namespace BudgetBoard.Database.Models;
 public class ApplicationUser : IdentityUser<Guid>
 {
     /// <summary>
-    /// Access token for external service integrations.
+    /// Access token for SimpleFIN service integration.
     /// </summary>
-    public string AccessToken { get; set; } = string.Empty;
+    public string SimpleFinAccessToken { get; set; } = string.Empty;
 
     /// <summary>
     /// The last date and time the user's data was synchronized.

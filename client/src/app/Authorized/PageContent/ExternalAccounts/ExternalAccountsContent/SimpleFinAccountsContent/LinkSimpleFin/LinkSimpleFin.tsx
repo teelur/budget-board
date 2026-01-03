@@ -1,11 +1,4 @@
-import {
-  Button,
-  Badge,
-  Group,
-  LoadingOverlay,
-  Stack,
-  Skeleton,
-} from "@mantine/core";
+import { Button, LoadingOverlay, Stack, Skeleton } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -18,6 +11,7 @@ import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 const LinkSimpleFin = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -75,15 +69,8 @@ const LinkSimpleFin = (): React.ReactNode => {
   return (
     <Card elevation={1}>
       <LoadingOverlay visible={doSetAccessToken.isPending} zIndex={1000} />
-      <Stack gap="1rem">
-        <Group gap="1rem">
-          <PrimaryText size="lg">{t("link_simplefin")}</PrimaryText>
-          {userQuery.data?.accessToken && (
-            <Badge color="var(--button-color-confirm)" maw={80}>
-              {t("linked")}
-            </Badge>
-          )}
-        </Group>
+      <Stack gap="0.5rem">
+        <DimmedText size="sm">{t("link_simplefin_description")}</DimmedText>
         <Stack gap="0.5rem">
           <PasswordInput
             {...simpleFinKeyField.getInputProps()}
@@ -95,9 +82,12 @@ const LinkSimpleFin = (): React.ReactNode => {
           <Button
             onClick={() => {
               simpleFinKeyField.validate();
-              if (!simpleFinKeyField.error) {
-                doSetAccessToken.mutate(simpleFinKeyField.getValue());
+
+              if (simpleFinKeyField.getValue().length === 0) {
+                return;
               }
+
+              doSetAccessToken.mutate(simpleFinKeyField.getValue());
             }}
           >
             {t("set_access_token")}

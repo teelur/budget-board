@@ -64,4 +64,26 @@ public class SimpleFinController(
             return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> RemoveAccessToken()
+    {
+        try
+        {
+            await simpleFinService.RemoveAccessTokenAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty)
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
 }

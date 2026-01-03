@@ -46,9 +46,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           {props.account.hideTransactions && (
             <Badge bg="purple">{t("hidden_transactions")}</Badge>
           )}
-          {props.account.syncID !== null && (
-            <Badge bg="blue">{t("simplefin")}</Badge>
-          )}
+          <Badge bg="blue">{t(props.account.source)}</Badge>
         </Group>
         <StatusText amount={props.account.currentBalance} size="md">
           {convertNumberToCurrency(

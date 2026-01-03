@@ -18,4 +18,11 @@ public interface ISimpleFinService : ISyncProvider
     /// A task that represents the asynchronous operation.
     /// </returns>
     Task ConfigureAccessTokenAsync(Guid userGuid, string setupToken);
+
+    /// <summary>
+    /// Removes the access token for SimpleFIN.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user whose access token is being removed.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    Task RemoveAccessTokenAsync(Guid userGuid);
 }

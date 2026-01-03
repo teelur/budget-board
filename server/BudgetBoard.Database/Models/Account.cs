@@ -81,11 +81,6 @@ public class Account
     public ICollection<Balance> Balances { get; set; } = [];
 
     /// <summary>
-    /// Identifier for the associated SimpleFIN account, if any.
-    /// </summary>
-    public Guid? SimpleFinAccountId { get; set; } = null;
-
-    /// <summary>
     /// Reference to the associated SimpleFIN account, if any.
     /// </summary>
     public SimpleFinAccount? SimpleFinAccount { get; set; } = null;

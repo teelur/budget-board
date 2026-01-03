@@ -1,54 +1,78 @@
-import { Group, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
+import { Button, Group, Stack } from "@mantine/core";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { ISimpleFinOrganizationResponse } from "~/models/simpleFinOrganization";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import SimpleFinOrganizationCard from "./SimpleFinOrganizationCard/SimpleFinOrganizationCard";
+import { IApplicationUser } from "~/models/applicationUser";
+import { AxiosError, AxiosResponse } from "axios";
+import SimpleFinOrganizationCards from "./SimpleFinOrganizationCards/SimpleFinOrganizationCards";
+import { notifications } from "@mantine/notifications";
+import { translateAxiosError } from "~/helpers/requests";
+import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 
 const SimpleFinAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
-  const simpleFinOrganizationsQuery = useQuery({
-    queryKey: ["simpleFinOrganizations"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/simpleFinOrganization",
+  const userQuery = useQuery({
+    queryKey: ["user"],
+    queryFn: async (): Promise<IApplicationUser | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/applicationUser",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as ISimpleFinOrganizationResponse[];
+        return res.data as IApplicationUser;
       }
 
       return undefined;
     },
   });
 
-  const organizations = simpleFinOrganizationsQuery.data ?? [];
+  const queryClient = useQueryClient();
+  const doRemoveAccessToken = useMutation({
+    mutationFn: async () =>
+      await request({
+        url: "/api/simplefin/removeAccessToken",
+        method: "POST",
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["simplefinOrganizations"],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
 
   return (
     <Stack p={0} gap="0.5rem">
-      <PrimaryText size="lg">{t("simplefin")}</PrimaryText>
-      <Stack gap="0.5rem">
-        {organizations.length > 0 ? (
-          organizations.map((organization) => (
-            <SimpleFinOrganizationCard
-              key={organization.id}
-              simpleFinOrganization={organization}
-            />
-          ))
-        ) : (
-          <Group justify="center">
-            <DimmedText size="sm">
-              {t("no_simplefin_accounts_found")}
-            </DimmedText>
-          </Group>
+      <Group justify="space-between">
+        <PrimaryText size="lg">{t("simplefin")}</PrimaryText>
+        {userQuery.data?.simpleFinAccessToken && (
+          <Button
+            bg="var(--button-color-destructive)"
+            size="xs"
+            loading={doRemoveAccessToken.isPending}
+            onClick={() => doRemoveAccessToken.mutate()}
+          >
+            {t("remove_simplefin")}
+          </Button>
         )}
-      </Stack>
+      </Group>
+      {userQuery.data?.simpleFinAccessToken ? (
+        <SimpleFinOrganizationCards />
+      ) : (
+        <LinkSimpleFin />
+      )}
     </Stack>
   );
 };

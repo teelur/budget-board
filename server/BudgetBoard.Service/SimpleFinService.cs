@@ -59,7 +59,7 @@ public class SimpleFinService(
             );
         }
 
-        userData.AccessToken = accessToken;
+        userData.SimpleFinAccessToken = accessToken;
         userDataContext.Update(userData);
         await userDataContext.SaveChangesAsync();
     }
@@ -69,7 +69,7 @@ public class SimpleFinService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var simpleFinData = await GetAccountDataAsync(userData.AccessToken, null, false);
+        var simpleFinData = await GetAccountDataAsync(userData.SimpleFinAccessToken, null, false);
         if (simpleFinData == null)
         {
             logger.LogError("{LogMessage}", logLocalizer["SimpleFinDataNotFoundLog"]);
@@ -114,7 +114,10 @@ public class SimpleFinService(
 
         try
         {
-            var simpleFinData = await GetAccountDataAsync(userData.AccessToken, syncStartDate);
+            var simpleFinData = await GetAccountDataAsync(
+                userData.SimpleFinAccessToken,
+                syncStartDate
+            );
             if (simpleFinData == null)
             {
                 logger.LogError("{LogMessage}", logLocalizer["SimpleFinDataNotFoundLog"]);
@@ -139,6 +142,17 @@ public class SimpleFinService(
             );
             return [responseLocalizer["SimpleFinDataRetrievalError"]];
         }
+    }
+
+    /// <inheritdoc />
+    public async Task RemoveAccessTokenAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        userData.SimpleFinAccessToken = string.Empty;
+
+        userDataContext.Update(userData);
+        await userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
@@ -392,6 +406,38 @@ public class SimpleFinService(
                     }
                 );
             }
+        }
+
+        return errors;
+    }
+
+    private async Task<List<string>> RemoveSimpleFinDataAsync(ApplicationUser userData)
+    {
+        List<string> errors = [];
+
+        foreach (var simpleFinAccount in userData.SimpleFinAccounts)
+        {
+            var linkedAccount = userData.Accounts.SingleOrDefault(a =>
+                a.ID == simpleFinAccount.LinkedAccountId
+            );
+            if (linkedAccount != null)
+            {
+                await accountService.UpdateAccountSourceAsync(
+                    userData.Id,
+                    linkedAccount.ID,
+                    AccountSource.Manual
+                );
+            }
+
+            await simpleFinAccountService.DeleteAccountAsync(userData.Id, simpleFinAccount.ID);
+        }
+
+        foreach (var simpleFinOrganization in userData.SimpleFinOrganizations)
+        {
+            await simpleFinOrganizationService.DeleteOrganizationAsync(
+                userData.Id,
+                simpleFinOrganization.ID
+            );
         }
 
         return errors;

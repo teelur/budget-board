@@ -118,7 +118,7 @@ const CreateTransactionModal = (): React.ReactNode => {
       accountID: accountIdsField.getValue()[0]!,
       source: AccountSource.Manual,
       syncID: null,
-    });
+    } as ITransactionCreateRequest);
   };
 
   return (

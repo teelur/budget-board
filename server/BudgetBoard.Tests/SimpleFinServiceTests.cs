@@ -74,7 +74,8 @@ public class SimpleFinServiceTests
         );
 
         // This is a demo token provided by SimpleFIN for dev.
-        helper.demoUser.AccessToken = "https://demo:demo@beta-bridge.simplefin.org/simplefin";
+        helper.demoUser.SimpleFinAccessToken =
+            "https://demo:demo@beta-bridge.simplefin.org/simplefin";
         helper.UserDataContext.SaveChanges();
 
         // Act
@@ -126,7 +127,7 @@ public class SimpleFinServiceTests
         // Assert
         helper
             .UserDataContext.Users.Single()
-            .AccessToken.Should()
+            .SimpleFinAccessToken.Should()
             .Be("https://demo:demo@beta-bridge.simplefin.org/simplefin");
     }
 }

@@ -28,7 +28,7 @@ public class SyncService(
         var errors = new List<string>();
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (!string.IsNullOrEmpty(userData.AccessToken))
+        if (!string.IsNullOrEmpty(userData.SimpleFinAccessToken))
         {
             errors.AddRange(await simpleFinService.UpdateDataAsync(userGuid));
 

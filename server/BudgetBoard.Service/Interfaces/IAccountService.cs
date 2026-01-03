@@ -54,4 +54,13 @@ public interface IAccountService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="orderedAccounts">A collection of account index requests defining the new order.</param>
     Task OrderAccountsAsync(Guid userGuid, IEnumerable<IAccountIndexRequest> orderedAccounts);
+
+    /// <summary>
+    /// Updates the source of a specific account for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="accountGuid">The unique identifier of the account to update.</param>
+    /// <param name="source">The new source value for the account.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task UpdateAccountSourceAsync(Guid userGuid, Guid accountGuid, string source);
 }
