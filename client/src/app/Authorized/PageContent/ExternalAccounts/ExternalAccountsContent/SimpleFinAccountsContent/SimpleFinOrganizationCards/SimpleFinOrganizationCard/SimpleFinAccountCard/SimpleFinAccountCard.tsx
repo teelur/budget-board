@@ -139,7 +139,8 @@ const SimpleFinAccountCard = (
     return accountsQuery.data
       ?.filter(
         (account) =>
-          !linkedAccountIds?.includes(account.id) ||
+          (!linkedAccountIds?.includes(account.id) &&
+            account.deleted == null) ||
           account.id === props.simpleFinAccount.linkedAccountId
       )
       .map((account) => ({
