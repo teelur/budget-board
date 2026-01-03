@@ -19,9 +19,9 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
+import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -160,7 +160,7 @@ const CreateTransactionModal = (): React.ReactNode => {
             {...amountField.getInputProps()}
             elevation={0}
           />
-          <AccountSelect
+          <AccountMultiSelect
             label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
             {...accountIdsField.getInputProps()}
             maxSelectedValues={1}

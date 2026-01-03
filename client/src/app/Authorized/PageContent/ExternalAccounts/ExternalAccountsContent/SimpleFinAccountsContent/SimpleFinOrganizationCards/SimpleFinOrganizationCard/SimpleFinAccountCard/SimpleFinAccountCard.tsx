@@ -9,7 +9,7 @@ import { PencilIcon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
+import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
@@ -141,7 +141,7 @@ const SimpleFinAccountCard = (
             {isEditable ? (
               <Group gap="0.5rem">
                 <PrimaryText size="xs">{t("linked_account_input")}</PrimaryText>
-                <AccountSelect
+                <AccountMultiSelect
                   size="xs"
                   value={
                     props.simpleFinAccount.linkedAccountId != null &&
