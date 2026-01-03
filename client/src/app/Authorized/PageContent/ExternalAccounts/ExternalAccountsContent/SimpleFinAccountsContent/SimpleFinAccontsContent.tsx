@@ -1,4 +1,4 @@
-import { Button, Group, Stack } from "@mantine/core";
+import { Badge, Button, Group, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -64,7 +64,10 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
   return (
     <Stack p={0} gap="0.5rem">
       <Group justify="space-between">
-        <PrimaryText size="lg">{t("simplefin")}</PrimaryText>
+        <Group>
+          <PrimaryText size="lg">{t("simplefin")}</PrimaryText>
+          <Badge color="var(--button-color-confirm)">{t("connected")}</Badge>
+        </Group>
         {userQuery.data?.simpleFinAccessToken && (
           <Button
             bg="var(--button-color-destructive)"

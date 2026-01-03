@@ -123,11 +123,7 @@ const SimpleFinAccountCard = (
     return props.simpleFinAccount.linkedAccountId ? (
       <Badge key="value" size="sm" />
     ) : (
-      <Badge
-        key="value"
-        size="sm"
-        color="var(--elevated-color-input-background)"
-      />
+      <Badge key="value" size="sm" color="gray" />
     );
   };
 
