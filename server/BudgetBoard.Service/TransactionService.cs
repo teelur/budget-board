@@ -335,6 +335,7 @@ public class TransactionService(
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
                 .Include(u => u.UserSettings)
+                .Include(u => u.TransactionCategories)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
