@@ -279,6 +279,7 @@
   "no_transactions_to_import_message": "No transactions to import.",
   "no_type": "No Type",
   "no_unbudgeted_categories": "No unbudgeted categories",
+  "no_valid_accounts_found": "No valid accounts found.",
   "no_value_entries": "No value entries.",
   "none": "None",
   "oidc_authentication_failed_message": "OIDC authentication failed. Please try logging in again.",

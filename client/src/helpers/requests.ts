@@ -1,5 +1,8 @@
 import { AxiosError } from "axios";
 
+export const simpleFinOrganizationQueryKey: string = "simpleFinOrganizations";
+export const simpleFinAccountQueryKey: string = "simpleFinAccounts";
+
 export interface ValidationError {
   title: string;
   type: string;

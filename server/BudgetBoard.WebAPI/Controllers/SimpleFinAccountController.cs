@@ -20,6 +20,29 @@ public class SimpleFinAccountController(
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Read()
+    {
+        try
+        {
+            return Ok(
+                await simpleFinAccountService.ReadSimpleFinAccountsAsync(
+                    new Guid(userManager.GetUserId(User) ?? string.Empty)
+                )
+            );
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
+
     [HttpPut]
     [Authorize]
     [Route("[action]")]

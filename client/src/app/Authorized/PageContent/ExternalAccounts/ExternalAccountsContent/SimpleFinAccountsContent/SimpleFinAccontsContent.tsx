@@ -8,7 +8,11 @@ import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";
 import SimpleFinOrganizationCards from "./SimpleFinOrganizationCards/SimpleFinOrganizationCards";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  simpleFinAccountQueryKey,
+  simpleFinOrganizationQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
 import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 
 const SimpleFinAccountsContent = (): React.ReactNode => {
@@ -41,7 +45,10 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       await queryClient.invalidateQueries({
-        queryKey: ["simplefinOrganizations"],
+        queryKey: [simpleFinOrganizationQueryKey],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [simpleFinAccountQueryKey],
       });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });

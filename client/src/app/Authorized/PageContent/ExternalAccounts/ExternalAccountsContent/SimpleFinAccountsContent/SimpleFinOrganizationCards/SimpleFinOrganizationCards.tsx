@@ -5,13 +5,14 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { ISimpleFinOrganizationResponse } from "~/models/simpleFinOrganization";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import SimpleFinOrganizationCard from "./SimpleFinOrganizationCard/SimpleFinOrganizationCard";
+import { simpleFinOrganizationQueryKey } from "~/helpers/requests";
 
 const SimpleFinOrganizationCards = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
   const simpleFinOrganizationsQuery = useQuery({
-    queryKey: ["simplefinOrganizations"],
+    queryKey: [simpleFinOrganizationQueryKey],
     queryFn: async () => {
       const res = await request({
         url: "/api/simpleFinOrganization",

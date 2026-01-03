@@ -9,12 +9,16 @@ import { PencilIcon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  simpleFinAccountQueryKey,
+  simpleFinOrganizationQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
 import { IAccountResponse } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -53,6 +57,22 @@ const SimpleFinAccountCard = (
     },
   });
 
+  const simpleFinAccountsQuery = useQuery({
+    queryKey: [simpleFinAccountQueryKey],
+    queryFn: async (): Promise<ISimpleFinAccountResponse[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/simpleFinAccount",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as ISimpleFinAccountResponse[];
+      }
+
+      return [];
+    },
+  });
+
   const queryClient = useQueryClient();
   const doUpdateLinkedAccount = useMutation({
     mutationFn: async (updateLinkedAccountRequest: {
@@ -69,8 +89,9 @@ const SimpleFinAccountCard = (
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["simplefinOrganizations"],
+        queryKey: [simpleFinOrganizationQueryKey],
       });
+      queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
       queryClient.invalidateQueries({ queryKey: ["institutions"] });
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
     },
@@ -110,6 +131,27 @@ const SimpleFinAccountCard = (
     );
   };
 
+  const selectableAccounts = React.useMemo(() => {
+    const linkedAccountIds = simpleFinAccountsQuery.data?.map(
+      (sfa) => sfa.linkedAccountId
+    );
+
+    return accountsQuery.data
+      ?.filter(
+        (account) =>
+          !linkedAccountIds?.includes(account.id) ||
+          account.id === props.simpleFinAccount.linkedAccountId
+      )
+      .map((account) => ({
+        value: account.id,
+        label: account.name,
+      }));
+  }, [
+    accountsQuery.data,
+    simpleFinAccountsQuery.data,
+    props.simpleFinAccount.linkedAccountId,
+  ]);
+
   return (
     <Card elevation={2}>
       <LoadingOverlay visible={doUpdateLinkedAccount.isPending} />
@@ -141,23 +183,18 @@ const SimpleFinAccountCard = (
             {isEditable ? (
               <Group gap="0.5rem">
                 <PrimaryText size="xs">{t("linked_account_input")}</PrimaryText>
-                <AccountMultiSelect
+                <Select
                   size="xs"
-                  value={
-                    props.simpleFinAccount.linkedAccountId != null &&
-                    props.simpleFinAccount.linkedAccountId.length > 0
-                      ? [props.simpleFinAccount.linkedAccountId]
-                      : []
-                  }
-                  maxSelectedValues={1}
+                  placeholder={t("select_an_account")}
+                  data={selectableAccounts}
+                  value={props.simpleFinAccount.linkedAccountId}
                   onChange={(value) => {
-                    const selectedAccountId =
-                      value.length > 0 ? value[0] : null;
                     doUpdateLinkedAccount.mutate({
                       simpleFinAccountGuid: props.simpleFinAccount.id,
-                      linkedAccountGuid: selectedAccountId ?? null,
+                      linkedAccountGuid: value,
                     });
                   }}
+                  nothingFoundMessage={t("no_valid_accounts_found")}
                   elevation={2}
                 />
               </Group>
