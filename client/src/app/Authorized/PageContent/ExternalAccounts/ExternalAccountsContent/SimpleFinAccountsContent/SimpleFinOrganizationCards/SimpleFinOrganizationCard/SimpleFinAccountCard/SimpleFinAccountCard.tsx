@@ -67,10 +67,12 @@ const SimpleFinAccountCard = (
           linkedAccountGuid: updateLinkedAccountRequest.linkedAccountGuid,
         },
       }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["simpleFinOrganizations"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["simplefinOrganizations"],
       });
+      queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
     },
     onError: (error: any) => {
       notifications.show({
@@ -89,7 +91,8 @@ const SimpleFinAccountCard = (
 
   React.useEffect(() => {
     linkedAccountIdField.setValue(
-      props.simpleFinAccount.linkedAccountId
+      props.simpleFinAccount.linkedAccountId != null &&
+        props.simpleFinAccount.linkedAccountId.length > 0
         ? [props.simpleFinAccount.linkedAccountId]
         : []
     );
@@ -140,7 +143,12 @@ const SimpleFinAccountCard = (
                 <PrimaryText size="xs">{t("linked_account_input")}</PrimaryText>
                 <AccountSelect
                   size="xs"
-                  {...linkedAccountIdField.getInputProps()}
+                  value={
+                    props.simpleFinAccount.linkedAccountId != null &&
+                    props.simpleFinAccount.linkedAccountId.length > 0
+                      ? [props.simpleFinAccount.linkedAccountId]
+                      : []
+                  }
                   maxSelectedValues={1}
                   onChange={(value) => {
                     const selectedAccountId =

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using BudgetBoard.Database.Data;
@@ -153,6 +154,8 @@ public class SimpleFinService(
 
         userDataContext.Update(userData);
         await userDataContext.SaveChangesAsync();
+
+        await RemoveSimpleFinDataAsync(userGuid);
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
@@ -411,11 +414,12 @@ public class SimpleFinService(
         return errors;
     }
 
-    private async Task<List<string>> RemoveSimpleFinDataAsync(ApplicationUser userData)
+    private async Task<List<string>> RemoveSimpleFinDataAsync(Guid userGuid)
     {
         List<string> errors = [];
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        foreach (var simpleFinAccount in userData.SimpleFinAccounts)
+        foreach (var simpleFinAccount in userData.SimpleFinAccounts.ToList())
         {
             var linkedAccount = userData.Accounts.SingleOrDefault(a =>
                 a.ID == simpleFinAccount.LinkedAccountId
@@ -432,7 +436,7 @@ public class SimpleFinService(
             await simpleFinAccountService.DeleteAccountAsync(userData.Id, simpleFinAccount.ID);
         }
 
-        foreach (var simpleFinOrganization in userData.SimpleFinOrganizations)
+        foreach (var simpleFinOrganization in userData.SimpleFinOrganizations.ToList())
         {
             await simpleFinOrganizationService.DeleteOrganizationAsync(
                 userData.Id,
@@ -659,14 +663,39 @@ public class SimpleFinService(
         // SimpleFin tokens are Base64-encoded URLs on which a POST request will
         // return the access URL for getting bank data.
 
-        byte[] data = Convert.FromBase64String(setupToken);
-        string decodedString = Encoding.UTF8.GetString(data);
+        string decodedString;
+        try
+        {
+            byte[] data = Convert.FromBase64String(setupToken);
+            decodedString = Encoding.UTF8.GetString(data);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["SimpleFinDecodeTokenInvalidLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinDecodeTokenInvalidError"]
+            );
+        }
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, decodedString);
-        var client = clientFactory.CreateClient();
-        var response = await client.SendAsync(request);
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, decodedString);
+            var client = clientFactory.CreateClient();
+            var response = await client.SendAsync(request);
 
-        return response;
+            return response;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["SimpleFinDecodeTokenRequestErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinDecodeTokenRequestError"]
+            );
+        }
     }
 
     private async Task<bool> IsAccessTokenValid(string accessToken) =>

@@ -43,6 +43,7 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
       await queryClient.invalidateQueries({
         queryKey: ["simplefinOrganizations"],
       });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
     },
     onError: (error: AxiosError) => {

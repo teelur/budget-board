@@ -9,9 +9,9 @@ import { notifications } from "@mantine/notifications";
 import { isNotEmpty, useField } from "@mantine/form";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 const LinkSimpleFin = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -72,7 +72,7 @@ const LinkSimpleFin = (): React.ReactNode => {
       <Stack gap="0.5rem">
         <DimmedText size="sm">{t("link_simplefin_description")}</DimmedText>
         <Stack gap="0.5rem">
-          <PasswordInput
+          <TextInput
             {...simpleFinKeyField.getInputProps()}
             label={
               <PrimaryText size="sm">{t("simplefin_access_token")}</PrimaryText>

@@ -376,6 +376,12 @@
   <data name="SimpleFinDeserializationErrorLog" xml:space="preserve">
     <value>Error deserializing SimpleFin data: {0}</value>
   </data>
+  <data name="SimpleFinDecodeTokenInvalidLog" xml:space="preserve">
+    <value>There was an error decoding the setup token.</value>
+  </data>
+  <data name="SimpleFinDecodeTokenRequestErrorLog" xml:space="preserve">
+    <value>Error sending request to decoded setup token URL: {0}</value>
+  </data>
   <data name="GoalNoBalanceFoundLog" xml:space="preserve">
     <value>No balance found for goal {0}</value>
   </data>

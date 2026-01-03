@@ -21,6 +21,9 @@ const SyncButton = (): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["goals"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["simplefinOrganizations"],
+      });
       if ((data.data?.length ?? 0) > 0) {
         {
           data.data.map((error: string) =>

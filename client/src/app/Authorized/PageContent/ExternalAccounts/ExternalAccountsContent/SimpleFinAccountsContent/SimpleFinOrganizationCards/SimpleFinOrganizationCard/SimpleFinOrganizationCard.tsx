@@ -12,6 +12,10 @@ interface ISimpleFinOrganizationCardProps {
 const SimpleFinOrganizationCard = (
   props: ISimpleFinOrganizationCardProps
 ): React.ReactNode => {
+  const sortedAccounts = props.simpleFinOrganization.accounts.sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
   return (
     <Card elevation={1}>
       <Stack p={0} gap="0.5rem">
@@ -32,7 +36,7 @@ const SimpleFinOrganizationCard = (
           )}
         </Group>
         <Stack gap="0.5rem">
-          {props.simpleFinOrganization.accounts.map((account) => (
+          {sortedAccounts.map((account) => (
             <SimpleFinAccountCard key={account.id} simpleFinAccount={account} />
           ))}
         </Stack>

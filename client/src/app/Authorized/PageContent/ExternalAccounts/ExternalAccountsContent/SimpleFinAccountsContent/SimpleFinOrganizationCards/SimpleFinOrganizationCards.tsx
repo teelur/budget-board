@@ -11,7 +11,7 @@ const SimpleFinOrganizationCards = (): React.ReactNode => {
   const { request } = useAuth();
 
   const simpleFinOrganizationsQuery = useQuery({
-    queryKey: ["simpleFinOrganizations"],
+    queryKey: ["simplefinOrganizations"],
     queryFn: async () => {
       const res = await request({
         url: "/api/simpleFinOrganization",
@@ -26,12 +26,11 @@ const SimpleFinOrganizationCards = (): React.ReactNode => {
     },
   });
 
-  const organizations = simpleFinOrganizationsQuery.data ?? [];
-
   return (
     <Stack gap="0.5rem">
-      {organizations.length > 0 ? (
-        organizations.map((organization) => (
+      {simpleFinOrganizationsQuery.data &&
+      simpleFinOrganizationsQuery.data.length > 0 ? (
+        simpleFinOrganizationsQuery.data.map((organization) => (
           <SimpleFinOrganizationCard
             key={organization.id}
             simpleFinOrganization={organization}

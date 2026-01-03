@@ -133,11 +133,19 @@ public class SimpleFinAccountService(
             throw new BudgetBoardServiceException(responseLocalizer["InvalidLinkedAccountIDError"]);
         }
 
+        var oldAccountLinkedId = accountToUpdate.LinkedAccountId;
+        if (oldAccountLinkedId != null)
+        {
+            var oldLinkedAccount = userData.Accounts.FirstOrDefault(a =>
+                a.ID == oldAccountLinkedId
+            );
+            oldLinkedAccount?.Source = AccountSource.Manual;
+        }
+
         accountToUpdate.LinkedAccountId = linkedAccountGuid;
         accountToUpdate.LastSync = null;
 
         var linkedAccount = userData.Accounts.FirstOrDefault(a => a.ID == linkedAccountGuid);
-
         linkedAccount?.Source =
             linkedAccountGuid != null ? AccountSource.SimpleFIN : AccountSource.Manual;
 
