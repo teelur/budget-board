@@ -33,7 +33,10 @@ public interface ISimpleFinOrganizationService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The request containing details for updating a SimpleFIN organization.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task UpdateOrganizationAsync(Guid userGuid, ISimpleFinOrganizationUpdateRequest request);
+    Task UpdateSimpleFinOrganizationAsync(
+        Guid userGuid,
+        ISimpleFinOrganizationUpdateRequest request
+    );
 
     /// <summary>
     /// Deletes a SimpleFIN organization for the specified user.
@@ -41,5 +44,5 @@ public interface ISimpleFinOrganizationService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="organizationGuid">The unique identifier of the SimpleFIN organization.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task DeleteOrganizationAsync(Guid userGuid, Guid organizationGuid);
+    Task DeleteSimpleFinOrganizationAsync(Guid userGuid, Guid organizationGuid);
 }

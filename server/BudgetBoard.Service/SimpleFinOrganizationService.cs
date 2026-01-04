@@ -60,7 +60,7 @@ public class SimpleFinOrganizationService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateOrganizationAsync(
+    public async Task UpdateSimpleFinOrganizationAsync(
         Guid userGuid,
         ISimpleFinOrganizationUpdateRequest request
     )
@@ -88,7 +88,7 @@ public class SimpleFinOrganizationService(
     }
 
     /// <inheritdoc />
-    public async Task DeleteOrganizationAsync(Guid userGuid, Guid organizationGuid)
+    public async Task DeleteSimpleFinOrganizationAsync(Guid userGuid, Guid organizationGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 

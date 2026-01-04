@@ -661,7 +661,7 @@ public class SimpleFinService(
 
         foreach (var simpleFinOrganization in userData.SimpleFinOrganizations.ToList())
         {
-            await simpleFinOrganizationService.DeleteOrganizationAsync(
+            await simpleFinOrganizationService.DeleteSimpleFinOrganizationAsync(
                 userData.Id,
                 simpleFinOrganization.ID
             );
