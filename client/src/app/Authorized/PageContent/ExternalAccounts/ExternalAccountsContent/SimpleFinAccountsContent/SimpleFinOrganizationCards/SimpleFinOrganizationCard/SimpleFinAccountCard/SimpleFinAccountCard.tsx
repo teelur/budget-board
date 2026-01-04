@@ -110,6 +110,16 @@ const SimpleFinAccountCard = (
     return account ? account.name : t("unknown_account");
   };
 
+  const isLinkedAccountDeleted = React.useMemo(() => {
+    if (!props.simpleFinAccount.linkedAccountId) {
+      return false;
+    }
+    const linkedAccount = accountsQuery.data?.find(
+      (account) => account.id === props.simpleFinAccount.linkedAccountId
+    );
+    return linkedAccount?.deleted != null;
+  }, [accountsQuery.data, props.simpleFinAccount.linkedAccountId]);
+
   React.useEffect(() => {
     linkedAccountIdField.setValue(
       props.simpleFinAccount.linkedAccountId != null &&
@@ -234,6 +244,11 @@ const SimpleFinAccountCard = (
                     getBadgeForAccountName(),
                   ]}
                 />
+                {isLinkedAccountDeleted && (
+                  <Badge size="sm" color="var(--button-color-destructive)">
+                    {t("deleted")}
+                  </Badge>
+                )}
               </Group>
             )}
             <DimmedText size="xs">
