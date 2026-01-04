@@ -29,13 +29,6 @@ public class SimpleFinServiceTests
         var nowProviderMock = Mock.Of<INowProvider>();
         Mock.Get(nowProviderMock).Setup(_ => _.UtcNow).Returns(DateTime.UtcNow);
 
-        var institutionService = new InstitutionService(
-            Mock.Of<ILogger<IInstitutionService>>(),
-            helper.UserDataContext,
-            nowProviderMock,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
@@ -64,7 +57,6 @@ public class SimpleFinServiceTests
             Mock.Of<ILogger<ISyncProvider>>(),
             nowProviderMock,
             accountService,
-            institutionService,
             transactionService,
             balanceService,
             Mock.Of<ISimpleFinOrganizationService>(),
@@ -108,7 +100,6 @@ public class SimpleFinServiceTests
             Mock.Of<ILogger<ISyncProvider>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
-            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<IBalanceService>(),
             Mock.Of<ISimpleFinOrganizationService>(),

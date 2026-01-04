@@ -24,7 +24,7 @@ public class SyncServiceTests
 
         var simpleFinServiceMock = new Mock<ISimpleFinService>();
         simpleFinServiceMock
-            .Setup(_ => _.SyncDataAsync(It.IsAny<Guid>()))
+            .Setup(_ => _.SyncTransactionHistoryAsync(It.IsAny<Guid>()))
             .ReturnsAsync([])
             .Verifiable();
 
@@ -92,7 +92,7 @@ public class SyncServiceTests
 
         var syncProviderMock = new Mock<ISimpleFinService>();
         syncProviderMock
-            .Setup(_ => _.SyncDataAsync(It.IsAny<Guid>()))
+            .Setup(_ => _.SyncTransactionHistoryAsync(It.IsAny<Guid>()))
             .ReturnsAsync([])
             .Verifiable();
 
