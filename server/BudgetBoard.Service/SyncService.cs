@@ -30,9 +30,8 @@ public class SyncService(
 
         if (!string.IsNullOrEmpty(userData.SimpleFinAccessToken))
         {
-            errors.AddRange(await simpleFinService.UpdateDataAsync(userGuid));
-
-            // TODO: Sync data based on local cache
+            errors.AddRange(await simpleFinService.RefreshAccountsAsync(userGuid));
+            errors.AddRange(await simpleFinService.SyncTransactionHistoryAsync(userGuid));
         }
         else
         {

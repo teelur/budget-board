@@ -430,4 +430,13 @@
   <data name="InvalidLinkedAccountIDLog" xml:space="preserve">
     <value>Attempted to link a SimpleFIN account to an account that does not exist.</value>
   </data>
+  <data name="SimpleFinAccountNotFoundForSyncLog" xml:space="preserve">
+    <value>SimpleFIN account with SyncID {0} not found in cache. Skipping account sync.</value>
+  </data>
+  <data name="SimpleFinAccountNotLinkedLog" xml:space="preserve">
+    <value>SimpleFIN account {0} is not linked to any account. Skipping transaction sync.</value>
+  </data>
+  <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
+    <value>SimpleFIN account {0} is deleted. Skipping.</value>
+  </data>
 </root>

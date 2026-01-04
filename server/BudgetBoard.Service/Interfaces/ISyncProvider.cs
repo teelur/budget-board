@@ -6,20 +6,16 @@ namespace BudgetBoard.Service.Interfaces;
 public interface ISyncProvider
 {
     /// <summary>
-    /// Update the local cache with data from the external provider.
+    /// Refresh accounts from the external provider.
     /// </summary>
-    /// <param name="userGuid">The unique identifier of the user whose data is being updated.</param>
-    /// <returns>A list of error messages encountered during the update process, if any.</returns>
-    Task<IList<string>> UpdateDataAsync(Guid userGuid);
+    /// <param name="userGuid">The unique identifier of the user whose accounts are being refreshed.</param>
+    /// <returns>A list of error messages encountered during the refresh process, if any.</returns>
+    Task<IList<string>> RefreshAccountsAsync(Guid userGuid);
 
     /// <summary>
-    /// Sync data from the external provider.
+    /// Sync transaction history from the external provider.
     /// </summary>
-    /// <param name="userGuid">
-    /// The unique identifier of the user whose data is being synced.
-    /// </param>
-    /// <returns>
-    /// A list of error messages encountered during the sync process, if any.
-    /// </returns>
-    Task<IList<string>> SyncDataAsync(Guid userGuid);
+    /// <param name="userGuid">The unique identifier of the user whose transaction history is being synced.</param>
+    /// <returns>A list of error messages encountered during the sync process, if any.</returns>
+    Task<IList<string>> SyncTransactionHistoryAsync(Guid userGuid);
 }

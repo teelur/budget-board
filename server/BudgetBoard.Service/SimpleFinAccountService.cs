@@ -34,7 +34,7 @@ public class SimpleFinAccountService(
             throw new BudgetBoardServiceException(responseLocalizer["InvalidOrganizationIDError"]);
         }
 
-        var newSimpleFinAccount = new Database.Models.SimpleFinAccount
+        var newSimpleFinAccount = new SimpleFinAccount
         {
             SyncID = request.SyncID,
             Name = request.Name,

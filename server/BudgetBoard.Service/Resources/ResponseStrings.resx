@@ -424,4 +424,7 @@
   <data name="InvalidLinkedAccountIDError" xml:space="preserve">
     <value>The linked account ID you provided does not exist.</value>
   </data>
+  <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
+    <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
+  </data>
   </root>

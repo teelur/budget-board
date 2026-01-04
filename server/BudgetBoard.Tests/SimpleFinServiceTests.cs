@@ -79,7 +79,7 @@ public class SimpleFinServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        var errors = await simpleFinService.SyncDataAsync(helper.demoUser.Id);
+        var errors = await simpleFinService.SyncTransactionHistoryAsync(helper.demoUser.Id);
 
         // Assert
         errors.Should().BeEmpty();

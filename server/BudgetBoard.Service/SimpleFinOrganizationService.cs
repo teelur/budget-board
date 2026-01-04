@@ -33,7 +33,7 @@ public class SimpleFinOrganizationService(
             );
         }
 
-        var newSimpleFinOrganization = new Database.Models.SimpleFinOrganization
+        var newSimpleFinOrganization = new SimpleFinOrganization
         {
             Domain = request.Domain,
             SimpleFinUrl = request.SimpleFinUrl,

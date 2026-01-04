@@ -149,6 +149,29 @@ const SimpleFinAccountCard = (
     props.simpleFinAccount.linkedAccountId,
   ]);
 
+  const accountCurrency = React.useMemo(() => {
+    const accountCurrency = props.simpleFinAccount.currency;
+    // Check if the currency is a valid ISO 4217 currency code
+    const iso4217CurrencyCodes = Intl.NumberFormat.supportedLocalesOf([
+      "en",
+    ]).map((locale) => {
+      const formatter = new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency:
+          accountCurrency != null && accountCurrency.length > 0
+            ? accountCurrency
+            : "USD",
+      });
+      const parts = formatter.formatToParts(1);
+      const currencyPart = parts.find((part) => part.type === "currency");
+      return currencyPart ? currencyPart.value : null;
+    });
+
+    return iso4217CurrencyCodes.includes(accountCurrency ?? "")
+      ? accountCurrency
+      : "USD";
+  }, [accountsQuery.data, props.simpleFinAccount.linkedAccountId]);
+
   return (
     <Card elevation={2}>
       <LoadingOverlay visible={doUpdateLinkedAccount.isPending} />
@@ -171,7 +194,7 @@ const SimpleFinAccountCard = (
             {convertNumberToCurrency(
               props.simpleFinAccount.balance,
               true,
-              props.simpleFinAccount.currency
+              accountCurrency
             )}
           </StatusText>
         </Group>

@@ -1,3 +1,5 @@
+using BudgetBoard.Database.Models;
+
 namespace BudgetBoard.Service.Models;
 
 public interface ISimpleFinOrganizationCreateRequest
@@ -29,9 +31,8 @@ public interface ISimpleFinOrganizationResponse
     IEnumerable<ISimpleFinAccountResponse> Accounts { get; }
 }
 
-public class SimpleFinOrganizationResponse(
-    Database.Models.SimpleFinOrganization simpleFinOrganization
-) : ISimpleFinOrganizationResponse
+public class SimpleFinOrganizationResponse(SimpleFinOrganization simpleFinOrganization)
+    : ISimpleFinOrganizationResponse
 {
     public Guid ID { get; init; } = simpleFinOrganization.ID;
     public string? Domain { get; init; } = simpleFinOrganization.Domain;

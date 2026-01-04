@@ -1,3 +1,5 @@
+using BudgetBoard.Database.Models;
+
 namespace BudgetBoard.Service.Models;
 
 public interface ISimpleFinAccountCreateRequest
@@ -33,8 +35,7 @@ public interface ISimpleFinAccountResponse
     public Guid? LinkedAccountId { get; }
 }
 
-public class SimpleFinAccountResponse(Database.Models.SimpleFinAccount simpleFinAccount)
-    : ISimpleFinAccountResponse
+public class SimpleFinAccountResponse(SimpleFinAccount simpleFinAccount) : ISimpleFinAccountResponse
 {
     public Guid ID { get; init; } = simpleFinAccount.ID;
     public string SyncID { get; init; } = simpleFinAccount.SyncID;

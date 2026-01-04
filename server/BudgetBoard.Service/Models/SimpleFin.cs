@@ -22,7 +22,7 @@ public class SimpleFinData : ISimpleFinData
     }
 }
 
-public interface ISimpleFinOrganization
+public interface ISimpleFinOrganizationData
 {
     string? Domain { get; }
     string SimpleFinUrl { get; }
@@ -31,7 +31,7 @@ public interface ISimpleFinOrganization
     string? SyncID { get; }
 }
 
-public class SimpleFinOrganization : ISimpleFinOrganization
+public class SimpleFinOrganizationData : ISimpleFinOrganizationData
 {
     public string? Domain { get; init; } = null;
 
@@ -44,7 +44,7 @@ public class SimpleFinOrganization : ISimpleFinOrganization
     public string? SyncID { get; init; } = null;
 }
 
-public interface ISimpleFinTransaction
+public interface ISimpleFinTransactionData
 {
     string Id { get; }
     int Posted { get; }
@@ -54,7 +54,7 @@ public interface ISimpleFinTransaction
     bool Pending { get; }
 }
 
-public class SimpleFinTransaction : ISimpleFinTransaction
+public class SimpleFinTransactionData : ISimpleFinTransactionData
 {
     public string Id { get; init; } = string.Empty;
     public int Posted { get; init; }
@@ -66,22 +66,22 @@ public class SimpleFinTransaction : ISimpleFinTransaction
     public bool Pending { get; init; }
 }
 
-public interface ISimpleFinAccount
+public interface ISimpleFinAccountData
 {
-    ISimpleFinOrganization Org { get; }
+    ISimpleFinOrganizationData Org { get; }
     string Id { get; }
     string Name { get; }
     string Currency { get; }
     string Balance { get; }
     string? AvailableBalance { get; }
     int BalanceDate { get; }
-    IEnumerable<ISimpleFinTransaction> Transactions { get; }
+    IEnumerable<ISimpleFinTransactionData> Transactions { get; }
 }
 
-public class SimpleFinAccount : ISimpleFinAccount
+public class SimpleFinAccountData : ISimpleFinAccountData
 {
-    public SimpleFinOrganization Org { get; init; } = new();
-    ISimpleFinOrganization ISimpleFinAccount.Org => Org;
+    public SimpleFinOrganizationData Org { get; init; } = new();
+    ISimpleFinOrganizationData ISimpleFinAccountData.Org => Org;
     public string Id { get; init; } = string.Empty;
     public string Name { get; init; } = string.Empty;
     public string Currency { get; init; } = string.Empty;
@@ -92,19 +92,19 @@ public class SimpleFinAccount : ISimpleFinAccount
 
     [JsonPropertyName("balance-date")]
     public int BalanceDate { get; init; }
-    public IEnumerable<SimpleFinTransaction> Transactions { get; init; } = [];
-    IEnumerable<ISimpleFinTransaction> ISimpleFinAccount.Transactions => Transactions;
+    public IEnumerable<SimpleFinTransactionData> Transactions { get; init; } = [];
+    IEnumerable<ISimpleFinTransactionData> ISimpleFinAccountData.Transactions => Transactions;
 }
 
-public interface ISimpleFinAccountData
+public interface ISimpleFinAccountsData
 {
     IEnumerable<string> Errors { get; }
-    IEnumerable<ISimpleFinAccount> Accounts { get; }
+    IEnumerable<ISimpleFinAccountData> Accounts { get; }
 }
 
-public class SimpleFinAccountData : ISimpleFinAccountData
+public class SimpleFinAccountsData : ISimpleFinAccountsData
 {
     public IEnumerable<string> Errors { get; init; } = [];
-    public IEnumerable<SimpleFinAccount> Accounts { get; init; } = [];
-    IEnumerable<ISimpleFinAccount> ISimpleFinAccountData.Accounts => Accounts;
+    public IEnumerable<SimpleFinAccountData> Accounts { get; init; } = [];
+    IEnumerable<ISimpleFinAccountData> ISimpleFinAccountsData.Accounts => Accounts;
 }
