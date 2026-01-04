@@ -68,6 +68,7 @@ public class SimpleFinService(
     /// <inheritdoc />
     public async Task<IList<string>> RefreshAccountsAsync(Guid userGuid)
     {
+        var errors = new List<string>();
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var simpleFinData = await GetSimpleFinAccountsDataAsync(
@@ -81,7 +82,7 @@ public class SimpleFinService(
             return [responseLocalizer["SimpleFinDataNotFoundError"]];
         }
 
-        List<string> errors = [.. simpleFinData.Errors];
+        errors.AddRange(simpleFinData.Errors);
 
         if (simpleFinData.Accounts.Any())
         {

@@ -14,7 +14,7 @@ public class SimpleFinServiceTests
     // This test is a quick and dirty check that values from the SimpleFIN demo get added to the database.
     // There's no validation that the data is correct, so more testing may be needed.
     [Fact]
-    public async Task SyncAsync_WhenCalledWithValidData_ShouldUpdateWithSyncedData()
+    public async Task SyncTransactionHistoryAsync_WhenCalledWithValidData_ShouldUpdateWithSyncedData()
     {
         // Arrange
         var helper = new TestHelper();
