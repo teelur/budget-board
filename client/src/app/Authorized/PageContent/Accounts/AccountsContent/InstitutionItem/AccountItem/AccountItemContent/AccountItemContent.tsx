@@ -1,6 +1,6 @@
 import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
 import dayjs from "dayjs";
-import { PencilIcon } from "lucide-react";
+import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -70,9 +70,19 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
         </StatusText>
       </Group>
       <Group justify="space-between" align="center">
-        <DimmedText size="sm">
-          {props.account.subtype ? props.account.subtype : props.account.type}
-        </DimmedText>
+        {props.account.type ? (
+          <Group gap="0.25rem">
+            <DimmedText size="sm">{props.account.type}</DimmedText>
+            {props.account.subtype && (
+              <>
+                <ChevronRightIcon size={14} />
+                <DimmedText size="sm">{props.account.subtype}</DimmedText>
+              </>
+            )}
+          </Group>
+        ) : (
+          <DimmedText size="sm">{t("no_type")}</DimmedText>
+        )}
         <DimmedText size="sm">
           {t("last_updated", {
             date: dayjs(props.account.balanceDate).isValid()
