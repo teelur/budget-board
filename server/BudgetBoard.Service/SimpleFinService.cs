@@ -63,6 +63,8 @@ public class SimpleFinService(
 
         userDataContext.Update(userData);
         await userDataContext.SaveChangesAsync();
+
+        await RefreshAccountsAsync(userData.Id);
     }
 
     /// <inheritdoc />

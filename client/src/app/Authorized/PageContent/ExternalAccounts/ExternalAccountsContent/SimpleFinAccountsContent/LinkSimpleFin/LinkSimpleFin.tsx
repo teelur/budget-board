@@ -4,7 +4,11 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  simpleFinAccountQueryKey,
+  simpleFinOrganizationQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { isNotEmpty, useField } from "@mantine/form";
 import Card from "~/components/core/Card/Card";
@@ -49,9 +53,11 @@ const LinkSimpleFin = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("simplefin_access_token_updated_successfully"),
+      await queryClient.invalidateQueries({
+        queryKey: [simpleFinOrganizationQueryKey],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [simpleFinAccountQueryKey],
       });
     },
     onError: (error: AxiosError) => {
