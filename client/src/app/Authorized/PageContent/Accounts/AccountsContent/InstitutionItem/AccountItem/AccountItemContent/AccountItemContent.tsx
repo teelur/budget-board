@@ -6,7 +6,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { IAccountResponse } from "~/models/account";
+import { AccountSource, IAccountResponse } from "~/models/account";
 
 interface IAccountItemContentProps {
   account: IAccountResponse;
@@ -16,6 +16,17 @@ interface IAccountItemContentProps {
 
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
+
+  const getAccountSourceBadgeColor = (): string => {
+    switch (props.account.source) {
+      case AccountSource.SimpleFIN:
+        return "blue";
+      case AccountSource.Manual:
+      default:
+        return "gray";
+    }
+  };
+
   return (
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
@@ -46,7 +57,9 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           {props.account.hideTransactions && (
             <Badge bg="purple">{t("hidden_transactions")}</Badge>
           )}
-          <Badge bg="blue">{t(props.account.source)}</Badge>
+          <Badge bg={getAccountSourceBadgeColor()}>
+            {t(props.account.source)}
+          </Badge>
         </Group>
         <StatusText amount={props.account.currentBalance} size="md">
           {convertNumberToCurrency(
