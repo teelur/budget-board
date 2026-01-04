@@ -2,7 +2,7 @@ import classes from "./AccountItem.module.css";
 
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { Group, Stack } from "@mantine/core";
-import { AccountSource, IAccountResponse } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -56,15 +56,13 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
           </StatusText>
         )}
       </Group>
-      {props.account.source !== AccountSource.Manual && (
-        <DimmedText size="sm">
-          {t("last_updated", {
-            date: props.account.balanceDate
-              ? new Date(props.account.balanceDate).toLocaleString()
-              : t("never"),
-          })}
-        </DimmedText>
-      )}
+      <DimmedText size="xs">
+        {t("last_updated", {
+          date: props.account.balanceDate
+            ? new Date(props.account.balanceDate).toLocaleString()
+            : t("never"),
+        })}
+      </DimmedText>
     </Stack>
   );
 };
