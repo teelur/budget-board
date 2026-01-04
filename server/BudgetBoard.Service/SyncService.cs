@@ -28,6 +28,9 @@ public class SyncService(
         var errors = new List<string>();
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
+        // The external sync provider update changed how the Source is determined. Need to reconcile existing accounts.
+        SetManualSourceForUnlinkedAccounts(userData.Accounts);
+
         if (!string.IsNullOrEmpty(userData.SimpleFinAccessToken))
         {
             errors.AddRange(await simpleFinService.RefreshAccountsAsync(userGuid));
@@ -63,6 +66,8 @@ public class SyncService(
                 .Include(u => u.Goals)
                 .ThenInclude(g => g.Accounts)
                 .Include(u => u.UserSettings)
+                .Include(u => u.Accounts)
+                .ThenInclude(a => a.SimpleFinAccount)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
@@ -83,5 +88,16 @@ public class SyncService(
         }
 
         return foundUser;
+    }
+
+    private static void SetManualSourceForUnlinkedAccounts(IEnumerable<Account> accounts)
+    {
+        foreach (var account in accounts)
+        {
+            if (account.SimpleFinAccount == null)
+            {
+                account.Source = AccountSource.Manual;
+            }
+        }
     }
 }
