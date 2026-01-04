@@ -59,19 +59,19 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DuplicateSyncIDError" xml:space="preserve">
-    <value>An account with this SyncID already exists.</value>
+    <value></value>
   </data>
   <data name="InvalidInstitutionIDError" xml:space="preserve">
-    <value>The provided Institution ID is invalid.</value>
+    <value></value>
   </data>
   <data name="AccountNotFoundError" xml:space="preserve">
-    <value>The account you are trying to access does not exist.</value>
+    <value></value>
   </data>
   <data name="AccountEditNotFoundError" xml:space="preserve">
-    <value>The account you are trying to edit does not exist.</value>
+    <value></value>
   </data>
   <data name="AccountEditEmptyNameError" xml:space="preserve">
-    <value>The account name cannot be empty.</value>
+    <value></value>
   </data>
   <data name="AccountDeleteNotFoundError" xml:space="preserve">
     <value>The account you are trying to delete does not exist.</value>
