@@ -302,9 +302,6 @@ const ConfigureTransactions = (
     // Remove any trailing non-numeric characters
     normalized = normalized.replace(/[^\d]+$/, "");
 
-    // Remove any remaining whitespace throughout the string
-    normalized = normalized.replace(/\s/g, "");
-
     // Thousands separators are not needed for parsing, so remove them
     normalized = normalized.replace(
       new RegExp(`\\${columnsOptions.thousandsSeparator}`, "g"),
@@ -318,6 +315,9 @@ const ConfigureTransactions = (
         "."
       );
     }
+
+    // Remove any remaining whitespace throughout the string
+    normalized = normalized.replace(/\s/g, "");
 
     return normalized;
   };
