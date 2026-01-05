@@ -14,6 +14,7 @@ import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 
 const CreateAccount = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -154,9 +155,15 @@ const CreateAccount = () => {
             label={<PrimaryText size="sm">{t("account_name")}</PrimaryText>}
             elevation={0}
           />
-          <TextInput
+          <Autocomplete
             {...institutionField.getInputProps()}
             label={<PrimaryText size="sm">{t("institution")}</PrimaryText>}
+            data={
+              institutionQuery.data
+                ? institutionQuery.data.map((i) => i.name)
+                : []
+            }
+            clearable
             elevation={0}
           />
           <Button
