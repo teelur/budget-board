@@ -1,7 +1,8 @@
-import { Divider, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Divider, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import Card from "~/components/core/Card/Card";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
 import Select from "~/components/core/Select/Select/Select";
@@ -143,14 +144,14 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
 
   return (
     <Stack>
-      <LoadingOverlay visible={props.loading} />
       <Divider label={t("columns_options")} labelPosition="center" />
       <Stack>
-        <Select
+        <Autocomplete
           label={<PrimaryText size="sm">{t("date_format")}</PrimaryText>}
           data={dateFormatOptions}
           {...dateFormatField.getInputProps()}
-          maw="150px"
+          clearable
+          maw="170px"
           elevation={0}
         />
         <Checkbox
