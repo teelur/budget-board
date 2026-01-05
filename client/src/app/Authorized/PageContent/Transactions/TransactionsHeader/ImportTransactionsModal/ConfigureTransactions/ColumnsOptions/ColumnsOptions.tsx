@@ -147,32 +147,37 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
     <Stack>
       <Divider label={t("columns_options")} labelPosition="center" />
       <Stack>
-        <Autocomplete
-          label={
-            <Stack gap="0.25rem">
-              <PrimaryText size="sm">{t("date_format")}</PrimaryText>
-              <DimmedText size="xs">{t("date_format_description")}</DimmedText>
-              <Button
-                mb="0.25rem"
-                size="compact-xs"
-                variant="outline"
-                onClick={() =>
-                  window.open(
-                    "https://budgetboard.net/features/importing-data/csv-import#date-format",
-                    "_blank"
-                  )
-                }
-              >
-                {t("examples")}
-              </Button>
-            </Stack>
-          }
-          data={dateFormatOptions}
-          {...dateFormatField.getInputProps()}
-          clearable
-          maw="250px"
-          elevation={0}
-        />
+        <Group gap="0.5rem">
+          <Autocomplete
+            label={
+              <Stack gap="0.25rem">
+                <PrimaryText size="sm">{t("date_format")}</PrimaryText>
+                <DimmedText size="xs">
+                  {t("date_format_description")}
+                </DimmedText>
+              </Stack>
+            }
+            data={dateFormatOptions}
+            {...dateFormatField.getInputProps()}
+            clearable
+            maw="250px"
+            elevation={0}
+          />
+          <Button
+            mb="0.25rem"
+            size="compact-xs"
+            variant="outline"
+            onClick={() =>
+              window.open(
+                "https://budgetboard.net/features/importing-data/csv-import#date-format",
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+          >
+            {t("examples")}
+          </Button>
+        </Group>
         <Checkbox
           checked={invertAmountField.getValue()}
           onChange={(event) => {
