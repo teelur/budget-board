@@ -9,7 +9,7 @@ export interface AutocompleteProps extends MantineAutocompleteProps {
 }
 
 const Autocomplete = ({
-  elevation,
+  elevation = 0,
   ...props
 }: AutocompleteProps): React.ReactNode => {
   switch (elevation) {
