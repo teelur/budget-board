@@ -344,7 +344,7 @@ public class SimpleFinService(
         var urlArgs = "?";
         if (startDate.HasValue)
         {
-            urlArgs += "start-date=" + startDate.Value.ToString() + "&";
+            urlArgs += "start-date=" + startDate.Value + "&";
         }
         if (!includeTransactions)
         {
