@@ -741,6 +741,7 @@ const ConfigureTransactions = (
         <Button
           flex="1 1 auto"
           disabled={alertDetails !== null || isPending}
+          loading={isPending}
           onClick={() =>
             props.advanceToNextDialog(importedTransactionsTableData)
           }
