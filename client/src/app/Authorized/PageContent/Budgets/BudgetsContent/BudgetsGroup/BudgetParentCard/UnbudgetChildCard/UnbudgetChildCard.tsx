@@ -70,6 +70,7 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
       <CornerDownRight />
       <Card
         w="100%"
+        p="0.25rem"
         onClick={() => {
           if (props.selectedDate) {
             props.openDetails(props.category, props.selectedDate);
