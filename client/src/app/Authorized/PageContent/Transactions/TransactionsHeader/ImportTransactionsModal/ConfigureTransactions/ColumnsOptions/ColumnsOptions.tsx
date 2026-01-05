@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import Card from "~/components/core/Card/Card";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -28,6 +29,8 @@ export const dateFormatOptions = [
 
 export interface IColumnsOptions {
   dateFormat: string;
+  thousandsSeparator: string;
+  decimalSeparator: string;
   invertAmount: boolean;
   splitAmountColumn: boolean;
   includeExpensesColumn: boolean;
@@ -49,6 +52,14 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
   const dateFormatField = useField<string>({
     initialValue: props.columnsOptions.dateFormat,
   });
+
+  const thousandsSeparatorField = useField<string>({
+    initialValue: props.columnsOptions.thousandsSeparator,
+  });
+  const decimalSeparatorField = useField<string>({
+    initialValue: props.columnsOptions.decimalSeparator,
+  });
+
   const invertAmountField = useField<boolean>({
     initialValue: props.columnsOptions.invertAmount,
   });
@@ -97,6 +108,8 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
   React.useEffect(() => {
     props.applyColumnsOptions({
       dateFormat: dateFormatField.getValue(),
+      thousandsSeparator: thousandsSeparatorField.getValue(),
+      decimalSeparator: decimalSeparatorField.getValue(),
       invertAmount: invertAmountField.getValue(),
       splitAmountColumn: splitAmountField.getValue(),
       includeExpensesColumn: includeExpensesColumnField.getValue(),
@@ -125,6 +138,8 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
     });
   }, [
     dateFormatField.getValue(),
+    thousandsSeparatorField.getValue(),
+    decimalSeparatorField.getValue(),
     invertAmountField.getValue(),
     splitAmountField.getValue(),
     expensesColumnValueField.getValue(),
@@ -146,16 +161,12 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
   return (
     <Stack>
       <Divider label={t("columns_options")} labelPosition="center" />
-      <Stack>
-        <Group gap="0.5rem">
+      <Group gap="1rem" justify="space-between" align="stretch">
+        <Stack gap="0.5rem">
+          <PrimaryText size="sm">{t("date_format")}</PrimaryText>
           <Autocomplete
             label={
-              <Stack gap="0.25rem">
-                <PrimaryText size="sm">{t("date_format")}</PrimaryText>
-                <DimmedText size="xs">
-                  {t("date_format_description")}
-                </DimmedText>
-              </Stack>
+              <DimmedText size="xs">{t("date_format_description")}</DimmedText>
             }
             data={dateFormatOptions}
             {...dateFormatField.getInputProps()}
@@ -177,142 +188,194 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
           >
             {t("examples")}
           </Button>
-        </Group>
-        <Checkbox
-          checked={invertAmountField.getValue()}
-          onChange={(event) => {
-            invertAmountField.setValue(event.currentTarget.checked);
-          }}
-          label={
-            <PrimaryText size="sm">{t("invert_amount_values")}</PrimaryText>
-          }
-          elevation={0}
-        />
-        <Checkbox
-          checked={splitAmountField.getValue()}
-          onChange={(event) => {
-            splitAmountField.setValue(event.currentTarget.checked);
-          }}
-          label={
-            <PrimaryText size="sm">
-              {t("split_income_expenses_into_separate_columns")}
-            </PrimaryText>
-          }
-          elevation={0}
-        />
-        {!splitAmountField.getValue() && (
-          <Group justify="flex-start" align="center" w="100%">
+        </Stack>
+        <Stack gap="0.5rem">
+          <PrimaryText size="sm">{t("amount_format")}</PrimaryText>
+          <Stack gap="0.25rem">
+            <TextInput
+              label={
+                <DimmedText size="xs">{t("thousands_separator")}</DimmedText>
+              }
+              {...thousandsSeparatorField.getInputProps()}
+              maxLength={1}
+              minLength={1}
+              elevation={0}
+            />
+            <TextInput
+              label={
+                <DimmedText size="xs">{t("decimal_separator")}</DimmedText>
+              }
+              {...decimalSeparatorField.getInputProps()}
+              maxLength={1}
+              minLength={1}
+              elevation={0}
+            />
+          </Stack>
+        </Stack>
+        <Stack gap="0.5rem">
+          <PrimaryText size="sm">{t("other_options")}</PrimaryText>
+          <Stack gap="0.5rem">
             <Checkbox
-              checked={includeExpensesColumnField.getValue()}
+              checked={invertAmountField.getValue()}
               onChange={(event) => {
-                includeExpensesColumnField.setValue(
-                  event.currentTarget.checked
-                );
+                invertAmountField.setValue(event.currentTarget.checked);
+              }}
+              label={
+                <PrimaryText size="sm">{t("invert_amount_values")}</PrimaryText>
+              }
+              elevation={0}
+            />
+            <Checkbox
+              checked={splitAmountField.getValue()}
+              onChange={(event) => {
+                splitAmountField.setValue(event.currentTarget.checked);
               }}
               label={
                 <PrimaryText size="sm">
-                  {t("include_income_expenses_columns")}
+                  {t("split_income_expenses_into_separate_columns")}
                 </PrimaryText>
               }
               elevation={0}
             />
-            {includeExpensesColumnField.getValue() && (
-              <Select
+            {!splitAmountField.getValue() && (
+              <Checkbox
+                checked={includeExpensesColumnField.getValue()}
+                onChange={(event) => {
+                  includeExpensesColumnField.setValue(
+                    event.currentTarget.checked
+                  );
+                }}
                 label={
-                  <PrimaryText size="sm">{t("expenses_column")}</PrimaryText>
+                  <PrimaryText size="sm">
+                    {t("include_income_expenses_columns")}
+                  </PrimaryText>
                 }
-                data={props.columns}
-                clearable
-                {...expensesColumnField.getInputProps()}
                 elevation={0}
               />
             )}
-            {includeExpensesColumnField.getValue() &&
-              expensesColumnField.getValue() && (
-                <Select
-                  label={
-                    <PrimaryText size="sm">{t("expenses_value")}</PrimaryText>
+            <Group>
+              <Checkbox
+                checked={filterDuplicatesField.getValue()}
+                onChange={(event) => {
+                  filterDuplicatesField.setValue(event.currentTarget.checked);
+                }}
+                label={
+                  <PrimaryText size="sm">{t("filter_duplicates")}</PrimaryText>
+                }
+                elevation={0}
+              />
+            </Group>
+          </Stack>
+        </Stack>
+      </Group>
+      <Group w="100%" justify="flex-end">
+        {filterDuplicatesField.getValue() && (
+          <Card elevation={1}>
+            <Stack justify="center" gap="0.5rem">
+              <Stack gap="0">
+                <PrimaryText size="sm">{t("filter_duplicates")}</PrimaryText>
+                <DimmedText size="xs">
+                  {t("filter_duplicates_description")}
+                </DimmedText>
+              </Stack>
+              <Group gap="2rem">
+                <Checkbox
+                  checked={filterByDateField.getValue()}
+                  onChange={(event) =>
+                    filterByDateField.setValue(event.currentTarget.checked)
                   }
-                  data={
-                    props.getExpensesColumnValues(
-                      expensesColumnField.getValue() ?? ""
-                    ) ?? []
-                  }
-                  clearable
-                  {...expensesColumnValueField.getInputProps()}
-                  elevation={0}
+                  label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
+                  elevation={1}
                 />
-              )}
-          </Group>
+                <Checkbox
+                  checked={filterByMerchantNameField.getValue()}
+                  onChange={(event) =>
+                    filterByMerchantNameField.setValue(
+                      event.currentTarget.checked
+                    )
+                  }
+                  label={
+                    <PrimaryText size="sm">{t("merchant_name")}</PrimaryText>
+                  }
+                  elevation={1}
+                />
+                <Checkbox
+                  checked={filterByCategoryField.getValue()}
+                  onChange={(event) =>
+                    filterByCategoryField.setValue(event.currentTarget.checked)
+                  }
+                  label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+                  elevation={1}
+                />
+                <Checkbox
+                  checked={filterByAmountField.getValue()}
+                  onChange={(event) =>
+                    filterByAmountField.setValue(event.currentTarget.checked)
+                  }
+                  label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+                  elevation={1}
+                />
+                <Checkbox
+                  checked={filterByAccountField.getValue()}
+                  onChange={(event) =>
+                    filterByAccountField.setValue(event.currentTarget.checked)
+                  }
+                  label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+                  elevation={1}
+                />
+              </Group>
+            </Stack>
+          </Card>
         )}
-        <Group>
-          <Checkbox
-            checked={filterDuplicatesField.getValue()}
-            onChange={(event) => {
-              filterDuplicatesField.setValue(event.currentTarget.checked);
-            }}
-            label={
-              <PrimaryText size="sm">{t("filter_duplicates")}</PrimaryText>
-            }
-            elevation={0}
-          />
-          {filterDuplicatesField.getValue() && (
+        {!splitAmountField.getValue() &&
+          includeExpensesColumnField.getValue() && (
             <Card elevation={1}>
-              <Stack justify="center">
-                <PrimaryText size="sm">{t("columns_to_match")}</PrimaryText>
-                <Group>
-                  <Checkbox
-                    checked={filterByDateField.getValue()}
-                    onChange={(event) =>
-                      filterByDateField.setValue(event.currentTarget.checked)
-                    }
-                    label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
-                    elevation={1}
-                  />
-                  <Checkbox
-                    checked={filterByMerchantNameField.getValue()}
-                    onChange={(event) =>
-                      filterByMerchantNameField.setValue(
-                        event.currentTarget.checked
-                      )
-                    }
-                    label={
-                      <PrimaryText size="sm">{t("merchant_name")}</PrimaryText>
-                    }
-                    elevation={1}
-                  />
-                  <Checkbox
-                    checked={filterByCategoryField.getValue()}
-                    onChange={(event) =>
-                      filterByCategoryField.setValue(
-                        event.currentTarget.checked
-                      )
-                    }
-                    label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
-                    elevation={1}
-                  />
-                  <Checkbox
-                    checked={filterByAmountField.getValue()}
-                    onChange={(event) =>
-                      filterByAmountField.setValue(event.currentTarget.checked)
-                    }
-                    label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
-                    elevation={1}
-                  />
-                  <Checkbox
-                    checked={filterByAccountField.getValue()}
-                    onChange={(event) =>
-                      filterByAccountField.setValue(event.currentTarget.checked)
-                    }
-                    label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
-                    elevation={1}
-                  />
+              <Stack gap="0.5rem">
+                <Stack gap={0}>
+                  <PrimaryText size="sm">
+                    {t("expenses_column_options")}
+                  </PrimaryText>
+                  <DimmedText size="xs">
+                    {t("expenses_column_options_description")}
+                  </DimmedText>
+                </Stack>
+                <Group gap="0.5rem">
+                  {includeExpensesColumnField.getValue() && (
+                    <Select
+                      label={
+                        <PrimaryText size="sm">
+                          {t("expenses_column")}
+                        </PrimaryText>
+                      }
+                      data={props.columns}
+                      clearable
+                      {...expensesColumnField.getInputProps()}
+                      elevation={0}
+                    />
+                  )}
+                  {includeExpensesColumnField.getValue() &&
+                    expensesColumnField.getValue() && (
+                      <Select
+                        label={
+                          <PrimaryText size="sm">
+                            {t("expenses_value")}
+                          </PrimaryText>
+                        }
+                        data={
+                          props.getExpensesColumnValues(
+                            expensesColumnField.getValue() ?? ""
+                          ) ?? []
+                        }
+                        clearable
+                        {...expensesColumnValueField.getInputProps()}
+                        elevation={0}
+                      />
+                    )}
                 </Group>
               </Stack>
             </Card>
           )}
-        </Group>
-      </Stack>
+      </Group>
     </Stack>
   );
 };
