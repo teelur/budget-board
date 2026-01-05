@@ -168,7 +168,7 @@ public class SimpleFinServiceTests
                 }
             );
 
-        var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
@@ -249,7 +249,7 @@ public class SimpleFinServiceTests
                 }
             );
 
-        var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
@@ -383,7 +383,7 @@ public class SimpleFinServiceTests
                 }
             );
 
-        var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
@@ -447,7 +447,7 @@ public class SimpleFinServiceTests
                 }
             );
 
-        var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
@@ -523,7 +523,7 @@ public class SimpleFinServiceTests
                 }
             );
 
-        var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
@@ -648,7 +648,7 @@ public class SimpleFinServiceTests
                 }
             );
 
-        var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
@@ -817,7 +817,7 @@ public class SimpleFinServiceTests
                 }
             );
 
-        var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))
@@ -941,7 +941,7 @@ public class SimpleFinServiceTests
                 }
             );
 
-        var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(string.Empty))

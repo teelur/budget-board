@@ -352,8 +352,7 @@ public class SimpleFinService(
         }
         var requestUrl = data.BaseUrl + "/accounts" + urlArgs;
 
-        var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-
+        using var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
         var client = clientFactory.CreateClient();
         var byteArray = Encoding.ASCII.GetBytes(data.Auth);
         client.DefaultRequestHeaders.Authorization =
