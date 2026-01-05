@@ -10,9 +10,8 @@ import { CornerDownRight, PlusIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
-import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
+import { roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
-import { uncategorizedTransactionCategory } from "~/models/transaction";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
@@ -96,27 +95,23 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
                 )}
               </PrimaryText>
             )}
-            {props.selectedDate &&
-              !areStringsEqual(
-                props.category,
-                uncategorizedTransactionCategory
-              ) && (
-                <ActionIcon
-                  size="sm"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    doAddBudget.mutate([
-                      {
-                        date: props.selectedDate!,
-                        category: props.category,
-                        limit: Math.round(Math.abs(props.amount)),
-                      },
-                    ]);
-                  }}
-                >
-                  <PlusIcon />
-                </ActionIcon>
-              )}
+            {props.selectedDate && (
+              <ActionIcon
+                size="sm"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  doAddBudget.mutate([
+                    {
+                      date: props.selectedDate!,
+                      category: props.category,
+                      limit: Math.round(Math.abs(props.amount)),
+                    },
+                  ]);
+                }}
+              >
+                <PlusIcon />
+              </ActionIcon>
+            )}
           </Group>
         </Group>
       </Card>
