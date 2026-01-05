@@ -76,6 +76,8 @@ const ConfigureTransactions = (
   // Options for parsing and interpreting CSV columns.
   const [columnsOptions, setColumnsOptions] = React.useState<IColumnsOptions>({
     dateFormat: dateFormatOptions[0]!.value,
+    thousandsSeparator: ",",
+    decimalSeparator: ".",
     invertAmount: false,
     splitAmountColumn: false,
     includeExpensesColumn: false,
@@ -162,6 +164,19 @@ const ConfigureTransactions = (
       }
     }
 
+    if (columnsOptions.thousandsSeparator.length === 0) {
+      setAlertDetails(t("thousands_separator_required_message"));
+      return;
+    }
+    if (columnsOptions.decimalSeparator.length === 0) {
+      setAlertDetails(t("decimal_separator_required_message"));
+      return;
+    }
+    if (columnsOptions.thousandsSeparator === columnsOptions.decimalSeparator) {
+      setAlertDetails(t("thousands_and_decimal_separator_must_differ_message"));
+      return;
+    }
+
     setAlertDetails(null);
   };
 
@@ -171,6 +186,8 @@ const ConfigureTransactions = (
     importedTransactionsTableData,
     columnsSelect,
     columnsOptions.splitAmountColumn,
+    columnsOptions.thousandsSeparator,
+    columnsOptions.decimalSeparator,
   ]);
 
   /**
@@ -258,6 +275,63 @@ const ConfigureTransactions = (
   };
 
   /**
+   * Escapes special regex characters in a string to make it safe for use in RegExp.
+   * @param str The string to escape.
+   * @returns The escaped string safe for use in a RegExp pattern.
+   */
+  const escapeRegexCharacters = (str: string): string => {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  };
+
+  /**
+   * Replaces the defined thousands and decimal separators in the given amount string
+   * with standardized characters for parsing.
+   * @param amountStr The amount string to normalize.
+   * @returns The normalized string ready for parseFloat, or the original if invalid.
+   */
+  const sanitizeAmountString = (amountStr: string): string => {
+    if (!amountStr || typeof amountStr !== "string") {
+      return amountStr;
+    }
+
+    // Validate that separators are different
+    if (
+      columnsOptions.thousandsSeparator.length === 0 ||
+      columnsOptions.decimalSeparator.length === 0 ||
+      columnsOptions.thousandsSeparator === columnsOptions.decimalSeparator
+    ) {
+      return amountStr;
+    }
+
+    let normalized = amountStr.trim();
+
+    // Remove any leading non-numeric characters (preserving minus sign for negative amounts)
+    normalized = normalized.replace(/^[^\d-]+/, "");
+
+    // Remove any trailing non-numeric characters
+    normalized = normalized.replace(/[^\d]+$/, "");
+
+    // Thousands separators are not needed for parsing, so remove them
+    normalized = normalized.replace(
+      new RegExp(escapeRegexCharacters(columnsOptions.thousandsSeparator), "g"),
+      ""
+    );
+
+    // Replace decimal separator with standard period only if it's different
+    if (columnsOptions.decimalSeparator !== ".") {
+      normalized = normalized.replace(
+        new RegExp(escapeRegexCharacters(columnsOptions.decimalSeparator), "g"),
+        "."
+      );
+    }
+
+    // Remove any remaining whitespace throughout the string
+    normalized = normalized.replace(/\s/g, "");
+
+    return normalized;
+  };
+
+  /**
    * Extracts and returns a numeric transaction amount from a parsed CSV row according to the current
    * column-selection options.
    *
@@ -270,8 +344,7 @@ const ConfigureTransactions = (
    *   mechanism to display warnings.
    *
    * @param row - A CSV row object (expected to contain string values for configured columns and a uid used in notifications).
-   * @returns The parsed amount as a number (positive for income, negative for expense) after applying any configured inversion,
-   *          or null if no valid numeric amount could be determined.
+   * @returns number | null - The transaction amount (possibly inverted) or null if not parseable/available.
    */
   const getImportedTransactionAmount = (row: CsvRow): number | null => {
     // User can select an option to invert the amount values during import.
@@ -300,13 +373,11 @@ const ConfigureTransactions = (
       }
 
       if (incomeValue) {
-        const parsed = parseFloat(incomeValue);
-        return Number.isNaN(parsed)
-          ? null
-          : applyInversion(parseFloat(incomeValue));
+        const parsed = parseFloat(sanitizeAmountString(incomeValue));
+        return Number.isNaN(parsed) ? null : applyInversion(parsed);
       }
       if (expenseValue) {
-        const parsed = parseFloat(expenseValue);
+        const parsed = parseFloat(sanitizeAmountString(expenseValue));
         return Number.isNaN(parsed) ? null : applyInversion(parsed * -1);
       }
     } else {
@@ -314,7 +385,8 @@ const ConfigureTransactions = (
         ? (row[columnsSelect.amount] as string)
         : null;
       if (amountValue) {
-        const parsed = parseFloat(amountValue);
+        const sanitized = sanitizeAmountString(amountValue);
+        const parsed = parseFloat(sanitized);
         return Number.isNaN(parsed) ? null : applyInversion(parsed);
       }
     }
