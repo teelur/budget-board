@@ -10,7 +10,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { ICategoryNode } from "~/models/category";
 import UnbudgetedChildCard from "./UnbudgetedChildCard/UnbudgetedChildCard";
-import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
+import { roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
 import Card from "~/components/core/Card/Card";
@@ -71,6 +71,43 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
     return null;
   }
 
+  const getUnbudgetedChildCards = (): React.ReactNode => {
+    if (props.categoryTree.subCategories.length === 0) {
+      return null;
+    }
+
+    const childCards: React.ReactNode[] = [];
+
+    props.categoryTree.subCategories.forEach((subCategory) => {
+      if (
+        !props.categoryToTransactionsTotalMap.has(
+          subCategory.value.toLocaleLowerCase()
+        )
+      ) {
+        return;
+      }
+      childCards.push(
+        <UnbudgetedChildCard
+          key={subCategory.value}
+          category={subCategory.value}
+          amount={
+            props.categoryToTransactionsTotalMap.get(
+              subCategory.value.toLocaleLowerCase()
+            )!
+          }
+          selectedDate={props.selectedDate}
+          openDetails={props.openDetails}
+        />
+      );
+    });
+
+    if (childCards.length === 0) {
+      return null;
+    }
+
+    return <Stack gap="0.5rem">{childCards}</Stack>;
+  };
+
   return (
     <Stack gap="0.5rem" w="100%">
       <Card
@@ -79,6 +116,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
             props.openDetails(props.categoryTree.value, props.selectedDate);
           }
         }}
+        p="0.25rem"
         hoverEffect
         elevation={2}
       >
@@ -101,62 +139,33 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
                 )}
               </PrimaryText>
             )}
-            {props.selectedDate &&
-              !areStringsEqual(
-                props.categoryTree.value,
-                uncategorizedTransactionCategory
-              ) && (
-                <ActionIcon
-                  size="sm"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    doAddBudget.mutate([
-                      {
-                        date: props.selectedDate!,
-                        category: props.categoryTree.value,
-                        limit: Math.round(
-                          Math.abs(
-                            props.categoryToTransactionsTotalMap.get(
-                              props.categoryTree.value.toLocaleLowerCase()
-                            ) ?? 0
-                          )
-                        ),
-                      },
-                    ]);
-                  }}
-                >
-                  <PlusIcon />
-                </ActionIcon>
-              )}
+            {props.selectedDate && props.categoryTree.value.length !== 0 && (
+              <ActionIcon
+                size="sm"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  doAddBudget.mutate([
+                    {
+                      date: props.selectedDate!,
+                      category: props.categoryTree.value,
+                      limit: Math.round(
+                        Math.abs(
+                          props.categoryToTransactionsTotalMap.get(
+                            props.categoryTree.value.toLocaleLowerCase()
+                          ) ?? 0
+                        )
+                      ),
+                    },
+                  ]);
+                }}
+              >
+                <PlusIcon />
+              </ActionIcon>
+            )}
           </Group>
         </Group>
       </Card>
-      {props.categoryTree.subCategories.length > 0 && (
-        <Stack gap="0.5rem">
-          {props.categoryTree.subCategories.map((subCategory) => {
-            if (
-              !props.categoryToTransactionsTotalMap.has(
-                subCategory.value.toLocaleLowerCase()
-              )
-            ) {
-              return null;
-            }
-            return (
-              <UnbudgetedChildCard
-                key={subCategory.value}
-                category={subCategory.value}
-                amount={
-                  props.categoryToTransactionsTotalMap.get(
-                    subCategory.value.toLocaleLowerCase()
-                  )!
-                }
-                selectedDate={props.selectedDate}
-                openDetails={props.openDetails}
-              />
-            );
-          })}
-        </Stack>
-      )}
+      {getUnbudgetedChildCards()}
     </Stack>
   );
 };
