@@ -15,6 +15,7 @@ import { IUserSettings } from "~/models/userSettings";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -24,6 +25,7 @@ interface UnbudgetedCardProps {
 }
 
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -124,7 +126,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
         <Group w="100%" justify="space-between">
           <PrimaryText size="md" fw={600}>
             {props.categoryTree.value.length === 0
-              ? uncategorizedTransactionCategory
+              ? t(uncategorizedTransactionCategory)
               : props.categoryTree.value}
           </PrimaryText>
           <Group gap="sm">
