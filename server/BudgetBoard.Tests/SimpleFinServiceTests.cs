@@ -150,21 +150,16 @@ public class SimpleFinServiceTests
                 (HttpRequestMessage request, CancellationToken token) =>
                 {
                     // Return success for decode, but failure for validation
-                    if (request.Method == HttpMethod.Post)
-                    {
-                        return new HttpResponseMessage
+                    return request.Method == HttpMethod.Post
+                        ? new HttpResponseMessage
                         {
                             StatusCode = System.Net.HttpStatusCode.OK,
                             Content = new StringContent("https://invalid:invalid@invalid.com/test"),
-                        };
-                    }
-                    else
-                    {
-                        return new HttpResponseMessage
+                        }
+                        : new HttpResponseMessage
                         {
                             StatusCode = System.Net.HttpStatusCode.Unauthorized,
                         };
-                    }
                 }
             );
 
