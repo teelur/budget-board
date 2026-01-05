@@ -1,10 +1,12 @@
-import { Divider, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Button, Divider, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import Card from "~/components/core/Card/Card";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
 import Select from "~/components/core/Select/Select/Select";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export interface IFilterByOptions {
@@ -143,16 +145,39 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
 
   return (
     <Stack>
-      <LoadingOverlay visible={props.loading} />
       <Divider label={t("columns_options")} labelPosition="center" />
       <Stack>
-        <Select
-          label={<PrimaryText size="sm">{t("date_format")}</PrimaryText>}
-          data={dateFormatOptions}
-          {...dateFormatField.getInputProps()}
-          maw="150px"
-          elevation={0}
-        />
+        <Group gap="0.5rem">
+          <Autocomplete
+            label={
+              <Stack gap="0.25rem">
+                <PrimaryText size="sm">{t("date_format")}</PrimaryText>
+                <DimmedText size="xs">
+                  {t("date_format_description")}
+                </DimmedText>
+              </Stack>
+            }
+            data={dateFormatOptions}
+            {...dateFormatField.getInputProps()}
+            clearable
+            maw="250px"
+            elevation={0}
+          />
+          <Button
+            mb="0.25rem"
+            size="compact-xs"
+            variant="outline"
+            onClick={() =>
+              window.open(
+                "https://budgetboard.net/features/importing-data/csv-import#date-format",
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+          >
+            {t("examples")}
+          </Button>
+        </Group>
         <Checkbox
           checked={invertAmountField.getValue()}
           onChange={(event) => {
