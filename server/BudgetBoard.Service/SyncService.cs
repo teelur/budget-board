@@ -92,12 +92,9 @@ public class SyncService(
 
     private static void SetManualSourceForUnlinkedAccounts(IEnumerable<Account> accounts)
     {
-        foreach (var account in accounts)
+        foreach (var account in accounts.Where(a => a.SimpleFinAccount == null))
         {
-            if (account.SimpleFinAccount == null)
-            {
-                account.Source = AccountSource.Manual;
-            }
+            account.Source = AccountSource.Manual;
         }
     }
 }
