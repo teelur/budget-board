@@ -164,9 +164,15 @@ const ConfigureTransactions = (
       }
     }
 
-    const userThousandsSeparator = columnsOptions.thousandsSeparator || ",";
-    const userDecimalSeparator = columnsOptions.decimalSeparator || ".";
-    if (userThousandsSeparator === userDecimalSeparator) {
+    if (columnsOptions.thousandsSeparator.length === 0) {
+      setAlertDetails(t("thousands_separator_required_message"));
+      return;
+    }
+    if (columnsOptions.decimalSeparator.length === 0) {
+      setAlertDetails(t("decimal_separator_required_message"));
+      return;
+    }
+    if (columnsOptions.thousandsSeparator === columnsOptions.decimalSeparator) {
       setAlertDetails(t("thousands_and_decimal_separator_must_differ_message"));
       return;
     }
@@ -279,11 +285,12 @@ const ConfigureTransactions = (
       return amountStr;
     }
 
-    const userThousandsSeparator = columnsOptions.thousandsSeparator || ",";
-    const userDecimalSeparator = columnsOptions.decimalSeparator || ".";
-
     // Validate that separators are different
-    if (userThousandsSeparator === userDecimalSeparator) {
+    if (
+      columnsOptions.thousandsSeparator.length === 0 ||
+      columnsOptions.decimalSeparator.length === 0 ||
+      columnsOptions.thousandsSeparator === columnsOptions.decimalSeparator
+    ) {
       return amountStr;
     }
 
@@ -300,14 +307,14 @@ const ConfigureTransactions = (
 
     // Thousands separators are not needed for parsing, so remove them
     normalized = normalized.replace(
-      new RegExp(`\\${userThousandsSeparator}`, "g"),
+      new RegExp(`\\${columnsOptions.thousandsSeparator}`, "g"),
       ""
     );
 
     // Replace decimal separator with standard period only if it's different
-    if (userDecimalSeparator !== ".") {
+    if (columnsOptions.decimalSeparator !== ".") {
       normalized = normalized.replace(
-        new RegExp(`\\${userDecimalSeparator}`, "g"),
+        new RegExp(`\\${columnsOptions.decimalSeparator}`, "g"),
         "."
       );
     }
