@@ -1,6 +1,6 @@
 export interface IApplicationUser {
   id: string;
-  accessToken: boolean;
+  simpleFinAccessToken: boolean;
   lastSync: Date;
   twoFactorEnabled: boolean;
   hasOidcLogin: boolean;

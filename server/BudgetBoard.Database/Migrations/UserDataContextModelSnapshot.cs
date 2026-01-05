@@ -73,9 +73,6 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("SyncID")
-                        .HasColumnType("text");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("text");
@@ -100,10 +97,6 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
-
-                    b.Property<string>("AccessToken")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -143,6 +136,10 @@ namespace BudgetBoard.Database.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SimpleFinAccessToken")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -390,6 +387,86 @@ namespace BudgetBoard.Database.Migrations
                     b.HasDiscriminator<string>("ParameterKind").HasValue("RuleParameterBase");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinAccount", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("BalanceDate")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastSync")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("LinkedAccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SyncID")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("LinkedAccountId")
+                        .IsUnique();
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SimpleFinAccount", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinOrganization", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Domain")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SimpleFinUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SyncID")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SimpleFinOrganization", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Transaction", b =>
@@ -775,6 +852,40 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinAccount", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.Account", "LinkedAccount")
+                        .WithOne("SimpleFinAccount")
+                        .HasForeignKey("BudgetBoard.Database.Models.SimpleFinAccount", "LinkedAccountId");
+
+                    b.HasOne("BudgetBoard.Database.Models.SimpleFinOrganization", "Organization")
+                        .WithMany("Accounts")
+                        .HasForeignKey("OrganizationId");
+
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("SimpleFinAccounts")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LinkedAccount");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinOrganization", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("SimpleFinOrganizations")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.Transaction", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.Account", "Account")
@@ -896,6 +1007,8 @@ namespace BudgetBoard.Database.Migrations
                 {
                     b.Navigation("Balances");
 
+                    b.Navigation("SimpleFinAccount");
+
                     b.Navigation("Transactions");
                 });
 
@@ -912,6 +1025,10 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("Goals");
 
                     b.Navigation("Institutions");
+
+                    b.Navigation("SimpleFinAccounts");
+
+                    b.Navigation("SimpleFinOrganizations");
 
                     b.Navigation("TransactionCategories");
 
@@ -933,6 +1050,11 @@ namespace BudgetBoard.Database.Migrations
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Institution", b =>
+                {
+                    b.Navigation("Accounts");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinOrganization", b =>
                 {
                     b.Navigation("Accounts");
                 });

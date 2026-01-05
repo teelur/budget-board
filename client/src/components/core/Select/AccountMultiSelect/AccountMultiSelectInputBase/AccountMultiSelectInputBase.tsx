@@ -6,20 +6,20 @@ import { AccountSource, IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
 import { useTranslation } from "react-i18next";
 
-export interface AccountSelectInputBaseProps extends MultiSelectProps {
+export interface AccountMultiSelectInputBaseProps extends MultiSelectProps {
   hideHidden?: boolean;
   filterTypes?: string[];
   manualOnly?: boolean;
   maxSelectedValues?: number;
 }
 
-const AccountSelectInputBase = ({
+const AccountMultiSelectInputBase = ({
   hideHidden = false,
   filterTypes = [],
   manualOnly = false,
   maxSelectedValues = undefined,
   ...props
-}: AccountSelectInputBaseProps): React.ReactNode => {
+}: AccountMultiSelectInputBaseProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
@@ -76,4 +76,4 @@ const AccountSelectInputBase = ({
   );
 };
 
-export default AccountSelectInputBase;
+export default AccountMultiSelectInputBase;

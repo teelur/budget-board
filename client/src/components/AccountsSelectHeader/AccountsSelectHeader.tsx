@@ -6,8 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
-import AccountSelect from "../core/Select/AccountSelect/AccountSelect";
 import { useTranslation } from "react-i18next";
+import AccountMultiSelect from "../core/Select/AccountMultiSelect/AccountMultiSelect";
 
 interface AccountsSelectHeaderProps {
   selectedAccountIds: string[];
@@ -47,7 +47,7 @@ const AccountsSelectHeader = (
         onChange={props.setDateRange}
         elevation={1}
       />
-      <AccountSelect
+      <AccountMultiSelect
         value={props.selectedAccountIds}
         onChange={props.setSelectedAccountIds}
         hideHidden

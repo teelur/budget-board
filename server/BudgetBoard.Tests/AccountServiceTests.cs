@@ -17,7 +17,6 @@ public class AccountServiceTests()
 {
     private readonly Faker<AccountCreateRequest> _accountCreateRequestFaker =
         new Faker<AccountCreateRequest>()
-            .RuleFor(a => a.SyncID, f => f.Random.String(20))
             .RuleFor(a => a.Name, f => f.Finance.AccountName())
             .RuleFor(a => a.InstitutionID, f => Guid.NewGuid())
             .RuleFor(a => a.Type, f => f.Finance.TransactionType())
@@ -120,84 +119,6 @@ public class AccountServiceTests()
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidInstitutionIDError");
-    }
-
-    [Fact]
-    public async Task CreateAccountAsync_WhenDuplicateSyncID_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(
-            Mock.Of<ILogger<IAccountService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
-        var institution = institutionFaker.Generate();
-
-        helper.UserDataContext.Institutions.Add(institution);
-
-        var accountFaker = new AccountFaker(helper.demoUser.Id);
-        var account = accountFaker.Generate();
-        account.InstitutionID = institution.ID;
-        account.SyncID = "TestSyncID";
-
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.SaveChanges();
-
-        var duplicateAccount = _accountCreateRequestFaker.Generate();
-        duplicateAccount.SyncID = account.SyncID;
-        duplicateAccount.InstitutionID = institution.ID;
-
-        // Act
-        var createAccountAct = () =>
-            accountService.CreateAccountAsync(helper.demoUser.Id, duplicateAccount);
-
-        // Assert
-        await createAccountAct
-            .Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("DuplicateSyncIDError");
-    }
-
-    [Fact]
-    public async Task CreateAccountAsync_WhenSyncIDNull_ShouldNotFlagAsDuplicate()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(
-            Mock.Of<ILogger<IAccountService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
-        var institution = institutionFaker.Generate();
-
-        helper.UserDataContext.Institutions.Add(institution);
-
-        var accountFaker = new AccountFaker(helper.demoUser.Id);
-        var account = accountFaker.Generate();
-        account.InstitutionID = institution.ID;
-        account.SyncID = null;
-
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.SaveChanges();
-
-        var duplicateAccount = _accountCreateRequestFaker.Generate();
-        duplicateAccount.SyncID = null;
-        duplicateAccount.InstitutionID = institution.ID;
-
-        // Act
-        await accountService.CreateAccountAsync(helper.demoUser.Id, duplicateAccount);
-
-        // Assert
-        helper.demoUser.Accounts.Should().HaveCount(2);
     }
 
     [Fact]

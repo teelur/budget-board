@@ -224,7 +224,7 @@ builder.Services.AddScoped<ITransactionCategoryService, TransactionCategoryServi
 builder.Services.AddScoped<IGoalService, GoalService>();
 builder.Services.AddScoped<IInstitutionService, InstitutionService>();
 builder.Services.AddScoped<ISyncService, SyncService>();
-builder.Services.AddScoped<ISyncProvider, SimpleFinService>();
+builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();
@@ -234,6 +234,8 @@ builder.Services.AddScoped<IWidgetSettingsService, WidgetSettingsService>();
 builder.Services.AddScoped<INetWorthWidgetLineService, NetWorthWidgetLineService>();
 builder.Services.AddScoped<INetWorthWidgetCategoryService, NetWorthWidgetCategoryService>();
 builder.Services.AddScoped<INetWorthWidgetGroupService, NetWorthWidgetGroupService>();
+builder.Services.AddScoped<ISimpleFinOrganizationService, SimpleFinOrganizationService>();
+builder.Services.AddScoped<ISimpleFinAccountService, SimpleFinAccountService>();
 
 var app = builder.Build();
 

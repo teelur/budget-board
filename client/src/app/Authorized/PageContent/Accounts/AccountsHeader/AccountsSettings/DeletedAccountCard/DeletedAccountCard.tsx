@@ -61,9 +61,7 @@ const DeletedAccountCard = (
                 : t("unknown_institution")}
             </DimmedText>
           </Stack>
-          {props.account.syncID !== null && (
-            <Badge bg="blue">{t("simplefin")}</Badge>
-          )}
+          <Badge bg="blue">{t(props.account.source)}</Badge>
         </Group>
         <Group style={{ alignSelf: "stretch" }}>
           <ActionIcon h="100%" onClick={() => doRestoreAccount.mutate()}>
