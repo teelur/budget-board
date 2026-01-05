@@ -275,6 +275,15 @@ const ConfigureTransactions = (
   };
 
   /**
+   * Escapes special regex characters in a string to make it safe for use in RegExp.
+   * @param str The string to escape.
+   * @returns The escaped string safe for use in a RegExp pattern.
+   */
+  const escapeRegexCharacters = (str: string): string => {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  };
+
+  /**
    * Replaces the defined thousands and decimal separators in the given amount string
    * with standardized characters for parsing.
    * @param amountStr The amount string to normalize.
@@ -304,14 +313,14 @@ const ConfigureTransactions = (
 
     // Thousands separators are not needed for parsing, so remove them
     normalized = normalized.replace(
-      new RegExp(`\\${columnsOptions.thousandsSeparator}`, "g"),
+      new RegExp(escapeRegexCharacters(columnsOptions.thousandsSeparator), "g"),
       ""
     );
 
     // Replace decimal separator with standard period only if it's different
     if (columnsOptions.decimalSeparator !== ".") {
       normalized = normalized.replace(
-        new RegExp(`\\${columnsOptions.decimalSeparator}`, "g"),
+        new RegExp(escapeRegexCharacters(columnsOptions.decimalSeparator), "g"),
         "."
       );
     }
