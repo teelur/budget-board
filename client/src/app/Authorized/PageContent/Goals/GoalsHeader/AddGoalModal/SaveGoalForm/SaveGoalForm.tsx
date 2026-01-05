@@ -12,11 +12,11 @@ import { getCurrencySymbol } from "~/helpers/currency";
 import dayjs from "dayjs";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
+import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 
 interface FormValues {
   goalName: string;
@@ -113,7 +113,7 @@ const SaveGoalForm = (): React.ReactNode => {
           {...form.getInputProps("goalName")}
           elevation={1}
         />
-        <AccountSelect
+        <AccountMultiSelect
           label={<PrimaryText size="sm">{t("accounts")}</PrimaryText>}
           key={form.key("goalAccounts")}
           {...form.getInputProps("goalAccounts")}

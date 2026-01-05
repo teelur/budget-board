@@ -348,7 +348,10 @@ const ConfigureTransactions = (
           : null,
         category: columnsSelect.category ? row[columnsSelect.category] : null,
         amount: getImportedTransactionAmount(row),
-        account: columnsSelect.account ? row[columnsSelect.account] : null,
+        account:
+          columnsSelect.account && row[columnsSelect.account] != null
+            ? String(row[columnsSelect.account])
+            : null,
         type:
           columnsOptions.includeExpensesColumn &&
           columnsOptions.expensesColumn &&

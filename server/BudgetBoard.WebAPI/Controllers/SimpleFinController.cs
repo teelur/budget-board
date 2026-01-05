@@ -15,17 +15,12 @@ namespace BudgetBoard.WebAPI.Controllers;
 public class SimpleFinController(
     ILogger<SimpleFinController> logger,
     UserManager<ApplicationUser> userManager,
-    ISyncService simpleFinService,
+    ISimpleFinService simpleFinService,
+    ISyncService syncService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
-    private readonly ILogger<SimpleFinController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly ISyncService _simpleFinService = simpleFinService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Sync()
@@ -33,9 +28,7 @@ public class SimpleFinController(
         try
         {
             return Ok(
-                await _simpleFinService.SyncAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
-                )
+                await syncService.SyncAsync(new Guid(userManager.GetUserId(User) ?? string.Empty))
             );
         }
         catch (BudgetBoardServiceException bbex)
@@ -44,8 +37,8 @@ public class SimpleFinController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -55,8 +48,8 @@ public class SimpleFinController(
     {
         try
         {
-            await _simpleFinService.UpdateAccessTokenFromSetupToken(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await simpleFinService.ConfigureAccessTokenAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 setupToken
             );
             return Ok();
@@ -67,8 +60,30 @@ public class SimpleFinController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> RemoveAccessToken()
+    {
+        try
+        {
+            await simpleFinService.RemoveAccessTokenAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty)
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 }

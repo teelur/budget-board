@@ -376,6 +376,12 @@
   <data name="SimpleFinDeserializationErrorLog" xml:space="preserve">
     <value>Error deserializing SimpleFin data: {0}</value>
   </data>
+  <data name="SimpleFinDecodeTokenInvalidLog" xml:space="preserve">
+    <value>There was an error decoding the setup token.</value>
+  </data>
+  <data name="SimpleFinDecodeTokenRequestErrorLog" xml:space="preserve">
+    <value>Error sending request to decoded setup token URL: {0}</value>
+  </data>
   <data name="GoalNoBalanceFoundLog" xml:space="preserve">
     <value>No balance found for goal {0}</value>
   </data>
@@ -402,5 +408,35 @@
   </data>
   <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineLog" xml:space="preserve">
     <value>Attempted to create a circular dependency between net worth widget lines.</value>
+  </data>
+  <data name="InvalidOrganizationIDLog" xml:space="preserve">
+    <value>Attempted to create an account with an invalid organization ID.</value>
+  </data>
+  <data name="SimpleFinAccountIDUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a SimpleFIN account that does not exist.</value>
+  </data>
+  <data name="DuplicateOrganizationCreateLog" xml:space="preserve">
+    <value>Attempted to create a duplicate organization for {Domain}.</value>
+  </data>
+  <data name="SimpleFinOrganizationUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a SimpleFIN organization that does not exist.</value>
+  </data>
+  <data name="SimpleFinOrganizationDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a SimpleFIN organization that does not exist.</value>
+  </data>
+  <data name="SyncSimpleFinOrganizationCreationErrorLog" xml:space="preserve">
+    <value>Failed to create SimpleFIN organization during sync for account {0}.</value>
+  </data>
+  <data name="InvalidLinkedAccountIDLog" xml:space="preserve">
+    <value>Attempted to link a SimpleFIN account to an account that does not exist.</value>
+  </data>
+  <data name="SimpleFinAccountNotFoundForSyncLog" xml:space="preserve">
+    <value>SimpleFIN account with SyncID {0} not found in cache. Skipping account sync.</value>
+  </data>
+  <data name="SimpleFinAccountNotLinkedLog" xml:space="preserve">
+    <value>SimpleFIN account {0} is not linked to any account. Skipping transaction sync.</value>
+  </data>
+  <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
+    <value>SimpleFIN account {0} is deleted. Skipping.</value>
   </data>
 </root>

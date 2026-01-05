@@ -27,6 +27,8 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<Asset> Assets { get; set; }
     public DbSet<Value> Values { get; set; }
     public DbSet<WidgetSettings> WidgetSettings { get; set; }
+    public DbSet<SimpleFinOrganization> SimpleFinOrganizations { get; set; }
+    public DbSet<SimpleFinAccount> SimpleFinAccounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -154,6 +156,21 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         {
             w.Property(e => e.Configuration).HasColumnType("jsonb");
             w.ToTable("WidgetSettings");
+        });
+
+        modelBuilder.Entity<SimpleFinOrganization>().ToTable("SimpleFinOrganization");
+
+        modelBuilder.Entity<SimpleFinAccount>(a =>
+        {
+            a.HasOne(e => e.Organization)
+                .WithMany(e => e.Accounts)
+                .HasForeignKey(e => e.OrganizationId);
+
+            a.HasOne(e => e.LinkedAccount)
+                .WithOne(e => e.SimpleFinAccount)
+                .HasForeignKey<SimpleFinAccount>(e => e.LinkedAccountId);
+
+            a.ToTable("SimpleFinAccount");
         });
 
         modelBuilder.UseIdentityColumns();

@@ -8,9 +8,9 @@ import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/Tr
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import AccountSelect from "~/components/core/Select/AccountSelect/AccountSelect";
 import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
+import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 
 interface FilterCardProps {
   categories: ICategory[];
@@ -52,7 +52,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
             label={<PrimaryText size="sm">{t("date_range")}</PrimaryText>}
             elevation={1}
           />
-          <AccountSelect
+          <AccountMultiSelect
             w={{ base: "100%", sm: "50%" }}
             value={transactionFilters.accounts}
             onChange={(newAccountIds: string[]) => {

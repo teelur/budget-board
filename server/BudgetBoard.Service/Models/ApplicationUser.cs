@@ -22,7 +22,7 @@ public class ApplicationUserUpdateRequest : IApplicationUserUpdateRequest
 public interface IApplicationUserResponse
 {
     Guid ID { get; }
-    bool AccessToken { get; }
+    bool SimpleFinAccessToken { get; }
     DateTime LastSync { get; }
     bool TwoFactorEnabled { get; }
     bool HasOidcLogin { get; }
@@ -32,7 +32,7 @@ public interface IApplicationUserResponse
 public class ApplicationUserResponse : IApplicationUserResponse
 {
     public Guid ID { get; set; }
-    public bool AccessToken { get; set; }
+    public bool SimpleFinAccessToken { get; set; }
     public DateTime LastSync { get; set; }
     public bool TwoFactorEnabled { get; set; }
     public bool HasOidcLogin { get; set; }
@@ -42,7 +42,7 @@ public class ApplicationUserResponse : IApplicationUserResponse
     public ApplicationUserResponse()
     {
         ID = new Guid();
-        AccessToken = false;
+        SimpleFinAccessToken = false;
         LastSync = DateTime.MinValue;
         TwoFactorEnabled = false;
         HasOidcLogin = false;
@@ -56,7 +56,7 @@ public class ApplicationUserResponse : IApplicationUserResponse
     )
     {
         ID = user.Id;
-        AccessToken = (user.AccessToken != string.Empty);
+        SimpleFinAccessToken = user.SimpleFinAccessToken != string.Empty;
         LastSync = user.LastSync;
         TwoFactorEnabled = user.TwoFactorEnabled;
         HasOidcLogin = hasOidcLogin;

@@ -1,12 +1,12 @@
 import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
 import dayjs from "dayjs";
-import { PencilIcon } from "lucide-react";
+import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { IAccountResponse } from "~/models/account";
+import { AccountSource, IAccountResponse } from "~/models/account";
 
 interface IAccountItemContentProps {
   account: IAccountResponse;
@@ -16,6 +16,17 @@ interface IAccountItemContentProps {
 
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
+
+  const getAccountSourceBadgeColor = (): string => {
+    switch (props.account.source) {
+      case AccountSource.SimpleFIN:
+        return "blue";
+      case AccountSource.Manual:
+      default:
+        return "gray";
+    }
+  };
+
   return (
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
@@ -46,9 +57,9 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           {props.account.hideTransactions && (
             <Badge bg="purple">{t("hidden_transactions")}</Badge>
           )}
-          {props.account.syncID !== null && (
-            <Badge bg="blue">{t("simplefin")}</Badge>
-          )}
+          <Badge bg={getAccountSourceBadgeColor()}>
+            {t(props.account.source)}
+          </Badge>
         </Group>
         <StatusText amount={props.account.currentBalance} size="md">
           {convertNumberToCurrency(
@@ -59,9 +70,19 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
         </StatusText>
       </Group>
       <Group justify="space-between" align="center">
-        <DimmedText size="sm">
-          {props.account.subtype ? props.account.subtype : props.account.type}
-        </DimmedText>
+        {props.account.type ? (
+          <Group gap="0.25rem">
+            <DimmedText size="sm">{props.account.type}</DimmedText>
+            {props.account.subtype && (
+              <>
+                <ChevronRightIcon size={14} />
+                <DimmedText size="sm">{props.account.subtype}</DimmedText>
+              </>
+            )}
+          </Group>
+        ) : (
+          <DimmedText size="sm">{t("no_type")}</DimmedText>
+        )}
         <DimmedText size="sm">
           {t("last_updated", {
             date: dayjs(props.account.balanceDate).isValid()
