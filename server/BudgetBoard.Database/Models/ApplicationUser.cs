@@ -16,6 +16,11 @@ public class ApplicationUser : IdentityUser<Guid>
     public string SimpleFinAccessToken { get; set; } = string.Empty;
 
     /// <summary>
+    /// API key for LunchFlow service integration.
+    /// </summary>
+    public string LunchFlowApiKey { get; set; } = string.Empty;
+
+    /// <summary>
     /// The last date and time the user's data was synchronized.
     /// </summary>
     public DateTime LastSync { get; set; } = DateTime.MinValue;
@@ -74,4 +79,9 @@ public class ApplicationUser : IdentityUser<Guid>
     /// Collection of SimpleFin accounts linked to the user.
     /// </summary>
     public ICollection<SimpleFinAccount> SimpleFinAccounts { get; set; } = [];
+
+    /// <summary>
+    /// Collection of LunchFlow accounts linked to the user.
+    /// </summary>
+    public ICollection<LunchFlowAccount> LunchFlowAccounts { get; set; } = [];
 }
