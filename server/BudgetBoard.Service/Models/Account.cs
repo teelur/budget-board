@@ -7,6 +7,7 @@ public static class AccountSource
 {
     public const string Manual = "Manual";
     public const string SimpleFIN = "SimpleFIN";
+    public const string LunchFlow = "LunchFlow";
 }
 
 public interface IAccountCreateRequest

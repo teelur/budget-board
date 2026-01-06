@@ -16,6 +16,11 @@ public class LunchFlowAccount
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
+    /// The Sync ID provided by LunchFlow to identify the account.
+    /// </summary>
+    public string SyncID { get; set; } = string.Empty;
+
+    /// <summary>
     /// Name of the financial institution associated with the account.
     /// </summary>
     public string InstitutionName { get; set; } = string.Empty;
@@ -36,9 +41,24 @@ public class LunchFlowAccount
     public string Currency { get; set; } = string.Empty;
 
     /// <summary>
-    /// The balance of the account.
+    /// The status of the account.
     /// </summary>
     public string Status { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The balance of the account.
+    /// </summary>
+    public decimal Balance { get; set; } = 0;
+
+    /// <summary>
+    /// The timestamp when the balance became what it is.
+    /// </summary>
+    public int BalanceDate { get; set; } = (int)DateTimeOffset.UnixEpoch.ToUnixTimeSeconds();
+
+    /// <summary>
+    /// The date and time when the account was last synchronized; null if never synchronized.
+    /// </summary>
+    public DateTime? LastSync { get; set; } = null;
 
     /// <summary>
     /// Identifier for the linked local Account entity within the budgeting application.

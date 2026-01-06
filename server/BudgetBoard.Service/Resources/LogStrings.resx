@@ -427,7 +427,7 @@
   <data name="SyncSimpleFinOrganizationCreationErrorLog" xml:space="preserve">
     <value>Failed to create SimpleFIN organization during sync for account {0}.</value>
   </data>
-  <data name="InvalidLinkedAccountIDLog" xml:space="preserve">
+  <data name="InvalidSimpleFinLinkedAccountIDLog" xml:space="preserve">
     <value>Attempted to link a SimpleFIN account to an account that does not exist.</value>
   </data>
   <data name="SimpleFinAccountNotFoundForSyncLog" xml:space="preserve">
@@ -438,5 +438,14 @@
   </data>
   <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
     <value>SimpleFIN account {0} is deleted. Skipping.</value>
+  </data>
+  <data name="DuplicateLunchFlowAccountLog" xml:space="preserve">
+    <value>Attempted to create a LunchFlow account with a duplicate SyncID.</value>
+  </data>
+  <data name="LunchFlowAccountNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a LunchFlow account that does not exist.</value>
+  </data>
+  <data name="InvalidLunchFlowLinkedAccountIDLog" xml:space="preserve">
+    <value>Attempted to link a LunchFlow account to an account that does not exist.</value>
   </data>
 </root>

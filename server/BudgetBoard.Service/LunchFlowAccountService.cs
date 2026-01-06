@@ -10,130 +10,135 @@ using Microsoft.Extensions.Logging;
 namespace BudgetBoard.Service;
 
 /// <inheritdoc />
-public class SimpleFinAccountService(
-    ILogger<ISimpleFinAccountService> logger,
+public class LunchFlowAccountService(
+    ILogger<ILunchFlowAccountService> logger,
     UserDataContext userDataContext,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer
-) : ISimpleFinAccountService
+) : ILunchFlowAccountService
 {
     /// <inheritdoc />
-    public async Task CreateSimpleFinAccountAsync(
+    public async Task CreateLunchFlowAccountAsync(
         Guid userGuid,
-        ISimpleFinAccountCreateRequest request
+        ILunchFlowAccountCreateRequest request
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var organization = userData.SimpleFinOrganizations.SingleOrDefault(i =>
-            i.ID == request.OrganizationId
-        );
-        if (organization == null)
+        if (userData.LunchFlowAccounts.Any(a => a.SyncID == request.SyncID))
         {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidOrganizationIDLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["InvalidOrganizationIDError"]);
+            logger.LogError("{LogMessage}", logLocalizer["DuplicateLunchFlowAccountLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["DuplicateLunchFlowAccountError"]
+            );
         }
 
-        var newSimpleFinAccount = new SimpleFinAccount
+        var newLunchFlowAccount = new LunchFlowAccount
         {
-            SyncID = request.SyncID,
             Name = request.Name,
+            SyncID = request.SyncID,
+            InstitutionName = request.InstitutionName,
+            InstitutionLogo = request.InstitutionLogo,
+            Provider = request.Provider,
             Currency = request.Currency,
+            Status = request.Status,
             Balance = request.Balance,
             BalanceDate = request.BalanceDate,
-            OrganizationId = request.OrganizationId,
+            LastSync = request.LastSync,
+            LinkedAccountId = request.LinkedAccountId,
             UserID = userData.Id,
         };
 
-        userDataContext.SimpleFinAccounts.Add(newSimpleFinAccount);
+        userDataContext.LunchFlowAccounts.Add(newLunchFlowAccount);
         await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<ISimpleFinAccountResponse>> ReadSimpleFinAccountsAsync(
+    public async Task<IReadOnlyList<ILunchFlowAccountResponse>> ReadLunchFlowAccountsAsync(
         Guid userGuid
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        return userData
-            .SimpleFinOrganizations.SelectMany(o => o.Accounts)
-            .Select(a => new SimpleFinAccountResponse(a))
-            .ToList();
+        return userData.LunchFlowAccounts.Select(a => new LunchFlowAccountResponse(a)).ToList();
     }
 
     /// <inheritdoc />
-    public async Task UpdateAccountAsync(Guid userGuid, ISimpleFinAccountUpdateRequest request)
+    public async Task UpdateLunchFlowAccountAsync(
+        Guid userGuid,
+        ILunchFlowAccountUpdateRequest request
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var accountToUpdate = userData
-            .SimpleFinOrganizations.SelectMany(o => o.Accounts)
-            .SingleOrDefault(a => a.ID == request.ID);
-        if (accountToUpdate == null)
+        var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a => a.ID == request.ID);
+        if (lunchFlowAccount == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountIDUpdateNotFoundLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                responseLocalizer["SimpleFinAccountIDUpdateNotFoundError"]
+                responseLocalizer["LunchFlowAccountNotFoundError"]
             );
         }
 
-        accountToUpdate.Name = request.Name;
-        accountToUpdate.Currency = request.Currency;
-        accountToUpdate.Balance = request.Balance;
-        accountToUpdate.BalanceDate = (int)
+        lunchFlowAccount.Name = request.Name;
+        lunchFlowAccount.Status = request.Status;
+        lunchFlowAccount.InstitutionName = request.InstitutionName;
+        lunchFlowAccount.InstitutionLogo = request.InstitutionLogo;
+        lunchFlowAccount.Provider = request.Provider;
+        lunchFlowAccount.Currency = request.Currency;
+        lunchFlowAccount.Balance = request.Balance;
+        lunchFlowAccount.BalanceDate = (int)
             new DateTimeOffset(request.BalanceDate).ToUnixTimeSeconds();
-        accountToUpdate.LastSync = request.LastSync;
+        lunchFlowAccount.LastSync = request.LastSync;
 
         await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task DeleteAccountAsync(Guid userGuid, Guid accountGuid)
+    public async Task DeleteLunchFlowAccountAsync(Guid userGuid, Guid accountGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var accountToDelete = userData
-            .SimpleFinOrganizations.SelectMany(o => o.Accounts)
-            .SingleOrDefault(a => a.ID == accountGuid);
-        if (accountToDelete == null)
+        var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a => a.ID == accountGuid);
+        if (lunchFlowAccount == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountIDDeleteNotFoundLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                responseLocalizer["SimpleFinAccountIDDeleteNotFoundError"]
+                responseLocalizer["LunchFlowAccountNotFoundError"]
             );
         }
 
-        userDataContext.SimpleFinAccounts.Remove(accountToDelete);
+        userData.LunchFlowAccounts.Remove(lunchFlowAccount);
         await userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task UpdateLinkedAccountAsync(
         Guid userGuid,
-        Guid simpleFinAccountGuid,
+        Guid lunchFlowAccountGuid,
         Guid? linkedAccountGuid
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var accountToUpdate = userData.SimpleFinAccounts.SingleOrDefault(o =>
-            o.ID == simpleFinAccountGuid
+        var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a =>
+            a.ID == lunchFlowAccountGuid
         );
-        if (accountToUpdate == null)
+        if (lunchFlowAccount == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountUpdateNotFoundLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                responseLocalizer["SimpleFinAccountUpdateNotFoundError"]
+                responseLocalizer["LunchFlowAccountNotFoundError"]
             );
         }
 
         if (linkedAccountGuid != null && !userData.Accounts.Any(a => a.ID == linkedAccountGuid))
         {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidSimpleFinLinkedAccountIDLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["InvalidLunchFlowLinkedAccountIDLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["InvalidLinkedAccountIDError"]);
         }
 
-        var oldAccountLinkedId = accountToUpdate.LinkedAccountId;
+        var oldAccountLinkedId = lunchFlowAccount.LinkedAccountId;
         if (oldAccountLinkedId != null)
         {
             var oldLinkedAccount = userData.Accounts.FirstOrDefault(a =>
@@ -142,12 +147,12 @@ public class SimpleFinAccountService(
             oldLinkedAccount?.Source = AccountSource.Manual;
         }
 
-        accountToUpdate.LinkedAccountId = linkedAccountGuid;
-        accountToUpdate.LastSync = null;
+        lunchFlowAccount.LinkedAccountId = linkedAccountGuid;
+        lunchFlowAccount.LastSync = null;
 
         var linkedAccount = userData.Accounts.FirstOrDefault(a => a.ID == linkedAccountGuid);
         linkedAccount?.Source =
-            linkedAccountGuid != null ? AccountSource.SimpleFIN : AccountSource.Manual;
+            linkedAccountGuid != null ? AccountSource.LunchFlow : AccountSource.Manual;
 
         await userDataContext.SaveChangesAsync();
     }
@@ -158,8 +163,7 @@ public class SimpleFinAccountService(
         try
         {
             foundUser = await userDataContext
-                .ApplicationUsers.Include(u => u.SimpleFinOrganizations)
-                .ThenInclude(i => i.Accounts)
+                .ApplicationUsers.Include(u => u.LunchFlowAccounts)
                 .Include(u => u.Accounts)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));

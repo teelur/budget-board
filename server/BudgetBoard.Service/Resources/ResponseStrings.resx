@@ -427,4 +427,10 @@
   <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
     <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
   </data>
+  <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
+    <value>A LunchFlow account with this SyncID already exists.</value>
+  </data>
+  <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
+    <value>The LunchFlow account you are trying to access does not exist.</value>
+  </data>
   </root>
