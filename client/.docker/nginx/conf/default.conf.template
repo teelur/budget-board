@@ -22,6 +22,7 @@ server {
     # This will redirect a request from this container to our backend container.
     proxy_pass http://backend_server/api/;
     proxy_set_header Host ${DOLLAR}proxy_host:${DOLLAR}proxy_port;
+    
     # These are used to identify the original reverse proxied request
     proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Host ${DOLLAR}http_host;
