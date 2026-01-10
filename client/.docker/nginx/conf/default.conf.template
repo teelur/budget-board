@@ -7,7 +7,7 @@ server {
   listen ${PORT};
 
   # You should configure this to the domain that points to this app.
-  server_name ${VITE_BUDGET_BOARD_DOMAIN};
+  server_name _;
 
   access_log /var/log/nginx/nginx.vhost.access.log;
   error_log /var/log/nginx/nginx.vhost.error.log;

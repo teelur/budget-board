@@ -6,7 +6,7 @@ services:
     build: ./server
     environment:
       Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
-      CLIENT_ADDRESS: ${CLIENT_ADDRESS:-budget-board-client}
+      CLIENT_ADDRESS: budget-board-client
       POSTGRES_HOST: ${POSTGRES_HOST:-budget-board-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       POSTGRES_DATABASE: ${POSTGRES_DATABASE:-budgetboard}
@@ -40,7 +40,7 @@ services:
     environment:
       PORT: ${PORT:-6253}
       VITE_BUDGET_BOARD_DOMAIN: ${BUDGET_BOARD_DOMAIN:-localhost:6253}
-      VITE_SERVER_ADDRESS: ${SERVER_ADDRESS:-budget-board-server}
+      VITE_SERVER_ADDRESS: budget-board-server
       VITE_OIDC_ENABLED: ${OIDC_ENABLED:-false}
       VITE_OIDC_PROVIDER: ${OIDC_ISSUER:-}
       VITE_OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
