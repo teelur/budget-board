@@ -9,8 +9,8 @@ public interface ILunchFlowAccountCreateRequest
     string InstitutionName { get; }
     string InstitutionLogo { get; }
     string Provider { get; }
-    string Currency { get; }
-    string Status { get; }
+    string? Currency { get; }
+    string? Status { get; }
     decimal Balance { get; }
     int BalanceDate { get; }
     DateTime? LastSync { get; }
@@ -24,8 +24,8 @@ public class LunchFlowAccountCreateRequest : ILunchFlowAccountCreateRequest
     public string InstitutionName { get; init; } = string.Empty;
     public string InstitutionLogo { get; init; } = string.Empty;
     public string Provider { get; init; } = string.Empty;
-    public string Currency { get; init; } = string.Empty;
-    public string Status { get; init; } = string.Empty;
+    public string? Currency { get; init; } = string.Empty;
+    public string? Status { get; init; } = string.Empty;
     public decimal Balance { get; init; } = 0;
     public int BalanceDate { get; init; } = (int)DateTimeOffset.UnixEpoch.ToUnixTimeSeconds();
     public DateTime? LastSync { get; init; } = null;
@@ -71,8 +71,8 @@ public interface ILunchFlowAccountUpdateRequest
     string InstitutionName { get; }
     string InstitutionLogo { get; }
     string Provider { get; }
-    string Currency { get; }
-    string Status { get; }
+    string? Currency { get; }
+    string? Status { get; }
     decimal Balance { get; }
     DateTime BalanceDate { get; }
     DateTime? LastSync { get; }
@@ -85,8 +85,8 @@ public class LunchFlowAccountUpdateRequest : ILunchFlowAccountUpdateRequest
     public string InstitutionName { get; init; } = string.Empty;
     public string InstitutionLogo { get; init; } = string.Empty;
     public string Provider { get; init; } = string.Empty;
-    public string Currency { get; init; } = string.Empty;
-    public string Status { get; init; } = string.Empty;
+    public string? Currency { get; init; } = string.Empty;
+    public string? Status { get; init; } = string.Empty;
     public decimal Balance { get; init; } = 0;
     public DateTime BalanceDate { get; init; } = DateTime.UnixEpoch;
     public DateTime? LastSync { get; init; } = null;

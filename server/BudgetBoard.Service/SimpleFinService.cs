@@ -17,7 +17,7 @@ namespace BudgetBoard.Service;
 public class SimpleFinService(
     IHttpClientFactory clientFactory,
     UserDataContext userDataContext,
-    ILogger<ISyncProvider> logger,
+    ILogger<ISimpleFinService> logger,
     INowProvider nowProvider,
     IAccountService accountService,
     ITransactionService transactionService,
@@ -598,42 +598,26 @@ public class SimpleFinService(
     )
     {
         List<string> errors = [];
-        var userAccount = userData.Accounts.FirstOrDefault(a =>
-            a.SimpleFinAccount != null && a.SimpleFinAccount.ID == simpleFinAccountId
-        );
-        if (userAccount == null)
-        {
-            logger.LogError(
-                "{LogMessage}",
-                logLocalizer["SimpleFinAccountNotFoundForBalanceLog", simpleFinAccountId]
-            );
-            errors.Add(
-                responseLocalizer["SimpleFinAccountNotFoundForBalanceError", simpleFinAccountId]
-            );
-            return errors;
-        }
-
-        // We only want to create a balance if it is newer than the latest balance we have.
-        var latestBalance = userAccount
-            .Balances.OrderByDescending(b => b.DateTime)
-            .FirstOrDefault();
-        long latestBalanceTimestamp =
-            latestBalance != null
-                ? ((DateTimeOffset)latestBalance.DateTime).ToUnixTimeSeconds()
-                : 0;
-        if (accountData.BalanceDate > latestBalanceTimestamp)
-        {
-            var newBalance = new BalanceCreateRequest
+        var error = await SyncHelpers.SyncBalance(
+            userData,
+            new BalanceCreateRequest
             {
+                AccountID = userData
+                    .Accounts.First(a =>
+                        a.SimpleFinAccount != null && a.SimpleFinAccount.ID == simpleFinAccountId
+                    )
+                    .ID,
                 Amount = decimal.Parse(
                     accountData.Balance,
                     CultureInfo.InvariantCulture.NumberFormat
                 ),
                 DateTime = DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate),
-                AccountID = userAccount.ID,
-            };
-
-            await balanceService.CreateBalancesAsync(userData.Id, newBalance);
+            },
+            balanceService
+        );
+        if (error.HasValue)
+        {
+            errors.Add(responseLocalizer[error.Value.ErrorKey, [.. error.Value.ErrorParams]]);
         }
 
         return errors;

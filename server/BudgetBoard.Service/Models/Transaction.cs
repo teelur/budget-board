@@ -20,6 +20,10 @@ public class TransactionSource
     {
         get { return new TransactionSource("SimpleFin"); }
     }
+    public static TransactionSource LunchFlow
+    {
+        get { return new TransactionSource("LunchFlow"); }
+    }
 }
 
 public interface ITransactionCreateRequest

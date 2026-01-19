@@ -438,8 +438,18 @@
   </data>
   <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
     <value>SimpleFIN account {0} is deleted. Skipping.</value>
+  </data>  <data name="LunchFlowApiKeyConfigurationErrorLog" xml:space="preserve">
+    <value>Failed to configure LunchFlow API key. Status code: {0}</value>
   </data>
-  <data name="DuplicateLunchFlowAccountLog" xml:space="preserve">
+  <data name="LunchFlowApiKeyMissingErrorLog" xml:space="preserve">
+    <value>LunchFlow API key is not configured for user.</value>
+  </data>
+  <data name="LunchFlowAccountDataRetrievalErrorLog" xml:space="preserve">
+    <value>Failed to retrieve LunchFlow account data from API.</value>
+  </data>
+  <data name="LunchFlowDeserializationErrorLog" xml:space="preserve">
+    <value>Failed to deserialize LunchFlow account data. Error: {0}</value>
+  </data>  <data name="DuplicateLunchFlowAccountLog" xml:space="preserve">
     <value>Attempted to create a LunchFlow account with a duplicate SyncID.</value>
   </data>
   <data name="LunchFlowAccountNotFoundLog" xml:space="preserve">

@@ -427,6 +427,15 @@
   <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
     <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
   </data>
+  <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
+    <value>Failed to configure LunchFlow API key. Status code: {0}</value>
+  </data>
+  <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
+    <value>LunchFlow API key is not configured.</value>
+  </data>
+  <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve LunchFlow account data.</value>
+  </data>
   <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
     <value>A LunchFlow account with this SyncID already exists.</value>
   </data>
