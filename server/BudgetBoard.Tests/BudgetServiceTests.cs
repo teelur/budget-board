@@ -70,6 +70,48 @@ public class BudgetServiceTests
     }
 
     [Fact]
+    public async Task CreateBudgetsWithParentsAsync_WithMultipleChildrenForSameParent_ShouldCreateCorrectParentLimit()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var today = DateTime.Today;
+
+        var child1 = _budgetCreateRequestFaker.Generate();
+        child1.Category = "Paycheck";
+        child1.Limit = 1000;
+        child1.Date = today;
+
+        var child2 = _budgetCreateRequestFaker.Generate();
+        child2.Category = "Bonus";
+        child2.Limit = 500;
+        child2.Date = today;
+
+        var child3 = _budgetCreateRequestFaker.Generate();
+        child3.Category = "Interest Income";
+        child3.Limit = 300;
+        child3.Date = today;
+
+        // Act
+        await budgetService.CreateBudgetsWithParentsAsync(
+            helper.demoUser.Id,
+            [child1, child2, child3]
+        );
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(4); // 3 children + 1 parent
+        helper.UserDataContext.Budgets.Should().Contain(b => b.Category == "Income");
+        var parentBudget = helper.UserDataContext.Budgets.Single(b => b.Category == "Income");
+        parentBudget.Limit.Should().Be(1800); // Sum of all children
+    }
+
+    [Fact]
     public async Task CreateBudgetsAsync_WhenValidData_ShouldCreateBudget()
     {
         // Arrange
@@ -299,6 +341,138 @@ public class BudgetServiceTests
     }
 
     [Fact]
+    public async Task CreateBudgetsAsync_WhenCategoryIsNull_ShouldThrowExceptionWithErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Category = null!;
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("BudgetCreateCompletedWithErrorsError");
+    }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_WhenCategoryIsEmpty_ShouldThrowExceptionWithErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Category = "";
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("BudgetCreateCompletedWithErrorsError");
+    }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_WithMixOfValidAndInvalid_ShouldThrowWithPartialCreation()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var validBudget1 = _budgetCreateRequestFaker.Generate();
+        validBudget1.Date = DateTime.Today;
+
+        var invalidBudget = _budgetCreateRequestFaker.Generate();
+        invalidBudget.Category = null!;
+        invalidBudget.Date = DateTime.Today;
+
+        var validBudget2 = _budgetCreateRequestFaker.Generate();
+        validBudget2.Date = DateTime.Today;
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.CreateBudgetsAsync(
+                helper.demoUser.Id,
+                [validBudget1, invalidBudget, validBudget2]
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("*BudgetCreateCompletedWithErrorsError*");
+        helper.UserDataContext.Budgets.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_WithNegativeLimit_ShouldCreateBudgetWithNegativeLimit()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Limit = -100;
+
+        // Act
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(1);
+        helper.UserDataContext.Budgets.Single().Limit.Should().Be(-100);
+    }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_WithZeroLimit_ShouldCreateBudgetWithZeroLimit()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budget = _budgetCreateRequestFaker.Generate();
+        budget.Limit = 0;
+
+        // Act
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(1);
+        helper.UserDataContext.Budgets.Single().Limit.Should().Be(0);
+    }
+
+    [Fact]
     public async Task ReadBudgetsAsync_WhenValidData_ShouldReturnBudgets()
     {
         // Arrange
@@ -336,6 +510,87 @@ public class BudgetServiceTests
                     .Where(b => b.Date.Month == DateTime.Now.Month)
                     .Select(b => new BudgetResponse(b))
             );
+    }
+
+    [Fact]
+    public async Task ReadBudgetsAsync_InvalidUserGuid_ThrowsException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.ReadBudgetsAsync(Guid.NewGuid(), DateTime.Now);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidUserError");
+    }
+
+    [Fact]
+    public async Task ReadBudgetsAsync_WhenNoBudgets_ShouldReturnEmptyList()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        var result = await budgetService.ReadBudgetsAsync(helper.demoUser.Id, DateTime.Now);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ReadBudgetsAsync_WithDifferentMonths_ShouldReturnOnlyRequestedMonth()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budgetFaker = new BudgetFaker(helper.demoUser.Id);
+
+        var januaryBudget = budgetFaker.Generate();
+        januaryBudget.Date = new DateTime(2026, 1, 15);
+        januaryBudget.Category = "January Budget";
+
+        var februaryBudget = budgetFaker.Generate();
+        februaryBudget.Date = new DateTime(2026, 2, 15);
+        februaryBudget.Category = "February Budget";
+
+        var marchBudget = budgetFaker.Generate();
+        marchBudget.Date = new DateTime(2026, 3, 15);
+        marchBudget.Category = "March Budget";
+
+        helper.UserDataContext.Budgets.AddRange([januaryBudget, februaryBudget, marchBudget]);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var result = await budgetService.ReadBudgetsAsync(
+            helper.demoUser.Id,
+            new DateTime(2026, 2, 1)
+        );
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.Single().Category.Should().Be("February Budget");
     }
 
     [Fact]
@@ -579,6 +834,109 @@ public class BudgetServiceTests
     }
 
     [Fact]
+    public async Task UpdateBudgetAsync_InvalidUserGuid_ThrowsException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budgetUpdateRequest = _budgetUpdateRequestFaker.Generate();
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.UpdateBudgetAsync(Guid.NewGuid(), budgetUpdateRequest);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidUserError");
+    }
+
+    [Fact]
+    public async Task UpdateBudgetAsync_WhenChildHasMultipleSiblings_ShouldUpdateParentCorrectly()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budgetFaker = new BudgetFaker(helper.demoUser.Id);
+        var parentBudget = budgetFaker.Generate();
+        parentBudget.Category = "Income";
+        parentBudget.Limit = 1500;
+        parentBudget.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(parentBudget);
+
+        var childBudget1 = budgetFaker.Generate();
+        childBudget1.Category = "Paycheck";
+        childBudget1.Limit = 1000;
+        childBudget1.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(childBudget1);
+
+        var childBudget2 = budgetFaker.Generate();
+        childBudget2.Category = "Bonus";
+        childBudget2.Limit = 500;
+        childBudget2.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(childBudget2);
+        helper.UserDataContext.SaveChanges();
+
+        var updatedBudget = _budgetUpdateRequestFaker.Generate();
+        updatedBudget.ID = childBudget1.ID;
+        updatedBudget.Limit = 2000;
+
+        // Act
+        await budgetService.UpdateBudgetAsync(helper.demoUser.Id, updatedBudget);
+
+        // Assert
+        var updatedParentBudget = helper.UserDataContext.Budgets.Single(b =>
+            b.Category == parentBudget.Category
+        );
+        updatedParentBudget.Limit.Should().Be(2500); // 2000 + 500
+    }
+
+    [Fact]
+    public async Task UpdateBudgetAsync_WithNegativeLimit_ShouldUpdateToNegativeLimit()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budgetFaker = new BudgetFaker(helper.demoUser.Id);
+        var budget = budgetFaker.Generate();
+        budget.Limit = 100;
+
+        helper.UserDataContext.Budgets.Add(budget);
+        helper.UserDataContext.SaveChanges();
+
+        var updatedBudget = _budgetUpdateRequestFaker.Generate();
+        updatedBudget.ID = budget.ID;
+        updatedBudget.Limit = -50;
+
+        // Act
+        await budgetService.UpdateBudgetAsync(helper.demoUser.Id, updatedBudget);
+
+        // Assert
+        helper.UserDataContext.Budgets.Single().Limit.Should().Be(-50);
+    }
+
+    [Fact]
     public async Task DeleteBudgetAsync_WhenValidData_ShouldDeleteBudget()
     {
         // Arrange
@@ -673,7 +1031,7 @@ public class BudgetServiceTests
     }
 
     [Fact]
-    public async Task CreateBudgetsAsync_WhenCategoryIsNull_ShouldThrowExceptionWithErrors()
+    public async Task DeleteBudgetAsync_WhenDeletingChildWithSiblings_ShouldNotAffectParent()
     {
         // Arrange
         var helper = new TestHelper();
@@ -684,41 +1042,38 @@ public class BudgetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var budget = _budgetCreateRequestFaker.Generate();
-        budget.Category = null!;
+        var budgetFaker = new BudgetFaker(helper.demoUser.Id);
+        var parentBudget = budgetFaker.Generate();
+        parentBudget.Category = "Income";
+        parentBudget.Limit = 1500;
+        parentBudget.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(parentBudget);
+
+        var childBudget1 = budgetFaker.Generate();
+        childBudget1.Category = "Paycheck";
+        childBudget1.Limit = 1000;
+        childBudget1.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(childBudget1);
+
+        var childBudget2 = budgetFaker.Generate();
+        childBudget2.Category = "Bonus";
+        childBudget2.Limit = 500;
+        childBudget2.Date = DateTime.Today;
+
+        helper.UserDataContext.Budgets.Add(childBudget2);
+        helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () =>
-            await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
+        await budgetService.DeleteBudgetAsync(helper.demoUser.Id, childBudget1.ID);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("*BudgetCreateCompletedWithErrorsError*");
-    }
-
-    [Fact]
-    public async Task CreateBudgetsAsync_WhenCategoryIsEmpty_ShouldThrowExceptionWithErrors()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var budgetService = new BudgetService(
-            Mock.Of<ILogger<IBudgetService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var budget = _budgetCreateRequestFaker.Generate();
-        budget.Category = "";
-
-        // Act
-        Func<Task> act = async () =>
-            await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("*BudgetCreateCompletedWithErrorsError*");
+        helper.UserDataContext.Budgets.Should().HaveCount(2);
+        helper
+            .UserDataContext.Budgets.Should()
+            .Contain(b => b.ID == parentBudget.ID && b.Limit == parentBudget.Limit);
+        helper.UserDataContext.Budgets.Should().Contain(b => b.ID == childBudget2.ID);
+        helper.UserDataContext.Budgets.Should().NotContain(b => b.ID == childBudget1.ID);
     }
 }
