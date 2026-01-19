@@ -6,16 +6,15 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";
-import SimpleFinOrganizationCards from "./SimpleFinOrganizationCards/SimpleFinOrganizationCards";
 import { notifications } from "@mantine/notifications";
 import {
-  simpleFinAccountQueryKey,
-  simpleFinOrganizationQueryKey,
+  lunchFlowAccountQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
-import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
+import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
+import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
 
-const SimpleFinAccountsContent = (): React.ReactNode => {
+const LunchFlowAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
@@ -36,19 +35,16 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
   });
 
   const queryClient = useQueryClient();
-  const doRemoveAccessToken = useMutation({
+  const doRemoveApiKey = useMutation({
     mutationFn: async () =>
       await request({
-        url: "/api/simplefin/removeAccessToken",
+        url: "/api/lunchFlow/removeApiKey",
         method: "POST",
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       await queryClient.invalidateQueries({
-        queryKey: [simpleFinOrganizationQueryKey],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: [simpleFinAccountQueryKey],
+        queryKey: [lunchFlowAccountQueryKey],
       });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
@@ -65,29 +61,29 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
     <Stack p={0} gap="0.5rem">
       <Group justify="space-between">
         <Group>
-          <PrimaryText size="lg">{t("simplefin")}</PrimaryText>
-          {userQuery.data?.simpleFinAccessToken && (
+          <PrimaryText size="lg">{t("lunchflow")}</PrimaryText>
+          {userQuery.data?.lunchFlowApiKey && (
             <Badge color="var(--button-color-confirm)">{t("connected")}</Badge>
           )}
         </Group>
-        {userQuery.data?.simpleFinAccessToken && (
+        {userQuery.data?.lunchFlowApiKey && (
           <Button
             bg="var(--button-color-destructive)"
             size="xs"
-            loading={doRemoveAccessToken.isPending}
-            onClick={() => doRemoveAccessToken.mutate()}
+            loading={doRemoveApiKey.isPending}
+            onClick={() => doRemoveApiKey.mutate()}
           >
-            {t("remove_simplefin")}
+            {t("remove_lunchflow")}
           </Button>
         )}
       </Group>
-      {userQuery.data?.simpleFinAccessToken ? (
-        <SimpleFinOrganizationCards />
+      {userQuery.data?.lunchFlowApiKey ? (
+        <LunchFlowInstitutionCards />
       ) : (
-        <LinkSimpleFin />
+        <LinkLunchFlow />
       )}
     </Stack>
   );
 };
 
-export default SimpleFinAccountsContent;
+export default LunchFlowAccountsContent;
