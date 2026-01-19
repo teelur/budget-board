@@ -40,8 +40,8 @@ public class LunchFlowAccountService(
             InstitutionName = request.InstitutionName,
             InstitutionLogo = request.InstitutionLogo,
             Provider = request.Provider,
-            Currency = request.Currency,
-            Status = request.Status,
+            Currency = request.Currency ?? string.Empty,
+            Status = request.Status ?? string.Empty,
             Balance = request.Balance,
             BalanceDate = request.BalanceDate,
             LastSync = request.LastSync,
@@ -81,11 +81,11 @@ public class LunchFlowAccountService(
         }
 
         lunchFlowAccount.Name = request.Name;
-        lunchFlowAccount.Status = request.Status;
+        lunchFlowAccount.Status = request.Status ?? string.Empty;
         lunchFlowAccount.InstitutionName = request.InstitutionName;
         lunchFlowAccount.InstitutionLogo = request.InstitutionLogo;
         lunchFlowAccount.Provider = request.Provider;
-        lunchFlowAccount.Currency = request.Currency;
+        lunchFlowAccount.Currency = request.Currency ?? string.Empty;
         lunchFlowAccount.Balance = request.Balance;
         lunchFlowAccount.BalanceDate = (int)
             new DateTimeOffset(request.BalanceDate).ToUnixTimeSeconds();

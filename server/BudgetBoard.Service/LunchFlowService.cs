@@ -24,7 +24,7 @@ public class LunchFlowService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : ILunchFlowService
 {
-    const string LunchFlowBaseUrl = "https://api.lunchflow.com/v1";
+    const string LunchFlowBaseUrl = "https://www.lunchflow.app/api/v1";
     const string LunchFlowAccountsEndpoint = "/accounts";
     const string LunchFlowTransactionsEndpoint = "/transactions";
     const string LunchFlowBalancesEndpoint = "/balance";
@@ -49,7 +49,7 @@ public class LunchFlowService(
                 logLocalizer["LunchFlowApiKeyConfigurationErrorLog", response.StatusCode]
             );
             throw new BudgetBoardServiceException(
-                responseLocalizer["LunchFlowApiKeyConfigurationError"]
+                responseLocalizer["LunchFlowApiKeyConfigurationError", response.StatusCode]
             );
         }
 
@@ -57,6 +57,8 @@ public class LunchFlowService(
 
         userDataContext.ApplicationUsers.Update(userData);
         await userDataContext.SaveChangesAsync();
+
+        await RefreshAccountsAsync(userData.Id);
     }
 
     /// <inheritdoc />
@@ -174,10 +176,9 @@ public class LunchFlowService(
     private async Task<HttpResponseMessage> SendQuery(string uri, string apiKey)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-        var client = clientFactory.CreateClient();
-        client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+        request.Headers.Add("x-api-key", apiKey);
 
+        var client = clientFactory.CreateClient();
         return await client.SendAsync(request);
     }
 

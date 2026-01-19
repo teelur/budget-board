@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using BudgetBoard.Service.Helpers;
 
 namespace BudgetBoard.Service.Models;
 
@@ -10,7 +11,8 @@ public interface ILunchFlowAccountsData
 
 public class LunchFlowAccountsData : ILunchFlowAccountsData
 {
-    public IEnumerable<ILunchFlowAccountData> Accounts { get; init; } = [];
+    public IEnumerable<LunchFlowAccountData> Accounts { get; init; } = [];
+    IEnumerable<ILunchFlowAccountData> ILunchFlowAccountsData.Accounts => Accounts;
     public int Total { get; init; }
 }
 
@@ -31,6 +33,7 @@ public interface ILunchFlowAccountData
 
 public class LunchFlowAccountData : ILunchFlowAccountData
 {
+    [JsonConverter(typeof(NumberToStringConverter))]
     public string ID { get; init; } = string.Empty;
     public string Name { get; init; } = string.Empty;
 
@@ -58,7 +61,10 @@ public interface ILunchFlowTransactionData
 
 public class LunchFlowTransactionData : ILunchFlowTransactionData
 {
+    [JsonConverter(typeof(NumberToStringConverter))]
     public string ID { get; init; } = string.Empty;
+
+    [JsonConverter(typeof(NumberToStringConverter))]
     public string AccountID { get; init; } = string.Empty;
     public int Amount { get; init; }
     public string Currency { get; init; } = string.Empty;
@@ -76,7 +82,8 @@ public interface ILunchFlowTransactionsData
 
 public class LunchFlowTransactionsData : ILunchFlowTransactionsData
 {
-    public IEnumerable<ILunchFlowTransactionData> Transactions { get; init; } = [];
+    public IEnumerable<LunchFlowTransactionData> Transactions { get; init; } = [];
+    IEnumerable<ILunchFlowTransactionData> ILunchFlowTransactionsData.Transactions => Transactions;
     public int Total { get; init; }
 }
 
