@@ -14,6 +14,7 @@ public class SyncService(
     ILogger<ISyncService> logger,
     UserDataContext userDataContext,
     ISimpleFinService simpleFinService,
+    ILunchFlowService lunchFlowService,
     IGoalService goalService,
     IApplicationUserService applicationUserService,
     IAutomaticRuleService automaticRuleService,
@@ -39,6 +40,16 @@ public class SyncService(
         else
         {
             logger.LogInformation("{LogMessage}", logLocalizer["SimpleFinTokenNotConfiguredLog"]);
+        }
+
+        if (!string.IsNullOrEmpty(userData.LunchFlowApiKey))
+        {
+            errors.AddRange(await lunchFlowService.RefreshAccountsAsync(userGuid));
+            errors.AddRange(await lunchFlowService.SyncTransactionHistoryAsync(userGuid));
+        }
+        else
+        {
+            logger.LogInformation("{LogMessage}", logLocalizer["LunchFlowApiKeyNotConfiguredLog"]);
         }
 
         await goalService.CompleteGoalsAsync(userData.Id);

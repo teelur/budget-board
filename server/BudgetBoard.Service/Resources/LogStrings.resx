@@ -367,6 +367,9 @@
   <data name="SimpleFinTokenNotConfiguredLog" xml:space="preserve">
     <value>SimpleFIN token is not configured. Skipping bank sync.</value>
   </data>
+  <data name="LunchFlowApiKeyNotConfiguredLog" xml:space="preserve">
+    <value>LunchFlow API key is not configured. Skipping LunchFlow sync.</value>
+  </data>
   <data name="SimpleFinDecodeTokenErrorLog" xml:space="preserve">
     <value>Attempt to decode setup token was unsuccessful.</value>
   </data>

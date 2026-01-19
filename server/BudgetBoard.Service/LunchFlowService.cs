@@ -381,7 +381,7 @@ public class LunchFlowService(
         return errors;
     }
 
-    private async Task<HttpResponseMessage> QueryLunchFlowTBalanceDataAsync(
+    private async Task<HttpResponseMessage> QueryLunchFlowBalanceDataAsync(
         string apiKey,
         string accountId
     )
@@ -399,7 +399,7 @@ public class LunchFlowService(
         string accountId
     )
     {
-        var response = await QueryLunchFlowTBalanceDataAsync(apiKey, accountId);
+        var response = await QueryLunchFlowBalanceDataAsync(apiKey, accountId);
         var jsonString = await response.Content.ReadAsStringAsync();
 
         try
