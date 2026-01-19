@@ -422,7 +422,7 @@ public class BudgetServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("*BudgetCreateCompletedWithErrorsError*");
+            .WithMessage("BudgetCreateCompletedWithErrorsError");
         helper.UserDataContext.Budgets.Should().HaveCount(2);
     }
 
