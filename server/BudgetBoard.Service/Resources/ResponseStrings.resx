@@ -358,6 +358,9 @@
   <data name="SimpleFinDecodeTokenError" xml:space="preserve">
     <value>An error occurred while decoding the setup token.</value>
   </data>
+  <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
+    <value>SimpleFIN access token is missing or empty.</value>
+  </data>
   <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
     <value>The provided access token is invalid.</value>
   </data>
@@ -366,6 +369,9 @@
   </data>
   <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
     <value>An error occurred while connecting to SimpleFIN. Please try again later.</value>
+  </data>
+  <data name="SimpleFinDataRequestError" xml:space="preserve">
+    <value>An error occurred while requesting SimpleFIN data.</value>
   </data>
   <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
     <value>Unsupported field '{0}' in rule condition.</value>

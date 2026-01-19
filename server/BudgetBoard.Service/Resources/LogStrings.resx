@@ -370,6 +370,9 @@
   <data name="SimpleFinDecodeTokenErrorLog" xml:space="preserve">
     <value>Attempt to decode setup token was unsuccessful.</value>
   </data>
+  <data name="SimpleFinMissingAccessTokenLog" xml:space="preserve">
+    <value>SimpleFIN access token is missing or empty.</value>
+  </data>
   <data name="SimpleFinInvalidAccessTokenLog" xml:space="preserve">
     <value>Attempt to update user with invalid access token.</value>
   </data>
@@ -381,6 +384,9 @@
   </data>
   <data name="SimpleFinDecodeTokenRequestErrorLog" xml:space="preserve">
     <value>Error sending request to decoded setup token URL: {0}</value>
+  </data>
+  <data name="SimpleFinDataRequestErrorLog" xml:space="preserve">
+    <value>Error requesting SimpleFIN account data: {0}</value>
   </data>
   <data name="GoalNoBalanceFoundLog" xml:space="preserve">
     <value>No balance found for goal {0}</value>

@@ -73,25 +73,43 @@ public class SimpleFinService(
         var errors = new List<string>();
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var simpleFinData = await GetSimpleFinAccountsDataAsync(
-            userData.SimpleFinAccessToken,
-            null,
-            false
-        );
-        if (simpleFinData == null)
+        try
         {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinDataNotFoundLog"]);
-            return [responseLocalizer["SimpleFinDataNotFoundError"]];
+            var simpleFinData = await GetSimpleFinAccountsDataAsync(
+                userData.SimpleFinAccessToken,
+                null,
+                false
+            );
+            if (simpleFinData == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["SimpleFinDataNotFoundLog"]);
+                return [responseLocalizer["SimpleFinDataNotFoundError"]];
+            }
+
+            errors.AddRange(simpleFinData.Errors);
+
+            if (simpleFinData.Accounts.Any())
+            {
+                errors.AddRange(
+                    await RefreshSimpleFinAccountsAsync(userData, simpleFinData.Accounts)
+                );
+            }
+
+            return errors;
         }
-
-        errors.AddRange(simpleFinData.Errors);
-
-        if (simpleFinData.Accounts.Any())
+        catch (BudgetBoardServiceException bbex)
         {
-            errors.AddRange(await RefreshSimpleFinAccountsAsync(userData, simpleFinData.Accounts));
+            return [bbex.Message];
         }
-
-        return errors;
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["SimpleFinDataRetrievalErrorLog", ex.Message]
+            );
+            return [responseLocalizer["SimpleFinDataRetrievalError"]];
+        }
     }
 
     /// <inheritdoc />
@@ -144,6 +162,10 @@ public class SimpleFinService(
             await userDataContext.SaveChangesAsync();
 
             return errors;
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return [bbex.Message];
         }
         catch (Exception ex)
         {
@@ -249,12 +271,19 @@ public class SimpleFinService(
 
     private static SimpleFinData GetUrlCredentials(string accessToken)
     {
-        string[] url = accessToken.Split("//");
-        string[] data = url.Last().Split("@");
-        var auth = data.First();
-        var baseUrl = url.First() + "//" + data.Last();
+        try
+        {
+            string[] url = accessToken.Split("//");
+            string[] data = url.Last().Split("@");
+            var auth = data.First();
+            var baseUrl = url.First() + "//" + data.Last();
 
-        return new SimpleFinData(auth, baseUrl);
+            return new SimpleFinData(auth, baseUrl);
+        }
+        catch (Exception)
+        {
+            throw new BudgetBoardServiceException("SimpleFinAccessTokenParseError");
+        }
     }
 
     private long GetOldestLastSyncTimestamp(IEnumerable<SimpleFinAccount> simpleFinAccounts)
@@ -339,29 +368,53 @@ public class SimpleFinService(
         bool includeTransactions
     )
     {
-        SimpleFinData data = GetUrlCredentials(accessToken);
-
-        var urlArgs = "?";
-        if (startDate.HasValue)
+        if (string.IsNullOrEmpty(accessToken))
         {
-            urlArgs += "start-date=" + startDate.Value + "&";
-        }
-        if (!includeTransactions)
-        {
-            urlArgs += "balances-only=1";
-        }
-        var requestUrl = data.BaseUrl + "/accounts" + urlArgs;
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-        var client = clientFactory.CreateClient();
-        var byteArray = Encoding.ASCII.GetBytes(data.Auth);
-        client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue(
-                "Basic",
-                Convert.ToBase64String(byteArray)
+            logger.LogError("{LogMessage}", logLocalizer["SimpleFinMissingAccessTokenLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinMissingAccessTokenError"]
             );
+        }
 
-        return await client.SendAsync(request);
+        try
+        {
+            SimpleFinData data = GetUrlCredentials(accessToken);
+
+            var urlArgs = "?";
+            if (startDate.HasValue)
+            {
+                urlArgs += "start-date=" + startDate.Value + "&";
+            }
+            if (!includeTransactions)
+            {
+                urlArgs += "balances-only=1";
+            }
+            var requestUrl = data.BaseUrl + "/accounts" + urlArgs;
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            var client = clientFactory.CreateClient();
+            var byteArray = Encoding.ASCII.GetBytes(data.Auth);
+            client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue(
+                    "Basic",
+                    Convert.ToBase64String(byteArray)
+                );
+
+            return await client.SendAsync(request);
+        }
+        catch (BudgetBoardServiceException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["SimpleFinDataRequestErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(responseLocalizer["SimpleFinDataRequestError"]);
+        }
     }
 
     private async Task<List<string>> RefreshSimpleFinAccountsAsync(
@@ -412,6 +465,20 @@ public class SimpleFinService(
                     continue;
                 }
             }
+            else
+            {
+                await simpleFinOrganizationService.UpdateSimpleFinOrganizationAsync(
+                    userData.Id,
+                    new SimpleFinOrganizationUpdateRequest
+                    {
+                        ID = existingOrganization.ID,
+                        Domain = simpleFinAccount.Org.Domain,
+                        SimpleFinUrl = simpleFinAccount.Org.SimpleFinUrl,
+                        Name = simpleFinAccount.Org.Name,
+                        Url = simpleFinAccount.Org.Url,
+                    }
+                );
+            }
 
             var existingAccount = userData.SimpleFinAccounts.SingleOrDefault(a =>
                 a.SyncID == simpleFinAccount.Id
@@ -437,7 +504,7 @@ public class SimpleFinService(
             }
             else
             {
-                await simpleFinAccountService.UpdateAccountAsync(
+                await simpleFinAccountService.UpdateSimpleFinAccountAsync(
                     userData.Id,
                     new SimpleFinAccountUpdateRequest
                     {
@@ -642,7 +709,10 @@ public class SimpleFinService(
                 );
             }
 
-            await simpleFinAccountService.DeleteAccountAsync(userData.Id, simpleFinAccount.ID);
+            await simpleFinAccountService.DeleteSimpleFinAccountAsync(
+                userData.Id,
+                simpleFinAccount.ID
+            );
         }
 
         foreach (var simpleFinOrganization in userData.SimpleFinOrganizations.ToList())
