@@ -25,10 +25,8 @@ public class TransactionService(
     private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
-    public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request)
+    public async Task CreateTransactionAsync(ApplicationUser userData, ITransactionCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
         var account = userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID);
         if (account == null)
         {
@@ -59,6 +57,12 @@ public class TransactionService(
         }
 
         await _userDataContext.SaveChangesAsync();
+    }
+
+    public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        await CreateTransactionAsync(userData, request);
     }
 
     /// <inheritdoc />
@@ -300,7 +304,7 @@ public class TransactionService(
             (newTransaction.Category, newTransaction.Subcategory) =
                 TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
 
-            await CreateTransactionAsync(userGuid, newTransaction);
+            await CreateTransactionAsync(userData, newTransaction);
         }
     }
 

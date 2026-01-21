@@ -49,37 +49,11 @@ public class TransactionServiceTests
         transaction.Date = transaction.Date.ToUniversalTime();
 
         // Act
-        await transactionService.CreateTransactionAsync(helper.demoUser.Id, transaction);
+        await transactionService.CreateTransactionAsync(helper.demoUser, transaction);
 
         // Assert
         helper.UserDataContext.Transactions.Should().ContainSingle();
         helper.UserDataContext.Transactions.Single().Should().BeEquivalentTo(transaction);
-    }
-
-    [Fact]
-    public async Task CreateTransactionAsync_InvalidUserId_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var transactionService = new TransactionService(
-            Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var transaction = _transactionCreateRequestFaker.Generate();
-
-        // Act
-        Func<Task> act = async () =>
-            await transactionService.CreateTransactionAsync(Guid.NewGuid(), transaction);
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("InvalidUserError");
     }
 
     [Fact]
@@ -100,7 +74,7 @@ public class TransactionServiceTests
 
         // Act
         Func<Task> act = async () =>
-            await transactionService.CreateTransactionAsync(helper.demoUser.Id, transaction);
+            await transactionService.CreateTransactionAsync(helper.demoUser, transaction);
 
         // Assert
         await act.Should()
@@ -133,7 +107,7 @@ public class TransactionServiceTests
         transaction.AccountID = account.ID;
 
         // Act
-        await transactionService.CreateTransactionAsync(helper.demoUser.Id, transaction);
+        await transactionService.CreateTransactionAsync(helper.demoUser, transaction);
         // Assert
         helper.UserDataContext.Balances.Should().ContainSingle();
         helper
@@ -187,7 +161,7 @@ public class TransactionServiceTests
         var oldBalance = balances[4].Amount;
 
         // Act
-        await transactionService.CreateTransactionAsync(helper.demoUser.Id, transaction);
+        await transactionService.CreateTransactionAsync(helper.demoUser, transaction);
 
         // Assert
         helper.UserDataContext.Balances.Should().HaveCount(6);
@@ -248,7 +222,7 @@ public class TransactionServiceTests
         var oldCurrentBalance = balances[4].Amount;
 
         // Act
-        await transactionService.CreateTransactionAsync(helper.demoUser.Id, transaction);
+        await transactionService.CreateTransactionAsync(helper.demoUser, transaction);
 
         // Assert
         helper.UserDataContext.Balances.Should().HaveCount(5);

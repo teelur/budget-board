@@ -585,7 +585,7 @@ public class SimpleFinService(
                 AccountID = userAccount.ID,
             };
 
-            await transactionService.CreateTransactionAsync(userData.Id, newTransaction);
+            await transactionService.CreateTransactionAsync(userData, newTransaction);
         }
 
         return errors;

@@ -1,4 +1,5 @@
-﻿using BudgetBoard.Service.Models;
+﻿using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Models;
 
 namespace BudgetBoard.Service.Interfaces;
 
@@ -7,6 +8,13 @@ namespace BudgetBoard.Service.Interfaces;
 /// </summary>
 public interface ITransactionService
 {
+    /// <summary>
+    /// Creates a new transaction for the specified user.
+    /// </summary>
+    /// <param name="userData">The user data.</param>
+    /// <param name="request">The transaction creation details.</param>
+    Task CreateTransactionAsync(ApplicationUser userData, ITransactionCreateRequest request);
+
     /// <summary>
     /// Creates a new transaction for the specified user.
     /// </summary>
