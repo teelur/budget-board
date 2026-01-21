@@ -465,6 +465,12 @@ public class SimpleFinService(
         IEnumerable<ISimpleFinAccountData> accountsData
     )
     {
+        // Instantiate an autoCategorizer
+        var autoCategorizer = AutomaticTransactionCategorizer.CreateAutoCategorizer(userDataContext, userData);
+
+        // Retrieve list of categories
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+
         List<string> errors = [];
         foreach (var accountData in accountsData)
         {
@@ -509,7 +515,9 @@ public class SimpleFinService(
             var transactionErrors = await SyncTransactionsAsync(
                 userData,
                 simpleFinAccount.ID,
-                accountData.Transactions
+                accountData.Transactions,
+                allCategories,
+                autoCategorizer
             );
             errors.AddRange(transactionErrors);
 
@@ -532,7 +540,9 @@ public class SimpleFinService(
     private async Task<List<string>> SyncTransactionsAsync(
         ApplicationUser userData,
         Guid simpleFinAccountId,
-        IEnumerable<ISimpleFinTransactionData> transactionsData
+        IEnumerable<ISimpleFinTransactionData> transactionsData,
+        IEnumerable<ICategory> allCategories,
+        AutomaticTransactionCategorizer? autoCategorizer
     )
     {
         List<string> errors = [];
@@ -585,7 +595,12 @@ public class SimpleFinService(
                 AccountID = userAccount.ID,
             };
 
-            await transactionService.CreateTransactionAsync(userData, newTransaction);
+            await transactionService.CreateTransactionAsync(
+                userData.Id,
+                newTransaction,
+                allCategories,
+                autoCategorizer
+            );
         }
 
         return errors;

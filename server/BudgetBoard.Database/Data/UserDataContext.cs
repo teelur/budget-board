@@ -30,6 +30,8 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<SimpleFinOrganization> SimpleFinOrganizations { get; set; }
     public DbSet<SimpleFinAccount> SimpleFinAccounts { get; set; }
 
+    public readonly Lazy<byte[]?> AutoCategorizerTrainingModel;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

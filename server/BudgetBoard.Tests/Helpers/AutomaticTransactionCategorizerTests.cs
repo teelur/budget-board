@@ -110,8 +110,8 @@ public class AutomaticTransactionCategorizerTests
     public void AutomaticTransactionCategorizer_WhenTwoMatches_ShouldReturnClosestAmount()
     {
         // Arrange
-        AutomaticTransactionCategorizer autoCategorizer = new AutomaticTransactionCategorizer();
-        autoCategorizer.Train(account.Transactions);
+        var mlModel = AutomaticTransactionCategorizer.Train(account.Transactions);
+        AutomaticTransactionCategorizer autoCategorizer = new AutomaticTransactionCategorizer(mlModel);
 
         var newTransaction1 = new Transaction
         {

@@ -1,4 +1,5 @@
 // Based on output by ML.NET Model Builder.
+using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Models;
 using Microsoft.ML;
@@ -34,7 +35,7 @@ public class AutomaticTransactionCategorizer
 
         [LoadColumn(3)]
         [ColumnName(@"category")]
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
     }
 
@@ -47,33 +48,29 @@ public class AutomaticTransactionCategorizer
     public class ModelOutput
     {
         [ColumnName(@"Features")]
-        public float[] Features { get; set; }
+        public float[]? Features { get; set; }
 
         [ColumnName(@"PredictedLabel")]
-        public string PredictedLabel { get; set; }
+        public string? PredictedLabel { get; set; }
 
         [ColumnName(@"Score")]
-        public float[] Score { get; set; }
+        public float[]? Score { get; set; }
 
     }
 
     #endregion
 
-    private Lazy<PredictionEngine<ModelInput, ModelOutput>> _predictEngine;
+    private PredictionEngine<ModelInput, ModelOutput> _predictEngine;
 
-    public AutomaticTransactionCategorizer()
+    public AutomaticTransactionCategorizer(byte[] mlNetModel)
     {
+        _predictEngine = CreatePredictEngine(mlNetModel);
     }
 
-    public AutomaticTransactionCategorizer(Stream mlNetModel)
-    {
-        _predictEngine = new Lazy<PredictionEngine<ModelInput, ModelOutput>>(() => CreatePredictEngine(mlNetModel), true);
-    }
-
-    private static PredictionEngine<ModelInput, ModelOutput> CreatePredictEngine(Stream mlNetModel)
+    private static PredictionEngine<ModelInput, ModelOutput> CreatePredictEngine(byte[] mlNetModel)
     {
         var mlContext = new MLContext();
-        ITransformer mlModel = mlContext.Model.Load(mlNetModel, out var _);
+        ITransformer mlModel = mlContext.Model.Load(new MemoryStream(mlNetModel), out var _);
         return mlContext.Model.CreatePredictionEngine<ModelInput, ModelOutput>(mlModel);
     }
 
@@ -86,13 +83,12 @@ public class AutomaticTransactionCategorizer
     {
         ModelInput modelInput = new ModelInput
         {
-            MerchantName = input.MerchantName,
-            Account = input.Account.Name,
+            MerchantName = input.MerchantName!,
+            Account = input.Account!.Name,
             Amount = (float)input.Amount
         };
 
-        var predEngine = _predictEngine.Value;
-        return predEngine.Predict(modelInput).PredictedLabel;
+        return _predictEngine.Predict(modelInput).PredictedLabel!;
     }
 
     /// <summary>
@@ -100,7 +96,7 @@ public class AutomaticTransactionCategorizer
     /// </summary>
     /// <param name="trainingTransactions">List of transactions to use for training</param>
     /// <returns>byte array containing the compressed ML model</returns>
-    public byte[] Train(IEnumerable<Transaction> trainingTransactions)
+    public static byte[] Train(IEnumerable<Transaction> trainingTransactions)
     {
         var mlContext = new MLContext();
 
@@ -108,10 +104,10 @@ public class AutomaticTransactionCategorizer
         IEnumerable<ModelInput> trainingInput = trainingTransactions.Select(
             t => new ModelInput
             {
-                MerchantName = t.MerchantName,
+                MerchantName = t.MerchantName!,
                 Amount = (float)t.Amount,
-                Account = t.Account.Name,
-                Category = (t.Subcategory == null || t.Subcategory.Equals(string.Empty)) ? t.Category : t.Subcategory
+                Account = t.Account!.Name,
+                Category = (t.Subcategory is null || t.Subcategory.Equals(string.Empty)) ? t.Category! : t.Subcategory
             }
         );
 
@@ -120,10 +116,7 @@ public class AutomaticTransactionCategorizer
         var pipeline = BuildPipeline(mlContext);
         var mlModel = pipeline.Fit(trainData);
 
-        // Recreate the prediction engine
-        _predictEngine = new Lazy<PredictionEngine<ModelInput, ModelOutput>>(() => mlContext.Model.CreatePredictionEngine<ModelInput, ModelOutput>(mlModel), true);
-
-        // Regenerate the model save data
+        // Generate the model save data
         MemoryStream memoryStream = new MemoryStream();
         mlContext.Model.Save(mlModel, trainData.Schema, memoryStream);
 
@@ -157,5 +150,30 @@ public class AutomaticTransactionCategorizer
             .Append(mlContext.Transforms.Conversion.MapKeyToValue(outputColumnName:@"PredictedLabel",inputColumnName:@"PredictedLabel"));
 
         return pipeline;
+    }
+
+    internal static AutomaticTransactionCategorizer? CreateAutoCategorizer(
+        UserDataContext userDataContext,
+        ApplicationUser userData
+    )
+    {
+        AutomaticTransactionCategorizer? autoCategorizer = null;
+
+        // First we check that the user has autoCategorizer on, and has a stored model.
+        if (
+            userData.UserSettings is not null &&
+            userData.UserSettings.EnableAutoCategorizer &&
+            userData.UserSettings.AutoCategorizerModelOID is not null
+        )
+        {
+            // Load the Large Object from the database
+            var autoCategorizerTrainingModel = userDataContext.AutoCategorizerTrainingModel.Value;
+            if (autoCategorizerTrainingModel is not null)
+            {
+                autoCategorizer = new AutomaticTransactionCategorizer(autoCategorizerTrainingModel);
+            }
+        }
+
+        return autoCategorizer;
     }
 }

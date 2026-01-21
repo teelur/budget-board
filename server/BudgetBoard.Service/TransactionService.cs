@@ -25,7 +25,12 @@ public class TransactionService(
     private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
-    public async Task CreateTransactionAsync(ApplicationUser userData, ITransactionCreateRequest request)
+    public async Task CreateTransactionAsync(
+        ApplicationUser userData,
+        ITransactionCreateRequest request,
+        IEnumerable<ICategory>? allCategories = null,
+        AutomaticTransactionCategorizer? autoCategorizer = null
+    )
     {
         var account = userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID);
         if (account == null)
@@ -48,6 +53,19 @@ public class TransactionService(
             AccountID = request.AccountID,
         };
 
+        // Auto categorize
+        if (
+            autoCategorizer is not null &&
+            allCategories is not null &&
+            newTransaction.MerchantName is not null &&
+            newTransaction.MerchantName != string.Empty
+            )
+        {
+            var matchedCategory = autoCategorizer.Predict(newTransaction);
+            (newTransaction.Category, newTransaction.Subcategory) =
+                TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
+        }
+
         _userDataContext.Transactions.Add(newTransaction);
 
         // Manual accounts need to manually update the balance
@@ -59,10 +77,15 @@ public class TransactionService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request)
+    public async Task CreateTransactionAsync(
+        Guid userGuid,
+        ITransactionCreateRequest request,
+        IEnumerable<ICategory>? allCategories = null,
+        AutomaticTransactionCategorizer? autoCategorizer = null
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        await CreateTransactionAsync(userData, request);
+        await CreateTransactionAsync(userData, request, allCategories, autoCategorizer);
     }
 
     /// <inheritdoc />
@@ -249,13 +272,17 @@ public class TransactionService(
     }
 
     /// <inheritdoc />
-    public async Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request)
+    public async Task ImportTransactionsAsync(
+        Guid userGuid,
+        ITransactionImportRequest request
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var transactions = request.Transactions;
         var accountNameToIDMap = request.AccountNameToIDMap;
 
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+        var autoCategorizer = AutomaticTransactionCategorizer.CreateAutoCategorizer(userDataContext, userData);
 
         foreach (var transaction in transactions)
         {
@@ -304,7 +331,7 @@ public class TransactionService(
             (newTransaction.Category, newTransaction.Subcategory) =
                 TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
 
-            await CreateTransactionAsync(userData, newTransaction);
+            await CreateTransactionAsync(userGuid, newTransaction, allCategories, autoCategorizer);
         }
     }
 
@@ -339,7 +366,7 @@ public class TransactionService(
         }
 
         return foundUser;
-    }
+    } 
 
     private void UpdateBalancesForNewTransaction(
         Account account,
