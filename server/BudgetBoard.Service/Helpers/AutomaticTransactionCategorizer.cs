@@ -82,13 +82,13 @@ public class AutomaticTransactionCategorizer
     /// </summary>
     /// <param name="input">Transaction to categorize.</param>
     /// <returns>String with the predicted category</returns>
-    public string Predict(TransactionImport input)
+    public string Predict(Transaction input)
     {
         ModelInput modelInput = new ModelInput
         {
             MerchantName = input.MerchantName,
-            Account = input.Account,
-            Amount = (float)(input.Amount ?? 0)
+            Account = input.Account.Name,
+            Amount = (float)input.Amount
         };
 
         var predEngine = _predictEngine.Value;

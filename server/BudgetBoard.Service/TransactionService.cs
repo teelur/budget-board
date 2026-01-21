@@ -248,19 +248,10 @@ public class TransactionService(
     public async Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
         var transactions = request.Transactions;
         var accountNameToIDMap = request.AccountNameToIDMap;
 
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         foreach (var transaction in transactions)
         {
@@ -296,29 +287,18 @@ public class TransactionService(
                     )
                     ?.Value ?? string.Empty;
 
-            var parentCategory = TransactionCategoriesHelpers.GetParentCategory(
-                matchedCategory,
-                allCategories
-            );
-
-            var childCategory = TransactionCategoriesHelpers.GetIsParentCategory(
-                matchedCategory,
-                allCategories
-            )
-                ? string.Empty
-                : matchedCategory;
-
             var newTransaction = new TransactionCreateRequest
             {
                 SyncID = string.Empty,
                 Amount = transaction.Amount ?? 0,
                 Date = transaction.Date ?? _nowProvider.UtcNow,
-                Category = parentCategory,
-                Subcategory = childCategory,
                 MerchantName = transaction.MerchantName,
                 Source = TransactionSource.Manual.Value,
                 AccountID = account.ID,
             };
+
+            (newTransaction.Category, newTransaction.Subcategory) =
+                TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
 
             await CreateTransactionAsync(userGuid, newTransaction);
         }

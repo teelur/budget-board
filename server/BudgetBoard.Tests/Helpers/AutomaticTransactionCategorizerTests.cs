@@ -113,21 +113,25 @@ public class AutomaticTransactionCategorizerTests
         AutomaticTransactionCategorizer autoCategorizer = new AutomaticTransactionCategorizer();
         autoCategorizer.Train(account.Transactions);
 
-        var newTransaction1 = new TransactionImport
+        var newTransaction1 = new Transaction
         {
             Amount = 21.49M,
             Date = DateTime.Parse("2025-02-01"),
-            Account = account.Name,
+            Account = account,
+            AccountID = account.ID,
             MerchantName = "jkl mno pqr",
+            Source = "foo",
             Category = ""
         };
 
-        var newTransaction2 = new TransactionImport
+        var newTransaction2 = new Transaction
         {
             Amount = 129.23M,
             Date = DateTime.Parse("2025-02-01"),
-            Account = account.Name,
+            Account = account,
+            AccountID = account.ID,
             MerchantName = "jkl mno pqr",
+            Source = "foo",
             Category = ""
         };
 

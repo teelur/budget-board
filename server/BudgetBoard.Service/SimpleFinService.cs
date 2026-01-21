@@ -83,7 +83,6 @@ public class SimpleFinService(
             logger.LogError("{LogMessage}", logLocalizer["SimpleFinDataNotFoundLog"]);
             return [responseLocalizer["SimpleFinDataNotFoundError"]];
         }
-
         errors.AddRange(simpleFinData.Errors);
 
         if (simpleFinData.Accounts.Any())
@@ -182,6 +181,7 @@ public class SimpleFinService(
                 .Include(u => u.Institutions)
                 .Include(u => u.SimpleFinOrganizations)
                 .ThenInclude(o => o.Accounts)
+                .Include(u => u.TransactionCategories)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
