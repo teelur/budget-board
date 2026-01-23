@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
-using BudgetBoard.Database.Models;
+﻿using BudgetBoard.Database.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Npgsql.Internal.Postgres;
 
 namespace BudgetBoard.Database.Data;
 

@@ -1,13 +1,10 @@
 // Based on output by ML.NET Model Builder.
-using System.Threading.Tasks;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
-using BudgetBoard.Service.Models;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms;
 using Microsoft.ML.Transforms.Text;
-using Npgsql.Internal.Postgres;
 
 namespace BudgetBoard.Service.Helpers;
 
@@ -83,7 +80,7 @@ public class AutomaticTransactionCategorizer
     /// <returns>String with the predicted category</returns>
     public string Predict(Transaction input)
     {
-        ModelInput modelInput = new ModelInput
+        ModelInput modelInput = new()
         {
             MerchantName = input.MerchantName!,
             Account = input.Account!.Name,
@@ -170,7 +167,7 @@ public class AutomaticTransactionCategorizer
         {
             // Load the Large Object from the database
             var autoCategorizerTrainingModel = await userDataContext.ReadLargeObjectAsync((uint) userData.UserSettings.AutoCategorizerModelOID);
-            if (autoCategorizerTrainingModel is not null)
+            if (autoCategorizerTrainingModel is not null && autoCategorizerTrainingModel.Length > 0)
             {
                 autoCategorizer = new AutomaticTransactionCategorizer(autoCategorizerTrainingModel);
             }

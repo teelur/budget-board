@@ -51,6 +51,7 @@ public class TransactionService(
             MerchantName = request.MerchantName,
             Source = request.Source ?? TransactionSource.Manual.Value,
             AccountID = request.AccountID,
+            Account = account,
         };
 
         // Auto categorize
