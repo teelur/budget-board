@@ -56,27 +56,11 @@ const EnableAutoCategorizer = (): React.ReactNode => {
     return <Skeleton height={75} radius="md" />;
   }
 
-  return (
-    <Stack gap="0.25rem">
-      <PrimaryText size="sm">
-        {t("enable_auto_categorizer")}
-      </PrimaryText>
-      <DimmedText size="xs">
-        {t("enable_auto_categorizer_description")}
-      </DimmedText>
-      <DimmedText size="xs">
-        {t("enable_auto_categorizer_warning")}
-      </DimmedText>
-      <Tooltip label={
-        userSettingsQuery.data?.autoCategorizerModelOID == null
-              ? t("enable_auto_categorizer_button_disabled_hover")
-              : null
-      }>
-        <Button
+  const button = <Button
           bg={
             userSettingsQuery.data?.enableAutoCategorizer
-              ? "var(--button-color-destructive)"
-              : ""
+              ? ""
+              : "var(--button-color-destructive)"
           }
           variant="primary"
           size="xs"
@@ -91,8 +75,28 @@ const EnableAutoCategorizer = (): React.ReactNode => {
           {userSettingsQuery.data?.enableAutoCategorizer
             ? t("enabled")
             : t("disabled")}
-        </Button>
+        </Button>;
+
+  // If the button is disabled, we need to envolve it in a tooltip.
+  const tooltip = <Tooltip label={t("enable_auto_categorizer_button_disabled_hover")}>
+        {button}
       </Tooltip>
+
+  return (
+    <Stack gap="0.25rem">
+      <PrimaryText size="sm">
+        {t("enable_auto_categorizer")}
+      </PrimaryText>
+      <DimmedText size="xs">
+        {t("enable_auto_categorizer_description")}
+      </DimmedText>
+      <DimmedText size="xs">
+        {t("enable_auto_categorizer_warning")}
+      </DimmedText>
+      {userSettingsQuery.data?.autoCategorizerModelOID == null
+              ? tooltip
+              : button
+      }
     </Stack>
   );
 };

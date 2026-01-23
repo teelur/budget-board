@@ -466,7 +466,7 @@ public class SimpleFinService(
     )
     {
         // Instantiate an autoCategorizer
-        var autoCategorizer = AutomaticTransactionCategorizer.CreateAutoCategorizer(userDataContext, userData);
+        var autoCategorizer = await AutomaticTransactionCategorizer.CreateAutoCategorizerAsync(userDataContext, userData);
 
         // Retrieve list of categories
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);

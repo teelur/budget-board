@@ -282,7 +282,7 @@ public class TransactionService(
         var accountNameToIDMap = request.AccountNameToIDMap;
 
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
-        var autoCategorizer = AutomaticTransactionCategorizer.CreateAutoCategorizer(userDataContext, userData);
+        var autoCategorizer = await AutomaticTransactionCategorizer.CreateAutoCategorizerAsync(userDataContext, userData);
 
         foreach (var transaction in transactions)
         {
@@ -331,7 +331,7 @@ public class TransactionService(
             (newTransaction.Category, newTransaction.Subcategory) =
                 TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
 
-            await CreateTransactionAsync(userGuid, newTransaction, allCategories, autoCategorizer);
+            await CreateTransactionAsync(userData, newTransaction, allCategories, autoCategorizer);
         }
     }
 

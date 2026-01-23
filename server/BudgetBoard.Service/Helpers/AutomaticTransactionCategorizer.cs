@@ -1,4 +1,5 @@
 // Based on output by ML.NET Model Builder.
+using System.Threading.Tasks;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Models;
@@ -6,6 +7,7 @@ using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms;
 using Microsoft.ML.Transforms.Text;
+using Npgsql.Internal.Postgres;
 
 namespace BudgetBoard.Service.Helpers;
 
@@ -152,7 +154,7 @@ public class AutomaticTransactionCategorizer
         return pipeline;
     }
 
-    internal static AutomaticTransactionCategorizer? CreateAutoCategorizer(
+    internal static async Task<AutomaticTransactionCategorizer?> CreateAutoCategorizerAsync(
         UserDataContext userDataContext,
         ApplicationUser userData
     )
@@ -167,7 +169,7 @@ public class AutomaticTransactionCategorizer
         )
         {
             // Load the Large Object from the database
-            var autoCategorizerTrainingModel = userDataContext.AutoCategorizerTrainingModel.Value;
+            var autoCategorizerTrainingModel = await userDataContext.ReadLargeObjectAsync((uint) userData.UserSettings.AutoCategorizerModelOID);
             if (autoCategorizerTrainingModel is not null)
             {
                 autoCategorizer = new AutomaticTransactionCategorizer(autoCategorizerTrainingModel);
