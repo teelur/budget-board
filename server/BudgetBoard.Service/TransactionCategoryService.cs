@@ -26,16 +26,7 @@ public class TransactionCategoryService(
     public async Task CreateTransactionCategoryAsync(Guid userGuid, ICategoryCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         if (
             allCategories.Any(c =>
@@ -144,15 +135,7 @@ public class TransactionCategoryService(
             );
         }
 
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         if (
             allCategories.Any(c =>

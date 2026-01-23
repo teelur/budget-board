@@ -25,10 +25,13 @@ public class TransactionService(
     private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
     /// <inheritdoc />
-    public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request)
+    public async Task CreateTransactionAsync(
+        ApplicationUser userData,
+        ITransactionCreateRequest request,
+        IEnumerable<ICategory>? allCategories = null,
+        AutomaticTransactionCategorizer? autoCategorizer = null
+    )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
         var account = userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID);
         if (account == null)
         {
@@ -48,7 +51,21 @@ public class TransactionService(
             MerchantName = request.MerchantName,
             Source = request.Source ?? TransactionSource.Manual.Value,
             AccountID = request.AccountID,
+            Account = account,
         };
+
+        // Auto categorize
+        if (
+            autoCategorizer is not null &&
+            allCategories is not null &&
+            newTransaction.MerchantName is not null &&
+            newTransaction.MerchantName != string.Empty
+            )
+        {
+            var matchedCategory = autoCategorizer.Predict(newTransaction);
+            (newTransaction.Category, newTransaction.Subcategory) =
+                TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
+        }
 
         _userDataContext.Transactions.Add(newTransaction);
 
@@ -59,6 +76,17 @@ public class TransactionService(
         }
 
         await _userDataContext.SaveChangesAsync();
+    }
+
+    public async Task CreateTransactionAsync(
+        Guid userGuid,
+        ITransactionCreateRequest request,
+        IEnumerable<ICategory>? allCategories = null,
+        AutomaticTransactionCategorizer? autoCategorizer = null
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        await CreateTransactionAsync(userData, request, allCategories, autoCategorizer);
     }
 
     /// <inheritdoc />
@@ -245,22 +273,17 @@ public class TransactionService(
     }
 
     /// <inheritdoc />
-    public async Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request)
+    public async Task ImportTransactionsAsync(
+        Guid userGuid,
+        ITransactionImportRequest request
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
         var transactions = request.Transactions;
         var accountNameToIDMap = request.AccountNameToIDMap;
 
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+        var autoCategorizer = await AutomaticTransactionCategorizer.CreateAutoCategorizerAsync(userDataContext, userData);
 
         foreach (var transaction in transactions)
         {
@@ -296,31 +319,20 @@ public class TransactionService(
                     )
                     ?.Value ?? string.Empty;
 
-            var parentCategory = TransactionCategoriesHelpers.GetParentCategory(
-                matchedCategory,
-                allCategories
-            );
-
-            var childCategory = TransactionCategoriesHelpers.GetIsParentCategory(
-                matchedCategory,
-                allCategories
-            )
-                ? string.Empty
-                : matchedCategory;
-
             var newTransaction = new TransactionCreateRequest
             {
                 SyncID = string.Empty,
                 Amount = transaction.Amount ?? 0,
                 Date = transaction.Date ?? _nowProvider.UtcNow,
-                Category = parentCategory,
-                Subcategory = childCategory,
                 MerchantName = transaction.MerchantName,
                 Source = TransactionSource.Manual.Value,
                 AccountID = account.ID,
             };
 
-            await CreateTransactionAsync(userGuid, newTransaction);
+            (newTransaction.Category, newTransaction.Subcategory) =
+                TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
+
+            await CreateTransactionAsync(userData, newTransaction, allCategories, autoCategorizer);
         }
     }
 
@@ -355,7 +367,7 @@ public class TransactionService(
         }
 
         return foundUser;
-    }
+    } 
 
     private void UpdateBalancesForNewTransaction(
         Account account,

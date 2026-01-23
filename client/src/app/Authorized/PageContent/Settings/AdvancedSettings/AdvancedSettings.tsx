@@ -1,9 +1,11 @@
 import { Stack } from "@mantine/core";
 import ForceSyncLookbackPeriod from "./ForceSyncLookbackPeriod/ForceSyncLookbackPeriod";
 import DisableBuiltInTransactionCategories from "./DisableBuiltInTransactionCategories/DisableBuiltInTransactionCategories";
+import EnableAutoCategorizer from "./EnableAutoCategorizer/EnableAutoCategorizer";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import TrainAutoCategorizerModal from "./TrainAutoCategorizerModal/TrainAutoCategorizerModal";
 
 const AdvancedSettings = () => {
   const { t } = useTranslation();
@@ -14,6 +16,8 @@ const AdvancedSettings = () => {
         <PrimaryText size="lg">{t("advanced_settings")}</PrimaryText>
         <DisableBuiltInTransactionCategories />
         <ForceSyncLookbackPeriod />
+        <EnableAutoCategorizer />
+        <TrainAutoCategorizerModal />
       </Stack>
     </Card>
   );

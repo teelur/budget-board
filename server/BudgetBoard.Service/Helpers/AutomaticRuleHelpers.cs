@@ -536,21 +536,12 @@ public static class AutomaticRuleHelpers
             int updatedTransactions = 0;
             foreach (var transaction in transactions)
             {
+                var updateRequest = new TransactionUpdateRequest(transaction);
+                (updateRequest.Category, updateRequest.Subcategory) =
+                    TransactionCategoriesHelpers.GetFullCategory(newCategory, allCategories);
                 await transactionService.UpdateTransactionAsync(
                     userGuid,
-                    new TransactionUpdateRequest(transaction)
-                    {
-                        Category = TransactionCategoriesHelpers.GetParentCategory(
-                            newCategory,
-                            allCategories
-                        ),
-                        Subcategory = TransactionCategoriesHelpers.GetIsParentCategory(
-                            newCategory,
-                            allCategories
-                        )
-                            ? ""
-                            : newCategory,
-                    }
+                    updateRequest
                 );
 
                 updatedTransactions++;

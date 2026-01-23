@@ -117,6 +117,31 @@ public class UserSettingsService(
                 request.DisableBuiltInTransactionCategories;
         }
 
+        if (request.EnableAutoCategorizer != null)
+        {
+            userSettings.EnableAutoCategorizer = (bool)request.EnableAutoCategorizer;
+        }
+
+        if (request.AutoCategorizerModelOID != null)
+        {
+            userSettings.AutoCategorizerModelOID = request.AutoCategorizerModelOID;
+        }
+
+        if (request.AutoCategorizerLastTrained != null)
+        {
+            userSettings.AutoCategorizerLastTrained = request.AutoCategorizerLastTrained;
+        }
+
+        if (request.AutoCategorizerModelStartDate != null)
+        {
+            userSettings.AutoCategorizerModelStartDate = request.AutoCategorizerModelStartDate;
+        }
+
+        if (request.AutoCategorizerModelEndDate != null)
+        {
+            userSettings.AutoCategorizerModelEndDate = request.AutoCategorizerModelEndDate;
+        }
+
         await _userDataContext.SaveChangesAsync();
     }
 

@@ -236,6 +236,7 @@ builder.Services.AddScoped<INetWorthWidgetCategoryService, NetWorthWidgetCategor
 builder.Services.AddScoped<INetWorthWidgetGroupService, NetWorthWidgetGroupService>();
 builder.Services.AddScoped<ISimpleFinOrganizationService, SimpleFinOrganizationService>();
 builder.Services.AddScoped<ISimpleFinAccountService, SimpleFinAccountService>();
+builder.Services.AddScoped<IAutomaticTransactionCategorizerService, AutomaticTransactionCategorizerService>();
 
 var app = builder.Build();
 

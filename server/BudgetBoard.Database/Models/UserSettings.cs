@@ -1,4 +1,7 @@
-﻿namespace BudgetBoard.Database.Models;
+﻿using Npgsql;
+using Npgsql.Internal.Postgres;
+
+namespace BudgetBoard.Database.Models;
 
 /// <summary>
 /// Supported currency codes.
@@ -57,6 +60,32 @@ public class UserSettings
     /// Indicates whether built-in transaction categories are disabled.
     /// </summary>
     public bool DisableBuiltInTransactionCategories { get; set; } = false;
+
+    /// <summary>
+    /// Indicates whether the auto-categorizer is enabled.
+    /// </summary>
+    public bool EnableAutoCategorizer { get; set; } = false;
+
+    /// <summary>
+    /// OID of the auto-categorizer ML model.
+    /// </summary>
+    public long? AutoCategorizerModelOID { get; set; } = null;
+
+    /// <summary>
+    /// Date of most recent auto-categorizer training.
+    /// </summary>
+    public DateOnly? AutoCategorizerLastTrained { get; set; } = null;
+
+
+    /// <summary>
+    /// Start date of most recent auto-categorizer model.
+    /// </summary>
+    public DateOnly? AutoCategorizerModelStartDate { get; set; } = null;
+
+    /// <summary>
+    /// End date of most recent auto-categorizer model.
+    /// </summary>
+    public DateOnly? AutoCategorizerModelEndDate { get; set; } = null;
 
     /// <summary>
     /// Identifier for the user who owns these settings.
