@@ -448,4 +448,13 @@
   <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
     <value>The LunchFlow account you are trying to access does not exist.</value>
   </data>
+  <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve transaction data for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
+    <value>Linked account not found for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
+  </data>
   </root>

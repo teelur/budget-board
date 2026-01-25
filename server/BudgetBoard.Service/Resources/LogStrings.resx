@@ -467,4 +467,13 @@
   <data name="InvalidLunchFlowLinkedAccountIDLog" xml:space="preserve">
     <value>Attempted to link a LunchFlow account to an account that does not exist.</value>
   </data>
+  <data name="LunchFlowTransactionDataRetrievalErrorLog" xml:space="preserve">
+    <value>Failed to retrieve transaction data for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowLinkedAccountNotFoundForSyncErrorLog" xml:space="preserve">
+    <value>Linked account not found for LunchFlow account {0} during sync.</value>
+  </data>
+  <data name="LunchFlowBalanceDataRetrievalErrorLog" xml:space="preserve">
+    <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
+  </data>
 </root>
