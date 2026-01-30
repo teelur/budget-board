@@ -59,34 +59,34 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DuplicateSyncIDError" xml:space="preserve">
-    <value>An account with this SyncID already exists.</value>
+    <value>Ein Account mit dieser SyncID existiert bereits.</value>
   </data>
   <data name="InvalidInstitutionIDError" xml:space="preserve">
     <value>The provided Institution ID is invalid.</value>
   </data>
   <data name="AccountNotFoundError" xml:space="preserve">
-    <value>The account you are trying to access does not exist.</value>
+    <value>Das Konto, auf das Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="AccountEditNotFoundError" xml:space="preserve">
-    <value>The account you are trying to edit does not exist.</value>
+    <value>Das Konto, das Sie bearbeiten möchten, existiert nicht.</value>
   </data>
   <data name="AccountEditEmptyNameError" xml:space="preserve">
-    <value>The account name cannot be empty.</value>
+    <value>Der Kontoname darf nicht leer sein.</value>
   </data>
   <data name="AccountDeleteNotFoundError" xml:space="preserve">
-    <value>The account you are trying to delete does not exist.</value>
+    <value>Das Konto, das Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="AccountRestoreNotFoundError" xml:space="preserve">
-    <value>The account you are trying to restore does not exist.</value>
+    <value>Das Konto, das Sie wiederherstellen möchten, existiert nicht.</value>
   </data>
   <data name="AccountOrderNotFoundError" xml:space="preserve">
-    <value>The account you are trying to order does not exist.</value>
+    <value>Das Konto, das Sie bestellen möchten, existiert nicht.</value>
   </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
-    <value>An error occurred while retrieving user data.</value>
+    <value>Beim Abrufen der Benutzerdaten ist ein Fehler aufgetreten.</value>
   </data>
   <data name="InvalidUserError" xml:space="preserve">
-    <value>The provided user is invalid.</value>
+    <value>Der angegebene Benutzer ist ungültig.</value>
   </data>
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to access does not exist.</value>
