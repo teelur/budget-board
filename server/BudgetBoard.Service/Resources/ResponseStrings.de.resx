@@ -62,7 +62,7 @@
     <value>Ein Account mit dieser SyncID existiert bereits.</value>
   </data>
   <data name="InvalidInstitutionIDError" xml:space="preserve">
-    <value>The provided Institution ID is invalid.</value>
+    <value>Die angegebene Institutions-ID ist ungültig.</value>
   </data>
   <data name="AccountNotFoundError" xml:space="preserve">
     <value>Das Konto, auf das Sie zugreifen möchten, existiert nicht.</value>
