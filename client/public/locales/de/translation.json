@@ -269,7 +269,7 @@
     "no_budgets": "Keine Budgets",
     "no_categories": "Keine Kategorien",
     "no_category": "Keine Kategorie",
-    "no_configuration_data_found": "Keine Konfigurationsdaten gefunden",
+    "no_configuration_data_found": "Keine Konfigurationsdaten gefunden.",
     "no_currencies_found": "Keine Währungen gefunden",
     "no_custom_categories": "Keine benutzerdefinierten Kategorien",
     "no_data_available": "Keine Daten verfügbar.",
@@ -412,5 +412,6 @@
     "view_and_restore_deleted_assets": "Gelöschte Vermögenswerte anzeigen und wiederherstellen.",
     "view_and_restore_deleted_transactions": "Gelöschte Transaktionen anzeigen und wiederherstellen.",
     "welcome_to": "Willkommen bei",
-    "widget_no_items_configured_message": "Für dieses Widget sind keine Elemente konfiguriert."
+    "widget_no_items_configured_message": "Für dieses Widget sind keine Elemente konfiguriert.",
+    "reset_password": "Passwort zurücksetzen"
 }
