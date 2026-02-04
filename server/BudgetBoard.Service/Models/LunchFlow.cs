@@ -51,7 +51,7 @@ public interface ILunchFlowTransactionData
 {
     string ID { get; }
     string AccountID { get; }
-    int Amount { get; }
+    decimal Amount { get; }
     string Currency { get; }
     string Date { get; }
     string? Merchant { get; }
@@ -66,7 +66,7 @@ public class LunchFlowTransactionData : ILunchFlowTransactionData
 
     [JsonConverter(typeof(NumberToStringConverter))]
     public string AccountID { get; init; } = string.Empty;
-    public int Amount { get; init; }
+    public decimal Amount { get; init; }
     public string Currency { get; init; } = string.Empty;
     public string Date { get; init; } = string.Empty;
     public string? Merchant { get; init; } = null;
@@ -89,12 +89,23 @@ public class LunchFlowTransactionsData : ILunchFlowTransactionsData
 
 public interface ILunchFlowBalanceData
 {
-    int Balance { get; }
+    decimal Amount { get; }
     string Currency { get; }
 }
 
 public class LunchFlowBalanceData : ILunchFlowBalanceData
 {
-    public int Balance { get; init; } = 0;
+    public decimal Amount { get; init; } = 0;
     public string Currency { get; init; } = string.Empty;
+}
+
+public interface ILunchFlowBalancesData
+{
+    ILunchFlowBalanceData? Balance { get; }
+}
+
+public class LunchFlowBalancesData : ILunchFlowBalancesData
+{
+    public LunchFlowBalanceData? Balance { get; init; }
+    ILunchFlowBalanceData? ILunchFlowBalancesData.Balance => Balance;
 }

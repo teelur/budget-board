@@ -221,6 +221,26 @@ public class LunchFlowService(
             var existingAccount = userData.LunchFlowAccounts.FirstOrDefault(a =>
                 a.SyncID == lunchFlowAccount.ID
             );
+
+            var lunchFlowAccountBalancesData = await GetLunchFlowBalancesDataAsync(
+                userData.LunchFlowApiKey,
+                lunchFlowAccount.ID
+            );
+            if (
+                lunchFlowAccountBalancesData == null
+                || lunchFlowAccountBalancesData.Balance == null
+            )
+            {
+                logger.LogError(
+                    "{LogMessage}",
+                    logLocalizer["LunchFlowBalanceDataRetrievalErrorLog", lunchFlowAccount.ID]
+                );
+                errors.Add(
+                    responseLocalizer["LunchFlowBalanceDataRetrievalError", lunchFlowAccount.ID]
+                );
+                continue;
+            }
+
             if (existingAccount == null)
             {
                 await lunchFlowAccountService.CreateLunchFlowAccountAsync(
@@ -234,6 +254,8 @@ public class LunchFlowService(
                         Provider = lunchFlowAccount.Provider,
                         Currency = lunchFlowAccount.Currency,
                         Status = lunchFlowAccount.Status,
+                        Balance = lunchFlowAccountBalancesData.Balance.Amount,
+                        BalanceDate = (int)((DateTimeOffset)nowProvider.UtcNow).ToUnixTimeSeconds(),
                     }
                 );
             }
@@ -250,6 +272,8 @@ public class LunchFlowService(
                         Provider = lunchFlowAccount.Provider,
                         Currency = lunchFlowAccount.Currency,
                         Status = lunchFlowAccount.Status,
+                        Balance = lunchFlowAccountBalancesData.Balance.Amount,
+                        BalanceDate = nowProvider.UtcNow,
                     }
                 );
             }
@@ -395,7 +419,7 @@ public class LunchFlowService(
         return await SendQuery(requestUrl, apiKey);
     }
 
-    private async Task<ILunchFlowBalanceData?> GetLunchFlowBalancesDataAsync(
+    private async Task<ILunchFlowBalancesData?> GetLunchFlowBalancesDataAsync(
         string apiKey,
         string accountId
     )
@@ -405,7 +429,7 @@ public class LunchFlowService(
 
         try
         {
-            return JsonSerializer.Deserialize<LunchFlowBalanceData>(jsonString, s_readOptions)
+            return JsonSerializer.Deserialize<LunchFlowBalancesData>(jsonString, s_readOptions)
                 ?? null;
         }
         catch (JsonException jex)
@@ -434,11 +458,11 @@ public class LunchFlowService(
         var lunchFlowAccounts = userData.LunchFlowAccounts.Where(a => a.LinkedAccountId != null);
         foreach (var lunchFlowAccount in lunchFlowAccounts)
         {
-            var lunchFlowBalanceData = await GetLunchFlowBalancesDataAsync(
+            var lunchFlowBalancesData = await GetLunchFlowBalancesDataAsync(
                 userData.LunchFlowApiKey,
                 lunchFlowAccount.SyncID
             );
-            if (lunchFlowBalanceData == null)
+            if (lunchFlowBalancesData == null || lunchFlowBalancesData.Balance == null)
             {
                 logger.LogError(
                     "{LogMessage}",
@@ -455,8 +479,8 @@ public class LunchFlowService(
                 new BalanceCreateRequest
                 {
                     AccountID = lunchFlowAccount.LinkedAccountId!.Value,
-                    Amount = lunchFlowBalanceData.Balance,
-                    DateTime = nowProvider.Now,
+                    Amount = lunchFlowBalancesData.Balance.Amount,
+                    DateTime = nowProvider.UtcNow,
                 },
                 balanceService
             );

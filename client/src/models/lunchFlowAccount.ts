@@ -8,7 +8,7 @@ export interface ILunchFlowAccountResponse {
   currency: string;
   status: string;
   balance: number;
-  balanceDate: number;
+  balanceDate: Date;
   lastSync?: Date;
   linkedAccountId?: string;
 }
