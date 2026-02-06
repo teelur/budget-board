@@ -1,5 +1,4 @@
-﻿using BudgetBoard.IntegrationTests.Fakers;
-using BudgetBoard.Service;
+﻿using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
