@@ -370,7 +370,7 @@
   "simplefin_key_is_required": "SimpleFIN key is required.",
   "sold": "Sold",
   "sold_on_for_styled": "<0>Sold on</0> <1>{{date}}</1> <2>for</2> <3>{{price}}</3>",
-  "sorty_by": "Sort By",
+  "sort_by": "Sort By",
   "spending": "Spending",
   "spending_trends": "Spending Trends",
   "spending_trends_less_than_last_month": "You have spent {{amount}} less than last month.",
