@@ -79,6 +79,8 @@ public class SyncService(
                 .Include(u => u.UserSettings)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.SimpleFinAccount)
+                .Include(u => u.Accounts)
+                .ThenInclude(a => a.LunchFlowAccount)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
@@ -103,7 +105,11 @@ public class SyncService(
 
     private static void SetManualSourceForUnlinkedAccounts(IEnumerable<Account> accounts)
     {
-        foreach (var account in accounts.Where(a => a.SimpleFinAccount == null))
+        foreach (
+            var account in accounts.Where(a =>
+                a.SimpleFinAccount == null && a.LunchFlowAccount == null
+            )
+        )
         {
             account.Source = AccountSource.Manual;
         }

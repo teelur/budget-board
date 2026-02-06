@@ -3,6 +3,7 @@ import { ICategory } from "./category";
 export enum AccountSource {
   Manual = "Manual",
   SimpleFIN = "SimpleFIN",
+  LunchFlow = "LunchFlow",
 }
 
 export interface IAccountCreateRequest {

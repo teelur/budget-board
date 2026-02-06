@@ -21,6 +21,8 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
     switch (props.account.source) {
       case AccountSource.SimpleFIN:
         return "blue";
+      case AccountSource.LunchFlow:
+        return "green";
       case AccountSource.Manual:
       default:
         return "gray";
@@ -65,7 +67,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           {convertNumberToCurrency(
             props.account.currentBalance,
             true,
-            props.userCurrency
+            props.userCurrency,
           )}
         </StatusText>
       </Group>
