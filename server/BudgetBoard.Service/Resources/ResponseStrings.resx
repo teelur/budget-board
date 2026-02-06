@@ -427,4 +427,10 @@
   <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
     <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
   </data>
+  <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
+    <value>No transactions in the range selected to train the Auto-Categorizer.</value>
+  </data>
+    <data name="AutoCategorizerNotTrained" xml:space="preserve">
+    <value>Auto-Categorizer cannot be enabled before training.</value>
+  </data>
   </root>

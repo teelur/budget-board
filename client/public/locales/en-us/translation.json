@@ -413,5 +413,18 @@
   "view_and_restore_deleted_assets": "View and restore deleted assets.",
   "view_and_restore_deleted_transactions": "View and restore deleted transactions.",
   "welcome_to": "Welcome to",
-  "widget_no_items_configured_message": "No items are configured for this widget."
+  "widget_no_items_configured_message": "No items are configured for this widget.",
+  "enable_auto_categorizer": "Auto-Categorizer",
+  "enable_auto_categorizer_description": "Auto-Categorizer can attempt to guess the category of a new uncategorized transaction based on your previous transactions.",
+  "enable_auto_categorizer_warning": "NOTE: Categories set on a transaction by matching Automatic Rules overwrite categories picked by Auto-Categorizer.",
+  "enable_auto_categorizer_button_disabled_hover": "You must train Auto-Categorizer with existing transactions before it can be enabled.",
+  "train_auto_categorizer": "Train Auto-Categorizer",
+  "train_auto_categorizer_description": "You may pick a start and/or end date for the transactions used for training. If both dates are left empty, all your transactions are used. Training can take a few minutes depending on how many transactions are in your chosen interval.",
+  "train_auto_categorizer_last_trained": "Auto-Categorizer last trained on {{lastTrained}}, using transactions from {{trainDataStartDate}} to {{trainDataEndDate}}.",
+  "train_auto_categorizer_not_trained": "Auto-Categorizer not trained yet.",
+  "train_auto_categorizer_button": "Train",
+  "start_date": "Start date",
+  "end_date": "End date",
+  "train_auto_categorizer_dates_error": "Start date must be before end date.",
+  "train_auto_categorizer_success": "Auto-Categorizer training successful"
 }

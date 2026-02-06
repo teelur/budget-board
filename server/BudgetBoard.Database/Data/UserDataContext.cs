@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace BudgetBoard.Database.Data;
 
@@ -11,6 +12,11 @@ namespace BudgetBoard.Database.Data;
 public class UserDataContext(DbContextOptions<UserDataContext> options)
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
+    // Constants needed for handling Postgres Large Objects
+    // https://github.com/postgres/postgres/blob/master/src/include/libpq/libpq-fs.h
+    private const int INV_WRITE = 0x00020000;
+    private const int INV_READ = 0x00040000;
+
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
@@ -174,5 +180,132 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         });
 
         modelBuilder.UseIdentityColumns();
+    }
+
+    // https://www.postgresql.org/docs/current/lo-interfaces.html
+    public async Task<long> WriteLargeObjectAsync(long objectId, byte[] data)
+    {
+        var conn = (NpgsqlConnection)Database.GetDbConnection();
+
+        await conn.OpenAsync();
+        using var transaction = await conn.BeginTransactionAsync();
+
+        try
+        {
+            // 1. Delete the large object if it already exists
+            if (objectId != 0)
+            {
+                using var unlinkCmd = new NpgsqlCommand("SELECT lo_unlink(@oid)", conn, transaction);
+                unlinkCmd.Parameters.AddWithValue("oid", objectId);
+                await unlinkCmd.ExecuteNonQueryAsync();
+            }
+
+            // 2. Create the new large object
+            using var createCmd = new NpgsqlCommand("SELECT lo_create(0)", conn, transaction);
+            objectId = Convert.ToInt64(await createCmd.ExecuteScalarAsync());
+
+            // 3. Open - Returns a file descriptor (fd) for the specific OID
+            using var openCmd = new NpgsqlCommand("SELECT lo_open(@oid, @mode)", conn, transaction);
+            openCmd.Parameters.AddWithValue("oid", objectId);
+            openCmd.Parameters.AddWithValue("mode", INV_READ | INV_WRITE);
+            int fd = (int)await openCmd.ExecuteScalarAsync();
+
+            try
+            {
+                // 4. Write - Use lo_write(fd, data)
+                using var writeCmd = new NpgsqlCommand("SELECT lowrite(@fd, @data)", conn, transaction);
+                writeCmd.Parameters.AddWithValue("fd", fd);
+                writeCmd.Parameters.AddWithValue("data", data);
+                await writeCmd.ExecuteNonQueryAsync();
+            }
+            finally
+            {
+                // 5. Close the file descriptor
+                using var closeCmd = new NpgsqlCommand("SELECT lo_close(@fd)", conn, transaction);
+                closeCmd.Parameters.AddWithValue("fd", fd);
+                await closeCmd.ExecuteNonQueryAsync();
+            }
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+        finally
+        {
+            await conn.CloseAsync();
+        }
+
+        return objectId;
+    }
+
+    // https://www.postgresql.org/docs/current/lo-interfaces.html
+    public async Task<byte[]> ReadLargeObjectAsync(long objectId)
+    {
+        var conn = (NpgsqlConnection)Database.GetDbConnection();
+
+        await conn.OpenAsync();
+        using var memoryStream = new MemoryStream();
+
+        using var transaction = await conn.BeginTransactionAsync();
+
+        try
+        {
+            // 1. Open - Returns a file descriptor (fd) for the specific OID
+            using var openCmd = new NpgsqlCommand("SELECT lo_open(@oid, @mode)", conn, transaction);
+            openCmd.Parameters.AddWithValue("oid", objectId);
+            openCmd.Parameters.AddWithValue("mode", INV_READ | INV_WRITE);
+            int fd = (int)await openCmd.ExecuteScalarAsync();
+
+            try
+            {
+                // 2. Read in chunks using lo_read
+                int bufferSize = 8192;
+                byte[] buffer;
+                bool eof = false;
+
+                while (!eof)
+                {
+                    await using (var readCmd = new NpgsqlCommand("SELECT loread(@fd, @len)", conn, transaction))
+                    {
+                        readCmd.Parameters.AddWithValue("fd", fd);
+                        readCmd.Parameters.AddWithValue("len", bufferSize);
+
+                        buffer = (byte[]) await readCmd.ExecuteScalarAsync();
+                        if (buffer == null || buffer.Length == 0)
+                        {
+                            eof = true;
+                        }
+                        else
+                        {
+                            // Process the chunk (e.g., write to a file or stream)
+                            await memoryStream.WriteAsync(buffer);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                // 4. Close the file descriptor
+                using var closeCmd = new NpgsqlCommand("SELECT lo_close(@fd)", conn, transaction);
+                closeCmd.Parameters.AddWithValue("fd", fd);
+                await closeCmd.ExecuteNonQueryAsync();
+            }
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+        finally
+        {
+            await conn.CloseAsync();
+        }
+
+        return memoryStream.ToArray();
     }
 }
