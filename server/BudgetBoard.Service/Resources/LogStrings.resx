@@ -158,7 +158,7 @@
     <value>Attempted to create a budget with an empty category.</value>
   </data>
   <data name="BudgetCreateDuplicateLog" xml:space="preserve">
-    <value>Attempted to create a duplicate budget for {Category} in {Month}.</value>
+    <value>Attempted to create a duplicate budget for {0} in {1}.</value>
   </data>
   <data name="BudgetCreateCompletedLog" xml:space="preserve">
     <value>Successfully created {0} budgets.</value>
