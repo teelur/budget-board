@@ -21,5 +21,5 @@ public interface ITrainAutoCategorizerResponse
 public class TrainAutoCategorizerResponse : ITrainAutoCategorizerResponse
 {
     public bool Success { get; set; } = true;
-    public string Error { get; set; } = "";
+    public string Error { get; set; } = string.Empty;
 }

@@ -1,7 +1,4 @@
-﻿using Npgsql;
-using Npgsql.Internal.Postgres;
-
-namespace BudgetBoard.Database.Models;
+﻿namespace BudgetBoard.Database.Models;
 
 /// <summary>
 /// Supported currency codes.

@@ -64,20 +64,24 @@ const EnableAutoCategorizer = (): React.ReactNode => {
           }
           variant="primary"
           size="xs"
-          onClick={() => {
+          onClick={
+            userSettingsQuery.data?.autoCategorizerModelOID != null
+            ? () => {
             doUpdateUserSettings.mutate({
               enableAutoCategorizer:
                 !userSettingsQuery.data?.enableAutoCategorizer,
-            } as IUserSettingsUpdateRequest);
-          }}
-          data-disabled={ userSettingsQuery.data?.autoCategorizerModelOID == null }
+              } as IUserSettingsUpdateRequest);
+            }
+            : (event) => event.preventDefault() // Prevent click when disabled
+        }
+          disabled={ userSettingsQuery.data?.autoCategorizerModelOID == null }
         >
           {userSettingsQuery.data?.enableAutoCategorizer
             ? t("enabled")
             : t("disabled")}
         </Button>;
 
-  // If the button is disabled, we need to envolve it in a tooltip.
+  // If the button is disabled, we need to wrap it in a tooltip.
   const tooltip = <Tooltip label={t("enable_auto_categorizer_button_disabled_hover")}>
         {button}
       </Tooltip>

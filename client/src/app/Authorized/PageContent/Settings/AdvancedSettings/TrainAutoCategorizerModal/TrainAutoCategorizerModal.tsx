@@ -54,6 +54,10 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
         data: trainAutoCategorizer,
       }),
     onSuccess: async () => {
+      notifications.show({
+        message: t("train_auto_categorizer_success")
+      });
+      close();
       await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
     },
     onError: (error: AxiosError) => {

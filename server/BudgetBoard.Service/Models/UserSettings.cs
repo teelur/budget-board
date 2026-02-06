@@ -59,10 +59,6 @@ public interface IUserSettingsUpdateRequest
     public int? ForceSyncLookbackMonths { get; }
     public bool? DisableBuiltInTransactionCategories { get; }
     public bool? EnableAutoCategorizer { get; }
-    public long? AutoCategorizerModelOID { get; }
-    public DateOnly? AutoCategorizerLastTrained { get; }
-    public DateOnly? AutoCategorizerModelStartDate { get; }
-    public DateOnly? AutoCategorizerModelEndDate { get; }
 }
 
 [method: JsonConstructor]
@@ -74,8 +70,4 @@ public class UserSettingsUpdateRequest() : IUserSettingsUpdateRequest
     public int? ForceSyncLookbackMonths { get; set; } = null;
     public bool? DisableBuiltInTransactionCategories { get; set; } = null;
     public bool? EnableAutoCategorizer { get; set; } = null;
-    public long? AutoCategorizerModelOID { get; set; } = null;
-    public DateOnly? AutoCategorizerLastTrained { get; set; } = null;
-    public DateOnly? AutoCategorizerModelStartDate { get; set; } = null;
-    public DateOnly? AutoCategorizerModelEndDate { get; set; } = null;
 }

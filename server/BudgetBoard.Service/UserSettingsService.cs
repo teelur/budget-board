@@ -119,27 +119,13 @@ public class UserSettingsService(
 
         if (request.EnableAutoCategorizer != null)
         {
+            // We can only enable auto categorizer if we trained it
+            if ((bool)request.EnableAutoCategorizer && userSettings.AutoCategorizerModelOID == null)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["AutoCategorizerNotTrainedLog"]);
+                throw new BudgetBoardServiceException(_responseLocalizer["AutoCategorizerNotTrained"]);
+            }
             userSettings.EnableAutoCategorizer = (bool)request.EnableAutoCategorizer;
-        }
-
-        if (request.AutoCategorizerModelOID != null)
-        {
-            userSettings.AutoCategorizerModelOID = request.AutoCategorizerModelOID;
-        }
-
-        if (request.AutoCategorizerLastTrained != null)
-        {
-            userSettings.AutoCategorizerLastTrained = request.AutoCategorizerLastTrained;
-        }
-
-        if (request.AutoCategorizerModelStartDate != null)
-        {
-            userSettings.AutoCategorizerModelStartDate = request.AutoCategorizerModelStartDate;
-        }
-
-        if (request.AutoCategorizerModelEndDate != null)
-        {
-            userSettings.AutoCategorizerModelEndDate = request.AutoCategorizerModelEndDate;
         }
 
         await _userDataContext.SaveChangesAsync();

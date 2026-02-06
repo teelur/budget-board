@@ -8,7 +8,7 @@ namespace BudgetBoard.IntegrationTests.Helpers;
 [Collection("IntegrationTests")]
 public class AutomaticTransactionCategorizerTests
 {
-    private Account account;
+    private readonly Account account;
     
     public AutomaticTransactionCategorizerTests()
     {

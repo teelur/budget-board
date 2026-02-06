@@ -13,14 +13,13 @@ namespace BudgetBoard.Service;
 public class AutomaticTransactionCategorizerService(
     ILogger<IAutomaticTransactionCategorizerService> logger,
     UserDataContext userDataContext,
-    ITransactionService transactionService,
+    INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer
 ) : IAutomaticTransactionCategorizerService
 {
     private readonly ILogger<IAutomaticTransactionCategorizerService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly ITransactionService _transactionService = transactionService;
     private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
     private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
@@ -28,6 +27,12 @@ public class AutomaticTransactionCategorizerService(
     public async Task TrainCategorizerAsync(Guid userGuid, ITrainAutoCategorizerRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userSettings = userData.UserSettings;
+        if (userSettings == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["UserSettingsNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["UserSettingsNotFoundError"]);
+        }
 
         var trainingTransactions = userData.Accounts.Select(a => a.Transactions).SelectMany(c => c);
         if (request.StartDate is not null)
@@ -38,18 +43,23 @@ public class AutomaticTransactionCategorizerService(
         {
             trainingTransactions = trainingTransactions.Where(t => DateOnly.FromDateTime(t.Date) <= request.EndDate);
         }
-        
+
+        if (trainingTransactions.Count() == 0)
+        {
+            throw new BudgetBoardServiceException(_responseLocalizer["AutoCategorizerTrainingNoTransactions"]);
+        }
+
         var mlModel = AutomaticTransactionCategorizer.Train(trainingTransactions);
 
         // Store the ML model
-        long objectId = userData.UserSettings!.AutoCategorizerModelOID ?? 0;
+        long objectId = userSettings.AutoCategorizerModelOID ?? 0;
         objectId = await _userDataContext.WriteLargeObjectAsync(objectId, mlModel);
 
         // Update user settings
-        userData.UserSettings.AutoCategorizerModelOID = objectId;
-        userData.UserSettings.AutoCategorizerLastTrained = DateOnly.FromDateTime(DateTime.Now);
-        userData.UserSettings.AutoCategorizerModelStartDate = DateOnly.FromDateTime(trainingTransactions.Min(t => t.Date));
-        userData.UserSettings.AutoCategorizerModelEndDate = DateOnly.FromDateTime(trainingTransactions.Max(t => t.Date));
+        userSettings.AutoCategorizerModelOID = objectId;
+        userSettings.AutoCategorizerLastTrained = DateOnly.FromDateTime(nowProvider.Now);
+        userSettings.AutoCategorizerModelStartDate = DateOnly.FromDateTime(trainingTransactions.Min(t => t.Date));
+        userSettings.AutoCategorizerModelEndDate = DateOnly.FromDateTime(trainingTransactions.Max(t => t.Date));
 
         await _userDataContext.SaveChangesAsync();
     }

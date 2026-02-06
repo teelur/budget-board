@@ -59,7 +59,7 @@ public class AutomaticTransactionCategorizer
 
     #endregion
 
-    private PredictionEngine<ModelInput, ModelOutput> _predictEngine;
+    private readonly PredictionEngine<ModelInput, ModelOutput> _predictEngine;
 
     public AutomaticTransactionCategorizer(byte[] mlNetModel)
     {
@@ -69,7 +69,8 @@ public class AutomaticTransactionCategorizer
     private static PredictionEngine<ModelInput, ModelOutput> CreatePredictEngine(byte[] mlNetModel)
     {
         var mlContext = new MLContext();
-        ITransformer mlModel = mlContext.Model.Load(new MemoryStream(mlNetModel), out var _);
+        using var modelStream = new MemoryStream(mlNetModel);
+        ITransformer mlModel = mlContext.Model.Load(modelStream, out var _);
         return mlContext.Model.CreatePredictionEngine<ModelInput, ModelOutput>(mlModel);
     }
 
@@ -103,10 +104,10 @@ public class AutomaticTransactionCategorizer
         IEnumerable<ModelInput> trainingInput = trainingTransactions.Select(
             t => new ModelInput
             {
-                MerchantName = t.MerchantName!,
+                MerchantName = t.MerchantName ?? string.Empty,
                 Amount = (float)t.Amount,
                 Account = t.Account!.Name,
-                Category = (t.Subcategory is null || t.Subcategory.Equals(string.Empty)) ? t.Category! : t.Subcategory
+                Category = (t.Subcategory is null || t.Subcategory.Equals(string.Empty)) ? t.Category ?? string.Empty : t.Subcategory
             }
         );
 
@@ -116,7 +117,7 @@ public class AutomaticTransactionCategorizer
         var mlModel = pipeline.Fit(trainData);
 
         // Generate the model save data
-        MemoryStream memoryStream = new MemoryStream();
+        using MemoryStream memoryStream = new MemoryStream();
         mlContext.Model.Save(mlModel, trainData.Schema, memoryStream);
 
         return memoryStream.ToArray();

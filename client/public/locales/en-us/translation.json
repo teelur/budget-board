@@ -424,5 +424,7 @@
   "train_auto_categorizer_not_trained": "Auto-Categorizer not trained yet.",
   "train_auto_categorizer_button": "Train",
   "start_date": "Start date",
-  "end_date": "End date"
+  "end_date": "End date",
+  "train_auto_categorizer_dates_error": "Start date must be before end date.",
+  "train_auto_categorizer_success": "Auto-Categorizer training successful"
 }

@@ -86,7 +86,6 @@ public interface ITransactionService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The transaction import details.</param>
-    /// <param name="autoCategorizer">The auto categorizer, if enabled and configured.</param>
     Task ImportTransactionsAsync(
         Guid userGuid,
         ITransactionImportRequest request

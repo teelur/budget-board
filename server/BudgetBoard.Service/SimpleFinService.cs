@@ -179,6 +179,7 @@ public class SimpleFinService(
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
                 .Include(u => u.Institutions)
+                .Include(u => u.UserSettings)
                 .Include(u => u.SimpleFinOrganizations)
                 .ThenInclude(o => o.Accounts)
                 .Include(u => u.TransactionCategories)
@@ -596,7 +597,7 @@ public class SimpleFinService(
             };
 
             await transactionService.CreateTransactionAsync(
-                userData.Id,
+                userData,
                 newTransaction,
                 allCategories,
                 autoCategorizer

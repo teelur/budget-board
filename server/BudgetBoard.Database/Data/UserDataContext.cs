@@ -187,22 +187,24 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     {
         var conn = (NpgsqlConnection)Database.GetDbConnection();
 
-        // Open connection
         await conn.OpenAsync();
-
-        // Start a transaction
         using var transaction = await conn.BeginTransactionAsync();
 
         try
         {
-            // 1. If needed, create the large object
-            if (objectId == 0)
+            // 1. Delete the large object if it already exists
+            if (objectId != 0)
             {
-                using var createCmd = new NpgsqlCommand("SELECT lo_create(0)", conn, transaction);
-                objectId = Convert.ToInt64(await createCmd.ExecuteScalarAsync());
+                using var unlinkCmd = new NpgsqlCommand("SELECT lo_unlink(@oid)", conn, transaction);
+                unlinkCmd.Parameters.AddWithValue("oid", objectId);
+                await unlinkCmd.ExecuteNonQueryAsync();
             }
 
-            // 2. Open - Returns a file descriptor (fd) for the specific OID
+            // 2. Create the new large object
+            using var createCmd = new NpgsqlCommand("SELECT lo_create(0)", conn, transaction);
+            objectId = Convert.ToInt64(await createCmd.ExecuteScalarAsync());
+
+            // 3. Open - Returns a file descriptor (fd) for the specific OID
             using var openCmd = new NpgsqlCommand("SELECT lo_open(@oid, @mode)", conn, transaction);
             openCmd.Parameters.AddWithValue("oid", objectId);
             openCmd.Parameters.AddWithValue("mode", INV_READ | INV_WRITE);
@@ -210,7 +212,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
 
             try
             {
-                // 3. Write - Use lo_write(fd, data)
+                // 4. Write - Use lo_write(fd, data)
                 using var writeCmd = new NpgsqlCommand("SELECT lowrite(@fd, @data)", conn, transaction);
                 writeCmd.Parameters.AddWithValue("fd", fd);
                 writeCmd.Parameters.AddWithValue("data", data);
@@ -218,7 +220,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
             }
             finally
             {
-                // 4. Close the file descriptor
+                // 5. Close the file descriptor
                 using var closeCmd = new NpgsqlCommand("SELECT lo_close(@fd)", conn, transaction);
                 closeCmd.Parameters.AddWithValue("fd", fd);
                 await closeCmd.ExecuteNonQueryAsync();
@@ -231,6 +233,10 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
             await transaction.RollbackAsync();
             throw;
         }
+        finally
+        {
+            await conn.CloseAsync();
+        }
 
         return objectId;
     }
@@ -240,12 +246,9 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     {
         var conn = (NpgsqlConnection)Database.GetDbConnection();
 
-        // Open connection
         await conn.OpenAsync();
+        using var memoryStream = new MemoryStream();
 
-        var memoryStream = new MemoryStream();
-
-        // Start a transaction
         using var transaction = await conn.BeginTransactionAsync();
 
         try
@@ -297,6 +300,10 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         {
             await transaction.RollbackAsync();
             throw;
+        }
+        finally
+        {
+            await conn.CloseAsync();
         }
 
         return memoryStream.ToArray();

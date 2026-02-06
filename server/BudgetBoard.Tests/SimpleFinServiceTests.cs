@@ -715,7 +715,7 @@ public class SimpleFinServiceTests
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
             s =>
-                s.CreateTransactionAsync(helper.demoUser.Id, It.IsAny<ITransactionCreateRequest>(), It.IsAny<IEnumerable<ICategory>>(), null),
+                s.CreateTransactionAsync(helper.demoUser, It.IsAny<ITransactionCreateRequest>(), It.IsAny<IEnumerable<ICategory>>(), null),
             Times.Once
         );
         balanceServiceMock.Verify(
