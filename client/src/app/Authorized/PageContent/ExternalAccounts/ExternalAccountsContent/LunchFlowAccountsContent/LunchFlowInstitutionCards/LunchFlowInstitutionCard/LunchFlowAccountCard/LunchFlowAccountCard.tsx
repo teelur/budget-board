@@ -18,7 +18,7 @@ import {
   lunchFlowAccountQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
-import { IAccountResponse } from "~/models/account";
+import { AccountSource, IAccountResponse } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
@@ -135,14 +135,15 @@ const LunchFlowAccountCard = (
 
   const selectableAccounts = React.useMemo(() => {
     const linkedAccountIds = lunchFlowAccountsQuery.data?.map(
-      (sfa) => sfa.linkedAccountId,
+      (lfa) => lfa.linkedAccountId,
     );
 
     return accountsQuery.data
       ?.filter(
         (account) =>
           (!linkedAccountIds?.includes(account.id) &&
-            account.deleted == null) ||
+            account.deleted == null &&
+            account.source !== AccountSource.SimpleFIN) ||
           account.id === props.lunchFlowAccount.linkedAccountId,
       )
       .map((account) => ({
