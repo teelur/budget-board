@@ -1,4 +1,5 @@
 using Bogus;
+using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
@@ -1115,7 +1116,12 @@ public class SimpleFinServiceTests
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
             s =>
-                s.CreateTransactionAsync(helper.demoUser.Id, It.IsAny<ITransactionCreateRequest>()),
+                s.CreateTransactionAsync(
+                    helper.demoUser,
+                    It.IsAny<ITransactionCreateRequest>(),
+                    It.IsAny<IEnumerable<ICategory>>(),
+                    null
+                ),
             Times.Once
         );
         balanceServiceMock.Verify(
@@ -1284,7 +1290,13 @@ public class SimpleFinServiceTests
         // Assert
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
-            s => s.CreateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionCreateRequest>()),
+            s =>
+                s.CreateTransactionAsync(
+                    It.IsAny<ApplicationUser>(),
+                    It.IsAny<ITransactionCreateRequest>(),
+                    null,
+                    null
+                ),
             Times.Never
         );
         balanceServiceMock.Verify(
@@ -1397,7 +1409,13 @@ public class SimpleFinServiceTests
         // Assert
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
-            s => s.CreateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionCreateRequest>()),
+            s =>
+                s.CreateTransactionAsync(
+                    It.IsAny<ApplicationUser>(),
+                    It.IsAny<ITransactionCreateRequest>(),
+                    null,
+                    null
+                ),
             Times.Never
         );
         balanceServiceMock.Verify(

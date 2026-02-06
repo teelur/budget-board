@@ -117,6 +117,17 @@ public class UserSettingsService(
                 request.DisableBuiltInTransactionCategories;
         }
 
+        if (request.EnableAutoCategorizer != null)
+        {
+            // We can only enable auto categorizer if we trained it
+            if ((bool)request.EnableAutoCategorizer && userSettings.AutoCategorizerModelOID == null)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["AutoCategorizerNotTrainedLog"]);
+                throw new BudgetBoardServiceException(_responseLocalizer["AutoCategorizerNotTrained"]);
+            }
+            userSettings.EnableAutoCategorizer = (bool)request.EnableAutoCategorizer;
+        }
+
         await _userDataContext.SaveChangesAsync();
     }
 

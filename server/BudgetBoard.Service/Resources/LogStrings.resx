@@ -448,6 +448,9 @@
   <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
     <value>SimpleFIN account {0} is deleted. Skipping.</value>
   </data>
+    <data name="AutoCategorizerNotTrainedLog" xml:space="preserve">
+    <value>Attempted to enable Auto-Categorizer without training the model.</value>
+  </data>
   <data name="LunchFlowApiKeyConfigurationErrorLog" xml:space="preserve">
     <value>Failed to configure LunchFlow API key. Status code: {0}</value>
   </data>

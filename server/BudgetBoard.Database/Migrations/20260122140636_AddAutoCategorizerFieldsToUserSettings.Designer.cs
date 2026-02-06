@@ -3,6 +3,7 @@ using System;
 using BudgetBoard.Database.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    partial class UserDataContextModelSnapshot : ModelSnapshot
+    [Migration("20260122140636_AddAutoCategorizerFieldsToUserSettings")]
+    partial class AddAutoCategorizerFieldsToUserSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,10 +120,6 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LunchFlowApiKey")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -356,65 +355,6 @@ namespace BudgetBoard.Database.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Institution", (string)null);
-                });
-
-            modelBuilder.Entity("BudgetBoard.Database.Models.LunchFlowAccount", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("BalanceDate")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("InstitutionLogo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("InstitutionName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("LastSync")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("LinkedAccountId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Provider")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SyncID")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserID")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("LinkedAccountId")
-                        .IsUnique();
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("LunchFlowAccount", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.RuleParameterBase", b =>
@@ -930,23 +870,6 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BudgetBoard.Database.Models.LunchFlowAccount", b =>
-                {
-                    b.HasOne("BudgetBoard.Database.Models.Account", "LinkedAccount")
-                        .WithOne("LunchFlowAccount")
-                        .HasForeignKey("BudgetBoard.Database.Models.LunchFlowAccount", "LinkedAccountId");
-
-                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
-                        .WithMany("LunchFlowAccounts")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LinkedAccount");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinAccount", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.Account", "LinkedAccount")
@@ -1102,8 +1025,6 @@ namespace BudgetBoard.Database.Migrations
                 {
                     b.Navigation("Balances");
 
-                    b.Navigation("LunchFlowAccount");
-
                     b.Navigation("SimpleFinAccount");
 
                     b.Navigation("Transactions");
@@ -1122,8 +1043,6 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("Goals");
 
                     b.Navigation("Institutions");
-
-                    b.Navigation("LunchFlowAccounts");
 
                     b.Navigation("SimpleFinAccounts");
 
