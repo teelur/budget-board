@@ -134,7 +134,7 @@
     <value>Rule matched {0} transactions.</value>
   </data>
   <data name="ErrorApplyingActionLog" xml:space="preserve">
-    <value>Error applying action: {ErrorMessage}</value>
+    <value>Error applying action: {0}</value>
   </data>
   <data name="RuleAppliedActionsLog" xml:space="preserve">
     <value>Rule applied changes to {0} transactions.</value>
@@ -158,7 +158,7 @@
     <value>Attempted to create a budget with an empty category.</value>
   </data>
   <data name="BudgetCreateDuplicateLog" xml:space="preserve">
-    <value>Attempted to create a duplicate budget for {Category} in {Month}.</value>
+    <value>Attempted to create a duplicate budget for {0} in {1}.</value>
   </data>
   <data name="BudgetCreateCompletedLog" xml:space="preserve">
     <value>Successfully created {0} budgets.</value>
@@ -425,7 +425,7 @@
     <value>Attempted to update a SimpleFIN account that does not exist.</value>
   </data>
   <data name="DuplicateOrganizationCreateLog" xml:space="preserve">
-    <value>Attempted to create a duplicate organization for {Domain}.</value>
+    <value>Attempted to create a duplicate organization for {0}.</value>
   </data>
   <data name="SimpleFinOrganizationUpdateNotFoundLog" xml:space="preserve">
     <value>Attempted to update a SimpleFIN organization that does not exist.</value>
@@ -447,7 +447,8 @@
   </data>
   <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
     <value>SimpleFIN account {0} is deleted. Skipping.</value>
-  </data>  <data name="LunchFlowApiKeyConfigurationErrorLog" xml:space="preserve">
+  </data>
+  <data name="LunchFlowApiKeyConfigurationErrorLog" xml:space="preserve">
     <value>Failed to configure LunchFlow API key. Status code: {0}</value>
   </data>
   <data name="LunchFlowApiKeyMissingErrorLog" xml:space="preserve">
@@ -458,7 +459,8 @@
   </data>
   <data name="LunchFlowDeserializationErrorLog" xml:space="preserve">
     <value>Failed to deserialize LunchFlow account data. Error: {0}</value>
-  </data>  <data name="DuplicateLunchFlowAccountLog" xml:space="preserve">
+  </data>
+  <data name="DuplicateLunchFlowAccountLog" xml:space="preserve">
     <value>Attempted to create a LunchFlow account with a duplicate SyncID.</value>
   </data>
   <data name="LunchFlowAccountNotFoundLog" xml:space="preserve">

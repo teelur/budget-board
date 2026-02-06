@@ -18,7 +18,6 @@ public static class SyncHelpers
         IBalanceService balanceService
     )
     {
-        var errors = new List<string>();
         var userAccount = userData.Accounts.FirstOrDefault(a => a.ID == newBalance.AccountID);
         if (userAccount == null)
         {

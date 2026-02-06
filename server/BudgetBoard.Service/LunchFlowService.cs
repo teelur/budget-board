@@ -37,6 +37,12 @@ public class LunchFlowService(
     /// <inheritdoc />
     public async Task ConfigureApiKeyAsync(Guid userGuid, string apiKey)
     {
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            logger.LogError("{LogMessage}", logLocalizer["LunchFlowApiKeyMissingErrorLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["LunchFlowApiKeyMissingError"]);
+        }
+
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var requestUrl = LunchFlowBaseUrl + LunchFlowAccountsEndpoint;
@@ -397,7 +403,7 @@ public class LunchFlowService(
                         Amount = transaction.Amount,
                         Date = DateTime.Parse(transaction.Date),
                         MerchantName = transaction.Merchant,
-                        Source = TransactionSource.LunchFlow.ToString(),
+                        Source = TransactionSource.LunchFlow.Value,
                     }
                 );
             }
