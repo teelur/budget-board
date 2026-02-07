@@ -1633,7 +1633,12 @@ public class SimpleFinServiceTests
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
             s =>
-                s.CreateTransactionAsync(helper.demoUser.Id, It.IsAny<ITransactionCreateRequest>()),
+                s.CreateTransactionAsync(
+                    It.Is<ApplicationUser>(u => u.Id == helper.demoUser.Id),
+                    It.IsAny<ITransactionCreateRequest>(),
+                    It.IsAny<IEnumerable<ICategory>>(),
+                    It.IsAny<AutomaticTransactionCategorizer>()
+                ),
             Times.Exactly(2)
         );
         balanceServiceMock.Verify(
