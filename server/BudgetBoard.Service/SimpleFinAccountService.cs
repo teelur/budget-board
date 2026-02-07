@@ -63,7 +63,10 @@ public class SimpleFinAccountService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateAccountAsync(Guid userGuid, ISimpleFinAccountUpdateRequest request)
+    public async Task UpdateSimpleFinAccountAsync(
+        Guid userGuid,
+        ISimpleFinAccountUpdateRequest request
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
@@ -89,7 +92,7 @@ public class SimpleFinAccountService(
     }
 
     /// <inheritdoc />
-    public async Task DeleteAccountAsync(Guid userGuid, Guid accountGuid)
+    public async Task DeleteSimpleFinAccountAsync(Guid userGuid, Guid accountGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
@@ -129,7 +132,7 @@ public class SimpleFinAccountService(
 
         if (linkedAccountGuid != null && !userData.Accounts.Any(a => a.ID == linkedAccountGuid))
         {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidLinkedAccountIDLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["InvalidSimpleFinLinkedAccountIDLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["InvalidLinkedAccountIDError"]);
         }
 

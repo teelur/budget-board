@@ -86,6 +86,11 @@ public class Account
     public SimpleFinAccount? SimpleFinAccount { get; set; } = null;
 
     /// <summary>
+    /// Reference to the associated LunchFlow account, if any.
+    /// </summary>
+    public LunchFlowAccount? LunchFlowAccount { get; set; } = null;
+
+    /// <summary>
     /// Identifier for the user who owns the account.
     /// </summary>
     public required Guid UserID { get; set; }

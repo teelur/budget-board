@@ -66,7 +66,9 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
       <Group justify="space-between">
         <Group>
           <PrimaryText size="lg">{t("simplefin")}</PrimaryText>
-          <Badge color="var(--button-color-confirm)">{t("connected")}</Badge>
+          {userQuery.data?.simpleFinAccessToken && (
+            <Badge color="var(--button-color-confirm)">{t("connected")}</Badge>
+          )}
         </Group>
         {userQuery.data?.simpleFinAccessToken && (
           <Button

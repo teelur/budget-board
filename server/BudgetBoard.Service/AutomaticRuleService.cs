@@ -171,16 +171,7 @@ public class AutomaticRuleService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         int updatedCount = await RunAutomaticRule(userData, request, allCategories);
         _logger.LogInformation(
@@ -195,16 +186,7 @@ public class AutomaticRuleService(
     public async Task RunAutomaticRulesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         var rules = await ReadAutomaticRulesAsync(userGuid);
         var ruleRequests = rules.Select(r => new AutomaticRuleCreateRequest

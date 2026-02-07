@@ -5,6 +5,7 @@ import { AxiosResponse, AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
+  lunchFlowAccountQueryKey,
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
   translateAxiosError,
@@ -31,13 +32,16 @@ const SyncButton = (): React.ReactNode => {
       await queryClient.invalidateQueries({
         queryKey: [simpleFinAccountQueryKey],
       });
+      await queryClient.invalidateQueries({
+        queryKey: [lunchFlowAccountQueryKey],
+      });
       if ((data.data?.length ?? 0) > 0) {
         {
           data.data.map((error: string) =>
             notifications.show({
               color: "var(--button-color-destructive)",
               message: error,
-            })
+            }),
           );
         }
       }

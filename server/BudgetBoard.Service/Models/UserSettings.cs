@@ -19,6 +19,11 @@ public class UserSettingsResponse : IUserSettingsResponse
     public int BudgetWarningThreshold { get; set; }
     public int ForceSyncLookbackMonths { get; set; }
     public bool DisableBuiltInTransactionCategories { get; set; }
+    public bool EnableAutoCategorizer { get; set; }
+    public long? AutoCategorizerModelOID { get; set; }
+    public DateOnly? AutoCategorizerLastTrained { get; set; }
+    public DateOnly? AutoCategorizerModelStartDate { get; set; }
+    public DateOnly? AutoCategorizerModelEndDate { get; set; }
 
     [JsonConstructor]
     public UserSettingsResponse()
@@ -28,6 +33,7 @@ public class UserSettingsResponse : IUserSettingsResponse
         BudgetWarningThreshold = 80;
         ForceSyncLookbackMonths = 0;
         DisableBuiltInTransactionCategories = false;
+        EnableAutoCategorizer = false;
     }
 
     public UserSettingsResponse(UserSettings userSettings)
@@ -37,6 +43,11 @@ public class UserSettingsResponse : IUserSettingsResponse
         BudgetWarningThreshold = userSettings.BudgetWarningThreshold;
         ForceSyncLookbackMonths = userSettings.ForceSyncLookbackMonths;
         DisableBuiltInTransactionCategories = userSettings.DisableBuiltInTransactionCategories;
+        EnableAutoCategorizer = userSettings.EnableAutoCategorizer;
+        AutoCategorizerModelOID = userSettings.AutoCategorizerModelOID;
+        AutoCategorizerLastTrained = userSettings.AutoCategorizerLastTrained;
+        AutoCategorizerModelStartDate = userSettings.AutoCategorizerModelStartDate;
+        AutoCategorizerModelEndDate = userSettings.AutoCategorizerModelEndDate;
     }
 }
 
@@ -47,6 +58,7 @@ public interface IUserSettingsUpdateRequest
     public int? BudgetWarningThreshold { get; }
     public int? ForceSyncLookbackMonths { get; }
     public bool? DisableBuiltInTransactionCategories { get; }
+    public bool? EnableAutoCategorizer { get; }
 }
 
 [method: JsonConstructor]
@@ -57,4 +69,5 @@ public class UserSettingsUpdateRequest() : IUserSettingsUpdateRequest
     public int? BudgetWarningThreshold { get; set; } = null;
     public int? ForceSyncLookbackMonths { get; set; } = null;
     public bool? DisableBuiltInTransactionCategories { get; set; } = null;
+    public bool? EnableAutoCategorizer { get; set; } = null;
 }

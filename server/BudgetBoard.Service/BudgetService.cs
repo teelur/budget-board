@@ -29,16 +29,7 @@ public class BudgetService(
     )
     {
         ApplicationUser userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         int newBudgetsCount = 0;
         List<string> errors = [];
@@ -161,16 +152,7 @@ public class BudgetService(
 
         budget.Limit = request.Limit;
 
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
         {
@@ -285,15 +267,7 @@ public class BudgetService(
         DateTime monthDate
     )
     {
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
-            customCategories,
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false
-        );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         var childBudgets = userData.Budgets.Where(b =>
             !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)

@@ -14,6 +14,7 @@ public class SyncService(
     ILogger<ISyncService> logger,
     UserDataContext userDataContext,
     ISimpleFinService simpleFinService,
+    ILunchFlowService lunchFlowService,
     IGoalService goalService,
     IApplicationUserService applicationUserService,
     IAutomaticRuleService automaticRuleService,
@@ -39,6 +40,16 @@ public class SyncService(
         else
         {
             logger.LogInformation("{LogMessage}", logLocalizer["SimpleFinTokenNotConfiguredLog"]);
+        }
+
+        if (!string.IsNullOrEmpty(userData.LunchFlowApiKey))
+        {
+            errors.AddRange(await lunchFlowService.RefreshAccountsAsync(userGuid));
+            errors.AddRange(await lunchFlowService.SyncTransactionHistoryAsync(userGuid));
+        }
+        else
+        {
+            logger.LogInformation("{LogMessage}", logLocalizer["LunchFlowApiKeyNotConfiguredLog"]);
         }
 
         await goalService.CompleteGoalsAsync(userData.Id);
@@ -68,6 +79,8 @@ public class SyncService(
                 .Include(u => u.UserSettings)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.SimpleFinAccount)
+                .Include(u => u.Accounts)
+                .ThenInclude(a => a.LunchFlowAccount)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
@@ -92,7 +105,11 @@ public class SyncService(
 
     private static void SetManualSourceForUnlinkedAccounts(IEnumerable<Account> accounts)
     {
-        foreach (var account in accounts.Where(a => a.SimpleFinAccount == null))
+        foreach (
+            var account in accounts.Where(a =>
+                a.SimpleFinAccount == null && a.LunchFlowAccount == null
+            )
+        )
         {
             account.Source = AccountSource.Manual;
         }

@@ -1,4 +1,5 @@
-﻿using BudgetBoard.Service.Models;
+﻿using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Models;
 
 namespace BudgetBoard.Service.Helpers;
 
@@ -62,6 +63,25 @@ internal static class TransactionCategoriesHelpers
     }
 
     /// <summary>
+    /// Retrieves the category and subcategory (if any) for a given category.
+    /// </summary>
+    /// <param name="category">
+    /// The name of the category whose parent is to be found.
+    /// </param>
+    /// <param name="allCategories">
+    /// A collection of categories to include in the search.
+    /// </param>
+    /// <returns>
+    /// A tuple with the parent and child categories. Child may be empty.
+    /// </returns>
+    internal static (string parent, string child) GetFullCategory(string category, IEnumerable<ICategory> categories)
+    {
+        var parentCategory = GetParentCategory(category, categories);
+        var childCategory = GetIsParentCategory(category, categories) ? string.Empty : category;
+        return (parentCategory, childCategory);
+    }
+
+    /// <summary>
     /// Combines built-in and custom transaction categories based on the specified settings.
     /// </summary>
     /// <param name="customCategories">
@@ -73,11 +93,17 @@ internal static class TransactionCategoriesHelpers
     /// <returns>
     /// A read-only list containing all applicable categories.
     /// </returns>
-    internal static IReadOnlyList<ICategory> GetAllTransactionCategories(
-        IEnumerable<ICategory> customCategories,
-        bool disableBuiltInTransactionCategories
-    )
+    internal static IReadOnlyList<ICategory> GetAllTransactionCategories(ApplicationUser userData)
     {
+        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
+        {
+            Value = tc.Value,
+            Parent = tc.Parent,
+        });
+
+        var disableBuiltInTransactionCategories =
+            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false;
+
         var allCategories = new List<ICategory>();
         if (!disableBuiltInTransactionCategories)
         {

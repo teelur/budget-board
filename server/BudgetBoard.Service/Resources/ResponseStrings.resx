@@ -358,6 +358,9 @@
   <data name="SimpleFinDecodeTokenError" xml:space="preserve">
     <value>An error occurred while decoding the setup token.</value>
   </data>
+  <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
+    <value>SimpleFIN access token is missing or empty.</value>
+  </data>
   <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
     <value>The provided access token is invalid.</value>
   </data>
@@ -366,6 +369,9 @@
   </data>
   <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
     <value>An error occurred while connecting to SimpleFIN. Please try again later.</value>
+  </data>
+  <data name="SimpleFinDataRequestError" xml:space="preserve">
+    <value>An error occurred while requesting SimpleFIN data.</value>
   </data>
   <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
     <value>Unsupported field '{0}' in rule condition.</value>
@@ -426,5 +432,35 @@
   </data>
   <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
     <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
+  </data>
+  <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
+    <value>No transactions in the range selected to train the Auto-Categorizer.</value>
+  </data>
+    <data name="AutoCategorizerNotTrained" xml:space="preserve">
+    <value>Auto-Categorizer cannot be enabled before training.</value>
+  </data>
+  <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
+    <value>Failed to configure LunchFlow API key. Status code: {0}</value>
+  </data>
+  <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
+    <value>LunchFlow API key is not configured.</value>
+  </data>
+  <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve LunchFlow account data.</value>
+  </data>
+  <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
+    <value>A LunchFlow account with this SyncID already exists.</value>
+  </data>
+  <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
+    <value>The LunchFlow account you are trying to access does not exist.</value>
+  </data>
+  <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve transaction data for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
+    <value>Linked account not found for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
   </data>
   </root>
