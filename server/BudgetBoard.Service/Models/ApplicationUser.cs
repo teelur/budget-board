@@ -23,6 +23,7 @@ public interface IApplicationUserResponse
 {
     Guid ID { get; }
     bool SimpleFinAccessToken { get; }
+    bool LunchFlowApiKey { get; }
     DateTime LastSync { get; }
     bool TwoFactorEnabled { get; }
     bool HasOidcLogin { get; }
@@ -31,23 +32,16 @@ public interface IApplicationUserResponse
 
 public class ApplicationUserResponse : IApplicationUserResponse
 {
-    public Guid ID { get; set; }
-    public bool SimpleFinAccessToken { get; set; }
-    public DateTime LastSync { get; set; }
-    public bool TwoFactorEnabled { get; set; }
-    public bool HasOidcLogin { get; set; }
-    public bool HasLocalLogin { get; set; }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public bool SimpleFinAccessToken { get; set; } = false;
+    public bool LunchFlowApiKey { get; set; } = false;
+    public DateTime LastSync { get; set; } = DateTime.MinValue;
+    public bool TwoFactorEnabled { get; set; } = false;
+    public bool HasOidcLogin { get; set; } = false;
+    public bool HasLocalLogin { get; set; } = false;
 
     [JsonConstructor]
-    public ApplicationUserResponse()
-    {
-        ID = new Guid();
-        SimpleFinAccessToken = false;
-        LastSync = DateTime.MinValue;
-        TwoFactorEnabled = false;
-        HasOidcLogin = false;
-        HasLocalLogin = false;
-    }
+    public ApplicationUserResponse() { }
 
     public ApplicationUserResponse(
         ApplicationUser user,
@@ -57,6 +51,7 @@ public class ApplicationUserResponse : IApplicationUserResponse
     {
         ID = user.Id;
         SimpleFinAccessToken = user.SimpleFinAccessToken != string.Empty;
+        LunchFlowApiKey = user.LunchFlowApiKey != string.Empty;
         LastSync = user.LastSync;
         TwoFactorEnabled = user.TwoFactorEnabled;
         HasOidcLogin = hasOidcLogin;

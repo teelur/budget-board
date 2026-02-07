@@ -161,7 +161,10 @@ public class SimpleFinAccountServiceTests()
         };
 
         // Act
-        await simpleFinAccountService.UpdateAccountAsync(helper.demoUser.Id, updateRequest);
+        await simpleFinAccountService.UpdateSimpleFinAccountAsync(
+            helper.demoUser.Id,
+            updateRequest
+        );
 
         // Assert
         var updatedAccount = helper.UserDataContext.SimpleFinAccounts.FirstOrDefault(a =>
@@ -200,7 +203,10 @@ public class SimpleFinAccountServiceTests()
 
         // Act
         Func<Task> act = async () =>
-            await simpleFinAccountService.UpdateAccountAsync(helper.demoUser.Id, updateRequest);
+            await simpleFinAccountService.UpdateSimpleFinAccountAsync(
+                helper.demoUser.Id,
+                updateRequest
+            );
 
         // Assert
         await act.Should()
@@ -231,7 +237,7 @@ public class SimpleFinAccountServiceTests()
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await simpleFinAccountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
+        await simpleFinAccountService.DeleteSimpleFinAccountAsync(helper.demoUser.Id, account.ID);
 
         // Assert
         var deletedAccount = helper.UserDataContext.SimpleFinAccounts.FirstOrDefault(a =>
@@ -255,7 +261,10 @@ public class SimpleFinAccountServiceTests()
 
         // Act
         Func<Task> act = async () =>
-            await simpleFinAccountService.DeleteAccountAsync(helper.demoUser.Id, Guid.NewGuid());
+            await simpleFinAccountService.DeleteSimpleFinAccountAsync(
+                helper.demoUser.Id,
+                Guid.NewGuid()
+            );
 
         // Assert
         await act.Should()

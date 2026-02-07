@@ -35,6 +35,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<WidgetSettings> WidgetSettings { get; set; }
     public DbSet<SimpleFinOrganization> SimpleFinOrganizations { get; set; }
     public DbSet<SimpleFinAccount> SimpleFinAccounts { get; set; }
+    public DbSet<LunchFlowAccount> LunchFlowAccounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -177,6 +178,15 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
                 .HasForeignKey<SimpleFinAccount>(e => e.LinkedAccountId);
 
             a.ToTable("SimpleFinAccount");
+        });
+
+        modelBuilder.Entity<LunchFlowAccount>(a =>
+        {
+            a.HasOne(e => e.LinkedAccount)
+                .WithOne(e => e.LunchFlowAccount)
+                .HasForeignKey<LunchFlowAccount>(e => e.LinkedAccountId);
+
+            a.ToTable("LunchFlowAccount");
         });
 
         modelBuilder.UseIdentityColumns();

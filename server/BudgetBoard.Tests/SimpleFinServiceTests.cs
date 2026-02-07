@@ -1,3 +1,4 @@
+using Bogus;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
@@ -30,7 +31,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -71,7 +72,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -109,7 +110,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -174,7 +175,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -196,6 +197,44 @@ public class SimpleFinServiceTests
                     helper.demoUser.Id,
                     validBase64Token
                 )
+            )
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>();
+    }
+
+    [Fact]
+    public async Task ConfigureAccessTokenAsync_WhenCalledWithEmptyToken_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        using var httpClient = new HttpClient();
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var emptyToken = string.Empty;
+
+        // Act & Assert
+        await FluentActions
+            .Invoking(async () =>
+                await simpleFinService.ConfigureAccessTokenAsync(helper.demoUser.Id, emptyToken)
             )
             .Should()
             .ThrowAsync<BudgetBoardServiceException>();
@@ -283,7 +322,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -336,7 +375,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -389,7 +428,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -453,7 +492,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -560,7 +599,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -581,12 +620,374 @@ public class SimpleFinServiceTests
         errors.Should().BeEmpty();
         simpleFinAccountServiceMock.Verify(
             s =>
-                s.UpdateAccountAsync(
+                s.UpdateSimpleFinAccountAsync(
                     helper.demoUser.Id,
                     It.Is<ISimpleFinAccountUpdateRequest>(r =>
                         r.ID == existingAccount.ID && r.Name == "Checking Account"
                     )
                 ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task RefreshAccountsAsync_WhenAccessTokenIsMissing_ShouldReturnErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        using var httpClient = new HttpClient();
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // User has no access token configured
+        helper.demoUser.SimpleFinAccessToken = null!;
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var errors = await simpleFinService.RefreshAccountsAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().NotBeEmpty();
+        errors.Should().Contain("SimpleFinMissingAccessTokenError");
+    }
+
+    [Fact]
+    public async Task RefreshAccountsAsync_WhenHttpRequestFails_ShouldReturnErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ThrowsAsync(new HttpRequestException("Network error"));
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.SimpleFinAccessToken = "https://demo:demo@test.com/simplefin";
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var errors = await simpleFinService.RefreshAccountsAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().NotBeEmpty();
+        errors.Should().Contain("SimpleFinDataRequestError");
+    }
+
+    [Fact]
+    public async Task RefreshAccountsAsync_WhenInvalidJsonResponse_ShouldReturnErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var invalidJsonResponse = "{ invalid json }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                new HttpResponseMessage
+                {
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Content = new StringContent(invalidJsonResponse),
+                }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.SimpleFinAccessToken = "https://demo:demo@test.com/simplefin";
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var errors = await simpleFinService.RefreshAccountsAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().NotBeEmpty();
+        errors.Should().Contain("SimpleFinDataNotFoundError");
+    }
+
+    [Fact]
+    public async Task RefreshAccountsAsync_WhenOrganizationExists_ShouldUpdateExisting()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var jsonResponse =
+            @"{
+            ""errors"": [],
+            ""accounts"": [
+                {
+                    ""org"": {
+                        ""domain"": ""example.com"",
+                        ""sfin-url"": ""https://example.com/simplefin"",
+                        ""name"": ""Updated Bank Name"",
+                        ""url"": ""https://example.com"",
+                        ""id"": ""org-123""
+                    },
+                    ""id"": ""account-456"",
+                    ""name"": ""Checking Account"",
+                    ""currency"": ""USD"",
+                    ""balance"": ""1000.50"",
+                    ""balance-date"": 1609459200,
+                    ""transactions"": []
+                }
+            ]
+        }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                new HttpResponseMessage
+                {
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Content = new StringContent(jsonResponse),
+                }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var simpleFinOrganizationServiceMock = new Mock<ISimpleFinOrganizationService>();
+        var simpleFinAccountServiceMock = new Mock<ISimpleFinAccountService>();
+
+        // Set up existing organization with old name
+        var existingOrg = new Database.Models.SimpleFinOrganization
+        {
+            ID = Guid.NewGuid(),
+            Domain = "example.com",
+            SimpleFinUrl = "https://example.com/simplefin",
+            Name = "Old Bank Name",
+            Url = "https://example.com",
+            SyncID = "org-123",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.SimpleFinOrganizations.Add(existingOrg);
+        helper.UserDataContext.SaveChanges();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            simpleFinOrganizationServiceMock.Object,
+            simpleFinAccountServiceMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.SimpleFinAccessToken = "https://demo:demo@test.com/simplefin";
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var errors = await simpleFinService.RefreshAccountsAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().BeEmpty();
+        simpleFinOrganizationServiceMock.Verify(
+            s =>
+                s.UpdateSimpleFinOrganizationAsync(
+                    helper.demoUser.Id,
+                    It.Is<ISimpleFinOrganizationUpdateRequest>(r =>
+                        r.ID == existingOrg.ID && r.Name == "Updated Bank Name"
+                    )
+                ),
+            Times.Once
+        );
+        simpleFinAccountServiceMock.Verify(
+            s =>
+                s.CreateSimpleFinAccountAsync(
+                    helper.demoUser.Id,
+                    It.IsAny<ISimpleFinAccountCreateRequest>()
+                ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task RemoveAccessTokenAsync_WhenCalledWithInvalidUserId_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        using var httpClient = new HttpClient();
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var invalidUserId = Guid.NewGuid();
+
+        // Act & Assert
+        await FluentActions
+            .Invoking(async () => await simpleFinService.RemoveAccessTokenAsync(invalidUserId))
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>();
+    }
+
+    [Fact]
+    public async Task RemoveAccessTokenAsync_WhenCalled_ShouldRemoveAccessTokenAndCleanupData()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        using var httpClient = new HttpClient();
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var accountServiceMock = new Mock<IAccountService>();
+        var simpleFinOrganizationServiceMock = new Mock<ISimpleFinOrganizationService>();
+        var simpleFinAccountServiceMock = new Mock<ISimpleFinAccountService>();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            Mock.Of<INowProvider>(),
+            accountServiceMock.Object,
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            simpleFinOrganizationServiceMock.Object,
+            simpleFinAccountServiceMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Set up existing SimpleFIN data
+        var org = new Database.Models.SimpleFinOrganization
+        {
+            Domain = "example.com",
+            Name = "Example Bank",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.SimpleFinOrganizations.Add(org);
+
+        var account = new Database.Models.Account
+        {
+            Name = "My Account",
+            Type = "checking",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.Accounts.Add(account);
+
+        var simpleFinAccount = new Database.Models.SimpleFinAccount
+        {
+            SyncID = "account-123",
+            Name = "Checking",
+            Currency = "USD",
+            OrganizationId = org.ID,
+            LinkedAccountId = account.ID,
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
+
+        helper.demoUser.SimpleFinAccessToken = "https://demo:demo@test.com/simplefin";
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await simpleFinService.RemoveAccessTokenAsync(helper.demoUser.Id);
+
+        // Assert
+        helper.UserDataContext.Users.Single().SimpleFinAccessToken.Should().BeEmpty();
+        simpleFinAccountServiceMock.Verify(
+            s => s.DeleteSimpleFinAccountAsync(helper.demoUser.Id, It.IsAny<Guid>()),
             Times.Once
         );
     }
@@ -660,7 +1061,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             nowProviderMock,
             Mock.Of<IAccountService>(),
             transactionServiceMock.Object,
@@ -715,7 +1116,12 @@ public class SimpleFinServiceTests
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
             s =>
-                s.CreateTransactionAsync(helper.demoUser, It.IsAny<ITransactionCreateRequest>(), It.IsAny<IEnumerable<ICategory>>(), null),
+                s.CreateTransactionAsync(
+                    helper.demoUser,
+                    It.IsAny<ITransactionCreateRequest>(),
+                    It.IsAny<IEnumerable<ICategory>>(),
+                    null
+                ),
             Times.Once
         );
         balanceServiceMock.Verify(
@@ -740,7 +1146,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             Mock.Of<INowProvider>(),
             Mock.Of<IAccountService>(),
             Mock.Of<ITransactionService>(),
@@ -829,7 +1235,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             nowProviderMock,
             Mock.Of<IAccountService>(),
             transactionServiceMock.Object,
@@ -884,7 +1290,13 @@ public class SimpleFinServiceTests
         // Assert
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
-            s => s.CreateTransactionAsync(It.IsAny<ApplicationUser>(), It.IsAny<ITransactionCreateRequest>(), null, null),
+            s =>
+                s.CreateTransactionAsync(
+                    It.IsAny<ApplicationUser>(),
+                    It.IsAny<ITransactionCreateRequest>(),
+                    null,
+                    null
+                ),
             Times.Never
         );
         balanceServiceMock.Verify(
@@ -953,7 +1365,7 @@ public class SimpleFinServiceTests
         var simpleFinService = new SimpleFinService(
             httpClientFactoryMock.Object,
             helper.UserDataContext,
-            Mock.Of<ILogger<ISyncProvider>>(),
+            Mock.Of<ILogger<ISimpleFinService>>(),
             nowProviderMock,
             Mock.Of<IAccountService>(),
             transactionServiceMock.Object,
@@ -997,12 +1409,241 @@ public class SimpleFinServiceTests
         // Assert
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
-            s => s.CreateTransactionAsync(It.IsAny<ApplicationUser>(), It.IsAny<ITransactionCreateRequest>(), null, null),
+            s =>
+                s.CreateTransactionAsync(
+                    It.IsAny<ApplicationUser>(),
+                    It.IsAny<ITransactionCreateRequest>(),
+                    null,
+                    null
+                ),
             Times.Never
         );
         balanceServiceMock.Verify(
             s => s.CreateBalancesAsync(It.IsAny<Guid>(), It.IsAny<IBalanceCreateRequest>()),
             Times.Never
+        );
+    }
+
+    [Fact]
+    public async Task SyncTransactionHistoryAsync_WhenAccessTokenIsMissing_ShouldReturnErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        using var httpClient = new HttpClient();
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            nowProviderMock.Object,
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // User has no access token configured
+        helper.demoUser.SimpleFinAccessToken = string.Empty;
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var errors = await simpleFinService.SyncTransactionHistoryAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().NotBeEmpty();
+        errors.Should().Contain("SimpleFinMissingAccessTokenError");
+    }
+
+    [Fact]
+    public async Task SyncTransactionHistoryAsync_WhenMultipleAccountsHaveTransactions_ShouldSyncAll()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var jsonResponse =
+            @"{
+            ""errors"": [],
+            ""accounts"": [
+                {
+                    ""org"": {
+                        ""domain"": ""example.com"",
+                        ""sfin-url"": ""https://example.com/simplefin"",
+                        ""name"": ""Example Bank"",
+                        ""url"": ""https://example.com"",
+                        ""id"": ""org-123""
+                    },
+                    ""id"": ""account-456"",
+                    ""name"": ""Checking Account"",
+                    ""currency"": ""USD"",
+                    ""balance"": ""1500.75"",
+                    ""balance-date"": 1609459200,
+                    ""transactions"": [
+                        {
+                            ""id"": ""txn-1"",
+                            ""posted"": 1609372800,
+                            ""amount"": ""-50.00"",
+                            ""description"": ""Coffee Shop"",
+                            ""transacted_at"": 1609372800,
+                            ""pending"": false
+                        }
+                    ]
+                },
+                {
+                    ""org"": {
+                        ""domain"": ""example.com"",
+                        ""sfin-url"": ""https://example.com/simplefin"",
+                        ""name"": ""Example Bank"",
+                        ""url"": ""https://example.com"",
+                        ""id"": ""org-123""
+                    },
+                    ""id"": ""account-789"",
+                    ""name"": ""Savings Account"",
+                    ""currency"": ""USD"",
+                    ""balance"": ""5000.00"",
+                    ""balance-date"": 1609459200,
+                    ""transactions"": [
+                        {
+                            ""id"": ""txn-2"",
+                            ""posted"": 1609372800,
+                            ""amount"": ""100.00"",
+                            ""description"": ""Transfer In"",
+                            ""transacted_at"": 1609372800,
+                            ""pending"": false
+                        }
+                    ]
+                }
+            ]
+        }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                new HttpResponseMessage
+                {
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Content = new StringContent(jsonResponse),
+                }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var nowProviderMock = Mock.Of<INowProvider>();
+        Mock.Get(nowProviderMock).Setup(_ => _.UtcNow).Returns(DateTime.UtcNow);
+
+        var transactionServiceMock = new Mock<ITransactionService>();
+        var balanceServiceMock = new Mock<IBalanceService>();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            nowProviderMock,
+            Mock.Of<IAccountService>(),
+            transactionServiceMock.Object,
+            balanceServiceMock.Object,
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Set up organization and two accounts
+        var org = new Database.Models.SimpleFinOrganization
+        {
+            Domain = "example.com",
+            SimpleFinUrl = "https://example.com/simplefin",
+            Name = "Example Bank",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.SimpleFinOrganizations.Add(org);
+
+        var account1 = new Database.Models.Account
+        {
+            Name = "My Checking",
+            Type = "checking",
+            Subtype = "checking",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.Accounts.Add(account1);
+
+        var account2 = new Database.Models.Account
+        {
+            Name = "My Savings",
+            Type = "savings",
+            Subtype = "savings",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.Accounts.Add(account2);
+
+        var simpleFinAccount1 = new Database.Models.SimpleFinAccount
+        {
+            SyncID = "account-456",
+            Name = "Checking Account",
+            Currency = "USD",
+            OrganizationId = org.ID,
+            LinkedAccountId = account1.ID,
+            UserID = helper.demoUser.Id,
+            LastSync = DateTime.UtcNow.AddDays(-1),
+        };
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount1);
+
+        var simpleFinAccount2 = new Database.Models.SimpleFinAccount
+        {
+            SyncID = "account-789",
+            Name = "Savings Account",
+            Currency = "USD",
+            OrganizationId = org.ID,
+            LinkedAccountId = account2.ID,
+            UserID = helper.demoUser.Id,
+            LastSync = DateTime.UtcNow.AddDays(-1),
+        };
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount2);
+
+        helper.demoUser.SimpleFinAccessToken = "https://demo:demo@test.com/simplefin";
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var errors = await simpleFinService.SyncTransactionHistoryAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().BeEmpty();
+        transactionServiceMock.Verify(
+            s =>
+                s.CreateTransactionAsync(
+                    It.Is<ApplicationUser>(u => u.Id == helper.demoUser.Id),
+                    It.IsAny<ITransactionCreateRequest>(),
+                    It.IsAny<IEnumerable<ICategory>>(),
+                    It.IsAny<AutomaticTransactionCategorizer>()
+                ),
+            Times.Exactly(2)
+        );
+        balanceServiceMock.Verify(
+            s => s.CreateBalancesAsync(helper.demoUser.Id, It.IsAny<IBalanceCreateRequest>()),
+            Times.Exactly(2)
         );
     }
 }

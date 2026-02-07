@@ -3,7 +3,6 @@ using BudgetBoard.Database.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.WebAPI.Utils;
 

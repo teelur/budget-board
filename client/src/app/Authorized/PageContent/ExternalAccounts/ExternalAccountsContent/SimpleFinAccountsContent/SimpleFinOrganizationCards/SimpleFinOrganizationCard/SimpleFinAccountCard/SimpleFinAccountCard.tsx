@@ -19,7 +19,7 @@ import {
   simpleFinOrganizationQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
-import { IAccountResponse } from "~/models/account";
+import { AccountSource, IAccountResponse } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
@@ -28,7 +28,7 @@ interface ISimpleFinAccountCardProps {
 }
 
 const SimpleFinAccountCard = (
-  props: ISimpleFinAccountCardProps
+  props: ISimpleFinAccountCardProps,
 ): React.ReactNode => {
   const [isEditable, { toggle }] = useDisclosure(false);
 
@@ -105,7 +105,7 @@ const SimpleFinAccountCard = (
 
   const getAccountNameForId = (accountId: string): string => {
     const account = accountsQuery.data?.find(
-      (account) => account.id === accountId
+      (account) => account.id === accountId,
     );
     return account ? account.name : t("unknown_account");
   };
@@ -115,7 +115,7 @@ const SimpleFinAccountCard = (
       return false;
     }
     const linkedAccount = accountsQuery.data?.find(
-      (account) => account.id === props.simpleFinAccount.linkedAccountId
+      (account) => account.id === props.simpleFinAccount.linkedAccountId,
     );
     return linkedAccount?.deleted != null;
   }, [accountsQuery.data, props.simpleFinAccount.linkedAccountId]);
@@ -125,7 +125,7 @@ const SimpleFinAccountCard = (
       props.simpleFinAccount.linkedAccountId != null &&
         props.simpleFinAccount.linkedAccountId.length > 0
         ? [props.simpleFinAccount.linkedAccountId]
-        : []
+        : [],
     );
   }, [props.simpleFinAccount.linkedAccountId]);
 
@@ -139,15 +139,16 @@ const SimpleFinAccountCard = (
 
   const selectableAccounts = React.useMemo(() => {
     const linkedAccountIds = simpleFinAccountsQuery.data?.map(
-      (sfa) => sfa.linkedAccountId
+      (sfa) => sfa.linkedAccountId,
     );
 
     return accountsQuery.data
       ?.filter(
         (account) =>
           (!linkedAccountIds?.includes(account.id) &&
-            account.deleted == null) ||
-          account.id === props.simpleFinAccount.linkedAccountId
+            account.deleted == null &&
+            account.source !== AccountSource.LunchFlow) ||
+          account.id === props.simpleFinAccount.linkedAccountId,
       )
       .map((account) => ({
         value: account.id,
@@ -204,7 +205,7 @@ const SimpleFinAccountCard = (
             {convertNumberToCurrency(
               props.simpleFinAccount.balance,
               true,
-              accountCurrency
+              accountCurrency,
             )}
           </StatusText>
         </Group>
@@ -235,7 +236,7 @@ const SimpleFinAccountCard = (
                   values={{
                     accountName: props.simpleFinAccount.linkedAccountId
                       ? getAccountNameForId(
-                          props.simpleFinAccount.linkedAccountId
+                          props.simpleFinAccount.linkedAccountId,
                         )
                       : t("none"),
                   }}

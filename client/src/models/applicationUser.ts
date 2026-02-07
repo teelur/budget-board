@@ -1,6 +1,7 @@
 export interface IApplicationUser {
   id: string;
   simpleFinAccessToken: boolean;
+  lunchFlowApiKey: boolean;
   lastSync: Date;
   twoFactorEnabled: boolean;
   hasOidcLogin: boolean;
