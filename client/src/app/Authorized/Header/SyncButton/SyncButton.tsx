@@ -4,7 +4,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse, AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  lunchFlowAccountQueryKey,
+  simpleFinAccountQueryKey,
+  simpleFinOrganizationQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
 import { useTranslation } from "react-i18next";
 
 const SyncButton = (): React.ReactNode => {
@@ -21,13 +26,22 @@ const SyncButton = (): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["goals"] });
+      await queryClient.invalidateQueries({
+        queryKey: [simpleFinOrganizationQueryKey],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [simpleFinAccountQueryKey],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [lunchFlowAccountQueryKey],
+      });
       if ((data.data?.length ?? 0) > 0) {
         {
           data.data.map((error: string) =>
             notifications.show({
               color: "var(--button-color-destructive)",
               message: error,
-            })
+            }),
           );
         }
       }

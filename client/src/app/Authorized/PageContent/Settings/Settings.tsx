@@ -1,6 +1,5 @@
 import { Stack } from "@mantine/core";
 import DarkModeToggle from "./DarkModeToggle/DarkModeToggle";
-import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 import React from "react";
 import ResetPassword from "./ResetPassword/ResetPassword";
 import UserSettings from "./UserSettings/UserSettings";
@@ -36,7 +35,6 @@ const Settings = (): React.ReactNode => {
     <Stack w="100%" maw={800} gap="1rem">
       <DarkModeToggle />
       <UserSettings />
-      <LinkSimpleFin />
       <TwoFactorAuth />
       <OidcSettings />
       {userQuery.data?.hasLocalLogin ?? true ? (

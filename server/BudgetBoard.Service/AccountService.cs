@@ -30,12 +30,6 @@ public class AccountService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (userData.Accounts.Any(a => request.SyncID != null && a.SyncID == request.SyncID))
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["DuplicateSyncIDLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["DuplicateSyncIDError"]);
-        }
-
         var institution = userData.Institutions.SingleOrDefault(i => i.ID == request.InstitutionID);
         if (institution == null)
         {
@@ -48,7 +42,6 @@ public class AccountService(
 
         var newAccount = new Account
         {
-            SyncID = request.SyncID,
             Name = request.Name,
             InstitutionID = request.InstitutionID,
             Type = request.Type,
@@ -201,6 +194,25 @@ public class AccountService(
 
             account.Index = orderedAccount.Index;
         }
+
+        await _userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task UpdateAccountSourceAsync(Guid userGuid, Guid accountGuid, string source)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
+        if (account == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["AccountSourceUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["AccountSourceUpdateNotFoundError"]
+            );
+        }
+
+        account.Source = source;
 
         await _userDataContext.SaveChangesAsync();
     }

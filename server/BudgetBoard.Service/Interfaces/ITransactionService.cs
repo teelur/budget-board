@@ -1,4 +1,6 @@
-﻿using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Helpers;
+using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Models;
 
 namespace BudgetBoard.Service.Interfaces;
 
@@ -10,9 +12,29 @@ public interface ITransactionService
     /// <summary>
     /// Creates a new transaction for the specified user.
     /// </summary>
+    /// <param name="userData">The user data.</param>
+    /// <param name="request">The transaction creation details.</param>
+    /// <param name="allCategories">List of allcategories for the user.</param>
+    /// <param name="autoCategorizer">The auto categorizer, if enabled and configured.</param>
+    Task CreateTransactionAsync(
+        ApplicationUser userData,
+        ITransactionCreateRequest request,
+        IEnumerable<ICategory>? allCategories = null,
+        AutomaticTransactionCategorizer? autoCategorizer = null);
+
+    /// <summary>
+    /// Creates a new transaction for the specified user.
+    /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The transaction creation details.</param>
-    Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request);
+    /// <param name="allCategories">List of allcategories for the user.</param>
+    /// <param name="autoCategorizer">The auto categorizer, if enabled and configured.</param>
+    Task CreateTransactionAsync(
+        Guid userGuid,
+        ITransactionCreateRequest request,
+        IEnumerable<ICategory>? allCategories = null,
+        AutomaticTransactionCategorizer? autoCategorizer = null
+    );
 
     /// <summary>
     /// Retrieves transactions for the specified user.
@@ -64,5 +86,8 @@ public interface ITransactionService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The transaction import details.</param>
-    Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request);
+    Task ImportTransactionsAsync(
+        Guid userGuid,
+        ITransactionImportRequest request
+    );
 }

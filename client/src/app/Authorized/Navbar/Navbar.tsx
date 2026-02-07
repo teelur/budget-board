@@ -2,6 +2,7 @@ import classes from "./Navbar.module.css";
 
 import { Burger, Stack } from "@mantine/core";
 import {
+  BanknoteArrowDownIcon,
   BanknoteIcon,
   CalculatorIcon,
   ChartNoAxesColumnIncreasingIcon,
@@ -115,6 +116,14 @@ const Navbar = (props: NavbarProps) => {
         {links}
       </Stack>
       <Stack justify="center" align="center" gap={5}>
+        <NavbarLink
+          icon={
+            <BanknoteArrowDownIcon color="var(--base-color-text-primary)" />
+          }
+          label={t("external_accounts")}
+          active={props.currentPage === Pages.ExternalAccounts}
+          onClick={() => props.setCurrentPage(Pages.ExternalAccounts)}
+        />
         <NavbarLink
           icon={<SettingsIcon color="var(--base-color-text-primary)" />}
           label={t("settings")}

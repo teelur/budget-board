@@ -11,9 +11,14 @@ namespace BudgetBoard.Database.Models;
 public class ApplicationUser : IdentityUser<Guid>
 {
     /// <summary>
-    /// Access token for external service integrations.
+    /// Access token for SimpleFIN service integration.
     /// </summary>
-    public string AccessToken { get; set; } = string.Empty;
+    public string SimpleFinAccessToken { get; set; } = string.Empty;
+
+    /// <summary>
+    /// API key for LunchFlow service integration.
+    /// </summary>
+    public string LunchFlowApiKey { get; set; } = string.Empty;
 
     /// <summary>
     /// The last date and time the user's data was synchronized.
@@ -64,4 +69,19 @@ public class ApplicationUser : IdentityUser<Guid>
     /// Collection of widget settings for the user's dashboard.
     /// </summary>
     public ICollection<WidgetSettings> WidgetSettings { get; set; } = [];
+
+    /// <summary>
+    /// Collection of SimpleFin organizations associated with the user.
+    /// </summary>
+    public ICollection<SimpleFinOrganization> SimpleFinOrganizations { get; set; } = [];
+
+    /// <summary>
+    /// Collection of SimpleFin accounts linked to the user.
+    /// </summary>
+    public ICollection<SimpleFinAccount> SimpleFinAccounts { get; set; } = [];
+
+    /// <summary>
+    /// Collection of LunchFlow accounts linked to the user.
+    /// </summary>
+    public ICollection<LunchFlowAccount> LunchFlowAccounts { get; set; } = [];
 }

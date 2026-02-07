@@ -1,1 +1,27 @@
-{}
+{
+    "account": "账户",
+    "account_column_is_required_message": "账户列是必填项。",
+    "accounts": "账户",
+    "accounts_settings": "账户设置",
+    "add_balance": "添加余额",
+    "add_category": "添加分类",
+    "add_goal": "添加目标",
+    "add_rule": "添加规则",
+    "add_value": "添加数值",
+    "advanced_settings": "高级设置",
+    "after": "之后",
+    "all": "全部",
+    "all_children_will_also_be_deleted": "所有子项也将被删除。",
+    "amount_format": "金额格式",
+    "appearance_mode": "显示模式",
+    "apply_existing_account_amount_to_goal": "将现有账户余额计入目标金额？",
+    "asset": "资产",
+    "asset_deleted_successfully_message": "资产删除成功。",
+    "asset_details": "资产详情",
+    "asset_name": "资产名称",
+    "asset_restored_successfully_message": "资产恢复成功。",
+    "assets": "资产",
+    "assets_settings": "资产设置",
+    "authorization_code_missing_message": "授权码缺失，请检查回调 URL 是否正确。",
+    "auto": "自动"
+}

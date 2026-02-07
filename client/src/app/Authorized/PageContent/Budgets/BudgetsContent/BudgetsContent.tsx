@@ -140,7 +140,6 @@ const BudgetsContent = (props: BudgetsContentProps) => {
           incomeCategories={incomeCategoryTree}
           expenseCategories={expenseCategoryTree}
           budgets={props.budgets}
-          transactions={props.transactions}
           categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
           unbudgetedCategoryTree={unbudgetedCategoryTree}
           isPending={props.isPending ?? false}

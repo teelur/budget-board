@@ -134,7 +134,7 @@
     <value>Rule matched {0} transactions.</value>
   </data>
   <data name="ErrorApplyingActionLog" xml:space="preserve">
-    <value>Error applying action: {ErrorMessage}</value>
+    <value>Error applying action: {0}</value>
   </data>
   <data name="RuleAppliedActionsLog" xml:space="preserve">
     <value>Rule applied changes to {0} transactions.</value>
@@ -158,7 +158,7 @@
     <value>Attempted to create a budget with an empty category.</value>
   </data>
   <data name="BudgetCreateDuplicateLog" xml:space="preserve">
-    <value>Attempted to create a duplicate budget for {Category} in {Month}.</value>
+    <value>Attempted to create a duplicate budget for {0} in {1}.</value>
   </data>
   <data name="BudgetCreateCompletedLog" xml:space="preserve">
     <value>Successfully created {0} budgets.</value>
@@ -367,14 +367,29 @@
   <data name="SimpleFinTokenNotConfiguredLog" xml:space="preserve">
     <value>SimpleFIN token is not configured. Skipping bank sync.</value>
   </data>
+  <data name="LunchFlowApiKeyNotConfiguredLog" xml:space="preserve">
+    <value>LunchFlow API key is not configured. Skipping LunchFlow sync.</value>
+  </data>
   <data name="SimpleFinDecodeTokenErrorLog" xml:space="preserve">
     <value>Attempt to decode setup token was unsuccessful.</value>
+  </data>
+  <data name="SimpleFinMissingAccessTokenLog" xml:space="preserve">
+    <value>SimpleFIN access token is missing or empty.</value>
   </data>
   <data name="SimpleFinInvalidAccessTokenLog" xml:space="preserve">
     <value>Attempt to update user with invalid access token.</value>
   </data>
   <data name="SimpleFinDeserializationErrorLog" xml:space="preserve">
     <value>Error deserializing SimpleFin data: {0}</value>
+  </data>
+  <data name="SimpleFinDecodeTokenInvalidLog" xml:space="preserve">
+    <value>There was an error decoding the setup token.</value>
+  </data>
+  <data name="SimpleFinDecodeTokenRequestErrorLog" xml:space="preserve">
+    <value>Error sending request to decoded setup token URL: {0}</value>
+  </data>
+  <data name="SimpleFinDataRequestErrorLog" xml:space="preserve">
+    <value>Error requesting SimpleFIN account data: {0}</value>
   </data>
   <data name="GoalNoBalanceFoundLog" xml:space="preserve">
     <value>No balance found for goal {0}</value>
@@ -402,5 +417,68 @@
   </data>
   <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineLog" xml:space="preserve">
     <value>Attempted to create a circular dependency between net worth widget lines.</value>
+  </data>
+  <data name="InvalidOrganizationIDLog" xml:space="preserve">
+    <value>Attempted to create an account with an invalid organization ID.</value>
+  </data>
+  <data name="SimpleFinAccountIDUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a SimpleFIN account that does not exist.</value>
+  </data>
+  <data name="DuplicateOrganizationCreateLog" xml:space="preserve">
+    <value>Attempted to create a duplicate organization for {0}.</value>
+  </data>
+  <data name="SimpleFinOrganizationUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a SimpleFIN organization that does not exist.</value>
+  </data>
+  <data name="SimpleFinOrganizationDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete a SimpleFIN organization that does not exist.</value>
+  </data>
+  <data name="SyncSimpleFinOrganizationCreationErrorLog" xml:space="preserve">
+    <value>Failed to create SimpleFIN organization during sync for account {0}.</value>
+  </data>
+  <data name="InvalidSimpleFinLinkedAccountIDLog" xml:space="preserve">
+    <value>Attempted to link a SimpleFIN account to an account that does not exist.</value>
+  </data>
+  <data name="SimpleFinAccountNotFoundForSyncLog" xml:space="preserve">
+    <value>SimpleFIN account with SyncID {0} not found in cache. Skipping account sync.</value>
+  </data>
+  <data name="SimpleFinAccountNotLinkedLog" xml:space="preserve">
+    <value>SimpleFIN account {0} is not linked to any account. Skipping transaction sync.</value>
+  </data>
+  <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
+    <value>SimpleFIN account {0} is deleted. Skipping.</value>
+  </data>
+    <data name="AutoCategorizerNotTrainedLog" xml:space="preserve">
+    <value>Attempted to enable Auto-Categorizer without training the model.</value>
+  </data>
+  <data name="LunchFlowApiKeyConfigurationErrorLog" xml:space="preserve">
+    <value>Failed to configure LunchFlow API key. Status code: {0}</value>
+  </data>
+  <data name="LunchFlowApiKeyMissingErrorLog" xml:space="preserve">
+    <value>LunchFlow API key is not configured for user.</value>
+  </data>
+  <data name="LunchFlowAccountDataRetrievalErrorLog" xml:space="preserve">
+    <value>Failed to retrieve LunchFlow account data from API.</value>
+  </data>
+  <data name="LunchFlowDeserializationErrorLog" xml:space="preserve">
+    <value>Failed to deserialize LunchFlow account data. Error: {0}</value>
+  </data>
+  <data name="DuplicateLunchFlowAccountLog" xml:space="preserve">
+    <value>Attempted to create a LunchFlow account with a duplicate SyncID.</value>
+  </data>
+  <data name="LunchFlowAccountNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a LunchFlow account that does not exist.</value>
+  </data>
+  <data name="InvalidLunchFlowLinkedAccountIDLog" xml:space="preserve">
+    <value>Attempted to link a LunchFlow account to an account that does not exist.</value>
+  </data>
+  <data name="LunchFlowTransactionDataRetrievalErrorLog" xml:space="preserve">
+    <value>Failed to retrieve transaction data for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowLinkedAccountNotFoundForSyncErrorLog" xml:space="preserve">
+    <value>Linked account not found for LunchFlow account {0} during sync.</value>
+  </data>
+  <data name="LunchFlowBalanceDataRetrievalErrorLog" xml:space="preserve">
+    <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
   </data>
 </root>

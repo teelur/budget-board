@@ -2,10 +2,8 @@ import { Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import BudgetSummaryItem from "./BudgetSummaryItem/BudgetSummaryItem";
 import { IBudget } from "~/models/budget";
-import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
 import { areStringsEqual } from "~/helpers/utils";
-import { sumTransactionAmounts } from "~/helpers/transactions";
 import { StatusColorType } from "~/helpers/budgets";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -15,7 +13,6 @@ interface BudgetSummaryCardProps {
   incomeCategories: ICategory[];
   expenseCategories: ICategory[];
   budgets: IBudget[];
-  transactions: ITransaction[];
   categoryToTransactionsTotalMap: Map<string, number>;
   unbudgetedCategoryTree: ICategory[];
   isPending: boolean;
@@ -63,8 +60,6 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
       .reduce((acc, total) => acc + total, 0) +
     (props.categoryToTransactionsTotalMap.get("") ?? 0);
 
-  const totalTransactionsTotal = sumTransactionAmounts(props.transactions);
-
   return (
     <Stack gap="0.5rem">
       <PrimaryText size="md" px="0.5rem">
@@ -73,21 +68,23 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
       <Card elevation={1}>
         <Stack gap="0.5rem">
           {props.isPending ? (
-            <Skeleton h={105} radius="md" />
+            <Skeleton h={100} radius="md" />
           ) : (
-            <Card elevation={2}>
+            <Card p="0.25rem" elevation={2}>
               <Stack gap="0.25rem">
                 <BudgetSummaryItem
                   label={t("income")}
                   amount={incomeTransactionsTotal}
                   total={incomeBudgetsTotal}
                   budgetValueType={StatusColorType.Income}
+                  showDivider={incomeBudgetsTotal <= 0}
                 />
                 <BudgetSummaryItem
                   label={t("expenses")}
                   amount={expenseTransactionsTotal}
                   total={expenseBudgetsTotal}
                   budgetValueType={StatusColorType.Expense}
+                  showDivider={expenseBudgetsTotal <= 0}
                 />
                 <BudgetSummaryItem
                   label={t("net_expenses")}
@@ -100,9 +97,9 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
             </Card>
           )}
           {props.isPending ? (
-            <Skeleton h={56} radius="md" />
+            <Skeleton h={43} radius="md" />
           ) : (
-            <Card elevation={2}>
+            <Card p="0.25rem" elevation={2}>
               <Stack gap="0.25rem">
                 <BudgetSummaryItem
                   label={t("unbudgeted")}
@@ -111,9 +108,21 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
                   hideProgress
                   showDivider
                 />
+              </Stack>
+            </Card>
+          )}
+          {props.isPending ? (
+            <Skeleton h={43} radius="md" />
+          ) : (
+            <Card p="0.25rem" elevation={2}>
+              <Stack gap="0.25rem">
                 <BudgetSummaryItem
                   label={t("net_cash_flow")}
-                  amount={totalTransactionsTotal}
+                  amount={
+                    incomeTransactionsTotal +
+                    expenseTransactionsTotal +
+                    unbudgetedTransactionsTotal
+                  }
                   budgetValueType={StatusColorType.Total}
                   hideProgress
                   showDivider
