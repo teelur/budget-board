@@ -9,6 +9,7 @@ export interface IUserSettings {
   autoCategorizerLastTrained?: Date;
   autoCategorizerModelStartDate?: Date;
   autoCategorizerModelEndDate?: Date;
+  autoCategorizerMinimumProbabilityPercentage: number;
 }
 
 export interface IUserSettingsUpdateRequest {
@@ -22,6 +23,7 @@ export interface IUserSettingsUpdateRequest {
   autoCategorizerLastTrained?: Date;
   autoCategorizerModelStartDate?: Date;
   autoCategorizerModelEndDate?: Date;
+  autoCategorizerMinimumProbabilityPercentage?: number;
 }
 
 export class LanguageItem {

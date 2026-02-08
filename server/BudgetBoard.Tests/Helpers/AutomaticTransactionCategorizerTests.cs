@@ -9,14 +9,14 @@ namespace BudgetBoard.IntegrationTests.Helpers;
 public class AutomaticTransactionCategorizerTests
 {
     private readonly Account account;
-    
+
     public AutomaticTransactionCategorizerTests()
     {
         account = new Account
         {
             Name = "account name",
             UserID = new Guid("dddddddddddddddddddddddddddddddd"),
-            ID = new Guid("dddddddddddddddddddddddddddddddd")
+            ID = new Guid("dddddddddddddddddddddddddddddddd"),
         };
 
         // Create transactions to be used to train the model.
@@ -29,7 +29,7 @@ public class AutomaticTransactionCategorizerTests
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "abc def ghi",
-                Category = "Category1"
+                Category = "Category1",
             }
         );
         account.Transactions.Add(
@@ -41,7 +41,7 @@ public class AutomaticTransactionCategorizerTests
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "jkl mno pqr",
-                Category = "Category2"
+                Category = "Category2",
             }
         );
         account.Transactions.Add(
@@ -53,7 +53,7 @@ public class AutomaticTransactionCategorizerTests
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "stu wv xyz",
-                Category = "Category3"
+                Category = "Category3",
             }
         );
         account.Transactions.Add(
@@ -65,7 +65,7 @@ public class AutomaticTransactionCategorizerTests
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "xyz a bc",
-                Category = "Category4"
+                Category = "Category4",
             }
         );
         account.Transactions.Add(
@@ -77,7 +77,7 @@ public class AutomaticTransactionCategorizerTests
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "abc x a g",
-                Category = "Category1"
+                Category = "Category1",
             }
         );
         account.Transactions.Add(
@@ -89,7 +89,7 @@ public class AutomaticTransactionCategorizerTests
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "bg xyz a bc",
-                Category = "Category4"
+                Category = "Category4",
             }
         );
         account.Transactions.Add(
@@ -101,7 +101,7 @@ public class AutomaticTransactionCategorizerTests
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "jkl mno pqr",
-                Category = "Category5"
+                Category = "Category5",
             }
         );
     }
@@ -110,8 +110,8 @@ public class AutomaticTransactionCategorizerTests
     public void AutomaticTransactionCategorizer_WhenTwoMatches_ShouldReturnClosestAmount()
     {
         // Arrange
-        var mlModel = AutomaticTransactionCategorizer.Train(account.Transactions);
-        AutomaticTransactionCategorizer autoCategorizer = new AutomaticTransactionCategorizer(mlModel);
+        var mlModel = AutomaticTransactionCategorizerHelper.Train(account.Transactions);
+        AutomaticTransactionCategorizerHelper autoCategorizer = new(mlModel);
 
         var newTransaction1 = new Transaction
         {
@@ -121,7 +121,7 @@ public class AutomaticTransactionCategorizerTests
             AccountID = account.ID,
             MerchantName = "jkl mno pqr",
             Source = "foo",
-            Category = ""
+            Category = "",
         };
 
         var newTransaction2 = new Transaction
@@ -132,15 +132,15 @@ public class AutomaticTransactionCategorizerTests
             AccountID = account.ID,
             MerchantName = "jkl mno pqr",
             Source = "foo",
-            Category = ""
+            Category = "",
         };
 
         // Act
-        var newCategory1 = autoCategorizer.Predict(newTransaction1);
-        var newCategory2 = autoCategorizer.Predict(newTransaction2);
+        var (category1, _) = autoCategorizer.PredictCategory(newTransaction1);
+        var (category2, _) = autoCategorizer.PredictCategory(newTransaction2);
 
         // Assert
-        newCategory1.Should().Be("Category2");
-        newCategory2.Should().Be("Category5");
+        category1.Should().Be("Category2");
+        category2.Should().Be("Category5");
     }
 }
