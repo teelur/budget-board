@@ -120,6 +120,7 @@
   "date_is_required": "Date is required.",
   "date_range": "Date Range",
   "days_since_deleted": "{{days}} days since deleted",
+  "de": "German",
   "decimal_separator": "Decimal Separator",
   "decimal_separator_required_message": "Decimal separator is required.",
   "delete": "Delete",
@@ -321,6 +322,7 @@
   "please_select_valid_csv_file_message": "Please select a valid CSV file.",
   "preferred_currency": "Preferred Currency",
   "preferred_language": "Preferred Language",
+  "preferred_language_description": "Translations may be incorrect or incomplete. If you notice any issues, please consider contributing a fix on <0>Weblate</0>.",
   "purchase_date": "Purchase Date",
   "purchase_price": "Purchase Price",
   "purchased_on_for": "Purchased on {{date}} for {{price}}.",
@@ -437,5 +439,6 @@
   "view_and_restore_deleted_assets": "View and restore deleted assets.",
   "view_and_restore_deleted_transactions": "View and restore deleted transactions.",
   "welcome_to": "Welcome to",
-  "widget_no_items_configured_message": "No items are configured for this widget."
+  "widget_no_items_configured_message": "No items are configured for this widget.",
+  "zh_hans": "Chinese (Simplified)"
 }
