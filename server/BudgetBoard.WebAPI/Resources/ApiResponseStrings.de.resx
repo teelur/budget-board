@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="UnexpectedServerError" xml:space="preserve">
+    <value>Ein unerwarteter Fehler ist aufgetreten.</value>
+  </data>
+  <data name="AuthCodeRequired" xml:space="preserve">
+    <value>Der Authorisierungsschlüssel wird benötigt.</value>
+  </data>
+  <data name="AuthFailed" xml:space="preserve">
+    <value>Authentifizierung fehlgeschlagen.</value>
+  </data>
+  <data name="LoginFailed" xml:space="preserve">
+    <value>Anmeldung konnte nicht abgeschlossen werden.</value>
+  </data>
+  <data name="UserNotAuthenticated" xml:space="preserve">
+    <value>Der Benutzer ist nicht authentifiziert.</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>Der Benutzer wurde nicht gefunden.</value>
+  </data>
+  <data name="NoOidcLoginFound" xml:space="preserve">
+    <value>Für diesen Benutzer wurde keine OIDC-Anmeldung gefunden.</value>
+  </data>
+  <data name="RemoveOidcNoPassword" xml:space="preserve">
+    <value>Die OIDC-Anmeldung kann nicht entfernt werden. Der Benutzer muss zunächst ein lokales Passwort festlegen, um den Zugriff auf das Konto aufrechtzuerhalten.</value>
+  </data>
+  <data name="RemoveOidcFailed" xml:space="preserve">
+    <value>Konnte die OIDC-Anmeldung nicht entfernen.</value>
+  </data>
+  <data name="RemoveOidcSuccess" xml:space="preserve">
+    <value>OIDC-Anmeldung erfolgreich getrennt.</value>
+  </data>
+  <data name="UserIdNotFound" xml:space="preserve">
+    <value>Die Benutzer-ID wurde nicht gefunden.</value>
+  </data>
+  <data name="InvalidJsonType" xml:space="preserve">
+    <value>Der angegebene JSON-Token-Typ ist ungültig.</value>
+  </data>
+  <data name="LocalAccountProviderName" xml:space="preserve">
+    <value>Lokales Konto</value>
+  </data>
+  <data name="RegistrationDisabledError" xml:space="preserve">
+    <value>Registrierung ist deaktiviert.</value>
+  </data>
+  <data name="NoEmailConfirmationEndpointError" xml:space="preserve">
+    <value>Es wurde kein E-Mail-Bestätigungsendpunkt registriert!</value>
+  </data>
+  <data name="UserEmailRequiredError" xml:space="preserve">
+    <value>Der Benutzer muss über eine E-Mail-Adresse verfügen.</value>
+  </data>
+  <data name="EndpointNotFoundError" xml:space="preserve">
+    <value>Der Endpunkt mit dem Namen '{0}' wurde nicht gefunden.</value>
+  </data>
+  <data name="InvalidLanguageError" xml:space="preserve">
+    <value>Die angegebene Sprache '{0}' wird nicht unterstützt.</value>
+  </data>
+</root>

@@ -59,342 +59,411 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DuplicateSyncIDError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InvalidInstitutionIDError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AccountNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AccountEditNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AccountEditEmptyNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AccountDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AccountRestoreNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AccountOrderNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InvalidUserError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AssetNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AssetEditNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="DuplicateAssetNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AssetDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AssetRestoreNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AssetOrderNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="NoConditionsError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="NoActionsError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InvalidConditionError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="RuleRunSummary" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleInvalidRegexError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForMerchantError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleCategoryDoesNotExistError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForCategoryError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForAmountError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForDateError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BalanceAccountUpdateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BalanceAccountDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BalanceAccountRestoreNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BudgetCreateParentInvalidError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalCreateNoAccountsError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalCreateInvalidAccountError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalUpdateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalUpdatePastDateError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalCompleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InstitutionCreateDuplicateNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InstitutionNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InstitutionUpdateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InstitutionUpdateEmptyNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InstitutionUpdateDuplicateNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InstitutionDeleteHasAccountsError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InstitutionOrderNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryDeleteInUseByTransactionsError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryDeleteInUseByBudgetsError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryDeleteHasChildrenError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionUpdateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionRestoreNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionSplitNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionSplitNoAccountError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="UserSettingsNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InvalidCurrencyCodeError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InvalidLanguageCodeError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="ValueCreateAssetNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="ValueAssetNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="ValueUpdateAssetNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="ValueDeleteNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="ValueRestoreNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="SimpleFinDataNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="SimpleFinDataRetrievalError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="SimpleFinOrganizationMissingIdError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="SyncInstitutionCreationError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="SimpleFinAccountNotFoundForBalanceError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="SimpleFinDecodeTokenError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="WidgetSettingsNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="WidgetConfigurationNullError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
-    <value></value>
+    <value />
+  </data>
+  <data name="SimpleFinDecodeTokenInvalidError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="InvalidOrganizationIDError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DuplicateOrganizationCreateError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="InvalidLinkedAccountIDError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
+    <value>SimpleFIN access token is missing or empty.</value>
+  </data>
+  <data name="SimpleFinDataRequestError" xml:space="preserve">
+    <value>An error occurred while requesting SimpleFIN data.</value>
+  </data>
+  <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
+    <value>No transactions in the range selected to train the Auto-Categorizer.</value>
+  </data>
+  <data name="AutoCategorizerNotTrained" xml:space="preserve">
+    <value>Auto-Categorizer cannot be enabled before training.</value>
+  </data>
+  <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
+    <value>Failed to configure LunchFlow API key. Status code: {0}</value>
+  </data>
+  <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
+    <value>LunchFlow API key is not configured.</value>
+  </data>
+  <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve LunchFlow account data.</value>
+  </data>
+  <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
+    <value>A LunchFlow account with this SyncID already exists.</value>
+  </data>
+  <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
+    <value>The LunchFlow account you are trying to access does not exist.</value>
+  </data>
+  <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve transaction data for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
+    <value>Linked account not found for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
+    <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
+  </data>
+  <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
+    <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
   </data>
 </root>

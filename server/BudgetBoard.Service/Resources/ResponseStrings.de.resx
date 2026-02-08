@@ -59,349 +59,349 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DuplicateSyncIDError" xml:space="preserve">
-    <value>具有此同步 ID 的账户已存在。</value>
+    <value>Ein Account mit dieser SyncID existiert bereits.</value>
   </data>
   <data name="InvalidInstitutionIDError" xml:space="preserve">
-    <value>提供的机构 ID 无效。</value>
+    <value>Die angegebene Institutions-ID ist ungültig.</value>
   </data>
   <data name="AccountNotFoundError" xml:space="preserve">
-    <value>您尝试访问的账户不存在。</value>
+    <value>Das Konto, auf das Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="AccountEditNotFoundError" xml:space="preserve">
-    <value>您尝试编辑的账户不存在。</value>
+    <value>Das Konto, das Sie bearbeiten möchten, existiert nicht.</value>
   </data>
   <data name="AccountEditEmptyNameError" xml:space="preserve">
-    <value>账户名称不能为空。</value>
+    <value>Der Kontoname darf nicht leer sein.</value>
   </data>
   <data name="AccountDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的账户不存在。</value>
+    <value>Das Konto, das Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="AccountRestoreNotFoundError" xml:space="preserve">
-    <value>您尝试恢复的账户不存在。</value>
+    <value>Das Konto, das Sie wiederherstellen möchten, existiert nicht.</value>
   </data>
   <data name="AccountOrderNotFoundError" xml:space="preserve">
-    <value>您尝试排序的账户不存在。</value>
+    <value>Das Konto, das Sie bestellen möchten, existiert nicht.</value>
   </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
-    <value>检索用户数据时发生错误。</value>
+    <value>Beim Abrufen der Benutzerdaten ist ein Fehler aufgetreten.</value>
   </data>
   <data name="InvalidUserError" xml:space="preserve">
-    <value>提供的用户无效。</value>
+    <value>Der angegebene Benutzer ist ungültig.</value>
   </data>
   <data name="AssetNotFoundError" xml:space="preserve">
-    <value>您尝试访问的资产不存在。</value>
+    <value>The asset you are trying to access does not exist.</value>
   </data>
   <data name="AssetEditNotFoundError" xml:space="preserve">
-    <value>您尝试编辑的资产不存在。</value>
+    <value>The asset you are trying to edit does not exist.</value>
   </data>
   <data name="DuplicateAssetNameError" xml:space="preserve">
-    <value>具有此名称的资产已存在。</value>
+    <value>An asset with this name already exists.</value>
   </data>
   <data name="AssetDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的资产不存在。</value>
+    <value>The asset you are trying to delete does not exist.</value>
   </data>
   <data name="AssetRestoreNotFoundError" xml:space="preserve">
-    <value>您尝试恢复的资产不存在。</value>
+    <value>The asset you are trying to restore does not exist.</value>
   </data>
   <data name="AssetOrderNotFoundError" xml:space="preserve">
-    <value>您尝试排序的资产不存在。</value>
+    <value>The asset you are trying to order does not exist.</value>
   </data>
   <data name="NoConditionsError" xml:space="preserve">
-    <value>规则必须至少提供一个条件。</value>
+    <value>At least one condition must be provided for the rule.</value>
   </data>
   <data name="NoActionsError" xml:space="preserve">
-    <value>规则必须至少提供一个操作。</value>
+    <value>At least one action must be provided for the rule.</value>
   </data>
   <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的自动规则不存在。</value>
+    <value>The automatic rule you are trying to update does not exist.</value>
   </data>
   <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的自动规则不存在。</value>
+    <value>The automatic rule you are trying to delete does not exist.</value>
   </data>
   <data name="InvalidConditionError" xml:space="preserve">
-    <value>自动规则中的一个或多个条件无效。</value>
+    <value>One or more conditions in the automatic rule are invalid.</value>
   </data>
   <data name="RuleRunSummary" xml:space="preserve">
-    <value>规则已应用 {0} 项更新。</value>
+    <value>Rule applied {0} updates.</value>
   </data>
   <data name="AutomaticRuleInvalidRegexError" xml:space="preserve">
-    <value>正则表达式模式 '{0}' 无效。</value>
+    <value>The regex pattern '{0}' is invalid.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForMerchantError" xml:space="preserve">
-    <value>商户字段不支持运算符 '{0}'。</value>
+    <value>Unsupported operator '{0}' for Merchant field.</value>
   </data>
   <data name="AutomaticRuleCategoryDoesNotExistError" xml:space="preserve">
-    <value>类别 '{0}' 不存在。</value>
+    <value>The category '{0}' does not exist.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForCategoryError" xml:space="preserve">
-    <value>类别字段不支持运算符 '{0}'。</value>
+    <value>Unsupported operator '{0}' for Category field.</value>
   </data>
   <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
-    <value>金额 '{0}' 不是有效的小数。</value>
+    <value>The amount '{0}' is not a valid decimal number.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForAmountError" xml:space="preserve">
-    <value>金额字段不支持运算符 '{0}'。</value>
+    <value>Unsupported operator '{0}' for Amount field.</value>
   </data>
   <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
-    <value>日期 '{0}' 不是有效的日期。</value>
+    <value>The date '{0}' is not a valid date.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForDateError" xml:space="preserve">
-    <value>日期字段不支持运算符 '{0}'。</value>
+    <value>Unsupported operator '{0}' for Date field.</value>
   </data>
   <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
-    <value>您尝试为其添加余额的账户不存在。</value>
+    <value>The account you are trying to add a balance to does not exist.</value>
   </data>
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
-    <value>您尝试访问的账户不存在。</value>
+    <value>The account you are trying to access does not exist.</value>
   </data>
   <data name="BalanceAccountUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的账户不存在。</value>
+    <value>The account you are trying to update does not exist.</value>
   </data>
   <data name="BalanceAccountDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的账户不存在。</value>
+    <value>The account you are trying to delete does not exist.</value>
   </data>
   <data name="BalanceAccountRestoreNotFoundError" xml:space="preserve">
-    <value>您尝试恢复的账户不存在。</value>
+    <value>The account you are trying to restore does not exist.</value>
   </data>
   <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>您尝试创建的预算没有类别。</value>
+    <value>A budget you are trying to create has no category.</value>
   </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
-    <value>类别为 '{0}'、日期为 '{1}' 的预算已存在。</value>
+    <value>A budget with the category '{0}' and date '{1}' already exists.</value>
   </data>
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
-    <value>预算创建完成，但有错误：{0}</value>
+    <value>Budget creation completed with errors: {0}</value>
   </data>
   <data name="BudgetCreateParentInvalidError" xml:space="preserve">
-    <value>您尝试创建的预算具有无效的父类别：{0}</value>
+    <value>The budget you are trying to create has an invalid parent category: {0}</value>
   </data>
   <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的预算不存在。</value>
+    <value>The budget you are trying to update does not exist.</value>
   </data>
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
-    <value>父预算不能小于其子预算的总和。</value>
+    <value>The parent budget cannot be less than the sum of its children.</value>
   </data>
   <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的预算不存在。</value>
+    <value>The budget you are trying to delete does not exist.</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
-    <value>目标必须设置每月存入金额或目标日期。</value>
+    <value>A goal must have a monthly contribution or target date.</value>
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">
-    <value>目标的目标日期不能是过去的日期。</value>
+    <value>A goal cannot have a target date in the past.</value>
   </data>
   <data name="GoalCreateNoAccountsError" xml:space="preserve">
-    <value>目标必须关联至少一个账户。</value>
+    <value>A goal must be associated with at least one account.</value>
   </data>
   <data name="GoalCreateInvalidAccountError" xml:space="preserve">
-    <value>您尝试使用的账户不存在。</value>
+    <value>The account you are trying to use does not exist.</value>
   </data>
   <data name="GoalUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的目标不存在。</value>
+    <value>The goal you are trying to update does not exist.</value>
   </data>
   <data name="GoalUpdatePastDateError" xml:space="preserve">
-    <value>目标的目标日期不能是过去的日期。</value>
+    <value>The target date for the goal cannot be in the past.</value>
   </data>
   <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
-    <value>目标的每月存入金额必须大于 0。</value>
+    <value>A goal must have a monthly contribution greater than 0.</value>
   </data>
   <data name="GoalDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的目标不存在。</value>
+    <value>The goal you are trying to delete does not exist.</value>
   </data>
   <data name="GoalCompleteNotFoundError" xml:space="preserve">
-    <value>您尝试完成的目标不存在。</value>
+    <value>The goal you are trying to complete does not exist.</value>
   </data>
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
-    <value>您尝试完成的目标已经完成。</value>
+    <value>The goal you are trying to complete has already been completed.</value>
   </data>
   <data name="InstitutionCreateDuplicateNameError" xml:space="preserve">
-    <value>具有此名称的机构已存在。</value>
+    <value>An institution with this name already exists.</value>
   </data>
   <data name="InstitutionNotFoundError" xml:space="preserve">
-    <value>您尝试访问的机构不存在。</value>
+    <value>The institution you are trying to access does not exist.</value>
   </data>
   <data name="InstitutionUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的机构不存在。</value>
+    <value>The institution you are trying to update does not exist.</value>
   </data>
   <data name="InstitutionUpdateEmptyNameError" xml:space="preserve">
-    <value>机构名称不能为空。</value>
+    <value>The institution name cannot be empty.</value>
   </data>
   <data name="InstitutionUpdateDuplicateNameError" xml:space="preserve">
-    <value>具有此名称的机构已存在。</value>
+    <value>An institution with this name already exists.</value>
   </data>
   <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的机构不存在。</value>
+    <value>The institution you are trying to delete does not exist.</value>
   </data>
   <data name="InstitutionDeleteHasAccountsError" xml:space="preserve">
-    <value>无法删除机构，因为它有关联的账户。请先删除或重新分配这些账户。</value>
+    <value>Cannot delete institution because it has associated accounts. Please delete or reassign these accounts first.</value>
   </data>
   <data name="InstitutionOrderNotFoundError" xml:space="preserve">
-    <value>您尝试排序的机构不存在。</value>
+    <value>The institution you are trying to order does not exist.</value>
   </data>
   <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
-    <value>具有此名称的交易类别已存在。</value>
+    <value>A transaction category with this name already exists.</value>
   </data>
   <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
-    <value>交易类别名称不能为空。</value>
+    <value>The transaction category name cannot be empty.</value>
   </data>
   <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
-    <value>交易类别不能与其父类别同名。</value>
+    <value>Transaction category cannot have the same name as its parent category.</value>
   </data>
   <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
-    <value>您尝试使用的父交易类别不存在。</value>
+    <value>The parent transaction category you are trying to use does not exist.</value>
   </data>
   <data name="TransactionCategoryNotFoundError" xml:space="preserve">
-    <value>您尝试访问的交易类别不存在。</value>
+    <value>The transaction category you are trying to access does not exist.</value>
   </data>
   <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的交易类别不存在。</value>
+    <value>The transaction category you are trying to update does not exist.</value>
   </data>
   <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
-    <value>交易类别名称不能为空。</value>
+    <value>The transaction category name cannot be empty.</value>
   </data>
   <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
-    <value>具有此名称的交易类别已存在。</value>
+    <value>A transaction category with this name already exists.</value>
   </data>
   <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
-    <value>交易类别不能与其父类别同名。</value>
+    <value>Transaction category cannot have the same name as its parent category.</value>
   </data>
   <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
-    <value>您尝试使用的父交易类别不存在。</value>
+    <value>The parent transaction category you are trying to use does not exist.</value>
   </data>
   <data name="TransactionCategoryDeleteInUseByTransactionsError" xml:space="preserve">
-    <value>您尝试删除的交易类别当前已分配给一个或多个交易。请先重新分配或删除这些交易。</value>
+    <value>The transaction category you are trying to delete is currently assigned to one or more transactions. Please reassign or remove these transactions first.</value>
   </data>
   <data name="TransactionCategoryDeleteInUseByBudgetsError" xml:space="preserve">
-    <value>您尝试删除的交易类别当前已分配给一个或多个预算。请先重新分配或删除这些预算。</value>
+    <value>The transaction category you are trying to delete is currently assigned to one or more budgets. Please reassign or remove these budgets first.</value>
   </data>
   <data name="TransactionCategoryDeleteHasChildrenError" xml:space="preserve">
-    <value>您尝试删除的交易类别包含子类别。请先重新分配或删除子类别。</value>
+    <value>The transaction category you are trying to delete has child categories. Please reassign or delete the child categories first.</value>
   </data>
   <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的交易类别不存在。</value>
+    <value>The transaction category you are trying to delete does not exist.</value>
   </data>
   <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
-    <value>您尝试向其添加交易的账户不存在。</value>
+    <value>The account you are trying to add a transaction to does not exist.</value>
   </data>
   <data name="TransactionNotFoundError" xml:space="preserve">
-    <value>您尝试访问的交易不存在。</value>
+    <value>The transaction you are trying to access does not exist.</value>
   </data>
   <data name="TransactionUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的交易不存在。</value>
+    <value>The transaction you are trying to update does not exist.</value>
   </data>
   <data name="TransactionDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的交易不存在。</value>
+    <value>The transaction you are trying to delete does not exist.</value>
   </data>
   <data name="TransactionRestoreNotFoundError" xml:space="preserve">
-    <value>您尝试恢复的交易不存在。</value>
+    <value>The transaction you are trying to restore does not exist.</value>
   </data>
   <data name="TransactionSplitNotFoundError" xml:space="preserve">
-    <value>您尝试拆分的交易不存在。</value>
+    <value>The transaction you are trying to split does not exist.</value>
   </data>
   <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
-    <value>拆分金额必须小于交易金额。</value>
+    <value>The split amount must be less than the transaction amount.</value>
   </data>
   <data name="TransactionSplitNoAccountError" xml:space="preserve">
-    <value>您尝试拆分的交易未关联任何账户。</value>
+    <value>The transaction you are trying to split is not associated with any account.</value>
   </data>
   <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
-    <value>您尝试向其添加交易的账户不存在。</value>
+    <value>The account you are trying to add a transaction to does not exist.</value>
   </data>
   <data name="UserSettingsNotFoundError" xml:space="preserve">
-    <value>您尝试访问的用户设置不存在。</value>
+    <value>The user settings you are trying to access do not exist.</value>
   </data>
   <data name="InvalidCurrencyCodeError" xml:space="preserve">
-    <value>提供的货币代码无效。</value>
+    <value>The provided currency code is invalid.</value>
   </data>
   <data name="InvalidLanguageCodeError" xml:space="preserve">
-    <value>提供的语言代码无效。</value>
+    <value>The provided language code is invalid.</value>
   </data>
   <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
-    <value>预算警告阈值必须在 0% 到 100% 之间。</value>
+    <value>The budget warning threshold must be between 0% and 100%.</value>
   </data>
   <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
-    <value>强制同步回溯期必须在 0 到 12 个月之间。</value>
+    <value>The force sync lookback period must be between 0 and 12 months.</value>
   </data>
   <data name="ValueCreateAssetNotFoundError" xml:space="preserve">
-    <value>您尝试为其添加数值的资产不存在。</value>
+    <value>The asset you are trying to add a value to does not exist.</value>
   </data>
   <data name="ValueAssetNotFoundError" xml:space="preserve">
-    <value>您尝试获取其数值的资产不存在。</value>
+    <value>The asset you are trying to access values for does not exist.</value>
   </data>
   <data name="ValueUpdateAssetNotFoundError" xml:space="preserve">
-    <value>您尝试更新的资产不存在。</value>
+    <value>The asset you are trying to update does not exist.</value>
   </data>
   <data name="ValueDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的值不存在。</value>
+    <value>The value you are trying to delete does not exist.</value>
   </data>
   <data name="ValueRestoreNotFoundError" xml:space="preserve">
-    <value>您尝试恢复的值不存在。</value>
+    <value>The value you are trying to restore does not exist.</value>
   </data>
   <data name="SimpleFinDataNotFoundError" xml:space="preserve">
-    <value>未找到 SimpleFIN 数据。</value>
+    <value>SimpleFIN data not found.</value>
   </data>
   <data name="SimpleFinDataRetrievalError" xml:space="preserve">
-    <value>检索 SimpleFIN 数据时发生错误。</value>
+    <value>An error occurred while retrieving SimpleFIN data.</value>
   </data>
   <data name="SimpleFinOrganizationMissingIdError" xml:space="preserve">
-    <value>账户 '{0}' 的机构缺少 ID。跳过账户同步。</value>
+    <value>Institution for account '{0}' is missing an ID. Skipping account sync.</value>
   </data>
   <data name="SyncInstitutionCreationError" xml:space="preserve">
-    <value>为账户 '{0}' 创建机构时出错。跳过账户同步。</value>
+    <value>There was an error creating institution for account '{0}'. Skipping account sync.</value>
   </data>
   <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
-    <value>未找到与同步 ID '{0}' 的交易匹配的账户。</value>
+    <value>No matching account found for transaction with SyncID '{0}'.</value>
   </data>
   <data name="SimpleFinAccountNotFoundForBalanceError" xml:space="preserve">
-    <value>未找到与同步 ID '{0}' 的余额匹配的账户。</value>
+    <value>No matching account found for balance with SyncID '{0}'.</value>
   </data>
   <data name="SimpleFinDecodeTokenError" xml:space="preserve">
-    <value>解码设置令牌时发生错误。</value>
+    <value>An error occurred while decoding the setup token.</value>
   </data>
   <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
-    <value>提供的访问令牌无效。</value>
-  </data>
-  <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
-    <value>规则条件中的字段 '{0}' 不受支持。</value>
-  </data>
-  <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
-    <value>规则操作中的字段 '{0}' 不受支持。</value>
-  </data>
-  <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
-    <value>类别 '{0}' 不存在。</value>
-  </data>
-  <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
-    <value>规则操作中的运算符 '{0}' 不受支持。</value>
-  </data>
-  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的小组件不存在。</value>
-  </data>
-  <data name="WidgetSettingsNotFoundError" xml:space="preserve">
-    <value>您尝试访问的小组件设置不存在。</value>
-  </data>
-  <data name="WidgetConfigurationNullError" xml:space="preserve">
-    <value>小组件配置为空或未设置。</value>
-  </data>
-  <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
-    <value>解析小组件配置失败。</value>
-  </data>
-  <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
-    <value>您尝试访问的净资产小组件行不存在。</value>
-  </data>
-  <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
-    <value>您尝试访问的净资产小组件组不存在。</value>
-  </data>
-  <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
-    <value>您尝试访问的净资产小组件类别不存在。</value>
-  </data>
-  <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
-    <value>无法创建循环依赖关系。目标行已经依赖于当前行。</value>
+    <value>The provided access token is invalid.</value>
   </data>
   <data name="SimpleFinDecodeTokenInvalidError" xml:space="preserve">
     <value>The setup token is invalid. Please check the token and try again.</value>
   </data>
   <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
     <value>An error occurred while connecting to SimpleFIN. Please try again later.</value>
+  </data>
+  <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
+    <value>Unsupported field '{0}' in rule condition.</value>
+  </data>
+  <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
+    <value>Unsupported field '{0}' in rule action.</value>
+  </data>
+  <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
+    <value>The category '{0}' does not exist.</value>
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
+    <value>Unsupported operator '{0}' in rule action.</value>
+  </data>
+  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
+    <value>The widget you are trying to update does not exist.</value>
+  </data>
+  <data name="WidgetSettingsNotFoundError" xml:space="preserve">
+    <value>The widget settings you are trying to access do not exist.</value>
+  </data>
+  <data name="WidgetConfigurationNullError" xml:space="preserve">
+    <value>The widget configuration is null or empty.</value>
+  </data>
+  <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
+    <value>Failed to deserialize the widget configuration.</value>
+  </data>
+  <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
+    <value>The net worth widget line you are trying to access does not exist.</value>
+  </data>
+  <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
+    <value>The net worth widget group you are trying to access does not exist.</value>
+  </data>
+  <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
+    <value>The net worth widget category you are trying to access does not exist.</value>
+  </data>
+  <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
+    <value>Cannot create a circular dependency. The target line already depends on this line.</value>
   </data>
   <data name="InvalidOrganizationIDError" xml:space="preserve">
     <value>The provided organization ID is invalid.</value>
