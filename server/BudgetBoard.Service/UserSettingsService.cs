@@ -96,7 +96,10 @@ public class UserSettingsService(
 
         if (request.ForceSyncLookbackMonths.HasValue)
         {
-            if (request.ForceSyncLookbackMonths < 0 || request.ForceSyncLookbackMonths > 12)
+            if (
+                request.ForceSyncLookbackMonths.Value < 0
+                || request.ForceSyncLookbackMonths.Value > 12
+            )
             {
                 logger.LogError("{LogMessage}", logLocalizer["InvalidForceSyncLookbackMonthsLog"]);
                 throw new BudgetBoardServiceException(

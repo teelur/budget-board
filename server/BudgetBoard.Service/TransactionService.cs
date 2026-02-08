@@ -73,8 +73,7 @@ public class TransactionService(
 
             if (
                 PredictionProbability
-                >= (userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70f)
-                    / 100f
+                >= (userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70) / 100f
             )
             {
                 (newTransaction.Category, newTransaction.Subcategory) =

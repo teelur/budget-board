@@ -455,7 +455,7 @@
     <value>Attempted to enable Auto-Categorizer without training the model.</value>
   </data>
   <data name="AutoCategorizerPredictionLog" xml:space="preserve">
-    <value>Auto-categorized transaction: Merchant='{2}', Account='{3}', Amount={4:C}, Predicted Category='{0}', Confidence={1:P2}</value>
+    <value>Auto-categorizer prediction: Merchant='{2}', Account='{3}', Amount={4:C}, Predicted Category='{0}', Confidence={1:P2}</value>
   </data>
   <data name="AutoCategorizerPredictionBelowThresholdLog" xml:space="preserve">
     <value>Auto-categorizer prediction below threshold: Merchant='{3}', Amount={4:C}, Predicted Category='{0}', Confidence={1:P2}, Threshold={2}%</value>

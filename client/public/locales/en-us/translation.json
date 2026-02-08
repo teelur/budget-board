@@ -47,7 +47,7 @@
   "authorization_code_missing_message": "Authorization code is missing from the callback URL.",
   "auto": "Auto",
   "auto_categorizer_minimum_probability": "Auto-Categorizer Minimum Probability",
-  "auto_categorizer_minimum_probability_description": "Set the minimum confidence threshold (0-1) required for Auto-Categorizer to automatically assign a category. Higher values mean more certainty is required.",
+  "auto_categorizer_minimum_probability_description": "Set the minimum confidence threshold (0%-100%) required for Auto-Categorizer to automatically assign a category. Higher values mean more certainty is required.",
   "automatic_rules": "Automatic Rules",
   "automatic_rules_description": "Create rules that automatically update fields during sync when the specified conditions are met.",
   "average_income": "Average Income",
