@@ -88,6 +88,8 @@ const AutoCategorizerMinimumProbability = (): React.ReactNode => {
           } as IUserSettingsUpdateRequest)
         }
         decimalScale={0}
+        min={0}
+        max={100}
         suffix="%"
         elevation={1}
       />
