@@ -299,7 +299,14 @@ app.MyMapIdentityApi<ApplicationUser>(
 // Activate the CORS policy
 app.UseCors(MyAllowSpecificOrigins);
 
-// Add localization support
+// Enable authentication and authorization after CORS Middleware
+// processing (UseCors) in case the Authorization Middleware tries
+// to initiate a challenge before the CORS Middleware has a chance
+// to set the appropriate headers.
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Add localization support after authentication so user identity is available
 var supportedCultures = SupportedLanguages.AllLanguages.ToArray();
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
@@ -307,16 +314,10 @@ var localizationOptions = new RequestLocalizationOptions()
     .AddSupportedUICultures(supportedCultures);
 
 // Insert custom user language provider at the beginning of the list
+// Falls back to browser locale if user hasn't configured a language
 localizationOptions.RequestCultureProviders.Insert(0, new UserLanguageCultureProvider());
 
 app.UseRequestLocalization(localizationOptions);
-
-// Enable authentication and authorization after CORS Middleware
-// processing (UseCors) in case the Authorization Middleware tries
-// to initiate a challenge before the CORS Middleware has a chance
-// to set the appropriate headers.
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 
