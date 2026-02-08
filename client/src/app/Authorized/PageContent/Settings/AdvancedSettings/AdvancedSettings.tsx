@@ -6,6 +6,7 @@ import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TrainAutoCategorizerModal from "./TrainAutoCategorizerModal/TrainAutoCategorizerModal";
+import AutoCategorizerMinimumProbability from "./AutoCategorizerMinimumProbability/AutoCategorizerMinimumProbability";
 
 const AdvancedSettings = () => {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ const AdvancedSettings = () => {
         <DisableBuiltInTransactionCategories />
         <ForceSyncLookbackPeriod />
         <EnableAutoCategorizer />
+        <AutoCategorizerMinimumProbability />
         <TrainAutoCategorizerModal />
       </Stack>
     </Card>

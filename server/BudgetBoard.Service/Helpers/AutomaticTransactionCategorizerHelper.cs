@@ -1,6 +1,9 @@
 // Based on output by ML.NET Model Builder.
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Resources;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms;
@@ -53,7 +56,9 @@ public class AutomaticTransactionCategorizerHelper(byte[] mlNetModel)
     /// </summary>
     /// <param name="transaction">Transaction to categorize.</param>
     /// <returns>String with the predicted category</returns>
-    public string PredictCategory(Transaction transaction)
+    public (string PredictCategory, float PredictionProbability) PredictCategory(
+        Transaction transaction
+    )
     {
         ModelInput modelInput = new()
         {
@@ -62,7 +67,20 @@ public class AutomaticTransactionCategorizerHelper(byte[] mlNetModel)
             Amount = (float)transaction.Amount,
         };
 
-        return _predictEngine.Predict(modelInput).PredictedLabel!;
+        var prediction = _predictEngine.Predict(modelInput);
+
+        // Convert raw scores to probabilities using softmax
+        float probability = 0f;
+        if (prediction.Score != null && prediction.Score.Length > 0)
+        {
+            float maxScore = prediction.Score.Max();
+            float[] expScores = prediction.Score.Select(s => MathF.Exp(s - maxScore)).ToArray();
+            float sumExp = expScores.Sum();
+            float[] probabilities = [.. expScores.Select(e => e / sumExp)];
+            probability = probabilities.Max();
+        }
+
+        return (prediction.PredictedLabel ?? string.Empty, probability);
     }
 
     internal static async Task<AutomaticTransactionCategorizerHelper?> CreateAutoCategorizerAsync(

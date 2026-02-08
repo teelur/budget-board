@@ -48,7 +48,6 @@ public class TransactionService(
             Account = account,
         };
 
-        // Auto categorize
         if (
             autoCategorizer is not null
             && allCategories is not null
@@ -56,9 +55,45 @@ public class TransactionService(
             && newTransaction.MerchantName != string.Empty
         )
         {
-            var matchedCategory = autoCategorizer.PredictCategory(newTransaction);
-            (newTransaction.Category, newTransaction.Subcategory) =
-                TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
+            var (PredictionCategory, PredictionProbability) = autoCategorizer.PredictCategory(
+                newTransaction
+            );
+
+            logger.LogInformation(
+                "{LogMessage}",
+                logLocalizer[
+                    "AutoCategorizerPredictionLog",
+                    PredictionCategory,
+                    PredictionProbability,
+                    newTransaction.MerchantName,
+                    newTransaction.Account.Name,
+                    newTransaction.Amount
+                ]
+            );
+
+            if (
+                PredictionProbability
+                >= (userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70f)
+                    / 100f
+            )
+            {
+                (newTransaction.Category, newTransaction.Subcategory) =
+                    TransactionCategoriesHelpers.GetFullCategory(PredictionCategory, allCategories);
+            }
+            else
+            {
+                logger.LogInformation(
+                    "{LogMessage}",
+                    logLocalizer[
+                        "AutoCategorizerPredictionBelowThresholdLog",
+                        PredictionCategory,
+                        PredictionProbability,
+                        userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70,
+                        newTransaction.MerchantName,
+                        newTransaction.Amount
+                    ]
+                );
+            }
         }
 
         userDataContext.Transactions.Add(newTransaction);

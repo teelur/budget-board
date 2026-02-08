@@ -322,6 +322,9 @@
   <data name="InvalidForceSyncLookbackMonthsLog" xml:space="preserve">
     <value>Attempted to update user settings with an invalid force sync lookback months value.</value>
   </data>
+  <data name="InvalidAutoCategorizerMinimumProbabilityPercentageLog" xml:space="preserve">
+    <value>Attempted to update user settings with an invalid auto-categorizer minimum probability percentage value.</value>
+  </data>
   <data name="ValueCreateAssetNotFoundLog" xml:space="preserve">
     <value>Attempted to create a value for an asset that does not exist.</value>
   </data>
@@ -450,6 +453,12 @@
   </data>
     <data name="AutoCategorizerNotTrainedLog" xml:space="preserve">
     <value>Attempted to enable Auto-Categorizer without training the model.</value>
+  </data>
+  <data name="AutoCategorizerPredictionLog" xml:space="preserve">
+    <value>Auto-categorized transaction: Merchant='{2}', Account='{3}', Amount={4:C}, Predicted Category='{0}', Confidence={1:P2}</value>
+  </data>
+  <data name="AutoCategorizerPredictionBelowThresholdLog" xml:space="preserve">
+    <value>Auto-categorizer prediction below threshold: Merchant='{3}', Amount={4:C}, Predicted Category='{0}', Confidence={1:P2}, Threshold={2}%</value>
   </data>
   <data name="LunchFlowApiKeyConfigurationErrorLog" xml:space="preserve">
     <value>Failed to configure LunchFlow API key. Status code: {0}</value>

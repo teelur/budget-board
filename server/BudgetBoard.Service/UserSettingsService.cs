@@ -17,11 +17,6 @@ public class UserSettingsService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : IUserSettingsService
 {
-    private readonly ILogger<IUserSettingsService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task<IUserSettingsResponse> ReadUserSettingsAsync(Guid userGuid)
     {
@@ -34,8 +29,8 @@ public class UserSettingsService(
 
             userData.UserSettings = userSettings;
 
-            _userDataContext.UserSettings.Add(userSettings);
-            await _userDataContext.SaveChangesAsync();
+            userDataContext.UserSettings.Add(userSettings);
+            await userDataContext.SaveChangesAsync();
         }
 
         return new UserSettingsResponse(userData.UserSettings);
@@ -49,86 +44,109 @@ public class UserSettingsService(
         var userSettings = userData.UserSettings;
         if (userSettings == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["UserSettingsNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["UserSettingsNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["UserSettingsNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["UserSettingsNotFoundError"]);
         }
 
-        if (request.Currency != null)
+        if (!string.IsNullOrEmpty(request.Currency))
         {
             var isValidCurrency = LocalizationHelpers.CurrencyCodes.Contains(request.Currency);
             if (!isValidCurrency)
             {
-                _logger.LogError("{LogMessage}", _logLocalizer["InvalidCurrencyCodeLog"]);
+                logger.LogError("{LogMessage}", logLocalizer["InvalidCurrencyCodeLog"]);
                 throw new BudgetBoardServiceException(
-                    _responseLocalizer["InvalidCurrencyCodeError"]
+                    responseLocalizer["InvalidCurrencyCodeError"]
                 );
             }
 
             userSettings.Currency = request.Currency;
         }
 
-        if (request.Language != null)
+        if (!string.IsNullOrEmpty(request.Language))
         {
             var isValidLanguage = SupportedLanguages.AllLanguages.Contains(
                 request.Language.ToLower()
             );
             if (!isValidLanguage)
             {
-                _logger.LogError("{LogMessage}", _logLocalizer["InvalidLanguageCodeLog"]);
+                logger.LogError("{LogMessage}", logLocalizer["InvalidLanguageCodeLog"]);
                 throw new BudgetBoardServiceException(
-                    _responseLocalizer["InvalidLanguageCodeError"]
+                    responseLocalizer["InvalidLanguageCodeError"]
                 );
             }
 
             userSettings.Language = request.Language.ToLower();
         }
 
-        if (request.BudgetWarningThreshold != null)
+        if (request.BudgetWarningThreshold.HasValue)
         {
-            if (request.BudgetWarningThreshold < 0 || request.BudgetWarningThreshold > 100)
+            if (
+                request.BudgetWarningThreshold.Value < 0
+                || request.BudgetWarningThreshold.Value > 100
+            )
             {
-                _logger.LogError("{LogMessage}", _logLocalizer["InvalidBudgetWarningThresholdLog"]);
+                logger.LogError("{LogMessage}", logLocalizer["InvalidBudgetWarningThresholdLog"]);
                 throw new BudgetBoardServiceException(
-                    _responseLocalizer["InvalidBudgetWarningThresholdError"]
+                    responseLocalizer["InvalidBudgetWarningThresholdError"]
                 );
             }
 
-            userSettings.BudgetWarningThreshold = (int)request.BudgetWarningThreshold;
+            userSettings.BudgetWarningThreshold = request.BudgetWarningThreshold.Value;
         }
 
-        if (request.ForceSyncLookbackMonths != null)
+        if (request.ForceSyncLookbackMonths.HasValue)
         {
             if (request.ForceSyncLookbackMonths < 0 || request.ForceSyncLookbackMonths > 12)
             {
-                _logger.LogError(
-                    "{LogMessage}",
-                    _logLocalizer["InvalidForceSyncLookbackMonthsLog"]
-                );
+                logger.LogError("{LogMessage}", logLocalizer["InvalidForceSyncLookbackMonthsLog"]);
                 throw new BudgetBoardServiceException(
-                    _responseLocalizer["InvalidForceSyncLookbackMonthsError"]
+                    responseLocalizer["InvalidForceSyncLookbackMonthsError"]
                 );
             }
-            userSettings.ForceSyncLookbackMonths = (int)request.ForceSyncLookbackMonths;
+            userSettings.ForceSyncLookbackMonths = request.ForceSyncLookbackMonths.Value;
         }
 
-        if (request.DisableBuiltInTransactionCategories != null)
+        if (request.DisableBuiltInTransactionCategories.HasValue)
         {
-            userSettings.DisableBuiltInTransactionCategories = (bool)
-                request.DisableBuiltInTransactionCategories;
+            userSettings.DisableBuiltInTransactionCategories = request
+                .DisableBuiltInTransactionCategories
+                .Value;
         }
 
-        if (request.EnableAutoCategorizer != null)
+        if (request.EnableAutoCategorizer.HasValue)
         {
             // We can only enable auto categorizer if we trained it
-            if ((bool)request.EnableAutoCategorizer && userSettings.AutoCategorizerModelOID == null)
+            if (request.EnableAutoCategorizer.Value && userSettings.AutoCategorizerModelOID == null)
             {
-                _logger.LogError("{LogMessage}", _logLocalizer["AutoCategorizerNotTrainedLog"]);
-                throw new BudgetBoardServiceException(_responseLocalizer["AutoCategorizerNotTrained"]);
+                logger.LogError("{LogMessage}", logLocalizer["AutoCategorizerNotTrainedLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AutoCategorizerNotTrained"]
+                );
             }
-            userSettings.EnableAutoCategorizer = (bool)request.EnableAutoCategorizer;
+            userSettings.EnableAutoCategorizer = request.EnableAutoCategorizer.Value;
         }
 
-        await _userDataContext.SaveChangesAsync();
+        if (request.AutoCategorizerMinimumProbabilityPercentage.HasValue)
+        {
+            if (
+                request.AutoCategorizerMinimumProbabilityPercentage.Value < 0
+                || request.AutoCategorizerMinimumProbabilityPercentage.Value > 100
+            )
+            {
+                logger.LogError(
+                    "{LogMessage}",
+                    logLocalizer["InvalidAutoCategorizerMinimumProbabilityPercentageLog"]
+                );
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidAutoCategorizerMinimumProbabilityPercentageError"]
+                );
+            }
+            userSettings.AutoCategorizerMinimumProbabilityPercentage = request
+                .AutoCategorizerMinimumProbabilityPercentage
+                .Value;
+        }
+
+        await userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
@@ -136,23 +154,20 @@ public class UserSettingsService(
         ApplicationUser? foundUser;
         try
         {
-            foundUser = await _userDataContext
+            foundUser = await userDataContext
                 .ApplicationUsers.Include(u => u.UserSettings)
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                "{LogMessage}",
-                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
-            );
-            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
+            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
+            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
+            logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;

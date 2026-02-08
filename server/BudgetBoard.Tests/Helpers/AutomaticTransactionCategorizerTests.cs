@@ -136,11 +136,11 @@ public class AutomaticTransactionCategorizerTests
         };
 
         // Act
-        var newCategory1 = autoCategorizer.PredictCategory(newTransaction1);
-        var newCategory2 = autoCategorizer.PredictCategory(newTransaction2);
+        var (category1, _) = autoCategorizer.PredictCategory(newTransaction1);
+        var (category2, _) = autoCategorizer.PredictCategory(newTransaction2);
 
         // Assert
-        newCategory1.Should().Be("Category2");
-        newCategory2.Should().Be("Category5");
+        category1.Should().Be("Category2");
+        category2.Should().Be("Category5");
     }
 }
