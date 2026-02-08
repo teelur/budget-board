@@ -89,100 +89,100 @@
     <value>Der angegebene Benutzer ist ungültig.</value>
   </data>
   <data name="AssetNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to access does not exist.</value>
+    <value>Der Vermögenswert, auf den Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="AssetEditNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to edit does not exist.</value>
+    <value>Der Vermögenswert, den Sie bearbeiten möchten, existiert nicht.</value>
   </data>
   <data name="DuplicateAssetNameError" xml:space="preserve">
-    <value>An asset with this name already exists.</value>
+    <value>Ein Vermögenswert mit diesem Namen existiert bereits.</value>
   </data>
   <data name="AssetDeleteNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to delete does not exist.</value>
+    <value>Der Vermögenswert, den Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="AssetRestoreNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to restore does not exist.</value>
+    <value>Der Vermögenswert, den Sie wiederherstellen möchten, existiert nicht.</value>
   </data>
   <data name="AssetOrderNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to order does not exist.</value>
+    <value>Der Vermögenswert, den Sie anfragen möchten, existiert nicht.</value>
   </data>
   <data name="NoConditionsError" xml:space="preserve">
-    <value>At least one condition must be provided for the rule.</value>
+    <value>Für die Regel muss mindestens eine Bedingung angegeben werden.</value>
   </data>
   <data name="NoActionsError" xml:space="preserve">
-    <value>At least one action must be provided for the rule.</value>
+    <value>Für die Regel muss mindestens eine Aktion angegeben werden.</value>
   </data>
   <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value>The automatic rule you are trying to update does not exist.</value>
+    <value>Die automatische Regel, die Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
-    <value>The automatic rule you are trying to delete does not exist.</value>
+    <value>Die automatische Regel, die Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="InvalidConditionError" xml:space="preserve">
-    <value>One or more conditions in the automatic rule are invalid.</value>
+    <value>Eine oder mehrere Bedingungen in der automatischen Regel sind ungültig.</value>
   </data>
   <data name="RuleRunSummary" xml:space="preserve">
-    <value>Rule applied {0} updates.</value>
+    <value>Die Regel hat {0} Aktualisierungen angewandt.</value>
   </data>
   <data name="AutomaticRuleInvalidRegexError" xml:space="preserve">
-    <value>The regex pattern '{0}' is invalid.</value>
+    <value>Das Regex-Muster '{0}' ist ungültig.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForMerchantError" xml:space="preserve">
-    <value>Unsupported operator '{0}' for Merchant field.</value>
+    <value>Nicht unterstützter Operator '{0}' für das Händler Feld.</value>
   </data>
   <data name="AutomaticRuleCategoryDoesNotExistError" xml:space="preserve">
-    <value>The category '{0}' does not exist.</value>
+    <value>Die Kategorie '{0}' existiert nicht.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForCategoryError" xml:space="preserve">
-    <value>Unsupported operator '{0}' for Category field.</value>
+    <value>Nicht unterstützter Operator '{0}' für das Kategoriefeld.</value>
   </data>
   <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
-    <value>The amount '{0}' is not a valid decimal number.</value>
+    <value>Der Betrag '{0}' ist keine gültige Dezimalzahl.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForAmountError" xml:space="preserve">
-    <value>Unsupported operator '{0}' for Amount field.</value>
+    <value>Nicht unterstützter Operator '{0}' für das Betragsfeld.</value>
   </data>
   <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
-    <value>The date '{0}' is not a valid date.</value>
+    <value>Das Datum '{0}' ist kein gültiges Datum.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForDateError" xml:space="preserve">
-    <value>Unsupported operator '{0}' for Date field.</value>
+    <value>Nicht unterstützter Operator '{0}' für das Datumsfeld.</value>
   </data>
   <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
-    <value>The account you are trying to add a balance to does not exist.</value>
+    <value>Das Konto, auf das Sie einen Saldo hinzufügen möchten, existiert nicht.</value>
   </data>
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
-    <value>The account you are trying to access does not exist.</value>
+    <value>Das Konto, auf das Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="BalanceAccountUpdateNotFoundError" xml:space="preserve">
-    <value>The account you are trying to update does not exist.</value>
+    <value>Das Konto, das Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="BalanceAccountDeleteNotFoundError" xml:space="preserve">
-    <value>The account you are trying to delete does not exist.</value>
+    <value>Das Konto, das Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="BalanceAccountRestoreNotFoundError" xml:space="preserve">
-    <value>The account you are trying to restore does not exist.</value>
+    <value>Das Konto, das Sie wiederherstellen möchten, existiert nicht.</value>
   </data>
   <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>A budget you are trying to create has no category.</value>
+    <value>Ein Budget, welches Sie erstellen möchten, hat keine Kategorie.</value>
   </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
-    <value>A budget with the category '{0}' and date '{1}' already exists.</value>
+    <value>Ein Budget mit der Kategorie "{0}" und dem Datum "{1}" existiert bereits.</value>
   </data>
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
-    <value>Budget creation completed with errors: {0}</value>
+    <value>Budgeterstellung mit Fehlern abgeschlossen: {0}</value>
   </data>
   <data name="BudgetCreateParentInvalidError" xml:space="preserve">
-    <value>The budget you are trying to create has an invalid parent category: {0}</value>
+    <value>Das Budget, das Sie erstellen möchten, hat eine ungültige übergeordnete Kategorie: {0}</value>
   </data>
   <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value>The budget you are trying to update does not exist.</value>
+    <value>Das Budget, das aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
-    <value>The parent budget cannot be less than the sum of its children.</value>
+    <value>Das übergeordnete Budget darf nicht kleiner sein als die Summe seiner untergeordneten Budgets.</value>
   </data>
   <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value>The budget you are trying to delete does not exist.</value>
+    <value>Das Budget, das Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
     <value>A goal must have a monthly contribution or target date.</value>
