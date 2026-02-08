@@ -300,7 +300,7 @@ app.MyMapIdentityApi<ApplicationUser>(
 app.UseCors(MyAllowSpecificOrigins);
 
 // Add localization support
-var supportedCultures = new[] { "en-US" };
+var supportedCultures = SupportedLanguages.AllLanguages.ToArray();
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
     .AddSupportedCultures(supportedCultures)
