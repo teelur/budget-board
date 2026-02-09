@@ -4,6 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
@@ -15,7 +16,7 @@ import {
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
-import { useTranslation } from "react-i18next";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 const UserSettings = (): React.ReactNode => {
   const currencyField = useField({
@@ -108,7 +109,28 @@ const UserSettings = (): React.ReactNode => {
               />
               <Select
                 label={
-                  <PrimaryText size="sm">{t("preferred_language")}</PrimaryText>
+                  <Stack gap="0">
+                    <PrimaryText size="sm">
+                      {t("preferred_language")}
+                    </PrimaryText>
+                    <DimmedText size="xs">
+                      <Trans
+                        i18nKey="preferred_language_description"
+                        components={[
+                          <a
+                            key="link"
+                            href="https://hosted.weblate.org/engage/budget-board/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              color: "inherit",
+                              textDecoration: "underline",
+                            }}
+                          />,
+                        ]}
+                      />
+                    </DimmedText>
+                  </Stack>
                 }
                 placeholder={t("select_your_preferred_language")}
                 data={Languages.map((lang: LanguageItem) => ({

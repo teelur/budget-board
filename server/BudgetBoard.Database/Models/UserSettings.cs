@@ -23,7 +23,14 @@ public static class SupportedLanguages
 {
     public const string SystemDefault = "default";
     public const string EnglishUnitedStates = "en-us";
-    public static List<string> AllLanguages { get; } = [SystemDefault, EnglishUnitedStates];
+    public const string German = "de";
+    public const string ChineseSimplified = "zh-hans";
+
+    public static List<string> SupportedCultureNames { get; } =
+    [EnglishUnitedStates, German, ChineseSimplified];
+
+    public static List<string> AllUserLanguageOptions { get; } =
+    [SystemDefault, .. SupportedCultureNames];
 }
 
 public class UserSettings
