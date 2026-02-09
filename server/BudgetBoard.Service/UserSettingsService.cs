@@ -64,7 +64,7 @@ public class UserSettingsService(
 
         if (!string.IsNullOrEmpty(request.Language))
         {
-            var isValidLanguage = SupportedLanguages.AllLanguages.Contains(
+            var isValidLanguage = SupportedLanguages.AllUserLanguageOptions.Contains(
                 request.Language.ToLower()
             );
             if (!isValidLanguage)

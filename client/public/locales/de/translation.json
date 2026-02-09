@@ -362,7 +362,7 @@
   "simplefin_key_is_required": "SimpleFIN-Schlüssel erforderlich.",
   "sold": "Verkauft",
   "sold_on_for_styled": "<0>Verkauft am</0> <1>{{date}}</1> <2>für</2> <3>{{price}}</3>",
-  "sorty_by": "Sortieren nach",
+  "sort_by": "Sortieren nach",
   "spending": "Ausgaben",
   "spending_trends": "Ausgabentrends",
   "spending_trends_less_than_last_month": "Sie haben {{amount}} weniger ausgegeben als im letzten Monat.",

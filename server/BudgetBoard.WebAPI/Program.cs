@@ -307,7 +307,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Add localization support after authentication so user identity is available
-var supportedCultures = SupportedLanguages.AllLanguages.ToArray();
+var supportedCultures = SupportedLanguages.SupportedCultureNames.ToArray();
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
     .AddSupportedCultures(supportedCultures)
