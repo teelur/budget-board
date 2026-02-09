@@ -1,13 +1,13 @@
 {
   "10_months": "10 Months",
   "11_months": "11 Months",
-  "12_months": "12 months",
+  "12_months": "12 Months",
   "1_month": "1 Month",
   "2_months": "2 Months",
-  "3_months": "3 months",
+  "3_months": "3 Months",
   "4_months": "4 Months",
   "5_months": "5 Months",
-  "6_months": "6 months",
+  "6_months": "6 Months",
   "7_months": "7 Months",
   "8_months": "8 Months",
   "9_months": "9 Months",
@@ -120,6 +120,7 @@
   "date_is_required": "Date is required.",
   "date_range": "Date Range",
   "days_since_deleted": "{{days}} days since deleted",
+  "de": "German",
   "decimal_separator": "Decimal Separator",
   "decimal_separator_required_message": "Decimal separator is required.",
   "delete": "Delete",
@@ -321,6 +322,7 @@
   "please_select_valid_csv_file_message": "Please select a valid CSV file.",
   "preferred_currency": "Preferred Currency",
   "preferred_language": "Preferred Language",
+  "preferred_language_description": "Translations may be incorrect or incomplete. If you notice any issues, please consider contributing a fix on <0>Weblate</0>.",
   "purchase_date": "Purchase Date",
   "purchase_price": "Purchase Price",
   "purchased_on_for": "Purchased on {{date}} for {{price}}.",
@@ -437,5 +439,6 @@
   "view_and_restore_deleted_assets": "View and restore deleted assets.",
   "view_and_restore_deleted_transactions": "View and restore deleted transactions.",
   "welcome_to": "Welcome to",
-  "widget_no_items_configured_message": "No items are configured for this widget."
+  "widget_no_items_configured_message": "No items are configured for this widget.",
+  "zh_hans": "Chinese (Simplified)"
 }

@@ -63,6 +63,7 @@ public class UserLanguageCultureProvider : RequestCultureProvider
             // If there's any error reading the database, fall through to the next provider
         }
 
+        // User has no language preference or set to "default", fall back to browser locale
         return null;
     }
 }
