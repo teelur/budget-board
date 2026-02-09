@@ -539,10 +539,7 @@ public static class AutomaticRuleHelpers
                 var updateRequest = new TransactionUpdateRequest(transaction);
                 (updateRequest.Category, updateRequest.Subcategory) =
                     TransactionCategoriesHelpers.GetFullCategory(newCategory, allCategories);
-                await transactionService.UpdateTransactionAsync(
-                    userGuid,
-                    updateRequest
-                );
+                await transactionService.UpdateTransactionAsync(userGuid, updateRequest);
 
                 updatedTransactions++;
             }

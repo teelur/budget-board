@@ -18,26 +18,20 @@ public class TransactionService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : ITransactionService
 {
-    private readonly ILogger<ITransactionService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly INowProvider _nowProvider = nowProvider;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task CreateTransactionAsync(
         ApplicationUser userData,
         ITransactionCreateRequest request,
         IEnumerable<ICategory>? allCategories = null,
-        AutomaticTransactionCategorizer? autoCategorizer = null
+        AutomaticTransactionCategorizerHelper? autoCategorizer = null
     )
     {
         var account = userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID);
         if (account == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["TransactionCreateAccountNotFoundLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["TransactionCreateAccountNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["TransactionCreateAccountNotFoundError"]
+                responseLocalizer["TransactionCreateAccountNotFoundError"]
             );
         }
 
@@ -54,20 +48,54 @@ public class TransactionService(
             Account = account,
         };
 
-        // Auto categorize
         if (
-            autoCategorizer is not null &&
-            allCategories is not null &&
-            newTransaction.MerchantName is not null &&
-            newTransaction.MerchantName != string.Empty
-            )
+            autoCategorizer is not null
+            && allCategories is not null
+            && newTransaction.MerchantName is not null
+            && newTransaction.MerchantName != string.Empty
+        )
         {
-            var matchedCategory = autoCategorizer.Predict(newTransaction);
-            (newTransaction.Category, newTransaction.Subcategory) =
-                TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
+            var (PredictionCategory, PredictionProbability) = autoCategorizer.PredictCategory(
+                newTransaction
+            );
+
+            logger.LogInformation(
+                "{LogMessage}",
+                logLocalizer[
+                    "AutoCategorizerPredictionLog",
+                    PredictionCategory,
+                    PredictionProbability,
+                    newTransaction.MerchantName,
+                    newTransaction.Account.Name,
+                    newTransaction.Amount
+                ]
+            );
+
+            if (
+                PredictionProbability
+                >= (userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70) / 100f
+            )
+            {
+                (newTransaction.Category, newTransaction.Subcategory) =
+                    TransactionCategoriesHelpers.GetFullCategory(PredictionCategory, allCategories);
+            }
+            else
+            {
+                logger.LogInformation(
+                    "{LogMessage}",
+                    logLocalizer[
+                        "AutoCategorizerPredictionBelowThresholdLog",
+                        PredictionCategory,
+                        PredictionProbability,
+                        userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70,
+                        newTransaction.MerchantName,
+                        newTransaction.Amount
+                    ]
+                );
+            }
         }
 
-        _userDataContext.Transactions.Add(newTransaction);
+        userDataContext.Transactions.Add(newTransaction);
 
         // Manual accounts need to manually update the balance
         if (account.Source == AccountSource.Manual)
@@ -75,14 +103,14 @@ public class TransactionService(
             UpdateBalancesForNewTransaction(account, request);
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     public async Task CreateTransactionAsync(
         Guid userGuid,
         ITransactionCreateRequest request,
         IEnumerable<ICategory>? allCategories = null,
-        AutomaticTransactionCategorizer? autoCategorizer = null
+        AutomaticTransactionCategorizerHelper? autoCategorizer = null
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -118,9 +146,9 @@ public class TransactionService(
             var transaction = transactions.FirstOrDefault(t => t.ID == guid);
             if (transaction == null)
             {
-                _logger.LogError("{LogMessage}", _logLocalizer["TransactionNotFoundLog"]);
+                logger.LogError("{LogMessage}", logLocalizer["TransactionNotFoundLog"]);
                 throw new BudgetBoardServiceException(
-                    _responseLocalizer["TransactionNotFoundError"]
+                    responseLocalizer["TransactionNotFoundError"]
                 );
             }
 
@@ -143,9 +171,9 @@ public class TransactionService(
             .FirstOrDefault(t => t.ID == editedTransaction.ID);
         if (transaction == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["TransactionUpdateNotFoundLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["TransactionUpdateNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["TransactionUpdateNotFoundError"]
+                responseLocalizer["TransactionUpdateNotFoundError"]
             );
         }
 
@@ -169,7 +197,7 @@ public class TransactionService(
             }
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -182,13 +210,13 @@ public class TransactionService(
             .FirstOrDefault(t => t.ID == guid);
         if (transaction == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["TransactionDeleteNotFoundLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["TransactionDeleteNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["TransactionDeleteNotFoundError"]
+                responseLocalizer["TransactionDeleteNotFoundError"]
             );
         }
 
-        transaction.Deleted = _nowProvider.UtcNow;
+        transaction.Deleted = nowProvider.UtcNow;
 
         Account account = transaction.Account!;
         // Manual accounts need to manually update the balance
@@ -204,7 +232,7 @@ public class TransactionService(
             }
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -217,14 +245,14 @@ public class TransactionService(
             .FirstOrDefault(t => t.ID == guid);
         if (transaction == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["TransactionRestoreNotFoundLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["TransactionRestoreNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["TransactionRestoreNotFoundError"]
+                responseLocalizer["TransactionRestoreNotFoundError"]
             );
         }
 
         transaction.Deleted = null;
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -240,17 +268,17 @@ public class TransactionService(
             .FirstOrDefault(t => t.ID == transactionSplitRequest.ID);
         if (transaction == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["TransactionSplitNotFoundLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["TransactionSplitNotFoundLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["TransactionSplitNotFoundError"]
+                responseLocalizer["TransactionSplitNotFoundError"]
             );
         }
 
         if (Math.Abs(transaction.Amount) <= Math.Abs(transactionSplitRequest.Amount))
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["TransactionSplitInvalidAmountLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["TransactionSplitInvalidAmountLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["TransactionSplitInvalidAmountError"]
+                responseLocalizer["TransactionSplitInvalidAmountError"]
             );
         }
 
@@ -268,22 +296,23 @@ public class TransactionService(
 
         transaction.Amount -= transactionSplitRequest.Amount;
 
-        _userDataContext.Transactions.Add(splitTransaction);
-        await _userDataContext.SaveChangesAsync();
+        userDataContext.Transactions.Add(splitTransaction);
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task ImportTransactionsAsync(
-        Guid userGuid,
-        ITransactionImportRequest request
-    )
+    public async Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var transactions = request.Transactions;
         var accountNameToIDMap = request.AccountNameToIDMap;
 
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
-        var autoCategorizer = await AutomaticTransactionCategorizer.CreateAutoCategorizerAsync(userDataContext, userData);
+        var autoCategorizer =
+            await AutomaticTransactionCategorizerHelper.CreateAutoCategorizerAsync(
+                userDataContext,
+                userData
+            );
 
         foreach (var transaction in transactions)
         {
@@ -300,12 +329,12 @@ public class TransactionService(
             );
             if (account == null)
             {
-                _logger.LogError(
+                logger.LogError(
                     "{LogMessage}",
-                    _logLocalizer["TransactionImportAccountNotFoundLog"]
+                    logLocalizer["TransactionImportAccountNotFoundLog"]
                 );
                 throw new BudgetBoardServiceException(
-                    _responseLocalizer["TransactionImportAccountNotFoundError"]
+                    responseLocalizer["TransactionImportAccountNotFoundError"]
                 );
             }
 
@@ -323,7 +352,7 @@ public class TransactionService(
             {
                 SyncID = string.Empty,
                 Amount = transaction.Amount ?? 0,
-                Date = transaction.Date ?? _nowProvider.UtcNow,
+                Date = transaction.Date ?? nowProvider.UtcNow,
                 MerchantName = transaction.MerchantName,
                 Source = TransactionSource.Manual.Value,
                 AccountID = account.ID,
@@ -341,7 +370,7 @@ public class TransactionService(
         ApplicationUser? foundUser;
         try
         {
-            foundUser = await _userDataContext
+            foundUser = await userDataContext
                 .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.Accounts)
@@ -353,21 +382,18 @@ public class TransactionService(
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                "{LogMessage}",
-                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
-            );
-            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
+            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
+            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
+            logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;
-    } 
+    }
 
     private void UpdateBalancesForNewTransaction(
         Account account,
@@ -392,7 +418,7 @@ public class TransactionService(
                 AccountID = account.ID,
             };
 
-            _userDataContext.Balances.Add(newBalance);
+            userDataContext.Balances.Add(newBalance);
         }
 
         // Then, update all following balances to include the new transaction.

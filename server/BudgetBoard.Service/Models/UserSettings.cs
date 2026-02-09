@@ -10,6 +10,12 @@ public interface IUserSettingsResponse
     int BudgetWarningThreshold { get; }
     int ForceSyncLookbackMonths { get; }
     bool DisableBuiltInTransactionCategories { get; }
+    bool EnableAutoCategorizer { get; set; }
+    long? AutoCategorizerModelOID { get; set; }
+    DateOnly? AutoCategorizerLastTrained { get; set; }
+    DateOnly? AutoCategorizerModelStartDate { get; set; }
+    DateOnly? AutoCategorizerModelEndDate { get; set; }
+    int AutoCategorizerMinimumProbabilityPercentage { get; }
 }
 
 public class UserSettingsResponse : IUserSettingsResponse
@@ -24,6 +30,7 @@ public class UserSettingsResponse : IUserSettingsResponse
     public DateOnly? AutoCategorizerLastTrained { get; set; }
     public DateOnly? AutoCategorizerModelStartDate { get; set; }
     public DateOnly? AutoCategorizerModelEndDate { get; set; }
+    public int AutoCategorizerMinimumProbabilityPercentage { get; set; }
 
     [JsonConstructor]
     public UserSettingsResponse()
@@ -34,6 +41,7 @@ public class UserSettingsResponse : IUserSettingsResponse
         ForceSyncLookbackMonths = 0;
         DisableBuiltInTransactionCategories = false;
         EnableAutoCategorizer = false;
+        AutoCategorizerMinimumProbabilityPercentage = 70;
     }
 
     public UserSettingsResponse(UserSettings userSettings)
@@ -48,6 +56,8 @@ public class UserSettingsResponse : IUserSettingsResponse
         AutoCategorizerLastTrained = userSettings.AutoCategorizerLastTrained;
         AutoCategorizerModelStartDate = userSettings.AutoCategorizerModelStartDate;
         AutoCategorizerModelEndDate = userSettings.AutoCategorizerModelEndDate;
+        AutoCategorizerMinimumProbabilityPercentage =
+            userSettings.AutoCategorizerMinimumProbabilityPercentage;
     }
 }
 
@@ -59,6 +69,7 @@ public interface IUserSettingsUpdateRequest
     public int? ForceSyncLookbackMonths { get; }
     public bool? DisableBuiltInTransactionCategories { get; }
     public bool? EnableAutoCategorizer { get; }
+    public int? AutoCategorizerMinimumProbabilityPercentage { get; }
 }
 
 [method: JsonConstructor]
@@ -70,4 +81,5 @@ public class UserSettingsUpdateRequest() : IUserSettingsUpdateRequest
     public int? ForceSyncLookbackMonths { get; set; } = null;
     public bool? DisableBuiltInTransactionCategories { get; set; } = null;
     public bool? EnableAutoCategorizer { get; set; } = null;
+    public int? AutoCategorizerMinimumProbabilityPercentage { get; set; } = null;
 }

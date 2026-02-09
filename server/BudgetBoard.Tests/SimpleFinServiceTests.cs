@@ -1637,7 +1637,7 @@ public class SimpleFinServiceTests
                     It.Is<ApplicationUser>(u => u.Id == helper.demoUser.Id),
                     It.IsAny<ITransactionCreateRequest>(),
                     It.IsAny<IEnumerable<ICategory>>(),
-                    It.IsAny<AutomaticTransactionCategorizer>()
+                    It.IsAny<AutomaticTransactionCategorizerHelper>()
                 ),
             Times.Exactly(2)
         );

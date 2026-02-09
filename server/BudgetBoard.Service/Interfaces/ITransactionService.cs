@@ -1,5 +1,5 @@
-using BudgetBoard.Service.Helpers;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Models;
 
 namespace BudgetBoard.Service.Interfaces;
@@ -20,7 +20,8 @@ public interface ITransactionService
         ApplicationUser userData,
         ITransactionCreateRequest request,
         IEnumerable<ICategory>? allCategories = null,
-        AutomaticTransactionCategorizer? autoCategorizer = null);
+        AutomaticTransactionCategorizerHelper? autoCategorizer = null
+    );
 
     /// <summary>
     /// Creates a new transaction for the specified user.
@@ -33,7 +34,7 @@ public interface ITransactionService
         Guid userGuid,
         ITransactionCreateRequest request,
         IEnumerable<ICategory>? allCategories = null,
-        AutomaticTransactionCategorizer? autoCategorizer = null
+        AutomaticTransactionCategorizerHelper? autoCategorizer = null
     );
 
     /// <summary>
@@ -86,8 +87,5 @@ public interface ITransactionService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The transaction import details.</param>
-    Task ImportTransactionsAsync(
-        Guid userGuid,
-        ITransactionImportRequest request
-    );
+    Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request);
 }

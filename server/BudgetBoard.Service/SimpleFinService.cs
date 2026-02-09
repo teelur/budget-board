@@ -534,10 +534,11 @@ public class SimpleFinService(
     )
     {
         // Instantiate an autoCategorizer
-        var autoCategorizer = await AutomaticTransactionCategorizer.CreateAutoCategorizerAsync(
-            userDataContext,
-            userData
-        );
+        var autoCategorizer =
+            await AutomaticTransactionCategorizerHelper.CreateAutoCategorizerAsync(
+                userDataContext,
+                userData
+            );
 
         // Retrieve list of categories
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
@@ -613,7 +614,7 @@ public class SimpleFinService(
         Guid simpleFinAccountId,
         IEnumerable<ISimpleFinTransactionData> transactionsData,
         IEnumerable<ICategory> allCategories,
-        AutomaticTransactionCategorizer? autoCategorizer
+        AutomaticTransactionCategorizerHelper? autoCategorizer
     )
     {
         List<string> errors = [];

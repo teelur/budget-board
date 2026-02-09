@@ -73,7 +73,6 @@ public class UserSettings
     /// </summary>
     public DateOnly? AutoCategorizerLastTrained { get; set; } = null;
 
-
     /// <summary>
     /// Start date of most recent auto-categorizer model.
     /// </summary>
@@ -83,6 +82,11 @@ public class UserSettings
     /// End date of most recent auto-categorizer model.
     /// </summary>
     public DateOnly? AutoCategorizerModelEndDate { get; set; } = null;
+
+    /// <summary>
+    /// Minimum probability percentage for auto-categorizer predictions.
+    /// </summary>
+    public int AutoCategorizerMinimumProbabilityPercentage { get; set; } = 70;
 
     /// <summary>
     /// Identifier for the user who owns these settings.

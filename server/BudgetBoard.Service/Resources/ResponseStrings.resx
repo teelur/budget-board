@@ -322,6 +322,9 @@
   <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
     <value>The force sync lookback period must be between 0 and 12 months.</value>
   </data>
+  <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
+    <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
+  </data>
   <data name="ValueCreateAssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to add a value to does not exist.</value>
   </data>

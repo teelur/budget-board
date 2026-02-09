@@ -463,4 +463,7 @@
   <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
     <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
   </data>
+  <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
+    <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
+  </data>
 </root>

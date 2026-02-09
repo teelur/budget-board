@@ -1126,4 +1126,191 @@ public class TransactionServiceTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("TransactionImportAccountNotFoundError");
     }
+
+    [Fact]
+    public async Task CreateTransactionAsync_WhenAutoCategorizerProbabilityBelowThreshold_ShouldNotApplyCategory()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        helper.UserDataContext.Accounts.Add(account);
+
+        // Set up user settings with a very high threshold (99%) to ensure prediction is below
+        helper.demoUser.UserSettings = new Database.Models.UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            EnableAutoCategorizer = true,
+            AutoCategorizerMinimumProbabilityPercentage = 99,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        // Train model with transactions
+        var trainingTransactions = new List<Database.Models.Transaction>
+        {
+            new()
+            {
+                Amount = 50M,
+                Date = DateTime.UtcNow,
+                Account = account,
+                AccountID = account.ID,
+                MerchantName = "Coffee Shop",
+                Category = "Dining",
+                Source = "test",
+            },
+            new()
+            {
+                Amount = 25M,
+                Date = DateTime.UtcNow,
+                Account = account,
+                AccountID = account.ID,
+                MerchantName = "Gas Station",
+                Category = "Transportation",
+                Source = "test",
+            },
+        };
+        helper.UserDataContext.Transactions.AddRange(trainingTransactions);
+        helper.UserDataContext.SaveChanges();
+
+        var mlModel = AutomaticTransactionCategorizerHelper.Train(trainingTransactions);
+
+        var allCategories = new List<ICategory>
+        {
+            new CategoryBase { Value = "Dining", Parent = string.Empty },
+            new CategoryBase { Value = "Transportation", Parent = string.Empty },
+        };
+
+        var autoCategorizer = new AutomaticTransactionCategorizerHelper(mlModel);
+
+        // Create a transaction with a merchant name that might have lower confidence
+        var transaction = new TransactionCreateRequest
+        {
+            SyncID = string.Empty,
+            Amount = 15M,
+            Date = DateTime.UtcNow,
+            MerchantName = "Random Store",
+            Source = "test",
+            AccountID = account.ID,
+        };
+
+        // Act
+        await transactionService.CreateTransactionAsync(
+            helper.demoUser,
+            transaction,
+            allCategories,
+            autoCategorizer
+        );
+
+        // Assert
+        var createdTransaction = helper.UserDataContext.Transactions.OrderBy(t => t.Date).Last();
+        createdTransaction.Category.Should().BeNullOrEmpty();
+        createdTransaction.Subcategory.Should().BeNullOrEmpty();
+    }
+
+    [Fact]
+    public async Task CreateTransactionAsync_WhenAutoCategorizerProbabilityAboveThreshold_ShouldApplyCategory()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        helper.UserDataContext.Accounts.Add(account);
+
+        // Set up user settings with default threshold (70%)
+        helper.demoUser.UserSettings = new Database.Models.UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            EnableAutoCategorizer = true,
+            AutoCategorizerMinimumProbabilityPercentage = 70,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        // Train model with transactions
+        var trainingTransactions = new List<Database.Models.Transaction>
+        {
+            new()
+            {
+                Amount = 50M,
+                Date = DateTime.UtcNow,
+                Account = account,
+                AccountID = account.ID,
+                MerchantName = "Coffee Shop",
+                Category = "Dining",
+                Source = "test",
+            },
+            new()
+            {
+                Amount = 55M,
+                Date = DateTime.UtcNow,
+                Account = account,
+                AccountID = account.ID,
+                MerchantName = "Coffee Place",
+                Category = "Dining",
+                Source = "test",
+            },
+            new()
+            {
+                Amount = 25M,
+                Date = DateTime.UtcNow,
+                Account = account,
+                AccountID = account.ID,
+                MerchantName = "Gas Station",
+                Category = "Transportation",
+                Source = "test",
+            },
+        };
+        helper.UserDataContext.Transactions.AddRange(trainingTransactions);
+        helper.UserDataContext.SaveChanges();
+
+        var mlModel = AutomaticTransactionCategorizerHelper.Train(trainingTransactions);
+
+        var allCategories = new List<ICategory>
+        {
+            new CategoryBase { Value = "Dining", Parent = string.Empty },
+            new CategoryBase { Value = "Transportation", Parent = string.Empty },
+        };
+
+        var autoCategorizer = new AutomaticTransactionCategorizerHelper(mlModel);
+
+        // Create a transaction with a merchant name similar to training data
+        var transaction = new TransactionCreateRequest
+        {
+            SyncID = string.Empty,
+            Amount = 52M,
+            Date = DateTime.UtcNow,
+            MerchantName = "Coffee Shop",
+            Source = "test",
+            AccountID = account.ID,
+        };
+
+        // Act
+        await transactionService.CreateTransactionAsync(
+            helper.demoUser,
+            transaction,
+            allCategories,
+            autoCategorizer
+        );
+
+        // Assert
+        var createdTransaction = helper.UserDataContext.Transactions.OrderBy(t => t.Date).Last();
+        createdTransaction.Category.Should().Be("Dining");
+    }
 }

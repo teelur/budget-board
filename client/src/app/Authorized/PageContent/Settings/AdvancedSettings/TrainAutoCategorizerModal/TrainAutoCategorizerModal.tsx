@@ -55,7 +55,7 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       notifications.show({
-        message: t("train_auto_categorizer_success")
+        message: t("train_auto_categorizer_success"),
       });
       close();
       await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
@@ -71,15 +71,11 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
   const onSubmit = () => {
     const startDate = startDateField.getValue();
     const endDate = endDateField.getValue();
-    if (
-      startDate != null &&
-      endDate != null &&
-      startDate > endDate
-    ) {
+    if (startDate != null && endDate != null && startDate > endDate) {
       notifications.show({
-              color: "var(--button-color-destructive)",
-              message: t("train_auto_categorizer_dates_error"),
-            });
+        color: "var(--button-color-destructive)",
+        message: t("train_auto_categorizer_dates_error"),
+      });
       return;
     }
 
@@ -91,23 +87,22 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
 
   return (
     <>
-      <PrimaryText size="sm">
-        {t("train_auto_categorizer")}
-      </PrimaryText>
+      <PrimaryText size="sm">{t("train_auto_categorizer")}</PrimaryText>
       <DimmedText size="xs">
         {t("train_auto_categorizer_description")}
       </DimmedText>
       <DimmedText size="xs">
-        { userSettingsQuery.data?.autoCategorizerLastTrained != null
-            ? t("train_auto_categorizer_last_trained", {
+        {userSettingsQuery.data?.autoCategorizerLastTrained != null
+          ? t("train_auto_categorizer_last_trained", {
               lastTrained: userSettingsQuery.data?.autoCategorizerLastTrained,
-              trainDataStartDate: userSettingsQuery.data?.autoCategorizerModelStartDate,
-              trainDataEndDate: userSettingsQuery.data?.autoCategorizerModelEndDate
+              trainDataStartDate:
+                userSettingsQuery.data?.autoCategorizerModelStartDate,
+              trainDataEndDate:
+                userSettingsQuery.data?.autoCategorizerModelEndDate,
             })
-            : t("train_auto_categorizer_not_trained")
-        }
+          : t("train_auto_categorizer_not_trained")}
       </DimmedText>
-      <Button size="input-sm" onClick={open}>
+      <Button size="xs" onClick={open}>
         {t("train_auto_categorizer_button")}
       </Button>
       <Modal
@@ -116,6 +111,9 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
         title={<PrimaryText>{t("train_auto_categorizer")}</PrimaryText>}
       >
         <Stack gap="0.25rem">
+          <DimmedText size="xs">
+            {t("train_auto_categorizer_date_range_description")}
+          </DimmedText>
           <DateInput
             label={<PrimaryText size="sm">{t("start_date")}</PrimaryText>}
             placeholder={t("select_a_date")}

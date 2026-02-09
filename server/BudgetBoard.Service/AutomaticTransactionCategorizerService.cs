@@ -18,11 +18,6 @@ public class AutomaticTransactionCategorizerService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : IAutomaticTransactionCategorizerService
 {
-    private readonly ILogger<IAutomaticTransactionCategorizerService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task TrainCategorizerAsync(Guid userGuid, ITrainAutoCategorizerRequest request)
     {
@@ -30,38 +25,47 @@ public class AutomaticTransactionCategorizerService(
         var userSettings = userData.UserSettings;
         if (userSettings == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["UserSettingsNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["UserSettingsNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["UserSettingsNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["UserSettingsNotFoundError"]);
         }
 
         var trainingTransactions = userData.Accounts.Select(a => a.Transactions).SelectMany(c => c);
         if (request.StartDate is not null)
         {
-            trainingTransactions = trainingTransactions.Where(t => DateOnly.FromDateTime(t.Date) >= request.StartDate);
+            trainingTransactions = trainingTransactions.Where(t =>
+                DateOnly.FromDateTime(t.Date) >= request.StartDate
+            );
         }
         if (request.EndDate is not null)
         {
-            trainingTransactions = trainingTransactions.Where(t => DateOnly.FromDateTime(t.Date) <= request.EndDate);
+            trainingTransactions = trainingTransactions.Where(t =>
+                DateOnly.FromDateTime(t.Date) <= request.EndDate
+            );
         }
 
-        if (trainingTransactions.Count() == 0)
+        if (!trainingTransactions.Any())
         {
-            throw new BudgetBoardServiceException(_responseLocalizer["AutoCategorizerTrainingNoTransactions"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["AutoCategorizerTrainingNoTransactions"]
+            );
         }
 
-        var mlModel = AutomaticTransactionCategorizer.Train(trainingTransactions);
+        var mlModel = AutomaticTransactionCategorizerHelper.Train(trainingTransactions);
 
-        // Store the ML model
+        // The ML model is serialized and stored as a large object in the database. If the user already has a model, it will be overwritten.
         long objectId = userSettings.AutoCategorizerModelOID ?? 0;
-        objectId = await _userDataContext.WriteLargeObjectAsync(objectId, mlModel);
+        objectId = await userDataContext.WriteLargeObjectAsync(objectId, mlModel);
 
-        // Update user settings
         userSettings.AutoCategorizerModelOID = objectId;
         userSettings.AutoCategorizerLastTrained = DateOnly.FromDateTime(nowProvider.Now);
-        userSettings.AutoCategorizerModelStartDate = DateOnly.FromDateTime(trainingTransactions.Min(t => t.Date));
-        userSettings.AutoCategorizerModelEndDate = DateOnly.FromDateTime(trainingTransactions.Max(t => t.Date));
+        userSettings.AutoCategorizerModelStartDate = DateOnly.FromDateTime(
+            trainingTransactions.Min(t => t.Date)
+        );
+        userSettings.AutoCategorizerModelEndDate = DateOnly.FromDateTime(
+            trainingTransactions.Max(t => t.Date)
+        );
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
@@ -69,7 +73,7 @@ public class AutomaticTransactionCategorizerService(
         ApplicationUser? foundUser;
         try
         {
-            foundUser = await _userDataContext
+            foundUser = await userDataContext
                 .ApplicationUsers.Include(u => u.Accounts)
                 .ThenInclude(a => a.Transactions)
                 .Include(u => u.UserSettings)
@@ -78,17 +82,14 @@ public class AutomaticTransactionCategorizerService(
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                "{LogMessage}",
-                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
-            );
-            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
+            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
+            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
+            logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;
