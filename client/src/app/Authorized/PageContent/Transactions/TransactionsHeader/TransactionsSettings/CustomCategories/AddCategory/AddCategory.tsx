@@ -50,7 +50,7 @@ const AddCategory = (): React.ReactNode => {
   });
 
   const parentCategories = transactionCategories.filter(
-    (category) => category.parent?.length === 0
+    (category) => category.parent?.length === 0,
   );
 
   return (
@@ -68,9 +68,12 @@ const AddCategory = (): React.ReactNode => {
             <DimmedText size="sm">{t("parent")}</DimmedText>
             <Switch
               checked={isChildCategory}
-              onChange={(event) =>
-                setIsChildCategory(event.currentTarget.checked)
-              }
+              onChange={(event) => {
+                setIsChildCategory(event.currentTarget.checked);
+                if (!event.currentTarget.checked) {
+                  parentField.setValue("");
+                }
+              }}
               size="md"
             />
             <DimmedText size="sm">{t("child")}</DimmedText>
