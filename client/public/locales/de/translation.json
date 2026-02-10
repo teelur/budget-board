@@ -434,5 +434,11 @@
     "view_and_restore_deleted_assets": "Gelöschte Vermögenswerte anzeigen und wiederherstellen.",
     "view_and_restore_deleted_transactions": "Gelöschte Transaktionen anzeigen und wiederherstellen.",
     "welcome_to": "Willkommen bei",
-    "widget_no_items_configured_message": "Für dieses Widget sind keine Elemente konfiguriert."
+    "widget_no_items_configured_message": "Für dieses Widget sind keine Elemente konfiguriert.",
+    "auto_categorizer_minimum_probability": "Automatische Kategorisierung Mindestwahrscheinlichkeit",
+    "auto_categorizer_minimum_probability_description": "Legen Sie den Mindestvertrauenswert (0%-100%) fest, der erforderlich ist, damit der Auto-Kategorisierer automatisch eine Kategorie zuweist. Höhere Werte bedeuten, dass eine mehr Gewissheit erforderlich ist.",
+    "de": "Deutsch",
+    "preferred_language_description": "Übersetzungen können fehlerhaft oder unvollständig sein. Wenn Sie Probleme feststellen, können Sie gerne eine Korrektur auf <0>Weblate</0> einreichen.",
+    "train_auto_categorizer_date_range_description": "Wählen Sie einen optionalen Datumsbereich für die Trainingsdaten aus. Lassen Sie das Feld leer, um alle Transaktionen zu verwenden.",
+    "zh_hans": "Chinesisch (vereinfacht)"
 }
