@@ -50,8 +50,14 @@ const AddCategory = (): React.ReactNode => {
   });
 
   const parentCategories = transactionCategories.filter(
-    (category) => category.parent?.length === 0
+    (category) => category.parent?.length === 0,
   );
+
+  React.useEffect(() => {
+    if (!isChildCategory) {
+      parentField.setValue("");
+    }
+  }, [isChildCategory]);
 
   return (
     <Card elevation={2}>
