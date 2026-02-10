@@ -53,12 +53,6 @@ const AddCategory = (): React.ReactNode => {
     (category) => category.parent?.length === 0,
   );
 
-  React.useEffect(() => {
-    if (!isChildCategory) {
-      parentField.setValue("");
-    }
-  }, [isChildCategory]);
-
   return (
     <Card elevation={2}>
       <LoadingOverlay visible={doAddCategory.isPending} />
@@ -74,9 +68,12 @@ const AddCategory = (): React.ReactNode => {
             <DimmedText size="sm">{t("parent")}</DimmedText>
             <Switch
               checked={isChildCategory}
-              onChange={(event) =>
-                setIsChildCategory(event.currentTarget.checked)
-              }
+              onChange={(event) => {
+                setIsChildCategory(event.currentTarget.checked);
+                if (!event.currentTarget.checked) {
+                  parentField.setValue("");
+                }
+              }}
               size="md"
             />
             <DimmedText size="sm">{t("child")}</DimmedText>
