@@ -185,285 +185,285 @@
     <value>Das Budget, das Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
-    <value>A goal must have a monthly contribution or target date.</value>
+    <value>Ein Ziel muss einen monatlichen Beitrag oder ein Zieldatum haben.</value>
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">
-    <value>A goal cannot have a target date in the past.</value>
+    <value>Ein Ziel kann kein Zieldatum in der Vergangenheit haben.</value>
   </data>
   <data name="GoalCreateNoAccountsError" xml:space="preserve">
-    <value>A goal must be associated with at least one account.</value>
+    <value>Ein Ziel muss mindestens einem Konto zugeordnet sein.</value>
   </data>
   <data name="GoalCreateInvalidAccountError" xml:space="preserve">
-    <value>The account you are trying to use does not exist.</value>
+    <value>Das Konto, das Sie verwenden möchten, existiert nicht.</value>
   </data>
   <data name="GoalUpdateNotFoundError" xml:space="preserve">
-    <value>The goal you are trying to update does not exist.</value>
+    <value>Das Ziel, das Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="GoalUpdatePastDateError" xml:space="preserve">
-    <value>The target date for the goal cannot be in the past.</value>
+    <value>Das Zieldatum für das Ziel darf nicht in der Vergangenheit liegen.</value>
   </data>
   <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
-    <value>A goal must have a monthly contribution greater than 0.</value>
+    <value>Ein Ziel muss einen monatlichen Beitrag von mehr als 0 haben.</value>
   </data>
   <data name="GoalDeleteNotFoundError" xml:space="preserve">
-    <value>The goal you are trying to delete does not exist.</value>
+    <value>Das Ziel, das Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="GoalCompleteNotFoundError" xml:space="preserve">
-    <value>The goal you are trying to complete does not exist.</value>
+    <value>Das Ziel, das Sie erledigen möchten, existiert nicht.</value>
   </data>
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
-    <value>The goal you are trying to complete has already been completed.</value>
+    <value>Das Ziel, das Sie erledigen möchten, wurde bereits erreicht.</value>
   </data>
   <data name="InstitutionCreateDuplicateNameError" xml:space="preserve">
-    <value>An institution with this name already exists.</value>
+    <value>Eine Institution mit diesem Namen existiert bereits.</value>
   </data>
   <data name="InstitutionNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to access does not exist.</value>
+    <value>Die Institution, auf die Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="InstitutionUpdateNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to update does not exist.</value>
+    <value>Die Institution, die Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="InstitutionUpdateEmptyNameError" xml:space="preserve">
-    <value>The institution name cannot be empty.</value>
+    <value>Der Name der Institution darf nicht leer sein.</value>
   </data>
   <data name="InstitutionUpdateDuplicateNameError" xml:space="preserve">
-    <value>An institution with this name already exists.</value>
+    <value>Eine Institution mit diesem Namen existiert bereits.</value>
   </data>
   <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to delete does not exist.</value>
+    <value>Die Institution, die Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="InstitutionDeleteHasAccountsError" xml:space="preserve">
-    <value>Cannot delete institution because it has associated accounts. Please delete or reassign these accounts first.</value>
+    <value>Die Institution kann nicht gelöscht werden, da sie verknüpfte Konten hat. Bitte löschen oder weisen Sie diese Konten zuerst neu zu.</value>
   </data>
   <data name="InstitutionOrderNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to order does not exist.</value>
+    <value>Die Institution, die Sie bestellen möchten, existiert nicht.</value>
   </data>
   <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
-    <value>A transaction category with this name already exists.</value>
+    <value>Eine Transaktionskategorie mit diesem Namen existiert bereits.</value>
   </data>
   <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
-    <value>The transaction category name cannot be empty.</value>
+    <value>Der Name der Transaktionskategorie darf nicht leer sein.</value>
   </data>
   <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
-    <value>Transaction category cannot have the same name as its parent category.</value>
+    <value>Die Transaktionskategorie darf nicht denselben Namen wie ihre übergeordnete Kategorie haben.</value>
   </data>
   <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
-    <value>The parent transaction category you are trying to use does not exist.</value>
+    <value>Die übergeordnete Transaktionskategorie, die Sie verwenden möchten, existiert nicht.</value>
   </data>
   <data name="TransactionCategoryNotFoundError" xml:space="preserve">
-    <value>The transaction category you are trying to access does not exist.</value>
+    <value>Die Transaktionskategorie, auf die Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
-    <value>The transaction category you are trying to update does not exist.</value>
+    <value>Die Transaktionskategorie, die Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
-    <value>The transaction category name cannot be empty.</value>
+    <value>Der Name der Transaktionskategorie darf nicht leer sein.</value>
   </data>
   <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
-    <value>A transaction category with this name already exists.</value>
+    <value>Eine Transaktionskategorie mit diesem Namen existiert bereits.</value>
   </data>
   <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
-    <value>Transaction category cannot have the same name as its parent category.</value>
+    <value>Die Transaktionskategorie darf nicht denselben Namen wie ihre übergeordnete Kategorie haben.</value>
   </data>
   <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
-    <value>The parent transaction category you are trying to use does not exist.</value>
+    <value>Die übergeordnete Transaktionskategorie, die Sie verwenden möchten, existiert nicht.</value>
   </data>
   <data name="TransactionCategoryDeleteInUseByTransactionsError" xml:space="preserve">
-    <value>The transaction category you are trying to delete is currently assigned to one or more transactions. Please reassign or remove these transactions first.</value>
+    <value>Die Transaktionskategorie, die Sie löschen möchten, ist derzeit einer oder mehreren Transaktionen zugeordnet. Bitte ordnen Sie diese Transaktionen zunächst neu zu oder entfernen Sie sie.</value>
   </data>
   <data name="TransactionCategoryDeleteInUseByBudgetsError" xml:space="preserve">
-    <value>The transaction category you are trying to delete is currently assigned to one or more budgets. Please reassign or remove these budgets first.</value>
+    <value>Die Transaktionskategorie, die Sie löschen möchten, ist derzeit einem oder mehreren Budgets zugeordnet. Bitte ordnen Sie diese Budgets zunächst neu zu oder entfernen Sie sie.</value>
   </data>
   <data name="TransactionCategoryDeleteHasChildrenError" xml:space="preserve">
-    <value>The transaction category you are trying to delete has child categories. Please reassign or delete the child categories first.</value>
+    <value>Die Transaktionskategorie, die Sie löschen möchten, hat Unterkategorien. Bitte weisen Sie die Unterkategorien zuerst neu zu oder löschen Sie sie.</value>
   </data>
   <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
-    <value>The transaction category you are trying to delete does not exist.</value>
+    <value>Die Transaktionskategorie, die Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
-    <value>The account you are trying to add a transaction to does not exist.</value>
+    <value>Das Konto, zu dem Sie eine Transaktion hinzufügen möchten, existiert nicht.</value>
   </data>
   <data name="TransactionNotFoundError" xml:space="preserve">
-    <value>The transaction you are trying to access does not exist.</value>
+    <value>Die Transaktion, auf die Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="TransactionUpdateNotFoundError" xml:space="preserve">
-    <value>The transaction you are trying to update does not exist.</value>
+    <value>Die Transaktion, die Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="TransactionDeleteNotFoundError" xml:space="preserve">
-    <value>The transaction you are trying to delete does not exist.</value>
+    <value>Die Transaktion, die Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="TransactionRestoreNotFoundError" xml:space="preserve">
-    <value>The transaction you are trying to restore does not exist.</value>
+    <value>Die Transaktion, die Sie wiederherstellen möchten, existiert nicht.</value>
   </data>
   <data name="TransactionSplitNotFoundError" xml:space="preserve">
-    <value>The transaction you are trying to split does not exist.</value>
+    <value>Die Transaktion, die Sie aufteilen möchten, existiert nicht.</value>
   </data>
   <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
-    <value>The split amount must be less than the transaction amount.</value>
+    <value>Der geteilte Betrag muss geringer sein als der Transaktionsbetrag.</value>
   </data>
   <data name="TransactionSplitNoAccountError" xml:space="preserve">
-    <value>The transaction you are trying to split is not associated with any account.</value>
+    <value>Die Transaktion, die Sie aufteilen möchten, ist mit keinem Konto verknüpft.</value>
   </data>
   <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
-    <value>The account you are trying to add a transaction to does not exist.</value>
+    <value>Das Konto, zu dem Sie eine Transaktion hinzufügen möchten, existiert nicht.</value>
   </data>
   <data name="UserSettingsNotFoundError" xml:space="preserve">
-    <value>The user settings you are trying to access do not exist.</value>
+    <value>Die Benutzereinstellungen, auf die Sie zugreifen möchten, existieren nicht.</value>
   </data>
   <data name="InvalidCurrencyCodeError" xml:space="preserve">
-    <value>The provided currency code is invalid.</value>
+    <value>Der angegebene Währungscode ist ungültig.</value>
   </data>
   <data name="InvalidLanguageCodeError" xml:space="preserve">
-    <value>The provided language code is invalid.</value>
+    <value>Der angegebene Sprachcode ist ungültig.</value>
   </data>
   <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
-    <value>The budget warning threshold must be between 0% and 100%.</value>
+    <value>Der Schwellenwert für die Budgetwarnung muss zwischen 0 % und 100 % liegen.</value>
   </data>
   <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
-    <value>The force sync lookback period must be between 0 and 12 months.</value>
+    <value>Der Rückblickzeitraum für die erzwungene Synchronisierung muss zwischen 0 und 12 Monaten liegen.</value>
   </data>
   <data name="ValueCreateAssetNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to add a value to does not exist.</value>
+    <value>Der Vermögenswert, dem Sie einen Wert hinzufügen möchten, existiert nicht.</value>
   </data>
   <data name="ValueAssetNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to access values for does not exist.</value>
+    <value>Der Vermögenswert, auf dessen Werte Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="ValueUpdateAssetNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to update does not exist.</value>
+    <value>Der Vermögenswert, den Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="ValueDeleteNotFoundError" xml:space="preserve">
-    <value>The value you are trying to delete does not exist.</value>
+    <value>Der Wert, den Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="ValueRestoreNotFoundError" xml:space="preserve">
-    <value>The value you are trying to restore does not exist.</value>
+    <value>Der Wert, den Sie wiederherstellen möchten, existiert nicht.</value>
   </data>
   <data name="SimpleFinDataNotFoundError" xml:space="preserve">
-    <value>SimpleFIN data not found.</value>
+    <value>SimpleFIN-Daten nicht gefunden.</value>
   </data>
   <data name="SimpleFinDataRetrievalError" xml:space="preserve">
-    <value>An error occurred while retrieving SimpleFIN data.</value>
+    <value>Beim Abrufen der SimpleFIN-Daten ist ein Fehler aufgetreten.</value>
   </data>
   <data name="SimpleFinOrganizationMissingIdError" xml:space="preserve">
-    <value>Institution for account '{0}' is missing an ID. Skipping account sync.</value>
+    <value>Der Institution für das Konto '{0}' fehlt eine ID. Kontosynchronisierung wird übersprungen.</value>
   </data>
   <data name="SyncInstitutionCreationError" xml:space="preserve">
-    <value>There was an error creating institution for account '{0}'. Skipping account sync.</value>
+    <value>Beim Erstellen der Institution für das Konto '{0}' ist ein Fehler aufgetreten. Die Kontosynchronisierung wird übersprungen.</value>
   </data>
   <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
-    <value>No matching account found for transaction with SyncID '{0}'.</value>
+    <value>Für die Transaktion mit der SyncID '{0}' wurde kein passendes Konto gefunden.</value>
   </data>
   <data name="SimpleFinAccountNotFoundForBalanceError" xml:space="preserve">
-    <value>No matching account found for balance with SyncID '{0}'.</value>
+    <value>Kein passendes Konto für den Saldo mit SyncID '{0}' gefunden.</value>
   </data>
   <data name="SimpleFinDecodeTokenError" xml:space="preserve">
-    <value>An error occurred while decoding the setup token.</value>
+    <value>Beim Dekodieren des Setup-Tokens ist ein Fehler aufgetreten.</value>
   </data>
   <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
-    <value>The provided access token is invalid.</value>
+    <value>Der bereitgestellte Zugriffstoken ist ungültig.</value>
   </data>
   <data name="SimpleFinDecodeTokenInvalidError" xml:space="preserve">
-    <value>The setup token is invalid. Please check the token and try again.</value>
+    <value>Das Setup-Token ist ungültig. Bitte überprüfen Sie das Token und versuchen Sie es erneut.</value>
   </data>
   <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
-    <value>An error occurred while connecting to SimpleFIN. Please try again later.</value>
+    <value>Beim Herstellen der Verbindung zu SimpleFIN ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.</value>
   </data>
   <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
-    <value>Unsupported field '{0}' in rule condition.</value>
+    <value>Nicht unterstütztes Feld '{0}' in Regelbedingung.</value>
   </data>
   <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
-    <value>Unsupported field '{0}' in rule action.</value>
+    <value>Nicht unterstütztes Feld '{0}' in Regelaktion.</value>
   </data>
   <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
-    <value>The category '{0}' does not exist.</value>
+    <value>Die Kategorie '{0}' existiert nicht.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
-    <value>Unsupported operator '{0}' in rule action.</value>
+    <value>Nicht unterstützter Operator '{0}' in Regelaktion.</value>
   </data>
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-    <value>The widget you are trying to update does not exist.</value>
+    <value>Das Widget, das Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="WidgetSettingsNotFoundError" xml:space="preserve">
-    <value>The widget settings you are trying to access do not exist.</value>
+    <value>Die Widget-Einstellungen, auf die Sie zugreifen möchten, existieren nicht.</value>
   </data>
   <data name="WidgetConfigurationNullError" xml:space="preserve">
-    <value>The widget configuration is null or empty.</value>
+    <value>Die Widget-Konfiguration ist null oder leer.</value>
   </data>
   <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
-    <value>Failed to deserialize the widget configuration.</value>
+    <value>Die Deserialisierung der Widget-Konfiguration ist fehlgeschlagen.</value>
   </data>
   <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
-    <value>The net worth widget line you are trying to access does not exist.</value>
+    <value>Die Zeile des Nettovermögens-Widgets, auf die Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
-    <value>The net worth widget group you are trying to access does not exist.</value>
+    <value>Die Gruppe des Nettovermögens-Widgets, auf die Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
-    <value>The net worth widget category you are trying to access does not exist.</value>
+    <value>Die Kategorie des Nettovermögens-Widgets, auf die Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
-    <value>Cannot create a circular dependency. The target line already depends on this line.</value>
+    <value>Es kann keine Ring-Abhängigkeit erstellt werden. Die Zielzeile hängt bereits von dieser Zeile ab.</value>
   </data>
   <data name="InvalidOrganizationIDError" xml:space="preserve">
-    <value>The provided organization ID is invalid.</value>
+    <value>Die angegebene Organisations-ID ist ungültig.</value>
   </data>
   <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
-    <value>The SimpleFIN account you are trying to update does not exist.</value>
+    <value>Das SimpleFIN-Konto, das Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="DuplicateOrganizationCreateError" xml:space="preserve">
-    <value>An organization with this domain already exists.</value>
+    <value>Eine Organisation mit dieser Domain existiert bereits.</value>
   </data>
   <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
-    <value>The SimpleFIN organization you are trying to update does not exist.</value>
+    <value>Die SimpleFIN-Organisation, die Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
-    <value>The SimpleFIN organization you are trying to delete does not exist.</value>
+    <value>Die SimpleFIN-Organisation, die Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
-    <value>Failed to create SimpleFIN organization for account {0}.</value>
+    <value>Die Erstellung der SimpleFIN-Organisation für das Konto {0} ist fehlgeschlagen.</value>
   </data>
   <data name="InvalidLinkedAccountIDError" xml:space="preserve">
-    <value>The linked account ID you provided does not exist.</value>
+    <value>Die von Ihnen angegebene verknüpfte Konto-ID existiert nicht.</value>
   </data>
   <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
-    <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
+    <value>SimpleFIN-Konto mit SyncID '{0}' nicht im Cache gefunden. Kontosynchronisierung wird übersprungen.</value>
   </data>
   <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
-    <value>SimpleFIN access token is missing or empty.</value>
+    <value>Der SimpleFIN-Zugriffstoken fehlt oder ist leer.</value>
   </data>
   <data name="SimpleFinDataRequestError" xml:space="preserve">
-    <value>An error occurred while requesting SimpleFIN data.</value>
+    <value>Bei der Anforderung von SimpleFIN-Daten ist ein Fehler aufgetreten.</value>
   </data>
   <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
-    <value>No transactions in the range selected to train the Auto-Categorizer.</value>
+    <value>Keine Transaktionen im ausgewählten Bereich zum Trainieren des Auto-Kategorisierers.</value>
   </data>
   <data name="AutoCategorizerNotTrained" xml:space="preserve">
-    <value>Auto-Categorizer cannot be enabled before training.</value>
+    <value>Der Auto-Kategorisierer kann ohne vorheriges Trainieren nicht aktiviert werden.</value>
   </data>
   <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
-    <value>Failed to configure LunchFlow API key. Status code: {0}</value>
+    <value>Die Konfiguration des LunchFlow-API-Schlüssels ist fehlgeschlagen. Statuscode: {0}</value>
   </data>
   <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
-    <value>LunchFlow API key is not configured.</value>
+    <value>Der LunchFlow-API-Schlüssel ist nicht konfiguriert.</value>
   </data>
   <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
-    <value>Failed to retrieve LunchFlow account data.</value>
+    <value>Das Abrufen der LunchFlow-Kontodaten ist fehlgeschlagen.</value>
   </data>
   <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
-    <value>A LunchFlow account with this SyncID already exists.</value>
+    <value>Ein LunchFlow-Konto mit dieser SyncID existiert bereits.</value>
   </data>
   <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
-    <value>The LunchFlow account you are trying to access does not exist.</value>
+    <value>Das LunchFlow-Konto, auf das Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
-    <value>Failed to retrieve transaction data for LunchFlow account {0}.</value>
+    <value>Die Transaktionsdaten für das LunchFlow-Konto {0} konnten nicht abgerufen werden.</value>
   </data>
   <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
-    <value>Linked account not found for LunchFlow account {0}.</value>
+    <value>Verknüpftes Konto für LunchFlow-Konto {0} nicht gefunden.</value>
   </data>
   <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
-    <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
+    <value>Die Kontostanddaten für das LunchFlow-Konto {0} konnten nicht abgerufen werden.</value>
   </data>
   <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
-    <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
+    <value>Die Mindestwahrscheinlichkeit für die automatische Kategorisierung muss zwischen 0 % und 100 % liegen.</value>
   </data>
 </root>
