@@ -23,5 +23,6 @@
     "assets": "资产",
     "assets_settings": "资产设置",
     "authorization_code_missing_message": "授权码缺失，请检查回调 URL 是否正确。",
-    "auto": "自动"
+    "auto": "自动",
+    "preferred_language_description": "翻译可能不准确或不完整。如果您发现任何问题，请考虑在 <0>Weblate</0> 上协助更正。"
 }
