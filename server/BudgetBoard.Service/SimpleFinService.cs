@@ -657,12 +657,12 @@ public class SimpleFinService(
 
             var newTransaction = new TransactionCreateRequest
             {
-                SyncID = transactionData.Id,
+                SyncID = SanitizeString(transactionData.Id),
                 Amount = decimal.Parse(transactionData.Amount),
                 Date = transactionData.Pending
                     ? DateTime.UnixEpoch.AddSeconds(transactionData.TransactedAt)
                     : DateTime.UnixEpoch.AddSeconds(transactionData.Posted),
-                MerchantName = transactionData.Description,
+                MerchantName = SanitizeString(transactionData.Description),
                 Source = TransactionSource.SimpleFin.Value,
                 AccountID = userAccount.ID,
             };
@@ -744,5 +744,13 @@ public class SimpleFinService(
         }
 
         return errors;
+    }
+
+    /// <summary>
+    /// Removes null bytes from strings to prevent PostgreSQL UTF8 encoding errors.
+    /// </summary>
+    private static string? SanitizeString(string? input)
+    {
+        return input?.Replace("\0", string.Empty);
     }
 }
