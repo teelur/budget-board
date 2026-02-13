@@ -37,13 +37,13 @@ public class TransactionService(
 
         var newTransaction = new Transaction
         {
-            SyncID = SanitizeString(request.SyncID),
+            SyncID = request.SyncID,
             Amount = request.Amount,
             Date = request.Date.ToUniversalTime(),
-            Category = SanitizeString(request.Category),
-            Subcategory = SanitizeString(request.Subcategory),
-            MerchantName = SanitizeString(request.MerchantName),
-            Source = SanitizeString(request.Source) ?? TransactionSource.Manual.Value,
+            Category = request.Category,
+            Subcategory = request.Subcategory,
+            MerchantName = request.MerchantName,
+            Source = request.Source ?? TransactionSource.Manual.Value,
             AccountID = request.AccountID,
             Account = account,
         };
@@ -181,9 +181,9 @@ public class TransactionService(
 
         transaction.Amount = editedTransaction.Amount;
         transaction.Date = editedTransaction.Date.ToUniversalTime();
-        transaction.Category = SanitizeString(editedTransaction.Category);
-        transaction.Subcategory = SanitizeString(editedTransaction.Subcategory);
-        transaction.MerchantName = SanitizeString(editedTransaction.MerchantName);
+        transaction.Category = editedTransaction.Category;
+        transaction.Subcategory = editedTransaction.Subcategory;
+        transaction.MerchantName = editedTransaction.MerchantName;
 
         if (transaction.Account?.Source == AccountSource.Manual)
         {
@@ -284,12 +284,12 @@ public class TransactionService(
 
         var splitTransaction = new Transaction
         {
-            SyncID = SanitizeString(transaction.SyncID),
+            SyncID = transaction.SyncID,
             Amount = transactionSplitRequest.Amount,
             Date = transaction.Date.ToUniversalTime(),
-            Category = SanitizeString(transactionSplitRequest.Category),
-            Subcategory = SanitizeString(transactionSplitRequest.Subcategory),
-            MerchantName = SanitizeString(transaction.MerchantName),
+            Category = transactionSplitRequest.Category,
+            Subcategory = transactionSplitRequest.Subcategory,
+            MerchantName = transaction.MerchantName,
             Source = transaction.Source ?? TransactionSource.Manual.Value,
             AccountID = transaction.AccountID,
         };
@@ -429,14 +429,5 @@ public class TransactionService(
         {
             balance.Amount += transaction.Amount;
         }
-    }
-
-    /// <summary>
-    /// Removes null bytes from strings to prevent PostgreSQL UTF8 encoding errors.
-    /// Null bytes can appear in external data from APIs or file imports.
-    /// </summary>
-    private static string? SanitizeString(string? input)
-    {
-        return input?.Replace("\0", string.Empty);
     }
 }

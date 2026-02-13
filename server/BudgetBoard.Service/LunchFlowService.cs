@@ -399,10 +399,10 @@ public class LunchFlowService(
                     new TransactionCreateRequest
                     {
                         AccountID = userAccount.ID,
-                        SyncID = SanitizeString(transaction.ID),
+                        SyncID = transaction.ID,
                         Amount = transaction.Amount,
                         Date = DateTime.Parse(transaction.Date),
-                        MerchantName = SanitizeString(transaction.Merchant),
+                        MerchantName = transaction.Merchant,
                         Source = TransactionSource.LunchFlow.Value,
                     }
                 );
@@ -497,13 +497,5 @@ public class LunchFlowService(
         }
 
         return errors;
-    }
-
-    /// <summary>
-    /// Removes null bytes from strings to prevent PostgreSQL UTF8 encoding errors.
-    /// </summary>
-    private static string? SanitizeString(string? input)
-    {
-        return input?.Replace("\0", string.Empty);
     }
 }
