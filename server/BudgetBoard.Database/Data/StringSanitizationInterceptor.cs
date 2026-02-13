@@ -39,12 +39,16 @@ public class StringSanitizationInterceptor : SaveChangesInterceptor
 
         foreach (var entry in entries)
         {
-            foreach (var property in entry.Properties)
+            foreach (
+                var property in entry.Properties.Where(p =>
+                    p.CurrentValue is string s && s.Contains('\0')
+                )
+            )
             {
-                if (property.CurrentValue is string stringValue && stringValue.Contains('\0'))
-                {
-                    property.CurrentValue = stringValue.Replace("\0", string.Empty);
-                }
+                property.CurrentValue = ((string)property.CurrentValue!).Replace(
+                    "\0",
+                    string.Empty
+                );
             }
         }
     }
