@@ -51,6 +51,11 @@ public class UserSettings
     public string Language { get; set; } = "default";
 
     /// <summary>
+    /// Gets or sets the date format used for the user.
+    /// </summary>
+    public string DateFormat { get; set; } = "default";
+
+    /// <summary>
     /// The percentage threshold for budget warnings.
     /// </summary>
     public int BudgetWarningThreshold { get; set; } = 80;

@@ -120,6 +120,7 @@
   "date_is_required": "Date is required.",
   "date_range": "Date Range",
   "days_since_deleted": "{{days}} days since deleted",
+  "dd_mm_yyyy": "DD/MM/YYYY",
   "de": "German",
   "decimal_separator": "Decimal Separator",
   "decimal_separator_required_message": "Decimal separator is required.",
@@ -263,6 +264,7 @@
   "matches_regex": "Matches regex",
   "merchant_name": "Merchant Name",
   "missing_information": "Missing information",
+  "mm_dd_yyyy": "MM/DD/YYYY",
   "month": "Month",
   "monthly_contribution": "Monthly Contribution",
   "name": "Name",
@@ -321,6 +323,7 @@
   "please_provide_valid_delimiter_message": "Please provide a valid delimiter.",
   "please_select_valid_csv_file_message": "Please select a valid CSV file.",
   "preferred_currency": "Preferred Currency",
+  "preferred_date_format": "Preferred Date Format",
   "preferred_language": "Preferred Language",
   "preferred_language_description": "Translations may be incorrect or incomplete. If you notice any issues, please consider contributing a fix on <0>Weblate</0>.",
   "purchase_date": "Purchase Date",
@@ -365,6 +368,7 @@
   "select_csv_file": "Select CSV file",
   "select_currency": "Select currency",
   "select_multiple": "Select Multiple",
+  "select_your_preferred_date_format": "Select your preferred date format",
   "select_your_preferred_language": "Select your preferred language",
   "sell_date": "Sell Date",
   "sell_price": "Sell Price",
@@ -440,5 +444,6 @@
   "view_and_restore_deleted_transactions": "View and restore deleted transactions.",
   "welcome_to": "Welcome to",
   "widget_no_items_configured_message": "No items are configured for this widget.",
+  "yyyy_mm_dd": "YYYY/MM/DD",
   "zh_hans": "Chinese (Simplified)"
 }

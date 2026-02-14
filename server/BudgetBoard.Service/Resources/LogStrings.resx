@@ -316,6 +316,9 @@
   <data name="InvalidLanguageCodeLog" xml:space="preserve">
     <value>Attempted to update user settings with an invalid language code.</value>
   </data>
+  <data name="InvalidDateFormatLog" xml:space="preserve">
+    <value>Attempted to update user settings with an invalid date format.</value>
+  </data>
   <data name="InvalidBudgetWarningThresholdLog" xml:space="preserve">
     <value>Attempted to update user settings with an invalid budget threshold value.</value>
   </data>
