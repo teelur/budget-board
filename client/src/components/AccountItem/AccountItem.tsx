@@ -22,7 +22,7 @@ interface AccountItemProps {
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
-  const { dayjs } = useDate();
+  const { dayjs, dateFormat } = useDate();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -61,7 +61,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
       <DimmedText size="xs">
         {t("last_updated", {
           date: props.account.balanceDate
-            ? dayjs(props.account.balanceDate).format("L LT")
+            ? dayjs(props.account.balanceDate).format(`${dateFormat} LT`)
             : t("never"),
         })}
       </DimmedText>

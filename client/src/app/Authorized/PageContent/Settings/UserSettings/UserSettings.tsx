@@ -77,9 +77,13 @@ const UserSettings = (): React.ReactNode => {
     if (userSettingsQuery.data?.language) {
       languageField.setValue(userSettingsQuery.data.language);
     }
+    if (userSettingsQuery.data?.dateFormat) {
+      dateFormatField.setValue(userSettingsQuery.data.dateFormat);
+    }
   }, [
     userSettingsQuery.data?.currency,
     userSettingsQuery.data?.language,
+    userSettingsQuery.data?.dateFormat,
     currencyField.setValue,
     languageField.setValue,
     dateFormatField.setValue,
