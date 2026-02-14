@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -58,4 +58,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="UnexpectedServerError" xml:space="preserve">
+    <value>Une erreur inattendue s’est produite.</value>
+  </data>
+  <data name="AuthCodeRequired" xml:space="preserve">
+    <value>Le code d’autorisation est requis.</value>
+  </data>
+  <data name="AuthFailed" xml:space="preserve">
+    <value>L’authentification a échoué.</value>
+  </data>
+  <data name="LoginFailed" xml:space="preserve">
+    <value>Impossible de terminer la connexion.</value>
+  </data>
+  <data name="UserNotAuthenticated" xml:space="preserve">
+    <value>L’utilisateur n’est pas authentifié.</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>L’utilisateur est introuvable.</value>
+  </data>
+  <data name="NoOidcLoginFound" xml:space="preserve">
+    <value>Aucune connexion OIDC n’a été trouvée pour cet utilisateur.</value>
+  </data>
+  <data name="RemoveOidcNoPassword" xml:space="preserve">
+    <value>Impossible de supprimer la connexion OIDC. L’utilisateur doit d’abord définir un mot de passe local afin de conserver l’accès au compte.</value>
+  </data>
+  <data name="RemoveOidcFailed" xml:space="preserve">
+    <value>Échec de la suppression de la connexion OIDC.</value>
+  </data>
+  <data name="RemoveOidcSuccess" xml:space="preserve">
+    <value>Connexion OIDC déconnectée avec succès.</value>
+  </data>
+  <data name="UserIdNotFound" xml:space="preserve">
+    <value>L’identifiant utilisateur est introuvable.</value>
+  </data>
+  <data name="InvalidJsonType" xml:space="preserve">
+    <value>Le type de jeton JSON fourni est invalide.</value>
+  </data>
+  <data name="LocalAccountProviderName" xml:space="preserve">
+    <value>Compte local</value>
+  </data>
+  <data name="RegistrationDisabledError" xml:space="preserve">
+    <value>L’inscription est désactivée.</value>
+  </data>
+  <data name="NoEmailConfirmationEndpointError" xml:space="preserve">
+    <value>Aucun point de terminaison de confirmation d’e-mail n’a été enregistré !</value>
+  </data>
+  <data name="UserEmailRequiredError" xml:space="preserve">
+    <value>L’utilisateur doit avoir une adresse e-mail.</value>
+  </data>
+  <data name="EndpointNotFoundError" xml:space="preserve">
+    <value>Impossible de trouver le point de terminaison nommé '{0}'.</value>
+  </data>
+  <data name="InvalidLanguageError" xml:space="preserve">
+    <value>La langue spécifiée '{0}' n’est pas prise en charge.</value>
+  </data>
 </root>
