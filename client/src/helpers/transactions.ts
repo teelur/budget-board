@@ -349,7 +349,12 @@ export const buildCategoryToTransactionsTotalMap = (
       currentTotalCategory + transaction.amount
     );
 
-    if (transaction.subcategory !== null && transaction.subcategory !== "") {
+    if (
+      transaction.subcategory !== null &&
+      transaction.subcategory !== "" &&
+      transaction.subcategory.toLocaleLowerCase() !==
+        (transaction.category ?? "").toLocaleLowerCase()
+    ) {
       const currentTotalSubCategory =
         categoryToTransactionsTotalMap.get(
           transaction.subcategory.toLocaleLowerCase()
