@@ -15,12 +15,12 @@ import { useField } from "@mantine/form";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IUserSettings } from "~/models/userSettings";
-import dayjs from "dayjs";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface EditableTransactionCardProps {
   transaction: ITransaction;
@@ -29,7 +29,7 @@ interface EditableTransactionCardProps {
 }
 
 const EditableTransactionCardContent = (
-  props: EditableTransactionCardProps
+  props: EditableTransactionCardProps,
 ): React.ReactNode => {
   const dateField = useField<Date>({
     initialValue: props.transaction.date,
@@ -40,14 +40,15 @@ const EditableTransactionCardContent = (
   const categoryField = useField<string>({
     initialValue:
       (props.transaction.subcategory ?? "").length > 0
-        ? props.transaction.subcategory ?? ""
-        : props.transaction.category ?? "",
+        ? (props.transaction.subcategory ?? "")
+        : (props.transaction.category ?? ""),
   });
   const amountField = useField<number>({
     initialValue: props.transaction.amount,
   });
 
   const { t } = useTranslation();
+  const { dayjs, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -93,8 +94,8 @@ const EditableTransactionCardContent = (
                   subcategory: variables.subcategory,
                   merchantName: variables.merchantName,
                 }
-              : oldTransaction
-          )
+              : oldTransaction,
+          ),
       );
 
       return { previousTransactions };
@@ -102,11 +103,11 @@ const EditableTransactionCardContent = (
     onError: (
       error: AxiosError,
       _variables: ITransactionUpdateRequest,
-      context
+      context,
     ) => {
       queryClient.setQueryData(
         ["transactions", { getHidden: false }],
-        context?.previousTransactions ?? []
+        context?.previousTransactions ?? [],
       );
       notifications.show({
         color: "var(--button-color-destructive)",
@@ -163,14 +164,14 @@ const EditableTransactionCardContent = (
       merchantName: merchantField.getValue(),
       category: getParentCategory(
         categoryField.getValue() ?? "",
-        props.categories
+        props.categories,
       ),
       subcategory: getIsParentCategory(
         categoryField.getValue() ?? "",
-        props.categories
+        props.categories,
       )
         ? ""
-        : categoryField.getValue() ?? "",
+        : (categoryField.getValue() ?? ""),
       amount: amountField.getValue(),
     });
   };
@@ -191,6 +192,8 @@ const EditableTransactionCardContent = (
             <DateInput
               w="100%"
               {...dateField.getInputProps()}
+              valueFormat={longDateFormat}
+              locale={dayjs.locale()}
               onChange={onDateChange}
               elevation={props.elevation}
             />

@@ -13,6 +13,7 @@ import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface ChartDatum {
   month: string;
@@ -31,6 +32,7 @@ interface NetCashFlowChartProps {
 
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { dayjs } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -50,7 +52,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   });
 
   const sortedMonths = props.months.sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
   );
 
   const buildChartData = (): ChartDatum[] => {
@@ -59,7 +61,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
     sortedMonths.forEach((month) => {
       const transactionsForMonth = getTransactionsForMonth(
         props.transactions,
-        month
+        month,
       );
 
       const incomeTotal = transactionsForMonth.reduce(
@@ -67,7 +69,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
           areStringsEqual(curr.category ?? "", "Income")
             ? acc + curr.amount
             : acc,
-        0
+        0,
       );
 
       const spendingTotal = transactionsForMonth.reduce(
@@ -75,11 +77,11 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
           !areStringsEqual(curr.category ?? "", "Income")
             ? acc + curr.amount
             : acc,
-        0
+        0,
       );
 
       spendingTrendsChartData.push({
-        month: getMonthAndYearDateString(month),
+        month: getMonthAndYearDateString(month, dayjs.locale()),
         Income: incomeTotal,
         Spending: spendingTotal,
         Net: incomeTotal + spendingTotal,
@@ -100,7 +102,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
       : convertNumberToCurrency(
           value,
           false,
-          userSettingsQuery.data?.currency ?? "USD"
+          userSettingsQuery.data?.currency ?? "USD",
         );
   };
 

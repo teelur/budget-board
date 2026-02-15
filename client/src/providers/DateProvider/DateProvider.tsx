@@ -17,12 +17,14 @@ export interface DateContextValue {
   dayjs: typeof dayjs;
   locale: string;
   dateFormat: string;
+  longDateFormat: string;
 }
 
 export const DateContext = React.createContext<DateContextValue>({
   dayjs,
   locale: "en",
   dateFormat: "L",
+  longDateFormat: "LL",
 });
 
 export const DateProvider = ({
@@ -49,6 +51,19 @@ export const DateProvider = ({
     },
   });
 
+  const getLongDateFormat = (dateFormat: string): string => {
+    switch (dateFormat) {
+      case "MM/DD/YYYY":
+        return "MMMM D, YYYY";
+      case "DD/MM/YYYY":
+        return "D MMMM YYYY";
+      case "YYYY/MM/DD":
+        return "YYYY MMMM D";
+      default:
+        return "LL";
+    }
+  };
+
   // Update dayjs locale whenever i18n language changes
   React.useEffect(() => {
     const dayjsLocale = localeMap[i18n.language] || "en";
@@ -67,6 +82,7 @@ export const DateProvider = ({
       dayjs,
       locale: dayjsLocale,
       dateFormat,
+      longDateFormat: getLongDateFormat(dateFormat),
     };
   }, [i18n.language, userSettingsQuery.data?.dateFormat]);
 
