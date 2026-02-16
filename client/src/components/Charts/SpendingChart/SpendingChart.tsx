@@ -47,19 +47,21 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
     },
   });
 
+  const formatDateString = (date: Date) => dayjs(date).format("MMMM YYYY");
+
   const chartData = React.useMemo(
     () =>
       buildTransactionChartData(
         sortedMonths,
         props.transactions,
-        dayjs.locale(),
+        formatDateString,
       ),
-    [sortedMonths, props.transactions],
+    [sortedMonths, props.transactions, formatDateString],
   );
 
   const chartSeries = React.useMemo(
-    () => buildTransactionChartSeries(sortedMonths, dayjs.locale()),
-    [sortedMonths],
+    () => buildTransactionChartSeries(sortedMonths, formatDateString),
+    [sortedMonths, formatDateString],
   );
 
   const chartValueFormatter = (value: number): string => {

@@ -4,7 +4,7 @@ import {
   getTransactionsForMonth,
   RollingTotalSpendingPerDay,
 } from "./transactions";
-import { getDaysInMonth, getMonthAndYearDateString } from "./datetime";
+import { getDaysInMonth } from "./datetime";
 
 export const chartColors = [
   "indigo.6",
@@ -27,7 +27,7 @@ export const chartColors = [
 export const buildTransactionChartData = (
   months: Date[],
   transactions: ITransaction[],
-  locale: string,
+  formatDateString: (date: Date) => string,
 ): any[] => {
   const spendingTrendsChartData: any[] = [];
   months.forEach((month) => {
@@ -57,13 +57,11 @@ export const buildTransactionChartData = (
         if (chartDay == null) {
           const newChartDay: any = {
             day: rollingTotalTransaction.day,
-            [getMonthAndYearDateString(month, locale)]:
-              rollingTotalTransaction.amount,
+            [formatDateString(month)]: rollingTotalTransaction.amount,
           };
           spendingTrendsChartData.push(newChartDay);
         } else {
-          chartDay[getMonthAndYearDateString(month, locale)] =
-            rollingTotalTransaction.amount;
+          chartDay[formatDateString(month)] = rollingTotalTransaction.amount;
         }
       },
     );
@@ -79,10 +77,10 @@ export const buildTransactionChartData = (
  */
 export const buildTransactionChartSeries = (
   months: Date[],
-  locale: string,
+  formatDateString: (date: Date) => string,
 ): { name: string; color: string }[] =>
   months.map((month, i) => ({
-    name: getMonthAndYearDateString(month, locale),
+    name: formatDateString(month),
     color: chartColors[i % chartColors.length] ?? "gray.6",
   }));
 

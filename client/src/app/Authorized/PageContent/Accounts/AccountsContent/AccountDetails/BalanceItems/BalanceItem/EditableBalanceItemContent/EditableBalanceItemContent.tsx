@@ -4,16 +4,16 @@ import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import dayjs from "dayjs";
 import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceResponse, IBalanceUpdateRequest } from "~/models/balance";
-import ElevatedDateInput from "~/components/core/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
-import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 interface EditableBalanceItemContentProps {
   balance: IBalanceResponse;
@@ -22,8 +22,12 @@ interface EditableBalanceItemContentProps {
 }
 
 const EditableBalanceItemContent = (
-  props: EditableBalanceItemContentProps
+  props: EditableBalanceItemContentProps,
 ): React.ReactNode => {
+  const { t } = useTranslation();
+  const { dayjs, longDateFormat } = useDate();
+  const { request } = useAuth();
+
   const balanceAmountField = useField<string | number | undefined>({
     initialValue: props.balance.amount,
     validateOnBlur: true,
@@ -34,19 +38,9 @@ const EditableBalanceItemContent = (
       return null;
     },
   });
-  const balanceDateField = useField<string>({
-    initialValue: dayjs(props.balance.dateTime).format("YYYY-MM-DD"),
-    validateOnBlur: true,
-    validate: (balance) => {
-      if (!dayjs(balance).isValid()) {
-        return "Date must be valid";
-      }
-      return null;
-    },
+  const balanceDateField = useField<Date>({
+    initialValue: props.balance.dateTime,
   });
-
-  const { t } = useTranslation();
-  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doUpdateBalance = useMutation({
@@ -140,11 +134,14 @@ const EditableBalanceItemContent = (
         }
       />
       <Stack w="100%" gap="0.5rem">
-        <ElevatedDateInput
+        <DateInput
           {...balanceDateField.getInputProps()}
           flex="1 1 auto"
+          locale={dayjs.locale()}
+          valueFormat={longDateFormat}
+          elevation={2}
         />
-        <ElevatedNumberInput
+        <NumberInput
           {...balanceAmountField.getInputProps()}
           flex="1 1 auto"
           prefix={getCurrencySymbol(props.userCurrency)}
@@ -152,6 +149,7 @@ const EditableBalanceItemContent = (
           decimalScale={2}
           fixedDecimalScale
           onBlur={() => doUpdateBalance.mutate()}
+          elevation={2}
         />
       </Stack>
       <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
