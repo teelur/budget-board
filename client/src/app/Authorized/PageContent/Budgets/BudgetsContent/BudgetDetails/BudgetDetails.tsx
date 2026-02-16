@@ -59,7 +59,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   )
     .filter((transaction) =>
       dayjs(transaction.date).isAfter(
-        getDateFromMonthsAgo(chartLookbackMonths, props.month ?? new Date()),
+        getDateFromMonthsAgo(
+          chartLookbackMonths,
+          props.month ?? dayjs().toDate(),
+        ),
         "month",
       ),
     )
@@ -85,7 +88,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     );
 
   const chartMonths = Array.from({ length: chartLookbackMonths }, (_, i) =>
-    getDateFromMonthsAgo(i, props.month ?? new Date()),
+    getDateFromMonthsAgo(i, props.month ?? dayjs().toDate()),
   );
 
   const isExpenseCategory = !areStringsEqual(

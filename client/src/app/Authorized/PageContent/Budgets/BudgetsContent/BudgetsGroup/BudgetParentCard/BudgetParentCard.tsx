@@ -35,6 +35,7 @@ import Popover from "~/components/core/Popover/Popover";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { useTranslation, Trans } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -49,20 +50,21 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const [isSelected, { toggle, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
+  const { dayjs } = useDate();
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
   const limit =
     props.categoryToLimitsMap.get(props.categoryTree.value.toLowerCase()) ?? 0;
   const amount =
     props.categoryToTransactionsTotalMap.get(
-      props.categoryTree.value.toLowerCase()
+      props.categoryTree.value.toLowerCase(),
     ) ?? 0;
 
   const budgets =
     props.categoryToBudgetsMap.get(props.categoryTree.value.toLowerCase()) ??
     [];
   const id =
-    budgets.length === 1 && props.selectedDate ? budgets[0]?.id ?? "" : "";
+    budgets.length === 1 && props.selectedDate ? (budgets[0]?.id ?? "") : "";
 
   const newLimitField = useField<number | string>({
     initialValue: limit ?? 0,
@@ -71,11 +73,11 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
 
   const percentComplete = roundAwayFromZero(
     (((props.categoryToTransactionsTotalMap.get(
-      props.categoryTree.value.toLowerCase()
+      props.categoryTree.value.toLowerCase(),
     ) ?? 0) *
       (isIncome ? 1 : -1)) /
       limit) *
-      100
+      100,
   );
 
   const { request } = useAuth();
@@ -114,8 +116,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
         oldBudgets?.map((oldBudget) =>
           oldBudget.id === variables.id
             ? { ...oldBudget, limit: variables.limit }
-            : oldBudget
-        )
+            : oldBudget,
+        ),
       );
 
       return { previousBudgets };
@@ -160,7 +162,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
         props.categoryToLimitsMap.get(subCategory.value.toLowerCase()) ?? 0;
       return acc + limit;
     },
-    0
+    0,
   );
 
   interface ChildCards {
@@ -178,11 +180,11 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       ) {
         const budgets =
           props.categoryToBudgetsMap.get(
-            subCategory.value.toLocaleLowerCase()
+            subCategory.value.toLocaleLowerCase(),
           ) ?? [];
         const budgetId =
           budgets.length === 1 && props.selectedDate
-            ? budgets[0]?.id ?? ""
+            ? (budgets[0]?.id ?? "")
             : "";
         budgetChildCards.push(
           <BudgetChildCard
@@ -191,7 +193,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
             categoryValue={subCategory.value}
             amount={
               props.categoryToTransactionsTotalMap.get(
-                subCategory.value.toLowerCase()
+                subCategory.value.toLowerCase(),
               ) ?? 0
             }
             limit={
@@ -199,13 +201,13 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               0
             }
             isIncome={isIncome}
-            selectedDate={props.selectedDate ?? new Date()}
+            selectedDate={props.selectedDate ?? dayjs().toDate()}
             openDetails={props.openDetails}
-          />
+          />,
         );
       } else if (
         props.categoryToTransactionsTotalMap.has(
-          subCategory.value.toLocaleLowerCase()
+          subCategory.value.toLocaleLowerCase(),
         )
       ) {
         unbudgetChildCards.push(
@@ -214,13 +216,13 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
             category={subCategory.value}
             amount={
               props.categoryToTransactionsTotalMap.get(
-                subCategory.value.toLowerCase()
+                subCategory.value.toLowerCase(),
               ) ?? 0
             }
             selectedDate={props.selectedDate}
             isIncome={isIncome}
             openDetails={props.openDetails}
-          />
+          />,
         );
       }
     });
@@ -281,7 +283,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                           amount: convertNumberToCurrency(
                             amount * (isIncome ? 1 : -1),
                             false,
-                            userSettingsQuery.data?.currency ?? "USD"
+                            userSettingsQuery.data?.currency ?? "USD",
                           ),
                         }}
                         components={[
@@ -297,7 +299,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                           max={999999}
                           step={1}
                           prefix={getCurrencySymbol(
-                            userSettingsQuery.data?.currency
+                            userSettingsQuery.data?.currency,
                           )}
                           placeholder={t("enter_limit")}
                           size="xs"
@@ -321,12 +323,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         amount: convertNumberToCurrency(
                           amount * (isIncome ? 1 : -1),
                           false,
-                          userSettingsQuery.data?.currency ?? "USD"
+                          userSettingsQuery.data?.currency ?? "USD",
                         ),
                         total: convertNumberToCurrency(
                           limit,
                           false,
-                          userSettingsQuery.data?.currency ?? "USD"
+                          userSettingsQuery.data?.currency ?? "USD",
                         ),
                       }}
                       components={[
@@ -363,7 +365,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     amount: convertNumberToCurrency(
                       roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
                       false,
-                      userSettingsQuery.data?.currency ?? "USD"
+                      userSettingsQuery.data?.currency ?? "USD",
                     ),
                   }}
                   components={[

@@ -19,6 +19,7 @@ import {
 } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -26,7 +27,7 @@ interface DuplicateTransactionTableProps {
 }
 
 const DuplicateTransactionTable = (
-  props: DuplicateTransactionTableProps
+  props: DuplicateTransactionTableProps,
 ): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 5;
@@ -40,6 +41,7 @@ const DuplicateTransactionTable = (
   }, [props.tableData]);
 
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -78,7 +80,7 @@ const DuplicateTransactionTable = (
     const map = new Map<string, string>();
     props.tableData.values().forEach((value) => {
       const account = accountsQuery.data?.find(
-        (account) => account.id === value.accountID
+        (account) => account.id === value.accountID,
       );
       if (!account) {
         return;
@@ -116,7 +118,7 @@ const DuplicateTransactionTable = (
               })
               .slice(
                 (page - 1) * itemsPerPage,
-                (page - 1) * itemsPerPage + itemsPerPage
+                (page - 1) * itemsPerPage + itemsPerPage,
               )
               .map((row, index) => (
                 <React.Fragment key={row.importedTransaction.uid}>
@@ -128,7 +130,7 @@ const DuplicateTransactionTable = (
                           variant="subtle"
                           onClick={() => {
                             props.restoreTransaction(
-                              row.importedTransaction.uid
+                              row.importedTransaction.uid,
                             );
                           }}
                         >
@@ -137,7 +139,7 @@ const DuplicateTransactionTable = (
                       </Flex>
                     </Table.Td>
                     <Table.Td>
-                      {row.importedTransaction.date?.toLocaleDateString()}
+                      {dayjs(row.importedTransaction.date).format(dateFormat)}
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.merchantName}</Table.Td>
                     <Table.Td>
@@ -146,7 +148,7 @@ const DuplicateTransactionTable = (
                         : convertNumberToCurrency(
                             row.importedTransaction.amount ?? 0,
                             true,
-                            userSettingsQuery.data?.currency ?? "USD"
+                            userSettingsQuery.data?.currency ?? "USD",
                           )}
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.account}</Table.Td>
@@ -158,9 +160,7 @@ const DuplicateTransactionTable = (
                       </Flex>
                     </Table.Td>
                     <Table.Td>
-                      {new Date(
-                        row.existingTransaction.date
-                      ).toLocaleDateString()}
+                      {dayjs(row.existingTransaction.date).format(dateFormat)}
                     </Table.Td>
                     <Table.Td>{row.existingTransaction.merchantName}</Table.Td>
                     <Table.Td>
@@ -169,12 +169,12 @@ const DuplicateTransactionTable = (
                         : convertNumberToCurrency(
                             row.existingTransaction.amount ?? 0,
                             true,
-                            userSettingsQuery.data?.currency ?? "USD"
+                            userSettingsQuery.data?.currency ?? "USD",
                           )}
                     </Table.Td>
                     <Table.Td>
                       {accountIDToNameMap.get(
-                        row.existingTransaction.accountID
+                        row.existingTransaction.accountID,
                       )}
                     </Table.Td>
                   </Table.Tr>
