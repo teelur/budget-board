@@ -9,7 +9,6 @@ import React from "react";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { getCurrencySymbol } from "~/helpers/currency";
-import dayjs from "dayjs";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -17,12 +16,13 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface FormValues {
   goalName: string;
   goalAccounts: string[];
   goalAmount: number;
-  goalCompleteDate: string | null;
+  goalCompleteDate: Date | null;
   goalMonthlyContribution: string | number;
   goalApplyAccountAmount: boolean;
 }
@@ -45,6 +45,7 @@ const SaveGoalForm = (): React.ReactNode => {
   });
 
   const { t } = useTranslation();
+  const { dayjs, locale, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -161,6 +162,8 @@ const SaveGoalForm = (): React.ReactNode => {
                 clearable
                 key={form.key("goalCompleteDate")}
                 {...form.getInputProps("goalCompleteDate")}
+                locale={locale}
+                valueFormat={longDateFormat}
                 elevation={1}
               />
             </Tabs.Panel>

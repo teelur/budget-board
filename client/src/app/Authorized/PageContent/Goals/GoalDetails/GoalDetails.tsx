@@ -15,12 +15,12 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
-import dayjs from "dayjs";
 import Drawer from "~/components/core/Drawer/Drawer";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Card from "~/components/core/Card/Card";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;
@@ -29,15 +29,16 @@ interface GoalDetailsProps {
 }
 
 const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
+  const { t } = useTranslation();
+  const { dayjs } = useDate();
+  const { request } = useAuth();
+
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(3);
 
   const dateRange: DatesRangeValue<string> = [
     dayjs().subtract(chartLookbackMonths, "month").toISOString(),
     dayjs().toISOString(),
   ];
-
-  const { t } = useTranslation();
-  const { request } = useAuth();
 
   const balancesQuery = useQueries({
     queries: (props.goal?.accounts ?? []).map((account: IAccountResponse) => ({

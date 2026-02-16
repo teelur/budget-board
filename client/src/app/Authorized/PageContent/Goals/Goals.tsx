@@ -1,5 +1,3 @@
-import classes from "./Goals.module.css";
-
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Skeleton, Stack } from "@mantine/core";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
@@ -20,7 +18,7 @@ const Goals = (): React.ReactNode => {
     useDisclosure();
 
   const [selectedGoal, setSelectedGoal] = React.useState<IGoalResponse | null>(
-    null
+    null,
   );
 
   const { request } = useAuth();
@@ -57,12 +55,12 @@ const Goals = (): React.ReactNode => {
 
   const activeGoals = React.useMemo(
     () => (goalsQuery.data ?? []).filter((goal) => goal.completed == null),
-    [goalsQuery.data]
+    [goalsQuery.data],
   );
 
   const completedGoals = React.useMemo(
     () => (goalsQuery.data ?? []).filter((goal) => goal.completed != null),
-    [goalsQuery.data]
+    [goalsQuery.data],
   );
 
   const openGoalDetails = (goal: IGoalResponse) => {
@@ -71,7 +69,7 @@ const Goals = (): React.ReactNode => {
   };
 
   return (
-    <Stack className={classes.root}>
+    <Stack w="100%" maw={1400}>
       <GoalDetails
         goal={selectedGoal}
         isOpen={isDetailsOpen}
@@ -81,7 +79,7 @@ const Goals = (): React.ReactNode => {
         includeInterest={includeInterest}
         toggleIncludeInterest={toggleIncludeInterest}
       />
-      <Stack className={classes.goals}>
+      <Stack gap="0.5rem">
         {goalsQuery.isPending ? (
           <Skeleton h={100} w="100%" radius="lg" />
         ) : (

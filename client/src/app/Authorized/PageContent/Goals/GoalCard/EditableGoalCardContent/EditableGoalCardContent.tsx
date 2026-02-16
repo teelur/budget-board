@@ -22,7 +22,6 @@ import { translateAxiosError } from "~/helpers/requests";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
-import dayjs from "dayjs";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -34,6 +33,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans, useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -42,9 +42,10 @@ interface GoalCardContentProps {
 }
 
 const EditableGoalCardContent = (
-  props: GoalCardContentProps
+  props: GoalCardContentProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
+  const { dayjs, locale, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const goalNameField = useField<string>({
@@ -57,8 +58,8 @@ const EditableGoalCardContent = (
     initialValue: props.goal.monthlyContribution,
   });
   const goalTargetDateField = useField<DateValue>({
-    initialValue: props.goal.completeDate
-      ? new Date(props.goal.completeDate)
+    initialValue: dayjs(props.goal.completeDate).isValid()
+      ? props.goal.completeDate
       : null,
   });
 
@@ -109,8 +110,8 @@ const EditableGoalCardContent = (
                   amount: variables.amount,
                   monthlyContribution: variables.monthlyContribution,
                 }
-              : oldGoal
-          )
+              : oldGoal,
+          ),
       );
 
       return { previousGoals };
@@ -118,7 +119,7 @@ const EditableGoalCardContent = (
     onError: (error: AxiosError, _variables: IGoalUpdateRequest, context) => {
       queryClient.setQueryData(
         ["goals", { includeInterest: props.includeInterest }],
-        context?.previousGoals ?? []
+        context?.previousGoals ?? [],
       );
       notifications.show({
         color: "var(--button-color-destructive)",
@@ -298,7 +299,7 @@ const EditableGoalCardContent = (
                         sumAccountsTotalBalance(props.goal.accounts) -
                           props.goal.initialAmount,
                         false,
-                        userSettingsQuery.data?.currency ?? "USD"
+                        userSettingsQuery.data?.currency ?? "USD",
                       ),
                     }}
                     components={[
@@ -315,7 +316,7 @@ const EditableGoalCardContent = (
                       maw={100}
                       min={0}
                       prefix={getCurrencySymbol(
-                        userSettingsQuery.data?.currency
+                        userSettingsQuery.data?.currency,
                       )}
                       thousandSeparator=","
                       {...goalTargetAmountField.getInputProps()}
@@ -332,15 +333,15 @@ const EditableGoalCardContent = (
                       sumAccountsTotalBalance(props.goal.accounts) -
                         props.goal.initialAmount,
                       false,
-                      userSettingsQuery.data?.currency ?? "USD"
+                      userSettingsQuery.data?.currency ?? "USD",
                     ),
                     total: convertNumberToCurrency(
                       getGoalTargetAmount(
                         props.goal.amount,
-                        props.goal.initialAmount
+                        props.goal.initialAmount,
                       ),
                       false,
-                      userSettingsQuery.data?.currency ?? "USD"
+                      userSettingsQuery.data?.currency ?? "USD",
                     ),
                   }}
                   components={[
@@ -372,7 +373,7 @@ const EditableGoalCardContent = (
                           sumAccountsTotalBalance(props.goal.accounts) -
                             props.goal.initialAmount,
                           false,
-                          userSettingsQuery.data?.currency ?? "USD"
+                          userSettingsQuery.data?.currency ?? "USD",
                         ),
                       }}
                       components={[<DimmedText size="sm" key="label" />]}
@@ -385,6 +386,8 @@ const EditableGoalCardContent = (
                       <DateInput
                         className="h-8"
                         {...goalTargetDateField.getInputProps()}
+                        locale={locale}
+                        valueFormat={longDateFormat}
                         onChange={submitTargetDateChanges}
                       />
                     </Flex>
@@ -393,12 +396,9 @@ const EditableGoalCardContent = (
                   <Trans
                     i18nKey="budget_projected_styled"
                     values={{
-                      amount: new Date(
-                        props.goal.completeDate
-                      ).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "long",
-                      }),
+                      amount: dayjs(props.goal.completeDate).format(
+                        "MMMM YYYY",
+                      ),
                     }}
                     components={[
                       <DimmedText size="sm" key="label" />,
@@ -418,7 +418,7 @@ const EditableGoalCardContent = (
                         sumAccountsTotalBalance(props.goal.accounts) -
                           props.goal.initialAmount,
                         false,
-                        userSettingsQuery.data?.currency ?? "USD"
+                        userSettingsQuery.data?.currency ?? "USD",
                       ),
                     }}
                     components={[
@@ -438,7 +438,7 @@ const EditableGoalCardContent = (
                       maw={100}
                       min={0}
                       prefix={getCurrencySymbol(
-                        userSettingsQuery.data?.currency
+                        userSettingsQuery.data?.currency,
                       )}
                       thousandSeparator=","
                       {...goalMonthlyContributionField.getInputProps()}
@@ -457,12 +457,12 @@ const EditableGoalCardContent = (
                     amount: convertNumberToCurrency(
                       props.goal.monthlyContributionProgress,
                       false,
-                      userSettingsQuery.data?.currency ?? "USD"
+                      userSettingsQuery.data?.currency ?? "USD",
                     ),
                     total: convertNumberToCurrency(
                       props.goal.monthlyContribution,
                       false,
-                      userSettingsQuery.data?.currency ?? "USD"
+                      userSettingsQuery.data?.currency ?? "USD",
                     ),
                   }}
                   components={[

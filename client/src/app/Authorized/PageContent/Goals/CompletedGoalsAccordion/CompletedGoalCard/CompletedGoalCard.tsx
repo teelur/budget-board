@@ -11,6 +11,7 @@ import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Trans } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface CompletedGoalCardProps {
   goal: IGoalResponse;
@@ -18,6 +19,7 @@ interface CompletedGoalCardProps {
 
 const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
   const { request } = useAuth();
+  const { dayjs } = useDate();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -56,10 +58,10 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
                 amount: convertNumberToCurrency(
                   getGoalTargetAmount(
                     props.goal.amount,
-                    props.goal.initialAmount
+                    props.goal.initialAmount,
                   ),
                   true,
-                  userSettingsQuery.data?.currency ?? "USD"
+                  userSettingsQuery.data?.currency ?? "USD",
                 ),
               }}
               components={[
@@ -72,7 +74,7 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
             <Trans
               i18nKey="goal_completed_date_styled"
               values={{
-                date: new Date(props.goal.completed ?? 0).toLocaleDateString(),
+                date: dayjs(props.goal.completed).format("MMMM YYYY"),
               }}
               components={[
                 <DimmedText size="sm" key="label" />,
