@@ -70,7 +70,13 @@ public class AssetService(
             throw new BudgetBoardServiceException(_responseLocalizer["AssetEditNotFoundError"]);
         }
 
-        _userDataContext.Entry(asset).CurrentValues.SetValues(request);
+        asset.Name = request.Name;
+        asset.PurchaseDate = request.PurchaseDate?.ToUniversalTime();
+        asset.PurchasePrice = request.PurchasePrice;
+        asset.SellDate = request.SellDate?.ToUniversalTime();
+        asset.SellPrice = request.SellPrice;
+        asset.Hide = request.Hide;
+
         await _userDataContext.SaveChangesAsync();
     }
 
