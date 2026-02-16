@@ -14,7 +14,6 @@ import { areStringsEqual } from "~/helpers/utils";
 import ColumnsSelect, { ISelectedColumns } from "./ColumnsSelect/ColumnsSelect";
 import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
 import { notifications } from "@mantine/notifications";
-import dayjs from "dayjs";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -24,6 +23,7 @@ import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -33,13 +33,14 @@ interface ConfigureTransactionsProps {
 }
 
 const ConfigureTransactions = (
-  props: ConfigureTransactionsProps
+  props: ConfigureTransactionsProps,
 ): React.ReactNode => {
   const [isPending, startTransition] = React.useTransition();
 
   const [alertDetails, setAlertDetails] = React.useState<string | null>(null);
 
   const { t } = useTranslation();
+  const { dayjs } = useDate();
 
   // The raw CSV data imported from the user's file.
   const [csvData, setCsvData] = React.useState<CsvRow[]>(props.csvData);
@@ -56,18 +57,18 @@ const ConfigureTransactions = (
       null,
     merchantName:
       props.csvHeaders.find((header) =>
-        areStringsEqual(header, t("merchant_name"))
+        areStringsEqual(header, t("merchant_name")),
       ) ?? null,
     category:
       props.csvHeaders.find((header) =>
-        areStringsEqual(header, t("category"))
+        areStringsEqual(header, t("category")),
       ) ?? null,
     amount:
       props.csvHeaders.find((header) => areStringsEqual(header, t("amount"))) ??
       null,
     account:
       props.csvHeaders.find((header) =>
-        areStringsEqual(header, t("account"))
+        areStringsEqual(header, t("account")),
       ) ?? null,
     incomeAmount: null,
     expenseAmount: null,
@@ -154,7 +155,7 @@ const ConfigureTransactions = (
       if (columnsOptions.splitAmountColumn) {
         if (!columnsSelect.incomeAmount && !columnsSelect.expenseAmount) {
           setAlertDetails(
-            t("transaction_import_columns_required_split_amount_message")
+            t("transaction_import_columns_required_split_amount_message"),
           );
           return;
         }
@@ -214,7 +215,7 @@ const ConfigureTransactions = (
     });
 
     const uniqueValues = Array.from(new Set(columnValues)).filter(
-      (value) => value !== null
+      (value) => value !== null,
     );
     return uniqueValues.map((value) => value.toString());
   };
@@ -236,7 +237,7 @@ const ConfigureTransactions = (
   const deleteImportedTransaction = (uid: number) => {
     setCsvData((prev) => prev.filter((row: any) => row.uid !== uid));
     setImportedTransactionsTableData((prev) =>
-      prev.filter((row) => row.uid !== uid)
+      prev.filter((row) => row.uid !== uid),
     );
   };
 
@@ -258,7 +259,7 @@ const ConfigureTransactions = (
    */
   const restoreImportedTransaction = (uid: number) => {
     const filteredTransaction = Array.from(duplicateTransactions.keys()).find(
-      (transaction) => transaction.uid === uid
+      (transaction) => transaction.uid === uid,
     );
 
     if (!filteredTransaction) {
@@ -314,14 +315,14 @@ const ConfigureTransactions = (
     // Thousands separators are not needed for parsing, so remove them
     normalized = normalized.replace(
       new RegExp(escapeRegexCharacters(columnsOptions.thousandsSeparator), "g"),
-      ""
+      "",
     );
 
     // Replace decimal separator with standard period only if it's different
     if (columnsOptions.decimalSeparator !== ".") {
       normalized = normalized.replace(
         new RegExp(escapeRegexCharacters(columnsOptions.decimalSeparator), "g"),
-        "."
+        ".",
       );
     }
 
@@ -461,7 +462,7 @@ const ConfigureTransactions = (
           transaction.type != null &&
           areStringsEqual(
             transaction.type.toString(),
-            columnsOptions.expensesColumnValue!
+            columnsOptions.expensesColumnValue!,
           ) &&
           transaction.amount
         ) {
@@ -492,7 +493,7 @@ const ConfigureTransactions = (
     // Fast-paths
     if (transactions.length === 0 || !transactionsQuery.data?.length) {
       setDuplicateTransactions(
-        new Map<ITransactionImportTableData, ITransaction>()
+        new Map<ITransactionImportTableData, ITransaction>(),
       );
       return transactions;
     }
@@ -506,7 +507,7 @@ const ConfigureTransactions = (
       !filterOpts?.account
     ) {
       setDuplicateTransactions(
-        new Map<ITransactionImportTableData, ITransaction>()
+        new Map<ITransactionImportTableData, ITransaction>(),
       );
       return transactions;
     }
@@ -526,7 +527,7 @@ const ConfigureTransactions = (
     // into O(N + M) map lookups.
     type Key = string;
     const makeKey = (
-      t: Partial<ITransaction> | ITransactionImportTableData
+      t: Partial<ITransaction> | ITransactionImportTableData,
     ): Key => {
       const parts: string[] = [];
       if (filterOpts.date && (t as any).date) {
@@ -537,7 +538,7 @@ const ConfigureTransactions = (
       }
       if (filterOpts.merchantName) {
         parts.push(
-          ((t as any).merchantName ?? "").toString().trim().toLowerCase()
+          ((t as any).merchantName ?? "").toString().trim().toLowerCase(),
         );
       }
       if (filterOpts.category) {
@@ -548,27 +549,30 @@ const ConfigureTransactions = (
           (t as ITransaction).subcategory !== undefined
         ) {
           parts.push(
-            ((t as ITransaction).category ?? "").toString().trim().toLowerCase()
+            ((t as ITransaction).category ?? "")
+              .toString()
+              .trim()
+              .toLowerCase(),
           );
           parts.push(
             ((t as ITransaction).subcategory ?? "")
               .toString()
               .trim()
-              .toLowerCase()
+              .toLowerCase(),
           );
         } else {
           const importedParent = getParentCategory(
             (t as any).category ?? "",
-            transactionCategories
+            transactionCategories,
           )
             .toString()
             .trim()
             .toLowerCase();
           const isParent = getIsParentCategory(
             (t as any).category ?? "",
-            transactionCategories
+            transactionCategories,
           );
-          const importedChild = isParent ? "" : (t as any).category ?? "";
+          const importedChild = isParent ? "" : ((t as any).category ?? "");
           parts.push(importedParent);
           parts.push(importedChild.toString().trim().toLowerCase());
         }
@@ -583,11 +587,11 @@ const ConfigureTransactions = (
           parts.push(
             (
               accountNameToId.get(
-                ((t as any).account ?? "").toString().trim().toLowerCase()
+                ((t as any).account ?? "").toString().trim().toLowerCase(),
               ) ?? ""
             )
               .toString()
-              .trim()
+              .trim(),
           );
         }
       }
@@ -627,13 +631,13 @@ const ConfigureTransactions = (
           if (ok && filterOpts.category) {
             const importedParent = getParentCategory(
               imp.category ?? "",
-              transactionCategories
+              transactionCategories,
             );
             const isParent = getIsParentCategory(
               imp.category ?? "",
-              transactionCategories
+              transactionCategories,
             );
-            const importedChild = isParent ? "" : imp.category ?? "";
+            const importedChild = isParent ? "" : (imp.category ?? "");
             ok =
               ok &&
               areStringsEqual(c.category ?? "", importedParent) &&
@@ -644,7 +648,7 @@ const ConfigureTransactions = (
           }
           if (ok && filterOpts.account) {
             const importedAccountID = accountNameToId.get(
-              ((imp.account ?? "") as string).toString().trim().toLowerCase()
+              ((imp.account ?? "") as string).toString().trim().toLowerCase(),
             );
             ok =
               ok &&
@@ -699,7 +703,7 @@ const ConfigureTransactions = (
       ) {
         setImportedTransactionsTableData([]);
         setDuplicateTransactions(
-          new Map<ITransactionImportTableData, ITransaction>()
+          new Map<ITransactionImportTableData, ITransaction>(),
         );
       }
 
@@ -716,7 +720,7 @@ const ConfigureTransactions = (
         filteredImportedTransactions = importedTransactions;
 
         setDuplicateTransactions(
-          new Map<ITransactionImportTableData, ITransaction>()
+          new Map<ITransactionImportTableData, ITransaction>(),
         );
       }
 
@@ -730,7 +734,7 @@ const ConfigureTransactions = (
       });
       setImportedTransactionsTableData([]);
       setDuplicateTransactions(
-        new Map<ITransactionImportTableData, ITransaction>()
+        new Map<ITransactionImportTableData, ITransaction>(),
       );
     }
   };

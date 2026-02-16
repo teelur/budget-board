@@ -9,6 +9,7 @@ import {
   TransactionFields,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface ActionItemProps {
   action: IRuleParameterResponse;
@@ -18,6 +19,10 @@ interface ActionItemProps {
 
 const ActionItem = (props: ActionItemProps) => {
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
+
+  const formatDate = (dateStr: string): string =>
+    dayjs(dateStr).format(dateFormat);
 
   const getCardContent = (): React.ReactNode => {
     if (props.action.operator === "set") {
@@ -25,7 +30,7 @@ const ActionItem = (props: ActionItemProps) => {
         <>
           <Badge bg="purple" size="sm">
             {TransactionFields.find(
-              (field) => field.value === props.action.field
+              (field) => field.value === props.action.field,
             )?.label ?? props.action.field}
           </Badge>
           <PrimaryText size="sm">{t("to")}</PrimaryText>
@@ -34,7 +39,8 @@ const ActionItem = (props: ActionItemProps) => {
               props.action.field,
               props.action.value,
               props.currency,
-              props.categories
+              props.categories,
+              formatDate,
             )}
           </Badge>
         </>
@@ -44,7 +50,7 @@ const ActionItem = (props: ActionItemProps) => {
   };
 
   const operatorLabelKey = ActionOperators.find(
-    (op) => op.value === props.action.operator
+    (op) => op.value === props.action.operator,
   )?.label;
 
   return (
