@@ -4,15 +4,15 @@ import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import dayjs from "dayjs";
 import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IValueResponse, IValueUpdateRequest } from "~/models/value";
-import ElevatedDateInput from "~/components/core/Input/Elevated/ElevatedDateInput/ElevatedDateInput";
-import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
+import { useDate } from "~/providers/DateProvider/DateProvider";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 interface EditableValueItemContentProps {
   value: IValueResponse;
@@ -21,8 +21,11 @@ interface EditableValueItemContentProps {
 }
 
 const EditableValueItemContent = (
-  props: EditableValueItemContentProps
+  props: EditableValueItemContentProps,
 ): React.ReactNode => {
+  const { request } = useAuth();
+  const { locale, longDateFormat } = useDate();
+
   const valueAmountField = useField<string | number | undefined>({
     initialValue: props.value.amount,
     validateOnBlur: true,
@@ -33,18 +36,9 @@ const EditableValueItemContent = (
       return null;
     },
   });
-  const valueDateField = useField<string>({
-    initialValue: dayjs(props.value.dateTime).format("YYYY-MM-DD"),
-    validateOnBlur: true,
-    validate: (value) => {
-      if (!dayjs(value).isValid()) {
-        return "Date must be valid";
-      }
-      return null;
-    },
+  const valueDateField = useField<Date>({
+    initialValue: props.value.dateTime,
   });
-
-  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doUpdateValue = useMutation({
@@ -55,7 +49,7 @@ const EditableValueItemContent = (
         data: {
           id: props.value.id,
           amount: Number(valueAmountField.getValue()),
-          dateTime: dayjs(valueDateField.getValue()).toDate(),
+          dateTime: valueDateField.getValue(),
         } as IValueUpdateRequest,
       }),
     onSuccess: async () => {
@@ -146,11 +140,14 @@ const EditableValueItemContent = (
         }
       />
       <Stack w="100%">
-        <ElevatedDateInput
+        <DateInput
           {...valueDateField.getInputProps()}
           flex="1 1 auto"
+          locale={locale}
+          valueFormat={longDateFormat}
+          elevation={2}
         />
-        <ElevatedNumberInput
+        <NumberInput
           {...valueAmountField.getInputProps()}
           flex="1 1 auto"
           prefix={getCurrencySymbol(props.userCurrency)}
@@ -158,6 +155,7 @@ const EditableValueItemContent = (
           decimalScale={2}
           fixedDecimalScale
           onBlur={() => doUpdateValue.mutate()}
+          elevation={2}
         />
       </Stack>
       <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">

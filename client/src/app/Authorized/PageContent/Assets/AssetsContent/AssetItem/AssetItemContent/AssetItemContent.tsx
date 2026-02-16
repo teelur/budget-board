@@ -7,6 +7,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface AssetItemContentProps {
   asset: IAssetResponse;
@@ -16,6 +17,7 @@ interface AssetItemContentProps {
 
 const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
 
   return (
     <Stack gap={0} flex="1 1 auto">
@@ -43,19 +45,20 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
           {convertNumberToCurrency(
             props.asset.currentValue ?? 0,
             true,
-            props.userCurrency
+            props.userCurrency,
           )}
         </StatusText>
       </Group>
       <Group justify="space-between" align="center">
-        {props.asset.purchaseDate && props.asset.purchasePrice ? (
+        {dayjs(props.asset.purchaseDate).isValid() &&
+        props.asset.purchasePrice ? (
           <DimmedText size="sm">
             {t("purchased_on_for", {
-              date: new Date(props.asset.purchaseDate).toLocaleDateString(),
+              date: dayjs(props.asset.purchaseDate).format(dateFormat),
               price: convertNumberToCurrency(
                 props.asset.purchasePrice ?? 0,
                 true,
-                props.userCurrency
+                props.userCurrency,
               ),
             })}
           </DimmedText>
@@ -64,8 +67,8 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
         )}
         <DimmedText size="sm">
           {t("last_updated", {
-            date: props.asset.valueDate
-              ? new Date(props.asset.valueDate).toLocaleDateString()
+            date: dayjs(props.asset.valueDate).isValid()
+              ? dayjs(props.asset.valueDate).format(`${dateFormat} LT`)
               : t("never"),
           })}
         </DimmedText>

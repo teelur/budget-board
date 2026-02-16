@@ -382,7 +382,7 @@
   "simplefin_access_token_updated_successfully": "SimpleFIN access token updated successfully.",
   "simplefin_key_is_required": "SimpleFIN key is required.",
   "sold": "Sold",
-  "sold_on_for_styled": "<0>Sold on</0> <1>{{date}}</1> <2>for</2> <3>{{price}}</3>",
+  "sold_on_for_styled": "<0>Sold on</0> <1>{{date}}</1> <0>for</0> <1>{{price}}</1>",
   "sort_by": "Sort By",
   "spending": "Spending",
   "spending_trends": "Spending Trends",
