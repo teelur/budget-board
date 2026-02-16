@@ -3,17 +3,14 @@ import { convertNumberToCurrency } from "./currency";
 import { getFormattedCategoryValue } from "./category";
 import { ICategory } from "~/models/category";
 
-export const getDefaultValue = (
-  field: string,
-  formatDate: (dateStr: string) => string,
-): string => {
+export const getDefaultValue = (field: string): string => {
   switch (field) {
     case "merchant":
       return "";
     case "amount":
       return "0";
     case "date":
-      return formatDate(dayjs().toString());
+      return dayjs().format("YYYY-MM-DD");
     case "category":
       return "";
     default:

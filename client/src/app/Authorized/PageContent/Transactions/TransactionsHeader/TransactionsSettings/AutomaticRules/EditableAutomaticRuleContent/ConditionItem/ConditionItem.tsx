@@ -35,7 +35,7 @@ export interface ConditionItemProps {
 
 const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useDate();
+  const { locale, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -126,9 +126,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
     return null;
   };
 
-  const formatDate = (dateStr: string): string =>
-    dayjs(dateStr).format(longDateFormat);
-
   return (
     <Card elevation={2}>
       <Group gap="0.5rem">
@@ -161,7 +158,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
                       OperatorTypes.STRING,
                   ),
                 ).at(0)?.value ?? "",
-              value: getDefaultValue(foundField.value, formatDate),
+              value: getDefaultValue(foundField.value),
             } as IRuleParameterEdit);
           }}
           allowDeselect={false}

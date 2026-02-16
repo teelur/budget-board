@@ -22,9 +22,9 @@ public static class LocalizationHelpers
 
     public static readonly List<string> DateFormats =
     [
-        "default", // Use system default
-        "MM/DD/YYYY", // US format
-        "DD/MM/YYYY", // European format
-        "YYYY/MM/DD", // ISO format
+        "default",
+        "MM/DD/YYYY",
+        "DD/MM/YYYY",
+        "YYYY/MM/DD",
     ];
 }

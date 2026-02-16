@@ -34,7 +34,7 @@ export interface ActionItemProps {
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useDate();
+  const { locale, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -125,9 +125,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
     return null;
   };
 
-  const formatDate = (dateStr: string): string =>
-    dayjs(dateStr).format(longDateFormat);
-
   const getCardContent = (): React.ReactNode => {
     if (props.ruleParameter.operator === "set") {
       return (
@@ -154,7 +151,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
               props.setRuleParameter({
                 ...props.ruleParameter,
                 field: foundValue.value,
-                value: getDefaultValue(foundValue.value, formatDate),
+                value: getDefaultValue(foundValue.value),
               });
             }}
             elevation={2}
