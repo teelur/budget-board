@@ -22,14 +22,18 @@ export interface NetWorthChartData {
  */
 export const BuildNetWorthChartData = (
   balances: IBalanceResponse[],
-  accounts: IAccountResponse[]
+  accounts: IAccountResponse[],
+  formatDateString: (date: Date) => string,
 ): NetWorthChartData[] => {
   // Use the account balance chart data to build the net worth chart data.
   const valuesWithParentId = balances.map((balance) => ({
     ...balance,
     parentId: balance.accountID,
   }));
-  const accountChartData = buildValueChartData(valuesWithParentId);
+  const accountChartData = buildValueChartData(
+    valuesWithParentId,
+    formatDateString,
+  );
 
   const chartData: NetWorthChartData[] = [];
   accountChartData.forEach((dataPoint) => {

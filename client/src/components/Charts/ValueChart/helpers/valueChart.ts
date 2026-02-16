@@ -55,8 +55,8 @@ export const getSortedValueDates = (values: IValue[]): Date[] =>
  */
 export const buildValueChartData = (
   sortedValues: IValue[],
-  invertData = false,
   formatDateString: (date: Date) => string,
+  invertData = false,
 ): ValueChartData[] => {
   const itemIdToSortedValuesMap = Map.groupBy(
     sortedValues,

@@ -1,5 +1,4 @@
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { getMonthAndYearDateString } from "~/helpers/datetime";
 import { getTransactionsForMonth } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
@@ -52,7 +51,8 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   });
 
   const sortedMonths = props.months.sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    (a, b) =>
+      dayjs(a).startOf("month").valueOf() - dayjs(b).startOf("month").valueOf(),
   );
 
   const buildChartData = (): ChartDatum[] => {
@@ -81,7 +81,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
       );
 
       spendingTrendsChartData.push({
-        month: getMonthAndYearDateString(month, dayjs.locale()),
+        month: dayjs(month).format("MMMM YYYY"),
         Income: incomeTotal,
         Spending: spendingTotal,
         Net: incomeTotal + spendingTotal,

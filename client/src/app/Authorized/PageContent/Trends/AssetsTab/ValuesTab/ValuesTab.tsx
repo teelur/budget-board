@@ -2,23 +2,25 @@ import { Stack } from "@mantine/core";
 import { DatesRangeValue } from "@mantine/dates";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
-import dayjs from "dayjs";
 import React from "react";
 import AssetsSelectHeader from "~/components/AssetsSelectHeader/AssetsSelectHeader";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
-import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
+import { mantineDateFormat } from "~/helpers/datetime";
 import { IAssetResponse } from "~/models/asset";
 import { IValueResponse } from "~/models/value";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 const ValuesTab = (): React.ReactNode => {
+  const { dayjs } = useDate();
+  const { request } = useAuth();
+
   const [selectedAssetIds, setSelectedAssetIds] = React.useState<string[]>([]);
   const [dateRange, setDateRange] = React.useState<DatesRangeValue<string>>([
-    dayjs(getDateFromMonthsAgo(1)).format(mantineDateFormat),
-    dayjs().format(mantineDateFormat),
+    dayjs().subtract(1, "month").startOf("month").format(mantineDateFormat),
+    dayjs().startOf("month").format(mantineDateFormat),
   ]);
 
-  const { request } = useAuth();
   const valuesQuery = useQueries({
     queries: selectedAssetIds.map((assetId: string) => ({
       queryKey: ["values", assetId],

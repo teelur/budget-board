@@ -102,8 +102,8 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
       w="100%"
       data={buildValueChartData(
         sortedChartValues(),
-        props.invertYAxis,
         formatDateString,
+        props.invertYAxis,
       )}
       series={chartSeries}
       dataKey="dateString"

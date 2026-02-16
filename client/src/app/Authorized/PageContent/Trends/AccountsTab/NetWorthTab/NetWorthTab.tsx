@@ -3,7 +3,7 @@ import classes from "./NetWorthTab.module.css";
 import { Stack } from "@mantine/core";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
-import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
+import { mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import NetWorthChart from "~/components/Charts/NetWorthChart/NetWorthChart";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -11,15 +11,16 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
-import dayjs from "dayjs";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 const NetWorthTab = (): React.ReactNode => {
+  const { dayjs } = useDate();
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
-    []
+    [],
   );
   const [dateRange, setDateRange] = React.useState<DatesRangeValue<string>>([
-    dayjs(getDateFromMonthsAgo(1)).format(mantineDateFormat),
-    dayjs().format(mantineDateFormat),
+    dayjs().subtract(1, "month").startOf("month").format(mantineDateFormat),
+    dayjs().startOf("month").format(mantineDateFormat),
   ]);
 
   const { request } = useAuth();
