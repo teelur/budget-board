@@ -15,7 +15,8 @@ const localeMap: Record<string, string> = {
 
 export interface LocaleContextValue {
   dayjs: typeof dayjs;
-  locale: string;
+  dayjsLocale: string;
+  intlLocale: string;
   dateFormat: string;
   longDateFormat: string;
   decimalSeparator: string;
@@ -24,7 +25,8 @@ export interface LocaleContextValue {
 
 export const LocaleContext = React.createContext<LocaleContextValue>({
   dayjs,
-  locale: "en",
+  dayjsLocale: "en",
+  intlLocale: "en-US",
   dateFormat: "L",
   longDateFormat: "LL",
   decimalSeparator: ".",
@@ -87,7 +89,8 @@ export const LocaleProvider = ({
 
     return {
       dayjs,
-      locale: dayjsLocale,
+      dayjsLocale,
+      intlLocale: i18n.language,
       dateFormat,
       longDateFormat: getLongDateFormat(dateFormat),
       decimalSeparator:

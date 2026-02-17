@@ -54,7 +54,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const [isSelected, { toggle, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { dayjs, locale, thousandsSeparator, decimalSeparator } = useLocale();
+  const { dayjs, intlLocale, thousandsSeparator, decimalSeparator } =
+    useLocale();
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
   const limit =
@@ -289,7 +290,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                             false,
                             userSettingsQuery.data?.currency ?? "USD",
                             SignDisplay.Auto,
-                            locale,
+                            intlLocale,
                           ),
                         }}
                         components={[
@@ -333,14 +334,14 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                           false,
                           userSettingsQuery.data?.currency ?? "USD",
                           SignDisplay.Auto,
-                          locale,
+                          intlLocale,
                         ),
                         total: convertNumberToCurrency(
                           limit,
                           false,
                           userSettingsQuery.data?.currency ?? "USD",
                           SignDisplay.Auto,
-                          locale,
+                          intlLocale,
                         ),
                       }}
                       components={[
@@ -379,7 +380,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
                       SignDisplay.Auto,
-                      locale,
+                      intlLocale,
                     ),
                   }}
                   components={[

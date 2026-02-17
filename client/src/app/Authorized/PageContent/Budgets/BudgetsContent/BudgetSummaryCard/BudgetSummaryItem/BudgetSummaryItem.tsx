@@ -24,7 +24,7 @@ interface BudgetSummaryItemProps {
 }
 
 const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
-  const { locale } = useLocale();
+  const { intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -60,14 +60,14 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     false,
     currency,
     SignDisplay.Auto,
-    locale,
+    intlLocale,
   );
   const formattedTotal = convertNumberToCurrency(
     props.total ?? 0,
     false,
     currency,
     SignDisplay.Auto,
-    locale,
+    intlLocale,
   );
 
   const statusTextProps = {

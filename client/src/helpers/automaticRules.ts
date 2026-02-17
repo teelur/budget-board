@@ -24,7 +24,7 @@ export const getFormattedValue = (
   currency: string,
   categories: ICategory[],
   formatDate: (dateStr: string) => string,
-  locale: string,
+  intlLocale: string,
 ): string => {
   switch (field) {
     case "merchant":
@@ -35,7 +35,7 @@ export const getFormattedValue = (
         true,
         currency,
         SignDisplay.Auto,
-        locale,
+        intlLocale,
       );
     case "date":
       return formatDate(value);

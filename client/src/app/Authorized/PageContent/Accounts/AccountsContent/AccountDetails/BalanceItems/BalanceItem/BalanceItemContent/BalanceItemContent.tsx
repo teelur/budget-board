@@ -15,7 +15,7 @@ interface BalanceItemContentProps {
 const BalanceItemContent = (
   props: BalanceItemContentProps,
 ): React.ReactNode => {
-  const { dayjs, longDateFormat, locale } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
 
   return (
     <Group justify="space-between" align="center">
@@ -40,7 +40,7 @@ const BalanceItemContent = (
           true,
           props.userCurrency,
           SignDisplay.Auto,
-          locale,
+          intlLocale,
         )}
       </StatusText>
     </Group>

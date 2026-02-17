@@ -72,8 +72,13 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, locale, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const {
+    dayjs,
+    dateFormat,
+    intlLocale,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -203,7 +208,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               true,
               props.userCurrency,
               SignDisplay.Auto,
-              locale,
+              intlLocale,
             )}
           </StatusText>
         </Group>

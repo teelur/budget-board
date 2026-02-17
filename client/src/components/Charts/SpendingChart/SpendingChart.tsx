@@ -28,7 +28,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
 
   const { t } = useTranslation();
-  const { dayjs, locale } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -72,7 +72,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
           false,
           userSettingsQuery.data?.currency ?? "USD",
           SignDisplay.Auto,
-          locale,
+          intlLocale,
         );
   };
 

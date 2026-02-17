@@ -35,7 +35,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat, locale } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const valuesQuery = useQuery({
@@ -102,7 +102,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                       true,
                       props.userCurrency,
                       SignDisplay.Auto,
-                      locale,
+                      intlLocale,
                     ),
                   }}
                   components={[
@@ -127,7 +127,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                       true,
                       props.userCurrency,
                       SignDisplay.Always,
-                      locale,
+                      intlLocale,
                     )}
                   </StatusText>
                 </Stack>
@@ -144,7 +144,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                         true,
                         props.userCurrency,
                         SignDisplay.Auto,
-                        locale,
+                        intlLocale,
                       ),
                     }}
                     components={[

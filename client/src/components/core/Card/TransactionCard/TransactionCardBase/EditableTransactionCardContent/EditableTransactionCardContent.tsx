@@ -48,8 +48,13 @@ const EditableTransactionCardContent = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const {
+    dayjs,
+    dayjsLocale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -194,7 +199,7 @@ const EditableTransactionCardContent = (
               w="100%"
               {...dateField.getInputProps()}
               valueFormat={longDateFormat}
-              locale={dayjs.locale()}
+              locale={dayjsLocale}
               onChange={onDateChange}
               elevation={props.elevation}
             />

@@ -25,7 +25,7 @@ interface UnbudgetChildCardProps {
 }
 
 const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
-  const { locale } = useLocale();
+  const { intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -96,7 +96,7 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
                   SignDisplay.Auto,
-                  locale,
+                  intlLocale,
                 )}
               </PrimaryText>
             )}

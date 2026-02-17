@@ -30,7 +30,7 @@ const CreateTransactionModal = (): React.ReactNode => {
   const { t } = useTranslation();
   const {
     dayjs,
-    locale,
+    dayjsLocale,
     longDateFormat,
     thousandsSeparator,
     decimalSeparator,
@@ -143,7 +143,7 @@ const CreateTransactionModal = (): React.ReactNode => {
             label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
             placeholder={t("select_a_date")}
             {...dateField.getInputProps()}
-            locale={locale}
+            locale={dayjsLocale}
             valueFormat={longDateFormat}
             elevation={0}
           />

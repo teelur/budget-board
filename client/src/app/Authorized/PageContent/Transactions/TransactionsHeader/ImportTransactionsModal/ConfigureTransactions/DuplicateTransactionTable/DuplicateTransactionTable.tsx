@@ -41,7 +41,7 @@ const DuplicateTransactionTable = (
   }, [props.tableData]);
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, locale } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -150,7 +150,7 @@ const DuplicateTransactionTable = (
                             true,
                             userSettingsQuery.data?.currency ?? "USD",
                             SignDisplay.Auto,
-                            locale,
+                            intlLocale,
                           )}
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.account}</Table.Td>
@@ -173,7 +173,7 @@ const DuplicateTransactionTable = (
                             true,
                             userSettingsQuery.data?.currency ?? "USD",
                             SignDisplay.Auto,
-                            locale,
+                            intlLocale,
                           )}
                     </Table.Td>
                     <Table.Td>

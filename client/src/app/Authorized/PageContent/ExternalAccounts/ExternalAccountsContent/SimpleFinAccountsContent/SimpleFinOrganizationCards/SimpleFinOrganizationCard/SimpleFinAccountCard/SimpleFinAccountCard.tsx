@@ -39,7 +39,7 @@ const SimpleFinAccountCard = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, locale } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -208,7 +208,7 @@ const SimpleFinAccountCard = (
               true,
               accountCurrency,
               SignDisplay.Auto,
-              locale,
+              intlLocale,
             )}
           </StatusText>
         </Group>

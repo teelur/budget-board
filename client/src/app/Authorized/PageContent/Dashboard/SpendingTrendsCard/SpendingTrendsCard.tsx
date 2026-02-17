@@ -22,7 +22,7 @@ const SpendingTrendsCard = (): React.ReactNode => {
   const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
 
   const { t } = useTranslation();
-  const { dayjs, locale } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -132,7 +132,7 @@ const SpendingTrendsCard = (): React.ReactNode => {
       true,
       userSettingsQuery.data?.currency ?? "USD",
       SignDisplay.Auto,
-      locale,
+      intlLocale,
     );
 
     if (spendingComparisonNumber < 0) {

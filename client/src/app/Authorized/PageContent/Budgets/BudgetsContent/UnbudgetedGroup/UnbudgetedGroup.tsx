@@ -23,7 +23,7 @@ interface UnbudgetedGroupProps {
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { locale } = useLocale();
+  const { intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -100,7 +100,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
                   SignDisplay.Auto,
-                  locale,
+                  intlLocale,
                 )}
               </PrimaryText>
             )}

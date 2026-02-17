@@ -28,7 +28,7 @@ interface NetWorthChartProps {
 
 const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dateFormat, locale } = useLocale();
+  const { dateFormat, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -66,7 +66,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
           false,
           userSettingsQuery.data?.currency ?? "USD",
           SignDisplay.Auto,
-          locale,
+          intlLocale,
         );
   };
 

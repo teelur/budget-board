@@ -24,7 +24,7 @@ const EditableValueItemContent = (
   props: EditableValueItemContentProps,
 ): React.ReactNode => {
   const { request } = useAuth();
-  const { locale, longDateFormat, thousandsSeparator, decimalSeparator } =
+  const { dayjsLocale, longDateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
 
   const valueAmountField = useField<string | number | undefined>({
@@ -144,7 +144,7 @@ const EditableValueItemContent = (
         <DateInput
           {...valueDateField.getInputProps()}
           flex="1 1 auto"
-          locale={locale}
+          locale={dayjsLocale}
           valueFormat={longDateFormat}
           elevation={2}
         />

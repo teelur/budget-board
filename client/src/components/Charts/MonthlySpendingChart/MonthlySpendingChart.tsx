@@ -27,7 +27,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   );
 
   const { t } = useTranslation();
-  const { locale } = useLocale();
+  const { intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -112,7 +112,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
                 false,
                 userSettingsQuery.data?.currency ?? "USD",
                 SignDisplay.Auto,
-                locale,
+                intlLocale,
               )}
         </DimmedText>
       </Group>
@@ -136,7 +136,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
                 false,
                 userSettingsQuery.data?.currency ?? "USD",
                 SignDisplay.Auto,
-                locale,
+                intlLocale,
               )
         }
         referenceLines={[

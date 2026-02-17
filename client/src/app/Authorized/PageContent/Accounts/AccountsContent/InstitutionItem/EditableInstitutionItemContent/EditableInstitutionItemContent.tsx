@@ -27,7 +27,7 @@ const EditableInstitutionItemContent = (
   });
 
   const { request } = useAuth();
-  const { locale } = useLocale();
+  const { intlLocale } = useLocale();
 
   const queryClient = useQueryClient();
   const doUpdateInstitution = useMutation({
@@ -83,7 +83,7 @@ const EditableInstitutionItemContent = (
           true,
           props.userCurrency,
           SignDisplay.Auto,
-          locale,
+          intlLocale,
         )}
       </StatusText>
     </Group>

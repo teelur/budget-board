@@ -22,7 +22,7 @@ interface TransactionCardContentProps {
 const TransactionCardContent = (
   props: TransactionCardContentProps,
 ): React.ReactNode => {
-  const { dayjs, longDateFormat, locale } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -111,7 +111,7 @@ const TransactionCardContent = (
                 true,
                 userSettingsQuery.data?.currency ?? "USD",
                 SignDisplay.Auto,
-                locale,
+                intlLocale,
               )}
             </StatusText>
           )}

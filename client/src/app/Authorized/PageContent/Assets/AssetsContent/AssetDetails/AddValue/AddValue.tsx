@@ -20,7 +20,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
   const { t } = useTranslation();
   const {
     dayjs,
-    locale,
+    dayjsLocale,
     longDateFormat,
     thousandsSeparator,
     decimalSeparator,
@@ -62,7 +62,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
     <Stack gap={10}>
       <DateInput
         {...dateField.getInputProps()}
-        locale={locale}
+        locale={dayjsLocale}
         valueFormat={longDateFormat}
         label={<PrimaryText size="xs">{t("date")}</PrimaryText>}
         maw={400}

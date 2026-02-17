@@ -22,7 +22,7 @@ interface AccountItemProps {
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
-  const { dayjs, dateFormat, locale } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -55,7 +55,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
               true,
               userSettingsQuery.data?.currency ?? "USD",
               SignDisplay.Auto,
-              locale,
+              intlLocale,
             )}
           </StatusText>
         )}

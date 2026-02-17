@@ -43,7 +43,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { locale, thousandsSeparator, decimalSeparator } = useLocale();
+  const { intlLocale, thousandsSeparator, decimalSeparator } = useLocale();
   const { request } = useAuth();
 
   const newLimitField = useField<number | string>({
@@ -182,14 +182,14 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                           false,
                           userSettingsQuery.data?.currency ?? "USD",
                           SignDisplay.Auto,
-                          locale,
+                          intlLocale,
                         ),
                         total: convertNumberToCurrency(
                           props.limit,
                           false,
                           userSettingsQuery.data?.currency ?? "USD",
                           SignDisplay.Auto,
-                          locale,
+                          intlLocale,
                         ),
                       }}
                       components={[
@@ -234,14 +234,14 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                         false,
                         userSettingsQuery.data?.currency ?? "USD",
                         SignDisplay.Auto,
-                        locale,
+                        intlLocale,
                       ),
                       total: convertNumberToCurrency(
                         props.limit,
                         false,
                         userSettingsQuery.data?.currency ?? "USD",
                         SignDisplay.Auto,
-                        locale,
+                        intlLocale,
                       ),
                     }}
                     components={[
@@ -284,7 +284,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                     false,
                     userSettingsQuery.data?.currency ?? "USD",
                     SignDisplay.Auto,
-                    locale,
+                    intlLocale,
                   ),
                 }}
                 components={[

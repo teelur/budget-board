@@ -29,7 +29,7 @@ interface ValueChartProps {
 
 const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat, locale } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -58,7 +58,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
           false,
           userSettingsQuery.data?.currency ?? "USD",
           SignDisplay.Auto,
-          locale,
+          intlLocale,
         );
   };
 

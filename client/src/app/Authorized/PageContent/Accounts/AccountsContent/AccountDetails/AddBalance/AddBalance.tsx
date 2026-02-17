@@ -22,8 +22,13 @@ interface AddBalanceProps {
 
 const AddBalance = (props: AddBalanceProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const {
+    dayjs,
+    dayjsLocale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { request } = useAuth();
 
   const dateField = useField<Date>({
@@ -60,7 +65,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
         {...dateField.getInputProps()}
         label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
         valueFormat={longDateFormat}
-        locale={dayjs.locale()}
+        locale={dayjsLocale}
         elevation={0}
       />
       <NumberInput

@@ -27,7 +27,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const itemsPerPage = 10;
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, locale } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -98,7 +98,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                           true,
                           userSettingsQuery.data?.currency ?? "USD",
                           SignDisplay.Auto,
-                          locale,
+                          intlLocale,
                         )}
                   </Table.Td>
                   <Table.Td>{row.account}</Table.Td>

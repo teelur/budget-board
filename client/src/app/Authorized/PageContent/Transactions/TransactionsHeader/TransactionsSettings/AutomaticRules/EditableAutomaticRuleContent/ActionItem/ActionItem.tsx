@@ -34,7 +34,7 @@ export interface ActionItemProps {
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { locale, longDateFormat, thousandsSeparator, decimalSeparator } =
+  const { dayjsLocale, longDateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
   const { request } = useAuth();
 
@@ -95,7 +95,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           flex="1 1 auto"
           placeholder={t("select_a_date")}
           value={props.ruleParameter.value}
-          locale={locale}
+          locale={dayjsLocale}
           valueFormat={longDateFormat}
           onChange={(value) =>
             props.setRuleParameter({

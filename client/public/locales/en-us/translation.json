@@ -225,7 +225,7 @@
   "institution_is_required": "Institution is required.",
   "interest_rate": "Interest Rate",
   "interest_rate_apr": "Interest Rate: {{rate}} APR",
-  "interest_rate_message": "Interest Rate: {{rate}}%",
+  "interest_rate_message": "Interest Rate: {{rate}}",
   "invalid_date": "Invalid date.",
   "invalid_email_message": "Please enter a valid email address.",
   "invalid_goal_name": "Invalid goal name.",

@@ -16,7 +16,7 @@ interface IAccountItemContentProps {
 
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat, locale } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
 
   const getAccountSourceBadgeColor = (): string => {
     switch (props.account.source) {
@@ -51,7 +51,10 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           </ActionIcon>
           <Badge>
             {t("interest_rate_message", {
-              rate: ((props.account.interestRate ?? 0) * 100).toFixed(2),
+              rate: Intl.NumberFormat(intlLocale, {
+                style: "percent",
+                maximumFractionDigits: 2,
+              }).format(props.account.interestRate ?? 0),
             })}
           </Badge>
           {props.account.hideAccount && (
@@ -70,7 +73,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
             true,
             props.userCurrency,
             SignDisplay.Auto,
-            locale,
+            intlLocale,
           )}
         </StatusText>
       </Group>

@@ -28,7 +28,7 @@ interface GoalCardContentProps {
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -56,10 +56,10 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             {props.includeInterest && props.goal.interestRate && (
               <Badge variant="light" flex="0 0 auto">
                 {t("interest_rate_apr", {
-                  rate: props.goal.interestRate.toLocaleString(undefined, {
+                  rate: Intl.NumberFormat(intlLocale, {
                     style: "percent",
-                    minimumFractionDigits: 2,
-                  }),
+                    maximumFractionDigits: 2,
+                  }).format(props.goal.interestRate),
                 })}
               </Badge>
             )}
@@ -84,7 +84,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
                   SignDisplay.Auto,
-                  locale,
+                  intlLocale,
                 ),
                 total: convertNumberToCurrency(
                   getGoalTargetAmount(
@@ -94,7 +94,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
                   SignDisplay.Auto,
-                  locale,
+                  intlLocale,
                 ),
               }}
               components={[
@@ -137,14 +137,14 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
                   SignDisplay.Auto,
-                  locale,
+                  intlLocale,
                 ),
                 total: convertNumberToCurrency(
                   props.goal.monthlyContribution,
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
                   SignDisplay.Auto,
-                  locale,
+                  intlLocale,
                 ),
               }}
               components={[

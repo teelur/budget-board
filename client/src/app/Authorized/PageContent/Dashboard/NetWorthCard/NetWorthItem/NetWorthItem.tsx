@@ -16,7 +16,7 @@ interface NetWorthItemProps {
 }
 
 const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
-  const { locale } = useLocale();
+  const { intlLocale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -52,7 +52,7 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
             true,
             userSettingsQuery.data?.currency ?? "USD",
             SignDisplay.Auto,
-            locale,
+            intlLocale,
           )}
         </StatusText>
       )}

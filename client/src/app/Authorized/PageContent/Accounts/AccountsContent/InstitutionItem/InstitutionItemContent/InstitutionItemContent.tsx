@@ -17,7 +17,7 @@ interface IInstitutionItemContentProps {
 const InstitutionItemContent = (
   props: IInstitutionItemContentProps,
 ): React.ReactNode => {
-  const { locale } = useLocale();
+  const { intlLocale } = useLocale();
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
@@ -39,7 +39,7 @@ const InstitutionItemContent = (
           true,
           props.userCurrency,
           SignDisplay.Auto,
-          locale,
+          intlLocale,
         )}
       </StatusText>
     </Group>

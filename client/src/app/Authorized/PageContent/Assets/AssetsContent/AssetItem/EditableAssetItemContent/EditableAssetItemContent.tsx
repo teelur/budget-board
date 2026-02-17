@@ -42,7 +42,8 @@ const EditableAssetItemContent = (
   const { t } = useTranslation();
   const {
     dayjs,
-    locale,
+    dayjsLocale,
+    intlLocale,
     dateFormat,
     longDateFormat,
     thousandsSeparator,
@@ -205,7 +206,7 @@ const EditableAssetItemContent = (
               true,
               props.userCurrency,
               SignDisplay.Auto,
-              locale,
+              intlLocale,
             )}
           </StatusText>
         </Group>
@@ -214,7 +215,7 @@ const EditableAssetItemContent = (
             <Group gap="0.5rem">
               <DateInput
                 {...purchaseDate.getInputProps()}
-                locale={locale}
+                locale={dayjsLocale}
                 valueFormat={longDateFormat}
                 placeholder={t("enter_date")}
                 maw={400}
@@ -243,7 +244,7 @@ const EditableAssetItemContent = (
             <Group gap="0.5rem">
               <DateInput
                 {...sellDate.getInputProps()}
-                locale={locale}
+                locale={dayjsLocale}
                 valueFormat={longDateFormat}
                 placeholder={t("enter_date")}
                 maw={400}

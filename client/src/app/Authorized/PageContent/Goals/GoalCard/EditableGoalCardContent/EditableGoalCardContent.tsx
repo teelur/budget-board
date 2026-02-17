@@ -51,7 +51,8 @@ const EditableGoalCardContent = (
   const { t } = useTranslation();
   const {
     dayjs,
-    locale,
+    dayjsLocale,
+    intlLocale,
     longDateFormat,
     thousandsSeparator,
     decimalSeparator,
@@ -267,10 +268,10 @@ const EditableGoalCardContent = (
               {props.includeInterest && props.goal.interestRate && (
                 <Badge variant="light">
                   {t("interest_rate_apr", {
-                    rate: props.goal.interestRate.toLocaleString(undefined, {
+                    rate: Intl.NumberFormat(intlLocale, {
                       style: "percent",
-                      minimumFractionDigits: 2,
-                    }),
+                      maximumFractionDigits: 2,
+                    }).format(props.goal.interestRate),
                   })}
                 </Badge>
               )}
@@ -311,7 +312,7 @@ const EditableGoalCardContent = (
                         false,
                         userSettingsQuery.data?.currency ?? "USD",
                         SignDisplay.Auto,
-                        locale,
+                        intlLocale,
                       ),
                     }}
                     components={[
@@ -348,7 +349,7 @@ const EditableGoalCardContent = (
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
                       SignDisplay.Auto,
-                      locale,
+                      intlLocale,
                     ),
                     total: convertNumberToCurrency(
                       getGoalTargetAmount(
@@ -358,7 +359,7 @@ const EditableGoalCardContent = (
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
                       SignDisplay.Auto,
-                      locale,
+                      intlLocale,
                     ),
                   }}
                   components={[
@@ -392,7 +393,7 @@ const EditableGoalCardContent = (
                           false,
                           userSettingsQuery.data?.currency ?? "USD",
                           SignDisplay.Auto,
-                          locale,
+                          intlLocale,
                         ),
                       }}
                       components={[<DimmedText size="sm" key="label" />]}
@@ -405,7 +406,7 @@ const EditableGoalCardContent = (
                       <DateInput
                         className="h-8"
                         {...goalTargetDateField.getInputProps()}
-                        locale={locale}
+                        locale={dayjsLocale}
                         valueFormat={longDateFormat}
                         onChange={submitTargetDateChanges}
                       />
@@ -439,7 +440,7 @@ const EditableGoalCardContent = (
                         false,
                         userSettingsQuery.data?.currency ?? "USD",
                         SignDisplay.Auto,
-                        locale,
+                        intlLocale,
                       ),
                     }}
                     components={[
@@ -481,14 +482,14 @@ const EditableGoalCardContent = (
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
                       SignDisplay.Auto,
-                      locale,
+                      intlLocale,
                     ),
                     total: convertNumberToCurrency(
                       props.goal.monthlyContribution,
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
                       SignDisplay.Auto,
-                      locale,
+                      intlLocale,
                     ),
                   }}
                   components={[

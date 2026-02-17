@@ -19,7 +19,7 @@ interface CompletedGoalCardProps {
 
 const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
   const { request } = useAuth();
-  const { dayjs, locale } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -63,7 +63,7 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
                   true,
                   userSettingsQuery.data?.currency ?? "USD",
                   SignDisplay.Auto,
-                  locale,
+                  intlLocale,
                 ),
               }}
               components={[

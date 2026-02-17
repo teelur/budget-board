@@ -42,7 +42,7 @@ const PayGoalForm = (): React.ReactNode => {
   const { t } = useTranslation();
   const {
     dayjs,
-    locale,
+    dayjsLocale,
     longDateFormat,
     thousandsSeparator,
     decimalSeparator,
@@ -142,7 +142,7 @@ const PayGoalForm = (): React.ReactNode => {
                 clearable
                 key={form.key("goalCompleteDate")}
                 {...form.getInputProps("goalCompleteDate")}
-                locale={locale}
+                locale={dayjsLocale}
                 valueFormat={longDateFormat}
                 elevation={1}
               />

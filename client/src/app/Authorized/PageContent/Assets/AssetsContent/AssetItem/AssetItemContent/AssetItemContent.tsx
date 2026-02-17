@@ -17,7 +17,7 @@ interface AssetItemContentProps {
 
 const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat, locale } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
 
   return (
     <Stack gap={0} flex="1 1 auto">
@@ -47,7 +47,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             true,
             props.userCurrency,
             SignDisplay.Auto,
-            locale,
+            intlLocale,
           )}
         </StatusText>
       </Group>
@@ -62,7 +62,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
                 true,
                 props.userCurrency,
                 SignDisplay.Auto,
-                locale,
+                intlLocale,
               ),
             })}
           </DimmedText>

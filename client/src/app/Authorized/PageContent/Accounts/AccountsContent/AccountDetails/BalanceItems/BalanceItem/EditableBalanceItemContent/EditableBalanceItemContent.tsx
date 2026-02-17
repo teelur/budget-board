@@ -28,7 +28,7 @@ const EditableBalanceItemContent = (
   const {
     dayjs,
     longDateFormat,
-    locale,
+    dayjsLocale,
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
@@ -143,7 +143,7 @@ const EditableBalanceItemContent = (
         <DateInput
           {...balanceDateField.getInputProps()}
           flex="1 1 auto"
-          locale={locale}
+          locale={dayjsLocale}
           valueFormat={longDateFormat}
           elevation={2}
         />
