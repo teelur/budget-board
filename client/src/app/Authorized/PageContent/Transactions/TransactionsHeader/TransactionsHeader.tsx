@@ -64,7 +64,7 @@ const TransactionsHeader = (
           <TransactionsSettings modalOpened={settingsOpen} closeModal={close} />
         </Group>
       </Flex>
-      <Collapse in={isFiltersPanelOpen}>
+      <Collapse in={isFiltersPanelOpen} transitionDuration={100}>
         <FilterCard categories={props.categories} />
       </Collapse>
     </Stack>
