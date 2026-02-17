@@ -14,13 +14,13 @@ import { AxiosResponse } from "axios";
 import NetCashFlowChart from "~/components/Charts/NetCashFlowChart/NetCashFlowChart";
 import { Button, Group, Stack } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 const NetCashFlowTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];
 
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
     dayjs().subtract(1, "month").toDate(),

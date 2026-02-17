@@ -4,7 +4,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IBalanceResponse } from "~/models/balance";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface BalanceItemContentProps {
   balance: IBalanceResponse;
@@ -15,7 +15,7 @@ interface BalanceItemContentProps {
 const BalanceItemContent = (
   props: BalanceItemContentProps,
 ): React.ReactNode => {
-  const { dayjs, longDateFormat } = useDate();
+  const { dayjs, longDateFormat } = useLocale();
 
   return (
     <Group justify="space-between" align="center">

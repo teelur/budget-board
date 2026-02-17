@@ -22,7 +22,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 export interface ConditionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -35,7 +35,7 @@ export interface ConditionItemProps {
 
 const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { locale, longDateFormat } = useDate();
+  const { locale, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

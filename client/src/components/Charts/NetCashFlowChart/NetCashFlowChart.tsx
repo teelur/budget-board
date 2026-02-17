@@ -12,7 +12,7 @@ import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface ChartDatum {
   month: string;
@@ -31,7 +31,7 @@ interface NetCashFlowChartProps {
 
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

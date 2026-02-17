@@ -10,7 +10,7 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface FilterCardProps {
   categories: ICategory[];
@@ -18,7 +18,7 @@ interface FilterCardProps {
 
 const FilterCard = (props: FilterCardProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useDate();
+  const { dayjs, locale, longDateFormat } = useLocale();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
 
   return (

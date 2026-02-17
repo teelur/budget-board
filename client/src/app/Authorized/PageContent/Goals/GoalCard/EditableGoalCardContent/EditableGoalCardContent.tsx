@@ -33,7 +33,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans, useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -45,7 +45,7 @@ const EditableGoalCardContent = (
   props: GoalCardContentProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useDate();
+  const { dayjs, locale, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const goalNameField = useField<string>({

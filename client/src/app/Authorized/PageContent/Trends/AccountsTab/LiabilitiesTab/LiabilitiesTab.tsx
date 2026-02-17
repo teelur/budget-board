@@ -12,11 +12,11 @@ import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 const LiabilitiesTab = (): React.ReactNode => {
   const { request } = useAuth();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
 
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
     [],

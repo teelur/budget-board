@@ -20,7 +20,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Card from "~/components/core/Card/Card";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;
@@ -30,7 +30,7 @@ interface GoalDetailsProps {
 
 const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
   const { request } = useAuth();
 
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(3);

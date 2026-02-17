@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import React from "react";
 import MonthToolcard from "./MonthToolcard/MonthToolcard";
 import { getCashFlowValue } from "~/helpers/budgets";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface MonthToolcardsProps {
   selectedDates: Date[];
@@ -19,7 +19,7 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
   const PAGE_BUTTON_WIDTH = 36;
   const MONTH_CARD_WIDTH = 68;
 
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
 
   const [index, setIndex] = React.useState(0);
   const { ref, width } = useElementSize();

@@ -15,7 +15,7 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
@@ -27,7 +27,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const itemsPerPage = 10;
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useDate();
+  const { dayjs, dateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

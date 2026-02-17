@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;
@@ -22,7 +22,7 @@ interface TransactionCardContentProps {
 const TransactionCardContent = (
   props: TransactionCardContentProps,
 ): React.ReactNode => {
-  const { dayjs, longDateFormat } = useDate();
+  const { dayjs, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

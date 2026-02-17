@@ -21,7 +21,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const chartLookbackMonths = 6;
 
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 

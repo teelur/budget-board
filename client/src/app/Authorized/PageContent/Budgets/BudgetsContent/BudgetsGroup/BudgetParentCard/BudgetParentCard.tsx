@@ -35,7 +35,7 @@ import Popover from "~/components/core/Popover/Popover";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { useTranslation, Trans } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -50,7 +50,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const [isSelected, { toggle, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
   const limit =

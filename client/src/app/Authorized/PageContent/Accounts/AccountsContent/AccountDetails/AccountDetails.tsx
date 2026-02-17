@@ -19,7 +19,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -32,7 +32,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
   const { request } = useAuth();
 
   const balancesQuery = useQuery({

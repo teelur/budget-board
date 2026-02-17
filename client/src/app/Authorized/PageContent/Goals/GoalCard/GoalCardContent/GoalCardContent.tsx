@@ -18,7 +18,7 @@ import { StatusColorType } from "~/helpers/budgets";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -28,7 +28,7 @@ interface GoalCardContentProps {
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

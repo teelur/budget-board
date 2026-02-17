@@ -11,10 +11,10 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 const NetWorthTab = (): React.ReactNode => {
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
     [],
   );

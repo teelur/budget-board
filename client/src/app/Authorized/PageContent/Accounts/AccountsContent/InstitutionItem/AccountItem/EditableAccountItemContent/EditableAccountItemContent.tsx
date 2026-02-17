@@ -29,7 +29,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -72,7 +72,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useDate();
+  const { dayjs, dateFormat } = useLocale();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();

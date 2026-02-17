@@ -19,7 +19,7 @@ import {
 } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -41,7 +41,7 @@ const DuplicateTransactionTable = (
   }, [props.tableData]);
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useDate();
+  const { dayjs, dateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

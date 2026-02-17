@@ -23,7 +23,7 @@ import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -40,7 +40,7 @@ const ConfigureTransactions = (
   const [alertDetails, setAlertDetails] = React.useState<string | null>(null);
 
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
 
   // The raw CSV data imported from the user's file.
   const [csvData, setCsvData] = React.useState<CsvRow[]>(props.csvData);

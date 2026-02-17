@@ -6,7 +6,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { AccountSource, IAccountResponse } from "~/models/account";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface IAccountItemContentProps {
   account: IAccountResponse;
@@ -16,7 +16,7 @@ interface IAccountItemContentProps {
 
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useDate();
+  const { dayjs, dateFormat } = useLocale();
 
   const getAccountSourceBadgeColor = (): string => {
     switch (props.account.source) {

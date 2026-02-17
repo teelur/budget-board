@@ -7,7 +7,7 @@ import { getCurrencySymbol } from "~/helpers/currency";
 import { IValueCreateRequest, IValueResponse } from "~/models/value";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
@@ -18,7 +18,7 @@ interface AddValueProps {
 
 const AddValue = (props: AddValueProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useDate();
+  const { dayjs, locale, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const amountField = useField<string | number>({

@@ -10,7 +10,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IValueResponse, IValueUpdateRequest } from "~/models/value";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
@@ -24,7 +24,7 @@ const EditableValueItemContent = (
   props: EditableValueItemContentProps,
 ): React.ReactNode => {
   const { request } = useAuth();
-  const { locale, longDateFormat } = useDate();
+  const { locale, longDateFormat } = useLocale();
 
   const valueAmountField = useField<string | number | undefined>({
     initialValue: props.value.amount,

@@ -20,7 +20,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface EditableTransactionCardProps {
   transaction: ITransaction;
@@ -48,7 +48,7 @@ const EditableTransactionCardContent = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useDate();
+  const { dayjs, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

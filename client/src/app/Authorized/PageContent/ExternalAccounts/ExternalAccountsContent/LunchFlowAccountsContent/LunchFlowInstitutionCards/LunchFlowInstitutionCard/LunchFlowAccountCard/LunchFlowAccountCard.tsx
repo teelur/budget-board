@@ -20,7 +20,7 @@ import {
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface ILunchFlowAccountCardProps {
   lunchFlowAccount: ILunchFlowAccountResponse;
@@ -38,7 +38,7 @@ const LunchFlowAccountCard = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useDate();
+  const { dayjs, dateFormat } = useLocale();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({

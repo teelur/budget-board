@@ -16,7 +16,7 @@ import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { BuildNetWorthChartData } from "./helpers/netWorthChart";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface NetWorthChartProps {
   accounts: IAccountResponse[];
@@ -28,7 +28,7 @@ interface NetWorthChartProps {
 
 const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dateFormat } = useDate();
+  const { dateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

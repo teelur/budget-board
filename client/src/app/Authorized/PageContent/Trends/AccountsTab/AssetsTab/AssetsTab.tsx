@@ -12,11 +12,11 @@ import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import { DatesRangeValue } from "@mantine/dates";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 const AssetsTab = (): React.ReactNode => {
   const { request } = useAuth();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
 
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
     [],

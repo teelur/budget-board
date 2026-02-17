@@ -9,10 +9,10 @@ import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { mantineDateFormat } from "~/helpers/datetime";
 import { IAssetResponse } from "~/models/asset";
 import { IValueResponse } from "~/models/value";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 const ValuesTab = (): React.ReactNode => {
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
   const { request } = useAuth();
 
   const [selectedAssetIds, setSelectedAssetIds] = React.useState<string[]>([]);

@@ -12,7 +12,7 @@ import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import StatusText from "../core/Text/StatusText/StatusText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface AccountItemProps {
   account: IAccountResponse;
@@ -22,7 +22,7 @@ interface AccountItemProps {
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
-  const { dayjs, dateFormat } = useDate();
+  const { dayjs, dateFormat } = useLocale();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],

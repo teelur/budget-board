@@ -17,7 +17,7 @@ import {
 } from "./helpers/valueChart";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface ValueChartProps {
   items: IItem[];
@@ -29,7 +29,7 @@ interface ValueChartProps {
 
 const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useDate();
+  const { dayjs, dateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

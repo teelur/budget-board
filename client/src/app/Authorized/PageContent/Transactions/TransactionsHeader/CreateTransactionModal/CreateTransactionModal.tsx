@@ -22,13 +22,13 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useDate();
+  const { dayjs, locale, longDateFormat } = useLocale();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 

@@ -15,7 +15,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface FormValues {
   goalName: string;
@@ -40,7 +40,7 @@ const PayGoalForm = (): React.ReactNode => {
   });
 
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useDate();
+  const { dayjs, locale, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

@@ -21,7 +21,7 @@ import {
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface ISimpleFinAccountCardProps {
   simpleFinAccount: ISimpleFinAccountResponse;
@@ -39,7 +39,7 @@ const SimpleFinAccountCard = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useDate();
+  const { dayjs, dateFormat } = useLocale();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({

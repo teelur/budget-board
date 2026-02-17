@@ -33,7 +33,7 @@ import {
   textEggshellDimmed,
 } from "./shared/colors";
 import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
-import { DateProvider } from "./providers/DateProvider/DateProvider";
+import { LocaleProvider } from "./providers/DateProvider/DateProvider";
 
 // Your theme configuration is merged with default theme
 const theme = createTheme({
@@ -188,9 +188,9 @@ function App() {
                 element={
                   <AuthorizedRoute>
                     <UserSettingsProvider>
-                      <DateProvider>
+                      <LocaleProvider>
                         <Authorized />
-                      </DateProvider>
+                      </LocaleProvider>
                     </UserSettingsProvider>
                   </AuthorizedRoute>
                 }

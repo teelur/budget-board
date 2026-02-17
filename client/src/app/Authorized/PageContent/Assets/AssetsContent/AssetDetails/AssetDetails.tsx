@@ -22,7 +22,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -35,7 +35,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useDate();
+  const { dayjs, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const valuesQuery = useQuery({

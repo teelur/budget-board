@@ -16,7 +16,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface FormValues {
   goalName: string;
@@ -45,7 +45,7 @@ const SaveGoalForm = (): React.ReactNode => {
   });
 
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useDate();
+  const { dayjs, locale, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

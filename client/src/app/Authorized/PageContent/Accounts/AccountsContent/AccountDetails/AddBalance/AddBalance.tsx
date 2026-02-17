@@ -11,7 +11,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceCreateRequest } from "~/models/balance";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
@@ -22,7 +22,7 @@ interface AddBalanceProps {
 
 const AddBalance = (props: AddBalanceProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useDate();
+  const { dayjs, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const dateField = useField<Date>({

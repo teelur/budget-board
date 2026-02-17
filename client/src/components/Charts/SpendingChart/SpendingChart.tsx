@@ -14,7 +14,7 @@ import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -28,7 +28,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
 
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

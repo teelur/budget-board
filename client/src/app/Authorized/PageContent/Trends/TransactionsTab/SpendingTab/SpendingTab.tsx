@@ -14,11 +14,11 @@ import { useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 const SpendingTab = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs } = useDate();
+  const { dayjs } = useLocale();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
     dayjs().subtract(1, "month").toDate(),

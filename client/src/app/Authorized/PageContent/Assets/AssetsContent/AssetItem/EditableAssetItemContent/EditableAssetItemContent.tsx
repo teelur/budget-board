@@ -24,7 +24,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
-import { useDate } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/DateProvider/DateProvider";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -36,7 +36,7 @@ const EditableAssetItemContent = (
   props: EditableAssetItemContentProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, dateFormat, longDateFormat } = useDate();
+  const { dayjs, locale, dateFormat, longDateFormat } = useLocale();
   const { request } = useAuth();
 
   const assetNameField = useField<string>({
