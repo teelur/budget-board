@@ -24,7 +24,8 @@ const EditableValueItemContent = (
   props: EditableValueItemContentProps,
 ): React.ReactNode => {
   const { request } = useAuth();
-  const { locale, longDateFormat } = useLocale();
+  const { locale, longDateFormat, thousandsSeparator, decimalSeparator } =
+    useLocale();
 
   const valueAmountField = useField<string | number | undefined>({
     initialValue: props.value.amount,
@@ -151,7 +152,8 @@ const EditableValueItemContent = (
           {...valueAmountField.getInputProps()}
           flex="1 1 auto"
           prefix={getCurrencySymbol(props.userCurrency)}
-          thousandSeparator=","
+          thousandSeparator={thousandsSeparator}
+          decimalSeparator={decimalSeparator}
           decimalScale={2}
           fixedDecimalScale
           onBlur={() => doUpdateValue.mutate()}

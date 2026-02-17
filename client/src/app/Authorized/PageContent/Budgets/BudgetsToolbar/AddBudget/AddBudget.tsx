@@ -21,6 +21,7 @@ import Popover from "~/components/core/Popover/Popover";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface AddBudgetProps {
   date: Date;
@@ -29,6 +30,7 @@ interface AddBudgetProps {
 
 const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { thousandsSeparator, decimalSeparator } = useLocale();
 
   const categoryField = useField<string>({
     initialValue: "",
@@ -97,7 +99,8 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
               prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
               min={0}
               decimalScale={2}
-              thousandSeparator=","
+              thousandSeparator={thousandsSeparator}
+              decimalSeparator={decimalSeparator}
               elevation={1}
             />
           </Stack>

@@ -45,7 +45,13 @@ const SaveGoalForm = (): React.ReactNode => {
   });
 
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useLocale();
+  const {
+    dayjs,
+    locale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -126,7 +132,8 @@ const SaveGoalForm = (): React.ReactNode => {
           prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
           min={0}
           decimalScale={2}
-          thousandSeparator=","
+          thousandSeparator={thousandsSeparator}
+          decimalSeparator={decimalSeparator}
           key={form.key("goalAmount")}
           {...form.getInputProps("goalAmount")}
           elevation={1}
@@ -178,7 +185,8 @@ const SaveGoalForm = (): React.ReactNode => {
                 prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
                 min={0}
                 decimalScale={2}
-                thousandSeparator=","
+                thousandSeparator={thousandsSeparator}
+                decimalSeparator={decimalSeparator}
                 key={form.key("goalMonthlyContribution")}
                 {...form.getInputProps("goalMonthlyContribution")}
                 elevation={1}

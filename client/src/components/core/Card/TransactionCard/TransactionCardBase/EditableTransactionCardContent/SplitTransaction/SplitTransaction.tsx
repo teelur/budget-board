@@ -22,6 +22,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface SplitTransactionProps {
   id: string;
@@ -40,6 +41,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
   });
 
   const { t } = useTranslation();
+  const { thousandsSeparator, decimalSeparator } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -95,7 +97,8 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
             {...amountField.getInputProps()}
             prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
             decimalScale={2}
-            thousandSeparator=","
+            thousandSeparator={thousandsSeparator}
+            decimalSeparator={decimalSeparator}
             maw={200}
             elevation={props.elevation}
           />
@@ -117,11 +120,11 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
                     : (amountField.getValue() as number),
                 category: getParentCategory(
                   categoryField.getValue(),
-                  props.categories
+                  props.categories,
                 ),
                 subcategory: getIsParentCategory(
                   categoryField.getValue(),
-                  props.categories
+                  props.categories,
                 )
                   ? ""
                   : categoryField.getValue(),

@@ -40,7 +40,14 @@ const EditableAssetItemContent = (
   props: EditableAssetItemContentProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, dateFormat, longDateFormat } = useLocale();
+  const {
+    dayjs,
+    locale,
+    dateFormat,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { request } = useAuth();
 
   const assetNameField = useField<string>({
@@ -222,7 +229,8 @@ const EditableAssetItemContent = (
                 placeholder={t("enter_price")}
                 maw={150}
                 prefix={getCurrencySymbol(props.userCurrency)}
-                thousandSeparator=","
+                thousandSeparator={thousandsSeparator}
+                decimalSeparator={decimalSeparator}
                 decimalScale={2}
                 fixedDecimalScale
                 onBlur={() => doUpdateAsset.mutate()}
@@ -248,7 +256,8 @@ const EditableAssetItemContent = (
                 placeholder={t("enter_price")}
                 maw={150}
                 prefix={getCurrencySymbol(props.userCurrency)}
-                thousandSeparator=","
+                thousandSeparator={thousandsSeparator}
+                decimalSeparator={decimalSeparator}
                 decimalScale={2}
                 fixedDecimalScale
                 onBlur={() => doUpdateAsset.mutate()}

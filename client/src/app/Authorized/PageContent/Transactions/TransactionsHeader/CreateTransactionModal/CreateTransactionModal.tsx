@@ -28,7 +28,13 @@ const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useLocale();
+  const {
+    dayjs,
+    locale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
@@ -159,7 +165,8 @@ const CreateTransactionModal = (): React.ReactNode => {
             placeholder={t("enter_amount")}
             prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
             decimalScale={2}
-            thousandSeparator=","
+            thousandSeparator={thousandsSeparator}
+            decimalSeparator={decimalSeparator}
             {...amountField.getInputProps()}
             elevation={0}
           />

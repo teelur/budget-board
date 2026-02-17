@@ -34,7 +34,8 @@ export interface ActionItemProps {
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { locale, longDateFormat } = useLocale();
+  const { locale, longDateFormat, thousandsSeparator, decimalSeparator } =
+    useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -83,7 +84,8 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           }
           prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
           decimalScale={2}
-          thousandSeparator=","
+          thousandSeparator={thousandsSeparator}
+          decimalSeparator={decimalSeparator}
           elevation={2}
         />
       );

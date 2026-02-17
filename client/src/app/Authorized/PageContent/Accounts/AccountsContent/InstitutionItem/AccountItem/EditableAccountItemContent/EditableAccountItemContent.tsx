@@ -23,13 +23,13 @@ import {
 } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import ElevatedNumberInput from "~/components/core/Input/Elevated/ElevatedNumberInput/ElevatedNumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -72,7 +72,8 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, locale } = useLocale();
+  const { dayjs, dateFormat, locale, thousandsSeparator, decimalSeparator } =
+    useLocale();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -154,15 +155,18 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 <PencilIcon size={16} />
               </ActionIcon>
             </Flex>
-            <ElevatedNumberInput
+            <NumberInput
               {...interestRateField.getInputProps()}
               label={<PrimaryText size="xs">{t("interest_rate")}</PrimaryText>}
               decimalScale={2}
+              thousandSeparator={thousandsSeparator}
+              decimalSeparator={decimalSeparator}
               min={0}
               step={1}
               suffix="%"
               maw={90}
               onBlur={() => doUpdateAccount.mutate()}
+              elevation={2}
             />
             <Group gap="0.5rem">
               <Button

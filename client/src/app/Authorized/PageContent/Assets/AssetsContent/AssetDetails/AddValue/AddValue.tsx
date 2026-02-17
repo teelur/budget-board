@@ -18,7 +18,13 @@ interface AddValueProps {
 
 const AddValue = (props: AddValueProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useLocale();
+  const {
+    dayjs,
+    locale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { request } = useAuth();
 
   const amountField = useField<string | number>({
@@ -67,7 +73,8 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
         label={<PrimaryText size="xs">{t("amount")}</PrimaryText>}
         prefix={getCurrencySymbol(props.currency)}
         decimalScale={2}
-        thousandSeparator=","
+        thousandSeparator={thousandsSeparator}
+        decimalSeparator={decimalSeparator}
         elevation={0}
       />
       <Button

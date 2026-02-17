@@ -54,7 +54,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const [isSelected, { toggle, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { dayjs, locale } = useLocale();
+  const { dayjs, locale, thousandsSeparator, decimalSeparator } = useLocale();
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
   const limit =
@@ -301,6 +301,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         <NumberInput
                           {...newLimitField.getInputProps()}
                           onBlur={() => handleEdit(newLimitField.getValue())}
+                          thousandSeparator={thousandsSeparator}
+                          decimalSeparator={decimalSeparator}
                           min={childLimitsTotal}
                           max={999999}
                           step={1}

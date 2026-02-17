@@ -22,7 +22,8 @@ interface AddBalanceProps {
 
 const AddBalance = (props: AddBalanceProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, thousandsSeparator, decimalSeparator } =
+    useLocale();
   const { request } = useAuth();
 
   const dateField = useField<Date>({
@@ -67,7 +68,8 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
         label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
         prefix={getCurrencySymbol(props.currency)}
         decimalScale={2}
-        thousandSeparator=","
+        decimalSeparator={decimalSeparator}
+        thousandSeparator={thousandsSeparator}
         elevation={0}
       />
       <Button

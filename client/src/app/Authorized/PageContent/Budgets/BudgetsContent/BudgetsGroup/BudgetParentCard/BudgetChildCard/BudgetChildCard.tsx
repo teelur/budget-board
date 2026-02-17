@@ -43,7 +43,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { locale } = useLocale();
+  const { locale, thousandsSeparator, decimalSeparator } = useLocale();
   const { request } = useAuth();
 
   const newLimitField = useField<number | string>({
@@ -201,6 +201,8 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       <NumberInput
                         {...newLimitField.getInputProps()}
                         onBlur={() => handleEdit(newLimitField.getValue())}
+                        thousandSeparator={thousandsSeparator}
+                        decimalSeparator={decimalSeparator}
                         min={0}
                         max={999999}
                         step={1}

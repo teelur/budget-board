@@ -25,7 +25,13 @@ const EditableBalanceItemContent = (
   props: EditableBalanceItemContentProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
+  const {
+    dayjs,
+    longDateFormat,
+    locale,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { request } = useAuth();
 
   const balanceAmountField = useField<string | number | undefined>({
@@ -137,7 +143,7 @@ const EditableBalanceItemContent = (
         <DateInput
           {...balanceDateField.getInputProps()}
           flex="1 1 auto"
-          locale={dayjs.locale()}
+          locale={locale}
           valueFormat={longDateFormat}
           elevation={2}
         />
@@ -145,7 +151,8 @@ const EditableBalanceItemContent = (
           {...balanceAmountField.getInputProps()}
           flex="1 1 auto"
           prefix={getCurrencySymbol(props.userCurrency)}
-          thousandSeparator=","
+          thousandSeparator={thousandsSeparator}
+          decimalSeparator={decimalSeparator}
           decimalScale={2}
           fixedDecimalScale
           onBlur={() => doUpdateBalance.mutate()}

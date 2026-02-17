@@ -49,7 +49,13 @@ const EditableGoalCardContent = (
   props: GoalCardContentProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, locale, longDateFormat } = useLocale();
+  const {
+    dayjs,
+    locale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
   const { request } = useAuth();
 
   const goalNameField = useField<string>({
@@ -324,7 +330,8 @@ const EditableGoalCardContent = (
                       prefix={getCurrencySymbol(
                         userSettingsQuery.data?.currency,
                       )}
-                      thousandSeparator=","
+                      thousandSeparator={thousandsSeparator}
+                      decimalSeparator={decimalSeparator}
                       {...goalTargetAmountField.getInputProps()}
                       onBlur={submitChanges}
                       elevation={1}
@@ -454,7 +461,8 @@ const EditableGoalCardContent = (
                       prefix={getCurrencySymbol(
                         userSettingsQuery.data?.currency,
                       )}
-                      thousandSeparator=","
+                      thousandSeparator={thousandsSeparator}
+                      decimalSeparator={decimalSeparator}
                       {...goalMonthlyContributionField.getInputProps()}
                       onBlur={submitChanges}
                       elevation={1}

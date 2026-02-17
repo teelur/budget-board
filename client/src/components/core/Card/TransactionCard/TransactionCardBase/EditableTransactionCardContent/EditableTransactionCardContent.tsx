@@ -48,7 +48,8 @@ const EditableTransactionCardContent = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, thousandsSeparator, decimalSeparator } =
+    useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -232,6 +233,8 @@ const EditableTransactionCardContent = (
               onBlur={handleSubmit}
               onClick={(e) => e.stopPropagation()}
               prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+              thousandSeparator={thousandsSeparator}
+              decimalSeparator={decimalSeparator}
               decimalScale={2}
               fixedDecimalScale
               elevation={props.elevation}
