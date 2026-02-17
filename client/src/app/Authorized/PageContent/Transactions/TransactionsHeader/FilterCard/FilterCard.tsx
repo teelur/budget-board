@@ -14,7 +14,6 @@ import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface FilterCardProps {
   categories: ICategory[];
-  style?: React.CSSProperties;
 }
 
 const FilterCard = (props: FilterCardProps): React.ReactNode => {
@@ -23,7 +22,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
 
   return (
-    <Card elevation={1} style={props.style}>
+    <Card elevation={1}>
       <Stack gap={0}>
         <PrimaryText size="lg">{t("filters")}</PrimaryText>
         <Flex
