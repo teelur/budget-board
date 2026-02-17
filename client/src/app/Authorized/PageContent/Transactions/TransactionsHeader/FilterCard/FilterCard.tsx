@@ -10,7 +10,7 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface FilterCardProps {
   categories: ICategory[];

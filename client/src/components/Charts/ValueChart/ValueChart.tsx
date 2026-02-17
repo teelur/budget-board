@@ -17,7 +17,7 @@ import {
 } from "./helpers/valueChart";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface ValueChartProps {
   items: IItem[];

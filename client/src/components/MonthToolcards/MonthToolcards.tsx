@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import React from "react";
 import MonthToolcard from "./MonthToolcard/MonthToolcard";
 import { getCashFlowValue } from "~/helpers/budgets";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface MonthToolcardsProps {
   selectedDates: Date[];

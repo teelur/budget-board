@@ -12,7 +12,7 @@ import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import StatusText from "../core/Text/StatusText/StatusText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface AccountItemProps {
   account: IAccountResponse;

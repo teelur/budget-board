@@ -4,7 +4,7 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IValueResponse } from "~/models/value";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface ValueItemContentProps {
   value: IValueResponse;

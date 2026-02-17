@@ -12,7 +12,7 @@ import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import { DatesRangeValue } from "@mantine/dates";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const AssetsTab = (): React.ReactNode => {
   const { request } = useAuth();

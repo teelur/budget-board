@@ -12,7 +12,7 @@ import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const LiabilitiesTab = (): React.ReactNode => {
   const { request } = useAuth();

@@ -14,7 +14,7 @@ import { AxiosResponse } from "axios";
 import NetCashFlowChart from "~/components/Charts/NetCashFlowChart/NetCashFlowChart";
 import { Button, Group, Stack } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const NetCashFlowTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];

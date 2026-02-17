@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;

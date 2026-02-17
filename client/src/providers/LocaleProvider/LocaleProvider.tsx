@@ -18,6 +18,8 @@ export interface LocaleContextValue {
   locale: string;
   dateFormat: string;
   longDateFormat: string;
+  decimalSeparator: string;
+  thousandsSeparator: string;
 }
 
 export const LocaleContext = React.createContext<LocaleContextValue>({
@@ -25,6 +27,8 @@ export const LocaleContext = React.createContext<LocaleContextValue>({
   locale: "en",
   dateFormat: "L",
   longDateFormat: "LL",
+  decimalSeparator: ".",
+  thousandsSeparator: ",",
 });
 
 export const LocaleProvider = ({
@@ -78,11 +82,18 @@ export const LocaleProvider = ({
     const dateFormat =
       userDateFormat && userDateFormat !== "default" ? userDateFormat : "L";
 
+    const formatter = new Intl.NumberFormat(dayjsLocale);
+    const parts = formatter.formatToParts(1234.56);
+
     return {
       dayjs,
       locale: dayjsLocale,
       dateFormat,
       longDateFormat: getLongDateFormat(dateFormat),
+      decimalSeparator:
+        parts.find((part) => part.type === "decimal")?.value || ".",
+      thousandsSeparator:
+        parts.find((part) => part.type === "group")?.value || ",",
     };
   }, [i18n.language, userSettingsQuery.data?.dateFormat]);
 

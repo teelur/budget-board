@@ -9,7 +9,7 @@ import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { mantineDateFormat } from "~/helpers/datetime";
 import { IAssetResponse } from "~/models/asset";
 import { IValueResponse } from "~/models/value";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const ValuesTab = (): React.ReactNode => {
   const { dayjs } = useLocale();

@@ -21,7 +21,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
 import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
-import { useLocale } from "~/providers/DateProvider/DateProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 export interface ActionItemProps {
   ruleParameter: IRuleParameterEdit;
