@@ -14,7 +14,11 @@ import { AxiosError } from "axios";
 import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
+import {
+  convertNumberToCurrency,
+  getCurrencySymbol,
+  SignDisplay,
+} from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
@@ -193,6 +197,8 @@ const EditableAssetItemContent = (
               props.asset.currentValue ?? 0,
               true,
               props.userCurrency,
+              SignDisplay.Auto,
+              locale,
             )}
           </StatusText>
         </Group>

@@ -2,7 +2,7 @@ import { ActionIcon, Group } from "@mantine/core";
 import { PencilIcon } from "lucide-react";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IValueResponse } from "~/models/value";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
@@ -13,7 +13,7 @@ interface ValueItemContentProps {
 }
 
 const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, locale } = useLocale();
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
@@ -32,7 +32,13 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
         </ActionIcon>
       </Group>
       <StatusText amount={props.value.amount} size="md">
-        {convertNumberToCurrency(props.value.amount, true, props.userCurrency)}
+        {convertNumberToCurrency(
+          props.value.amount,
+          true,
+          props.userCurrency,
+          SignDisplay.Auto,
+          locale,
+        )}
       </StatusText>
     </Group>
   );

@@ -19,7 +19,7 @@ interface ActionItemProps {
 
 const ActionItem = (props: ActionItemProps) => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, locale } = useLocale();
 
   const formatDate = (dateStr: string): string =>
     dayjs(dateStr).format(dateFormat);
@@ -41,6 +41,7 @@ const ActionItem = (props: ActionItemProps) => {
               props.currency,
               props.categories,
               formatDate,
+              locale,
             )}
           </Badge>
         </>

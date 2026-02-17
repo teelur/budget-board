@@ -3,8 +3,9 @@ import { PencilIcon } from "lucide-react";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IInstitution } from "~/models/institution";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface IInstitutionItemContentProps {
   institution: IInstitution;
@@ -14,8 +15,9 @@ interface IInstitutionItemContentProps {
 }
 
 const InstitutionItemContent = (
-  props: IInstitutionItemContentProps
+  props: IInstitutionItemContentProps,
 ): React.ReactNode => {
+  const { locale } = useLocale();
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
@@ -32,7 +34,13 @@ const InstitutionItemContent = (
         </ActionIcon>
       </Group>
       <StatusText amount={props.totalBalance} size="md">
-        {convertNumberToCurrency(props.totalBalance, true, props.userCurrency)}
+        {convertNumberToCurrency(
+          props.totalBalance,
+          true,
+          props.userCurrency,
+          SignDisplay.Auto,
+          locale,
+        )}
       </StatusText>
     </Group>
   );

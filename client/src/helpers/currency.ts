@@ -1,3 +1,10 @@
+export enum SignDisplay {
+  Auto = "auto",
+  Always = "always",
+  Never = "never",
+  ExceptZero = "exceptZero",
+}
+
 /**
  * Format a numeric value as a localized currency string.
  *
@@ -20,15 +27,16 @@ export const convertNumberToCurrency = (
   number: number,
   shouldIncludeCents: boolean,
   currency: string,
-  signDisplay?: "auto" | "always" | "never" | "exceptZero"
+  signDisplay: SignDisplay,
+  locale: string,
 ): string => {
   // Adding 0 to avoid -0 for the output.
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     maximumFractionDigits: shouldIncludeCents ? 2 : 0,
     minimumFractionDigits: shouldIncludeCents ? 2 : 0,
-    signDisplay: signDisplay ?? "auto",
+    signDisplay: signDisplay ?? SignDisplay.Auto,
   }).format(number + 0);
 };
 

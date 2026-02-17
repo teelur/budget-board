@@ -1,6 +1,10 @@
 import classes from "./BudgetChildCard.module.css";
 
-import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
+import {
+  convertNumberToCurrency,
+  getCurrencySymbol,
+  SignDisplay,
+} from "~/helpers/currency";
 import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
@@ -23,6 +27,7 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans, useTranslation } from "react-i18next";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface BudgetChildCardProps {
   id: string;
@@ -38,13 +43,13 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
+  const { locale } = useLocale();
+  const { request } = useAuth();
 
   const newLimitField = useField<number | string>({
     initialValue: props.limit ?? 0,
     validate: (value) => (value !== "" ? null : t("invalid_limit")),
   });
-
-  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -80,8 +85,8 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
         oldBudgets?.map((oldBudget) =>
           oldBudget.id === variables.id
             ? { ...oldBudget, limit: variables.limit }
-            : oldBudget
-        )
+            : oldBudget,
+        ),
       );
 
       return { previousBudgets };
@@ -121,7 +126,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   };
 
   const percentComplete = roundAwayFromZero(
-    ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100
+    ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100,
   );
 
   return (
@@ -175,12 +180,16 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                         amount: convertNumberToCurrency(
                           props.amount * (props.isIncome ? 1 : -1),
                           false,
-                          userSettingsQuery.data?.currency ?? "USD"
+                          userSettingsQuery.data?.currency ?? "USD",
+                          SignDisplay.Auto,
+                          locale,
                         ),
                         total: convertNumberToCurrency(
                           props.limit,
                           false,
-                          userSettingsQuery.data?.currency ?? "USD"
+                          userSettingsQuery.data?.currency ?? "USD",
+                          SignDisplay.Auto,
+                          locale,
                         ),
                       }}
                       components={[
@@ -196,7 +205,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                         max={999999}
                         step={1}
                         prefix={getCurrencySymbol(
-                          userSettingsQuery.data?.currency
+                          userSettingsQuery.data?.currency,
                         )}
                         placeholder={t("enter_limit")}
                         size="xs"
@@ -221,12 +230,16 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       amount: convertNumberToCurrency(
                         props.amount * (props.isIncome ? 1 : -1),
                         false,
-                        userSettingsQuery.data?.currency ?? "USD"
+                        userSettingsQuery.data?.currency ?? "USD",
+                        SignDisplay.Auto,
+                        locale,
                       ),
                       total: convertNumberToCurrency(
                         props.limit,
                         false,
-                        userSettingsQuery.data?.currency ?? "USD"
+                        userSettingsQuery.data?.currency ?? "USD",
+                        SignDisplay.Auto,
+                        locale,
                       ),
                     }}
                     components={[
@@ -264,10 +277,12 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 values={{
                   amount: convertNumberToCurrency(
                     roundAwayFromZero(
-                      props.limit - props.amount * (props.isIncome ? 1 : -1)
+                      props.limit - props.amount * (props.isIncome ? 1 : -1),
                     ),
                     false,
-                    userSettingsQuery.data?.currency ?? "USD"
+                    userSettingsQuery.data?.currency ?? "USD",
+                    SignDisplay.Auto,
+                    locale,
                   ),
                 }}
                 components={[

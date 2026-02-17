@@ -14,7 +14,7 @@ import { AxiosError } from "axios";
 import { PencilIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   accountCategories,
@@ -72,7 +72,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, locale } = useLocale();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -198,6 +198,8 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               props.account.currentBalance,
               true,
               props.userCurrency,
+              SignDisplay.Auto,
+              locale,
             )}
           </StatusText>
         </Group>

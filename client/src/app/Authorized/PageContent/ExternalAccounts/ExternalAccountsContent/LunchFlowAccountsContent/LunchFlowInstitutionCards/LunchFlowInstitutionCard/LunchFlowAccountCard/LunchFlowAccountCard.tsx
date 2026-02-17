@@ -12,7 +12,7 @@ import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import {
   lunchFlowAccountQueryKey,
   translateAxiosError,
@@ -38,7 +38,7 @@ const LunchFlowAccountCard = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, locale } = useLocale();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -203,6 +203,8 @@ const LunchFlowAccountCard = (
               props.lunchFlowAccount.balance,
               true,
               accountCurrency,
+              SignDisplay.Auto,
+              locale,
             )}
           </StatusText>
         </Group>

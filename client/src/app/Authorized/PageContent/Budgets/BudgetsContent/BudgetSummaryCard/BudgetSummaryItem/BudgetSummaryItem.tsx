@@ -1,5 +1,5 @@
 import { StatusColorType } from "~/helpers/budgets";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { Divider, Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -12,6 +12,7 @@ import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -23,6 +24,7 @@ interface BudgetSummaryItemProps {
 }
 
 const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
+  const { locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -45,7 +47,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     ((props.amount *
       (props.budgetValueType === StatusColorType.Expense ? -1 : 1)) /
       (props.total ?? 0)) *
-      100
+      100,
   );
 
   const currency = userSettingsQuery.data?.currency ?? "USD";
@@ -56,12 +58,16 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const formattedAmount = convertNumberToCurrency(
     signedAmount,
     false,
-    currency
+    currency,
+    SignDisplay.Auto,
+    locale,
   );
   const formattedTotal = convertNumberToCurrency(
     props.total ?? 0,
     false,
-    currency
+    currency,
+    SignDisplay.Auto,
+    locale,
   );
 
   const statusTextProps = {

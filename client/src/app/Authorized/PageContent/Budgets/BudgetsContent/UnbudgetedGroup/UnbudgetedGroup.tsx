@@ -2,7 +2,7 @@ import { Accordion as MantineAccordion, Group, Stack } from "@mantine/core";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
@@ -11,6 +11,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -22,6 +23,7 @@ interface UnbudgetedGroupProps {
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -43,7 +45,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const total =
     props.categoryTree.reduce((acc, category) => {
       const categoryTotal = props.categoryToTransactionsTotalMap.get(
-        category.value.toLocaleLowerCase()
+        category.value.toLocaleLowerCase(),
       );
       return acc + (categoryTotal ? categoryTotal : 0);
     }, 0) + (props.categoryToTransactionsTotalMap.get("") ?? 0);
@@ -64,7 +66,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
           categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}
           selectedDate={props.selectedDate}
           openDetails={props.openDetails}
-        />
+        />,
       );
     }
 
@@ -76,7 +78,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
           categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}
           selectedDate={props.selectedDate}
           openDetails={props.openDetails}
-        />
+        />,
       );
     });
 
@@ -96,7 +98,9 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
                 {convertNumberToCurrency(
                   total,
                   false,
-                  userSettingsQuery.data?.currency ?? "USD"
+                  userSettingsQuery.data?.currency ?? "USD",
+                  SignDisplay.Auto,
+                  locale,
                 )}
               </PrimaryText>
             )}

@@ -1,4 +1,4 @@
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
@@ -16,6 +16,7 @@ import { uncategorizedTransactionCategory } from "~/models/transaction";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -26,6 +27,7 @@ interface UnbudgetedCardProps {
 
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -66,8 +68,8 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   if (
     roundAwayFromZero(
       props.categoryToTransactionsTotalMap.get(
-        props.categoryTree.value.toLocaleLowerCase()
-      ) ?? 0
+        props.categoryTree.value.toLocaleLowerCase(),
+      ) ?? 0,
     ) === 0
   ) {
     return null;
@@ -83,7 +85,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
     props.categoryTree.subCategories.forEach((subCategory) => {
       if (
         !props.categoryToTransactionsTotalMap.has(
-          subCategory.value.toLocaleLowerCase()
+          subCategory.value.toLocaleLowerCase(),
         )
       ) {
         return;
@@ -94,12 +96,12 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
           category={subCategory.value}
           amount={
             props.categoryToTransactionsTotalMap.get(
-              subCategory.value.toLocaleLowerCase()
+              subCategory.value.toLocaleLowerCase(),
             )!
           }
           selectedDate={props.selectedDate}
           openDetails={props.openDetails}
-        />
+        />,
       );
     });
 
@@ -134,10 +136,12 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
               <PrimaryText size="1rem" fw={600}>
                 {convertNumberToCurrency(
                   props.categoryToTransactionsTotalMap.get(
-                    props.categoryTree.value.toLocaleLowerCase()
+                    props.categoryTree.value.toLocaleLowerCase(),
                   ) ?? 0,
                   false,
-                  userSettingsQuery.data?.currency ?? "USD"
+                  userSettingsQuery.data?.currency ?? "USD",
+                  SignDisplay.Auto,
+                  locale,
                 )}
               </PrimaryText>
             )}
@@ -153,9 +157,9 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
                       limit: Math.round(
                         Math.abs(
                           props.categoryToTransactionsTotalMap.get(
-                            props.categoryTree.value.toLocaleLowerCase()
-                          ) ?? 0
-                        )
+                            props.categoryTree.value.toLocaleLowerCase(),
+                          ) ?? 0,
+                        ),
                       ),
                     },
                   ]);

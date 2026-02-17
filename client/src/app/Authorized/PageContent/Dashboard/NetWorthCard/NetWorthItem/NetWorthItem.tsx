@@ -1,5 +1,5 @@
 import { Divider, Group } from "@mantine/core";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +7,7 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface NetWorthItemProps {
   title: string;
@@ -15,6 +16,7 @@ interface NetWorthItemProps {
 }
 
 const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
+  const { locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -48,7 +50,9 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
           {convertNumberToCurrency(
             props.totalBalance,
             true,
-            userSettingsQuery.data?.currency ?? "USD"
+            userSettingsQuery.data?.currency ?? "USD",
+            SignDisplay.Auto,
+            locale,
           )}
         </StatusText>
       )}

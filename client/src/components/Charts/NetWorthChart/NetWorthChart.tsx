@@ -1,5 +1,5 @@
 import { filterBalancesByDateRange } from "~/helpers/balances";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
@@ -28,7 +28,7 @@ interface NetWorthChartProps {
 
 const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dateFormat } = useLocale();
+  const { dateFormat, locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -65,6 +65,8 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
           value,
           false,
           userSettingsQuery.data?.currency ?? "USD",
+          SignDisplay.Auto,
+          locale,
         );
   };
 

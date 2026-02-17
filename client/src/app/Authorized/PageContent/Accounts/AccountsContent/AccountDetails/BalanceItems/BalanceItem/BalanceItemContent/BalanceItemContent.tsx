@@ -2,7 +2,7 @@ import { ActionIcon, Group } from "@mantine/core";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IBalanceResponse } from "~/models/balance";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
@@ -15,7 +15,7 @@ interface BalanceItemContentProps {
 const BalanceItemContent = (
   props: BalanceItemContentProps,
 ): React.ReactNode => {
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, locale } = useLocale();
 
   return (
     <Group justify="space-between" align="center">
@@ -39,6 +39,8 @@ const BalanceItemContent = (
           props.balance.amount,
           true,
           props.userCurrency,
+          SignDisplay.Auto,
+          locale,
         )}
       </StatusText>
     </Group>

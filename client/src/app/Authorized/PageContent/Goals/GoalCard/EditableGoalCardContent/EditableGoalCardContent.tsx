@@ -14,7 +14,11 @@ import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
-import { convertNumberToCurrency, getCurrencySymbol } from "~/helpers/currency";
+import {
+  convertNumberToCurrency,
+  getCurrencySymbol,
+  SignDisplay,
+} from "~/helpers/currency";
 import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
 import { notifications } from "@mantine/notifications";
@@ -300,6 +304,8 @@ const EditableGoalCardContent = (
                           props.goal.initialAmount,
                         false,
                         userSettingsQuery.data?.currency ?? "USD",
+                        SignDisplay.Auto,
+                        locale,
                       ),
                     }}
                     components={[
@@ -334,6 +340,8 @@ const EditableGoalCardContent = (
                         props.goal.initialAmount,
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
+                      SignDisplay.Auto,
+                      locale,
                     ),
                     total: convertNumberToCurrency(
                       getGoalTargetAmount(
@@ -342,6 +350,8 @@ const EditableGoalCardContent = (
                       ),
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
+                      SignDisplay.Auto,
+                      locale,
                     ),
                   }}
                   components={[
@@ -374,6 +384,8 @@ const EditableGoalCardContent = (
                             props.goal.initialAmount,
                           false,
                           userSettingsQuery.data?.currency ?? "USD",
+                          SignDisplay.Auto,
+                          locale,
                         ),
                       }}
                       components={[<DimmedText size="sm" key="label" />]}
@@ -419,6 +431,8 @@ const EditableGoalCardContent = (
                           props.goal.initialAmount,
                         false,
                         userSettingsQuery.data?.currency ?? "USD",
+                        SignDisplay.Auto,
+                        locale,
                       ),
                     }}
                     components={[
@@ -458,11 +472,15 @@ const EditableGoalCardContent = (
                       props.goal.monthlyContributionProgress,
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
+                      SignDisplay.Auto,
+                      locale,
                     ),
                     total: convertNumberToCurrency(
                       props.goal.monthlyContribution,
                       false,
                       userSettingsQuery.data?.currency ?? "USD",
+                      SignDisplay.Auto,
+                      locale,
                     ),
                   }}
                   components={[

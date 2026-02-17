@@ -5,11 +5,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { PencilIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface IEditableInstitutionItemContentProps {
   institution: IInstitution;
@@ -19,13 +20,14 @@ interface IEditableInstitutionItemContentProps {
 }
 
 const EditableInstitutionItemContent = (
-  props: IEditableInstitutionItemContentProps
+  props: IEditableInstitutionItemContentProps,
 ) => {
   const institutionNameField = useField({
     initialValue: props.institution.name,
   });
 
   const { request } = useAuth();
+  const { locale } = useLocale();
 
   const queryClient = useQueryClient();
   const doUpdateInstitution = useMutation({
@@ -76,7 +78,13 @@ const EditableInstitutionItemContent = (
         </ActionIcon>
       </Group>
       <StatusText amount={props.totalBalance} size="md">
-        {convertNumberToCurrency(props.totalBalance, true, props.userCurrency)}
+        {convertNumberToCurrency(
+          props.totalBalance,
+          true,
+          props.userCurrency,
+          SignDisplay.Auto,
+          locale,
+        )}
       </StatusText>
     </Group>
   );

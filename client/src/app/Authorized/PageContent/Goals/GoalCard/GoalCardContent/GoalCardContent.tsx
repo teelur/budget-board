@@ -6,7 +6,7 @@ import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
@@ -28,7 +28,7 @@ interface GoalCardContentProps {
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs } = useLocale();
+  const { dayjs, locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -83,6 +83,8 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                     props.goal.initialAmount,
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
+                  SignDisplay.Auto,
+                  locale,
                 ),
                 total: convertNumberToCurrency(
                   getGoalTargetAmount(
@@ -91,6 +93,8 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   ),
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
+                  SignDisplay.Auto,
+                  locale,
                 ),
               }}
               components={[
@@ -132,11 +136,15 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   props.goal.monthlyContributionProgress,
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
+                  SignDisplay.Auto,
+                  locale,
                 ),
                 total: convertNumberToCurrency(
                   props.goal.monthlyContribution,
                   false,
                   userSettingsQuery.data?.currency ?? "USD",
+                  SignDisplay.Auto,
+                  locale,
                 ),
               }}
               components={[

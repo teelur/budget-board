@@ -1,6 +1,6 @@
 import classes from "./UnbudgetChildCard.module.css";
 
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IBudgetCreateRequest } from "~/models/budget";
@@ -14,6 +14,7 @@ import { roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface UnbudgetChildCardProps {
   selectedDate: Date | null;
@@ -24,6 +25,7 @@ interface UnbudgetChildCardProps {
 }
 
 const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
+  const { locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -92,7 +94,9 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
                 {convertNumberToCurrency(
                   props.amount * (props.isIncome ? 1 : -1),
                   false,
-                  userSettingsQuery.data?.currency ?? "USD"
+                  userSettingsQuery.data?.currency ?? "USD",
+                  SignDisplay.Auto,
+                  locale,
                 )}
               </PrimaryText>
             )}

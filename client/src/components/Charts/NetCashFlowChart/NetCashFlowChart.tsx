@@ -1,4 +1,4 @@
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { getTransactionsForMonth } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
@@ -31,7 +31,7 @@ interface NetCashFlowChartProps {
 
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs } = useLocale();
+  const { dayjs, locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -103,6 +103,8 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
           value,
           false,
           userSettingsQuery.data?.currency ?? "USD",
+          SignDisplay.Auto,
+          locale,
         );
   };
 

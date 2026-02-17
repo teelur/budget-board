@@ -19,7 +19,7 @@ interface ConditionItemProps {
 
 const ConditionItem = (props: ConditionItemProps) => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, locale } = useLocale();
 
   const fieldLabelKey = TransactionFields.find(
     (field) => field.value === props.condition.field,
@@ -48,6 +48,7 @@ const ConditionItem = (props: ConditionItemProps) => {
             props.currency,
             props.categories,
             formatDate,
+            locale,
           )}
         </Badge>
       </Group>

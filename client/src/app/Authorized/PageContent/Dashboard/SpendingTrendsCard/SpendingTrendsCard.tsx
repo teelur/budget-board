@@ -1,6 +1,6 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { getDateFromMonthsAgo, getDaysInMonth } from "~/helpers/datetime";
 import {
   filterHiddenTransactions,
@@ -22,7 +22,7 @@ const SpendingTrendsCard = (): React.ReactNode => {
   const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
 
   const { t } = useTranslation();
-  const { dayjs } = useLocale();
+  const { dayjs, locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -131,6 +131,8 @@ const SpendingTrendsCard = (): React.ReactNode => {
       Math.abs(spendingComparisonNumber),
       true,
       userSettingsQuery.data?.currency ?? "USD",
+      SignDisplay.Auto,
+      locale,
     );
 
     if (spendingComparisonNumber < 0) {

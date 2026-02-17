@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
@@ -16,7 +16,7 @@ interface IAccountItemContentProps {
 
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, locale } = useLocale();
 
   const getAccountSourceBadgeColor = (): string => {
     switch (props.account.source) {
@@ -69,6 +69,8 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
             props.account.currentBalance,
             true,
             props.userCurrency,
+            SignDisplay.Auto,
+            locale,
           )}
         </StatusText>
       </Group>

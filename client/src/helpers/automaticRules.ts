@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { convertNumberToCurrency } from "./currency";
+import { convertNumberToCurrency, SignDisplay } from "./currency";
 import { getFormattedCategoryValue } from "./category";
 import { ICategory } from "~/models/category";
 
@@ -24,12 +24,19 @@ export const getFormattedValue = (
   currency: string,
   categories: ICategory[],
   formatDate: (dateStr: string) => string,
+  locale: string,
 ): string => {
   switch (field) {
     case "merchant":
       return value;
     case "amount":
-      return convertNumberToCurrency(parseFloat(value), true, currency);
+      return convertNumberToCurrency(
+        parseFloat(value),
+        true,
+        currency,
+        SignDisplay.Auto,
+        locale,
+      );
     case "date":
       return formatDate(value);
     case "category":

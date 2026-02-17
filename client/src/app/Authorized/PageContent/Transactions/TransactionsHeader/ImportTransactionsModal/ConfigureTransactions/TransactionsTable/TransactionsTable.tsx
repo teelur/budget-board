@@ -11,7 +11,7 @@ import { AxiosResponse } from "axios";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
@@ -27,7 +27,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const itemsPerPage = 10;
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, locale } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -97,6 +97,8 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                           row.amount ?? 0,
                           true,
                           userSettingsQuery.data?.currency ?? "USD",
+                          SignDisplay.Auto,
+                          locale,
                         )}
                   </Table.Td>
                   <Table.Td>{row.account}</Table.Td>
