@@ -1,7 +1,6 @@
 import { Stack } from "@mantine/core";
 import React from "react";
 import BudgetsToolbar from "./BudgetsToolbar/BudgetsToolbar";
-import { initCurrentMonth } from "~/helpers/datetime";
 import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
@@ -13,15 +12,16 @@ import { AxiosResponse } from "axios";
 import { ITransaction } from "~/models/transaction";
 import BudgetsContent from "./BudgetsContent/BudgetsContent";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const Budgets = (): React.ReactNode => {
-  const [selectedDates, setSelectedDates] = React.useState<Date[]>([
-    initCurrentMonth(),
-  ]);
-
   const { transactionCategories } = useTransactionCategories();
-
+  const { dayjs } = useLocale();
   const { request } = useAuth();
+
+  const [selectedDates, setSelectedDates] = React.useState<Date[]>([
+    dayjs().startOf("month").toDate(),
+  ]);
 
   const budgetsQuery = useQueries({
     queries: selectedDates.map((date: Date) => ({
@@ -78,12 +78,12 @@ const Budgets = (): React.ReactNode => {
 
   // We need to filter out the transactions labelled with 'Hide From Budgets'
   const transactionsWithoutHidden = filterHiddenTransactions(
-    transactionsForMonthsQuery.data ?? []
+    transactionsForMonthsQuery.data ?? [],
   );
 
   const timeToMonthlyTotalsMap: Map<number, number> = React.useMemo(
     () => buildTimeToMonthlyTotalsMap(selectedDates, transactionsWithoutHidden),
-    [selectedDates, transactionsWithoutHidden]
+    [selectedDates, transactionsWithoutHidden],
   );
 
   return (
@@ -105,7 +105,7 @@ const Budgets = (): React.ReactNode => {
         categories={transactionCategories}
         transactions={transactionsWithoutHidden}
         selectedDate={
-          selectedDates.length === 1 ? selectedDates[0] ?? null : null
+          selectedDates.length === 1 ? (selectedDates[0] ?? null) : null
         }
         isPending={budgetsQuery.isPending}
       />
