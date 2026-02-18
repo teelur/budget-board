@@ -4,7 +4,7 @@ import {
   getTransactionsForMonth,
   RollingTotalSpendingPerDay,
 } from "./transactions";
-import { getDaysInMonth, getMonthAndYearDateString } from "./datetime";
+import { getDaysInMonth } from "./datetime";
 
 export const chartColors = [
   "indigo.6",
@@ -26,7 +26,8 @@ export const chartColors = [
  */
 export const buildTransactionChartData = (
   months: Date[],
-  transactions: ITransaction[]
+  transactions: ITransaction[],
+  formatDateString: (date: Date) => string,
 ): any[] => {
   const spendingTrendsChartData: any[] = [];
   months.forEach((month) => {
@@ -43,27 +44,26 @@ export const buildTransactionChartData = (
         transactionsForMonth,
         isThisMonth
           ? today.getDate()
-          : getDaysInMonth(month.getMonth(), month.getFullYear())
+          : getDaysInMonth(month.getMonth(), month.getFullYear()),
       );
 
     rollingTotalTransactionsForMonth.forEach(
       (rollingTotalTransaction: RollingTotalSpendingPerDay) => {
         const chartDay = spendingTrendsChartData.find(
-          (data) => data.day === rollingTotalTransaction.day
+          (data) => data.day === rollingTotalTransaction.day,
         );
 
         // On the very first loop, we need to create the data point.
         if (chartDay == null) {
           const newChartDay: any = {
             day: rollingTotalTransaction.day,
-            [getMonthAndYearDateString(month)]: rollingTotalTransaction.amount,
+            [formatDateString(month)]: rollingTotalTransaction.amount,
           };
           spendingTrendsChartData.push(newChartDay);
         } else {
-          chartDay[getMonthAndYearDateString(month)] =
-            rollingTotalTransaction.amount;
+          chartDay[formatDateString(month)] = rollingTotalTransaction.amount;
         }
-      }
+      },
     );
   });
   return spendingTrendsChartData;
@@ -76,10 +76,11 @@ export const buildTransactionChartData = (
  * @returns An array of objects containing the name of the month and the color to use.
  */
 export const buildTransactionChartSeries = (
-  months: Date[]
+  months: Date[],
+  formatDateString: (date: Date) => string,
 ): { name: string; color: string }[] =>
   months.map((month, i) => ({
-    name: getMonthAndYearDateString(month),
+    name: formatDateString(month),
     color: chartColors[i % chartColors.length] ?? "gray.6",
   }));
 
@@ -91,7 +92,7 @@ interface MonthlySpendingData {
 export const buildMonthlySpendingChartData = (
   months: Date[],
   transactions: ITransaction[],
-  invertData: boolean
+  invertData: boolean,
 ): MonthlySpendingData[] => {
   const monthlySpendingChartData: MonthlySpendingData[] = [];
   months.forEach((month) => {
@@ -105,7 +106,7 @@ export const buildMonthlySpendingChartData = (
       total:
         transactionsForMonth.reduce(
           (acc, transaction) => acc + transaction.amount,
-          0
+          0,
         ) * (invertData ? -1 : 1),
     });
   });

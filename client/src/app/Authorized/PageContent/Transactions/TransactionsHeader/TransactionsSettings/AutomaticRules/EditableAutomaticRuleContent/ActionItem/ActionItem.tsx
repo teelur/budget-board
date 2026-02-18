@@ -21,6 +21,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
 import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 export interface ActionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -33,6 +34,7 @@ export interface ActionItemProps {
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { locale, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -91,6 +93,8 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           flex="1 1 auto"
           placeholder={t("select_a_date")}
           value={props.ruleParameter.value}
+          locale={locale}
+          valueFormat={longDateFormat}
           onChange={(value) =>
             props.setRuleParameter({
               ...props.ruleParameter,
@@ -132,12 +136,12 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
             }))}
             value={
               TransactionFields.find(
-                (field) => field.value === props.ruleParameter.field
+                (field) => field.value === props.ruleParameter.field,
               )?.value
             }
             onChange={(value) => {
               const foundValue = TransactionFields.find(
-                (field) => field.value === value
+                (field) => field.value === value,
               );
 
               if (!foundValue) {
@@ -170,7 +174,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           }))}
           value={
             ActionOperators.find(
-              (op) => op.value === props.ruleParameter.operator
+              (op) => op.value === props.ruleParameter.operator,
             )?.value
           }
           onChange={(value) => {

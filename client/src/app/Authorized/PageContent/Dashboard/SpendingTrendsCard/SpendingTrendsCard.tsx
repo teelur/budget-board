@@ -16,11 +16,13 @@ import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 const SpendingTrendsCard = (): React.ReactNode => {
   const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
 
   const { t } = useTranslation();
+  const { dayjs } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -75,30 +77,36 @@ const SpendingTrendsCard = (): React.ReactNode => {
   }
 
   const getSpendingComparison = (): number => {
-    const today = new Date().getDate();
+    const today = dayjs().date();
 
     const thisMonthRollingTotal = getRollingTotalSpendingForMonth(
       filterHiddenTransactions(
         (transactionsQueries.data ?? []).filter(
           (transaction) =>
-            new Date(transaction.date).getMonth() === months[0]?.getMonth()
-        )
+            dayjs(transaction.date).month() === dayjs(months[0])?.month(),
+        ),
       ),
-      today
+      today,
     );
     const lastMonthRollingTotal = getRollingTotalSpendingForMonth(
       filterHiddenTransactions(
         (transactionsQueries.data ?? []).filter(
           (transaction) =>
-            new Date(transaction.date).getMonth() === months[1]?.getMonth()
-        )
+            dayjs(transaction.date).month() === dayjs(months[1])?.month(),
+        ),
       ),
-      getDaysInMonth(months[1]?.getMonth() ?? 0, months[1]?.getFullYear() ?? 0)
+      getDaysInMonth(
+        dayjs(months[1])?.month() ?? 0,
+        dayjs(months[1])?.year() ?? 0,
+      ),
     );
 
     if (
       today >
-      getDaysInMonth(months[1]?.getMonth() ?? 0, months[1]?.getFullYear() ?? 0)
+      getDaysInMonth(
+        dayjs(months[1])?.month() ?? 0,
+        dayjs(months[1])?.year() ?? 0,
+      )
     ) {
       // If today is greater than the last day of the last month, we need to compare to the
       // last day of the last month.
@@ -122,7 +130,7 @@ const SpendingTrendsCard = (): React.ReactNode => {
     const amount = convertNumberToCurrency(
       Math.abs(spendingComparisonNumber),
       true,
-      userSettingsQuery.data?.currency ?? "USD"
+      userSettingsQuery.data?.currency ?? "USD",
     );
 
     if (spendingComparisonNumber < 0) {

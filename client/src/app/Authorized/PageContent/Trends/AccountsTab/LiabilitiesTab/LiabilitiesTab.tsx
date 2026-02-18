@@ -3,7 +3,7 @@ import classes from "./LiabilitiesTab.module.css";
 import { Stack } from "@mantine/core";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
-import { getDateFromMonthsAgo, mantineDateFormat } from "~/helpers/datetime";
+import { mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -11,19 +11,21 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
-import dayjs from "dayjs";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 const LiabilitiesTab = (): React.ReactNode => {
+  const { request } = useAuth();
+  const { dayjs } = useDate();
+
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
-    []
+    [],
   );
   const [dateRange, setDateRange] = React.useState<DatesRangeValue<string>>([
-    dayjs(getDateFromMonthsAgo(1)).format(mantineDateFormat),
-    dayjs().format(mantineDateFormat),
+    dayjs().subtract(1, "month").startOf("month").format(mantineDateFormat),
+    dayjs().startOf("month").format(mantineDateFormat),
   ]);
 
-  const { request } = useAuth();
   const balancesQuery = useQueries({
     queries: selectedAccountIds.map((accountId: string) => ({
       queryKey: ["balances", accountId],
@@ -86,7 +88,7 @@ const LiabilitiesTab = (): React.ReactNode => {
               ({
                 id: account.id,
                 name: account.name,
-              } as IItem)
+              }) as IItem,
           )}
         dateRange={dateRange}
         isPending={balancesQuery.isPending || accountsQuery.isPending}

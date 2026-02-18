@@ -18,6 +18,7 @@ import { StatusColorType } from "~/helpers/budgets";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -27,6 +28,7 @@ interface GoalCardContentProps {
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { dayjs } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -80,15 +82,15 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   sumAccountsTotalBalance(props.goal.accounts) -
                     props.goal.initialAmount,
                   false,
-                  userSettingsQuery.data?.currency ?? "USD"
+                  userSettingsQuery.data?.currency ?? "USD",
                 ),
                 total: convertNumberToCurrency(
                   getGoalTargetAmount(
                     props.goal.amount,
-                    props.goal.initialAmount
+                    props.goal.initialAmount,
                   ),
                   false,
-                  userSettingsQuery.data?.currency ?? "USD"
+                  userSettingsQuery.data?.currency ?? "USD",
                 ),
               }}
               components={[
@@ -113,13 +115,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
               <Trans
                 i18nKey="budget_projected_styled"
                 values={{
-                  amount: new Date(props.goal.completeDate).toLocaleDateString(
-                    undefined,
-                    {
-                      year: "numeric",
-                      month: "long",
-                    }
-                  ),
+                  amount: dayjs(props.goal.completeDate).format("MMMM YYYY"),
                 }}
                 components={[
                   <DimmedText size="sm" key="label" />,
@@ -135,12 +131,12 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                 amount: convertNumberToCurrency(
                   props.goal.monthlyContributionProgress,
                   false,
-                  userSettingsQuery.data?.currency ?? "USD"
+                  userSettingsQuery.data?.currency ?? "USD",
                 ),
                 total: convertNumberToCurrency(
                   props.goal.monthlyContribution,
                   false,
-                  userSettingsQuery.data?.currency ?? "USD"
+                  userSettingsQuery.data?.currency ?? "USD",
                 ),
               }}
               components={[

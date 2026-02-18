@@ -3,7 +3,6 @@ import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
-import dayjs from "dayjs";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -11,18 +10,19 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface FilterCardProps {
   categories: ICategory[];
-  style?: React.CSSProperties;
 }
 
 const FilterCard = (props: FilterCardProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { dayjs, locale, longDateFormat } = useDate();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
 
   return (
-    <Card elevation={1} style={props.style}>
+    <Card elevation={1}>
       <Stack gap={0}>
         <PrimaryText size="lg">{t("filters")}</PrimaryText>
         <Flex
@@ -37,6 +37,8 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
             type="range"
             placeholder={t("select_a_date_range")}
             value={transactionFilters.dateRange}
+            locale={locale}
+            valueFormat={longDateFormat}
             onChange={(dateRange: DatesRangeValue<string>) => {
               const parsedDateRange: [Date | null, Date | null] = [
                 dateRange[0] ? dayjs(dateRange[0]).toDate() : null,

@@ -4,7 +4,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
-import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -21,6 +20,7 @@ import {
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface ILunchFlowAccountCardProps {
   lunchFlowAccount: ILunchFlowAccountResponse;
@@ -38,6 +38,7 @@ const LunchFlowAccountCard = (
   });
 
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -251,7 +252,9 @@ const LunchFlowAccountCard = (
             <DimmedText size="xs">
               {t("last_sync", {
                 date: dayjs(props.lunchFlowAccount.lastSync).isValid()
-                  ? dayjs(props.lunchFlowAccount.lastSync).format("L LT")
+                  ? dayjs(props.lunchFlowAccount.lastSync).format(
+                      `${dateFormat} LT`,
+                    )
                   : t("never"),
               })}
             </DimmedText>
@@ -259,7 +262,9 @@ const LunchFlowAccountCard = (
           <DimmedText size="xs">
             {t("last_updated", {
               date: dayjs(props.lunchFlowAccount.balanceDate).isValid()
-                ? dayjs(props.lunchFlowAccount.balanceDate).format("L LT")
+                ? dayjs(props.lunchFlowAccount.balanceDate).format(
+                    `${dateFormat} LT`,
+                  )
                 : t("never"),
             })}
           </DimmedText>

@@ -1,10 +1,10 @@
-import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { ActionIcon, Group } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import React from "react";
 import MonthToolcard from "./MonthToolcard/MonthToolcard";
 import { getCashFlowValue } from "~/helpers/budgets";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface MonthToolcardsProps {
   selectedDates: Date[];
@@ -19,16 +19,22 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
   const PAGE_BUTTON_WIDTH = 36;
   const MONTH_CARD_WIDTH = 68;
 
+  const { dayjs } = useDate();
+
   const [index, setIndex] = React.useState(0);
   const { ref, width } = useElementSize();
 
   const dates = Array.from(
     {
       length: Math.floor(
-        ((width ?? 0) - PAGE_BUTTON_WIDTH * 2) / MONTH_CARD_WIDTH
+        ((width ?? 0) - PAGE_BUTTON_WIDTH * 2) / MONTH_CARD_WIDTH,
       ),
     },
-    (_, i) => getDateFromMonthsAgo(i + index)
+    (_, i) =>
+      dayjs()
+        .subtract(i + index, "month")
+        .startOf("month")
+        .toDate(),
   );
 
   const handleClick = (date: Date) => {
@@ -39,8 +45,8 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
       ) {
         props.setSelectedDates(
           props.selectedDates.filter(
-            (selectedDate: Date) => selectedDate.getTime() !== date.getTime()
-          )
+            (selectedDate: Date) => selectedDate.getTime() !== date.getTime(),
+          ),
         );
       } else {
         // If it isn't present, then add to selected.

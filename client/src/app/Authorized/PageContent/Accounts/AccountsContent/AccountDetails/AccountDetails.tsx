@@ -7,7 +7,6 @@ import {
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
-import dayjs from "dayjs";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
@@ -20,6 +19,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -32,6 +32,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
+  const { dayjs } = useDate();
   const { request } = useAuth();
 
   const balancesQuery = useQuery({
@@ -64,8 +65,8 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
 
   const balancesForChart = sortedBalances.filter((balance) =>
     dayjs(balance.dateTime).isAfter(
-      dayjs().subtract(chartLookbackMonths, "months")
-    )
+      dayjs().subtract(chartLookbackMonths, "months"),
+    ),
   );
 
   return (

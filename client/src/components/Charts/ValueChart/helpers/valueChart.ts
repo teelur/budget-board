@@ -53,31 +53,26 @@ export const getSortedValueDates = (values: IValue[]): Date[] =>
  * @param invertData Optional. If true, inverts the value data (e.g., for representing expenses as negative values). Defaults to false.
  * @returns An array of objects, where each object represents a date and the corresponding value for each item on that date.
  */
-export const buildValueChartData = (values: IValue[], invertData = false) => {
-  const sortedValues = values.sort(
-    (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
-  );
-
+export const buildValueChartData = (
+  sortedValues: IValue[],
+  formatDateString: (date: Date) => string,
+  invertData = false,
+): ValueChartData[] => {
   const itemIdToSortedValuesMap = Map.groupBy(
     sortedValues,
-    (value: IValue) => value.parentId
+    (value: IValue) => value.parentId,
   );
 
   // When multiple accounts are selected, some dates might not be represented on all accounts.
   // We need to aggregate all dates that have an associated balance for at least one account.
   const distinctSortedValueDates: Date[] = getUniqueDates(
-    getSortedValueDates(values)
+    getSortedValueDates(sortedValues),
   );
 
   const chartData: ValueChartData[] = [];
 
   distinctSortedValueDates.forEach((date: Date, index: number) => {
-    // TODO: This is a hack to get around charts not liking non-string keys.
-    // It works with shadcn, so need to figure out how to make it work here.
-    const dateString = date.toLocaleDateString("en-US", {
-      month: "numeric",
-      day: "numeric",
-    });
+    const dateString = formatDateString(date);
 
     const chartDataPoint: ValueChartData = { date, dateString };
 
@@ -85,7 +80,7 @@ export const buildValueChartData = (values: IValue[], invertData = false) => {
       const valuesForDate = itemValues.filter(
         (value) =>
           getStandardDate(new Date(value.dateTime)).getTime() ===
-          getStandardDate(date).getTime()
+          getStandardDate(date).getTime(),
       );
 
       if (valuesForDate.length > 0) {
@@ -117,8 +112,8 @@ export const buildValueChartData = (values: IValue[], invertData = false) => {
 export const filterValuesByDateRange = (
   values: IValue[],
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ): IValue[] =>
   values.filter((value) =>
-    dayjs(value.dateTime).isBetween(startDate, endDate, "date", "[]")
+    dayjs(value.dateTime).isBetween(startDate, endDate, "date", "[]"),
   );

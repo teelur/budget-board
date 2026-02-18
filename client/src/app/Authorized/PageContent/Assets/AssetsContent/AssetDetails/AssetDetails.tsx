@@ -14,7 +14,6 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IValueResponse } from "~/models/value";
 import { AxiosResponse } from "axios";
-import dayjs from "dayjs";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import Drawer from "~/components/core/Drawer/Drawer";
@@ -23,6 +22,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -35,6 +35,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
+  const { dayjs, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const valuesQuery = useQuery({
@@ -67,8 +68,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
 
   const valuesForChart = sortedValues.filter((value) =>
     dayjs(value.dateTime).isAfter(
-      dayjs().subtract(chartLookbackMonths, "months")
-    )
+      dayjs().subtract(chartLookbackMonths, "months"),
+    ),
   );
 
   return (
@@ -93,13 +94,13 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 <Trans
                   i18nKey="purchased_on_for_styled"
                   values={{
-                    date: new Date(
-                      props.asset.purchaseDate
-                    ).toLocaleDateString(),
+                    date: dayjs(props.asset.purchaseDate).format(
+                      longDateFormat,
+                    ),
                     price: convertNumberToCurrency(
                       props.asset.purchasePrice,
                       true,
-                      props.userCurrency
+                      props.userCurrency,
                     ),
                   }}
                   components={[
@@ -109,10 +110,10 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 />
               </Stack>
             )}
-            {props.asset?.purchaseDate &&
-              props.asset.purchasePrice &&
-              props.asset.sellDate &&
-              props.asset.sellPrice && (
+            {dayjs(props.asset?.purchaseDate).isValid() &&
+              props.asset?.purchasePrice &&
+              dayjs(props.asset?.sellDate).isValid() &&
+              props.asset?.sellPrice && (
                 <Stack gap={0} justify="center" align="center">
                   <MoveRightIcon size={32} />
                   <StatusText
@@ -123,30 +124,31 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                       props.asset.sellPrice - props.asset.purchasePrice,
                       true,
                       props.userCurrency,
-                      "always"
+                      "always",
                     )}
                   </StatusText>
                 </Stack>
               )}
-            {props.asset?.sellDate && props.asset.sellPrice && (
-              <Stack gap={0} justify="center" align="center">
-                <Trans
-                  i18nKey="sold_on_for_styled"
-                  values={{
-                    date: new Date(props.asset.sellDate).toLocaleDateString(),
-                    price: convertNumberToCurrency(
-                      props.asset.sellPrice,
-                      true,
-                      props.userCurrency
-                    ),
-                  }}
-                  components={[
-                    <DimmedText size="xs" key="sold-label" />,
-                    <PrimaryText size="md" key="sold-value" />,
-                  ]}
-                />
-              </Stack>
-            )}
+            {dayjs(props.asset?.sellDate).isValid() &&
+              props.asset?.sellPrice && (
+                <Stack gap={0} justify="center" align="center">
+                  <Trans
+                    i18nKey="sold_on_for_styled"
+                    values={{
+                      date: dayjs(props.asset.sellDate).format(longDateFormat),
+                      price: convertNumberToCurrency(
+                        props.asset.sellPrice,
+                        true,
+                        props.userCurrency,
+                      ),
+                    }}
+                    components={[
+                      <DimmedText size="xs" key="sold-label" />,
+                      <PrimaryText size="md" key="sold-value" />,
+                    ]}
+                  />
+                </Stack>
+              )}
           </Group>
           <Accordion
             defaultValue={["add-value", "chart", "values"]}

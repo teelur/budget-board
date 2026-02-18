@@ -22,14 +22,18 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
+  const { dayjs, locale, longDateFormat } = useDate();
+  const { transactionCategories } = useTransactionCategories();
+  const { request } = useAuth();
 
   const dateField = useField<Date | null>({
-    initialValue: new Date(),
+    initialValue: dayjs().toDate(),
     validate: (value) => (value ? null : t("date_is_required")),
   });
   const merchantNameField = useField<string>({
@@ -46,9 +50,6 @@ const CreateTransactionModal = (): React.ReactNode => {
     validate: (value) =>
       value && value.length > 0 ? null : t("account_is_required"),
   });
-
-  const { transactionCategories } = useTransactionCategories();
-  const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -105,11 +106,11 @@ const CreateTransactionModal = (): React.ReactNode => {
       merchantName: merchantNameField.getValue(),
       category: getParentCategory(
         categoryField.getValue(),
-        transactionCategories
+        transactionCategories,
       ),
       subcategory: getIsParentCategory(
         categoryField.getValue(),
-        transactionCategories
+        transactionCategories,
       )
         ? null
         : categoryField.getValue(),
@@ -136,6 +137,8 @@ const CreateTransactionModal = (): React.ReactNode => {
             label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
             placeholder={t("select_a_date")}
             {...dateField.getInputProps()}
+            locale={locale}
+            valueFormat={longDateFormat}
             elevation={0}
           />
           <TextInput

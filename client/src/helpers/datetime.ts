@@ -117,8 +117,8 @@ export const getDaysInMonth = (monthIndex: number, year: number): number =>
  * @param {Date} date - The date to format.
  * @returns {string} The formatted month and year string.
  */
-export const getMonthAndYearDateString = (date: Date): string => {
-  return date.toLocaleString("default", { month: "long", year: "numeric" });
+export const getMonthAndYearDateString = (date: Date, locale: string): string => {
+  return date.toLocaleString(locale, { month: "long", year: "numeric" });
 };
 
 /**

@@ -4,16 +4,16 @@ import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import dayjs from "dayjs";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
 import { IBalanceCreateRequest } from "~/models/balance";
-import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 interface AddBalanceProps {
   accountId: string;
@@ -21,15 +21,16 @@ interface AddBalanceProps {
 }
 
 const AddBalance = (props: AddBalanceProps): React.ReactNode => {
-  const dateField = useField<string>({
-    initialValue: dayjs().toString(),
+  const { t } = useTranslation();
+  const { dayjs, longDateFormat } = useDate();
+  const { request } = useAuth();
+
+  const dateField = useField<Date>({
+    initialValue: dayjs().toDate(),
   });
   const amountField = useField<string | number>({
     initialValue: 0,
   });
-
-  const { t } = useTranslation();
-  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doCreateBalance = useMutation({
@@ -54,16 +55,20 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
 
   return (
     <Stack gap={10}>
-      <SurfaceDateInput
+      <DateInput
         {...dateField.getInputProps()}
         label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
+        valueFormat={longDateFormat}
+        locale={dayjs.locale()}
+        elevation={0}
       />
-      <SurfaceNumberInput
+      <NumberInput
         {...amountField.getInputProps()}
         label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
         prefix={getCurrencySymbol(props.currency)}
         decimalScale={2}
         thousandSeparator=","
+        elevation={0}
       />
       <Button
         loading={doCreateBalance.isPending}

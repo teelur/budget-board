@@ -50,11 +50,12 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
   return (
     <Flex
       className={classes.container}
+      gap="0.5rem"
       direction={{ base: "column", sm: "row" }}
       align={{ base: "start", sm: "center" }}
     >
       <DimmedText size="sm">{t("sort_by")}</DimmedText>
-      <Group className={classes.sortButtons}>
+      <Group gap="0.5rem">
         {SortOptions.map((sortOption: SortOption) => (
           <SortButton
             key={sortOption.value}
@@ -71,7 +72,7 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
                 props.setSortDirection(SortDirection.Decending);
               } else {
                 props.setSortDirection(
-                  ToggleSortDirection(props.sortDirection)
+                  ToggleSortDirection(props.sortDirection),
                 );
               }
               props.setCurrentSort(sortOption.value);

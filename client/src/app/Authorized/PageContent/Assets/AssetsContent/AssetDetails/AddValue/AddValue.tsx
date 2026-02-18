@@ -1,15 +1,15 @@
 import { Button, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import dayjs from "dayjs";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IValueCreateRequest, IValueResponse } from "~/models/value";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SurfaceDateInput from "~/components/core/Input/Surface/SurfaceDateInput/SurfaceDateInput";
-import SurfaceNumberInput from "~/components/core/Input/Surface/SurfaceNumberInput/SurfaceNumberInput";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 interface AddValueProps {
   assetId: string;
@@ -17,15 +17,16 @@ interface AddValueProps {
 }
 
 const AddValue = (props: AddValueProps): React.ReactNode => {
+  const { t } = useTranslation();
+  const { dayjs, locale, longDateFormat } = useDate();
+  const { request } = useAuth();
+
   const amountField = useField<string | number>({
     initialValue: 0,
   });
-  const dateField = useField<string>({
-    initialValue: dayjs().toString(),
+  const dateField = useField<Date>({
+    initialValue: dayjs().toDate(),
   });
-
-  const { t } = useTranslation();
-  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doAddValue = useMutation({
@@ -53,24 +54,28 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
 
   return (
     <Stack gap={10}>
-      <SurfaceDateInput
+      <DateInput
         {...dateField.getInputProps()}
+        locale={locale}
+        valueFormat={longDateFormat}
         label={<PrimaryText size="xs">{t("date")}</PrimaryText>}
         maw={400}
+        elevation={0}
       />
-      <SurfaceNumberInput
+      <NumberInput
         {...amountField.getInputProps()}
         label={<PrimaryText size="xs">{t("amount")}</PrimaryText>}
         prefix={getCurrencySymbol(props.currency)}
         decimalScale={2}
         thousandSeparator=","
+        elevation={0}
       />
       <Button
         loading={doAddValue.isPending}
         onClick={() =>
           doAddValue.mutate({
             amount: Number(amountField.getValue()),
-            dateTime: dayjs(dateField.getValue()).toDate(),
+            dateTime: dateField.getValue(),
             assetID: props.assetId,
           })
         }

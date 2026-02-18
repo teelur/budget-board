@@ -8,6 +8,8 @@ import { Trans, useTranslation } from "react-i18next";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
+  DateFormatItem,
+  DateFormats,
   IUserSettings,
   IUserSettingsUpdateRequest,
   LanguageItem,
@@ -23,6 +25,9 @@ const UserSettings = (): React.ReactNode => {
     initialValue: "",
   });
   const languageField = useField({
+    initialValue: "",
+  });
+  const dateFormatField = useField({
     initialValue: "",
   });
 
@@ -72,11 +77,16 @@ const UserSettings = (): React.ReactNode => {
     if (userSettingsQuery.data?.language) {
       languageField.setValue(userSettingsQuery.data.language);
     }
+    if (userSettingsQuery.data?.dateFormat) {
+      dateFormatField.setValue(userSettingsQuery.data.dateFormat);
+    }
   }, [
     userSettingsQuery.data?.currency,
     userSettingsQuery.data?.language,
+    userSettingsQuery.data?.dateFormat,
     currencyField.setValue,
     languageField.setValue,
+    dateFormatField.setValue,
   ]);
 
   return (
@@ -142,6 +152,27 @@ const UserSettings = (): React.ReactNode => {
                   if (value) {
                     doUpdateUserSettings.mutate({
                       language: value,
+                    });
+                  }
+                }}
+                elevation={1}
+              />
+              <Select
+                label={
+                  <PrimaryText size="sm">
+                    {t("preferred_date_format")}
+                  </PrimaryText>
+                }
+                placeholder={t("select_your_preferred_date_format")}
+                data={DateFormats.map((dateFormatItem: DateFormatItem) => ({
+                  value: dateFormatItem.value,
+                  label: t(dateFormatItem.label),
+                }))}
+                {...dateFormatField.getInputProps()}
+                onChange={(value) => {
+                  if (value) {
+                    doUpdateUserSettings.mutate({
+                      dateFormat: value,
                     });
                   }
                 }}

@@ -1,5 +1,4 @@
 import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
-import dayjs from "dayjs";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -7,6 +6,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { AccountSource, IAccountResponse } from "~/models/account";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface IAccountItemContentProps {
   account: IAccountResponse;
@@ -16,6 +16,7 @@ interface IAccountItemContentProps {
 
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
 
   const getAccountSourceBadgeColor = (): string => {
     switch (props.account.source) {
@@ -88,7 +89,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
         <DimmedText size="sm">
           {t("last_updated", {
             date: dayjs(props.account.balanceDate).isValid()
-              ? dayjs(props.account.balanceDate).format("L LT")
+              ? dayjs(props.account.balanceDate).format(`${dateFormat} LT`)
               : t("never"),
           })}
         </DimmedText>

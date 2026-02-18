@@ -22,6 +22,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 export interface ConditionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -34,6 +35,7 @@ export interface ConditionItemProps {
 
 const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { locale, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -92,6 +94,8 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           flex="1 1 auto"
           placeholder={t("select_a_date")}
           value={props.ruleParameter.value}
+          locale={locale}
+          valueFormat={longDateFormat}
           onChange={(value) =>
             props.setRuleParameter({
               ...props.ruleParameter,
@@ -132,12 +136,12 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           }))}
           value={
             TransactionFields.find(
-              (field) => field.value === props.ruleParameter.field
+              (field) => field.value === props.ruleParameter.field,
             )?.value
           }
           onChange={(value) => {
             const foundField = TransactionFields.find(
-              (field) => field.value === value
+              (field) => field.value === value,
             );
 
             if (!foundField) {
@@ -151,8 +155,8 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
                 Operators.filter((op) =>
                   op.type.includes(
                     FieldToOperatorType.get(foundField.value) ??
-                      OperatorTypes.STRING
-                  )
+                      OperatorTypes.STRING,
+                  ),
                 ).at(0)?.value ?? "",
               value: getDefaultValue(foundField.value),
             } as IRuleParameterEdit);
@@ -164,14 +168,14 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           data={Operators.filter((op) =>
             op.type.includes(
               FieldToOperatorType.get(props.ruleParameter.field) ??
-                OperatorTypes.STRING
-            )
+                OperatorTypes.STRING,
+            ),
           ).map(
             (op) =>
               ({
                 value: op.value,
                 label: t(op.label),
-              } as ComboboxItem)
+              }) as ComboboxItem,
           )}
           value={
             Operators.find((op) => op.value === props.ruleParameter.operator)

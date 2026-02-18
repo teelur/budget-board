@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;
@@ -19,8 +20,9 @@ interface TransactionCardContentProps {
 }
 
 const TransactionCardContent = (
-  props: TransactionCardContentProps
+  props: TransactionCardContentProps,
 ): React.ReactNode => {
+  const { dayjs, longDateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -67,8 +69,8 @@ const TransactionCardContent = (
 
   const categoryValue =
     (props.transaction.subcategory ?? "").length > 0
-      ? props.transaction.subcategory ?? ""
-      : props.transaction.category ?? "";
+      ? (props.transaction.subcategory ?? "")
+      : (props.transaction.category ?? "");
 
   return (
     <Flex className={classes.content} w="100%" gap="0.5rem" align="center">
@@ -79,11 +81,7 @@ const TransactionCardContent = (
         size="sm"
         fw={600}
       >
-        {new Date(props.transaction.date ?? 0).toLocaleDateString([], {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
+        {dayjs(props.transaction.date).format(`${longDateFormat}`)}
       </Text>
       <Text
         className={classes.merchantNameText}
@@ -111,7 +109,7 @@ const TransactionCardContent = (
               {convertNumberToCurrency(
                 props.transaction.amount,
                 true,
-                userSettingsQuery.data?.currency ?? "USD"
+                userSettingsQuery.data?.currency ?? "USD",
               )}
             </StatusText>
           )}

@@ -1,10 +1,10 @@
 import { ActionIcon, Group } from "@mantine/core";
-import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency } from "~/helpers/currency";
 import { IBalanceResponse } from "~/models/balance";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface BalanceItemContentProps {
   balance: IBalanceResponse;
@@ -13,13 +13,15 @@ interface BalanceItemContentProps {
 }
 
 const BalanceItemContent = (
-  props: BalanceItemContentProps
+  props: BalanceItemContentProps,
 ): React.ReactNode => {
+  const { dayjs, longDateFormat } = useDate();
+
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
         <PrimaryText size="md">
-          {dayjs(props.balance.dateTime).format("L")}
+          {dayjs(props.balance.dateTime).format(longDateFormat)}
         </PrimaryText>
         <ActionIcon
           variant="transparent"
@@ -36,7 +38,7 @@ const BalanceItemContent = (
         {convertNumberToCurrency(
           props.balance.amount,
           true,
-          props.userCurrency
+          props.userCurrency,
         )}
       </StatusText>
     </Group>

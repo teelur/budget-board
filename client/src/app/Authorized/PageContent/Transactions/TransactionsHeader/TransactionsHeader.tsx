@@ -3,10 +3,10 @@ import classes from "./TransactionsHeader.module.css";
 import {
   ActionIcon,
   Button,
+  Collapse,
   Flex,
   Group,
   Stack,
-  Transition,
 } from "@mantine/core";
 import { FilterIcon, SettingsIcon } from "lucide-react";
 import React from "react";
@@ -31,7 +31,7 @@ interface TransactionsHeaderProps {
 }
 
 const TransactionsHeader = (
-  props: TransactionsHeaderProps
+  props: TransactionsHeaderProps,
 ): React.ReactNode => {
   const [settingsOpen, { open, close }] = useDisclosure(false);
 
@@ -64,17 +64,9 @@ const TransactionsHeader = (
           <TransactionsSettings modalOpened={settingsOpen} closeModal={close} />
         </Group>
       </Flex>
-      <Transition
-        mounted={isFiltersPanelOpen}
-        keepMounted
-        transition="slide-down"
-        duration={100}
-        exitDuration={100}
-      >
-        {(styles) => (
-          <FilterCard categories={props.categories} style={styles} />
-        )}
-      </Transition>
+      <Collapse in={isFiltersPanelOpen} transitionDuration={100}>
+        <FilterCard categories={props.categories} />
+      </Collapse>
     </Stack>
   );
 };

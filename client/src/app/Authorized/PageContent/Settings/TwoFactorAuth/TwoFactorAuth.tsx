@@ -215,7 +215,7 @@ const TwoFactorAuth = (): React.ReactNode => {
             </PrimaryText>
             <QRCodeSVG
               value={buildAuthenticatorUrl(
-                twoFactorAuthQuery.data?.sharedKey ?? ""
+                twoFactorAuthQuery.data?.sharedKey ?? "",
               )}
               bgColor="var(--background-color-surface)"
               fgColor="var(--base-color-text-primary)"
@@ -289,11 +289,9 @@ const TwoFactorAuth = (): React.ReactNode => {
         <Group gap="1rem">
           <PrimaryText size="lg">{t("two_factor_authentication")}</PrimaryText>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
-            <Badge color="var(--button-color-confirm)" maw={80}>
-              {t("enabled")}
-            </Badge>
+            <Badge color="var(--button-color-confirm)">{t("enabled")}</Badge>
           ) : (
-            <Badge color="var(--button-color-destructive)" maw={85}>
+            <Badge color="var(--button-color-destructive)">
               {t("disabled")}
             </Badge>
           )}

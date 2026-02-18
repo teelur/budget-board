@@ -1,7 +1,7 @@
 import { Group, Pagination, Stack } from "@mantine/core";
 import React from "react";
 import { ITransaction } from "~/models/transaction";
-import DeletedTransactionsCard from "../DeletedTransactionCard/DeletedTransactionsCard";
+import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 
@@ -10,7 +10,7 @@ interface DeletedTransactionCardsProps {
 }
 
 const DeletedTransactionCards = (
-  props: DeletedTransactionCardsProps
+  props: DeletedTransactionCardsProps,
 ): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const [itemsPerPage, _setItemsPerPage] = React.useState(15);
@@ -24,7 +24,7 @@ const DeletedTransactionCards = (
           props.transactions
             .slice(
               (page - 1) * itemsPerPage,
-              (page - 1) * itemsPerPage + itemsPerPage
+              (page - 1) * itemsPerPage + itemsPerPage,
             )
             .map((transaction) => (
               <DeletedTransactionsCard

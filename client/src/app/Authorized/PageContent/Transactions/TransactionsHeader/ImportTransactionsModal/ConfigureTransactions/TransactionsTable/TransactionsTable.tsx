@@ -15,6 +15,7 @@ import { convertNumberToCurrency } from "~/helpers/currency";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
@@ -26,6 +27,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const itemsPerPage = 10;
 
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -63,7 +65,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
             {props.tableData
               .slice(
                 (page - 1) * itemsPerPage,
-                (page - 1) * itemsPerPage + itemsPerPage
+                (page - 1) * itemsPerPage + itemsPerPage,
               )
               .map((row, index) => (
                 <Table.Tr key={index}>
@@ -81,7 +83,11 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                       </ActionIcon>
                     </Flex>
                   </Table.Td>
-                  <Table.Td>{row.date?.toLocaleDateString()}</Table.Td>
+                  <Table.Td>
+                    {dayjs(row.date).isValid()
+                      ? dayjs(row.date).format(dateFormat)
+                      : null}
+                  </Table.Td>
                   <Table.Td>{row.merchantName}</Table.Td>
                   <Table.Td>{row.category}</Table.Td>
                   <Table.Td>
@@ -90,7 +96,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                       : convertNumberToCurrency(
                           row.amount ?? 0,
                           true,
-                          userSettingsQuery.data?.currency ?? "USD"
+                          userSettingsQuery.data?.currency ?? "USD",
                         )}
                   </Table.Td>
                   <Table.Td>{row.account}</Table.Td>

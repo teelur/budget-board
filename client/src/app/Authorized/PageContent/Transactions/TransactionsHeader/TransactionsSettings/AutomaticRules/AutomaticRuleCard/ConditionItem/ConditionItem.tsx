@@ -9,6 +9,7 @@ import {
   TransactionFields,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface ConditionItemProps {
   condition: IRuleParameterResponse;
@@ -18,14 +19,18 @@ interface ConditionItemProps {
 
 const ConditionItem = (props: ConditionItemProps) => {
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
 
   const fieldLabelKey = TransactionFields.find(
-    (field) => field.value === props.condition.field
+    (field) => field.value === props.condition.field,
   )?.label;
 
   const operatorLabelKey = Operators.find(
-    (op) => op.value === props.condition.operator
+    (op) => op.value === props.condition.operator,
   )?.label;
+
+  const formatDate = (dateStr: string): string =>
+    dayjs(dateStr).format(dateFormat);
 
   return (
     <Card p="0.25rem" shadow="xs" elevation={1}>
@@ -41,7 +46,8 @@ const ConditionItem = (props: ConditionItemProps) => {
             props.condition.field,
             props.condition.value,
             props.currency,
-            props.categories
+            props.categories,
+            formatDate,
           )}
         </Badge>
       </Group>

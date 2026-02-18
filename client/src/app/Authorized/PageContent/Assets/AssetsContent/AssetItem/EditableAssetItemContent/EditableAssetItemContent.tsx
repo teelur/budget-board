@@ -11,7 +11,6 @@ import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import dayjs from "dayjs";
 import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -25,6 +24,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -33,22 +33,26 @@ interface EditableAssetItemContentProps {
 }
 
 const EditableAssetItemContent = (
-  props: EditableAssetItemContentProps
+  props: EditableAssetItemContentProps,
 ): React.ReactNode => {
+  const { t } = useTranslation();
+  const { dayjs, locale, dateFormat, longDateFormat } = useDate();
+  const { request } = useAuth();
+
   const assetNameField = useField<string>({
     initialValue: props.asset.name,
   });
-  const purchaseDate = useField<string | null>({
+  const purchaseDate = useField<Date | null>({
     initialValue: props.asset.purchaseDate
-      ? dayjs(props.asset.purchaseDate).toString()
+      ? dayjs(props.asset.purchaseDate).toDate()
       : null,
   });
   const purchasePrice = useField<string | number | undefined>({
     initialValue: props.asset.purchasePrice ?? undefined,
   });
-  const sellDate = useField<string | null>({
+  const sellDate = useField<Date | null>({
     initialValue: props.asset.sellDate
-      ? dayjs(props.asset.sellDate).toString()
+      ? dayjs(props.asset.sellDate).toDate()
       : null,
   });
   const sellPrice = useField<string | number | undefined>({
@@ -58,21 +62,18 @@ const EditableAssetItemContent = (
     initialValue: props.asset.hide,
   });
 
-  const { t } = useTranslation();
-  const { request } = useAuth();
-
   const queryClient = useQueryClient();
   const doUpdateAsset = useMutation({
     mutationFn: async () => {
       const editedAsset: IAssetUpdateRequest = {
         id: props.asset.id,
         name: assetNameField.getValue(),
-        purchaseDate: dayjs(purchaseDate.getValue()).toDate() || null,
+        purchaseDate: purchaseDate.getValue(),
         purchasePrice:
           purchasePrice.getValue() === undefined
             ? null
             : Number(purchasePrice.getValue()),
-        sellDate: dayjs(sellDate.getValue()).toDate() || null,
+        sellDate: sellDate.getValue(),
         sellPrice:
           sellPrice.getValue() === undefined
             ? null
@@ -146,7 +147,7 @@ const EditableAssetItemContent = (
 
   useDidUpdate(
     () => doUpdateAsset.mutate(),
-    [purchaseDate.getValue(), sellDate.getValue(), hideAssetField.getValue()]
+    [purchaseDate.getValue(), sellDate.getValue(), hideAssetField.getValue()],
   );
 
   return (
@@ -191,7 +192,7 @@ const EditableAssetItemContent = (
             {convertNumberToCurrency(
               props.asset.currentValue ?? 0,
               true,
-              props.userCurrency
+              props.userCurrency,
             )}
           </StatusText>
         </Group>
@@ -200,6 +201,8 @@ const EditableAssetItemContent = (
             <Group gap="0.5rem">
               <DateInput
                 {...purchaseDate.getInputProps()}
+                locale={locale}
+                valueFormat={longDateFormat}
                 placeholder={t("enter_date")}
                 maw={400}
                 clearable
@@ -226,6 +229,8 @@ const EditableAssetItemContent = (
             <Group gap="0.5rem">
               <DateInput
                 {...sellDate.getInputProps()}
+                locale={locale}
+                valueFormat={longDateFormat}
                 placeholder={t("enter_date")}
                 maw={400}
                 clearable
@@ -248,8 +253,8 @@ const EditableAssetItemContent = (
           </Group>
           <DimmedText size="sm">
             {t("last_updated", {
-              date: props.asset.valueDate
-                ? new Date(props.asset.valueDate).toLocaleDateString()
+              date: dayjs(props.asset.valueDate).isValid()
+                ? dayjs(props.asset.valueDate).format(`${dateFormat} LT`)
                 : t("never"),
             })}
           </DimmedText>

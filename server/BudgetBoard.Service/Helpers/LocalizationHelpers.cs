@@ -19,4 +19,12 @@ public static class LocalizationHelpers
             .Distinct()
             .OrderBy(currency => currency),
     ];
+
+    public static readonly List<string> DateFormats =
+    [
+        "default",
+        "MM/DD/YYYY",
+        "DD/MM/YYYY",
+        "YYYY/MM/DD",
+    ];
 }

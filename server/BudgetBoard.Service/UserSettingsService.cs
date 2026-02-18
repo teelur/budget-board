@@ -78,6 +78,18 @@ public class UserSettingsService(
             userSettings.Language = request.Language.ToLower();
         }
 
+        if (!string.IsNullOrEmpty(request.DateFormat))
+        {
+            var isValidDateFormat = LocalizationHelpers.DateFormats.Contains(request.DateFormat);
+            if (!isValidDateFormat)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["InvalidDateFormatLog"]);
+                throw new BudgetBoardServiceException(responseLocalizer["InvalidDateFormatError"]);
+            }
+
+            userSettings.DateFormat = request.DateFormat;
+        }
+
         if (request.BudgetWarningThreshold.HasValue)
         {
             if (

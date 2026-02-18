@@ -16,6 +16,7 @@ import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { BuildNetWorthChartData } from "./helpers/netWorthChart";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface NetWorthChartProps {
   accounts: IAccountResponse[];
@@ -27,6 +28,7 @@ interface NetWorthChartProps {
 
 const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { dateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -62,9 +64,11 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
       : convertNumberToCurrency(
           value,
           false,
-          userSettingsQuery.data?.currency ?? "USD"
+          userSettingsQuery.data?.currency ?? "USD",
         );
   };
+
+  const formatDateString = (date: Date) => dayjs(date).format(dateFormat);
 
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
@@ -90,9 +94,12 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
           props.dateRange[0]
             ? dayjs(props.dateRange[0]).toDate()
             : getDateFromMonthsAgo(1),
-          props.dateRange[1] ? dayjs(props.dateRange[1]).toDate() : new Date()
+          dayjs(props.dateRange[1]).isValid()
+            ? dayjs(props.dateRange[1]).toDate()
+            : dayjs().toDate(),
         ),
-        props.accounts
+        props.accounts,
+        formatDateString,
       )}
       series={chartSeries}
       withLegend

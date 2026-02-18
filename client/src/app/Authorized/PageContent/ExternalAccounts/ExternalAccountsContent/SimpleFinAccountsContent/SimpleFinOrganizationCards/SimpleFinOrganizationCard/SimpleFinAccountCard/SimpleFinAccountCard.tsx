@@ -4,7 +4,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
-import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -22,6 +21,7 @@ import {
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface ISimpleFinAccountCardProps {
   simpleFinAccount: ISimpleFinAccountResponse;
@@ -39,6 +39,7 @@ const SimpleFinAccountCard = (
   });
 
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -255,7 +256,9 @@ const SimpleFinAccountCard = (
             <DimmedText size="xs">
               {t("last_sync", {
                 date: dayjs(props.simpleFinAccount.lastSync).isValid()
-                  ? dayjs(props.simpleFinAccount.lastSync).format("L LT")
+                  ? dayjs(props.simpleFinAccount.lastSync).format(
+                      `${dateFormat} LT`,
+                    )
                   : t("never"),
               })}
             </DimmedText>
@@ -263,7 +266,9 @@ const SimpleFinAccountCard = (
           <DimmedText size="xs">
             {t("last_updated", {
               date: dayjs(props.simpleFinAccount.balanceDate).isValid()
-                ? dayjs(props.simpleFinAccount.balanceDate).format("L LT")
+                ? dayjs(props.simpleFinAccount.balanceDate).format(
+                    `${dateFormat} LT`,
+                  )
                 : t("never"),
             })}
           </DimmedText>

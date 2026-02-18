@@ -1,5 +1,4 @@
 import { convertNumberToCurrency } from "~/helpers/currency";
-import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { BarChart } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
 import React from "react";
@@ -8,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { DatesRangeValue } from "@mantine/dates";
-import dayjs from "dayjs";
 import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
 import {
   buildValueChartData,
@@ -19,6 +17,7 @@ import {
 } from "./helpers/valueChart";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface ValueChartProps {
   items: IItem[];
@@ -30,6 +29,7 @@ interface ValueChartProps {
 
 const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -56,7 +56,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
       : convertNumberToCurrency(
           value,
           false,
-          userSettingsQuery.data?.currency ?? "USD"
+          userSettingsQuery.data?.currency ?? "USD",
         );
   };
 
@@ -72,19 +72,38 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
     );
   }
 
+  const sortedChartValues = () => {
+    const startDate: Date = props.dateRange[0]
+      ? dayjs(props.dateRange[0]).toDate()
+      : dayjs().subtract(1, "month").toDate();
+    const endDate: Date = props.dateRange[1]
+      ? dayjs(props.dateRange[1]).toDate()
+      : dayjs().toDate();
+
+    const filteredValues: IValue[] = filterValuesByDateRange(
+      props.values,
+      startDate,
+      endDate,
+    );
+
+    return filteredValues.sort((a, b) =>
+      dayjs(a.dateTime).diff(dayjs(b.dateTime)),
+    );
+  };
+
+  const formatDateString = React.useCallback(
+    (date: Date): string => dayjs(date).format(dateFormat),
+    [dayjs, dateFormat],
+  );
+
   return (
     <BarChart
       h={400}
       w="100%"
       data={buildValueChartData(
-        filterValuesByDateRange(
-          props.values,
-          props.dateRange[0]
-            ? dayjs(props.dateRange[0]).toDate()
-            : getDateFromMonthsAgo(1),
-          props.dateRange[1] ? dayjs(props.dateRange[1]).toDate() : new Date()
-        ),
-        props.invertYAxis
+        sortedChartValues(),
+        formatDateString,
+        props.invertYAxis,
       )}
       series={chartSeries}
       dataKey="dateString"

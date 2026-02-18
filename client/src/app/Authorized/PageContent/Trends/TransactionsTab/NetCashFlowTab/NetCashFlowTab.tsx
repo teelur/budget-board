@@ -2,11 +2,7 @@ import classes from "./NetCashFlowTab.module.css";
 
 import React from "react";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
-import {
-  getDateFromMonthsAgo,
-  getUniqueYears,
-  initCurrentMonth,
-} from "~/helpers/datetime";
+import { getUniqueYears } from "~/helpers/datetime";
 import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
@@ -18,16 +14,18 @@ import { AxiosResponse } from "axios";
 import NetCashFlowChart from "~/components/Charts/NetCashFlowChart/NetCashFlowChart";
 import { Button, Group, Stack } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 const NetCashFlowTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];
 
-  const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
-    getDateFromMonthsAgo(1),
-    initCurrentMonth(),
-  ]);
-
   const { t } = useTranslation();
+  const { dayjs } = useDate();
+
+  const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
+    dayjs().subtract(1, "month").toDate(),
+    dayjs().toDate(),
+  ]);
 
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
@@ -59,7 +57,7 @@ const NetCashFlowTab = (): React.ReactNode => {
 
   // We need to filter out the transactions labelled with 'Hide From Budgets'
   const transactionsWithoutHidden = filterHiddenTransactions(
-    transactionsQuery.data ?? []
+    transactionsQuery.data ?? [],
   );
 
   return (
@@ -69,7 +67,7 @@ const NetCashFlowTab = (): React.ReactNode => {
         setSelectedDates={setSelectedMonths}
         timeToMonthlyTotalsMap={buildTimeToMonthlyTotalsMap(
           selectedMonths,
-          transactionsWithoutHidden
+          transactionsWithoutHidden,
         )}
         isPending={transactionsQuery.isPending}
         allowSelectMultiple
@@ -86,7 +84,7 @@ const NetCashFlowTab = (): React.ReactNode => {
               for (let i = 0; i < months; i++) {
                 setSelectedMonths((prev) => {
                   const newMonths = [...prev];
-                  newMonths.push(getDateFromMonthsAgo(i));
+                  newMonths.push(dayjs().subtract(i, "month").toDate());
                   return newMonths;
                 });
               }

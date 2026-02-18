@@ -1,5 +1,3 @@
-import classes from "./GoalsHeader.module.css";
-
 import { Button, Group } from "@mantine/core";
 import React from "react";
 import AddGoalModal from "./AddGoalModal/AddGoalModal";
@@ -13,7 +11,7 @@ interface GoalsHeaderProps {
 const GoalsHeader = (props: GoalsHeaderProps): React.ReactNode => {
   const { t } = useTranslation();
   return (
-    <Group className={classes.root}>
+    <Group justify="flex-end" align="center" gap="0.5rem">
       <Button
         variant="outline"
         color={

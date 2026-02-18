@@ -115,6 +115,7 @@ public class UserSettingsServiceTests
 
         var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
         userSettingsUpdateRequest.Language = "en-US";
+        userSettingsUpdateRequest.DateFormat = "MM/DD/YYYY";
         userSettingsUpdateRequest.DisableBuiltInTransactionCategories = true;
         userSettingsUpdateRequest.BudgetWarningThreshold = 50;
         userSettingsUpdateRequest.ForceSyncLookbackMonths = 6;
@@ -130,6 +131,7 @@ public class UserSettingsServiceTests
         settings.Should().NotBeNull();
         settings!.Currency.Should().Be(userSettingsUpdateRequest.Currency);
         settings.Language.Should().Be(userSettingsUpdateRequest.Language.ToLower());
+        settings.DateFormat.Should().Be(userSettingsUpdateRequest.DateFormat);
         settings
             .DisableBuiltInTransactionCategories.Should()
             .Be((bool)userSettingsUpdateRequest.DisableBuiltInTransactionCategories);
@@ -271,5 +273,39 @@ public class UserSettingsServiceTests
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidForceSyncLookbackMonthsError");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_WhenInvalidDateFormat_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
+        userSettingsUpdateRequest.DateFormat = "INVALID/FORMAT";
+
+        // Act
+        var updateUserSettingsAct = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(
+                helper.demoUser.Id,
+                userSettingsUpdateRequest
+            );
+
+        // Assert
+        await updateUserSettingsAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidDateFormatError");
     }
 }

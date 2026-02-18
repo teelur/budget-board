@@ -14,7 +14,6 @@ import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { areStringsEqual } from "~/helpers/utils";
 import { ITransaction } from "~/models/transaction";
 import TransactionCards from "./TransactionCards/TransactionCards";
-import dayjs from "dayjs";
 import { filterHiddenTransactions } from "~/helpers/transactions";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Drawer from "~/components/core/Drawer/Drawer";
@@ -22,6 +21,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -34,6 +34,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const chartLookbackMonths = 6;
 
   const { t } = useTranslation();
+  const { dayjs } = useDate();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
@@ -54,13 +55,16 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   });
 
   const transactionsForCategory = filterHiddenTransactions(
-    transactionsQuery.data ?? []
+    transactionsQuery.data ?? [],
   )
     .filter((transaction) =>
       dayjs(transaction.date).isAfter(
-        getDateFromMonthsAgo(chartLookbackMonths, props.month ?? new Date()),
-        "month"
-      )
+        getDateFromMonthsAgo(
+          chartLookbackMonths,
+          props.month ?? dayjs().toDate(),
+        ),
+        "month",
+      ),
     )
     .filter((transaction) => {
       if (
@@ -69,27 +73,27 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       ) {
         return areStringsEqual(
           transaction.category ?? "",
-          props.category ?? ""
+          props.category ?? "",
         );
       }
       return areStringsEqual(
         transaction.subcategory ?? "",
-        props.category ?? ""
+        props.category ?? "",
       );
     });
 
   const transactionsForCategoryForCurrentMonth =
     transactionsForCategory?.filter((transaction) =>
-      dayjs(transaction.date).isSame(props.month, "month")
+      dayjs(transaction.date).isSame(props.month, "month"),
     );
 
   const chartMonths = Array.from({ length: chartLookbackMonths }, (_, i) =>
-    getDateFromMonthsAgo(i, props.month ?? new Date())
+    getDateFromMonthsAgo(i, props.month ?? dayjs().toDate()),
   );
 
   const isExpenseCategory = !areStringsEqual(
     getParentCategory(props.category ?? "", transactionCategories),
-    "income"
+    "income",
   );
 
   return (
@@ -116,10 +120,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             <Stack gap={0}>
               <DimmedText size="xs">{t("month")}</DimmedText>
               <PrimaryText size="lg">
-                {props.month?.toLocaleString("default", {
-                  month: "long",
-                  year: "numeric",
-                })}
+                {dayjs(props.month).format("MMMM YYYY")}
               </PrimaryText>
             </Stack>
           </Group>

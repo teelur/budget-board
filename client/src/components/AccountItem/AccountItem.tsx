@@ -12,6 +12,7 @@ import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import StatusText from "../core/Text/StatusText/StatusText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface AccountItemProps {
   account: IAccountResponse;
@@ -21,6 +22,7 @@ interface AccountItemProps {
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
+  const { dayjs, dateFormat } = useDate();
 
   const userSettingsQuery = useQuery({
     queryKey: ["userSettings"],
@@ -51,7 +53,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
             {convertNumberToCurrency(
               props.account.currentBalance,
               true,
-              userSettingsQuery.data?.currency ?? "USD"
+              userSettingsQuery.data?.currency ?? "USD",
             )}
           </StatusText>
         )}
@@ -59,7 +61,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
       <DimmedText size="xs">
         {t("last_updated", {
           date: props.account.balanceDate
-            ? new Date(props.account.balanceDate).toLocaleString()
+            ? dayjs(props.account.balanceDate).format(`${dateFormat} LT`)
             : t("never"),
         })}
       </DimmedText>

@@ -14,6 +14,7 @@ import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -27,6 +28,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
 
   const { t } = useTranslation();
+  const { dayjs } = useDate();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -45,14 +47,21 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
     },
   });
 
+  const formatDateString = (date: Date) => dayjs(date).format("MMMM YYYY");
+
   const chartData = React.useMemo(
-    () => buildTransactionChartData(sortedMonths, props.transactions),
-    [sortedMonths, props.transactions]
+    () =>
+      buildTransactionChartData(
+        sortedMonths,
+        props.transactions,
+        formatDateString,
+      ),
+    [sortedMonths, props.transactions, formatDateString],
   );
 
   const chartSeries = React.useMemo(
-    () => buildTransactionChartSeries(sortedMonths),
-    [sortedMonths]
+    () => buildTransactionChartSeries(sortedMonths, formatDateString),
+    [sortedMonths, formatDateString],
   );
 
   const chartValueFormatter = (value: number): string => {
@@ -61,7 +70,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
       : convertNumberToCurrency(
           value,
           false,
-          userSettingsQuery.data?.currency ?? "USD"
+          userSettingsQuery.data?.currency ?? "USD",
         );
   };
 

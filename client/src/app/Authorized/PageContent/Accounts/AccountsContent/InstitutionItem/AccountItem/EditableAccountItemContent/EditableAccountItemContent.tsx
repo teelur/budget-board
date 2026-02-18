@@ -11,7 +11,6 @@ import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import dayjs from "dayjs";
 import { PencilIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
@@ -30,6 +29,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import { useDate } from "~/providers/DateProvider/DateProvider";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -72,6 +72,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   });
 
   const { t } = useTranslation();
+  const { dayjs, dateFormat } = useDate();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -109,7 +110,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       interestRateField.setValue(
         props.account.interestRate
           ? props.account.interestRate * 100
-          : undefined
+          : undefined,
       );
       accountTypeField.setValue(props.account.type);
       accountSubTypeField.setValue(props.account.subtype ?? "");
@@ -125,7 +126,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       accountSubTypeField.getValue(),
       hideAccountField.getValue(),
       hideTransactionsField.getValue(),
-    ]
+    ],
   );
 
   return (
@@ -184,7 +185,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 }
                 onClick={() =>
                   hideTransactionsField.setValue(
-                    !hideTransactionsField.getValue()
+                    !hideTransactionsField.getValue(),
                   )
                 }
               >
@@ -196,7 +197,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             {convertNumberToCurrency(
               props.account.currentBalance,
               true,
-              props.userCurrency
+              props.userCurrency,
             )}
           </StatusText>
         </Group>
@@ -222,7 +223,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
           <DimmedText size="sm">
             {t("last_updated", {
               date: dayjs(props.account.balanceDate).isValid()
-                ? dayjs(props.account.balanceDate).format("L LT")
+                ? dayjs(props.account.balanceDate).format(`${dateFormat} LT`)
                 : t("never"),
             })}
           </DimmedText>

@@ -1,11 +1,5 @@
 .container {
-  gap: 0.5rem;
-
   @container (max-width: 820px) {
     align-self: flex-start;
   }
-}
-
-.sortButtons {
-  gap: 0.5rem;
 }

@@ -316,6 +316,9 @@
   <data name="InvalidLanguageCodeError" xml:space="preserve">
     <value>The provided language code is invalid.</value>
   </data>
+  <data name="InvalidDateFormatError" xml:space="preserve">
+    <value>The provided date format is invalid.</value>
+  </data>
   <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
     <value>The budget warning threshold must be between 0% and 100%.</value>
   </data>
