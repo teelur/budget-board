@@ -51,7 +51,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           </ActionIcon>
           <Badge>
             {t("interest_rate_message", {
-              rate: Intl.NumberFormat(intlLocale, {
+              rate: new Intl.NumberFormat(intlLocale, {
                 style: "percent",
                 maximumFractionDigits: 2,
               }).format(props.account.interestRate ?? 0),

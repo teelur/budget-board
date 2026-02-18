@@ -56,7 +56,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             {props.includeInterest && props.goal.interestRate && (
               <Badge variant="light" flex="0 0 auto">
                 {t("interest_rate_apr", {
-                  rate: Intl.NumberFormat(intlLocale, {
+                  rate: new Intl.NumberFormat(intlLocale, {
                     style: "percent",
                     maximumFractionDigits: 2,
                   }).format(props.goal.interestRate),
