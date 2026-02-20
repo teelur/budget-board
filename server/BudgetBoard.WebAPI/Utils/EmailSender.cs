@@ -24,10 +24,6 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
         }
 
         var senderPassword = Configuration.GetValue<string>("EMAIL_SENDER_PASSWORD");
-        if (string.IsNullOrEmpty(senderPassword))
-        {
-            throw new ArgumentNullException(nameof(senderPassword));
-        }
 
         var smtpHost = Configuration.GetValue<string>("EMAIL_SMTP_HOST");
         if (string.IsNullOrEmpty(smtpHost))
@@ -48,8 +44,12 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
             EnableSsl = true,
             UseDefaultCredentials = false,
             Port = smtpPort,
-            Credentials = new NetworkCredential(senderUsername, senderPassword),
         };
+
+        if (!string.IsNullOrEmpty(senderPassword))
+        {
+            smtp.Credentials = new NetworkCredential(senderUsername, senderPassword);
+        }
 
         await smtp.SendMailAsync(mm);
     }
