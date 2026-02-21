@@ -442,6 +442,8 @@
   "value_history": "Value History",
   "value_trends": "Value Trends",
   "values": "Values",
+  "verification_email_resent_error_message": "There was an error sending the verification email.",
+  "verification_email_resent_message": "Verification email resent.",
   "view_and_restore_deleted_accounts": "View and restore deleted accounts.",
   "view_and_restore_deleted_assets": "View and restore deleted assets.",
   "view_and_restore_deleted_transactions": "View and restore deleted transactions.",

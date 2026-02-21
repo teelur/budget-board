@@ -47,6 +47,6 @@ public static class Helpers
 
     public static string GetProto(HttpRequest request)
     {
-        return request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? request.Protocol;
+        return request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? request.Scheme;
     }
 }

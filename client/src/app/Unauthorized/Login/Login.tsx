@@ -54,6 +54,28 @@ const Login = (props: LoginProps): React.ReactNode => {
 
   const queryClient = useQueryClient();
 
+  const doResendVerificationEmail = (): void => {
+    request({
+      url: "/api/resendConfirmationEmail",
+      method: "POST",
+      data: {
+        email: emailField.getValue(),
+      },
+    })
+      .then(() => {
+        notifications.show({
+          color: "var(--button-color-confirm)",
+          message: t("verification_email_resent_message"),
+        });
+      })
+      .catch(() => {
+        notifications.show({
+          color: "var(--button-color-destructive)",
+          message: t("verification_email_resent_error_message"),
+        });
+      });
+  };
+
   const doLogin = async (): Promise<void> => {
     setLoading(true);
 
@@ -92,7 +114,11 @@ const Login = (props: LoginProps): React.ReactNode => {
             message: (
               <Group gap="1rem" wrap="nowrap">
                 <div>{t("login_account_not_verified_message")}</div>
-                <Button size="xs" miw="fit-content">
+                <Button
+                  size="xs"
+                  miw="fit-content"
+                  onClick={doResendVerificationEmail}
+                >
                   {t("resend")}
                 </Button>
               </Group>
