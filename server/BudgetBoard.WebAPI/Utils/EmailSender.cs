@@ -43,13 +43,22 @@ public class EmailSender(
         message.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = htmlMessage };
 
         using var smtp = new SmtpClient();
-        await smtp.ConnectAsync(smtpHost, smtpPort, MailKit.Security.SecureSocketOptions.Auto);
-
-        if (!string.IsNullOrEmpty(senderPassword))
+        try
         {
-            await smtp.AuthenticateAsync(senderUsername, senderPassword);
-        }
+            await smtp.ConnectAsync(smtpHost, smtpPort, MailKit.Security.SecureSocketOptions.Auto);
 
-        await smtp.SendAsync(message);
+            if (!string.IsNullOrEmpty(senderPassword))
+            {
+                await smtp.AuthenticateAsync(senderUsername, senderPassword);
+            }
+            await smtp.SendAsync(message);
+        }
+        finally
+        {
+            if (smtp.IsConnected)
+            {
+                await smtp.DisconnectAsync(true);
+            }
+        }
     }
 }
