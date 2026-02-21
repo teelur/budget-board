@@ -1,4 +1,11 @@
-import { Anchor, Button, LoadingOverlay, Stack, Divider } from "@mantine/core";
+import {
+  Anchor,
+  Button,
+  LoadingOverlay,
+  Stack,
+  Divider,
+  Group,
+} from "@mantine/core";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -38,7 +45,7 @@ const Login = (props: LoginProps): React.ReactNode => {
       { min: passwordMinLength },
       t("password_min_length_message", {
         minLength: passwordMinLength,
-      })
+      }),
     ),
   });
 
@@ -46,6 +53,28 @@ const Login = (props: LoginProps): React.ReactNode => {
     useAuth();
 
   const queryClient = useQueryClient();
+
+  const doResendVerificationEmail = (): void => {
+    request({
+      url: "/api/resendConfirmationEmail",
+      method: "POST",
+      data: {
+        email: emailField.getValue(),
+      },
+    })
+      .then(() => {
+        notifications.show({
+          color: "var(--button-color-confirm)",
+          message: t("verification_email_resent_message"),
+        });
+      })
+      .catch(() => {
+        notifications.show({
+          color: "var(--button-color-destructive)",
+          message: t("verification_email_resent_error_message"),
+        });
+      });
+  };
 
   const doLogin = async (): Promise<void> => {
     setLoading(true);
@@ -79,12 +108,27 @@ const Login = (props: LoginProps): React.ReactNode => {
       .catch((error: AxiosError) => {
         // These error response values are specific to ASP.NET Identity,
         // so will do the error translation here.
-        if ((error.response?.data as any)?.detail === "NotAllowed") {
+        if ((error.response?.data as any)?.detail === "EmailNotVerifiedError") {
           notifications.show({
             color: "var(--button-color-destructive)",
-            message: t("login_account_not_verified_message"),
+            message: (
+              <Group gap="1rem" wrap="nowrap">
+                <div>{t("login_account_not_verified_message")}</div>
+                <Button
+                  size="xs"
+                  miw="fit-content"
+                  onClick={doResendVerificationEmail}
+                >
+                  {t("resend")}
+                </Button>
+              </Group>
+            ),
+            autoClose: 10000,
           });
-        } else if ((error.response?.data as any)?.detail === "Failed") {
+        } else if (
+          (error.response?.data as any)?.detail ===
+          "InvalidEmailOrPasswordError"
+        ) {
           notifications.show({
             color: "var(--button-color-destructive)",
             message: t("login_failed_message"),
