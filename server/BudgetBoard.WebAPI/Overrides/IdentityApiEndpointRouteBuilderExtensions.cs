@@ -161,8 +161,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 {
                     var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
                     var userManager = signInManager.UserManager;
-                    var basicEmailSender =
-                        sp.GetService<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender>();
+                    var basicEmailSender = sp.GetService<Identity.UI.Services.IEmailSender>();
 
                     // TODO: Probably should add a Remember Me? option to login.
                     var isPersistent = true;
@@ -210,7 +209,10 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             );
                         }
 
-                        if (!await userManager.IsEmailConfirmedAsync(user))
+                        if (
+                            !await userManager.IsEmailConfirmedAsync(user)
+                            && userManager.Options.SignIn.RequireConfirmedEmail
+                        )
                         {
                             return TypedResults.Problem(
                                 "EmailNotVerifiedError",
