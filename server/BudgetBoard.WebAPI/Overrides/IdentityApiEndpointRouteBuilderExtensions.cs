@@ -152,10 +152,63 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 {
                     var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
                     var userManager = signInManager.UserManager;
+                    var basicEmailSender =
+                        sp.GetService<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender>();
 
                     // TODO: Probably should add a Remember Me? option to login.
                     var isPersistent = true;
 
+                    // Check if user exists and verify password manually first
+                    // This allows us to differentiate between wrong password vs unverified email
+                    var user = await userManager.FindByEmailAsync(login.Email);
+                    if (user != null)
+                    {
+                        // Check lockout BEFORE password verification to prevent infinite attempts on locked accounts
+                        if (await userManager.IsLockedOutAsync(user))
+                        {
+                            // Send email notification to legitimate user
+                            var email = await userManager.GetEmailAsync(user);
+                            if (!string.IsNullOrEmpty(email) && basicEmailSender != null)
+                            {
+                                var subject = localizer["AccountLockedOutEmailSubject"];
+                                var message = localizer["AccountLockedOutEmailBody"];
+                                // Discarding the await since we don't want to delay the lockout response, and we don't need to know when it completes.
+                                _ = basicEmailSender.SendEmailAsync(email, subject, message);
+                            }
+
+                            // Return generic error to prevent account enumeration
+                            return TypedResults.Problem(
+                                "InvalidEmailOrPasswordError",
+                                statusCode: StatusCodes.Status401Unauthorized
+                            );
+                        }
+
+                        var isPasswordCorrect = await userManager.CheckPasswordAsync(
+                            user,
+                            login.Password
+                        );
+
+                        if (!isPasswordCorrect)
+                        {
+                            // Increment failed login attempts for lockout
+                            await userManager.AccessFailedAsync(user);
+
+                            return TypedResults.Problem(
+                                "InvalidEmailOrPasswordError",
+                                statusCode: StatusCodes.Status401Unauthorized
+                            );
+                        }
+
+                        if (!await userManager.IsEmailConfirmedAsync(user))
+                        {
+                            return TypedResults.Problem(
+                                "EmailNotVerifiedError",
+                                statusCode: StatusCodes.Status401Unauthorized
+                            );
+                        }
+                    }
+
+                    // Proceed with normal sign-in flow
                     var result = await signInManager.PasswordSignInAsync(
                         login.Email,
                         login.Password,
@@ -187,14 +240,15 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
                     if (!result.Succeeded)
                     {
+                        // If we get here and user doesn't exist, return generic error
                         return TypedResults.Problem(
-                            result.ToString(),
+                            "InvalidEmailOrPasswordError",
                             statusCode: StatusCodes.Status401Unauthorized
                         );
                     }
 
                     // Add local login provider for existing users who don't have it
-                    var user = await userManager.FindByEmailAsync(login.Email);
+                    // (user was already fetched earlier in this flow)
                     if (user is not null)
                     {
                         var logins = await userManager.GetLoginsAsync(user);
