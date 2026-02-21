@@ -9,6 +9,7 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
+import { RegisterResponse } from "~/models/auth";
 
 interface RegisterProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -31,7 +32,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
       { min: passwordMinLength },
       t("password_min_length_message", {
         minLength: passwordMinLength,
-      })
+      }),
     ),
   });
   const confirmPasswordField = useField<string>({
@@ -55,7 +56,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
     }
 
     try {
-      await request({
+      const response = await request({
         url: "/api/register",
         method: "POST",
         data: {
@@ -66,9 +67,14 @@ const Register = (props: RegisterProps): React.ReactNode => {
 
       props.setLoginCardState(LoginCardState.Login);
 
+      const accountCreatedMessage = `${t("account_created_message")}${
+        (response.data as RegisterResponse).emailConfirmationRequired
+          ? t("account_created_check_your_email_message")
+          : ""
+      }`;
       notifications.show({
         color: "var(--button-color-confirm)",
-        message: t("account_created_email_verification_message"),
+        message: accountCreatedMessage,
       });
     } catch (error: any) {
       if (
@@ -81,7 +87,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
           title: t("validation_errors_occurred_message"),
           color: "var(--button-color-destructive)",
           message: Object.values(
-            (error.response.data as ValidationError).errors
+            (error.response.data as ValidationError).errors,
           ).join("\n"),
         });
       } else {

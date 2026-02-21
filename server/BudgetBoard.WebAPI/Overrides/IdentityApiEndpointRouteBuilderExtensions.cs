@@ -67,7 +67,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             // https://github.com/dotnet/aspnetcore/issues/47338
             routeGroup.MapPost(
                 "/register",
-                async Task<Results<Ok, ValidationProblem>> (
+                async Task<Results<Ok<RegisterResponse>, ValidationProblem>> (
                     [FromBody] RegisterRequest registration,
                     HttpContext context,
                     [FromServices] IServiceProvider sp
@@ -124,7 +124,16 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                     }
 
                     await SendConfirmationEmailAsync(user, userManager, context, email);
-                    return TypedResults.Ok();
+
+                    return TypedResults.Ok(
+                        new RegisterResponse
+                        {
+                            EmailConfirmationRequired = userManager
+                                .Options
+                                .SignIn
+                                .RequireConfirmedEmail,
+                        }
+                    );
                 }
             );
         }
