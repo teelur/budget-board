@@ -166,17 +166,6 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         // Check lockout BEFORE password verification to prevent infinite attempts on locked accounts
                         if (await userManager.IsLockedOutAsync(user))
                         {
-                            // Send email notification to legitimate user
-                            var email = await userManager.GetEmailAsync(user);
-                            if (!string.IsNullOrEmpty(email) && basicEmailSender != null)
-                            {
-                                var subject = localizer["AccountLockedOutEmailSubject"];
-                                var message = localizer["AccountLockedOutEmailBody"];
-                                // Discarding the await since we don't want to delay the lockout response, and we don't need to know when it completes.
-                                _ = basicEmailSender.SendEmailAsync(email, subject, message);
-                            }
-
-                            // Return generic error to prevent account enumeration
                             return TypedResults.Problem(
                                 "InvalidEmailOrPasswordError",
                                 statusCode: StatusCodes.Status401Unauthorized
@@ -192,6 +181,19 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         {
                             // Increment failed login attempts for lockout
                             await userManager.AccessFailedAsync(user);
+
+                            // Check if the account just became locked (send email only once)
+                            if (await userManager.IsLockedOutAsync(user))
+                            {
+                                var email = await userManager.GetEmailAsync(user);
+                                if (!string.IsNullOrEmpty(email) && basicEmailSender != null)
+                                {
+                                    var subject = localizer["AccountLockedOutEmailSubject"];
+                                    var message = localizer["AccountLockedOutEmailBody"];
+                                    // Fire and forget - send email asynchronously
+                                    _ = basicEmailSender.SendEmailAsync(email, subject, message);
+                                }
+                            }
 
                             return TypedResults.Problem(
                                 "InvalidEmailOrPasswordError",
