@@ -112,4 +112,19 @@
   <data name="InvalidLanguageError" xml:space="preserve">
     <value>Die angegebene Sprache '{0}' wird nicht unterstützt.</value>
   </data>
+  <data name="AccountLockedOutEmailBody" xml:space="preserve">
+    <value>&lt;h2&gt;Ihr Konto wurde gesperrt&lt;/h2&gt;
+&lt;p&gt;Wir haben mehrere fehlgeschlagene Anmeldeversuche für Ihr Konto festgestellt. Zu Ihrer Sicherheit wurde Ihr Konto vorübergehend gesperrt.&lt;/p&gt;
+&lt;p&gt;Ihr Konto wird nach Ablauf der Sperrfrist automatisch wieder entsperrt.&lt;/p&gt;
+&lt;p&gt;Wenn Sie dies waren, versuchen Sie es bitte später erneut oder verwenden Sie die Option „Passwort vergessen“, um Ihre Anmeldedaten zurückzusetzen.&lt;/p&gt;</value>
+  </data>
+  <data name="EmailSenderConfigMissing" xml:space="preserve">
+    <value>Die Konfiguration des E-Mail-Absenders fehlt. Bitte einen Wert für EMAIL_SENDER setzen.</value>
+  </data>
+  <data name="AccountLockedOutEmailSubject" xml:space="preserve">
+    <value>Konto aufgrund mehrerer fehlgeschlagener Anmeldeversuche gesperrt</value>
+  </data>
+  <data name="SmtpHostConfigMissing" xml:space="preserve">
+    <value>Die Konfiguration des SMTP-Hosts fehlt. Bitte einen Wert für EMAIL_SMTP_HOST setzen.</value>
+  </data>
 </root>

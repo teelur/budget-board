@@ -425,7 +425,7 @@
     <value>L’identifiant de compte lié que vous avez fourni n’existe pas.</value>
   </data>
   <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
-    <value />
+    <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
   </data>
   <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
     <value>SimpleFIN access token is missing or empty.</value>
@@ -465,5 +465,8 @@
   </data>
   <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
     <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
+  </data>
+  <data name="InvalidDateFormatError" xml:space="preserve">
+    <value>The provided date format is invalid.</value>
   </data>
 </root>
