@@ -326,7 +326,7 @@ public class SimpleFinService(
                 : nowUnix - forceSyncLookbackUnix;
         }
 
-        // SimpleFIN can lookback a maximum of 365 days (not inclusive).
+        // SimpleFIN can lookback a maximum of 90 days (not inclusive).
         if (earliestBalanceTimestamp < nowUnix - MAX_SYNC_LOOKBACK_UNIX)
         {
             return nowUnix - MAX_SYNC_LOOKBACK_UNIX;
