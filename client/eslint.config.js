@@ -3,7 +3,10 @@ import tseslint from "typescript-eslint";
 import jsonc from "eslint-plugin-jsonc";
 
 export default [
-  ...tseslint.config(...mantine),
+  ...tseslint.config(...mantine).map((config) => ({
+    ...config,
+    files: config.files ?? ["**/*.{ts,tsx}"],
+  })),
   {
     ignores: ["**/*.{mjs,cjs,js,d.ts,d.mts}", "./.storybook/main.ts"],
   },

@@ -83,6 +83,7 @@
   "category_name": "Kategoriename",
   "category_type": "Kategorieart",
   "child": "Unterobjekt",
+  "chinese_simplified": "Chinesisch (vereinfacht)",
   "clear_all": "Alles bereinigen",
   "clear_filters": "Filter zurücksetzen",
   "clear_selection": "Auswahl zurücksetzen",
@@ -121,7 +122,6 @@
   "date_is_required": "Das Datum wird benötigt.",
   "date_range": "Datumsbereich",
   "days_since_deleted": "{{days}} Tage seit dem Löschen",
-  "german": "Deutsch",
   "decimal_separator": "Dezimal Trennzeichen",
   "decimal_separator_required_message": "Dezimal Trennzeichen wird benötigt.",
   "delete": "Löschen",
@@ -194,6 +194,7 @@
   "force_sync_lookback_period_description": "Mit dieser Einstellung kann die Anzahl der Monate überschrieben werden, die während der Synchronisierung von SimpleFIN angefordert werden sollen. Lassen Sie die Einstellung auf „Auto“, entscheidet das System.",
   "force_sync_lookback_period_warning": "Hinweis: Lassen Sie diese Option für eine optimale Leistung auf „Auto” eingestellt.",
   "generate_new_recovery_codes": "Neue Wiederherstellungscodes generieren",
+  "german": "Deutsch",
   "goal_completed_date_styled": "<0>Erledigt:</0> <1>{{date}}</1>",
   "goal_completed_total_styled": "<0>Gesamt: </0> <1>{{amount}}</1>",
   "goal_deleted_successfully": "Ziel erfolgreich gelöscht.",
@@ -440,6 +441,5 @@
   "view_and_restore_deleted_assets": "Gelöschte Vermögenswerte anzeigen und wiederherstellen.",
   "view_and_restore_deleted_transactions": "Gelöschte Transaktionen anzeigen und wiederherstellen.",
   "welcome_to": "Willkommen bei",
-  "widget_no_items_configured_message": "Für dieses Widget sind keine Elemente konfiguriert.",
-  "chinese_simplified": "Chinesisch (vereinfacht)"
+  "widget_no_items_configured_message": "Für dieses Widget sind keine Elemente konfiguriert."
 }

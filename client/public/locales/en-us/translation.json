@@ -83,6 +83,7 @@
   "category_name": "Category Name",
   "category_type": "Category Type",
   "child": "Child",
+  "chinese_simplified": "Chinese (Simplified)",
   "clear_all": "Clear All",
   "clear_filters": "Clear Filters",
   "clear_selection": "Clear Selection",
@@ -122,7 +123,6 @@
   "date_range": "Date Range",
   "days_since_deleted": "{{days}} days since deleted",
   "dd_mm_yyyy": "DD/MM/YYYY",
-  "german": "German",
   "decimal_separator": "Decimal Separator",
   "decimal_separator_required_message": "Decimal separator is required.",
   "delete": "Delete",
@@ -148,7 +148,6 @@
   "duplicate_transactions": "Duplicate Transactions",
   "editable_amount_fraction_this_month": "this month",
   "email_address": "Email Address",
-  "english_us": "English (US)",
   "enable": "Enable",
   "enable_auto_categorizer": "Auto-Categorizer",
   "enable_auto_categorizer_button_disabled_hover": "You must train Auto-Categorizer with existing transactions before it can be enabled.",
@@ -157,6 +156,7 @@
   "enabled": "Enabled",
   "end_date": "End date",
   "ends_with": "Ends with",
+  "english_us": "English (US)",
   "enter_amount": "Enter amount",
   "enter_asset_name": "Enter asset name",
   "enter_authentication_code_message": "Please enter your authentication code.",
@@ -197,6 +197,7 @@
   "force_sync_lookback_period_warning": "Note: Leave this on auto for the best performance.",
   "french": "French",
   "generate_new_recovery_codes": "Generate New Recovery Codes",
+  "german": "German",
   "goal_completed_date_styled": "<0>Completed:</0> <1>{{date}}</1>",
   "goal_completed_total_styled": "<0>Total: </0> <1>{{amount}}</1>",
   "goal_deleted_successfully": "Goal deleted successfully.",
@@ -451,6 +452,5 @@
   "view_and_restore_deleted_transactions": "View and restore deleted transactions.",
   "welcome_to": "Welcome to",
   "widget_no_items_configured_message": "No items are configured for this widget.",
-  "yyyy_mm_dd": "YYYY/MM/DD",
-  "chinese_simplified": "Chinese (Simplified)"
+  "yyyy_mm_dd": "YYYY/MM/DD"
 }
