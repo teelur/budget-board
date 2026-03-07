@@ -319,7 +319,11 @@ public class SimpleFinService(
 
         if (forceSyncLookbackMonths > 0)
         {
-            return nowUnix - (UNIX_MONTH * forceSyncLookbackMonths);
+            // Cap the maximum lookback to prevent SimpleFIN from complaining.
+            var forceSyncLookbackUnix = UNIX_MONTH * forceSyncLookbackMonths;
+            return forceSyncLookbackUnix > MAX_SYNC_LOOKBACK_UNIX
+                ? nowUnix - MAX_SYNC_LOOKBACK_UNIX
+                : nowUnix - forceSyncLookbackUnix;
         }
 
         // SimpleFIN can lookback a maximum of 365 days (not inclusive).
