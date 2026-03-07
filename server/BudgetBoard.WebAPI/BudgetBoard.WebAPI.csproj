@@ -32,8 +32,8 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
-    <PackageReference Include="Quartz.AspNetCore" Version="3.15.1" />
-    <PackageReference Include="MailKit" Version="4.15.0" />
+    <PackageReference Include="Quartz.AspNetCore" Version="3.16.1" />
+    <PackageReference Include="MailKit" Version="4.15.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BudgetBoard.Database\BudgetBoard.Database.csproj" />
