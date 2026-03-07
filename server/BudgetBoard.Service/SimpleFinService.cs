@@ -27,7 +27,7 @@ public class SimpleFinService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : ISimpleFinService
 {
-    private const int MAX_SYNC_LOOKBACK_UNIX = 31449600; // 364 days
+    private const int MAX_SYNC_LOOKBACK_UNIX = 7689600; // 89 days
     private const long UNIX_MONTH = 2629743;
     private const long UNIX_WEEK = 604800;
 
@@ -204,6 +204,7 @@ public class SimpleFinService(
                 .Include(u => u.UserSettings)
                 .Include(u => u.SimpleFinOrganizations)
                 .ThenInclude(o => o.Accounts)
+                .Include(u => u.SimpleFinAccounts)
                 .Include(u => u.TransactionCategories)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
@@ -520,6 +521,7 @@ public class SimpleFinService(
                         BalanceDate = DateTimeOffset
                             .FromUnixTimeSeconds(simpleFinAccount.BalanceDate)
                             .UtcDateTime,
+                        LastSync = existingAccount.LastSync,
                     }
                 );
             }
