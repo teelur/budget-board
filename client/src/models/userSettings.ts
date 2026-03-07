@@ -37,6 +37,7 @@ export const Languages: LanguageItem[] = [
   { value: "default", label: "system_default" },
   { value: "en-us", label: "en_us" },
   { value: "de", label: "de" },
+  { value: "fr", label: "fr" },
   { value: "zh-hans", label: "zh_hans" },
 ];
 

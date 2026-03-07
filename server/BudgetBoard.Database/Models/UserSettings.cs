@@ -24,10 +24,11 @@ public static class SupportedLanguages
     public const string SystemDefault = "default";
     public const string EnglishUnitedStates = "en-us";
     public const string German = "de";
+    public const string French = "fr";
     public const string ChineseSimplified = "zh-hans";
 
     public static List<string> SupportedCultureNames { get; } =
-    [EnglishUnitedStates, German, ChineseSimplified];
+    [EnglishUnitedStates, German, French, ChineseSimplified];
 
     public static List<string> AllUserLanguageOptions { get; } =
     [SystemDefault, .. SupportedCultureNames];
