@@ -466,4 +466,7 @@
   <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
     <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
   </data>
+  <data name="InvalidDateFormatError" xml:space="preserve">
+    <value>The provided date format is invalid.</value>
+  </data>
 </root>
