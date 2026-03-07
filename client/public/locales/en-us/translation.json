@@ -195,6 +195,7 @@
   "force_sync_lookback_period": "Force Sync Lookback Period",
   "force_sync_lookback_period_description": "This setting can be used to override the number of months to request from SimpleFIN during sync. Leave as \"Auto\" to let the system decide.",
   "force_sync_lookback_period_warning": "Note: Leave this on auto for the best performance.",
+  "fr": "French",
   "generate_new_recovery_codes": "Generate New Recovery Codes",
   "goal_completed_date_styled": "<0>Completed:</0> <1>{{date}}</1>",
   "goal_completed_total_styled": "<0>Total: </0> <1>{{amount}}</1>",
