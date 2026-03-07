@@ -122,7 +122,7 @@
   "date_range": "Date Range",
   "days_since_deleted": "{{days}} days since deleted",
   "dd_mm_yyyy": "DD/MM/YYYY",
-  "de": "German",
+  "german": "German",
   "decimal_separator": "Decimal Separator",
   "decimal_separator_required_message": "Decimal separator is required.",
   "delete": "Delete",
@@ -148,7 +148,7 @@
   "duplicate_transactions": "Duplicate Transactions",
   "editable_amount_fraction_this_month": "this month",
   "email_address": "Email Address",
-  "en_us": "English (US)",
+  "english_us": "English (US)",
   "enable": "Enable",
   "enable_auto_categorizer": "Auto-Categorizer",
   "enable_auto_categorizer_button_disabled_hover": "You must train Auto-Categorizer with existing transactions before it can be enabled.",
@@ -195,7 +195,7 @@
   "force_sync_lookback_period": "Force Sync Lookback Period",
   "force_sync_lookback_period_description": "This setting can be used to override the number of months to request from SimpleFIN during sync. Leave as \"Auto\" to let the system decide.",
   "force_sync_lookback_period_warning": "Note: Leave this on auto for the best performance.",
-  "fr_fr": "French",
+  "french": "French",
   "generate_new_recovery_codes": "Generate New Recovery Codes",
   "goal_completed_date_styled": "<0>Completed:</0> <1>{{date}}</1>",
   "goal_completed_total_styled": "<0>Total: </0> <1>{{amount}}</1>",
@@ -452,5 +452,5 @@
   "welcome_to": "Welcome to",
   "widget_no_items_configured_message": "No items are configured for this widget.",
   "yyyy_mm_dd": "YYYY/MM/DD",
-  "zh_hans": "Chinese (Simplified)"
+  "chinese_simplified": "Chinese (Simplified)"
 }
