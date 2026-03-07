@@ -6,11 +6,17 @@ upstream backend_server {
 server {
   listen ${PORT};
 
-  # You should configure this to the domain that points to this app.
   server_name _;
 
   access_log /var/log/nginx/nginx.vhost.access.log;
   error_log /var/log/nginx/nginx.vhost.error.log;
+
+  location /locales/ {
+    # Serve translation files directly; return 404 if missing so i18next can
+    # handle the fallback gracefully instead of receiving index.html as JSON.
+    root /usr/share/nginx/html;
+    try_files ${DOLLAR}uri =404;
+  }
 
   location / {
     # This would be the directory where your React app's static files are stored.
