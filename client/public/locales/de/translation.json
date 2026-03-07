@@ -122,7 +122,6 @@
   "date_is_required": "Das Datum wird benötigt.",
   "date_range": "Datumsbereich",
   "days_since_deleted": "{{days}} Tage seit dem Löschen",
-  "dd_mm_yyyy": "",
   "decimal_separator": "Dezimal Trennzeichen",
   "decimal_separator_required_message": "Dezimal Trennzeichen wird benötigt.",
   "delete": "Löschen",
@@ -449,6 +448,5 @@
   "view_and_restore_deleted_assets": "Gelöschte Vermögenswerte anzeigen und wiederherstellen.",
   "view_and_restore_deleted_transactions": "Gelöschte Transaktionen anzeigen und wiederherstellen.",
   "welcome_to": "Willkommen bei",
-  "widget_no_items_configured_message": "Für dieses Widget sind keine Elemente konfiguriert.",
-  "yyyy_mm_dd": ""
+  "widget_no_items_configured_message": "Für dieses Widget sind keine Elemente konfiguriert."
 }
