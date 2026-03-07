@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import { getCurrencySymbol } from "~/helpers/currency";
 
 const localeMap: Record<string, string> = {
   "en-us": "en",
@@ -21,6 +22,7 @@ export interface LocaleContextValue {
   longDateFormat: string;
   decimalSeparator: string;
   thousandsSeparator: string;
+  currencySymbol: string;
 }
 
 export const LocaleContext = React.createContext<LocaleContextValue>({
@@ -31,6 +33,7 @@ export const LocaleContext = React.createContext<LocaleContextValue>({
   longDateFormat: "LL",
   decimalSeparator: ".",
   thousandsSeparator: ",",
+  currencySymbol: "$",
 });
 
 export const LocaleProvider = ({
@@ -97,8 +100,15 @@ export const LocaleProvider = ({
         parts.find((part) => part.type === "decimal")?.value || ".",
       thousandsSeparator:
         parts.find((part) => part.type === "group")?.value || ",",
+      currencySymbol: userSettingsQuery.data?.currency
+        ? getCurrencySymbol(userSettingsQuery.data.currency)
+        : "$",
     };
-  }, [i18n.language, userSettingsQuery.data?.dateFormat]);
+  }, [
+    i18n.language,
+    userSettingsQuery.data?.dateFormat,
+    userSettingsQuery.data?.currency,
+  ]);
 
   return (
     <LocaleContext.Provider value={localeValue}>
