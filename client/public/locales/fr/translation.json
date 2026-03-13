@@ -260,5 +260,5 @@
   "login_failed_message": "Échec de la connexion. Veuillez vérifier vos identifiants et réessayer.",
   "login_with_oidc": "Se connecter avec l'OIDC",
   "logout": "Déconnexion",
-  "lunchflow": "LunchFLow"
+  "lunchflow": "LunchFlow"
 }
