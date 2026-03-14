@@ -3,12 +3,12 @@ import { DatesRangeValue } from "@mantine/dates";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
-interface ISelectLastNMonthsRangeProps {
+interface SelectLastNMonthsRangeProps {
   monthButtons: number[];
   setDateRange: React.Dispatch<React.SetStateAction<DatesRangeValue<string>>>;
 }
 
-const SelectLastNMonthsRange = (props: ISelectLastNMonthsRangeProps) => {
+const SelectLastNMonthsRange = (props: SelectLastNMonthsRangeProps) => {
   const { t } = useTranslation();
   const { dayjs } = useLocale();
 

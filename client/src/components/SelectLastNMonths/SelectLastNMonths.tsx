@@ -2,12 +2,12 @@ import { Button, Group } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
-interface ISelectLastNMonthsProps {
+interface SelectLastNMonthsProps {
   monthButtons: number[];
   setSelectedMonths: React.Dispatch<React.SetStateAction<Date[]>>;
 }
 
-const SelectLastNMonths = (props: ISelectLastNMonthsProps) => {
+const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
   const { t } = useTranslation();
   const { dayjs } = useLocale();
 
