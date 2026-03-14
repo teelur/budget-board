@@ -27,10 +27,6 @@ const NetCashFlowTab = (): React.ReactNode => {
     dayjs().startOf("month").toDate(),
   ]);
 
-  React.useEffect(() => {
-    console.log(selectedMonths);
-  }, [selectedMonths]);
-
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
   const { request } = useAuth();
