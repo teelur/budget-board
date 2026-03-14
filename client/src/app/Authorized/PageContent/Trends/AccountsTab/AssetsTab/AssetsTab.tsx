@@ -1,5 +1,3 @@
-import classes from "./AssetsTab.module.css";
-
 import { Stack } from "@mantine/core";
 import React from "react";
 import { mantineDateFormat } from "~/helpers/datetime";
@@ -68,7 +66,7 @@ const AssetsTab = (): React.ReactNode => {
   });
 
   return (
-    <Stack className={classes.root}>
+    <Stack p={"0.5rem"}>
       <AccountsSelectHeader
         selectedAccountIds={selectedAccountIds}
         setSelectedAccountIds={setSelectedAccountIds}
