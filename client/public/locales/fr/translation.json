@@ -182,5 +182,7 @@
   "expenses": "Dépenses",
   "expenses_column": "Colonne des dépenses",
   "expenses_column_options": "Options de la colonne des dépenses",
-  "german": "Allemand"
+  "german": "Allemand",
+  "mm_dd_yyyy": "MM{{separator}}JJ{{separator}}AAAA",
+  "yyyy_mm_dd": "AAAA{{separator}}MM{{separator}}JJ"
 }
