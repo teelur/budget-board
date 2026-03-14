@@ -57,7 +57,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-superSecretPassword}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in compose.env}
       POSTGRES_DB: ${POSTGRES_DATABASE:-budgetboard}
     ports:
       - "6252:5432"
