@@ -71,8 +71,6 @@ var connectionString = new string(
     .Replace("{USER}", postgresUser)
     .Replace("{PASSWORD}", postgresPassword);
 
-System.Diagnostics.Debug.WriteLine("Connection string: " + connectionString);
-
 builder.Services.AddDbContext<UserDataContext>(o =>
     o.UseNpgsql(connectionString).AddInterceptors(new StringSanitizationInterceptor())
 );
