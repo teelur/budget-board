@@ -19,17 +19,13 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
           variant="light"
           key={months}
           onClick={() => {
-            // Clear prior to adding new months to prevent duplicates.
-            props.setSelectedMonths([]);
+            const newMonths = [];
             for (let i = 0; i < months; i++) {
-              props.setSelectedMonths((prev) => {
-                const newMonths = [...prev];
-                newMonths.push(
-                  dayjs().subtract(i, "month").startOf("month").toDate(),
-                );
-                return newMonths;
-              });
+              newMonths.push(
+                dayjs().subtract(i, "month").startOf("month").toDate(),
+              );
             }
+            props.setSelectedMonths(newMonths);
           }}
         >
           {t("last_n_months", { count: months })}
