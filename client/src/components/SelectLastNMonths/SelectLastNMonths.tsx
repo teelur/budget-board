@@ -2,12 +2,12 @@ import { Button, Group } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
-interface ISelectLastNMonthsProps {
+interface SelectLastNMonthsProps {
   monthButtons: number[];
   setSelectedMonths: React.Dispatch<React.SetStateAction<Date[]>>;
 }
 
-const SelectLastNMonths = (props: ISelectLastNMonthsProps) => {
+const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
   const { t } = useTranslation();
   const { dayjs } = useLocale();
 
@@ -19,17 +19,13 @@ const SelectLastNMonths = (props: ISelectLastNMonthsProps) => {
           variant="light"
           key={months}
           onClick={() => {
-            // Clear prior to adding new months to prevent duplicates.
-            props.setSelectedMonths([]);
+            const newMonths: Date[] = [];
             for (let i = 0; i < months; i++) {
-              props.setSelectedMonths((prev) => {
-                const newMonths = [...prev];
-                newMonths.push(
-                  dayjs().subtract(i, "month").startOf("month").toDate(),
-                );
-                return newMonths;
-              });
+              newMonths.push(
+                dayjs().subtract(i, "month").startOf("month").toDate(),
+              );
             }
+            props.setSelectedMonths(newMonths);
           }}
         >
           {t("last_n_months", { count: months })}
