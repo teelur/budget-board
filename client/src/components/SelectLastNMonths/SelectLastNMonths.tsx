@@ -19,7 +19,7 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
           variant="light"
           key={months}
           onClick={() => {
-            const newMonths = [];
+            const newMonths: Date[] = [];
             for (let i = 0; i < months; i++) {
               newMonths.push(
                 dayjs().subtract(i, "month").startOf("month").toDate(),
