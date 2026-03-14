@@ -23,9 +23,13 @@ const NetCashFlowTab = (): React.ReactNode => {
   const { dayjs } = useLocale();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
-    dayjs().subtract(1, "month").toDate(),
-    dayjs().toDate(),
+    dayjs().subtract(1, "month").startOf("month").toDate(),
+    dayjs().startOf("month").toDate(),
   ]);
+
+  React.useEffect(() => {
+    console.log(selectedMonths);
+  }, [selectedMonths]);
 
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
@@ -84,7 +88,9 @@ const NetCashFlowTab = (): React.ReactNode => {
               for (let i = 0; i < months; i++) {
                 setSelectedMonths((prev) => {
                   const newMonths = [...prev];
-                  newMonths.push(dayjs().subtract(i, "month").toDate());
+                  newMonths.push(
+                    dayjs().subtract(i, "month").startOf("month").toDate(),
+                  );
                   return newMonths;
                 });
               }
