@@ -80,7 +80,7 @@ public class UserSettingsService(
 
         if (!string.IsNullOrEmpty(request.DateFormat))
         {
-            var isValidDateFormat = LocalizationHelpers.DateFormats.Contains(request.DateFormat);
+            var isValidDateFormat = LocalizationHelpers.IsValidDateFormat(request.DateFormat);
             if (!isValidDateFormat)
             {
                 logger.LogError("{LogMessage}", logLocalizer["InvalidDateFormatLog"]);

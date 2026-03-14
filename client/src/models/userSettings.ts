@@ -46,9 +46,20 @@ export class DateFormatItem {
   label: string = "";
 }
 
+export const DATE_SEPARATOR_PLACEHOLDER = "{sep}";
+
 export const DateFormats: DateFormatItem[] = [
   { value: "default", label: "system_default" },
-  { value: "MM/DD/YYYY", label: "mm_dd_yyyy" },
-  { value: "DD/MM/YYYY", label: "dd_mm_yyyy" },
-  { value: "YYYY/MM/DD", label: "yyyy_mm_dd" },
+  {
+    value: `MM${DATE_SEPARATOR_PLACEHOLDER}DD${DATE_SEPARATOR_PLACEHOLDER}YYYY`,
+    label: "mm_dd_yyyy",
+  },
+  {
+    value: `DD${DATE_SEPARATOR_PLACEHOLDER}MM${DATE_SEPARATOR_PLACEHOLDER}YYYY`,
+    label: "dd_mm_yyyy",
+  },
+  {
+    value: `YYYY${DATE_SEPARATOR_PLACEHOLDER}MM${DATE_SEPARATOR_PLACEHOLDER}DD`,
+    label: "yyyy_mm_dd",
+  },
 ];
