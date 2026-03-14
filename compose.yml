@@ -5,6 +5,7 @@ services:
     image: ghcr.io/teelur/budget-board/server:v3
     build: ./server
     environment:
+      ASPNETCORE_ENVIRONMENT: Production
       Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
       CLIENT_ADDRESS: budget-board-client
       POSTGRES_HOST: ${POSTGRES_HOST:-budget-board-db}
