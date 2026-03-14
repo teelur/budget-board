@@ -1,6 +1,7 @@
 import { Button, Group } from "@mantine/core";
 import { DatesRangeValue } from "@mantine/dates";
 import { useTranslation } from "react-i18next";
+import { mantineDateFormat } from "~/helpers/datetime";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface SelectLastNMonthsRangeProps {
@@ -21,8 +22,8 @@ const SelectLastNMonthsRange = (props: SelectLastNMonthsRangeProps) => {
           key={months}
           onClick={() => {
             props.setDateRange([
-              dayjs().subtract(months, "month").format("YYYY-MM-DD"),
-              dayjs().format("YYYY-MM-DD"),
+              dayjs().subtract(months, "month").format(mantineDateFormat),
+              dayjs().format(mantineDateFormat),
             ]);
           }}
         >
