@@ -266,7 +266,7 @@
   "matches_regex": "Entspricht regex",
   "merchant_name": "Händlername",
   "missing_information": "Fehlende Information",
-  "mm_dd_yyyy": "MM/DD/YYYY",
+  "mm_dd_yyyy": "MM{{separator}}DD{{separator}}YYYY",
   "month": "Monat",
   "monthly_contribution": "Monatlicher Beitrag",
   "name": "Name",

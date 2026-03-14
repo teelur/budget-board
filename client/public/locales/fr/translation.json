@@ -121,7 +121,7 @@
   "date_is_required": "La date est requise.",
   "date_range": "Plage de dates",
   "days_since_deleted": "{{days}} jours depuis la suppression",
-  "dd_mm_yyyy": "JJ/MM/AAAA",
+  "dd_mm_yyyy": "JJ{{separator}}MM{{separator}}AAAA",
   "decimal_separator": "Séparateur décimal",
   "decimal_separator_required_message": "Le séparateur décimal est requis.",
   "delete": "Supprimer",
