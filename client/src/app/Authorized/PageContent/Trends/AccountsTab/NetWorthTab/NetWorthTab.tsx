@@ -1,5 +1,3 @@
-import classes from "./NetWorthTab.module.css";
-
 import { Stack } from "@mantine/core";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
@@ -66,7 +64,7 @@ const NetWorthTab = (): React.ReactNode => {
   });
 
   return (
-    <Stack className={classes.root}>
+    <Stack p={"0.5rem"}>
       <AccountsSelectHeader
         selectedAccountIds={selectedAccountIds}
         setSelectedAccountIds={setSelectedAccountIds}
