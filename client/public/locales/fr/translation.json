@@ -122,7 +122,7 @@
   "date_is_required": "La date est requise.",
   "date_range": "Plage de dates",
   "days_since_deleted": "{{days}} jours depuis la suppression",
-  "dd_mm_yyyy": "JJ/MM/AAAA",
+  "dd_mm_yyyy": "JJ{{separator}}MM{{separator}}AAAA",
   "decimal_separator": "Séparateur décimal",
   "decimal_separator_required_message": "Le séparateur décimal est requis.",
   "delete": "Supprimer",
@@ -269,7 +269,7 @@
   "matches_regex": "Correspond à l'expression régulière",
   "merchant_name": "Nom du commerçant",
   "missing_information": "Information manquante",
-  "mm_dd_yyyy": "MM/JJ/AAAA",
+  "mm_dd_yyyy": "MM{{separator}}JJ{{separator}}AAAA",
   "month": "Mois",
   "monthly_contribution": "Contribution mensuelle",
   "name": "Nom",
@@ -452,5 +452,5 @@
   "view_and_restore_deleted_transactions": "Consultez et restaurez les transactions supprimées.",
   "welcome_to": "Bienvenue sur",
   "widget_no_items_configured_message": "Aucun élément n'est configuré pour ce widget.",
-  "yyyy_mm_dd": "AAAA/MM/JJ"
+  "yyyy_mm_dd": "AAAA{{separator}}MM{{separator}}JJ"
 }
