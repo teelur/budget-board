@@ -8,17 +8,18 @@ import { IAssetResponse } from "~/models/asset";
 import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import AssetSelect from "../core/Select/AssetSelect/AssetSelect";
 import { useTranslation } from "react-i18next";
+import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
 
 interface AssetsSelectHeaderProps {
   selectedAssetIds: string[];
   setSelectedAssetIds: (assetIds: string[]) => void;
   dateRange: DatesRangeValue<string>;
-  setDateRange: (dateRange: DatesRangeValue<string>) => void;
+  setDateRange: React.Dispatch<React.SetStateAction<DatesRangeValue<string>>>;
   filters?: string[];
 }
 
 const AssetsSelectHeader = (
-  props: AssetsSelectHeaderProps
+  props: AssetsSelectHeaderProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
@@ -41,34 +42,40 @@ const AssetsSelectHeader = (
 
   return (
     <Group>
-      <DatePickerInput
-        type="range"
-        value={props.dateRange}
-        onChange={props.setDateRange}
-        elevation={1}
+      <Group>
+        <DatePickerInput
+          type="range"
+          value={props.dateRange}
+          onChange={props.setDateRange}
+          elevation={1}
+        />
+        <AssetSelect
+          selectedAssetIds={props.selectedAssetIds}
+          setSelectedAssetIds={props.setSelectedAssetIds}
+          hideHidden
+          miw="230px"
+          maw="400px"
+          elevation={1}
+        />
+        <Button
+          onClick={() => {
+            props.setSelectedAssetIds(
+              assetsQuery.data
+                ?.filter((asset: IAssetResponse) => !asset?.hide)
+                ?.map((asset) => asset.id) ?? [],
+            );
+          }}
+        >
+          {t("select_all")}
+        </Button>
+        <Button onClick={() => props.setSelectedAssetIds([])}>
+          {t("clear_all")}
+        </Button>
+      </Group>
+      <SelectLastNMonthsRange
+        monthButtons={[3, 6, 12]}
+        setDateRange={props.setDateRange}
       />
-      <AssetSelect
-        selectedAssetIds={props.selectedAssetIds}
-        setSelectedAssetIds={props.setSelectedAssetIds}
-        hideHidden
-        miw="230px"
-        maw="400px"
-        elevation={1}
-      />
-      <Button
-        onClick={() => {
-          props.setSelectedAssetIds(
-            assetsQuery.data
-              ?.filter((asset: IAssetResponse) => !asset?.hide)
-              ?.map((asset) => asset.id) ?? []
-          );
-        }}
-      >
-        {t("select_all")}
-      </Button>
-      <Button onClick={() => props.setSelectedAssetIds([])}>
-        {t("clear_all")}
-      </Button>
     </Group>
   );
 };

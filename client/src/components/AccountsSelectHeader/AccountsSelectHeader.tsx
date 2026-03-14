@@ -8,17 +8,18 @@ import React from "react";
 import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "../core/Select/AccountMultiSelect/AccountMultiSelect";
+import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
 
 interface AccountsSelectHeaderProps {
   selectedAccountIds: string[];
   setSelectedAccountIds: (accountIds: string[]) => void;
   dateRange: DatesRangeValue<string>;
-  setDateRange: (dateRange: DatesRangeValue<string>) => void;
+  setDateRange: React.Dispatch<React.SetStateAction<DatesRangeValue<string>>>;
   filters?: string[];
 }
 
 const AccountsSelectHeader = (
-  props: AccountsSelectHeaderProps
+  props: AccountsSelectHeaderProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
@@ -41,40 +42,49 @@ const AccountsSelectHeader = (
 
   return (
     <Group>
-      <DatePickerInput
-        type="range"
-        value={props.dateRange}
-        onChange={props.setDateRange}
-        elevation={1}
+      <Group>
+        <DatePickerInput
+          type="range"
+          value={props.dateRange}
+          onChange={props.setDateRange}
+          elevation={1}
+        />
+        <AccountMultiSelect
+          value={props.selectedAccountIds}
+          onChange={props.setSelectedAccountIds}
+          hideHidden
+          filterTypes={props.filters}
+          w={"auto"}
+          miw="230px"
+          maw="600px"
+          elevation={1}
+        />
+        <Button
+          onClick={() => {
+            props.setSelectedAccountIds(
+              accountsQuery.data
+                ?.filter(
+                  (account: IAccountResponse) =>
+                    !account.hideAccount &&
+                    !account.deleted &&
+                    (props.filters
+                      ? props.filters?.includes(account.type)
+                      : true),
+                )
+                ?.map((account) => account.id) ?? [],
+            );
+          }}
+        >
+          {t("select_all")}
+        </Button>
+        <Button onClick={() => props.setSelectedAccountIds([])}>
+          {t("clear_all")}
+        </Button>
+      </Group>
+      <SelectLastNMonthsRange
+        monthButtons={[3, 6, 12]}
+        setDateRange={props.setDateRange}
       />
-      <AccountMultiSelect
-        value={props.selectedAccountIds}
-        onChange={props.setSelectedAccountIds}
-        hideHidden
-        filterTypes={props.filters}
-        miw="230px"
-        maw="400px"
-        elevation={1}
-      />
-      <Button
-        onClick={() => {
-          props.setSelectedAccountIds(
-            accountsQuery.data
-              ?.filter(
-                (account: IAccountResponse) =>
-                  !account.hideAccount &&
-                  !account.deleted &&
-                  (props.filters ? props.filters?.includes(account.type) : true)
-              )
-              ?.map((account) => account.id) ?? []
-          );
-        }}
-      >
-        {t("select_all")}
-      </Button>
-      <Button onClick={() => props.setSelectedAccountIds([])}>
-        {t("clear_all")}
-      </Button>
     </Group>
   );
 };
