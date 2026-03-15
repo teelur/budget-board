@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
@@ -10,6 +11,7 @@ using BudgetBoard.WebAPI.Utils;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Serilog;
@@ -171,6 +173,22 @@ builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+const string AuthRateLimitPolicy = "auth";
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter(
+        AuthRateLimitPolicy,
+        limiterOptions =>
+        {
+            limiterOptions.PermitLimit = 10;
+            limiterOptions.Window = TimeSpan.FromMinutes(1);
+            limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            limiterOptions.QueueLimit = 0;
+        }
+    );
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
 // This is needed for reverse proxy
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -293,17 +311,18 @@ app.UseSerilogRequestLogging();
 
 // Create routes for the identity endpoints
 app.MyMapIdentityApi<ApplicationUser>(
-    new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
-    {
-        ExcludeRegisterPost =
-            builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS") || disableLocalAuth,
-        ExcludeLoginPost = disableLocalAuth,
-        ExcludeLogoutPost = false, // Keep logout available even with OIDC
-        ExcludeForgotPasswordPost = disableLocalAuth,
-        ExcludeResetPasswordPost = disableLocalAuth,
-        ExcludeResendConfirmationEmailPost = disableLocalAuth,
-    }
-);
+        new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
+        {
+            ExcludeRegisterPost =
+                builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS") || disableLocalAuth,
+            ExcludeLoginPost = disableLocalAuth,
+            ExcludeLogoutPost = false, // Keep logout available even with OIDC
+            ExcludeForgotPasswordPost = disableLocalAuth,
+            ExcludeResetPasswordPost = disableLocalAuth,
+            ExcludeResendConfirmationEmailPost = disableLocalAuth,
+        }
+    )
+    .RequireRateLimiting(AuthRateLimitPolicy);
 
 // Activate the CORS policy
 app.UseCors(MyAllowSpecificOrigins);
@@ -312,6 +331,7 @@ app.UseCors(MyAllowSpecificOrigins);
 // processing (UseCors) in case the Authorization Middleware tries
 // to initiate a challenge before the CORS Middleware has a chance
 // to set the appropriate headers.
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
