@@ -309,6 +309,17 @@ app.UseForwardedHeaders();
 //Add support to logging request with SERILOG
 app.UseSerilogRequestLogging();
 
+// Add security headers to all responses
+app.Use(
+    async (context, next) =>
+    {
+        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Append("X-Frame-Options", "SAMEORIGIN");
+        context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+        await next();
+    }
+);
+
 // Create routes for the identity endpoints
 app.MyMapIdentityApi<ApplicationUser>(
         new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
