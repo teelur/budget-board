@@ -139,7 +139,7 @@ var emailSender = builder.Configuration.GetValue<string>("EMAIL_SENDER");
 builder
     .Services.AddIdentityCore<ApplicationUser>(opt =>
     {
-        opt.Password.RequiredLength = 3;
+        opt.Password.RequiredLength = 8;
         opt.Password.RequiredUniqueChars = 0;
         opt.Password.RequireNonAlphanumeric = false;
         opt.Password.RequireDigit = false;
