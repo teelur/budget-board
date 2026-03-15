@@ -19,54 +19,32 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 
 ### Features
 
-#### Data Aggregation
+#### Manage Finances
 
-- Manage your financial accounts and assets in one place.
-- Automatically sync your bank account data (accounts, transactions, balances) with [SimpleFIN](https://www.simplefin.org/).
-- Import transactions via CSV files.
-- Manually add accounts, assets and transactions.
+- **Accounts & Assets**: Manage both your financial accounts (checking, savings, credit cards) and assets (property, valuables) in one place.
+- **Transactions**: Record and categorize your transactions to keep track of your spending habits.
+- **Budgeting**: Set monthly budgets for different categories and track your spending against them.
 
-#### Dashboard View
+#### Data Import & Automation
 
-- Dashboard to view data at a glance
+- **Transaction CSV Import**: Import transactions in bulk using CSV files.
+- **Sync Providers**: Integrate with financial institutions through providers like SimpleFIN and LunchFlow for automatic transaction and account balance syncing.
+- **Auto-Categorization**: Train a machine learning model on your categorized transactions to automatically predict categories for new transactions.
+- **Automatic Rules**: Create rules to automatically update transactions based on criteria like description, amount, or date.
 
-#### Accounts View
+#### Analytics & Insights
 
-- View all your financial accounts in one place.
-- View account balances and recent transactions.
-- Update account balances manually or via sync with SimpleFIN.
+- **Financial Goals**: Set and track progress towards financial goals such as saving for a house or paying off debt.
+- **Customizable Trends Charts**: Visualize spending trends with customizable charts that can be filtered by date range, account, and category.
 
-#### Assets View
+#### Security
 
-- View all your assets in one place.
-- View asset values and recent changes.
-- Update asset values manually.
+- **User Authentication**: Authenticate locally with two-factor authentication (2FA), or bring your own authentication provider with OIDC login.
 
-#### Transactions View
+#### Internationalization
 
-- Organize transactions into categories and subcategories.
-- Create custom categories to organize your transactions.
-- Create rules that automatically update transaction fields during sync when the specified conditions are met.
-
-#### Budgets View
-
-- Create monthly budgets for categories and subcategories.
-- View aggregated budgets for multiple months.
-- Calculate net cash flow for the month.
-- Click on a budget to view more details such as monthly trends and associated transactions.
-
-#### Goals View
-
-- Create goals to track savings or loan payoff.
-- Estimate completion date given a monthly contribution.
-- Estimate monthly contibution given a target completion date.
-- Option to include interest rate in the calculations.
-- Click on a budget to view more details such as monthly trends and associated accounts.
-
-#### Trends View
-
-- Several charts to view different metrics over time.
-- View monthly spending trends, monthly net cash flow, total assets, total liabilities, and total net worth charts.
+- **Multiple Languages**: Selectable languages include English, German, French, and Simplified Chinese, with community-contributed translations.
+- **Localized Date & Number Formats**: Dates and numbers are displayed according to the selected language and locale.
 
 ### Feedback
 
