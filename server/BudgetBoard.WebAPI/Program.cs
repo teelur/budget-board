@@ -114,6 +114,7 @@ if (oidcEnabled)
 
 // Configure Identity with cookie authentication
 // Same configuration whether OIDC is enabled or not since frontend handles OIDC flow
+var requireHttps = builder.Configuration.GetValue<bool?>("REQUIRE_HTTPS") ?? false;
 builder
     .Services.AddAuthentication(options =>
     {
@@ -121,7 +122,15 @@ builder
         options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
         options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
     })
-    .AddCookie(IdentityConstants.ApplicationScheme);
+    .AddCookie(
+        IdentityConstants.ApplicationScheme,
+        options =>
+        {
+            options.Cookie.SecurePolicy = requireHttps
+                ? CookieSecurePolicy.Always
+                : CookieSecurePolicy.SameAsRequest;
+        }
+    );
 builder.Services.AddAuthorization();
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
