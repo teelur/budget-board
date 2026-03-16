@@ -8,9 +8,21 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useField } from "@mantine/form";
 import SaveGoalOptions from "./SaveGoalOptions/SaveGoalOptions";
+import { useDidUpdate } from "@mantine/hooks";
+
+export interface IGoalConfiguration {
+  name: string;
+  accounts: string[];
+  targetAmount: number;
+  applyAccountAmount: boolean;
+}
 
 interface ConfigureGoalProps {
   selectedGoalType: string | null;
+  goalConfiguration: IGoalConfiguration;
+  setGoalConfiguration: React.Dispatch<
+    React.SetStateAction<IGoalConfiguration>
+  >;
   goBackToPreviousDialog: () => void;
   launchNextDialog: () => void;
 }
@@ -19,17 +31,56 @@ const ConfigureGoal = (props: ConfigureGoalProps): React.ReactNode => {
   const { t } = useTranslation();
 
   const goalNameField = useField<string>({
-    initialValue: "",
+    initialValue: props.goalConfiguration.name,
   });
   const goalAccountsField = useField<string[]>({
-    initialValue: [],
+    initialValue: props.goalConfiguration.accounts,
   });
   const goalTargetAmountField = useField<number>({
-    initialValue: 0,
+    initialValue: props.goalConfiguration.targetAmount,
   });
   const goalApplyAccountAmountField = useField<boolean>({
-    initialValue: false,
+    initialValue: props.goalConfiguration.applyAccountAmount,
   });
+
+  useDidUpdate(() => {
+    goalNameField.reset();
+    goalAccountsField.reset();
+    goalTargetAmountField.reset();
+    goalApplyAccountAmountField.reset();
+    props.setGoalConfiguration({
+      name: "",
+      accounts: [],
+      targetAmount: 0,
+      applyAccountAmount: false,
+    });
+  }, [props.selectedGoalType]);
+
+  useDidUpdate(() => {
+    props.setGoalConfiguration({
+      name: goalNameField.getValue(),
+      accounts: goalAccountsField.getValue(),
+      targetAmount: goalTargetAmountField.getValue(),
+      applyAccountAmount: goalApplyAccountAmountField.getValue(),
+    });
+  }, [
+    goalNameField.getValue(),
+    goalAccountsField.getValue(),
+    goalTargetAmountField.getValue(),
+    goalApplyAccountAmountField.getValue(),
+  ]);
+
+  const isNextButtonDisabled = () => {
+    let disabled =
+      goalNameField.getValue().trim() === "" ||
+      goalAccountsField.getValue().length === 0;
+
+    if (props.selectedGoalType === GoalType.SaveGoal) {
+      disabled = disabled || goalTargetAmountField.getValue() <= 0;
+    }
+
+    return disabled;
+  };
 
   return (
     <Stack gap={"1rem"}>
@@ -58,8 +109,8 @@ const ConfigureGoal = (props: ConfigureGoalProps): React.ReactNode => {
         </Button>
         <Button
           flex="1 1 auto"
+          disabled={isNextButtonDisabled()}
           onClick={() => props.launchNextDialog()}
-          disabled={props.selectedGoalType === null}
         >
           {<MoveRightIcon size={16} />}
         </Button>

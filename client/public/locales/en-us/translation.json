@@ -202,6 +202,7 @@
   "german": "German",
   "goal_completed_date_styled": "<0>Completed:</0> <1>{{date}}</1>",
   "goal_completed_total_styled": "<0>Total: </0> <1>{{amount}}</1>",
+  "goal_created_successfully": "Goal created successfully.",
   "goal_deleted_successfully": "Goal deleted successfully.",
   "goal_details": "Goal Details",
   "goal_name": "Goal Name",
