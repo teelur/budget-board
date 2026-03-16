@@ -19,7 +19,7 @@ public class GoalServiceTests
             .RuleFor(g => g.Name, f => f.Lorem.Word())
             .RuleFor(g => g.CompleteDate, f => f.Date.Future())
             .RuleFor(g => g.Amount, f => f.Finance.Amount())
-            .RuleFor(g => g.InitialAmount, f => f.Finance.Amount())
+            .RuleFor(g => g.ApplyExistingBalanceTowardsGoal, f => f.Random.Bool())
             .RuleFor(g => g.MonthlyContribution, f => f.Finance.Amount());
 
     private readonly Faker<GoalUpdateRequest> _goalUpdateRequestFaker =
@@ -60,7 +60,13 @@ public class GoalServiceTests
         helper
             .UserDataContext.Goals.Single()
             .Should()
-            .BeEquivalentTo(goal, options => options.Excluding(g => g.AccountIds));
+            .BeEquivalentTo(
+                goal,
+                options =>
+                    options
+                        .Excluding(g => g.AccountIds)
+                        .Excluding(g => g.ApplyExistingBalanceTowardsGoal)
+            );
         helper.UserDataContext.Goals.Single().Accounts.Should().BeEquivalentTo(accounts);
     }
 
@@ -209,7 +215,7 @@ public class GoalServiceTests
     }
 
     [Fact]
-    public async Task CreateGoalAsync_WhenInitialAmountNotSet_ShouldSetToAccountRunningBalance()
+    public async Task CreateGoalAsync_WhenApplyExistingBalanceTowardsGoalIsFalse_ShouldSetToAccountRunningBalance()
     {
         // Arrange
         var helper = new TestHelper();
@@ -240,7 +246,7 @@ public class GoalServiceTests
 
         var goal = _goalCreateRequestFaker.Generate();
         goal.AccountIds = [.. accounts.Select(a => a.ID)];
-        goal.InitialAmount = null;
+        goal.ApplyExistingBalanceTowardsGoal = false;
 
         // Act
         await goalService.CreateGoalAsync(helper.demoUser.Id, goal);

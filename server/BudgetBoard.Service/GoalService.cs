@@ -78,7 +78,7 @@ public class GoalService(
             Name = request.Name,
             CompleteDate = request.CompleteDate,
             Amount = request.Amount,
-            InitialAmount = request.InitialAmount ?? runningBalance,
+            InitialAmount = request.ApplyExistingBalanceTowardsGoal ? 0.0M : runningBalance,
             MonthlyContribution = request.MonthlyContribution,
             Accounts = accounts,
             UserID = userData.Id,
