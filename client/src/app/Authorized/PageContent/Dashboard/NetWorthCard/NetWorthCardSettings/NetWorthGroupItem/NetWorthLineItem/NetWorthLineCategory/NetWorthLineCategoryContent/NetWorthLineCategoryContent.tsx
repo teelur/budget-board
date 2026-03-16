@@ -12,21 +12,23 @@ interface NetWorthLineCategoryContentProps {
 }
 
 const NetWorthLineCategoryContent = (
-  props: NetWorthLineCategoryContentProps
+  props: NetWorthLineCategoryContentProps,
 ) => {
   const { t } = useTranslation();
 
   const getTypeDisplayString = (): string => {
+    // This needs to be coerced to lowercase because pre-localization these were stored with a capitalized first letter.
     const type = NET_WORTH_CATEGORY_TYPES.find(
-      (type) => type.value === props.category.type
+      (type) => type.value === props.category.type.toLowerCase(),
     );
     return type ? t(type.label) : props.category.type;
   };
 
   const getSubtypeDisplayString = (): string => {
+    // This needs to be coerced to lowercase because pre-localization these were stored with a capitalized first letter.
     const subtypeOptions = getSubtypeOptions(props.category.type);
     const subtype = subtypeOptions.find(
-      (subtype) => subtype.value === props.category.subtype
+      (subtype) => subtype.value === props.category.subtype.toLowerCase(),
     );
     return subtype ? t(subtype.label) : props.category.subtype;
   };

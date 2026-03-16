@@ -30,13 +30,14 @@ interface EditableNetWorthLineCategoryContentProps {
 }
 
 const EditableNetWorthLineCategoryContent = (
-  props: EditableNetWorthLineCategoryContentProps
+  props: EditableNetWorthLineCategoryContentProps,
 ): React.ReactNode => {
+  // These two need to be coerced to lowercase because pre-localization these were stored with a capitalized first letter.
   const typeField = useField<string | null>({
-    initialValue: props.category.type,
+    initialValue: props.category.type.toLowerCase(),
   });
   const subtypeField = useField<string | null>({
-    initialValue: props.category.subtype,
+    initialValue: props.category.subtype.toLowerCase(),
   });
   const valueField = useField<string | null>({
     initialValue: props.category.value,
@@ -191,7 +192,7 @@ const EditableNetWorthLineCategoryContent = (
       .filter(
         (name) =>
           !areStringsEqual(name, props.currentLineName) &&
-          !wouldCreateCircularDependency(name)
+          !wouldCreateCircularDependency(name),
       );
 
     return [...new Set(validLineNames)];
@@ -199,7 +200,7 @@ const EditableNetWorthLineCategoryContent = (
 
   const getValidNetWorthValuesForTypeAndSubtype = (
     type: string,
-    subtype: string
+    subtype: string,
   ): React.ReactNode => {
     if (areStringsEqual(type, "account")) {
       if (areStringsEqual(subtype, "category")) {
@@ -241,7 +242,7 @@ const EditableNetWorthLineCategoryContent = (
           w="100px"
           size="xs"
           data={NET_WORTH_CATEGORY_TYPES.map((i) => ({
-            ...i,
+            value: i.value,
             label: t(i.label),
           }))}
           {...typeField.getInputProps()}
@@ -252,7 +253,7 @@ const EditableNetWorthLineCategoryContent = (
           w="100px"
           size="xs"
           data={getSubtypeOptions(typeField.getValue() ?? "").map((i) => ({
-            ...i,
+            value: i.value,
             label: t(i.label),
           }))}
           {...subtypeField.getInputProps()}
@@ -265,7 +266,7 @@ const EditableNetWorthLineCategoryContent = (
       <Group gap="0.25rem">
         {getValidNetWorthValuesForTypeAndSubtype(
           typeField.getValue() ?? "",
-          subtypeField.getValue() ?? ""
+          subtypeField.getValue() ?? "",
         )}
         <Flex style={{ alignSelf: "stretch" }}>
           <ActionIcon
