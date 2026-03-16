@@ -24,6 +24,15 @@ const Modal = ({ children, ...props }: ModalProps): React.ReactNode => {
           right: "0",
           padding: "0 !important",
         },
+        content: {
+          maxHeight: "100dvh",
+          display: "flex",
+          flexDirection: "column",
+        },
+        body: {
+          overflowY: "auto",
+          flex: 1,
+        },
       }}
       {...props}
     >
