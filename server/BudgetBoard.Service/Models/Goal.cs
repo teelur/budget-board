@@ -15,12 +15,12 @@ public interface IGoalCreateRequest
 
 public class GoalCreateRequest : IGoalCreateRequest
 {
-    public required string Name { get; init; }
-    public DateTime? CompleteDate { get; init; }
-    public required decimal Amount { get; init; }
-    public bool ApplyExistingBalanceTowardsGoal { get; init; }
-    public decimal? MonthlyContribution { get; init; }
-    public required IEnumerable<Guid> AccountIds { get; init; }
+    public required string Name { get; set; }
+    public DateTime? CompleteDate { get; set; }
+    public required decimal Amount { get; set; }
+    public bool ApplyExistingBalanceTowardsGoal { get; set; }
+    public decimal? MonthlyContribution { get; set; }
+    public required IEnumerable<Guid> AccountIds { get; set; }
 
     [JsonConstructor]
     public GoalCreateRequest()
