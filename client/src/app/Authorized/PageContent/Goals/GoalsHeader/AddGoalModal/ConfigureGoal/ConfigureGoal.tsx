@@ -110,7 +110,15 @@ const ConfigureGoal = (props: ConfigureGoalProps): React.ReactNode => {
         <Button
           flex="1 1 auto"
           disabled={isNextButtonDisabled()}
-          onClick={() => props.launchNextDialog()}
+          onClick={() => {
+            props.setGoalConfiguration({
+              name: goalNameField.getValue(),
+              accounts: goalAccountsField.getValue(),
+              targetAmount: goalTargetAmountField.getValue(),
+              applyAccountAmount: goalApplyAccountAmountField.getValue(),
+            });
+            props.launchNextDialog();
+          }}
         >
           {<MoveRightIcon size={16} />}
         </Button>

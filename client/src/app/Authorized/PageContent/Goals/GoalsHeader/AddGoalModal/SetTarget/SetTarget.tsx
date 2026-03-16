@@ -42,6 +42,11 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
     goalMonthlyContributionField.reset();
   }, [targetType]);
 
+  const isTargetValid =
+    targetType === "completeDate"
+      ? goalCompleteDateField.getValue() !== null
+      : goalMonthlyContributionField.getValue() > 0;
+
   return (
     <Stack gap={"1rem"}>
       <SegmentedControl
@@ -95,6 +100,7 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
               goalMonthlyContributionField.getValue(),
             );
           }}
+          disabled={!isTargetValid || props.isCreatingGoal}
           loading={props.isCreatingGoal}
         >
           {t("create_goal")}
