@@ -4,7 +4,7 @@ export interface IGoalCreateRequest {
   name: string;
   completeDate: Date | null;
   amount: number;
-  initialAmount: number | null;
+  applyExistingBalanceTowardsGoal: boolean;
   monthlyContribution: number | null;
   accountIds: string[];
 }

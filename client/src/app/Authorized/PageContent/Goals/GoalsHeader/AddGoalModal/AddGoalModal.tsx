@@ -80,7 +80,7 @@ const AddGoalModal = (): React.ReactNode => {
         ? parsedCompleteDate.toDate()
         : null,
       amount: goalConfiguration.targetAmount,
-      initialAmount: goalConfiguration.applyAccountAmount ? 0 : null,
+      applyExistingBalanceTowardsGoal: goalConfiguration.applyAccountAmount,
       monthlyContribution:
         monthlyContribution === 0 ? null : monthlyContribution,
       accountIds: goalConfiguration.accounts,

@@ -8,19 +8,19 @@ public interface IGoalCreateRequest
     string Name { get; }
     DateTime? CompleteDate { get; }
     decimal Amount { get; }
-    decimal? InitialAmount { get; }
+    bool ApplyExistingBalanceTowardsGoal { get; }
     decimal? MonthlyContribution { get; }
     IEnumerable<Guid> AccountIds { get; }
 }
 
 public class GoalCreateRequest : IGoalCreateRequest
 {
-    public required string Name { get; set; }
-    public DateTime? CompleteDate { get; set; }
-    public required decimal Amount { get; set; }
-    public decimal? InitialAmount { get; set; }
-    public decimal? MonthlyContribution { get; set; }
-    public required IEnumerable<Guid> AccountIds { get; set; }
+    public required string Name { get; init; }
+    public DateTime? CompleteDate { get; init; }
+    public required decimal Amount { get; init; }
+    public bool ApplyExistingBalanceTowardsGoal { get; init; }
+    public decimal? MonthlyContribution { get; init; }
+    public required IEnumerable<Guid> AccountIds { get; init; }
 
     [JsonConstructor]
     public GoalCreateRequest()
@@ -28,7 +28,7 @@ public class GoalCreateRequest : IGoalCreateRequest
         Name = string.Empty;
         CompleteDate = null;
         Amount = 0.0M;
-        InitialAmount = null;
+        ApplyExistingBalanceTowardsGoal = false;
         MonthlyContribution = null;
         AccountIds = [];
     }
