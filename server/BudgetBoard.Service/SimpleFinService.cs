@@ -27,7 +27,7 @@ public class SimpleFinService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : ISimpleFinService
 {
-    private const int MAX_SYNC_LOOKBACK_UNIX = 31449600; // 364 days
+    private const int MAX_SYNC_LOOKBACK_UNIX = 7689600; // 89 days
     private const long UNIX_MONTH = 2629743;
     private const long UNIX_WEEK = 604800;
 
@@ -204,6 +204,7 @@ public class SimpleFinService(
                 .Include(u => u.UserSettings)
                 .Include(u => u.SimpleFinOrganizations)
                 .ThenInclude(o => o.Accounts)
+                .Include(u => u.SimpleFinAccounts)
                 .Include(u => u.TransactionCategories)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
@@ -318,10 +319,14 @@ public class SimpleFinService(
 
         if (forceSyncLookbackMonths > 0)
         {
-            return nowUnix - (UNIX_MONTH * forceSyncLookbackMonths);
+            // Cap the maximum lookback to prevent SimpleFIN from complaining.
+            var forceSyncLookbackUnix = UNIX_MONTH * forceSyncLookbackMonths;
+            return forceSyncLookbackUnix > MAX_SYNC_LOOKBACK_UNIX
+                ? nowUnix - MAX_SYNC_LOOKBACK_UNIX
+                : nowUnix - forceSyncLookbackUnix;
         }
 
-        // SimpleFIN can lookback a maximum of 365 days (not inclusive).
+        // SimpleFIN can lookback a maximum of 90 days (not inclusive).
         if (earliestBalanceTimestamp < nowUnix - MAX_SYNC_LOOKBACK_UNIX)
         {
             return nowUnix - MAX_SYNC_LOOKBACK_UNIX;
@@ -520,6 +525,7 @@ public class SimpleFinService(
                         BalanceDate = DateTimeOffset
                             .FromUnixTimeSeconds(simpleFinAccount.BalanceDate)
                             .UtcDateTime,
+                        LastSync = existingAccount.LastSync,
                     }
                 );
             }

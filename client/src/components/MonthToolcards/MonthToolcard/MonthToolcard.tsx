@@ -46,7 +46,7 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
       p="0.125rem"
       onClick={() => props.handleClick(props.date)}
       hoverEffect
-      elevation={1}
+      elevation={props.isSelected ? 2 : 1}
     >
       <Stack gap={0} style={{ userSelect: "none" }}>
         <Card

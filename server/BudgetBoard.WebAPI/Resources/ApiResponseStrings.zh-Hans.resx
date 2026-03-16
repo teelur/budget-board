@@ -112,4 +112,19 @@
   <data name="InvalidLanguageError" xml:space="preserve">
     <value>不支持指定的语言“{0}”。</value>
   </data>
+  <data name="AccountLockedOutEmailBody" xml:space="preserve">
+    <value>&lt;h2&gt;Your Account Has Been Locked&lt;/h2&gt;
+&lt;p&gt;We've detected multiple failed login attempts on your account. For your security, your account has been temporarily locked.&lt;/p&gt;
+&lt;p&gt;Your account will be automatically unlocked after the lockout period expires.&lt;/p&gt;
+&lt;p&gt;If this was you, please try again later or use the 'Forgot Password' option to reset your credentials.&lt;/p&gt;</value>
+  </data>
+  <data name="EmailSenderConfigMissing" xml:space="preserve">
+    <value>Email sender configuration is missing. Please set EMAIL_SENDER.</value>
+  </data>
+  <data name="AccountLockedOutEmailSubject" xml:space="preserve">
+    <value>Account Locked Due to Multiple Failed Login Attempts</value>
+  </data>
+  <data name="SmtpHostConfigMissing" xml:space="preserve">
+    <value>SMTP host configuration is missing. Please set EMAIL_SMTP_HOST.</value>
+  </data>
 </root>

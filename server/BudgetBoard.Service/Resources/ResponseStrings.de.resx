@@ -466,4 +466,7 @@
   <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
     <value>Die Mindestwahrscheinlichkeit für die automatische Kategorisierung muss zwischen 0 % und 100 % liegen.</value>
   </data>
+  <data name="InvalidDateFormatError" xml:space="preserve">
+    <value>Das angegebene Datumsformat ist ungültig.</value>
+  </data>
 </root>

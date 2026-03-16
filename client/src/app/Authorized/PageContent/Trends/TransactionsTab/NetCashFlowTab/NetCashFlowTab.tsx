@@ -1,5 +1,3 @@
-import classes from "./NetCashFlowTab.module.css";
-
 import React from "react";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import { getUniqueYears } from "~/helpers/datetime";
@@ -12,19 +10,18 @@ import { useQueries } from "@tanstack/react-query";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import NetCashFlowChart from "~/components/Charts/NetCashFlowChart/NetCashFlowChart";
-import { Button, Group, Stack } from "@mantine/core";
-import { useTranslation } from "react-i18next";
+import { Stack } from "@mantine/core";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import SelectLastNMonths from "~/components/SelectLastNMonths/SelectLastNMonths";
 
 const NetCashFlowTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];
 
-  const { t } = useTranslation();
   const { dayjs } = useLocale();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
-    dayjs().subtract(1, "month").toDate(),
-    dayjs().toDate(),
+    dayjs().subtract(1, "month").startOf("month").toDate(),
+    dayjs().startOf("month").toDate(),
   ]);
 
   // Querying by year is the best balance of covering probable dates a user will select,
@@ -61,7 +58,7 @@ const NetCashFlowTab = (): React.ReactNode => {
   );
 
   return (
-    <Stack className={classes.root}>
+    <Stack p={"0.5rem"}>
       <MonthToolcards
         selectedDates={selectedMonths}
         setSelectedDates={setSelectedMonths}
@@ -72,35 +69,10 @@ const NetCashFlowTab = (): React.ReactNode => {
         isPending={transactionsQuery.isPending}
         allowSelectMultiple
       />
-      <Group w="100%" justify="end">
-        {monthButtons.map((months) => (
-          <Button
-            size="compact-sm"
-            variant="light"
-            key={months}
-            onClick={() => {
-              // Clear prior to adding new months to prevent duplicates.
-              setSelectedMonths([]);
-              for (let i = 0; i < months; i++) {
-                setSelectedMonths((prev) => {
-                  const newMonths = [...prev];
-                  newMonths.push(dayjs().subtract(i, "month").toDate());
-                  return newMonths;
-                });
-              }
-            }}
-          >
-            {t("last_n_months", { count: months })}
-          </Button>
-        ))}
-        <Button
-          size="compact-sm"
-          variant="primary"
-          onClick={() => setSelectedMonths([])}
-        >
-          {t("clear_selection")}
-        </Button>
-      </Group>
+      <SelectLastNMonths
+        monthButtons={monthButtons}
+        setSelectedMonths={setSelectedMonths}
+      />
       <NetCashFlowChart
         transactions={transactionsWithoutHidden}
         months={selectedMonths}

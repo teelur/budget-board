@@ -1,5 +1,3 @@
-import classes from "./SpendingTab.module.css";
-
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
@@ -8,21 +6,22 @@ import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
 } from "~/helpers/transactions";
-import { Button, Group, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import SelectLastNMonths from "~/components/SelectLastNMonths/SelectLastNMonths";
 
 const SpendingTab = (): React.ReactNode => {
-  const { t } = useTranslation();
+  const monthButtons = [3, 6, 12];
+
   const { dayjs } = useLocale();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
-    dayjs().subtract(1, "month").toDate(),
-    dayjs().toDate(),
+    dayjs().subtract(1, "month").startOf("month").toDate(),
+    dayjs().startOf("month").toDate(),
   ]);
 
   // Querying by year is the best balance of covering probable dates a user will select,
@@ -59,7 +58,7 @@ const SpendingTab = (): React.ReactNode => {
   );
 
   return (
-    <Stack className={classes.root}>
+    <Stack p={"0.5rem"}>
       <MonthToolcards
         selectedDates={selectedMonths}
         setSelectedDates={setSelectedMonths}
@@ -70,15 +69,10 @@ const SpendingTab = (): React.ReactNode => {
         isPending={transactionsQuery.isPending}
         allowSelectMultiple
       />
-      <Group w="100%" justify="end">
-        <Button
-          size="compact-sm"
-          variant="primary"
-          onClick={() => setSelectedMonths([])}
-        >
-          {t("clear_selection")}
-        </Button>
-      </Group>
+      <SelectLastNMonths
+        monthButtons={monthButtons}
+        setSelectedMonths={setSelectedMonths}
+      />
       <SpendingChart
         transactions={transactionsWithoutHidden}
         months={selectedMonths}

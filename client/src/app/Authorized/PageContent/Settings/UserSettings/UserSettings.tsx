@@ -1,4 +1,4 @@
-import { LoadingOverlay, Skeleton, Stack } from "@mantine/core";
+import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import {
+  DATE_SEPARATOR_PLACEHOLDER,
   DateFormatItem,
   DateFormats,
   IUserSettings,
@@ -19,6 +20,7 @@ import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 const UserSettings = (): React.ReactNode => {
   const currencyField = useField({
@@ -28,6 +30,9 @@ const UserSettings = (): React.ReactNode => {
     initialValue: "",
   });
   const dateFormatField = useField({
+    initialValue: "",
+  });
+  const dateSeparatorField = useField({
     initialValue: "",
   });
 
@@ -78,7 +83,18 @@ const UserSettings = (): React.ReactNode => {
       languageField.setValue(userSettingsQuery.data.language);
     }
     if (userSettingsQuery.data?.dateFormat) {
-      dateFormatField.setValue(userSettingsQuery.data.dateFormat);
+      const storedFormat = userSettingsQuery.data.dateFormat;
+
+      // For simplicity, the dateFormatField will store the format with a placeholder for the separator
+      const separatorMatch = storedFormat.match(/^[A-Z]+(.)[A-Z]+\1[A-Z]+$/);
+      const separator = separatorMatch ? (separatorMatch[1] ?? "") : "";
+
+      const placeholderFormat = separator
+        ? storedFormat.replaceAll(separator, DATE_SEPARATOR_PLACEHOLDER)
+        : storedFormat;
+
+      dateFormatField.setValue(placeholderFormat);
+      dateSeparatorField.setValue(separator);
     }
   }, [
     userSettingsQuery.data?.currency,
@@ -87,6 +103,7 @@ const UserSettings = (): React.ReactNode => {
     currencyField.setValue,
     languageField.setValue,
     dateFormatField.setValue,
+    dateSeparatorField.setValue,
   ]);
 
   return (
@@ -157,27 +174,69 @@ const UserSettings = (): React.ReactNode => {
                 }}
                 elevation={1}
               />
-              <Select
-                label={
-                  <PrimaryText size="sm">
-                    {t("preferred_date_format")}
-                  </PrimaryText>
-                }
-                placeholder={t("select_your_preferred_date_format")}
-                data={DateFormats.map((dateFormatItem: DateFormatItem) => ({
-                  value: dateFormatItem.value,
-                  label: t(dateFormatItem.label),
-                }))}
-                {...dateFormatField.getInputProps()}
-                onChange={(value) => {
-                  if (value) {
-                    doUpdateUserSettings.mutate({
-                      dateFormat: value,
-                    });
+              <Group gap={"0.5rem"} wrap="nowrap">
+                <Select
+                  w={"100%"}
+                  label={
+                    <PrimaryText size="sm">
+                      {t("preferred_date_format")}
+                    </PrimaryText>
                   }
-                }}
-                elevation={1}
-              />
+                  placeholder={t("select_your_preferred_date_format")}
+                  data={DateFormats.map((dateFormatItem: DateFormatItem) => ({
+                    value: dateFormatItem.value,
+                    label: t(dateFormatItem.label, {
+                      separator:
+                        dateSeparatorField.getValue()?.length > 0
+                          ? dateSeparatorField.getValue()
+                          : " ",
+                    }),
+                  }))}
+                  {...dateFormatField.getInputProps()}
+                  onChange={(value) => {
+                    if (value === "default") {
+                      dateSeparatorField.setValue("");
+                    }
+                    if (value) {
+                      doUpdateUserSettings.mutate({
+                        dateFormat: value.replaceAll(
+                          DATE_SEPARATOR_PLACEHOLDER,
+                          dateSeparatorField.getValue() || " ",
+                        ),
+                      });
+                    }
+                  }}
+                  elevation={1}
+                />
+                {dateFormatField.getValue() !== DateFormats.at(0)?.value && (
+                  <TextInput
+                    label={
+                      <PrimaryText size="sm">{t("separator")}</PrimaryText>
+                    }
+                    maw={100}
+                    {...dateSeparatorField.getInputProps()}
+                    onChange={(event) => {
+                      const value = event.currentTarget.value;
+                      // Only allow non-alphanumeric characters
+                      if (!value || /^[^a-zA-Z0-9]$/.test(value)) {
+                        dateSeparatorField.setValue(value);
+                      }
+                    }}
+                    onBlur={() =>
+                      doUpdateUserSettings.mutate({
+                        dateFormat: dateFormatField
+                          .getValue()
+                          .replaceAll(
+                            DATE_SEPARATOR_PLACEHOLDER,
+                            dateSeparatorField.getValue() || " ",
+                          ),
+                      })
+                    }
+                    maxLength={1}
+                    elevation={1}
+                  />
+                )}
+              </Group>
             </Stack>
           )}
         </Stack>

@@ -61,7 +61,16 @@ export const LocaleProvider = ({
   });
 
   const getLongDateFormat = (dateFormat: string): string => {
-    switch (dateFormat) {
+    // Extract separator and normalize format to determine pattern
+    const separatorMatch = dateFormat.match(/^[A-Z]+(.)[A-Z]+\1[A-Z]+$/);
+    if (!separatorMatch || separatorMatch.length < 2) {
+      return "LL";
+    }
+
+    const separator = separatorMatch[1]!;
+    const normalizedFormat = dateFormat.replaceAll(separator, "/");
+
+    switch (normalizedFormat) {
       case "MM/DD/YYYY":
         return "MMMM D, YYYY";
       case "DD/MM/YYYY":

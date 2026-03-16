@@ -1,5 +1,3 @@
-import classes from "./LiabilitiesTab.module.css";
-
 import { Stack } from "@mantine/core";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
@@ -68,7 +66,7 @@ const LiabilitiesTab = (): React.ReactNode => {
   });
 
   return (
-    <Stack className={classes.root}>
+    <Stack p={"0.5rem"}>
       <AccountsSelectHeader
         selectedAccountIds={selectedAccountIds}
         setSelectedAccountIds={setSelectedAccountIds}
