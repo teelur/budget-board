@@ -61,6 +61,11 @@ public class LunchFlowAccount
     public DateTime? LastSync { get; set; } = null;
 
     /// <summary>
+    /// The first date from which transactions will be synchronized; null to sync all.
+    /// </summary>
+    public DateTime? SyncFromDate { get; set; } = null;
+
+    /// <summary>
     /// Identifier for the linked local Account entity within the budgeting application.
     /// </summary>
     public Guid? LinkedAccountId { get; set; } = null;

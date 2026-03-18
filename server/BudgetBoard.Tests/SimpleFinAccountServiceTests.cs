@@ -381,4 +381,109 @@ public class SimpleFinAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidLinkedAccountIDError");
     }
+
+    [Fact]
+    public async Task UpdateSimpleFinAccountSyncFromDateAsync_WhenValidData_ShouldUpdateSyncFromDate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organizationFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
+        var organization = organizationFaker.Generate();
+
+        var accountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.SimpleFinAccounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var newSyncFromDate = DateTime.UtcNow.AddMonths(-3);
+
+        // Act
+        await simpleFinAccountService.UpdateSimpleFinAccountSyncFromDateAsync(
+            helper.demoUser.Id,
+            account.ID,
+            newSyncFromDate
+        );
+
+        // Assert
+        var updatedAccount = helper.UserDataContext.SimpleFinAccounts.FirstOrDefault(a =>
+            a.ID == account.ID
+        );
+
+        updatedAccount.Should().NotBeNull();
+        updatedAccount!.SyncFromDate.Should().Be(newSyncFromDate);
+    }
+
+    [Fact]
+    public async Task UpdateSimpleFinAccountSyncFromDateAsync_WhenClearingSyncFromDate_ShouldSetToNull()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organizationFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
+        var organization = organizationFaker.Generate();
+
+        var accountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
+        var account = accountFaker.Generate();
+        account.SyncFromDate = DateTime.UtcNow.AddMonths(-6);
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.SimpleFinAccounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await simpleFinAccountService.UpdateSimpleFinAccountSyncFromDateAsync(
+            helper.demoUser.Id,
+            account.ID,
+            null
+        );
+
+        // Assert
+        var updatedAccount = helper.UserDataContext.SimpleFinAccounts.FirstOrDefault(a =>
+            a.ID == account.ID
+        );
+
+        updatedAccount.Should().NotBeNull();
+        updatedAccount!.SyncFromDate.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task UpdateSimpleFinAccountSyncFromDateAsync_WhenAccountNotFound_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await simpleFinAccountService.UpdateSimpleFinAccountSyncFromDateAsync(
+                helper.demoUser.Id,
+                Guid.NewGuid(),
+                DateTime.UtcNow
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("SimpleFinAccountUpdateNotFoundError");
+    }
 }

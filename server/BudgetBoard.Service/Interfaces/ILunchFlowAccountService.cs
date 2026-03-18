@@ -50,4 +50,17 @@ public interface ILunchFlowAccountService
         Guid lunchFlowAccountGuid,
         Guid? linkedAccountGuid
     );
+
+    /// <summary>
+    /// Updates the synchronization start date for a specific LunchFlow account, which determines from which date transactions will be synced.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="lunchFlowAccountGuid">The unique identifier of the LunchFlow account.</param>
+    /// <param name="syncFromDate">The date from which transactions will be synchronized.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task UpdateLunchFlowAccountSyncFromDateAsync(
+        Guid userGuid,
+        Guid lunchFlowAccountGuid,
+        DateTime? syncFromDate
+    );
 }

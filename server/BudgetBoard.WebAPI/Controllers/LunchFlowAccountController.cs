@@ -70,4 +70,32 @@ public class LunchFlowAccountController(
             return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
+
+    [HttpPut]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> UpdateSyncFromDate(
+        Guid lunchFlowAccountGuid,
+        DateTime? syncFromDate
+    )
+    {
+        try
+        {
+            await lunchFlowAccountService.UpdateLunchFlowAccountSyncFromDateAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                lunchFlowAccountGuid,
+                syncFromDate
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
 }
