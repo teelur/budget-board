@@ -116,7 +116,13 @@ const LunchFlowAccountCard = (
         method: "PUT",
         params: {
           lunchFlowAccountGuid: updateSyncStartDateRequest.lunchFlowAccountGuid,
-          syncStartDate: updateSyncStartDateRequest.syncStartDate,
+          syncStartDate: dayjs(
+            updateSyncStartDateRequest.syncStartDate,
+          ).isValid()
+            ? dayjs(updateSyncStartDateRequest.syncStartDate).format(
+                "YYYY-MM-DD",
+              )
+            : null,
         },
       }),
     onSuccess: () => {

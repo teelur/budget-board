@@ -76,7 +76,7 @@ public class LunchFlowAccountController(
     [Route("[action]")]
     public async Task<IActionResult> UpdateSyncStartDate(
         Guid lunchFlowAccountGuid,
-        DateOnly? syncStartDate
+        string? syncStartDate
     )
     {
         try
@@ -84,7 +84,13 @@ public class LunchFlowAccountController(
             await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
                 lunchFlowAccountGuid,
-                syncStartDate
+                syncStartDate != null
+                    ? DateOnly.ParseExact(
+                        syncStartDate,
+                        "yyyy-MM-dd",
+                        System.Globalization.CultureInfo.InvariantCulture
+                    )
+                    : null
             );
             return Ok();
         }

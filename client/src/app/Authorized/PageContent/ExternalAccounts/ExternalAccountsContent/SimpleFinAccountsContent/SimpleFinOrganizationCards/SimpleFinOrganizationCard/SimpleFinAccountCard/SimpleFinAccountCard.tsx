@@ -120,7 +120,13 @@ const SimpleFinAccountCard = (
         method: "PUT",
         params: {
           simpleFinAccountGuid: updateSyncStartDateRequest.simpleFinAccountGuid,
-          syncStartDate: updateSyncStartDateRequest.syncStartDate,
+          syncStartDate: dayjs(
+            updateSyncStartDateRequest.syncStartDate,
+          ).isValid()
+            ? dayjs(updateSyncStartDateRequest.syncStartDate).format(
+                "YYYY-MM-DD",
+              )
+            : null,
         },
       }),
     onSuccess: () => {

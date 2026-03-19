@@ -76,7 +76,7 @@ public class SimpleFinAccountController(
     [Route("[action]")]
     public async Task<IActionResult> UpdateSyncStartDate(
         Guid simpleFinAccountGuid,
-        DateOnly? syncStartDate
+        string? syncStartDate
     )
     {
         try
@@ -84,7 +84,13 @@ public class SimpleFinAccountController(
             await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
                 simpleFinAccountGuid,
-                syncStartDate
+                syncStartDate != null
+                    ? DateOnly.ParseExact(
+                        syncStartDate,
+                        "yyyy-MM-dd",
+                        System.Globalization.CultureInfo.InvariantCulture
+                    )
+                    : null
             );
             return Ok();
         }
