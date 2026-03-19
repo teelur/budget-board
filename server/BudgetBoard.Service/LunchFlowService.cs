@@ -387,7 +387,15 @@ public class LunchFlowService(
             [
                 .. userAccount.Transactions.OrderByDescending(t => t.Date),
             ];
-            foreach (var transaction in lunchFlowTransactionsData.Transactions)
+
+            // SyncStartDate allows the user to specify a date from which to start syncing transactions.
+            // If it is unset, all transactions will be synced.
+            var transactionsToSync = lunchFlowTransactionsData.Transactions.Where(t =>
+                !lunchFlowAccount.SyncStartDate.HasValue
+                || DateTime.Parse(t.Date).Date >= lunchFlowAccount.SyncStartDate.Value.Date
+            );
+
+            foreach (var transaction in transactionsToSync)
             {
                 if (userTransactions.Any(t => t.SyncID != null && t.SyncID == transaction.ID))
                 {

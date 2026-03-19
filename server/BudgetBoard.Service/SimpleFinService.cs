@@ -592,7 +592,7 @@ public class SimpleFinService(
 
             var transactionErrors = await SyncTransactionsAsync(
                 userData,
-                simpleFinAccount.ID,
+                simpleFinAccount,
                 accountData.Transactions,
                 allCategories,
                 autoCategorizer
@@ -617,7 +617,7 @@ public class SimpleFinService(
 
     private async Task<List<string>> SyncTransactionsAsync(
         ApplicationUser userData,
-        Guid simpleFinAccountId,
+        SimpleFinAccount simpleFinAccount,
         IEnumerable<ISimpleFinTransactionData> transactionsData,
         IEnumerable<ICategory> allCategories,
         AutomaticTransactionCategorizerHelper? autoCategorizer
@@ -628,16 +628,19 @@ public class SimpleFinService(
             return errors;
 
         var userAccount = userData.Accounts.FirstOrDefault(a =>
-            a.SimpleFinAccount != null && a.SimpleFinAccount.ID == simpleFinAccountId
+            a.SimpleFinAccount != null && a.SimpleFinAccount.ID == simpleFinAccount.ID
         );
         if (userAccount == null)
         {
             logger.LogError(
                 "{LogMessage}",
-                logLocalizer["SimpleFinAccountNotFoundForTransactionLog", simpleFinAccountId]
+                logLocalizer["SimpleFinAccountNotFoundForTransactionLog", simpleFinAccount.ID]
             );
             errors.Add(
-                responseLocalizer["SimpleFinAccountNotFoundForTransactionError", simpleFinAccountId]
+                responseLocalizer[
+                    "SimpleFinAccountNotFoundForTransactionError",
+                    simpleFinAccount.ID
+                ]
             );
             return errors;
         }
@@ -646,7 +649,16 @@ public class SimpleFinService(
         [
             .. userAccount.Transactions.OrderByDescending(t => t.Date),
         ];
-        foreach (var transactionData in transactionsData)
+
+        // SyncStartDate allows the user to specify a date from which to start syncing transactions.
+        // If it is unset, all transactions will be synced.
+        var transactionsToSync = transactionsData.Where(t =>
+            !simpleFinAccount.SyncStartDate.HasValue
+            || DateTime.UnixEpoch.AddSeconds(t.Posted).Date
+                >= simpleFinAccount.SyncStartDate.Value.Date
+        );
+
+        foreach (var transactionData in transactionsToSync)
         {
             if (
                 userTransactions.Any(t =>
