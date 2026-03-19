@@ -540,7 +540,7 @@ public class LunchFlowAccountServiceTests()
     }
 
     [Fact]
-    public async Task UpdateLunchFlowAccountSyncFromDateAsync_WhenValidData_ShouldUpdateSyncFromDate()
+    public async Task UpdateLunchFlowAccountSyncStartDateAsync_WhenValidData_ShouldUpdateSyncStartDate()
     {
         // Arrange
         var helper = new TestHelper();
@@ -557,13 +557,13 @@ public class LunchFlowAccountServiceTests()
         helper.UserDataContext.LunchFlowAccounts.Add(account);
         await helper.UserDataContext.SaveChangesAsync();
 
-        var newSyncFromDate = DateTime.UtcNow.AddMonths(-3);
+        var newSyncStartDate = DateTime.UtcNow.AddMonths(-3);
 
         // Act
-        await lunchFlowAccountService.UpdateLunchFlowAccountSyncFromDateAsync(
+        await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
             helper.demoUser.Id,
             account.ID,
-            newSyncFromDate
+            newSyncStartDate
         );
 
         // Assert
@@ -572,11 +572,11 @@ public class LunchFlowAccountServiceTests()
         );
 
         updatedAccount.Should().NotBeNull();
-        updatedAccount!.SyncFromDate.Should().Be(newSyncFromDate);
+        updatedAccount!.SyncStartDate.Should().Be(newSyncStartDate);
     }
 
     [Fact]
-    public async Task UpdateLunchFlowAccountSyncFromDateAsync_WhenClearingSyncFromDate_ShouldSetToNull()
+    public async Task UpdateLunchFlowAccountSyncStartDateAsync_WhenClearingSyncStartDate_ShouldSetToNull()
     {
         // Arrange
         var helper = new TestHelper();
@@ -589,13 +589,13 @@ public class LunchFlowAccountServiceTests()
 
         var accountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.SyncFromDate = DateTime.UtcNow.AddMonths(-6);
+        account.SyncStartDate = DateTime.UtcNow.AddMonths(-6);
 
         helper.UserDataContext.LunchFlowAccounts.Add(account);
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await lunchFlowAccountService.UpdateLunchFlowAccountSyncFromDateAsync(
+        await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
             helper.demoUser.Id,
             account.ID,
             null
@@ -607,11 +607,11 @@ public class LunchFlowAccountServiceTests()
         );
 
         updatedAccount.Should().NotBeNull();
-        updatedAccount!.SyncFromDate.Should().BeNull();
+        updatedAccount!.SyncStartDate.Should().BeNull();
     }
 
     [Fact]
-    public async Task UpdateLunchFlowAccountSyncFromDateAsync_WhenAccountNotFound_ShouldThrowException()
+    public async Task UpdateLunchFlowAccountSyncStartDateAsync_WhenAccountNotFound_ShouldThrowException()
     {
         // Arrange
         var helper = new TestHelper();
@@ -624,7 +624,7 @@ public class LunchFlowAccountServiceTests()
 
         // Act
         Func<Task> act = async () =>
-            await lunchFlowAccountService.UpdateLunchFlowAccountSyncFromDateAsync(
+            await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
                 helper.demoUser.Id,
                 Guid.NewGuid(),
                 DateTime.UtcNow

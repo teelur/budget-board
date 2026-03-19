@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    [Migration("20260317234845_AddSyncFromDate")]
-    partial class AddSyncFromDate
+    [Migration("20260317234845_AddSyncStartDate")]
+    partial class AddSyncStartDate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -403,7 +403,7 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("SyncFromDate")
+                    b.Property<DateTime?>("SyncStartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SyncID")
@@ -487,7 +487,7 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<Guid?>("OrganizationId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("SyncFromDate")
+                    b.Property<DateTime?>("SyncStartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SyncID")

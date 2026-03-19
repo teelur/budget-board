@@ -6,34 +6,32 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BudgetBoard.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class AddSyncFromDate : Migration
+    public partial class AddSyncStartDate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
-                name: "SyncFromDate",
+                name: "SyncStartDate",
                 table: "SimpleFinAccount",
                 type: "timestamp with time zone",
-                nullable: true);
+                nullable: true
+            );
 
             migrationBuilder.AddColumn<DateTime>(
-                name: "SyncFromDate",
+                name: "SyncStartDate",
                 table: "LunchFlowAccount",
                 type: "timestamp with time zone",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "SyncFromDate",
-                table: "SimpleFinAccount");
+            migrationBuilder.DropColumn(name: "SyncStartDate", table: "SimpleFinAccount");
 
-            migrationBuilder.DropColumn(
-                name: "SyncFromDate",
-                table: "LunchFlowAccount");
+            migrationBuilder.DropColumn(name: "SyncStartDate", table: "LunchFlowAccount");
         }
     }
 }

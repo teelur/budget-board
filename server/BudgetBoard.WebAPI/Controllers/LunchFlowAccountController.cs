@@ -74,17 +74,17 @@ public class LunchFlowAccountController(
     [HttpPut]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> UpdateSyncFromDate(
+    public async Task<IActionResult> UpdateSyncStartDate(
         Guid lunchFlowAccountGuid,
-        DateTime? syncFromDate
+        DateTime? syncStartDate
     )
     {
         try
         {
-            await lunchFlowAccountService.UpdateLunchFlowAccountSyncFromDateAsync(
+            await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
                 lunchFlowAccountGuid,
-                syncFromDate
+                syncStartDate
             );
             return Ok();
         }

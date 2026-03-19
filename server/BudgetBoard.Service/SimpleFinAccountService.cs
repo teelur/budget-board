@@ -155,10 +155,10 @@ public class SimpleFinAccountService(
         await userDataContext.SaveChangesAsync();
     }
 
-    public async Task UpdateSimpleFinAccountSyncFromDateAsync(
+    public async Task UpdateSimpleFinAccountSyncStartDateAsync(
         Guid userGuid,
         Guid simpleFinAccountGuid,
-        DateTime? syncFromDate
+        DateTime? syncStartDate
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -174,7 +174,7 @@ public class SimpleFinAccountService(
             );
         }
 
-        accountToUpdate.SyncFromDate = syncFromDate;
+        accountToUpdate.SyncStartDate = syncStartDate;
 
         await userDataContext.SaveChangesAsync();
     }

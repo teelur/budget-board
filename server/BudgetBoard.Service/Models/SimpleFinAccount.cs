@@ -31,7 +31,7 @@ public interface ISimpleFinAccountResponse
     public decimal Balance { get; }
     public DateTime BalanceDate { get; }
     public DateTime? LastSync { get; }
-    public DateTime? SyncFromDate { get; }
+    public DateTime? SyncStartDate { get; }
     public Guid? OrganizationId { get; }
     public Guid? LinkedAccountId { get; }
 }
@@ -46,7 +46,7 @@ public class SimpleFinAccountResponse(SimpleFinAccount simpleFinAccount) : ISimp
     public DateTime BalanceDate { get; init; } =
         DateTimeOffset.FromUnixTimeSeconds(simpleFinAccount.BalanceDate).UtcDateTime;
     public DateTime? LastSync { get; init; } = simpleFinAccount.LastSync;
-    public DateTime? SyncFromDate { get; init; } = simpleFinAccount.SyncFromDate;
+    public DateTime? SyncStartDate { get; init; } = simpleFinAccount.SyncStartDate;
     public Guid? OrganizationId { get; init; } = simpleFinAccount.OrganizationId;
     public Guid? LinkedAccountId { get; init; } = simpleFinAccount.LinkedAccountId;
 }

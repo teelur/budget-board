@@ -56,11 +56,11 @@ public interface ILunchFlowAccountService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="lunchFlowAccountGuid">The unique identifier of the LunchFlow account.</param>
-    /// <param name="syncFromDate">The date from which transactions will be synchronized.</param>
+    /// <param name="syncStartDate">The date from which transactions will be synchronized.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task UpdateLunchFlowAccountSyncFromDateAsync(
+    Task UpdateLunchFlowAccountSyncStartDateAsync(
         Guid userGuid,
         Guid lunchFlowAccountGuid,
-        DateTime? syncFromDate
+        DateTime? syncStartDate
     );
 }

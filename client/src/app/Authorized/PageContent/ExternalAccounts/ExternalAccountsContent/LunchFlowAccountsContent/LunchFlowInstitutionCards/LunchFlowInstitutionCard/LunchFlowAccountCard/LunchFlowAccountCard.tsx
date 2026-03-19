@@ -38,9 +38,9 @@ const LunchFlowAccountCard = (
       ? [props.lunchFlowAccount.linkedAccountId]
       : [],
   });
-  const syncFromDateField = useField<DateValue>({
-    initialValue: props.lunchFlowAccount.syncFromDate
-      ? new Date(props.lunchFlowAccount.syncFromDate)
+  const syncStartDateField = useField<DateValue>({
+    initialValue: props.lunchFlowAccount.syncStartDate
+      ? new Date(props.lunchFlowAccount.syncStartDate)
       : null,
   });
 
@@ -106,17 +106,17 @@ const LunchFlowAccountCard = (
       });
     },
   });
-  const doUpdateSyncFromDate = useMutation({
-    mutationFn: async (updateSyncFromDateRequest: {
+  const doUpdateSyncStartDate = useMutation({
+    mutationFn: async (updateSyncStartDateRequest: {
       lunchFlowAccountGuid: string;
-      syncFromDate: Date | null;
+      syncStartDate: Date | null;
     }) =>
       await request({
-        url: "/api/lunchFlowAccount/updateSyncFromDate",
+        url: "/api/lunchFlowAccount/updateSyncStartDate",
         method: "PUT",
         params: {
-          lunchFlowAccountGuid: updateSyncFromDateRequest.lunchFlowAccountGuid,
-          syncFromDate: updateSyncFromDateRequest.syncFromDate,
+          lunchFlowAccountGuid: updateSyncStartDateRequest.lunchFlowAccountGuid,
+          syncStartDate: updateSyncStartDateRequest.syncStartDate,
         },
       }),
     onSuccess: () => {
@@ -157,12 +157,12 @@ const LunchFlowAccountCard = (
   }, [props.lunchFlowAccount.linkedAccountId]);
 
   React.useEffect(() => {
-    syncFromDateField.setValue(
-      dayjs(props.lunchFlowAccount.syncFromDate).isValid()
-        ? dayjs(props.lunchFlowAccount.syncFromDate).toDate()
+    syncStartDateField.setValue(
+      dayjs(props.lunchFlowAccount.syncStartDate).isValid()
+        ? dayjs(props.lunchFlowAccount.syncStartDate).toDate()
         : null,
     );
-  }, [props.lunchFlowAccount.syncFromDate]);
+  }, [props.lunchFlowAccount.syncStartDate]);
 
   const getBadgeForAccountName = (): React.ReactElement => {
     return props.lunchFlowAccount.linkedAccountId ? (
@@ -173,7 +173,7 @@ const LunchFlowAccountCard = (
   };
 
   const getBadgeForSyncStartDate = (): React.ReactElement => {
-    return props.lunchFlowAccount.syncFromDate ? (
+    return props.lunchFlowAccount.syncStartDate ? (
       <Badge key="value" size="sm" color="var(--accent-color-purple)" />
     ) : (
       <Badge key="value" size="sm" color="gray" />
@@ -230,7 +230,7 @@ const LunchFlowAccountCard = (
     <Card elevation={2}>
       <LoadingOverlay
         visible={
-          doUpdateLinkedAccount.isPending || doUpdateSyncFromDate.isPending
+          doUpdateLinkedAccount.isPending || doUpdateSyncStartDate.isPending
         }
       />
       <Stack gap={0}>
@@ -309,12 +309,12 @@ const LunchFlowAccountCard = (
                 <DateInput
                   size="xs"
                   w="8rem"
-                  {...syncFromDateField.getInputProps()}
+                  {...syncStartDateField.getInputProps()}
                   onChange={(value) => {
-                    syncFromDateField.setValue(value);
-                    doUpdateSyncFromDate.mutate({
+                    syncStartDateField.setValue(value);
+                    doUpdateSyncStartDate.mutate({
                       lunchFlowAccountGuid: props.lunchFlowAccount.id,
-                      syncFromDate: dayjs(value).isValid()
+                      syncStartDate: dayjs(value).isValid()
                         ? dayjs(value).toDate()
                         : null,
                     });
@@ -332,9 +332,9 @@ const LunchFlowAccountCard = (
                   i18nKey="sync_start_date_styled"
                   values={{
                     startDate: dayjs(
-                      props.lunchFlowAccount.syncFromDate,
+                      props.lunchFlowAccount.syncStartDate,
                     ).isValid()
-                      ? dayjs(props.lunchFlowAccount.syncFromDate).format(
+                      ? dayjs(props.lunchFlowAccount.syncStartDate).format(
                           `${dateFormat}`,
                         )
                       : t("auto"),

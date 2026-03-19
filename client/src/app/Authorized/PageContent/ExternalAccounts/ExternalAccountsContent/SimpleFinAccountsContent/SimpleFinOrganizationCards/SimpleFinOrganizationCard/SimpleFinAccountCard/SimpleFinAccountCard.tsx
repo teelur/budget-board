@@ -39,9 +39,9 @@ const SimpleFinAccountCard = (
       ? [props.simpleFinAccount.linkedAccountId]
       : [],
   });
-  const syncFromDateField = useField<DateValue>({
-    initialValue: props.simpleFinAccount.syncFromDate
-      ? new Date(props.simpleFinAccount.syncFromDate)
+  const syncStartDateField = useField<DateValue>({
+    initialValue: props.simpleFinAccount.syncStartDate
+      ? new Date(props.simpleFinAccount.syncStartDate)
       : null,
   });
 
@@ -110,21 +110,24 @@ const SimpleFinAccountCard = (
       });
     },
   });
-  const doUpdateSyncFromDate = useMutation({
-    mutationFn: async (updateSyncFromDateRequest: {
+  const doUpdateSyncStartDate = useMutation({
+    mutationFn: async (updateSyncStartDateRequest: {
       simpleFinAccountGuid: string;
-      syncFromDate: Date | null;
+      syncStartDate: Date | null;
     }) =>
       await request({
-        url: "/api/simpleFinAccount/updateSyncFromDate",
+        url: "/api/simpleFinAccount/updateSyncStartDate",
         method: "PUT",
         params: {
-          simpleFinAccountGuid: updateSyncFromDateRequest.simpleFinAccountGuid,
-          syncFromDate: updateSyncFromDateRequest.syncFromDate,
+          simpleFinAccountGuid: updateSyncStartDateRequest.simpleFinAccountGuid,
+          syncStartDate: updateSyncStartDateRequest.syncStartDate,
         },
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
+      queryClient.invalidateQueries({
+        queryKey: [simpleFinOrganizationQueryKey],
+      });
     },
     onError: (error: any) => {
       notifications.show({
@@ -161,12 +164,12 @@ const SimpleFinAccountCard = (
   }, [props.simpleFinAccount.linkedAccountId]);
 
   React.useEffect(() => {
-    syncFromDateField.setValue(
-      dayjs(props.simpleFinAccount.syncFromDate).isValid()
-        ? dayjs(props.simpleFinAccount.syncFromDate).toDate()
+    syncStartDateField.setValue(
+      dayjs(props.simpleFinAccount.syncStartDate).isValid()
+        ? dayjs(props.simpleFinAccount.syncStartDate).toDate()
         : null,
     );
-  }, [props.simpleFinAccount.syncFromDate]);
+  }, [props.simpleFinAccount.syncStartDate]);
 
   const getBadgeForAccountName = (): React.ReactElement => {
     return props.simpleFinAccount.linkedAccountId ? (
@@ -177,7 +180,7 @@ const SimpleFinAccountCard = (
   };
 
   const getBadgeForSyncStartDate = (): React.ReactElement => {
-    return props.simpleFinAccount.syncFromDate ? (
+    return props.simpleFinAccount.syncStartDate ? (
       <Badge key="value" size="sm" color="var(--accent-color-purple)" />
     ) : (
       <Badge key="value" size="sm" color="gray" />
@@ -234,7 +237,7 @@ const SimpleFinAccountCard = (
     <Card elevation={2}>
       <LoadingOverlay
         visible={
-          doUpdateLinkedAccount.isPending || doUpdateSyncFromDate.isPending
+          doUpdateLinkedAccount.isPending || doUpdateSyncStartDate.isPending
         }
       />
       <Stack gap={0}>
@@ -313,12 +316,14 @@ const SimpleFinAccountCard = (
                 <DateInput
                   size="xs"
                   w="8rem"
-                  {...syncFromDateField.getInputProps()}
+                  {...syncStartDateField.getInputProps()}
                   onChange={(value) => {
-                    syncFromDateField.setValue(value);
-                    doUpdateSyncFromDate.mutate({
+                    syncStartDateField.setValue(value);
+                    doUpdateSyncStartDate.mutate({
                       simpleFinAccountGuid: props.simpleFinAccount.id,
-                      syncFromDate: value ? dayjs(value).toDate() : null,
+                      syncStartDate: dayjs(value).isValid()
+                        ? dayjs(value).toDate()
+                        : null,
                     });
                   }}
                   clearable
@@ -334,9 +339,9 @@ const SimpleFinAccountCard = (
                   i18nKey="sync_start_date_styled"
                   values={{
                     startDate: dayjs(
-                      props.simpleFinAccount.syncFromDate,
+                      props.simpleFinAccount.syncStartDate,
                     ).isValid()
-                      ? dayjs(props.simpleFinAccount.syncFromDate).format(
+                      ? dayjs(props.simpleFinAccount.syncStartDate).format(
                           `${dateFormat}`,
                         )
                       : t("auto"),

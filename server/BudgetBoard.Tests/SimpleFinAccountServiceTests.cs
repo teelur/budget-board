@@ -383,7 +383,7 @@ public class SimpleFinAccountServiceTests()
     }
 
     [Fact]
-    public async Task UpdateSimpleFinAccountSyncFromDateAsync_WhenValidData_ShouldUpdateSyncFromDate()
+    public async Task UpdateSimpleFinAccountSyncStartDateAsync_WhenValidData_ShouldUpdateSyncStartDate()
     {
         // Arrange
         var helper = new TestHelper();
@@ -404,13 +404,13 @@ public class SimpleFinAccountServiceTests()
         helper.UserDataContext.SimpleFinAccounts.Add(account);
         await helper.UserDataContext.SaveChangesAsync();
 
-        var newSyncFromDate = DateTime.UtcNow.AddMonths(-3);
+        var newSyncStartDate = DateTime.UtcNow.AddMonths(-3);
 
         // Act
-        await simpleFinAccountService.UpdateSimpleFinAccountSyncFromDateAsync(
+        await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
             helper.demoUser.Id,
             account.ID,
-            newSyncFromDate
+            newSyncStartDate
         );
 
         // Assert
@@ -419,11 +419,11 @@ public class SimpleFinAccountServiceTests()
         );
 
         updatedAccount.Should().NotBeNull();
-        updatedAccount!.SyncFromDate.Should().Be(newSyncFromDate);
+        updatedAccount!.SyncStartDate.Should().Be(newSyncStartDate);
     }
 
     [Fact]
-    public async Task UpdateSimpleFinAccountSyncFromDateAsync_WhenClearingSyncFromDate_ShouldSetToNull()
+    public async Task UpdateSimpleFinAccountSyncStartDateAsync_WhenClearingSyncStartDate_ShouldSetToNull()
     {
         // Arrange
         var helper = new TestHelper();
@@ -439,14 +439,14 @@ public class SimpleFinAccountServiceTests()
 
         var accountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
         var account = accountFaker.Generate();
-        account.SyncFromDate = DateTime.UtcNow.AddMonths(-6);
+        account.SyncStartDate = DateTime.UtcNow.AddMonths(-6);
 
         helper.UserDataContext.SimpleFinOrganizations.Add(organization);
         helper.UserDataContext.SimpleFinAccounts.Add(account);
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await simpleFinAccountService.UpdateSimpleFinAccountSyncFromDateAsync(
+        await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
             helper.demoUser.Id,
             account.ID,
             null
@@ -458,11 +458,11 @@ public class SimpleFinAccountServiceTests()
         );
 
         updatedAccount.Should().NotBeNull();
-        updatedAccount!.SyncFromDate.Should().BeNull();
+        updatedAccount!.SyncStartDate.Should().BeNull();
     }
 
     [Fact]
-    public async Task UpdateSimpleFinAccountSyncFromDateAsync_WhenAccountNotFound_ShouldThrowException()
+    public async Task UpdateSimpleFinAccountSyncStartDateAsync_WhenAccountNotFound_ShouldThrowException()
     {
         // Arrange
         var helper = new TestHelper();
@@ -475,7 +475,7 @@ public class SimpleFinAccountServiceTests()
 
         // Act
         Func<Task> act = async () =>
-            await simpleFinAccountService.UpdateSimpleFinAccountSyncFromDateAsync(
+            await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
                 helper.demoUser.Id,
                 Guid.NewGuid(),
                 DateTime.UtcNow

@@ -56,11 +56,11 @@ public interface ISimpleFinAccountService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="simpleFinAccountGuid">The unique identifier of the SimpleFIN account.</param>
-    /// <param name="syncFromDate">The date from which transactions will be synchronized.</param>
+    /// <param name="syncStartDate">The date from which transactions will be synchronized.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task UpdateSimpleFinAccountSyncFromDateAsync(
+    Task UpdateSimpleFinAccountSyncStartDateAsync(
         Guid userGuid,
         Guid simpleFinAccountGuid,
-        DateTime? syncFromDate
+        DateTime? syncStartDate
     );
 }

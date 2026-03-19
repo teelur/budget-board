@@ -400,7 +400,7 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("SyncFromDate")
+                    b.Property<DateTime?>("SyncStartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SyncID")
@@ -484,7 +484,7 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<Guid?>("OrganizationId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("SyncFromDate")
+                    b.Property<DateTime?>("SyncStartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SyncID")

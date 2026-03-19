@@ -6,7 +6,7 @@ export interface ISimpleFinAccountResponse {
   balance: number;
   balanceDate: Date;
   lastSync?: Date;
-  syncFromDate?: Date;
+  syncStartDate?: Date;
   organizationId?: string;
   linkedAccountId?: string;
 }

@@ -157,10 +157,10 @@ public class LunchFlowAccountService(
         await userDataContext.SaveChangesAsync();
     }
 
-    public async Task UpdateLunchFlowAccountSyncFromDateAsync(
+    public async Task UpdateLunchFlowAccountSyncStartDateAsync(
         Guid userGuid,
         Guid lunchFlowAccountGuid,
-        DateTime? syncFromDate
+        DateTime? syncStartDate
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -176,7 +176,7 @@ public class LunchFlowAccountService(
             );
         }
 
-        lunchFlowAccount.SyncFromDate = syncFromDate;
+        lunchFlowAccount.SyncStartDate = syncStartDate;
 
         await userDataContext.SaveChangesAsync();
     }

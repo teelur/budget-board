@@ -74,17 +74,17 @@ public class SimpleFinAccountController(
     [HttpPut]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> UpdateSyncFromDate(
+    public async Task<IActionResult> UpdateSyncStartDate(
         Guid simpleFinAccountGuid,
-        DateTime? syncFromDate
+        DateTime? syncStartDate
     )
     {
         try
         {
-            await simpleFinAccountService.UpdateSimpleFinAccountSyncFromDateAsync(
+            await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
                 simpleFinAccountGuid,
-                syncFromDate
+                syncStartDate
             );
             return Ok();
         }
