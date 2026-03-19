@@ -28,7 +28,7 @@ const ActionItem = (props: ActionItemProps) => {
     if (props.action.operator === "set") {
       return (
         <>
-          <Badge bg="purple" size="sm">
+          <Badge bg="var(--accent-color-purple)" size="sm">
             {TransactionFields.find(
               (field) => field.value === props.action.field,
             )?.label ?? props.action.field}

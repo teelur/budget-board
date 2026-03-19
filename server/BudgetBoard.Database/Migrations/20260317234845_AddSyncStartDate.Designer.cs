@@ -3,6 +3,7 @@ using System;
 using BudgetBoard.Database.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    partial class UserDataContextModelSnapshot : ModelSnapshot
+    [Migration("20260317234845_AddSyncStartDate")]
+    partial class AddSyncStartDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -400,12 +403,12 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("SyncStartDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("SyncID")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateOnly?>("SyncStartDate")
-                        .HasColumnType("date");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uuid");
@@ -484,12 +487,12 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<Guid?>("OrganizationId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime?>("SyncStartDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("SyncID")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateOnly?>("SyncStartDate")
-                        .HasColumnType("date");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uuid");

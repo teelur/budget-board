@@ -10,5 +10,6 @@ export interface ILunchFlowAccountResponse {
   balance: number;
   balanceDate: Date;
   lastSync?: Date;
+  syncStartDate?: Date;
   linkedAccountId?: string;
 }

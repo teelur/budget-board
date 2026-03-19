@@ -188,7 +188,11 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 {t("hide_account")}
               </Button>
               <Button
-                bg={hideTransactionsField.getValue() ? "purple" : undefined}
+                bg={
+                  hideTransactionsField.getValue()
+                    ? "var(--accent-color-purple)"
+                    : undefined
+                }
                 variant={
                   hideTransactionsField.getValue() ? "filled" : "outline"
                 }

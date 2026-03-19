@@ -155,6 +155,30 @@ public class SimpleFinAccountService(
         await userDataContext.SaveChangesAsync();
     }
 
+    public async Task UpdateSimpleFinAccountSyncStartDateAsync(
+        Guid userGuid,
+        Guid simpleFinAccountGuid,
+        DateOnly? syncStartDate
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var accountToUpdate = userData.SimpleFinAccounts.SingleOrDefault(o =>
+            o.ID == simpleFinAccountGuid
+        );
+        if (accountToUpdate == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinAccountUpdateNotFoundError"]
+            );
+        }
+
+        accountToUpdate.SyncStartDate = syncStartDate;
+
+        await userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         ApplicationUser? foundUser;

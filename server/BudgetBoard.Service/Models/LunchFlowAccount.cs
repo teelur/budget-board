@@ -45,6 +45,7 @@ public interface ILunchFlowAccountResponse
     decimal Balance { get; }
     DateTime BalanceDate { get; }
     DateTime? LastSync { get; }
+    DateOnly? SyncStartDate { get; }
     Guid? LinkedAccountId { get; }
 }
 
@@ -62,6 +63,7 @@ public class LunchFlowAccountResponse(LunchFlowAccount lunchFlowAccount) : ILunc
     public DateTime BalanceDate { get; init; } =
         DateTimeOffset.FromUnixTimeSeconds(lunchFlowAccount.BalanceDate).UtcDateTime;
     public DateTime? LastSync { get; init; } = lunchFlowAccount.LastSync;
+    public DateOnly? SyncStartDate { get; init; } = lunchFlowAccount.SyncStartDate;
     public Guid? LinkedAccountId { get; init; } = lunchFlowAccount.LinkedAccountId;
 }
 

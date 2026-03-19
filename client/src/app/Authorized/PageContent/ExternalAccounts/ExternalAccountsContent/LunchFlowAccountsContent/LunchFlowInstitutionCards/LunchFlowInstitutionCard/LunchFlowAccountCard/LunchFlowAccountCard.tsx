@@ -1,4 +1,5 @@
 import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -8,6 +9,7 @@ import { PencilIcon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -36,9 +38,14 @@ const LunchFlowAccountCard = (
       ? [props.lunchFlowAccount.linkedAccountId]
       : [],
   });
+  const syncStartDateField = useField<DateValue>({
+    initialValue: props.lunchFlowAccount.syncStartDate
+      ? new Date(props.lunchFlowAccount.syncStartDate)
+      : null,
+  });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { dayjs, dateFormat, intlLocale, dayjsLocale } = useLocale();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -99,6 +106,35 @@ const LunchFlowAccountCard = (
       });
     },
   });
+  const doUpdateSyncStartDate = useMutation({
+    mutationFn: async (updateSyncStartDateRequest: {
+      lunchFlowAccountGuid: string;
+      syncStartDate: Date | null;
+    }) =>
+      await request({
+        url: "/api/lunchFlowAccount/updateSyncStartDate",
+        method: "PUT",
+        params: {
+          lunchFlowAccountGuid: updateSyncStartDateRequest.lunchFlowAccountGuid,
+          syncStartDate: dayjs(
+            updateSyncStartDateRequest.syncStartDate,
+          ).isValid()
+            ? dayjs(updateSyncStartDateRequest.syncStartDate).format(
+                "YYYY-MM-DD",
+              )
+            : null,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
 
   const getAccountNameForId = (accountId: string): string => {
     const account = accountsQuery.data?.find(
@@ -126,9 +162,25 @@ const LunchFlowAccountCard = (
     );
   }, [props.lunchFlowAccount.linkedAccountId]);
 
+  React.useEffect(() => {
+    syncStartDateField.setValue(
+      dayjs(props.lunchFlowAccount.syncStartDate).isValid()
+        ? dayjs(props.lunchFlowAccount.syncStartDate).toDate()
+        : null,
+    );
+  }, [props.lunchFlowAccount.syncStartDate]);
+
   const getBadgeForAccountName = (): React.ReactElement => {
     return props.lunchFlowAccount.linkedAccountId ? (
       <Badge key="value" size="sm" />
+    ) : (
+      <Badge key="value" size="sm" color="gray" />
+    );
+  };
+
+  const getBadgeForSyncStartDate = (): React.ReactElement => {
+    return props.lunchFlowAccount.syncStartDate ? (
+      <Badge key="value" size="sm" color="var(--accent-color-purple)" />
     ) : (
       <Badge key="value" size="sm" color="gray" />
     );
@@ -182,7 +234,11 @@ const LunchFlowAccountCard = (
 
   return (
     <Card elevation={2}>
-      <LoadingOverlay visible={doUpdateLinkedAccount.isPending} />
+      <LoadingOverlay
+        visible={
+          doUpdateLinkedAccount.isPending || doUpdateSyncStartDate.isPending
+        }
+      />
       <Stack gap={0}>
         <Group justify="space-between" align="center">
           <Group gap="0.5rem">
@@ -249,6 +305,51 @@ const LunchFlowAccountCard = (
                     {t("deleted")}
                   </Badge>
                 )}
+              </Group>
+            )}
+            {isEditable ? (
+              <Group gap="0.5rem">
+                <PrimaryText size="xs">
+                  {t("sync_start_date_input")}
+                </PrimaryText>
+                <DateInput
+                  size="xs"
+                  w="8rem"
+                  {...syncStartDateField.getInputProps()}
+                  onChange={(value) => {
+                    syncStartDateField.setValue(value);
+                    doUpdateSyncStartDate.mutate({
+                      lunchFlowAccountGuid: props.lunchFlowAccount.id,
+                      syncStartDate: dayjs(value).isValid()
+                        ? dayjs(value).toDate()
+                        : null,
+                    });
+                  }}
+                  clearable
+                  placeholder={t("auto")}
+                  valueFormat={dateFormat}
+                  locale={dayjsLocale}
+                  elevation={2}
+                />
+              </Group>
+            ) : (
+              <Group gap="0.25rem">
+                <Trans
+                  i18nKey="sync_start_date_styled"
+                  values={{
+                    startDate: dayjs(
+                      props.lunchFlowAccount.syncStartDate,
+                    ).isValid()
+                      ? dayjs(props.lunchFlowAccount.syncStartDate).format(
+                          `${dateFormat}`,
+                        )
+                      : t("auto"),
+                  }}
+                  components={[
+                    <DimmedText size="xs" key="label" />,
+                    getBadgeForSyncStartDate(),
+                  ]}
+                />
               </Group>
             )}
             <DimmedText size="xs">

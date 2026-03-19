@@ -412,6 +412,8 @@
   "step_3": "Step 3",
   "submit": "Submit",
   "sync": "Sync",
+  "sync_start_date_input": "Sync Start Date:",
+  "sync_start_date_styled": "<0>Sync Start Date:</0><1>{{startDate}}</1>",
   "system_default": "System Default",
   "target_amount": "Target Amount",
   "then": "Then",

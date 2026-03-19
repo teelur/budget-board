@@ -157,6 +157,30 @@ public class LunchFlowAccountService(
         await userDataContext.SaveChangesAsync();
     }
 
+    public async Task UpdateLunchFlowAccountSyncStartDateAsync(
+        Guid userGuid,
+        Guid lunchFlowAccountGuid,
+        DateOnly? syncStartDate
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a =>
+            a.ID == lunchFlowAccountGuid
+        );
+        if (lunchFlowAccount == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["LunchFlowAccountNotFoundError"]
+            );
+        }
+
+        lunchFlowAccount.SyncStartDate = syncStartDate;
+
+        await userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         ApplicationUser? foundUser;

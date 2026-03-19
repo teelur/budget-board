@@ -127,3 +127,29 @@ export const red: MantineColorsTuple = [
   "#b90610",
   "#a2000a",
 ];
+
+export const purple: MantineColorsTuple = [
+  "#f3e9ff",
+  "#e0c2ff",
+  "#c48cff",
+  "#a655ff",
+  "#8b2fff",
+  "#7719fe",
+  "#5f00e4",
+  "#4d00b6",
+  "#3c0088",
+  "#2a0059",
+];
+
+export const yellow: MantineColorsTuple = [
+  "#fff9e5",
+  "#fff2cc",
+  "#ffe699",
+  "#ffda66",
+  "#ffce33",
+  "#ffc500",
+  "#e6a500",
+  "#b37a00",
+  "#805000",
+  "#4d2700",
+];

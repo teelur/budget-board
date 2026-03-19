@@ -538,4 +538,101 @@ public class LunchFlowAccountServiceTests()
         updatedNewAccount.Should().NotBeNull();
         updatedNewAccount!.Source.Should().Be(AccountSource.LunchFlow);
     }
+
+    [Fact]
+    public async Task UpdateLunchFlowAccountSyncStartDateAsync_WhenValidData_ShouldUpdateSyncStartDate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var lunchFlowAccountService = new LunchFlowAccountService(
+            Mock.Of<ILogger<ILunchFlowAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.LunchFlowAccounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var newSyncStartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-3));
+
+        // Act
+        await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
+            helper.demoUser.Id,
+            account.ID,
+            newSyncStartDate
+        );
+
+        // Assert
+        var updatedAccount = helper.UserDataContext.LunchFlowAccounts.FirstOrDefault(a =>
+            a.ID == account.ID
+        );
+
+        updatedAccount.Should().NotBeNull();
+        updatedAccount!.SyncStartDate.Should().Be(newSyncStartDate);
+    }
+
+    [Fact]
+    public async Task UpdateLunchFlowAccountSyncStartDateAsync_WhenClearingSyncStartDate_ShouldSetToNull()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var lunchFlowAccountService = new LunchFlowAccountService(
+            Mock.Of<ILogger<ILunchFlowAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.SyncStartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-6));
+
+        helper.UserDataContext.LunchFlowAccounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
+            helper.demoUser.Id,
+            account.ID,
+            null
+        );
+
+        // Assert
+        var updatedAccount = helper.UserDataContext.LunchFlowAccounts.FirstOrDefault(a =>
+            a.ID == account.ID
+        );
+
+        updatedAccount.Should().NotBeNull();
+        updatedAccount!.SyncStartDate.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task UpdateLunchFlowAccountSyncStartDateAsync_WhenAccountNotFound_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var lunchFlowAccountService = new LunchFlowAccountService(
+            Mock.Of<ILogger<ILunchFlowAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
+                helper.demoUser.Id,
+                Guid.NewGuid(),
+                DateOnly.FromDateTime(DateTime.UtcNow)
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("LunchFlowAccountNotFoundError");
+    }
 }

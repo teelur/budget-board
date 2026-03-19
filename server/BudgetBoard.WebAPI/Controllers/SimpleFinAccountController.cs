@@ -70,4 +70,38 @@ public class SimpleFinAccountController(
             return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
+
+    [HttpPut]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> UpdateSyncStartDate(
+        Guid simpleFinAccountGuid,
+        string? syncStartDate
+    )
+    {
+        try
+        {
+            await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                simpleFinAccountGuid,
+                syncStartDate != null
+                    ? DateOnly.ParseExact(
+                        syncStartDate,
+                        "yyyy-MM-dd",
+                        System.Globalization.CultureInfo.InvariantCulture
+                    )
+                    : null
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
 }
