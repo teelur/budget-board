@@ -76,7 +76,7 @@ public class LunchFlowAccountController(
     [Route("[action]")]
     public async Task<IActionResult> UpdateSyncStartDate(
         Guid lunchFlowAccountGuid,
-        DateTime? syncStartDate
+        DateOnly? syncStartDate
     )
     {
         try

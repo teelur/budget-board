@@ -404,7 +404,7 @@ public class SimpleFinAccountServiceTests()
         helper.UserDataContext.SimpleFinAccounts.Add(account);
         await helper.UserDataContext.SaveChangesAsync();
 
-        var newSyncStartDate = DateTime.UtcNow.AddMonths(-3);
+        var newSyncStartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-3));
 
         // Act
         await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
@@ -439,7 +439,7 @@ public class SimpleFinAccountServiceTests()
 
         var accountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
         var account = accountFaker.Generate();
-        account.SyncStartDate = DateTime.UtcNow.AddMonths(-6);
+        account.SyncStartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-6));
 
         helper.UserDataContext.SimpleFinOrganizations.Add(organization);
         helper.UserDataContext.SimpleFinAccounts.Add(account);
@@ -478,7 +478,7 @@ public class SimpleFinAccountServiceTests()
             await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
                 helper.demoUser.Id,
                 Guid.NewGuid(),
-                DateTime.UtcNow
+                DateOnly.FromDateTime(DateTime.UtcNow)
             );
 
         // Assert

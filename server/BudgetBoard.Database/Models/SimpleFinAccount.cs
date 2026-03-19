@@ -47,7 +47,7 @@ public class SimpleFinAccount
     /// <summary>
     /// The first date from which transactions will be synchronized; null to sync all.
     /// </summary>
-    public DateTime? SyncStartDate { get; set; } = null;
+    public DateOnly? SyncStartDate { get; set; } = null;
 
     /// <summary>
     /// Identifier for the associated SimpleFIN Organization, if any.

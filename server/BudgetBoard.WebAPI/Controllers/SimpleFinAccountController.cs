@@ -76,7 +76,7 @@ public class SimpleFinAccountController(
     [Route("[action]")]
     public async Task<IActionResult> UpdateSyncStartDate(
         Guid simpleFinAccountGuid,
-        DateTime? syncStartDate
+        DateOnly? syncStartDate
     )
     {
         try

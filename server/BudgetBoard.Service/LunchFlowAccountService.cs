@@ -160,7 +160,7 @@ public class LunchFlowAccountService(
     public async Task UpdateLunchFlowAccountSyncStartDateAsync(
         Guid userGuid,
         Guid lunchFlowAccountGuid,
-        DateTime? syncStartDate
+        DateOnly? syncStartDate
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

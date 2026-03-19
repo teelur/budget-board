@@ -61,6 +61,6 @@ public interface ILunchFlowAccountService
     Task UpdateLunchFlowAccountSyncStartDateAsync(
         Guid userGuid,
         Guid lunchFlowAccountGuid,
-        DateTime? syncStartDate
+        DateOnly? syncStartDate
     );
 }

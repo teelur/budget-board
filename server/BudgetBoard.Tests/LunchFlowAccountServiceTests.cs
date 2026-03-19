@@ -557,7 +557,7 @@ public class LunchFlowAccountServiceTests()
         helper.UserDataContext.LunchFlowAccounts.Add(account);
         await helper.UserDataContext.SaveChangesAsync();
 
-        var newSyncStartDate = DateTime.UtcNow.AddMonths(-3);
+        var newSyncStartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-3));
 
         // Act
         await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
@@ -589,7 +589,7 @@ public class LunchFlowAccountServiceTests()
 
         var accountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.SyncStartDate = DateTime.UtcNow.AddMonths(-6);
+        account.SyncStartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-6));
 
         helper.UserDataContext.LunchFlowAccounts.Add(account);
         await helper.UserDataContext.SaveChangesAsync();
@@ -627,7 +627,7 @@ public class LunchFlowAccountServiceTests()
             await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
                 helper.demoUser.Id,
                 Guid.NewGuid(),
-                DateTime.UtcNow
+                DateOnly.FromDateTime(DateTime.UtcNow)
             );
 
         // Assert

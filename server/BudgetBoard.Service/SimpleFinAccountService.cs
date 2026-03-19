@@ -158,7 +158,7 @@ public class SimpleFinAccountService(
     public async Task UpdateSimpleFinAccountSyncStartDateAsync(
         Guid userGuid,
         Guid simpleFinAccountGuid,
-        DateTime? syncStartDate
+        DateOnly? syncStartDate
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());

@@ -392,7 +392,8 @@ public class LunchFlowService(
             // If it is unset, all transactions will be synced.
             var transactionsToSync = lunchFlowTransactionsData.Transactions.Where(t =>
                 !lunchFlowAccount.SyncStartDate.HasValue
-                || DateTime.Parse(t.Date).Date >= lunchFlowAccount.SyncStartDate.Value.Date
+                || DateOnly.FromDateTime(DateTime.Parse(t.Date))
+                    >= lunchFlowAccount.SyncStartDate.Value
             );
 
             foreach (var transaction in transactionsToSync)

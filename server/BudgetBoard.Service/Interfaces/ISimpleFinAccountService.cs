@@ -61,6 +61,6 @@ public interface ISimpleFinAccountService
     Task UpdateSimpleFinAccountSyncStartDateAsync(
         Guid userGuid,
         Guid simpleFinAccountGuid,
-        DateTime? syncStartDate
+        DateOnly? syncStartDate
     );
 }
