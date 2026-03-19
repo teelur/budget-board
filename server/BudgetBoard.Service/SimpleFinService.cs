@@ -654,7 +654,7 @@ public class SimpleFinService(
         // If it is unset, all transactions will be synced.
         var transactionsToSync = transactionsData.Where(t =>
             !simpleFinAccount.SyncStartDate.HasValue
-            || DateTime.UnixEpoch.AddSeconds(t.Posted).Date
+            || DateTime.UnixEpoch.AddSeconds(t.Pending ? t.TransactedAt : t.Posted).Date
                 >= simpleFinAccount.SyncStartDate.Value.Date
         );
 
