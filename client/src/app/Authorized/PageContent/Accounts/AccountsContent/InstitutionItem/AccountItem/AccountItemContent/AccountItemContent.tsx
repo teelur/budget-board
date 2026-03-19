@@ -58,10 +58,12 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
             })}
           </Badge>
           {props.account.hideAccount && (
-            <Badge bg="var(--button-color-warning)">{t("hidden")}</Badge>
+            <Badge bg="var(--accent-color-orange)">{t("hidden")}</Badge>
           )}
           {props.account.hideTransactions && (
-            <Badge bg="purple">{t("hidden_transactions")}</Badge>
+            <Badge bg="var(--accent-color-purple)">
+              {t("hidden_transactions")}
+            </Badge>
           )}
           <Badge bg={getAccountSourceBadgeColor()}>
             {t(props.account.source)}

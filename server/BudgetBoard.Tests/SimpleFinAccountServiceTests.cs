@@ -381,4 +381,109 @@ public class SimpleFinAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidLinkedAccountIDError");
     }
+
+    [Fact]
+    public async Task UpdateSimpleFinAccountSyncStartDateAsync_WhenValidData_ShouldUpdateSyncStartDate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organizationFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
+        var organization = organizationFaker.Generate();
+
+        var accountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.SimpleFinAccounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var newSyncStartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-3));
+
+        // Act
+        await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
+            helper.demoUser.Id,
+            account.ID,
+            newSyncStartDate
+        );
+
+        // Assert
+        var updatedAccount = helper.UserDataContext.SimpleFinAccounts.FirstOrDefault(a =>
+            a.ID == account.ID
+        );
+
+        updatedAccount.Should().NotBeNull();
+        updatedAccount!.SyncStartDate.Should().Be(newSyncStartDate);
+    }
+
+    [Fact]
+    public async Task UpdateSimpleFinAccountSyncStartDateAsync_WhenClearingSyncStartDate_ShouldSetToNull()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organizationFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
+        var organization = organizationFaker.Generate();
+
+        var accountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
+        var account = accountFaker.Generate();
+        account.SyncStartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-6));
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.SimpleFinAccounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
+            helper.demoUser.Id,
+            account.ID,
+            null
+        );
+
+        // Assert
+        var updatedAccount = helper.UserDataContext.SimpleFinAccounts.FirstOrDefault(a =>
+            a.ID == account.ID
+        );
+
+        updatedAccount.Should().NotBeNull();
+        updatedAccount!.SyncStartDate.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task UpdateSimpleFinAccountSyncStartDateAsync_WhenAccountNotFound_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await simpleFinAccountService.UpdateSimpleFinAccountSyncStartDateAsync(
+                helper.demoUser.Id,
+                Guid.NewGuid(),
+                DateOnly.FromDateTime(DateTime.UtcNow)
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("SimpleFinAccountUpdateNotFoundError");
+    }
 }

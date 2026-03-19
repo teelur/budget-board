@@ -31,6 +31,7 @@ import {
   red,
   borderEggshell,
   textEggshellDimmed,
+  purple,
 } from "./shared/colors";
 import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
 import { LocaleProvider } from "./providers/LocaleProvider/LocaleProvider";
@@ -102,6 +103,12 @@ const resolver: CSSVariablesResolver = () => ({
     "--button-color-confirm": green[9],
     "--button-color-warning": orange[6],
     "--button-color-destructive": red[5],
+    // Accent colors
+    "--accent-color-green": green[9],
+    "--accent-color-blue": blue[7],
+    "--accent-color-orange": orange[5],
+    "--accent-color-red": red[5],
+    "--accent-color-purple": purple[4],
     // Other
     "--light-color-off": backgroundEggshell[7],
   },
@@ -142,6 +149,12 @@ const resolver: CSSVariablesResolver = () => ({
     "--button-color-confirm": green[9],
     "--button-color-warning": orange[5],
     "--button-color-destructive": red[4],
+    // Accent colors
+    "--accent-color-green": green[8],
+    "--accent-color-blue": blue[5],
+    "--accent-color-orange": orange[7],
+    "--accent-color-red": red[4],
+    "--accent-color-purple": purple[5],
     // Other
     "--light-color-off": backgroundGray[3],
   },
