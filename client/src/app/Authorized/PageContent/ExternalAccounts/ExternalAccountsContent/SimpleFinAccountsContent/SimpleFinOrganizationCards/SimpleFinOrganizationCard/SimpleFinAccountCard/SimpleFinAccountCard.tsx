@@ -1,4 +1,5 @@
 import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -8,6 +9,7 @@ import { PencilIcon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
+import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -37,9 +39,14 @@ const SimpleFinAccountCard = (
       ? [props.simpleFinAccount.linkedAccountId]
       : [],
   });
+  const syncFromDateField = useField<DateValue>({
+    initialValue: props.simpleFinAccount.syncFromDate
+      ? new Date(props.simpleFinAccount.syncFromDate)
+      : null,
+  });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { dayjs, dateFormat, intlLocale, dayjsLocale } = useLocale();
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
@@ -103,6 +110,29 @@ const SimpleFinAccountCard = (
       });
     },
   });
+  const doUpdateSyncFromDate = useMutation({
+    mutationFn: async (updateSyncFromDateRequest: {
+      simpleFinAccountGuid: string;
+      syncFromDate: Date | null;
+    }) =>
+      await request({
+        url: "/api/simpleFinAccount/updateSyncFromDate",
+        method: "PUT",
+        params: {
+          simpleFinAccountGuid: updateSyncFromDateRequest.simpleFinAccountGuid,
+          syncFromDate: updateSyncFromDateRequest.syncFromDate,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
 
   const getAccountNameForId = (accountId: string): string => {
     const account = accountsQuery.data?.find(
@@ -130,9 +160,25 @@ const SimpleFinAccountCard = (
     );
   }, [props.simpleFinAccount.linkedAccountId]);
 
+  React.useEffect(() => {
+    syncFromDateField.setValue(
+      dayjs(props.simpleFinAccount.syncFromDate).isValid()
+        ? dayjs(props.simpleFinAccount.syncFromDate).toDate()
+        : null,
+    );
+  }, [props.simpleFinAccount.syncFromDate]);
+
   const getBadgeForAccountName = (): React.ReactElement => {
     return props.simpleFinAccount.linkedAccountId ? (
       <Badge key="value" size="sm" />
+    ) : (
+      <Badge key="value" size="sm" color="gray" />
+    );
+  };
+
+  const getBadgeForSyncStartDate = (): React.ReactElement => {
+    return props.simpleFinAccount.syncFromDate ? (
+      <Badge key="value" size="sm" color="var(--accent-color-purple)" />
     ) : (
       <Badge key="value" size="sm" color="gray" />
     );
@@ -186,7 +232,11 @@ const SimpleFinAccountCard = (
 
   return (
     <Card elevation={2}>
-      <LoadingOverlay visible={doUpdateLinkedAccount.isPending} />
+      <LoadingOverlay
+        visible={
+          doUpdateLinkedAccount.isPending || doUpdateSyncFromDate.isPending
+        }
+      />
       <Stack gap={0}>
         <Group justify="space-between" align="center">
           <Group gap="0.5rem">
@@ -253,6 +303,49 @@ const SimpleFinAccountCard = (
                     {t("deleted")}
                   </Badge>
                 )}
+              </Group>
+            )}
+            {isEditable ? (
+              <Group gap="0.5rem">
+                <PrimaryText size="xs">
+                  {t("sync_start_date_input")}
+                </PrimaryText>
+                <DateInput
+                  size="xs"
+                  w="8rem"
+                  {...syncFromDateField.getInputProps()}
+                  onChange={(value) => {
+                    syncFromDateField.setValue(value);
+                    doUpdateSyncFromDate.mutate({
+                      simpleFinAccountGuid: props.simpleFinAccount.id,
+                      syncFromDate: value ? dayjs(value).toDate() : null,
+                    });
+                  }}
+                  clearable
+                  placeholder={t("auto")}
+                  valueFormat={dateFormat}
+                  locale={dayjsLocale}
+                  elevation={2}
+                />
+              </Group>
+            ) : (
+              <Group gap="0.25rem">
+                <Trans
+                  i18nKey="sync_start_date_styled"
+                  values={{
+                    startDate: dayjs(
+                      props.simpleFinAccount.syncFromDate,
+                    ).isValid()
+                      ? dayjs(props.simpleFinAccount.syncFromDate).format(
+                          `${dateFormat}`,
+                        )
+                      : t("auto"),
+                  }}
+                  components={[
+                    <DimmedText size="xs" key="label" />,
+                    getBadgeForSyncStartDate(),
+                  ]}
+                />
               </Group>
             )}
             <DimmedText size="xs">

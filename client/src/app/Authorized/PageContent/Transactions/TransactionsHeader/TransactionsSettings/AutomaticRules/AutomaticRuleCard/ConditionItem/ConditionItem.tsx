@@ -35,7 +35,7 @@ const ConditionItem = (props: ConditionItemProps) => {
   return (
     <Card p="0.25rem" shadow="xs" elevation={1}>
       <Group gap="0.3rem">
-        <Badge bg="purple" size="sm">
+        <Badge bg="var(--accent-color-purple)" size="sm">
           {fieldLabelKey ? t(fieldLabelKey) : props.condition.field}
         </Badge>
         <PrimaryText size="sm">
