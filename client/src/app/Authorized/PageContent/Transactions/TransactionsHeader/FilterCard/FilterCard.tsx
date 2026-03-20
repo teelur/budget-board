@@ -2,7 +2,6 @@ import { Flex, Stack, Button } from "@mantine/core";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
-import { ICategory } from "~/models/category";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -11,15 +10,13 @@ import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerI
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
-interface FilterCardProps {
-  categories: ICategory[];
-}
-
-const FilterCard = (props: FilterCardProps): React.ReactNode => {
+const FilterCard = (): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dayjsLocale, longDateFormat } = useLocale();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
+  const { transactionCategories } = useTransactionCategories();
 
   return (
     <Card elevation={1}>
@@ -27,13 +24,14 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
         <PrimaryText size="lg">{t("filters")}</PrimaryText>
         <Flex
           justify="space-between"
-          align="center"
+          align={{ base: "center", sm: "flex-end" }}
           direction={{ base: "column", sm: "row" }}
           wrap="nowrap"
           gap="md"
         >
           <DatePickerInput
             w={{ base: "100%", sm: "25%" }}
+            miw={165}
             type="range"
             placeholder={t("select_a_date_range")}
             value={transactionFilters.dateRange}
@@ -56,6 +54,7 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
           />
           <AccountMultiSelect
             w={{ base: "100%", sm: "50%" }}
+            miw={150}
             value={transactionFilters.accounts}
             onChange={(newAccountIds: string[]) => {
               const newFilters = new Filters();
@@ -70,7 +69,8 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
           />
           <CategorySelect
             w={{ base: "100%", sm: "20%" }}
-            categories={props.categories}
+            miw={170}
+            categories={transactionCategories}
             value={transactionFilters.category}
             onChange={(val) => {
               const newFilters = new Filters();
@@ -85,7 +85,8 @@ const FilterCard = (props: FilterCardProps): React.ReactNode => {
             elevation={1}
           />
           <Button
-            w={{ base: "100%", sm: "130px" }}
+            w={"100%"}
+            maw={{ base: undefined, sm: "120px" }}
             variant={
               transactionFilters.isEqual(new Filters()) ? "outline" : "primary"
             }
