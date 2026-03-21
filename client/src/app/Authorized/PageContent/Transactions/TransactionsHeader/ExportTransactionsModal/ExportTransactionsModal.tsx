@@ -131,7 +131,9 @@ const ExportTransactionsModal = (): React.ReactNode => {
     a.href = url;
     a.download = "transactions.csv";
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 0);
   };
 
   return (

@@ -15,7 +15,9 @@ interface ColumnOrderCardProps {
 
 const ColumnOrderCard = (props: ColumnOrderCardProps): React.ReactNode => {
   const { t } = useTranslation();
-  const listRef = React.useRef<HTMLDivElement>(null);
+  const [listElement, setListElement] = React.useState<HTMLDivElement | null>(
+    null,
+  );
 
   const fieldLabelMap = React.useMemo(
     () => Object.fromEntries(EXPORT_FIELDS.map((f) => [f.key, t(f.labelKey)])),
@@ -31,14 +33,14 @@ const ColumnOrderCard = (props: ColumnOrderCardProps): React.ReactNode => {
             props.onChange(move(props.orderedFields, event));
           }}
         >
-          <Stack ref={listRef} gap="0.5rem">
+          <Stack ref={setListElement} gap="0.5rem">
             {props.orderedFields.map((key, index) => (
               <ColumnOrderItem
                 key={key}
                 fieldKey={key}
                 label={fieldLabelMap[key] ?? key}
                 index={index}
-                container={listRef.current as Element}
+                container={listElement ?? undefined}
               />
             ))}
           </Stack>

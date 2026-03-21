@@ -12,7 +12,7 @@ interface ColumnOrderItemProps {
   fieldKey: string;
   label: string;
   index: number;
-  container: Element;
+  container?: Element;
 }
 
 const ColumnOrderItem = (props: ColumnOrderItemProps): React.ReactNode => {
@@ -20,7 +20,9 @@ const ColumnOrderItem = (props: ColumnOrderItemProps): React.ReactNode => {
     id: props.fieldKey,
     index: props.index,
     modifiers: [
-      RestrictToElement.configure({ element: props.container }),
+      ...(props.container
+        ? [RestrictToElement.configure({ element: props.container })]
+        : []),
       RestrictToVerticalAxis,
     ],
     collisionDetector: closestCenter,

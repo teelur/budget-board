@@ -156,8 +156,8 @@ public class TransactionService(
         }
 
         return transactions
-            .Select(t => new TransactionResponse(t))
             .OrderByDescending(t => t.Date)
+            .Select(t => new TransactionResponse(t))
             .ToList();
     }
 
