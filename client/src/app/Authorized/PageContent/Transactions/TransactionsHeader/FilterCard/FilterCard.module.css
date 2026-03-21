@@ -16,8 +16,8 @@
 }
 
 .datePickerInput {
-  width: 30%;
-  max-width: 400px;
+  width: 35%;
+  max-width: 360px;
 
   @container (max-width: 660px) {
     width: 100%;
@@ -26,7 +26,7 @@
 }
 
 .accountMultiSelect {
-  width: 45%;
+  width: 50%;
 
   @container (max-width: 660px) {
     width: 100%;
@@ -35,7 +35,7 @@
 
 .categorySelect {
   width: 30%;
-  max-width: 240px;
+  max-width: 220px;
 
   @container (max-width: 660px) {
     width: 100%;
