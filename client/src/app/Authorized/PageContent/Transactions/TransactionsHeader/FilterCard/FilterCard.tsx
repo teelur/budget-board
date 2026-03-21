@@ -30,7 +30,7 @@ const FilterCard = (): React.ReactNode => {
           gap="md"
         >
           <DatePickerInput
-            w={{ base: "100%", sm: "25%" }}
+            w={{ base: "100%", sm: "30%" }}
             miw={165}
             type="range"
             placeholder={t("select_a_date_range")}
