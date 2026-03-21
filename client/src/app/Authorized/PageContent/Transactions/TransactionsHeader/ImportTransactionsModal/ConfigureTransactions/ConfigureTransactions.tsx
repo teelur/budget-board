@@ -41,6 +41,8 @@ const ConfigureTransactions = (
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
+  const { transactionCategories } = useTransactionCategories();
+  const { request } = useAuth();
 
   // The raw CSV data imported from the user's file.
   const [csvData, setCsvData] = React.useState<CsvRow[]>(props.csvData);
@@ -98,9 +100,6 @@ const ConfigureTransactions = (
   const [duplicateTransactions, setDuplicateTransactions] = React.useState<
     Map<ITransactionImportTableData, ITransaction>
   >(new Map<ITransactionImportTableData, ITransaction>());
-
-  const { transactionCategories } = useTransactionCategories();
-  const { request } = useAuth();
 
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],

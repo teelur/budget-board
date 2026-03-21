@@ -6,15 +6,12 @@ import React from "react";
 import { SortDirection } from "~/components/SortButton";
 import { Sorts } from "./TransactionsHeader/SortMenu/SortMenuHelpers";
 import TransactionCards from "./TransactionCards.tsx/TransactionCards";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 const Transactions = (): React.ReactNode => {
   const [sort, setSort] = React.useState(Sorts.Date);
   const [sortDirection, setSortDirection] = React.useState<SortDirection>(
-    SortDirection.Decending
+    SortDirection.Decending,
   );
-
-  const { transactionCategories } = useTransactionCategories();
 
   return (
     <Stack className={classes.root}>
@@ -23,7 +20,6 @@ const Transactions = (): React.ReactNode => {
         setSort={setSort}
         sortDirection={sortDirection}
         setSortDirection={setSortDirection}
-        categories={transactionCategories}
       />
       <TransactionCards sort={sort} sortDirection={sortDirection} />
     </Stack>
