@@ -16,18 +16,17 @@ import { Sorts } from "./SortMenu/SortMenuHelpers";
 import FilterCard from "./FilterCard/FilterCard";
 import { useDisclosure } from "@mantine/hooks";
 import TransactionsSettings from "./TransactionsSettings/TransactionsSettings";
-import { ICategory } from "~/models/category";
 import CreateTransactionModal from "./CreateTransactionModal/CreateTransactionModal";
 import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransactionsModal";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTranslation } from "react-i18next";
+import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransactionsModal";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
   setSort: (newSort: Sorts) => void;
   sortDirection: SortDirection;
   setSortDirection: (newSortDirection: SortDirection) => void;
-  categories: ICategory[];
 }
 
 const TransactionsHeader = (
@@ -49,6 +48,7 @@ const TransactionsHeader = (
         />
         <Group className={classes.buttonGroup}>
           <ImportTransactionsModal />
+          <ExportTransactionsModal />
           <Button
             variant={isFiltersPanelOpen ? "outline" : "primary"}
             size="sm"
@@ -65,7 +65,7 @@ const TransactionsHeader = (
         </Group>
       </Flex>
       <Collapse in={isFiltersPanelOpen} transitionDuration={100}>
-        <FilterCard categories={props.categories} />
+        <FilterCard />
       </Collapse>
     </Stack>
   );

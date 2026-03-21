@@ -2,7 +2,7 @@ import { Button, Stepper } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { ImportIcon } from "lucide-react";
+import { FileDownIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
@@ -114,7 +114,7 @@ const ImportTransactionsModal = () => {
   });
 
   const onSubmit = async (
-    filteredImportedData: ITransactionImportTableData[]
+    filteredImportedData: ITransactionImportTableData[],
   ) => {
     if (filteredImportedData.length === 0) {
       notifications.show({
@@ -132,7 +132,7 @@ const ImportTransactionsModal = () => {
             ({
               accountName,
               accountID,
-            } as IAccountNameToIDKeyValuePair)
+            }) as IAccountNameToIDKeyValuePair,
         );
 
     const transactionImportRequest: ITransactionImportRequest = {
@@ -144,7 +144,7 @@ const ImportTransactionsModal = () => {
   };
 
   const advanceToAccountMappingDialog = (
-    importData: ITransactionImportTableData[]
+    importData: ITransactionImportTableData[],
   ) => {
     setImportData(importData);
     setActiveStep(2);
@@ -154,14 +154,14 @@ const ImportTransactionsModal = () => {
     <>
       <Button
         size="sm"
-        rightSection={<ImportIcon size="1rem" />}
+        rightSection={<FileDownIcon size="1rem" />}
         onClick={() => {
           resetData();
           setActiveStep(0);
           open();
         }}
       >
-        {t("import_transactions")}
+        {t("import")}
       </Button>
       <Modal
         opened={opened}
