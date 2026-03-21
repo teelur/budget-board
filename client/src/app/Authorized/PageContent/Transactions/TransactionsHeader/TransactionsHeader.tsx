@@ -20,6 +20,7 @@ import CreateTransactionModal from "./CreateTransactionModal/CreateTransactionMo
 import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransactionsModal";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTranslation } from "react-i18next";
+import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransactionsModal";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
@@ -47,6 +48,7 @@ const TransactionsHeader = (
         />
         <Group className={classes.buttonGroup}>
           <ImportTransactionsModal />
+          <ExportTransactionsModal />
           <Button
             variant={isFiltersPanelOpen ? "outline" : "primary"}
             size="sm"

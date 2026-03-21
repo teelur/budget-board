@@ -45,7 +45,7 @@ public interface ITransactionService
     /// <param name="month">Optional. The month to filter transactions by.</param>
     /// <param name="getHidden">If true, includes hidden transactions in the response.</param>
     /// <param name="guid">Optional. The unique identifier of a specific transaction to retrieve.</param>
-    /// <returns>A collection of transaction details.</returns>
+    /// <returns>A collection of transaction details sorted by date in descending order.</returns>
     Task<IReadOnlyList<ITransactionResponse>> ReadTransactionsAsync(
         Guid userGuid,
         int? year,

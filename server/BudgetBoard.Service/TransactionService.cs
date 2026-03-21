@@ -155,7 +155,10 @@ public class TransactionService(
             return [new TransactionResponse(transaction)];
         }
 
-        return transactions.Select(t => new TransactionResponse(t)).ToList();
+        return transactions
+            .Select(t => new TransactionResponse(t))
+            .OrderByDescending(t => t.Date)
+            .ToList();
     }
 
     /// <inheritdoc />
