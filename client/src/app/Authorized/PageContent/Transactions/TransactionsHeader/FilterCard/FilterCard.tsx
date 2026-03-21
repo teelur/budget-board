@@ -1,3 +1,5 @@
+import classes from "./FilterCard.module.css";
+
 import { Flex, Stack, Button } from "@mantine/core";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
@@ -20,19 +22,18 @@ const FilterCard = (): React.ReactNode => {
 
   return (
     <Card elevation={1}>
-      <Stack gap={0}>
+      <Stack gap={0} className={classes.root}>
         <PrimaryText size="lg">{t("filters")}</PrimaryText>
         <Flex
+          className={classes.container}
           justify="space-between"
-          align={{ base: "center", sm: "flex-end" }}
-          direction={{ base: "column", sm: "row" }}
           wrap="nowrap"
-          gap="md"
         >
           <DatePickerInput
-            w={{ base: "100%", sm: "30%" }}
+            className={classes.datePickerInput}
             miw={165}
             type="range"
+            label={<PrimaryText size="sm">{t("date_range")}</PrimaryText>}
             placeholder={t("select_a_date_range")}
             value={transactionFilters.dateRange}
             locale={dayjsLocale}
@@ -49,11 +50,10 @@ const FilterCard = (): React.ReactNode => {
               setTransactionFilters(newFilters);
             }}
             clearable
-            label={<PrimaryText size="sm">{t("date_range")}</PrimaryText>}
             elevation={1}
           />
           <AccountMultiSelect
-            w={{ base: "100%", sm: "50%" }}
+            className={classes.accountMultiSelect}
             miw={150}
             value={transactionFilters.accounts}
             onChange={(newAccountIds: string[]) => {
@@ -68,7 +68,7 @@ const FilterCard = (): React.ReactNode => {
             elevation={1}
           />
           <CategorySelect
-            w={{ base: "100%", sm: "20%" }}
+            className={classes.categorySelect}
             miw={170}
             categories={transactionCategories}
             value={transactionFilters.category}
@@ -85,8 +85,8 @@ const FilterCard = (): React.ReactNode => {
             elevation={1}
           />
           <Button
-            w={"100%"}
-            maw={{ base: undefined, sm: "120px" }}
+            className={classes.clearButton}
+            w="100%"
             variant={
               transactionFilters.isEqual(new Filters()) ? "outline" : "primary"
             }
