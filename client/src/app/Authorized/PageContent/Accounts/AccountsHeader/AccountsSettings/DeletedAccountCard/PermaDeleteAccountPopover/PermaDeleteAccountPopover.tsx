@@ -33,13 +33,13 @@ const PermaDeleteAccountPopover = (
         params: { guid: props.accountId },
       }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["institutions"] });
-      await queryClient.refetchQueries({ queryKey: ["accounts"] });
-      await queryClient.refetchQueries({ queryKey: ["transactions"] });
-      await queryClient.refetchQueries({
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({
         queryKey: [simpleFinAccountQueryKey],
       });
-      await queryClient.refetchQueries({
+      await queryClient.invalidateQueries({
         queryKey: [lunchFlowAccountQueryKey],
       });
     },
@@ -53,11 +53,7 @@ const PermaDeleteAccountPopover = (
   return (
     <Popover>
       <Popover.Target>
-        <ActionIcon
-          h="100%"
-          onClick={() => {}}
-          bg={"var(--button-color-destructive)"}
-        >
+        <ActionIcon h="100%" bg={"var(--button-color-destructive)"}>
           <Trash2Icon size="1.2rem" />
         </ActionIcon>
       </Popover.Target>
