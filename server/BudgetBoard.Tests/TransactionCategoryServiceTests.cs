@@ -297,7 +297,8 @@ public class TransactionCategoryServiceTests
 
         // Act
         var result = await transactionCategoryService.ReadTransactionCategoriesAsync(
-            helper.demoUser.Id
+            helper.demoUser.Id,
+            true
         );
 
         // Assert
@@ -305,7 +306,7 @@ public class TransactionCategoryServiceTests
     }
 
     [Fact]
-    public async Task ReadTransactionCategoriesAsync_WhenCalledWithValidDataAndCategoryGuid_ShouldReturnCategory()
+    public async Task ReadTransactionCategoriesAsync_WhenIncludeDefaultCategories_ShouldReturnCategories()
     {
         // Arrange
         var helper = new TestHelper();
@@ -326,43 +327,21 @@ public class TransactionCategoryServiceTests
         // Act
         var result = await transactionCategoryService.ReadTransactionCategoriesAsync(
             helper.demoUser.Id,
-            transactionCategories.First().ID
+            false
         );
 
         // Assert
-        result.Should().BeEquivalentTo([new CategoryResponse(transactionCategories.First())]);
-    }
-
-    [Fact]
-    public async Task ReadTransactionCategoriesAsync_WhenCalledWithInvalidCategoryGuid_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var transactionCategoryService = new TransactionCategoryService(
-            Mock.Of<ILogger<ITransactionCategoryService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
-        var transactionCategories = transactionCategoryFaker.Generate(5);
-
-        helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        Func<Task> act = async () =>
-            await transactionCategoryService.ReadTransactionCategoriesAsync(
-                helper.demoUser.Id,
-                Guid.NewGuid()
+        result
+            .Should()
+            .BeEquivalentTo(
+                TransactionCategoriesConstants
+                    .DefaultTransactionCategories.Select(dc => new CategoryResponse
+                    {
+                        Value = dc.Value,
+                        Parent = dc.Parent,
+                    })
+                    .Concat(transactionCategories.Select(t => new CategoryResponse(t)))
             );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("TransactionCategoryNotFoundError");
     }
 
     [Fact]

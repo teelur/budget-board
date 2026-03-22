@@ -250,9 +250,6 @@
   <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
     <value>您尝试使用的父交易类别不存在。</value>
   </data>
-  <data name="TransactionCategoryNotFoundError" xml:space="preserve">
-    <value>您尝试访问的交易类别不存在。</value>
-  </data>
   <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
     <value>您尝试更新的交易类别不存在。</value>
   </data>

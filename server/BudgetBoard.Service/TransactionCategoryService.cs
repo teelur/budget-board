@@ -95,28 +95,33 @@ public class TransactionCategoryService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<ICategoryResponse>> ReadTransactionCategoriesAsync(
         Guid userGuid,
-        Guid categoryGuid = default
+        bool excludeDefaultCategories = false
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if (categoryGuid != default)
-        {
-            var transactionCategory = userData.TransactionCategories.FirstOrDefault(t =>
-                t.ID == categoryGuid
-            );
-            if (transactionCategory == null)
-            {
-                _logger.LogError("{LogMessage}", _logLocalizer["TransactionCategoryNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    _responseLocalizer["TransactionCategoryNotFoundError"]
-                );
-            }
+        var userCategories = userData
+            .TransactionCategories.Select(c => new CategoryResponse(c))
+            .ToList();
 
-            return [new CategoryResponse(transactionCategory)];
+        if (
+            excludeDefaultCategories
+            || userData.UserSettings?.DisableBuiltInTransactionCategories == true
+        )
+        {
+            return userCategories;
         }
 
-        return userData.TransactionCategories.Select(c => new CategoryResponse(c)).ToList();
+        var defaultCategories = TransactionCategoriesConstants
+            .DefaultTransactionCategories.Select(dc => new CategoryResponse
+            {
+                ID = Guid.Empty,
+                Value = dc.Value,
+                Parent = dc.Parent,
+            })
+            .ToList();
+
+        return userCategories.Concat(defaultCategories).ToList();
     }
 
     /// <inheritdoc />

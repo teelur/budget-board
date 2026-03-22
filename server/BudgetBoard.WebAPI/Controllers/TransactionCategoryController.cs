@@ -52,13 +52,14 @@ public class TransactionCategoryController(
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> Read()
+    public async Task<IActionResult> Read(bool excludeDefaultCategories = false)
     {
         try
         {
             return Ok(
                 await _transactionCategoryService.ReadTransactionCategoriesAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    excludeDefaultCategories
                 )
             );
         }

@@ -74,7 +74,10 @@ internal static class TransactionCategoriesHelpers
     /// <returns>
     /// A tuple with the parent and child categories. Child may be empty.
     /// </returns>
-    internal static (string parent, string child) GetFullCategory(string category, IEnumerable<ICategory> categories)
+    internal static (string parent, string child) GetFullCategory(
+        string category,
+        IEnumerable<ICategory> categories
+    )
     {
         var parentCategory = GetParentCategory(category, categories);
         var childCategory = GetIsParentCategory(category, categories) ? string.Empty : category;

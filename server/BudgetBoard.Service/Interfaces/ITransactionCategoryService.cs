@@ -18,11 +18,11 @@ public interface ITransactionCategoryService
     /// Retrieves transaction categories for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="categoryGuid">Optional. The unique identifier of a specific category to retrieve.</param>
+    /// <param name="excludeDefaultCategories">Optional. Whether to exclude default categories.</param>
     /// <returns>A collection of category details.</returns>
     Task<IReadOnlyList<ICategoryResponse>> ReadTransactionCategoriesAsync(
         Guid userGuid,
-        Guid categoryGuid = default
+        bool excludeDefaultCategories = false
     );
 
     /// <summary>

@@ -253,9 +253,6 @@
   <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
     <value>The parent transaction category you are trying to use does not exist.</value>
   </data>
-  <data name="TransactionCategoryNotFoundError" xml:space="preserve">
-    <value>The transaction category you are trying to access does not exist.</value>
-  </data>
   <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
     <value>The transaction category you are trying to update does not exist.</value>
   </data>
