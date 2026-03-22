@@ -469,4 +469,7 @@
   <data name="InvalidDateFormatError" xml:space="preserve">
     <value>Das angegebene Datumsformat ist ungültig.</value>
   </data>
+  <data name="AccountPermanentDeleteNotFoundError" xml:space="preserve">
+    <value>The account you are trying to permanently delete does not exist.</value>
+  </data>
 </root>
