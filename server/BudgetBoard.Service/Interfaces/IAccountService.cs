@@ -63,4 +63,12 @@ public interface IAccountService
     /// <param name="source">The new source value for the account.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task UpdateAccountSourceAsync(Guid userGuid, Guid accountGuid, string source);
+
+    /// <summary>
+    /// Permanently deletes an account for the specified user, removing it and all associated transactions and balances from the database entirely.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="accountGuid">The unique identifier of the account to delete.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task PermanentlyDeleteAccountAsync(Guid userGuid, Guid accountGuid);
 }
