@@ -217,6 +217,44 @@ public class AccountService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
+    public async Task PermanentlyDeleteAccountAsync(Guid userGuid, Guid accountGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
+        if (account == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["AccountPermanentDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["AccountPermanentDeleteNotFoundError"]
+            );
+        }
+
+        var lunchFlowAccount = await _userDataContext.LunchFlowAccounts.FirstOrDefaultAsync(a =>
+            a.LinkedAccountId == accountGuid
+        );
+        if (lunchFlowAccount != null)
+        {
+            lunchFlowAccount.LinkedAccountId = null;
+            lunchFlowAccount.LastSync = null;
+        }
+
+        var simpleFinAccount = await _userDataContext.SimpleFinAccounts.FirstOrDefaultAsync(a =>
+            a.LinkedAccountId == accountGuid
+        );
+        if (simpleFinAccount != null)
+        {
+            simpleFinAccount.LinkedAccountId = null;
+            simpleFinAccount.LastSync = null;
+        }
+
+        _userDataContext.Transactions.RemoveRange(account.Transactions);
+        _userDataContext.Balances.RemoveRange(account.Balances);
+        _userDataContext.Accounts.Remove(account);
+        await _userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         ApplicationUser? foundUser;
