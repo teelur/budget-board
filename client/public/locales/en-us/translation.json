@@ -335,6 +335,8 @@
   "passwords_do_not_match": "Passwords do not match.",
   "pay_off_debt": "Pay off debt",
   "pending": "Pending",
+  "perma_delete_account_warning": "This will permanently delete the account along with all of its associated transaction and balance records. This action cannot be undone.",
+  "permanently_delete_account": "Permanently Delete Account",
   "please_provide_valid_delimiter_message": "Please provide a valid delimiter.",
   "please_select_valid_csv_file_message": "Please select a valid CSV file.",
   "preferred_currency": "Preferred Currency",

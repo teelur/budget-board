@@ -11,6 +11,7 @@ import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import PermaDeleteAccountPopover from "./PermaDeleteAccountPopover/PermaDeleteAccountPopover";
 
 interface DeletedAccountCardProps {
   account: IAccountResponse;
@@ -18,7 +19,7 @@ interface DeletedAccountCardProps {
 }
 
 const DeletedAccountCard = (
-  props: DeletedAccountCardProps
+  props: DeletedAccountCardProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
@@ -63,10 +64,11 @@ const DeletedAccountCard = (
           </Stack>
           <Badge bg="blue">{t(props.account.source)}</Badge>
         </Group>
-        <Group style={{ alignSelf: "stretch" }}>
+        <Group style={{ alignSelf: "stretch" }} gap={"0.5rem"}>
           <ActionIcon h="100%" onClick={() => doRestoreAccount.mutate()}>
             <Undo2Icon size="1.2rem" />
           </ActionIcon>
+          <PermaDeleteAccountPopover accountId={props.account.id} />
         </Group>
       </Group>
     </ElevatedCard>
