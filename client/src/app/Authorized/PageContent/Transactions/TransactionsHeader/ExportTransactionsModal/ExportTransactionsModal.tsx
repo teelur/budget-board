@@ -14,7 +14,7 @@ import FieldSelectionCard from "./FieldSelectionCard/FieldSelectionCard";
 import ColumnOrderCard from "./ColumnOrderCard/ColumnOrderCard";
 import useIsMobile from "~/hooks/useIsMobile";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { ITransaction, Filters } from "~/models/transaction";
 import { IInstitution } from "~/models/institution";
@@ -47,7 +47,7 @@ const ExportTransactionsModal = (): React.ReactNode => {
 
   const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
   const { request } = useAuth();
   const isMobile = useIsMobile();
 

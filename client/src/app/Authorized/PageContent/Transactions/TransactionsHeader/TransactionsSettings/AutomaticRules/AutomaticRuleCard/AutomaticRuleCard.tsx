@@ -15,7 +15,7 @@ import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/Editab
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
@@ -31,11 +31,11 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
     IRuleParameterEdit[]
   >(props.rule.conditions ?? []);
   const [actionItems, setActionItems] = React.useState<IRuleParameterEdit[]>(
-    props.rule.actions ?? []
+    props.rule.actions ?? [],
   );
 
   const { t } = useTranslation();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

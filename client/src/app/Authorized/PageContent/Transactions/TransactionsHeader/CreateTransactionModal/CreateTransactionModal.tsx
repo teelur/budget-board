@@ -13,7 +13,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import Modal from "~/components/core/Modal/Modal";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -35,7 +35,7 @@ const CreateTransactionModal = (): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
   const { request } = useAuth();
 
   const dateField = useField<Date | null>({

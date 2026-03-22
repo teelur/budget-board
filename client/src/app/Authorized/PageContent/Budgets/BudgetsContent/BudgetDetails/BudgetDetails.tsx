@@ -15,7 +15,7 @@ import { areStringsEqual } from "~/helpers/utils";
 import { ITransaction } from "~/models/transaction";
 import TransactionCards from "./TransactionCards/TransactionCards";
 import { filterHiddenTransactions } from "~/helpers/transactions";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import Drawer from "~/components/core/Drawer/Drawer";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -35,7 +35,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({

@@ -11,7 +11,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
@@ -27,7 +27,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({
@@ -49,13 +49,13 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const filteredTransactions = getFilteredTransactions(
     transactionsQuery.data ?? [],
     transactionFilters ?? new Filters(),
-    transactionCategories
+    transactionCategories,
   );
 
   const sortedFilteredTransactions = sortTransactions(
     filteredTransactions,
     props.sort,
-    props.sortDirection
+    props.sortDirection,
   );
 
   return (
@@ -70,7 +70,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
             sortedFilteredTransactions
               .slice(
                 (page - 1) * itemsPerPage,
-                (page - 1) * itemsPerPage + itemsPerPage
+                (page - 1) * itemsPerPage + itemsPerPage,
               )
               .map((transaction) => (
                 <TransactionCard

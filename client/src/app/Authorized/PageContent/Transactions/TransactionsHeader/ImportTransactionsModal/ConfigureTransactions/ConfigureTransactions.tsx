@@ -20,7 +20,7 @@ import { AxiosResponse } from "axios";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { IAccountResponse } from "~/models/account";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -41,7 +41,7 @@ const ConfigureTransactions = (
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
   const { request } = useAuth();
 
   // The raw CSV data imported from the user's file.

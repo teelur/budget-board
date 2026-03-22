@@ -7,7 +7,7 @@ import { ICategoryCreateRequest } from "~/models/category";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import Card from "~/components/core/Card/Card";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -19,7 +19,7 @@ const AddCategory = (): React.ReactNode => {
   const [isChildCategory, setIsChildCategory] = React.useState(false);
 
   const { t } = useTranslation();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
 
   const nameField = useField<string>({
     initialValue: "",

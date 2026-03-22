@@ -11,7 +11,7 @@ import {
 } from "~/models/automaticRule";
 import ActionItem from "./ActionItem/ActionItem";
 import ConditionItem from "./ConditionItem/ConditionItem";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 
@@ -23,13 +23,13 @@ interface EditableAutomaticRuleContentProps {
 }
 
 const EditableAutomaticRuleContent = (
-  props: EditableAutomaticRuleContentProps
+  props: EditableAutomaticRuleContentProps,
 ): React.ReactNode => {
   const defaultField =
     TransactionFields.find((field) => field.value === "merchant")?.value ?? "";
 
   const { t } = useTranslation();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
 
   const addNewCondition = () => {
     props.setConditionItems((prev) => [
@@ -39,8 +39,8 @@ const EditableAutomaticRuleContent = (
         operator:
           Operators.filter((op) =>
             op.type.includes(
-              FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING
-            )
+              FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING,
+            ),
           )
             .map((op) => op.value)
             .at(0) ?? "",
@@ -86,7 +86,7 @@ const EditableAutomaticRuleContent = (
             setRuleParameter={(newParameter) =>
               props.setConditionItems(
                 (prev: IRuleParameterEdit[]): IRuleParameterEdit[] =>
-                  prev.map((param, i) => (i === index ? newParameter : param))
+                  prev.map((param, i) => (i === index ? newParameter : param)),
               )
             }
             allowDelete={props.conditionItems.length > 1}
@@ -110,7 +110,7 @@ const EditableAutomaticRuleContent = (
             setRuleParameter={(newParameter) =>
               props.setActionItems(
                 (prev: IRuleParameterEdit[]): IRuleParameterEdit[] =>
-                  prev.map((param, i) => (i === index ? newParameter : param))
+                  prev.map((param, i) => (i === index ? newParameter : param)),
               )
             }
             allowDelete={props.actionItems.length > 1}

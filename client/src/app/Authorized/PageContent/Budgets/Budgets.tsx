@@ -11,11 +11,11 @@ import { IBudget } from "~/models/budget";
 import { AxiosResponse } from "axios";
 import { ITransaction } from "~/models/transaction";
 import BudgetsContent from "./BudgetsContent/BudgetsContent";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const Budgets = (): React.ReactNode => {
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
   const { dayjs } = useLocale();
   const { request } = useAuth();
 

@@ -12,13 +12,13 @@ import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerI
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 
 const FilterCard = (): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dayjsLocale, longDateFormat } = useLocale();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
 
   return (
     <Card elevation={1}>

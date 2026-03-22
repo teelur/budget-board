@@ -8,7 +8,7 @@ import { ITransaction } from "~/models/transaction";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import useTransactionCategories from "~/hooks/useTransactionCategories";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
@@ -19,7 +19,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   const [activePage, setPage] = React.useState(1);
 
   const { t } = useTranslation();
-  const { transactionCategories } = useTransactionCategories();
+  const { data: transactionCategories = [] } = useTransactionCategories();
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({
@@ -41,9 +41,9 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   const sortedFilteredTransactions = React.useMemo(
     () =>
       getVisibleTransactions(
-        getTransactionsByCategory(transactionsQuery.data ?? [], "")
+        getTransactionsByCategory(transactionsQuery.data ?? [], ""),
       ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-    [transactionsQuery.data]
+    [transactionsQuery.data],
   );
 
   if (sortedFilteredTransactions.length === 0) {
@@ -68,7 +68,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
               {sortedFilteredTransactions
                 .slice(
                   (activePage - 1) * itemsPerPage,
-                  (activePage - 1) * itemsPerPage + itemsPerPage
+                  (activePage - 1) * itemsPerPage + itemsPerPage,
                 )
                 .map((transaction: ITransaction) => (
                   <TransactionCard
