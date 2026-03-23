@@ -127,6 +127,7 @@ const ToshlAccountsContent = (): React.ReactNode => {
   ]);
 
   const queryClient = useQueryClient();
+  const hasLinkedToshlAccessToken = Boolean(userQuery.data?.toshlAccessToken);
   const toshlFullSyncStatus =
     userSettingsQuery.data?.toshlFullSyncStatus ?? ToshlFullSyncStatuses.Idle;
   const isToshlFullSyncActive =
@@ -302,24 +303,6 @@ const ToshlAccountsContent = (): React.ReactNode => {
         </DimmedText>
 
         <Stack gap="0.5rem">
-          <Group justify="space-between" align="center" wrap="wrap">
-            <Stack gap={0}>
-              <PrimaryText size="sm">
-                {t("toshl_category_mappings", {
-                  defaultValue: "Toshl Category Mappings",
-                })}
-              </PrimaryText>
-              <DimmedText size="xs">
-                {t("toshl_category_mappings_short_description", {
-                  defaultValue:
-                    "Override Toshl category and tag imports with explicit Budget Board category mappings.",
-                })}
-              </DimmedText>
-            </Stack>
-            <ToshlCategoryMappingsModal
-              disabled={!userQuery.data?.toshlAccessToken}
-            />
-          </Group>
           <TextInput
             label={
               <PrimaryText size="sm">
@@ -354,156 +337,176 @@ const ToshlAccountsContent = (): React.ReactNode => {
             }}
             elevation={1}
           />
-          <Group align="flex-end" wrap="nowrap">
-            <Select
-              label={
-                <PrimaryText size="sm">
-                  {t("toshl_metadata_sync_direction", {
-                    defaultValue: "Toshl Metadata Sync Direction",
-                  })}
-                </PrimaryText>
-              }
-              description={
-                <DimmedText size="xs">
-                  {t("toshl_metadata_sync_direction_description", {
-                    defaultValue:
-                      "Choose which side should be treated as the source of truth for categories and tags.",
-                  })}
-                </DimmedText>
-              }
-              data={[
-                {
-                  value: ToshlMetadataSyncDirections.Toshl,
-                  label: t("toshl_to_budgetboard", {
-                    defaultValue: "Toshl → Budget Board",
-                  }),
-                },
-                {
-                  value: ToshlMetadataSyncDirections.BudgetBoard,
-                  label: t("budgetboard_to_toshl", {
-                    defaultValue: "Budget Board → Toshl",
-                  }),
-                },
-              ]}
-              {...toshlMetadataSyncDirectionField.getInputProps()}
-              onChange={(value) => {
-                if (value) {
-                  toshlMetadataSyncDirectionField.setValue(value);
+          {hasLinkedToshlAccessToken && (
+            <>
+              <Group justify="space-between" align="center" wrap="wrap">
+                <Stack gap={0}>
+                  <PrimaryText size="sm">
+                    {t("toshl_category_mappings", {
+                      defaultValue: "Toshl Category Mappings",
+                    })}
+                  </PrimaryText>
+                  <DimmedText size="xs">
+                    {t("toshl_category_mappings_short_description", {
+                      defaultValue:
+                        "Override Toshl category and tag imports with explicit Budget Board category mappings.",
+                    })}
+                  </DimmedText>
+                </Stack>
+                <ToshlCategoryMappingsModal disabled={!hasLinkedToshlAccessToken} />
+              </Group>
+              <Group align="flex-end" wrap="nowrap">
+                <Select
+                  label={
+                    <PrimaryText size="sm">
+                      {t("toshl_metadata_sync_direction", {
+                        defaultValue: "Toshl Metadata Sync Direction",
+                      })}
+                    </PrimaryText>
+                  }
+                  description={
+                    <DimmedText size="xs">
+                      {t("toshl_metadata_sync_direction_description", {
+                        defaultValue:
+                          "Choose which side should be treated as the source of truth for categories and tags.",
+                      })}
+                    </DimmedText>
+                  }
+                  data={[
+                    {
+                      value: ToshlMetadataSyncDirections.Toshl,
+                      label: t("toshl_to_budgetboard", {
+                        defaultValue: "Toshl → Budget Board",
+                      }),
+                    },
+                    {
+                      value: ToshlMetadataSyncDirections.BudgetBoard,
+                      label: t("budgetboard_to_toshl", {
+                        defaultValue: "Budget Board → Toshl",
+                      }),
+                    },
+                  ]}
+                  {...toshlMetadataSyncDirectionField.getInputProps()}
+                  onChange={(value) => {
+                    if (value) {
+                      toshlMetadataSyncDirectionField.setValue(value);
+                    }
+                  }}
+                  elevation={1}
+                  style={{ flex: 1 }}
+                />
+                <Select
+                  label={
+                    <PrimaryText size="sm">
+                      {t("toshl_sync_period", {
+                        defaultValue: "Toshl Sync Period",
+                      })}
+                    </PrimaryText>
+                  }
+                  description={
+                    <DimmedText size="xs">
+                      {t("toshl_sync_period_description", {
+                        defaultValue:
+                          "Choose how far back the manual Toshl full sync should import transactions.",
+                      })}
+                    </DimmedText>
+                  }
+                  data={ToshlSyncLookbackOptions.map((months) => ({
+                    value: String(months),
+                    label:
+                      months === 0
+                        ? t("all_time", { defaultValue: "All Time" })
+                        : months === 12
+                          ? t("1_year", { defaultValue: "1 Year" })
+                          : t(months === 1 ? "1_month" : `${months}_months`, {
+                              defaultValue:
+                                months === 1 ? "1 Month" : `${months} Months`,
+                            }),
+                  }))}
+                  value={String(toshlSyncLookbackMonthsField.getValue())}
+                  onChange={(value) => {
+                    if (value) {
+                      toshlSyncLookbackMonthsField.setValue(Number(value));
+                    }
+                  }}
+                  elevation={1}
+                  style={{ flex: 1 }}
+                />
+                <Group align="center" wrap="nowrap" style={{ flex: 1 }}>
+                  <Button
+                    miw={120}
+                    onClick={() => doSyncToshl.mutate()}
+                    loading={doSyncToshl.isPending}
+                    disabled={!hasLinkedToshlAccessToken || isToshlFullSyncActive}
+                  >
+                    {isToshlFullSyncActive
+                      ? t("toshl_full_sync_in_progress", {
+                          defaultValue: "Sync in Progress",
+                        })
+                      : t("full_sync", { defaultValue: "Full Sync" })}
+                  </Button>
+                  <DimmedText
+                    size="xs"
+                    ta="center"
+                    style={{ flex: 1, lineHeight: 1.2 }}
+                  >
+                    {getToshlFullSyncInlineStatusText(userSettingsQuery.data, t)}
+                  </DimmedText>
+                </Group>
+              </Group>
+              {userSettingsQuery.data?.toshlFullSyncError &&
+                toshlFullSyncStatus === ToshlFullSyncStatuses.Failed && (
+                  <DimmedText size="xs" c="var(--button-color-destructive)">
+                    {userSettingsQuery.data.toshlFullSyncError}
+                  </DimmedText>
+                )}
+              <Select
+                label={
+                  <PrimaryText size="sm">
+                    {t("toshl_auto_sync_period", {
+                      defaultValue: "Toshl Auto-Sync Period",
+                    })}
+                  </PrimaryText>
                 }
-              }}
-              elevation={1}
-              style={{ flex: 1 }}
-            />
-            <Select
-              label={
-                <PrimaryText size="sm">
-                  {t("toshl_sync_period", {
-                    defaultValue: "Toshl Sync Period",
-                  })}
-                </PrimaryText>
-              }
-              description={
-                <DimmedText size="xs">
-                  {t("toshl_sync_period_description", {
-                    defaultValue:
-                      "Choose how far back the manual Toshl full sync should import transactions.",
-                  })}
-                </DimmedText>
-              }
-              data={ToshlSyncLookbackOptions.map((months) => ({
-                value: String(months),
-                label:
-                  months === 0
-                    ? t("all_time", { defaultValue: "All Time" })
-                    : months === 12
-                      ? t("1_year", { defaultValue: "1 Year" })
-                      : t(months === 1 ? "1_month" : `${months}_months`, {
-                          defaultValue:
-                            months === 1 ? "1 Month" : `${months} Months`,
-                        }),
-              }))}
-              value={String(toshlSyncLookbackMonthsField.getValue())}
-              onChange={(value) => {
-                if (value) {
-                  toshlSyncLookbackMonthsField.setValue(Number(value));
+                description={
+                  <DimmedText size="xs">
+                    {t("toshl_auto_sync_period_description", {
+                      defaultValue:
+                        "Budget Board will refresh Toshl metadata on this cadence in the background.",
+                    })}
+                  </DimmedText>
                 }
-              }}
-              elevation={1}
-              style={{ flex: 1 }}
-            />
-            <Group align="center" wrap="nowrap" style={{ flex: 1 }}>
-              <Button
-                miw={120}
-                onClick={() => doSyncToshl.mutate()}
-                loading={doSyncToshl.isPending}
-                disabled={!userQuery.data?.toshlAccessToken || isToshlFullSyncActive}
-              >
-                {isToshlFullSyncActive
-                  ? t("toshl_full_sync_in_progress", {
-                      defaultValue: "Sync in Progress",
-                    })
-                  : t("full_sync", { defaultValue: "Full Sync" })}
-              </Button>
-              <DimmedText
-                size="xs"
-                ta="center"
-                style={{ flex: 1, lineHeight: 1.2 }}
-              >
-                {getToshlFullSyncInlineStatusText(userSettingsQuery.data, t)}
-              </DimmedText>
-            </Group>
-          </Group>
-          {userSettingsQuery.data?.toshlFullSyncError &&
-            toshlFullSyncStatus === ToshlFullSyncStatuses.Failed && (
-              <DimmedText size="xs" c="var(--button-color-destructive)">
-                {userSettingsQuery.data.toshlFullSyncError}
-              </DimmedText>
-            )}
-          <Select
-            label={
-              <PrimaryText size="sm">
-                {t("toshl_auto_sync_period", {
-                  defaultValue: "Toshl Auto-Sync Period",
-                })}
-              </PrimaryText>
-            }
-            description={
-              <DimmedText size="xs">
-                {t("toshl_auto_sync_period_description", {
-                  defaultValue:
-                    "Budget Board will refresh Toshl metadata on this cadence in the background.",
-                })}
-              </DimmedText>
-            }
-            data={ToshlAutoSyncOptions.map((hours) => {
-              if (hours > 0) {
-                return {
-                  value: String(hours),
-                  label: t("hours_with_value", {
-                    hours,
-                    defaultValue: `${hours}h`,
-                  }),
-                };
-              }
+                data={ToshlAutoSyncOptions.map((hours) => {
+                  if (hours > 0) {
+                    return {
+                      value: String(hours),
+                      label: t("hours_with_value", {
+                        hours,
+                        defaultValue: `${hours}h`,
+                      }),
+                    };
+                  }
 
-              return {
-                value: String(hours),
-                label:
-                  hours === 0
-                    ? t("end_of_day", { defaultValue: "End of Day" })
-                    : hours === -1
-                      ? t("end_of_week", { defaultValue: "End of Week" })
-                      : t("end_of_month", { defaultValue: "End of Month" }),
-              };
-            })}
-            value={String(toshlAutoSyncIntervalHoursField.getValue())}
-            onChange={(value) => {
-              if (value) {
-                toshlAutoSyncIntervalHoursField.setValue(Number(value));
-              }
-            }}
-            elevation={1}
-          />
+                  return {
+                    value: String(hours),
+                    label:
+                      hours === 0
+                        ? t("end_of_day", { defaultValue: "End of Day" })
+                        : hours === -1
+                          ? t("end_of_week", { defaultValue: "End of Week" })
+                          : t("end_of_month", { defaultValue: "End of Month" }),
+                  };
+                })}
+                value={String(toshlAutoSyncIntervalHoursField.getValue())}
+                onChange={(value) => {
+                  if (value) {
+                    toshlAutoSyncIntervalHoursField.setValue(Number(value));
+                  }
+                }}
+                elevation={1}
+              />
+            </>
+          )}
           <Button
             onClick={() => doSaveToshlSettings.mutate()}
             loading={doSaveToshlSettings.isPending}
