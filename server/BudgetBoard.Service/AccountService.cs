@@ -120,6 +120,11 @@ public class AccountService(
         var now = _nowProvider.UtcNow;
         account.Deleted = now;
 
+        foreach (var goal in account.Goals.ToList())
+        {
+            goal.Accounts.Remove(account);
+        }
+
         if (deleteTransactions)
         {
             foreach (var transaction in account.Transactions)
@@ -267,6 +272,8 @@ public class AccountService(
                 .ThenInclude(a => a.Balances)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Institution)
+                .Include(u => u.Accounts)
+                .ThenInclude(a => a.Goals)
                 .Include(u => u.Institutions)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));

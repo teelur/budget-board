@@ -517,6 +517,37 @@ public class AccountServiceTests()
     }
 
     [Fact]
+    public async Task DeleteAccountAsync_WithLinkedGoal_ShouldRemoveAccountFromGoal()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
+        var goal = goalFaker.Generate();
+        goal.Accounts.Add(account);
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.Goals.Add(goal);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.UserDataContext.Goals.Single(g => g.ID == goal.ID).Accounts.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task RestoreAccountAsync_ExistingAccount_ShouldRestoreAccount()
     {
         // Arrange
