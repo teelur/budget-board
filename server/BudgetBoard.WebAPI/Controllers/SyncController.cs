@@ -35,7 +35,7 @@ public class SyncController(
         }
         catch (BudgetBoardServiceException bbex)
         {
-            return Helpers.BuildErrorResponse(bbex.Message);
+            return Helpers.BuildErrorResponse(bbex.Message, bbex.StatusCode);
         }
         catch (Exception ex)
         {

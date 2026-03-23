@@ -65,6 +65,17 @@ public class ToshlCategoryMappingsUpdateRequest : IToshlCategoryMappingsUpdateRe
     }
 }
 
+public class ToshlAccessTokenUpdateRequest
+{
+    public string AccessToken { get; set; }
+
+    [JsonConstructor]
+    public ToshlAccessTokenUpdateRequest()
+    {
+        AccessToken = string.Empty;
+    }
+}
+
 public class ToshlCategoryMappingUpdateItem
 {
     public string ToshlId { get; set; }

@@ -182,6 +182,7 @@ public partial class ToshlService
                 && t.Account.Institution != null
                 && EF.Functions.ILike(t.Account.Institution.Name, ToshlImportInstitutionName)
                 && !string.IsNullOrWhiteSpace(t.SyncID)
+                && t.Deleted == null
             )
             .ToDictionaryAsync(t => t.SyncID!, StringComparer.OrdinalIgnoreCase);
 

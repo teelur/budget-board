@@ -29,7 +29,7 @@ public partial class AddToshlSetup : Migration
             table: "UserSettings",
             type: "text",
             nullable: false,
-            defaultValue: "budgetboard"
+            defaultValue: "toshl"
         );
 
         migrationBuilder.AddColumn<int>(

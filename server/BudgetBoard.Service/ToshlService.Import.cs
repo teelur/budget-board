@@ -210,7 +210,7 @@ public partial class ToshlService
     )
     {
         var normalizedAmount = NormalizeToshlAmount(entry) ?? existingTransaction.Amount;
-        var normalizedDate = ParseToshlDate(entry.Date);
+        var normalizedDate = ParseToshlDate(entry.Date) ?? existingTransaction.Date;
 
         if (existingTransaction.AccountID != mappedAccount.Id)
         {
@@ -594,7 +594,7 @@ public partial class ToshlService
         return Array.Empty<string>();
     }
 
-    private static DateTime ParseToshlDate(string? date)
+    private static DateTime? ParseToshlDate(string? date)
     {
         if (
             !string.IsNullOrWhiteSpace(date)
@@ -610,7 +610,7 @@ public partial class ToshlService
             return DateTime.SpecifyKind(parsed.Date, DateTimeKind.Utc);
         }
 
-        return DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
+        return null;
     }
 
     private static string ResolveToshlEntryCategory(

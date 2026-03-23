@@ -202,7 +202,7 @@ const ToshlAccountsContent = (): React.ReactNode => {
         await request({
           url: "/api/toshl/updateAccessToken",
           method: "PUT",
-          params: { accessToken },
+          data: { accessToken },
         });
       }
 

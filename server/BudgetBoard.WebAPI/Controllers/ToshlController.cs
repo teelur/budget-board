@@ -24,12 +24,14 @@ public class ToshlController(
 {
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> UpdateAccessToken(string accessToken)
+    public async Task<IActionResult> UpdateAccessToken(
+        [FromBody] ToshlAccessTokenUpdateRequest request
+    )
     {
         try
         {
             var userGuid = new Guid(userManager.GetUserId(User) ?? string.Empty);
-            await toshlService.ConfigureAccessTokenAsync(userGuid, accessToken);
+            await toshlService.ConfigureAccessTokenAsync(userGuid, request.AccessToken);
             await toshlFullSyncQueue.QueueAsync(userGuid);
             return Accepted();
         }
@@ -40,7 +42,7 @@ public class ToshlController(
         catch (Exception ex)
         {
             logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(BuildDetailedErrorMessage(ex));
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -62,7 +64,7 @@ public class ToshlController(
         catch (Exception ex)
         {
             logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(BuildDetailedErrorMessage(ex));
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -84,7 +86,7 @@ public class ToshlController(
         catch (Exception ex)
         {
             logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(BuildDetailedErrorMessage(ex));
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -107,7 +109,7 @@ public class ToshlController(
         catch (Exception ex)
         {
             logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(BuildDetailedErrorMessage(ex));
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -132,13 +134,7 @@ public class ToshlController(
         catch (Exception ex)
         {
             logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(BuildDetailedErrorMessage(ex));
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
-    }
-
-    private static string BuildDetailedErrorMessage(Exception ex)
-    {
-        var root = ex.GetBaseException();
-        return $"{root.GetType().Name}: {root.Message}";
     }
 }

@@ -39,6 +39,7 @@ public sealed class ToshlFullSyncQueue(
                 || userSettings.ToshlFullSyncStatus == ToshlFullSyncStatuses.Running
             )
             {
+                s_queuedOrRunningUsers.TryRemove(userGuid, out _);
                 return;
             }
 
@@ -134,7 +135,7 @@ public sealed class ToshlFullSyncQueue(
                 startedAt: null,
                 completedAt: DateTime.UtcNow,
                 error: $"{ex.GetBaseException().GetType().Name}: {ex.GetBaseException().Message}",
-                progressPercent: null,
+                progressPercent: 100,
                 progressDescription: "Failed",
                 cancellationToken
             );
