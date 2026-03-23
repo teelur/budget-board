@@ -23,7 +23,7 @@ public partial class ToshlService
         var errors = new List<string>();
 
         var remoteAccounts = await GetRemoteItemsAsync<ToshlAccountItem>(
-            ToshlAccountsEndpoint,
+            $"{ToshlAccountsEndpoint}?include_deleted=true",
             userData
         );
         var remoteCategories = await GetRemoteItemsAsync<ToshlMetadataItem>(
@@ -421,6 +421,11 @@ public partial class ToshlService
                 continue;
             }
 
+            if (remoteAccount.Deleted == true)
+            {
+                continue;
+            }
+
             var createdAccount = new Account
             {
                 Name = remoteAccount.Name!,
@@ -560,42 +565,48 @@ public partial class ToshlService
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        var staleBudgets = await userDataContext.Budgets
+        var staleBudgetIds = await userDataContext.Budgets
             .Where(b =>
                 b.UserID == userData.Id
                 && b.Date.Year == currentMonthStart.Year
                 && b.Date.Month == currentMonthStart.Month
                 && !validCategories.Contains(b.Category)
             )
+            .Select(b => b.ID)
             .ToListAsync();
 
-        if (staleBudgets.Count > 0)
+        if (staleBudgetIds.Count > 0)
         {
-            userDataContext.Budgets.RemoveRange(staleBudgets);
+            await userDataContext.Budgets
+                .Where(b => staleBudgetIds.Contains(b.ID))
+                .ExecuteDeleteAsync();
         }
+
+        var existingBudgets = await userDataContext.Budgets
+            .Where(b =>
+                b.UserID == userData.Id
+                && b.Date.Year == currentMonthStart.Year
+                && b.Date.Month == currentMonthStart.Month
+            )
+            .ToDictionaryAsync(b => b.Category, StringComparer.OrdinalIgnoreCase);
 
         foreach (var budgetResolution in resolvedBudgetCategories)
         {
             var remoteBudget = budgetResolution.RemoteBudget;
             var mappedCategory = budgetResolution.Category;
 
-            var existingBudget = await userDataContext.Budgets.FirstOrDefaultAsync(b =>
-                b.UserID == userData.Id
-                && b.Date.Year == currentMonthStart.Year
-                && b.Date.Month == currentMonthStart.Month
-                && b.Category == mappedCategory
-            );
+            existingBudgets.TryGetValue(mappedCategory, out var existingBudget);
             if (existingBudget == null)
             {
-                userDataContext.Budgets.Add(
-                    new Budget
-                    {
-                        UserID = userData.Id,
-                        Date = currentMonthStart,
-                        Category = mappedCategory,
-                        Limit = remoteBudget.Limit!.Value,
-                    }
-                );
+                existingBudget = new Budget
+                {
+                    UserID = userData.Id,
+                    Date = currentMonthStart,
+                    Category = mappedCategory,
+                    Limit = remoteBudget.Limit!.Value,
+                };
+                userDataContext.Budgets.Add(existingBudget);
+                existingBudgets[mappedCategory] = existingBudget;
                 continue;
             }
 
