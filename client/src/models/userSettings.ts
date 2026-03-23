@@ -5,6 +5,16 @@ export interface IUserSettings {
   budgetWarningThreshold: number;
   forceSyncLookbackMonths: number;
   disableBuiltInTransactionCategories: boolean;
+  toshlMetadataSyncDirection: string;
+  toshlSyncLookbackMonths: number;
+  toshlAutoSyncIntervalHours: number;
+  toshlFullSyncStatus: string;
+  toshlFullSyncQueuedAt?: Date;
+  toshlFullSyncStartedAt?: Date;
+  toshlFullSyncCompletedAt?: Date;
+  toshlFullSyncError: string;
+  toshlFullSyncProgressPercent: number;
+  toshlFullSyncProgressDescription: string;
   enableAutoCategorizer: boolean;
   autoCategorizerModelOID?: number;
   autoCategorizerLastTrained?: Date;
@@ -13,6 +23,19 @@ export interface IUserSettings {
   autoCategorizerMinimumProbabilityPercentage: number;
 }
 
+export const ToshlMetadataSyncDirections = {
+  BudgetBoard: "budgetboard",
+  Toshl: "toshl",
+} as const;
+
+export const ToshlFullSyncStatuses = {
+  Idle: "idle",
+  Queued: "queued",
+  Running: "running",
+  Succeeded: "succeeded",
+  Failed: "failed",
+} as const;
+
 export interface IUserSettingsUpdateRequest {
   currency?: string;
   language?: string;
@@ -20,6 +43,9 @@ export interface IUserSettingsUpdateRequest {
   budgetWarningThreshold?: number;
   forceSyncLookbackMonths?: number;
   disableBuiltInTransactionCategories?: boolean;
+  toshlMetadataSyncDirection?: string;
+  toshlSyncLookbackMonths?: number;
+  toshlAutoSyncIntervalHours?: number;
   enableAutoCategorizer?: boolean;
   autoCategorizerModelOID?: number;
   autoCategorizerLastTrained?: Date;

@@ -128,6 +128,59 @@ public class UserSettingsService(
                 .Value;
         }
 
+        if (!string.IsNullOrEmpty(request.ToshlMetadataSyncDirection))
+        {
+            var direction = request.ToshlMetadataSyncDirection.ToLowerInvariant();
+            if (!ToshlMetadataSyncDirections.AllOptions.Contains(direction))
+            {
+                logger.LogError("Invalid Toshl metadata sync direction: {Direction}", direction);
+                throw new BudgetBoardServiceException(
+                    "Invalid Toshl metadata sync direction."
+                );
+            }
+
+            userSettings.ToshlMetadataSyncDirection = direction;
+        }
+
+        if (request.ToshlSyncLookbackMonths.HasValue)
+        {
+            var lookbackMonths = request.ToshlSyncLookbackMonths.Value;
+            var allowedLookbackValues = new[] { 0, 1, 3, 6, 12 };
+            if (!allowedLookbackValues.Contains(lookbackMonths))
+            {
+                logger.LogError(
+                    "Invalid Toshl sync lookback period: {LookbackMonths}",
+                    lookbackMonths
+                );
+                throw new BudgetBoardServiceException(
+                    "Toshl sync lookback period must be 1, 3, 6, or 12 months, or all time."
+                );
+            }
+
+            userSettings.ToshlSyncLookbackMonths = lookbackMonths;
+        }
+
+        if (request.ToshlAutoSyncIntervalHours.HasValue)
+        {
+            var autoSyncPeriod = request.ToshlAutoSyncIntervalHours.Value;
+            var allowedPeriodValues = new[] { 0, -1, -2 };
+            if (
+                autoSyncPeriod is < 1 or > 24
+                && !allowedPeriodValues.Contains(autoSyncPeriod)
+            )
+            {
+                logger.LogError(
+                    "Invalid Toshl auto sync interval: {Interval}",
+                    autoSyncPeriod
+                );
+                throw new BudgetBoardServiceException(
+                    "Toshl auto sync interval must be 1-24 hours, end of day, week, or month."
+                );
+            }
+
+            userSettings.ToshlAutoSyncIntervalHours = autoSyncPeriod;
+        }
+
         if (request.EnableAutoCategorizer.HasValue)
         {
             // We can only enable auto categorizer if we trained it

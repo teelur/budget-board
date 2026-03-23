@@ -20,12 +20,14 @@ const SyncButton = (): React.ReactNode => {
   const queryClient = useQueryClient();
   const doSyncMutation = useMutation({
     mutationFn: async () =>
-      await request({ url: "/api/simplefin/sync", method: "GET" }),
+      await request({ url: "/api/sync/run", method: "POST" }),
     onSuccess: async (data: AxiosResponse) => {
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["goals"] });
+      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
       await queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });

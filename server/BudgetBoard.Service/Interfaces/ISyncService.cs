@@ -14,5 +14,5 @@ public interface ISyncService
     /// <returns>
     /// A collection of messages or status updates regarding the sync process.
     /// </returns>
-    Task<IReadOnlyList<string>> SyncAsync(Guid userGuid);
+    Task<IReadOnlyList<string>> SyncAsync(Guid userGuid, bool force = false);
 }

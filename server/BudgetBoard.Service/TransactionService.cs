@@ -353,7 +353,7 @@ public class TransactionService(
 
             var newTransaction = new TransactionCreateRequest
             {
-                SyncID = string.Empty,
+                SyncID = transaction.SyncID ?? string.Empty,
                 Amount = transaction.Amount ?? 0,
                 Date = transaction.Date ?? nowProvider.UtcNow,
                 MerchantName = transaction.MerchantName,
