@@ -94,6 +94,19 @@ public partial class ToshlService
         foreach (var entry in remoteEntries)
         {
             processedEntries++;
+            if (IsToshlRecurringTemplateEntry(entry))
+            {
+                if (
+                    !string.IsNullOrWhiteSpace(entry.Id)
+                    && localTransactionsBySyncId.TryGetValue(entry.Id!, out var templateTransaction)
+                )
+                {
+                    await transactionService.DeleteTransactionAsync(userData.Id, templateTransaction.ID);
+                }
+
+                continue;
+            }
+
             if (!string.IsNullOrWhiteSpace(entry.Id)
                 && localTransactionsBySyncId.TryGetValue(entry.Id!, out var existingTransaction)
                 && entry.Deleted == true)
@@ -887,6 +900,11 @@ public partial class ToshlService
         return decimal.Round(entry.Amount.Value / mainRate.Value, 2, MidpointRounding.AwayFromZero);
     }
 
+    private static bool IsToshlRecurringTemplateEntry(ToshlEntryItem entry)
+    {
+        return entry.Repeat?.Template == true;
+    }
+
     private static bool IsSyncDue(DateTime lastSyncUtc, int autoSyncPeriod, DateTime nowUtc)
     {
         if (lastSyncUtc == DateTime.MinValue)
@@ -1067,7 +1085,14 @@ public partial class ToshlService
         public string? Category { get; init; }
         public IReadOnlyList<string>? Tags { get; init; }
         public string? Modified { get; init; }
+        public ToshlRepeatItem? Repeat { get; init; }
         public bool? Deleted { get; init; }
+    }
+
+    private sealed record ToshlRepeatItem
+    {
+        public string? Id { get; init; }
+        public bool? Template { get; init; }
     }
 
     private sealed record ToshlEntryCurrencyItem
