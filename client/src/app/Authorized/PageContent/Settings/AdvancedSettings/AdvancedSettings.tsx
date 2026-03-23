@@ -7,8 +7,14 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TrainAutoCategorizerModal from "./TrainAutoCategorizerModal/TrainAutoCategorizerModal";
 import AutoCategorizerMinimumProbability from "./AutoCategorizerMinimumProbability/AutoCategorizerMinimumProbability";
+import WipeAllDataButton from "./WipeAllDataButton/WipeAllDataButton";
+import { Pages } from "../../PageContent";
 
-const AdvancedSettings = () => {
+interface AdvancedSettingsProps {
+  setCurrentPage?: (page: Pages) => void;
+}
+
+const AdvancedSettings = ({ setCurrentPage }: AdvancedSettingsProps) => {
   const { t } = useTranslation();
 
   return (
@@ -20,6 +26,7 @@ const AdvancedSettings = () => {
         <EnableAutoCategorizer />
         <AutoCategorizerMinimumProbability />
         <TrainAutoCategorizerModal />
+        <WipeAllDataButton setCurrentPage={setCurrentPage} />
       </Stack>
     </Card>
   );

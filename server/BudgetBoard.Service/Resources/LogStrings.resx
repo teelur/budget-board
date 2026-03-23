@@ -88,6 +88,9 @@
   <data name="UserDataRetrievalErrorLog" xml:space="preserve">
     <value>An error occurred while retrieving the user data: {0}</value>
   </data>
+  <data name="UserDataWipeErrorLog" xml:space="preserve">
+    <value>Failed to wipe user data for user {1}: {0}</value>
+  </data>
   <data name="InvalidUserErrorLog" xml:space="preserve">
     <value>Attempted to access an invalid user.</value>
   </data>

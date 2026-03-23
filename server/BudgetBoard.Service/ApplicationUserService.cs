@@ -49,14 +49,94 @@ public class ApplicationUserService(
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
+    public async Task WipeUserDataAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        await using var transaction = await _userDataContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            await _userDataContext
+                .Values.Where(v => v.Asset != null && v.Asset.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext
+                .Transactions.Where(t => t.Account != null && t.Account.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext
+                .Balances.Where(b => b.Account != null && b.Account.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext
+                .SimpleFinAccounts.Where(a => a.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext
+                .LunchFlowAccounts.Where(a => a.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext
+                .Accounts.Where(a => a.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext
+                .SimpleFinOrganizations.Where(o => o.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext.Budgets.Where(b => b.UserID == userGuid).ExecuteDeleteAsync();
+
+            await _userDataContext.Goals.Where(g => g.UserID == userGuid).ExecuteDeleteAsync();
+
+            await _userDataContext.Assets.Where(a => a.UserID == userGuid).ExecuteDeleteAsync();
+
+            await _userDataContext
+                .AutomaticRules.Where(r => r.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext
+                .TransactionCategories.Where(c => c.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            await _userDataContext
+                .Institutions.Where(i => i.UserID == userGuid)
+                .ExecuteDeleteAsync();
+
+            if (userData.UserSettings != null)
+            {
+                userData.UserSettings.EnableAutoCategorizer = false;
+                userData.UserSettings.AutoCategorizerModelOID = null;
+                userData.UserSettings.AutoCategorizerLastTrained = null;
+                userData.UserSettings.AutoCategorizerModelStartDate = null;
+                userData.UserSettings.AutoCategorizerModelEndDate = null;
+            }
+
+            userData.LastSync = DateTime.MinValue;
+
+            await _userDataContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(
+                ex,
+                "{LogMessage}",
+                _logLocalizer["UserDataWipeErrorLog", ex.Message, userGuid]
+            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataWipeError"]);
+        }
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         ApplicationUser? foundUser;
         try
         {
-            foundUser = await _userDataContext.ApplicationUsers.FirstOrDefaultAsync(u =>
-                u.Id == new Guid(id)
-            );
+            foundUser = await _userDataContext
+                .ApplicationUsers.Include(u => u.UserSettings)
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {

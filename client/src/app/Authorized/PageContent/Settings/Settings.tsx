@@ -11,8 +11,13 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosResponse } from "axios";
 import CreatePassword from "./CreatePassword/CreatePassword";
+import { Pages } from "../PageContent";
 
-const Settings = (): React.ReactNode => {
+interface SettingsProps {
+  setCurrentPage?: (page: Pages) => void;
+}
+
+const Settings = ({ setCurrentPage }: SettingsProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userQuery = useQuery({
@@ -42,7 +47,7 @@ const Settings = (): React.ReactNode => {
       ) : (
         <CreatePassword />
       )}
-      <AdvancedSettings />
+      <AdvancedSettings setCurrentPage={setCurrentPage} />
     </Stack>
   );
 };
