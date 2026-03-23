@@ -120,8 +120,12 @@ public class ApplicationUserService(
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
-            _logger.LogError(ex, "Failed to wipe user data for user {UserId}", userGuid);
-            throw new BudgetBoardServiceException("Failed to wipe user data.");
+            _logger.LogError(
+                ex,
+                "{LogMessage}",
+                _logLocalizer["UserDataWipeErrorLog", ex.Message, userGuid]
+            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataWipeError"]);
         }
     }
 

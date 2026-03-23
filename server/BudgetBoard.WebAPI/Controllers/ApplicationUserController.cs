@@ -90,9 +90,14 @@ public class ApplicationUserController(
     {
         try
         {
-            await _applicationUserService.WipeUserDataAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty)
-            );
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.LogWarning("{LogMessage}", _logLocalizer["UserIdNotFoundLog"]);
+                return Unauthorized(_responseLocalizer["UserNotAuthenticated"].Value);
+            }
+
+            await _applicationUserService.WipeUserDataAsync(new Guid(userId));
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)

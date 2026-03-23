@@ -32,6 +32,9 @@ const WipeAllDataButton = ({
       queryClient.invalidateQueries({ queryKey: ["goals"] }),
       queryClient.invalidateQueries({ queryKey: ["transactionCategories"] }),
       queryClient.invalidateQueries({ queryKey: ["institutions"] }),
+      queryClient.invalidateQueries({ queryKey: ["balances"] }),
+      queryClient.invalidateQueries({ queryKey: ["automaticRule"] }),
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] }),
     ]);
   }, [queryClient]);
 
