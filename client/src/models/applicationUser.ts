@@ -2,6 +2,10 @@ export interface IApplicationUser {
   id: string;
   simpleFinAccessToken: boolean;
   lunchFlowApiKey: boolean;
+  toshlAccessToken: boolean;
+  toshlAccessTokenSuffix: string;
+  toshlAccessTokenLength: number;
+  toshlLastSync: Date;
   lastSync: Date;
   twoFactorEnabled: boolean;
   hasOidcLogin: boolean;

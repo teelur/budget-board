@@ -135,6 +135,7 @@ public class TransactionSplitRequest : ITransactionSplitRequest
 
 public class TransactionImport
 {
+    public string? SyncID { get; set; }
     public DateTime? Date { get; set; }
     public string? MerchantName { get; set; }
     public string? Category { get; set; }
@@ -144,6 +145,7 @@ public class TransactionImport
     [JsonConstructor]
     public TransactionImport()
     {
+        SyncID = null;
         Date = DateTime.MinValue;
         MerchantName = string.Empty;
         Category = null;

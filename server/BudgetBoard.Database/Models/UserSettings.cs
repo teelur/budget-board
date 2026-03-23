@@ -34,6 +34,25 @@ public static class SupportedLanguages
     [SystemDefault, .. SupportedCultureNames];
 }
 
+public static class ToshlMetadataSyncDirections
+{
+    public const string BudgetBoard = "budgetboard";
+    public const string Toshl = "toshl";
+
+    public static List<string> AllOptions { get; } = [BudgetBoard, Toshl];
+}
+
+public static class ToshlFullSyncStatuses
+{
+    public const string Idle = "idle";
+    public const string Queued = "queued";
+    public const string Running = "running";
+    public const string Succeeded = "succeeded";
+    public const string Failed = "failed";
+
+    public static List<string> AllOptions { get; } = [Idle, Queued, Running, Succeeded, Failed];
+}
+
 public class UserSettings
 {
     /// <summary>
@@ -70,6 +89,63 @@ public class UserSettings
     /// Indicates whether built-in transaction categories are disabled.
     /// </summary>
     public bool DisableBuiltInTransactionCategories { get; set; } = false;
+
+    /// <summary>
+    /// Controls which metadata source is authoritative for Toshl-linked data.
+    /// </summary>
+    public string ToshlMetadataSyncDirection { get; set; } =
+        ToshlMetadataSyncDirections.Toshl;
+
+    /// <summary>
+    /// Controls how far back Toshl transaction imports should look.
+    /// A value of 0 imports all available history.
+    /// </summary>
+    public int ToshlSyncLookbackMonths { get; set; } = 0;
+
+    /// <summary>
+    /// Controls how often Toshl metadata is synchronized automatically.
+    /// </summary>
+    public int ToshlAutoSyncIntervalHours { get; set; } = 8;
+
+    /// <summary>
+    /// Serialized Toshl category and tag mappings to Budget Board categories.
+    /// </summary>
+    public string ToshlCategoryMappingsJson { get; set; } = "[]";
+
+    /// <summary>
+    /// Status of the latest user-triggered Toshl full sync.
+    /// </summary>
+    public string ToshlFullSyncStatus { get; set; } = ToshlFullSyncStatuses.Idle;
+
+    /// <summary>
+    /// Time when the latest user-triggered Toshl full sync was queued.
+    /// </summary>
+    public DateTime? ToshlFullSyncQueuedAt { get; set; } = null;
+
+    /// <summary>
+    /// Time when the latest user-triggered Toshl full sync started.
+    /// </summary>
+    public DateTime? ToshlFullSyncStartedAt { get; set; } = null;
+
+    /// <summary>
+    /// Time when the latest user-triggered Toshl full sync completed.
+    /// </summary>
+    public DateTime? ToshlFullSyncCompletedAt { get; set; } = null;
+
+    /// <summary>
+    /// Detailed failure text for the latest user-triggered Toshl full sync.
+    /// </summary>
+    public string ToshlFullSyncError { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Coarse completion percentage for the latest user-triggered Toshl full sync.
+    /// </summary>
+    public int ToshlFullSyncProgressPercent { get; set; } = 0;
+
+    /// <summary>
+    /// Human-readable progress text for the latest user-triggered Toshl full sync.
+    /// </summary>
+    public string ToshlFullSyncProgressDescription { get; set; } = string.Empty;
 
     /// <summary>
     /// Indicates whether the auto-categorizer is enabled.

@@ -160,6 +160,8 @@ builder.Host.UseSerilog(
 );
 
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IToshlFullSyncQueue, ToshlFullSyncQueue>();
+builder.Services.AddHostedService(sp => (ToshlFullSyncQueue)sp.GetRequiredService<IToshlFullSyncQueue>());
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -228,6 +230,7 @@ builder.Services.AddScoped<IInstitutionService, InstitutionService>();
 builder.Services.AddScoped<ISyncService, SyncService>();
 builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<ILunchFlowService, LunchFlowService>();
+builder.Services.AddScoped<IToshlService, ToshlService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();

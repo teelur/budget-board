@@ -9,11 +9,14 @@ public static class Helpers
 
     public const string DEFAULT_ERROR_STRING = "There was an internal server error.";
 
-    public static IActionResult BuildErrorResponse(string message = DEFAULT_ERROR_STRING)
+    public static IActionResult BuildErrorResponse(
+        string message = DEFAULT_ERROR_STRING,
+        int statusCode = StatusCodes.Status500InternalServerError
+    )
     {
         var errorObjectResult = new ObjectResult(message)
         {
-            StatusCode = StatusCodes.Status500InternalServerError,
+            StatusCode = statusCode,
         };
 
         return errorObjectResult;

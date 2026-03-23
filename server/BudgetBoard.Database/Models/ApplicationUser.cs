@@ -21,6 +21,16 @@ public class ApplicationUser : IdentityUser<Guid>
     public string LunchFlowApiKey { get; set; } = string.Empty;
 
     /// <summary>
+    /// Personal access token for Toshl service integration.
+    /// </summary>
+    public string ToshlAccessToken { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The last date and time Toshl metadata was synchronized.
+    /// </summary>
+    public DateTime ToshlLastSync { get; set; } = DateTime.MinValue;
+
+    /// <summary>
     /// The last date and time the user's data was synchronized.
     /// </summary>
     public DateTime LastSync { get; set; } = DateTime.MinValue;

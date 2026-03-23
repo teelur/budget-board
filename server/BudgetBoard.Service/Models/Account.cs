@@ -8,6 +8,7 @@ public static class AccountSource
     public const string Manual = "Manual";
     public const string SimpleFIN = "SimpleFIN";
     public const string LunchFlow = "LunchFlow";
+    public const string Toshl = "Toshl";
 }
 
 public interface IAccountCreateRequest
@@ -133,21 +134,19 @@ public class AccountResponse : IAccountResponse
 
     public AccountResponse(Account account)
     {
+        var latestVisibleBalance = account
+            .Balances.Where(b => b.Deleted == null)
+            .OrderByDescending(b => b.DateTime <= DateTime.UtcNow)
+            .ThenByDescending(b => b.DateTime)
+            .FirstOrDefault();
+
         ID = account.ID;
         Name = account.Name;
         InstitutionID = account.InstitutionID;
         Type = account.Type;
         Subtype = account.Subtype;
-        CurrentBalance =
-            account
-                .Balances.OrderByDescending(b => b.DateTime)
-                .FirstOrDefault(b => b.Deleted == null)
-                ?.Amount
-            ?? 0;
-        BalanceDate = account
-            .Balances.OrderByDescending(b => b.DateTime)
-            .FirstOrDefault(b => b.Deleted == null)
-            ?.DateTime;
+        CurrentBalance = latestVisibleBalance?.Amount ?? 0;
+        BalanceDate = latestVisibleBalance?.DateTime;
         HideTransactions = account.HideTransactions;
         HideAccount = account.HideAccount;
         Deleted = account.Deleted;

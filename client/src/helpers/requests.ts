@@ -28,7 +28,24 @@ export const translateAxiosError = (error: AxiosError): string => {
       // that falls out of the range of 2xx
       return error.response.data;
     }
-    return "An error occurred with an unexpected response format.";
+
+    if (typeof error.response.data === "object" && error.response.data !== null) {
+      const data = error.response.data as Record<string, unknown>;
+      const candidateMessage =
+        (typeof data.message === "string" && data.message) ||
+        (typeof data.detail === "string" && data.detail) ||
+        (typeof data.title === "string" && data.title);
+
+      if (candidateMessage) {
+        return candidateMessage;
+      }
+
+      if (typeof data.errors === "object" && data.errors !== null) {
+        return JSON.stringify(data.errors);
+      }
+    }
+
+    return `Request failed with status ${error.response.status}.`;
   } else if (error.request) {
     // The request was made but no response was received
     return "No response received from the server.";

@@ -15,6 +15,7 @@ public class SyncService(
     UserDataContext userDataContext,
     ISimpleFinService simpleFinService,
     ILunchFlowService lunchFlowService,
+    IToshlService toshlService,
     IGoalService goalService,
     IApplicationUserService applicationUserService,
     IAutomaticRuleService automaticRuleService,
@@ -24,7 +25,7 @@ public class SyncService(
 ) : ISyncService
 {
     /// <inheritdoc />
-    public async Task<IReadOnlyList<string>> SyncAsync(Guid userGuid)
+    public async Task<IReadOnlyList<string>> SyncAsync(Guid userGuid, bool force = false)
     {
         var errors = new List<string>();
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -50,6 +51,28 @@ public class SyncService(
         else
         {
             logger.LogInformation("{LogMessage}", logLocalizer["LunchFlowApiKeyNotConfiguredLog"]);
+        }
+
+        if (!string.IsNullOrEmpty(userData.ToshlAccessToken))
+        {
+            var toshlFullSyncStatus = userData.UserSettings?.ToshlFullSyncStatus ?? string.Empty;
+            if (
+                toshlFullSyncStatus == ToshlFullSyncStatuses.Queued
+                || toshlFullSyncStatus == ToshlFullSyncStatuses.Running
+            )
+            {
+                logger.LogInformation(
+                    "Skipping background Toshl sync because a Toshl full sync is already queued or running."
+                );
+            }
+            else
+            {
+                errors.AddRange(await toshlService.SyncAsync(userGuid, force: force));
+            }
+        }
+        else
+        {
+            logger.LogInformation("{LogMessage}", logLocalizer["ToshlTokenNotConfiguredLog"]);
         }
 
         await goalService.CompleteGoalsAsync(userData.Id);
@@ -81,6 +104,7 @@ public class SyncService(
                 .ThenInclude(a => a.SimpleFinAccount)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.LunchFlowAccount)
+                .Include(u => u.TransactionCategories)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
@@ -105,12 +129,17 @@ public class SyncService(
 
     private static void SetManualSourceForUnlinkedAccounts(IEnumerable<Account> accounts)
     {
-        foreach (
-            var account in accounts.Where(a =>
-                a.SimpleFinAccount == null && a.LunchFlowAccount == null
-            )
-        )
+        foreach (var account in accounts.Where(a => a.SimpleFinAccount == null && a.LunchFlowAccount == null))
         {
+            if (
+                string.Equals(account.Source, AccountSource.Toshl, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(account.Institution?.Name, "Toshl", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                account.Source = AccountSource.Toshl;
+                continue;
+            }
+
             account.Source = AccountSource.Manual;
         }
     }
