@@ -23,6 +23,7 @@ export enum Pages {
 
 interface PageContentProps {
   currentPage: Pages;
+  setCurrentPage?: (page: Pages) => void;
 }
 
 const PageContent = (props: PageContentProps): React.ReactNode => {
@@ -45,7 +46,7 @@ const PageContent = (props: PageContentProps): React.ReactNode => {
       case Pages.ExternalAccounts:
         return <ExternalAccounts />;
       case Pages.Settings:
-        return <Settings />;
+        return <Settings setCurrentPage={props.setCurrentPage} />;
     }
   };
 

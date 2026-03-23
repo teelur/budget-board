@@ -26,4 +26,10 @@ public interface IApplicationUserService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The user update details.</param>
     Task UpdateApplicationUserAsync(Guid userGuid, IApplicationUserUpdateRequest request);
+
+    /// <summary>
+    /// Deletes all user-owned financial data while preserving the user account and settings.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    Task WipeUserDataAsync(Guid userGuid);
 }

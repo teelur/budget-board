@@ -83,6 +83,29 @@ public class ApplicationUserController(
     [Route("[action]")]
     public IActionResult IsSignedIn() => Ok(HttpContext.User?.Identity?.IsAuthenticated ?? false);
 
+    [HttpPost]
+    [Route("[action]")]
+    [Authorize]
+    public async Task<IActionResult> WipeData()
+    {
+        try
+        {
+            await _applicationUserService.WipeUserDataAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty)
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+        }
+    }
+
     [HttpDelete]
     [Route("[action]")]
     [Authorize]

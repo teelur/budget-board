@@ -52,7 +52,7 @@ const Authorized = (): React.ReactNode => {
       >
         <TransactionCategoryProvider>
           <TransactionFiltersProvider setCurrentPage={setCurrentPage}>
-            <PageContent currentPage={currentPage} />
+            <PageContent currentPage={currentPage} setCurrentPage={setCurrentPage} />
           </TransactionFiltersProvider>
         </TransactionCategoryProvider>
       </AppShellMain>
