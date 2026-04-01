@@ -1,5 +1,5 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
@@ -7,21 +7,22 @@ public static class AccountSource
 {
     public const string Manual = "Manual";
     public const string SimpleFIN = "SimpleFIN";
+    public const string LunchFlow = "LunchFlow";
 }
+
 public interface IAccountCreateRequest
 {
-    public string? SyncID { get; set; }
-    public string Name { get; set; }
-    public Guid? InstitutionID { get; set; }
-    public string Type { get; set; }
-    public string Subtype { get; set; }
-    public bool HideTransactions { get; set; }
-    public bool HideAccount { get; set; }
-    public string Source { get; set; }
+    public string Name { get; }
+    public Guid? InstitutionID { get; }
+    public string Type { get; }
+    public string Subtype { get; }
+    public bool HideTransactions { get; }
+    public bool HideAccount { get; }
+    public string Source { get; }
 }
+
 public class AccountCreateRequest() : IAccountCreateRequest
 {
-    public string? SyncID { get; set; }
     public string Name { get; set; } = string.Empty;
     public Guid? InstitutionID { get; set; }
     public string Type { get; set; } = string.Empty;
@@ -33,13 +34,15 @@ public class AccountCreateRequest() : IAccountCreateRequest
 
 public interface IAccountUpdateRequest
 {
-    public Guid ID { get; set; }
-    public string Name { get; set; }
-    public string Type { get; set; }
-    public string Subtype { get; set; }
-    public bool HideTransactions { get; set; }
-    public bool HideAccount { get; set; }
+    public Guid ID { get; }
+    public string Name { get; }
+    public string Type { get; }
+    public string Subtype { get; }
+    public bool HideTransactions { get; }
+    public bool HideAccount { get; }
+    public decimal? InterestRate { get; }
 }
+
 public class AccountUpdateRequest() : IAccountUpdateRequest
 {
     public Guid ID { get; set; } = Guid.NewGuid();
@@ -48,8 +51,10 @@ public class AccountUpdateRequest() : IAccountUpdateRequest
     public string Subtype { get; set; } = string.Empty;
     public bool HideTransactions { get; set; } = false;
     public bool HideAccount { get; set; } = false;
+    public decimal? InterestRate { get; set; } = null;
 
-    public AccountUpdateRequest(Account account) : this()
+    public AccountUpdateRequest(Account account)
+        : this()
     {
         ID = account.ID;
         Name = account.Name;
@@ -57,14 +62,16 @@ public class AccountUpdateRequest() : IAccountUpdateRequest
         Subtype = account.Subtype;
         HideTransactions = account.HideTransactions;
         HideAccount = account.HideAccount;
+        InterestRate = account.InterestRate;
     }
 }
 
 public interface IAccountIndexRequest
 {
-    public Guid ID { get; set; }
-    public int Index { get; set; }
+    public Guid ID { get; }
+    public int Index { get; }
 }
+
 public class AccountIndexRequest : IAccountIndexRequest
 {
     public Guid ID { get; set; }
@@ -73,25 +80,25 @@ public class AccountIndexRequest : IAccountIndexRequest
 
 public interface IAccountResponse
 {
-    public Guid ID { get; set; }
-    public string? SyncID { get; set; }
-    public string Name { get; set; }
-    public Guid? InstitutionID { get; set; }
-    public string Type { get; set; }
-    public string Subtype { get; set; }
-    public decimal CurrentBalance { get; set; }
-    public DateTime? BalanceDate { get; set; }
-    public bool HideTransactions { get; set; }
-    public bool HideAccount { get; set; }
-    public DateTime? Deleted { get; set; }
-    public int Index { get; set; }
-    public string Source { get; set; }
-    public Guid UserID { get; set; }
+    public Guid ID { get; }
+    public string Name { get; }
+    public Guid? InstitutionID { get; }
+    public string Type { get; }
+    public string Subtype { get; }
+    public decimal CurrentBalance { get; }
+    public DateTime? BalanceDate { get; }
+    public bool HideTransactions { get; }
+    public bool HideAccount { get; }
+    public DateTime? Deleted { get; }
+    public int Index { get; }
+    public decimal InterestRate { get; }
+    public string Source { get; }
+    public Guid UserID { get; }
 }
+
 public class AccountResponse : IAccountResponse
 {
     public Guid ID { get; set; }
-    public string? SyncID { get; set; }
     public string Name { get; set; }
     public Guid? InstitutionID { get; set; }
     public string Type { get; set; }
@@ -102,6 +109,7 @@ public class AccountResponse : IAccountResponse
     public bool HideAccount { get; set; }
     public DateTime? Deleted { get; set; }
     public int Index { get; set; }
+    public decimal InterestRate { get; set; }
     public string Source { get; set; }
     public Guid UserID { get; set; }
 
@@ -109,7 +117,6 @@ public class AccountResponse : IAccountResponse
     public AccountResponse()
     {
         ID = Guid.NewGuid();
-        SyncID = string.Empty;
         Name = string.Empty;
         InstitutionID = null;
         Type = string.Empty;
@@ -127,17 +134,25 @@ public class AccountResponse : IAccountResponse
     public AccountResponse(Account account)
     {
         ID = account.ID;
-        SyncID = account.SyncID;
         Name = account.Name;
         InstitutionID = account.InstitutionID;
         Type = account.Type;
         Subtype = account.Subtype;
-        CurrentBalance = account.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0;
-        BalanceDate = account.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.DateTime;
+        CurrentBalance =
+            account
+                .Balances.OrderByDescending(b => b.DateTime)
+                .FirstOrDefault(b => b.Deleted == null)
+                ?.Amount
+            ?? 0;
+        BalanceDate = account
+            .Balances.OrderByDescending(b => b.DateTime)
+            .FirstOrDefault(b => b.Deleted == null)
+            ?.DateTime;
         HideTransactions = account.HideTransactions;
         HideAccount = account.HideAccount;
         Deleted = account.Deleted;
         Index = account.Index;
+        InterestRate = account.InterestRate ?? 0;
         Source = account.Source;
         UserID = account.UserID;
     }

@@ -5,12 +5,14 @@ import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import AddBudget from "./AddBudget/AddBudget";
 import { ICategory } from "~/models/category";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IBudget, IBudgetCreateRequest } from "~/models/budget";
 import { AxiosError, AxiosResponse } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
+import BudgetSettings from "./BudgetSettings/BudgetSettings";
+import { useTranslation } from "react-i18next";
 
 interface BudgetsToolbarProps {
   categories: ICategory[];
@@ -24,7 +26,8 @@ interface BudgetsToolbarProps {
 const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   const [canSelectMultiple, { toggle }] = useDisclosure(false);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { t } = useTranslation();
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doCopyBudget = useMutation({
@@ -33,13 +36,17 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         url: "/api/budget",
         method: "POST",
         data: newBudgets,
+        params: { isCopy: true },
       }),
     onSuccess: async (_, variables: IBudgetCreateRequest[]) =>
       await queryClient.invalidateQueries({
         queryKey: ["budgets", variables[0]?.date],
       }),
     onError: (error: AxiosError) =>
-      notifications.show({ message: translateAxiosError(error), color: "red" }),
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      }),
   });
 
   const onCopyBudgets = (): void => {
@@ -64,15 +71,15 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
           doCopyBudget.mutate(newBudgets);
         } else {
           notifications.show({
-            message: "Previous month has no budget!",
-            color: "red",
+            message: t("budget_previous_month_no_budgets"),
+            color: "var(--button-color-destructive)",
           });
         }
       })
       .catch(() => {
         notifications.show({
-          message: "There was an error copying the previous month's budget.",
-          color: "red",
+          message: t("budget_copy_failed_message"),
+          color: "var(--button-color-destructive)",
         });
       });
   };
@@ -95,33 +102,37 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   };
 
   return (
-    <Stack>
-      <Button
-        onClick={toggleSelectMultiple}
-        variant="outline"
-        color={canSelectMultiple ? "green" : "gray"}
-      >
-        Select Multiple
-      </Button>
+    <Stack gap="1rem">
       <MonthToolcards
         selectedDates={props.selectedDates}
         setSelectedDates={props.setSelectedDates}
         timeToMonthlyTotalsMap={props.timeToMonthlyTotalsMap}
         isPending={props.isPending}
         allowSelectMultiple={canSelectMultiple}
+        allowFutureMonths
       />
-      <Group justify="flex-end">
-        {props.showCopy && (
-          <Button onClick={onCopyBudgets} loading={doCopyBudget.isPending}>
-            Copy Previous Month
-          </Button>
-        )}
-        {props.selectedDates.length === 1 && (
-          <AddBudget
-            date={props.selectedDates[0]!}
-            categories={props.categories}
-          />
-        )}
+      <Group justify="space-between" gap="0.5rem">
+        <Button
+          onClick={toggleSelectMultiple}
+          variant="outline"
+          color={canSelectMultiple ? "var(--button-color-confirm)" : ""}
+        >
+          {t("select_multiple")}
+        </Button>
+        <Group gap="0.5rem">
+          {props.showCopy && (
+            <Button onClick={onCopyBudgets} loading={doCopyBudget.isPending}>
+              {t("copy_previous")}
+            </Button>
+          )}
+          {props.selectedDates.length === 1 && (
+            <AddBudget
+              date={props.selectedDates[0]!}
+              categories={props.categories}
+            />
+          )}
+          <BudgetSettings />
+        </Group>
       </Group>
     </Stack>
   );

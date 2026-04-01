@@ -4,10 +4,14 @@
 
 ---
 
-[![Build and Publish](https://github.com/tshea113/budget-board/actions/workflows/docker-image-ci-build.yml/badge.svg)](https://github.com/tshea113/budget-board/actions/workflows/docker-image-ci-build.yml)
-![GitHub Release](https://img.shields.io/github/v/release/tshea113/budget-board)
+[![Build and Publish](https://github.com/teelur/budget-board/actions/workflows/docker-image-ci-build.yml/badge.svg)](https://github.com/teelur/budget-board/actions/workflows/docker-image-ci-build.yml)
+![GitHub Release](https://img.shields.io/github/v/release/teelur/budget-board)
 
 A simple app for tracking monthly spending and working towards financial goals.
+
+## Getting Started
+
+Check out the [wiki](https://budgetboard.net/) for instructions on how to setup Budget Board.
 
 ## About The Project
 
@@ -15,40 +19,50 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 
 ### Features
 
-- Automatically sync your bank account data with [SimpleFIN](https://www.simplefin.org/)
-- Dashboard to view account data at a glance
-- Organize transactions into categories and subcategories
-- Create monthly budgets for categories and subcategories
-- Create and track goals for savings/loan payoff
-- Graphs to view trends over time (Spending, Assets, Liabilities, Net Worth, and more)
+#### Manage Finances
 
-### Bugs and Feature Requests
+- **Accounts & Assets**: Manage both your financial accounts (checking, savings, credit cards) and assets (property, valuables) in one place.
+- **Transactions**: Record and categorize your transactions to keep track of your spending habits.
+- **Budgeting**: Set monthly budgets for different categories and track your spending against them.
 
-Feel free to open an issue if you notice any bugs or have any feature requests!
+#### Data Import & Automation
+
+- **Transaction CSV Import**: Import transactions in bulk using CSV files.
+- **Sync Providers**: Integrate with financial institutions through providers like SimpleFIN and LunchFlow for automatic transaction and account balance syncing.
+- **Auto-Categorization**: Train a machine learning model on your categorized transactions to automatically predict categories for new transactions.
+- **Automatic Rules**: Create rules to automatically update transactions based on criteria like description, amount, or date.
+
+#### Analytics & Insights
+
+- **Financial Goals**: Set and track progress towards financial goals such as saving for a house or paying off debt.
+- **Customizable Trends Charts**: Visualize spending trends with customizable charts that can be filtered by date range, account, and category.
+
+#### Security
+
+- **User Authentication**: Authenticate locally with two-factor authentication (2FA), or bring your own authentication provider with OIDC login.
+
+#### Internationalization
+
+- **Multiple Languages**: Selectable languages include English, German, French, and Simplified Chinese, with community-contributed translations.
+- **Localized Date & Number Formats**: Dates and numbers are displayed according to the selected language and locale.
+
+### Feedback
+
+- [Notice a bug?](https://github.com/teelur/budget-board/issues/new/choose)
+- [Have a feature request?](https://github.com/teelur/budget-board/discussions/categories/feature-requests)
+- [Have any feedback?](https://github.com/teelur/budget-board/discussions/categories/feedback)
+- [Have a question?](https://github.com/teelur/budget-board/discussions/categories/q-a)
+
+### Translations
+
+- Help translate Budget Board into other languages at [Weblate](https://hosted.weblate.org/projects/budget-board/).
 
 ### Screenshots
 
-<img width="80%" alt="dash" src="img/budget-board-dashboard.png" />
-<img width="80%" alt="dash" src="img/budget-board-budgets.png" />
-
-## Configuration
-
-### Setting up Docker Compose
-
-This project is deployed using Docker Compose.
-
-The `compose.yml` and `compose.override.yml` files are used to deploy the app.
-Both files are able to deploy the app as is, but it is recommended to at least update the database password.
-
-See the [wiki](https://github.com/tshea113/budget-board/wiki/Deploying-via-Docker-Compose) for more details about configuring the compose override file.
-### Deploy
-
-Deploy the app by running the following command:
-
-```
-docker compose up -d
-```
-
-You can now access the app at `localhost:6253`.
-
-Check out the [wiki](https://github.com/tshea113/budget-board/wiki) for more details about configuration and using the app :)
+<img width="45%" alt="dashboard" src="img/budget-board-dashboard.png" />
+<img width="45%" alt="accounts" src="img/budget-board-accounts.png" />
+<img width="45%" alt="assets" src="img/budget-board-assets.png" />
+<img width="45%" alt="transactions" src="img/budget-board-transactions.png" />
+<img width="45%" alt="budgets" src="img/budget-board-budgets.png" />
+<img width="45%" alt="goals" src="img/budget-board-goals.png" />
+<img width="45%" alt="trends" src="img/budget-board-trends.png" />

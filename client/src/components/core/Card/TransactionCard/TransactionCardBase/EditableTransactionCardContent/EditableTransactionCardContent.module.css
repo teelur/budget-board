@@ -1,0 +1,39 @@
+.content {
+  flex-direction: row;
+
+  @container (max-width: 784px) {
+    flex-direction: column;
+  }
+}
+
+.dateContainer {
+  width: 160px;
+
+  @container (max-width: 784px) {
+    width: 100%;
+  }
+}
+
+.contentSubcontainer {
+  width: auto;
+
+  @container (max-width: 784px) {
+    width: 100%;
+  }
+}
+
+.categoryContainer {
+  width: 180px;
+
+  @container (max-width: 784px) {
+    width: 100%;
+  }
+}
+
+.amountContainer {
+  width: 110px;
+
+  @container (max-width: 784px) {
+    width: 100%;
+  }
+}

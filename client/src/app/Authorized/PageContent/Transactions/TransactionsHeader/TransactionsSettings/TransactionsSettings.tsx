@@ -1,12 +1,18 @@
-import { Accordion, Modal, Stack } from "@mantine/core";
+import { Accordion as MantineAccordion, Stack } from "@mantine/core";
 import React from "react";
 import CustomCategories from "./CustomCategories/CustomCategories";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { getDeletedTransactions } from "~/helpers/transactions";
-import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
+import AutomaticRules from "./AutomaticRules/AutomaticRules";
+import Modal from "~/components/core/Modal/Modal";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import DeletedTransactionCards from "./DeletedTransactionCards/DeletedTransactionCards";
+import Accordion from "~/components/core/Accordion/Accordion";
+import { useTranslation } from "react-i18next";
 
 interface TransactionsSettingsProps {
   modalOpened: boolean;
@@ -16,7 +22,8 @@ interface TransactionsSettingsProps {
 const TransactionsSettings = (
   props: TransactionsSettingsProps
 ): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { t } = useTranslation();
+  const { request } = useAuth();
 
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: true }],
@@ -43,44 +50,44 @@ const TransactionsSettings = (
 
   return (
     <Modal
-      size="40rem"
-      centered
-      padding="0.5rem"
+      size="60rem"
       opened={props.modalOpened}
       onClose={props.closeModal}
-      title="Transactions Settings"
-      styles={{
-        inner: {
-          left: "0",
-          right: "0",
-          padding: "0 !important",
-        },
-      }}
+      title={<PrimaryText size="md">{t("transactions_settings")}</PrimaryText>}
     >
-      <Accordion variant="filled" multiple defaultValue={["custom categories"]}>
-        <Accordion.Item value="custom categories">
-          <Accordion.Control>Custom Categories</Accordion.Control>
-          <Accordion.Panel>
+      <Accordion
+        defaultValue={["custom categories", "automatic rules"]}
+        elevation={1}
+      >
+        <MantineAccordion.Item value="custom categories">
+          <MantineAccordion.Control>
+            <PrimaryText size="md">{t("custom_categories")}</PrimaryText>
+          </MantineAccordion.Control>
+          <MantineAccordion.Panel>
             <CustomCategories />
-          </Accordion.Panel>
-        </Accordion.Item>
-        <Accordion.Item value="deleted transactions">
-          <Accordion.Control>Deleted Transactions</Accordion.Control>
-          <Accordion.Panel>
+          </MantineAccordion.Panel>
+        </MantineAccordion.Item>
+        <MantineAccordion.Item value="automatic rules">
+          <MantineAccordion.Control>
+            <PrimaryText size="md">{t("automatic_rules")}</PrimaryText>
+          </MantineAccordion.Control>
+          <MantineAccordion.Panel>
+            <AutomaticRules />
+          </MantineAccordion.Panel>
+        </MantineAccordion.Item>
+        <MantineAccordion.Item value="deleted transactions">
+          <MantineAccordion.Control>
+            <PrimaryText size="md">{t("deleted_transactions")}</PrimaryText>
+          </MantineAccordion.Control>
+          <MantineAccordion.Panel>
             <Stack gap="0.5rem">
-              {deletedTransactions.length !== 0 ? (
-                deletedTransactions.map((deletedTransaction: ITransaction) => (
-                  <DeletedTransactionsCard
-                    key={deletedTransaction.id}
-                    deletedTransaction={deletedTransaction}
-                  />
-                ))
-              ) : (
-                <span>No deleted transactions.</span>
-              )}
+              <DimmedText size="sm">
+                {t("view_and_restore_deleted_transactions")}
+              </DimmedText>
+              <DeletedTransactionCards transactions={deletedTransactions} />
             </Stack>
-          </Accordion.Panel>
-        </Accordion.Item>
+          </MantineAccordion.Panel>
+        </MantineAccordion.Item>
       </Accordion>
     </Modal>
   );

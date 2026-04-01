@@ -1,34 +1,27 @@
-import classes from "./UncategorizedTransactionsCard.module.css";
-
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   getTransactionsByCategory,
   getVisibleTransactions,
 } from "~/helpers/transactions";
-import {
-  Card,
-  Group,
-  Pagination,
-  ScrollArea,
-  Skeleton,
-  Stack,
-  Title,
-} from "@mantine/core";
-import {
-  defaultTransactionCategories,
-  ITransaction,
-} from "~/models/transaction";
+import { Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { ITransaction } from "~/models/transaction";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import UncategorizedTransaction from "./UncategorizedTransaction/UncategorizedTransaction";
-import { ICategoryResponse } from "~/models/category";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
+import { useTranslation } from "react-i18next";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;
   const [activePage, setPage] = React.useState(1);
 
-  const { request } = React.useContext<any>(AuthContext);
+  const { t } = useTranslation();
+  const { transactionCategories } = useTransactionCategories();
+  const { request } = useAuth();
+
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
@@ -45,26 +38,6 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
     },
   });
 
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
-
   const sortedFilteredTransactions = React.useMemo(
     () =>
       getVisibleTransactions(
@@ -78,40 +51,43 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   }
 
   return (
-    <Card className={classes.root} withBorder radius="md">
+    <Card w="100%" elevation={1}>
       <Stack gap="0.5rem" align="center" w="100%">
-        <Group justify="center">
-          <Title order={2}>Uncategorized Transactions</Title>
-        </Group>
-        <Pagination
-          value={activePage}
-          onChange={setPage}
-          total={Math.ceil(sortedFilteredTransactions.length / itemsPerPage)}
-        />
-        {transactionsQuery.isPending || transactionCategoriesQuery.isPending ? (
+        <PrimaryText size="xl">{t("uncategorized_transactions")}</PrimaryText>
+        {transactionsQuery.isPending ? (
           <Skeleton height={350} radius="lg" />
         ) : (
           <ScrollArea.Autosize
-            className={classes.scrollArea}
+            w="100%"
+            p="0.125rem"
             mah={350}
             type="auto"
             offsetScrollbars
           >
-            <Stack className={classes.transactionList}>
+            <Stack gap="0.5rem">
               {sortedFilteredTransactions
                 .slice(
                   (activePage - 1) * itemsPerPage,
                   (activePage - 1) * itemsPerPage + itemsPerPage
                 )
                 .map((transaction: ITransaction) => (
-                  <UncategorizedTransaction
+                  <TransactionCard
                     key={transaction.id}
                     transaction={transaction}
-                    categories={transactionCategoriesWithCustom}
+                    categories={transactionCategories}
+                    hoverEffect
+                    elevation={2}
                   />
                 ))}
             </Stack>
           </ScrollArea.Autosize>
+        )}
+        {sortedFilteredTransactions.length > itemsPerPage && (
+          <Pagination
+            value={activePage}
+            onChange={setPage}
+            total={Math.ceil(sortedFilteredTransactions.length / itemsPerPage)}
+          />
         )}
       </Stack>
     </Card>

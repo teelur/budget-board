@@ -1,30 +1,27 @@
-import classes from "./Budgets.module.css";
-
 import { Stack } from "@mantine/core";
 import React from "react";
 import BudgetsToolbar from "./BudgetsToolbar/BudgetsToolbar";
-import { initCurrentMonth } from "~/helpers/datetime";
 import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
 } from "~/helpers/transactions";
-import { useQueries, useQuery } from "@tanstack/react-query";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useQueries } from "@tanstack/react-query";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IBudget } from "~/models/budget";
 import { AxiosResponse } from "axios";
-import {
-  defaultTransactionCategories,
-  ITransaction,
-} from "~/models/transaction";
-import { ICategoryResponse } from "~/models/category";
+import { ITransaction } from "~/models/transaction";
 import BudgetsContent from "./BudgetsContent/BudgetsContent";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const Budgets = (): React.ReactNode => {
-  const [selectedDates, setSelectedDates] = React.useState<Date[]>([
-    initCurrentMonth(),
-  ]);
+  const { transactionCategories } = useTransactionCategories();
+  const { dayjs } = useLocale();
+  const { request } = useAuth();
 
-  const { request } = React.useContext<any>(AuthContext);
+  const [selectedDates, setSelectedDates] = React.useState<Date[]>([
+    dayjs().startOf("month").toDate(),
+  ]);
 
   const budgetsQuery = useQueries({
     queries: selectedDates.map((date: Date) => ({
@@ -79,40 +76,20 @@ const Budgets = (): React.ReactNode => {
     },
   });
 
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
-
   // We need to filter out the transactions labelled with 'Hide From Budgets'
   const transactionsWithoutHidden = filterHiddenTransactions(
-    transactionsForMonthsQuery.data ?? []
+    transactionsForMonthsQuery.data ?? [],
   );
 
   const timeToMonthlyTotalsMap: Map<number, number> = React.useMemo(
     () => buildTimeToMonthlyTotalsMap(selectedDates, transactionsWithoutHidden),
-    [selectedDates, transactionsWithoutHidden]
+    [selectedDates, transactionsWithoutHidden],
   );
 
   return (
-    <Stack className={classes.root}>
+    <Stack w="100%" maw={1400}>
       <BudgetsToolbar
-        categories={transactionCategoriesWithCustom}
+        categories={transactionCategories}
         selectedDates={selectedDates}
         setSelectedDates={setSelectedDates}
         timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
@@ -121,18 +98,16 @@ const Budgets = (): React.ReactNode => {
           budgetsQuery.data.length === 0 &&
           selectedDates.length === 1
         }
-        isPending={
-          budgetsQuery.isPending || transactionCategoriesQuery.isPending
-        }
+        isPending={budgetsQuery.isPending}
       />
       <BudgetsContent
         budgets={budgetsQuery.data ?? []}
-        categories={transactionCategoriesWithCustom}
+        categories={transactionCategories}
         transactions={transactionsWithoutHidden}
-        selectedDate={selectedDates.length === 1 ? selectedDates[0] : undefined}
-        isPending={
-          budgetsQuery.isPending || transactionCategoriesQuery.isPending
+        selectedDate={
+          selectedDates.length === 1 ? (selectedDates[0] ?? null) : null
         }
+        isPending={budgetsQuery.isPending}
       />
     </Stack>
   );

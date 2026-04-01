@@ -1,33 +1,41 @@
 import classes from "./TransactionsHeader.module.css";
 
-import { ActionIcon, Button, Flex, Group, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Collapse,
+  Flex,
+  Group,
+  Stack,
+} from "@mantine/core";
 import { FilterIcon, SettingsIcon } from "lucide-react";
 import React from "react";
 import SortMenu from "./SortMenu/SortMenu";
 import { SortDirection } from "~/components/SortButton";
-import { Filters } from "~/models/transaction";
 import { Sorts } from "./SortMenu/SortMenuHelpers";
 import FilterCard from "./FilterCard/FilterCard";
 import { useDisclosure } from "@mantine/hooks";
 import TransactionsSettings from "./TransactionsSettings/TransactionsSettings";
-import { ICategory } from "~/models/category";
 import CreateTransactionModal from "./CreateTransactionModal/CreateTransactionModal";
+import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransactionsModal";
+import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
+import { useTranslation } from "react-i18next";
+import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransactionsModal";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
   setSort: (newSort: Sorts) => void;
   sortDirection: SortDirection;
   setSortDirection: (newSortDirection: SortDirection) => void;
-  filters: Filters;
-  setFilters: (newFilters: Filters) => void;
-  categories: ICategory[];
 }
 
 const TransactionsHeader = (
-  props: TransactionsHeaderProps
+  props: TransactionsHeaderProps,
 ): React.ReactNode => {
   const [settingsOpen, { open, close }] = useDisclosure(false);
-  const [isFilterCardOpen, { toggle }] = useDisclosure();
+
+  const { t } = useTranslation();
+  const { isFiltersPanelOpen, toggleFiltersPanel } = useTransactionFilters();
 
   return (
     <Stack className={classes.root}>
@@ -39,26 +47,26 @@ const TransactionsHeader = (
           setSortDirection={props.setSortDirection}
         />
         <Group className={classes.buttonGroup}>
+          <ImportTransactionsModal />
+          <ExportTransactionsModal />
           <Button
+            variant={isFiltersPanelOpen ? "outline" : "primary"}
             size="sm"
             rightSection={<FilterIcon size="1rem" />}
-            onClick={toggle}
+            onClick={toggleFiltersPanel}
           >
-            Filter
+            {t("filters")}
           </Button>
           <CreateTransactionModal />
-          <ActionIcon size="input-sm" onClick={open}>
+          <ActionIcon variant="subtle" size="input-sm" onClick={open}>
             <SettingsIcon />
           </ActionIcon>
           <TransactionsSettings modalOpened={settingsOpen} closeModal={close} />
         </Group>
       </Flex>
-      <FilterCard
-        isOpen={isFilterCardOpen}
-        categories={props.categories}
-        filters={props.filters}
-        setFilters={props.setFilters}
-      />
+      <Collapse in={isFiltersPanelOpen} transitionDuration={100}>
+        <FilterCard />
+      </Collapse>
     </Stack>
   );
 };

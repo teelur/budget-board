@@ -1,8 +1,14 @@
+import dayjs from "dayjs";
+
 const DATE = 1;
 const HOUR = 12;
 const MINUTES = 0;
 const SECONDS = 0;
 const MILLISECONDS = 0;
+
+// Mantine uses formatted date strings.
+export const mantineDateFormat = "YYYY-MM-DD";
+export const mantineDateTimeFormat = "YYYY-MM-DD HH:mm:ss";
 
 /**
  * Returns the number of days elapsed since the specified date, as a string.
@@ -29,14 +35,13 @@ export const getDaysSinceDate = (date: Date): string => {
  * @param {Date} date - The original date object to standardize.
  * @returns {Date} A new date object with standard time set.
  */
-export const getStandardDate = (date: Date) => {
-  const newDate = new Date(date);
-  newDate.setHours(HOUR);
-  newDate.setMinutes(MINUTES);
-  newDate.setSeconds(SECONDS);
-  newDate.setMilliseconds(MILLISECONDS);
-  return newDate;
-};
+export const getStandardDate = (date: Date) =>
+  dayjs(date)
+    .hour(HOUR)
+    .minute(MINUTES)
+    .second(SECONDS)
+    .millisecond(MILLISECONDS)
+    .toDate();
 
 /**
  * Initializes the current month by setting the date to 1, and time to 12:00:00.000.
@@ -112,8 +117,8 @@ export const getDaysInMonth = (monthIndex: number, year: number): number =>
  * @param {Date} date - The date to format.
  * @returns {string} The formatted month and year string.
  */
-export const getMonthAndYearDateString = (date: Date): string => {
-  return date.toLocaleString("default", { month: "long", year: "numeric" });
+export const getMonthAndYearDateString = (date: Date, locale: string): string => {
+  return date.toLocaleString(locale, { month: "long", year: "numeric" });
 };
 
 /**
@@ -130,3 +135,28 @@ export const getUniqueDates = (dates: Date[]): Date[] =>
     (date, index, array) =>
       array.findIndex((d) => d.getTime() === date.getTime()) === index
   );
+
+/**
+ * Determines whether two Date objects represent the same calendar day.
+ *
+ * Compares the year, month, and day components of both dates.
+ *
+ * @param date1 - The first date to compare.
+ * @param date2 - The second date to compare.
+ * @returns `true` if both dates are on the same year, month, and day; otherwise, `false`.
+ */
+export const areDatesEqual = (
+  date1: Date | null,
+  date2: Date | null
+): boolean => {
+  if (!date1 || !date2) {
+    return false;
+  }
+  const formattedDate1 = new Date(date1);
+  const formattedDate2 = new Date(date2);
+  return (
+    formattedDate1.getFullYear() === formattedDate2.getFullYear() &&
+    formattedDate1.getMonth() === formattedDate2.getMonth() &&
+    formattedDate1.getDate() === formattedDate2.getDate()
+  );
+};

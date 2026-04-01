@@ -1,0 +1,11 @@
+.container {
+  container-type: inline-size;
+}
+
+.fieldsContainer {
+  flex-direction: row;
+
+  @container (max-width: 450px) {
+    flex-direction: column;
+  }
+}

@@ -1,51 +1,64 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using System.Net;
-using System.Net.Mail;
+﻿using BudgetBoard.WebAPI.Resources;
+using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Localization;
+using MimeKit;
 
-namespace BudgetBoard.WebAPI.Utils;
+namespace BudgetBoard.Utils;
 
-public class EmailSender : IEmailSender
+public class EmailSender(
+    IConfiguration configuration,
+    IStringLocalizer<ApiResponseStrings> responseLocalizer
+) : IEmailSender
 {
-    public IConfiguration Configuration { get; }
-    public EmailSender(IConfiguration configuration)
-    {
-        Configuration = configuration;
-    }
-
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        var sender = Configuration.GetValue<string>("EMAIL_SENDER");
+        var sender = configuration.GetValue<string>("EMAIL_SENDER");
         if (string.IsNullOrEmpty(sender))
         {
-            throw new ArgumentNullException(nameof(sender));
+            throw new InvalidOperationException(responseLocalizer["EmailSenderConfigMissing"]);
         }
 
-        var senderPassword = Configuration.GetValue<string>("EMAIL_SENDER_PASSWORD");
-        if (string.IsNullOrEmpty(senderPassword))
+        // Some SMTP servers use a username separate from the sender email. If not set, use the sender email as username.
+        var senderUsername = configuration.GetValue<string>("EMAIL_SENDER_USERNAME");
+        if (string.IsNullOrEmpty(senderUsername))
         {
-            throw new ArgumentNullException(nameof(senderPassword));
+            senderUsername = sender;
         }
 
-        var smtpHost = Configuration.GetValue<string>("EMAIL_SMTP_HOST");
+        var senderPassword = configuration.GetValue<string>("EMAIL_SENDER_PASSWORD");
+
+        var smtpHost = configuration.GetValue<string>("EMAIL_SMTP_HOST");
         if (string.IsNullOrEmpty(smtpHost))
         {
-            throw new ArgumentNullException(nameof(smtpHost));
+            throw new InvalidOperationException(responseLocalizer["SmtpHostConfigMissing"]);
         }
 
-        using (MailMessage mm = new MailMessage(sender, email))
+        var smtpPort = configuration.GetValue<int?>("EMAIL_SMTP_PORT") ?? 587;
+
+        var message = new MimeMessage();
+        message.From.Add(MailboxAddress.Parse(sender));
+        message.To.Add(MailboxAddress.Parse(email));
+        message.Subject = subject;
+        message.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = htmlMessage };
+
+        using var smtp = new SmtpClient();
+        try
         {
-            mm.Subject = subject;
-            string body = htmlMessage;
-            mm.Body = body;
-            mm.IsBodyHtml = true;
-            SmtpClient smtp = new SmtpClient();
-            smtp.Host = smtpHost;
-            smtp.EnableSsl = true;
-            NetworkCredential NetworkCred = new NetworkCredential(sender, senderPassword);
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = NetworkCred;
-            smtp.Port = 587;
-            await smtp.SendMailAsync(mm);
+            await smtp.ConnectAsync(smtpHost, smtpPort, MailKit.Security.SecureSocketOptions.Auto);
+
+            if (!string.IsNullOrEmpty(senderPassword))
+            {
+                await smtp.AuthenticateAsync(senderUsername, senderPassword);
+            }
+            await smtp.SendAsync(message);
+        }
+        finally
+        {
+            if (smtp.IsConnected)
+            {
+                await smtp.DisconnectAsync(true);
+            }
         }
     }
 }

@@ -1,7 +1,0 @@
-.settingsIcon {
-  color: var(--mantine-color-text);
-
-  &:hover {
-    color: var(--mantine-color-primary);
-  }
-}

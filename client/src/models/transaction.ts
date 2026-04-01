@@ -1,5 +1,28 @@
 import { ICategory } from "./category";
 
+export interface ITransactionImport {
+  date: Date | null;
+  merchantName: string | null;
+  category: string | null;
+  amount: number | null;
+  account: string | null;
+}
+
+export interface ITransactionImportTableData extends ITransactionImport {
+  uid: number;
+  type: string | null;
+}
+
+export interface IAccountNameToIDKeyValuePair {
+  accountName: string;
+  accountID: string;
+}
+
+export interface ITransactionImportRequest {
+  transactions: ITransactionImport[];
+  accountNameToIDMap: IAccountNameToIDKeyValuePair[];
+}
+
 export interface ITransactionCreateRequest {
   syncID: string | null;
   amount: number;
@@ -43,6 +66,8 @@ export interface ITransaction {
 
 export interface IFilters {
   accounts: string[];
+  category: string;
+  dateRange: [Date | null, Date | null];
 }
 
 export class Filters implements IFilters {
@@ -57,6 +82,16 @@ export class Filters implements IFilters {
       this.dateRange = filter.dateRange;
     }
   }
+
+  public isEqual(other: Filters): boolean {
+    return (
+      JSON.stringify([...this.accounts].sort()) ===
+        JSON.stringify([...other.accounts].sort()) &&
+      this.category === other.category &&
+      this.dateRange[0]?.getTime() === other.dateRange[0]?.getTime() &&
+      this.dateRange[1]?.getTime() === other.dateRange[1]?.getTime()
+    );
+  }
 }
 
 export enum TransactionCardType {
@@ -66,6 +101,7 @@ export enum TransactionCardType {
 }
 
 export const hiddenTransactionCategory = "Hide from Budgets";
+export const uncategorizedTransactionCategory = "uncategorized";
 
 export const defaultTransactionCategories: ICategory[] = [
   {
@@ -331,7 +367,7 @@ export const defaultTransactionCategories: ICategory[] = [
     parent: "income",
   },
   {
-    value: "Reimburstments",
+    value: "Reimbursements",
     parent: "income",
   },
   {

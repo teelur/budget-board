@@ -1,122 +1,53 @@
 using Bogus;
+using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit.Abstractions;
 
 namespace BudgetBoard.IntegrationTests;
 
 [Collection("IntegrationTests")]
-public class AccountServiceTests(ITestOutputHelper testOutputHelper)
+public class AccountServiceTests()
 {
-    private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
+    private readonly Faker<AccountCreateRequest> _accountCreateRequestFaker =
+        new Faker<AccountCreateRequest>()
+            .RuleFor(a => a.Name, f => f.Finance.AccountName())
+            .RuleFor(a => a.InstitutionID, f => Guid.NewGuid())
+            .RuleFor(a => a.Type, f => f.Finance.TransactionType())
+            .RuleFor(a => a.Subtype, f => f.Finance.TransactionType())
+            .RuleFor(a => a.HideTransactions, f => false)
+            .RuleFor(a => a.HideAccount, f => false)
+            .RuleFor(a => a.Source, f => AccountSource.Manual);
 
-    private readonly Faker<AccountCreateRequest> _accountCreateRequestFaker = new Faker<AccountCreateRequest>()
-        .RuleFor(a => a.SyncID, f => f.Random.String(20))
-        .RuleFor(a => a.Name, f => f.Finance.AccountName())
-        .RuleFor(a => a.InstitutionID, f => Guid.NewGuid())
-        .RuleFor(a => a.Type, f => f.Finance.TransactionType())
-        .RuleFor(a => a.Subtype, f => f.Finance.TransactionType())
-        .RuleFor(a => a.HideTransactions, f => false)
-        .RuleFor(a => a.HideAccount, f => false)
-        .RuleFor(a => a.Source, f => AccountSource.Manual);
-
-    private readonly Faker<AccountUpdateRequest> _accountUpdateRequestFaker = new Faker<AccountUpdateRequest>()
-        .RuleFor(a => a.Name, f => f.Finance.AccountName())
-        .RuleFor(a => a.Type, f => f.Finance.TransactionType())
-        .RuleFor(a => a.Subtype, f => f.Finance.TransactionType())
-        .RuleFor(a => a.HideTransactions, f => false)
-        .RuleFor(a => a.HideAccount, f => false);
+    private readonly Faker<AccountUpdateRequest> _accountUpdateRequestFaker =
+        new Faker<AccountUpdateRequest>()
+            .RuleFor(a => a.Name, f => f.Finance.AccountName())
+            .RuleFor(a => a.Type, f => f.Finance.TransactionType())
+            .RuleFor(a => a.Subtype, f => f.Finance.TransactionType())
+            .RuleFor(a => a.HideTransactions, f => false)
+            .RuleFor(a => a.HideAccount, f => false);
 
     [Fact]
-    public async Task CreateAccountAsync_InvalidUserId_ThrowsError()
+    public async Task CreateAccountAsync_WhenRequestIsValid_ShouldCreateAccount()
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-
-        institution.UserID = helper.demoUser.Id;
-
-        helper.UserDataContext.Institutions.Add(institution);
-        helper.UserDataContext.SaveChanges();
-
-        var account = _accountCreateRequestFaker.Generate();
-        account.InstitutionID = institution.ID;
-
-        // Act
-        var createAccountAct = () => accountService.CreateAccountAsync(Guid.NewGuid(), account);
-
-        // Assert
-        await createAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Provided user not found.");
-    }
-
-    [Fact]
-    public async Task CreateAccountAsync_InvalidInstitutionId_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
-
-        var account = _accountCreateRequestFaker.Generate();
-        account.InstitutionID = Guid.NewGuid();
-
-        // Act
-        var createAccountAct = () => accountService.CreateAccountAsync(helper.demoUser.Id, account);
-
-        // Assert
-        await createAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Invalid Institution ID.");
-    }
-
-    [Fact]
-    public async Task CreateAccountAsync_DuplicateName_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
-
-        var institutionFaker = new InstitutionFaker();
-        var institution = institutionFaker.Generate();
-
-        institution.UserID = helper.demoUser.Id;
-        helper.UserDataContext.Institutions.Add(institution);
-
-        var accountFaker = new AccountFaker();
-        var firstAccount = accountFaker.Generate();
-        firstAccount.UserID = helper.demoUser.Id;
-        firstAccount.InstitutionID = institution.ID;
-        firstAccount.Name = "Test Account";
-
-        helper.UserDataContext.Accounts.Add(firstAccount);
-
-        var account = _accountCreateRequestFaker.Generate();
-        account.InstitutionID = institution.ID;
-        account.Name = "Test Account";
-
-        // Act
-        var createAccountAct = () => accountService.CreateAccountAsync(helper.demoUser.Id, account);
-
-        // Assert
-        await createAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("An account with this name already exists!");
-    }
-
-    [Fact]
-    public async Task CreateAccountAsync_NewAccount_HappyPath()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
-
-        var institutionFaker = new InstitutionFaker();
-        var institution = institutionFaker.Generate();
-
-        institution.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Institutions.Add(institution);
         helper.UserDataContext.SaveChanges();
@@ -129,47 +60,148 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
 
         // Assert
         helper.demoUser.Accounts.Should().HaveCount(1);
-
         helper.demoUser.Accounts.Single().Should().BeEquivalentTo(account);
     }
 
     [Fact]
-    public async Task ReadAccountsAsync_ReadAll_HappyPath()
+    public async Task CreateAccountAsync_InvalidUserId_ThrowsError()
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
+        var institution = institutionFaker.Generate();
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.SaveChanges();
+
+        var account = _accountCreateRequestFaker.Generate();
+        account.InstitutionID = institution.ID;
+
+        // Act
+        var createAccountAct = () => accountService.CreateAccountAsync(Guid.NewGuid(), account);
+
+        // Assert
+        await createAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidUserError");
+    }
+
+    [Fact]
+    public async Task CreateAccountAsync_InvalidInstitutionId_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var account = _accountCreateRequestFaker.Generate();
+        account.InstitutionID = Guid.NewGuid();
+
+        // Act
+        var createAccountAct = () => accountService.CreateAccountAsync(helper.demoUser.Id, account);
+
+        // Assert
+        await createAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidInstitutionIDError");
+    }
+
+    [Fact]
+    public async Task CreateAccountAsync_WhenInstitutionDeleted_ShouldRestoreInstitution()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
+        var institution = institutionFaker.Generate();
+        institution.Deleted = new Faker().Date.Past().ToUniversalTime();
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.SaveChanges();
+
+        var account = _accountCreateRequestFaker.Generate();
+        account.InstitutionID = institution.ID;
+
+        // Act
+        await accountService.CreateAccountAsync(helper.demoUser.Id, account);
+
+        // Assert
+        helper.demoUser.Accounts.Should().HaveCount(1);
+        helper.demoUser.Institutions.Single(i => i.ID == institution.ID).Deleted.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ReadAccountsAsync_ReadAll_ShouldReturnOrderedAccounts()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
+        account.Index = 1;
 
-        helper.UserDataContext.Accounts.Add(account);
+        var secondAccount = accountFaker.Generate();
+        secondAccount.Index = 2;
+
+        helper.UserDataContext.Accounts.AddRange(account, secondAccount);
         helper.UserDataContext.SaveChanges();
 
         // Act
         var result = await accountService.ReadAccountsAsync(helper.demoUser.Id);
 
         // Assert
-        result.Should().HaveCount(1);
-        result.Single().Should().BeEquivalentTo(new AccountResponse(account));
+        result.Should().HaveCount(2);
+        result[0].Should().BeEquivalentTo(new AccountResponse(account));
+        result[1].Should().BeEquivalentTo(new AccountResponse(secondAccount));
     }
 
     [Fact]
-    public async Task ReadAccountsAsync_ReadSingle_HappyPath()
+    public async Task ReadAccountsAsync_ReadSingle_ShouldReturnJustThatAccount()
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         var secondAccount = accountFaker.Generate();
-        secondAccount.UserID = helper.demoUser.Id;
 
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.Accounts.Add(secondAccount);
+        helper.UserDataContext.Accounts.AddRange(account, secondAccount);
         helper.UserDataContext.SaveChanges();
 
         // Act
@@ -181,15 +213,20 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public async Task ReadAccountsAsync_ReadInvalid_ThrowsError()
+    public async Task ReadAccountsAsync_ReadInvalidGuid_ThrowsError()
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -197,22 +234,31 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var invalidGuid = Guid.NewGuid();
 
         // Act
-        var readAccountAct = () => accountService.ReadAccountsAsync(helper.demoUser.Id, invalidGuid);
+        var readAccountAct = () =>
+            accountService.ReadAccountsAsync(helper.demoUser.Id, invalidGuid);
 
         // Assert
-        await readAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The account you are trying to access does not exist.");
+        await readAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountNotFoundError");
     }
 
     [Fact]
-    public async Task UpdateAccountAsync_ExistingAccount_HappyPath()
+    public async Task UpdateAccountAsync_ExistingAccount_ShouldUpdateAccount()
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -232,36 +278,88 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
 
         var editedAccount = _accountUpdateRequestFaker.Generate();
-
-        var invalidGuid = Guid.NewGuid();
+        editedAccount.ID = Guid.NewGuid();
 
         // Act
-        var updateAccountAct = () => accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
+        var updateAccountAct = () =>
+            accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
 
         // Assert
-        await updateAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The account you are trying to edit does not exist.");
+        await updateAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountEditNotFoundError");
     }
 
     [Fact]
-    public async Task DeleteAccountAsync_ExistingAccount_HappyPath()
+    public async Task UpdateAccountAsync_WhenNameIsEmpty_ThrowsError()
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var editedAccount = _accountUpdateRequestFaker.Generate();
+        editedAccount.ID = account.ID;
+        editedAccount.Name = string.Empty;
+
+        // Act
+        var updateAccountAct = () =>
+            accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
+
+        // Assert
+        await updateAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountEditEmptyNameError");
+    }
+
+    [Fact]
+    public async Task DeleteAccountAsync_ExistingAccount_ShouldDeleteAccount()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -270,7 +368,7 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
 
         // Assert
-        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().BeCloseTo(DateTime.Now.ToUniversalTime(), TimeSpan.FromMinutes(1));
+        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().Be(fakeDate);
     }
 
     [Fact]
@@ -278,36 +376,53 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
-        var invalidGuid = Guid.NewGuid();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
 
         // Act
-        var deleteAccountAct = () => accountService.DeleteAccountAsync(helper.demoUser.Id, invalidGuid);
+        var deleteAccountAct = () =>
+            accountService.DeleteAccountAsync(helper.demoUser.Id, Guid.NewGuid());
 
         // Assert
-        await deleteAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The account you are trying to delete does not exist.");
+        await deleteAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountDeleteNotFoundError");
     }
 
     [Fact]
-    public async Task DeleteAccountAsync_DeleteTransactions_HappyPath()
+    public async Task DeleteAccountAsync_WhenDeleteTransactionsIsTrue_ShouldDeleteTransactions()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate();
         transaction.AccountID = account.ID;
 
@@ -319,24 +434,37 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID, true);
 
         // Assert
-        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().BeCloseTo(DateTime.Now.ToUniversalTime(), TimeSpan.FromMinutes(1));
-        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Transactions.Single(t => t.ID == transaction.ID).Deleted.Should().BeCloseTo(DateTime.Now.ToUniversalTime(), TimeSpan.FromMinutes(1));
+        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().Be(fakeDate);
+        helper
+            .demoUser.Accounts.Single(a => a.ID == account.ID)
+            .Transactions.Single(t => t.ID == transaction.ID)
+            .Deleted.Should()
+            .Be(fakeDate);
     }
 
     [Fact]
     public async Task DeleteAccountAsync_DeleteLastAccount_ShouldDeleteInstitution()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
         helper.UserDataContext.Institutions.Add(institution);
@@ -347,7 +475,10 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
 
         // Assert
-        helper.demoUser.Institutions.Single(i => i.ID == institution.ID).Deleted.Should().BeCloseTo(DateTime.Now.ToUniversalTime(), TimeSpan.FromMinutes(1));
+        helper
+            .demoUser.Institutions.Single(i => i.ID == institution.ID)
+            .Deleted.Should()
+            .Be(fakeDate);
     }
 
     [Fact]
@@ -355,19 +486,22 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
         var secondAccount = accountFaker.Generate();
-        secondAccount.UserID = helper.demoUser.Id;
         secondAccount.InstitutionID = institution.ID;
 
         helper.UserDataContext.Institutions.Add(institution);
@@ -383,16 +517,26 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public async Task RestoreAccountAsync_ExistingAccount_HappyPath()
+    public async Task RestoreAccountAsync_ExistingAccount_ShouldRestoreAccount()
     {
         // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
-        var accountFaker = new AccountFaker();
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
-        account.Deleted = DateTime.Now.ToUniversalTime();
+        account.Deleted = fakeDate;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -408,13 +552,23 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     public async Task RestoreAccountAsync_InvalidAccount_ThrowsError()
     {
         // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
-        var accountFaker = new AccountFaker();
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
-        account.Deleted = DateTime.Now.ToUniversalTime();
+        account.Deleted = fakeDate;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -422,29 +576,42 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         var invalidGuid = Guid.NewGuid();
 
         // Act
-        var restoreAccountAct = () => accountService.RestoreAccountAsync(helper.demoUser.Id, invalidGuid);
+        var restoreAccountAct = () =>
+            accountService.RestoreAccountAsync(helper.demoUser.Id, invalidGuid);
 
         // Assert
-        await restoreAccountAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The account you are trying to restore does not exist.");
+        await restoreAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountRestoreNotFoundError");
     }
 
     [Fact]
-    public async Task RestoreAccountAsync_RestoreTransactions_HappyPath()
+    public async Task RestoreAccountAsync_WhenRestoreTransactionsIsTrue_ShouldRestoreTransactions()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
-        account.Deleted = DateTime.Now.ToUniversalTime();
+        account.Deleted = fakeDate;
 
-        var transactionFaker = new TransactionFaker();
-        transactionFaker.AccountIds.Add(account.ID);
+        var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate();
 
-        transaction.Deleted = DateTime.Now.ToUniversalTime();
+        transaction.Deleted = fakeDate;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.Transactions.Add(transaction);
@@ -455,24 +622,37 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
 
         // Assert
         helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().BeNull();
-        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Transactions.Single(t => t.ID == transaction.ID).Deleted.Should().BeNull();
+        helper
+            .demoUser.Accounts.Single(a => a.ID == account.ID)
+            .Transactions.Single(t => t.ID == transaction.ID)
+            .Deleted.Should()
+            .BeNull();
     }
 
     [Fact]
     public async Task RestoreAccountAsync_RestoreAccount_ShouldRestoreInstitution()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var institutionFaker = new InstitutionFaker();
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
         var institution = institutionFaker.Generate();
-        institution.UserID = helper.demoUser.Id;
-        institution.Deleted = DateTime.Now.ToUniversalTime();
+        institution.Deleted = fakeDate;
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
         account.InstitutionID = institution.ID;
 
         helper.UserDataContext.Institutions.Add(institution);
@@ -487,39 +667,48 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public async Task OrderAccountsAsync_ExistingAccounts_HappyPath()
+    public async Task OrderAccountsAsync_WhenExistingAccounts_ShouldOrderAccounts()
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var randomNumberBetween1And10 = new Random().Next(1, 10);
-        _testOutputHelper.WriteLine($"Number of accounts: {randomNumberBetween1And10}");
-
-        var accountFaker = new AccountFaker();
-        var accounts = accountFaker.Generate(randomNumberBetween1And10);
-        foreach (var account in accounts)
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(10);
+        var rnd = new Random();
+        accounts = [.. accounts.OrderBy(a => rnd.Next())];
+        for (int i = 0; i < accounts.Count; i++)
         {
-            account.UserID = helper.demoUser.Id;
+            accounts[i].Index = i;
         }
 
         helper.UserDataContext.Accounts.AddRange(accounts);
         helper.UserDataContext.SaveChanges();
 
-        List<IAccountIndexRequest> orderedAccounts = [];
-        foreach (var account in accounts)
+        var orderedAccounts = new List<IAccountIndexRequest>();
+        List<Account> shuffledAccounts = [.. accounts.OrderBy(a => Guid.NewGuid())];
+        foreach (var account in shuffledAccounts)
         {
-            orderedAccounts.Add(new AccountIndexRequest { ID = account.ID, Index = accounts.IndexOf(account) });
+            orderedAccounts.Add(
+                new AccountIndexRequest { ID = account.ID, Index = accounts.IndexOf(account) }
+            );
         }
 
         // Act
         await accountService.OrderAccountsAsync(helper.demoUser.Id, orderedAccounts);
 
         // Assert
-        foreach (var account in accounts)
-        {
-            helper.demoUser.Accounts.Single(a => a.ID == account.ID).Should().BeEquivalentTo(account);
-        }
+        helper
+            .demoUser.Accounts.OrderBy(a => a.Index)
+            .Select(a => a.ID)
+            .Should()
+            .BeEquivalentTo(orderedAccounts.OrderBy(o => o.Index).Select(o => o.ID));
     }
 
     [Fact]
@@ -527,17 +716,16 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var helper = new TestHelper();
-        var accountService = new AccountService(Mock.Of<ILogger<IAccountService>>(), helper.UserDataContext);
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var randomNumberBetween1And10 = new Random().Next(1, 10);
-        _testOutputHelper.WriteLine($"Number of accounts: {randomNumberBetween1And10}");
-
-        var accountFaker = new AccountFaker();
-        var accounts = accountFaker.Generate(randomNumberBetween1And10);
-        foreach (var account in accounts)
-        {
-            account.UserID = helper.demoUser.Id;
-        }
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(10);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
         helper.UserDataContext.SaveChanges();
@@ -545,16 +733,191 @@ public class AccountServiceTests(ITestOutputHelper testOutputHelper)
         List<IAccountIndexRequest> orderedAccounts = [];
         foreach (var account in accounts)
         {
-            orderedAccounts.Add(new AccountIndexRequest { ID = account.ID, Index = accounts.IndexOf(account) });
+            orderedAccounts.Add(
+                new AccountIndexRequest { ID = account.ID, Index = accounts.IndexOf(account) }
+            );
         }
 
         var invalidGuid = Guid.NewGuid();
         orderedAccounts.Add(new AccountIndexRequest { ID = invalidGuid, Index = accounts.Count });
 
         // Act
-        var orderAccountsAct = () => accountService.OrderAccountsAsync(helper.demoUser.Id, orderedAccounts);
+        var orderAccountsAct = () =>
+            accountService.OrderAccountsAsync(helper.demoUser.Id, orderedAccounts);
 
         // Assert
-        await orderAccountsAct.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The account you are trying to set the index for does not exist.");
+        await orderAccountsAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountOrderNotFoundError");
+    }
+
+    [Fact]
+    public async Task PermanentlyDeleteAccountAsync_ExistingAccount_ShouldRemoveAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
+    }
+
+    [Fact]
+    public async Task PermanentlyDeleteAccountAsync_InvalidAccount_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var act = () =>
+            accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, Guid.NewGuid());
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountPermanentDeleteNotFoundError");
+    }
+
+    [Fact]
+    public async Task PermanentlyDeleteAccountAsync_WithTransactionsAndBalances_ShouldRemoveAll()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(3);
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balances = balanceFaker.Generate(3);
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.Transactions.AddRange(transactions);
+        helper.UserDataContext.Balances.AddRange(balances);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
+        helper
+            .UserDataContext.Transactions.Should()
+            .NotContain(t => transactions.Select(tx => tx.ID).Contains(t.ID));
+        helper
+            .UserDataContext.Balances.Should()
+            .NotContain(b => balances.Select(bl => bl.ID).Contains(b.ID));
+    }
+
+    [Fact]
+    public async Task PermanentlyDeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldClearLink()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
+        var lunchFlowAccount = lunchFlowAccountFaker.Generate();
+        lunchFlowAccount.LinkedAccountId = account.ID;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
+        helper
+            .UserDataContext.LunchFlowAccounts.Single(a => a.ID == lunchFlowAccount.ID)
+            .LinkedAccountId.Should()
+            .BeNull();
+    }
+
+    [Fact]
+    public async Task PermanentlyDeleteAccountAsync_WithLinkedSimpleFinAccount_ShouldClearLink()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var orgFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
+        var org = orgFaker.Generate();
+
+        var simpleFinAccountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, org.ID);
+        var simpleFinAccount = simpleFinAccountFaker.Generate();
+        simpleFinAccount.LinkedAccountId = account.ID;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SimpleFinOrganizations.Add(org);
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
+        helper
+            .UserDataContext.SimpleFinAccounts.Single(a => a.ID == simpleFinAccount.ID)
+            .LinkedAccountId.Should()
+            .BeNull();
     }
 }

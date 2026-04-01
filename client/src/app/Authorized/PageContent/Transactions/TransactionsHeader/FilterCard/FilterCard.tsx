@@ -1,67 +1,101 @@
-import CategorySelect from "~/components/CategorySelect";
 import classes from "./FilterCard.module.css";
 
-import AccountSelectInput from "~/components/AccountSelectInput";
-import { Card, Flex, Stack, Title } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { Flex, Stack, Button } from "@mantine/core";
+import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
-import { ICategory } from "~/models/category";
+import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
+import { useTranslation } from "react-i18next";
+import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
-interface FilterCardProps {
-  isOpen: boolean;
-  categories: ICategory[];
-  filters: Filters;
-  setFilters: (newFilters: Filters) => void;
-}
-
-const FilterCard = (props: FilterCardProps): React.ReactNode => {
-  if (!props.isOpen) {
-    return null;
-  }
+const FilterCard = (): React.ReactNode => {
+  const { t } = useTranslation();
+  const { dayjs, dayjsLocale, longDateFormat } = useLocale();
+  const { transactionFilters, setTransactionFilters } = useTransactionFilters();
+  const { transactionCategories } = useTransactionCategories();
 
   return (
-    <Card className={classes.root} radius="md">
-      <Stack gap="0.5rem">
-        <Title order={3}>Filters</Title>
+    <Card elevation={1}>
+      <Stack gap={0} className={classes.root}>
+        <PrimaryText size="lg">{t("filters")}</PrimaryText>
         <Flex
-          className={classes.group}
-          direction={{ base: "column", sm: "row" }}
+          className={classes.container}
+          justify="space-between"
           wrap="nowrap"
-          gap="md"
         >
           <DatePickerInput
-            w={{ base: "100%", sm: "30%" }}
+            className={classes.datePickerInput}
+            miw={165}
             type="range"
-            placeholder="Pick a date range"
-            value={props.filters.dateRange}
-            onChange={(dateRange: [Date | null, Date | null]) =>
-              props.setFilters({
-                ...props.filters,
-                dateRange,
-              })
-            }
+            label={<PrimaryText size="sm">{t("date_range")}</PrimaryText>}
+            placeholder={t("select_a_date_range")}
+            value={transactionFilters.dateRange}
+            locale={dayjsLocale}
+            valueFormat={longDateFormat}
+            onChange={(dateRange: DatesRangeValue<string>) => {
+              const parsedDateRange: [Date | null, Date | null] = [
+                dateRange[0] ? dayjs(dateRange[0]).toDate() : null,
+                dateRange[1] ? dayjs(dateRange[1]).toDate() : null,
+              ];
+              const newFilters = new Filters();
+              newFilters.accounts = transactionFilters.accounts;
+              newFilters.category = transactionFilters.category;
+              newFilters.dateRange = parsedDateRange;
+              setTransactionFilters(newFilters);
+            }}
+            clearable
+            elevation={1}
           />
-          <AccountSelectInput
-            w={{ base: "100%", sm: "50%" }}
-            selectedAccountIds={props.filters.accounts}
-            setSelectedAccountIds={(newAccountIds: string[]) => {
-              props.setFilters({
-                ...props.filters,
-                accounts: newAccountIds,
-              });
+          <AccountMultiSelect
+            className={classes.accountMultiSelect}
+            miw={150}
+            value={transactionFilters.accounts}
+            onChange={(newAccountIds: string[]) => {
+              const newFilters = new Filters();
+              newFilters.accounts = newAccountIds;
+              newFilters.category = transactionFilters.category;
+              newFilters.dateRange = transactionFilters.dateRange;
+              setTransactionFilters(newFilters);
             }}
             hideHidden
+            label={<PrimaryText size="sm">{t("accounts")}</PrimaryText>}
+            elevation={1}
           />
           <CategorySelect
-            w={{ base: "100%", sm: "20%" }}
-            categories={props.categories}
-            value={props.filters.category}
-            onChange={(val) =>
-              props.setFilters({ ...props.filters, category: val })
-            }
+            className={classes.categorySelect}
+            miw={170}
+            categories={transactionCategories}
+            value={transactionFilters.category}
+            onChange={(val) => {
+              const newFilters = new Filters();
+              newFilters.accounts = transactionFilters.accounts;
+              newFilters.category = val;
+              newFilters.dateRange = transactionFilters.dateRange;
+              setTransactionFilters(newFilters);
+            }}
             withinPortal
+            includeUncategorized
+            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+            elevation={1}
           />
+          <Button
+            className={classes.clearButton}
+            w="100%"
+            variant={
+              transactionFilters.isEqual(new Filters()) ? "outline" : "primary"
+            }
+            onClick={() => {
+              setTransactionFilters(new Filters());
+            }}
+          >
+            {t("clear_filters")}
+          </Button>
         </Flex>
       </Stack>
     </Card>

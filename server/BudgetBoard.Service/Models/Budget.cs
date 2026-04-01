@@ -1,14 +1,15 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
 public interface IBudgetCreateRequest
 {
-    DateTime Date { get; set; }
-    string Category { get; set; }
-    decimal Limit { get; set; }
+    DateTime Date { get; }
+    string Category { get; }
+    decimal Limit { get; }
 }
+
 public class BudgetCreateRequest : IBudgetCreateRequest
 {
     public DateTime Date { get; set; }
@@ -26,9 +27,10 @@ public class BudgetCreateRequest : IBudgetCreateRequest
 
 public interface IBudgetUpdateRequest
 {
-    Guid ID { get; set; }
-    decimal Limit { get; set; }
+    Guid ID { get; }
+    decimal Limit { get; }
 }
+
 public class BudgetUpdateRequest : IBudgetUpdateRequest
 {
     public Guid ID { get; set; }
@@ -44,12 +46,13 @@ public class BudgetUpdateRequest : IBudgetUpdateRequest
 
 public interface IBudgetResponse
 {
-    Guid ID { get; set; }
-    DateTime Date { get; set; }
-    string Category { get; set; }
-    decimal Limit { get; set; }
-    Guid UserID { get; set; }
+    Guid ID { get; }
+    DateTime Date { get; }
+    string Category { get; }
+    decimal Limit { get; }
+    Guid UserID { get; }
 }
+
 public class BudgetResponse : IBudgetResponse
 {
     public Guid ID { get; set; }

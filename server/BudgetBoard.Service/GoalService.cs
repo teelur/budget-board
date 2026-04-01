@@ -1,82 +1,101 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
-public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataContext) : IGoalService
+public class GoalService(
+    ILogger<IGoalService> logger,
+    UserDataContext userDataContext,
+    INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
+) : IGoalService
 {
     private readonly ILogger<IGoalService> _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
+    private readonly INowProvider _nowProvider = nowProvider;
+    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
+    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
 
-    public async Task CreateGoalAsync(Guid userGuid, IGoalCreateRequest createdGoal)
+    /// <inheritdoc />
+    public async Task CreateGoalAsync(Guid userGuid, IGoalCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        if ((createdGoal.MonthlyContribution == 0 || !createdGoal.MonthlyContribution.HasValue) && !createdGoal.CompleteDate.HasValue)
+        if (
+            (request.MonthlyContribution == 0 || !request.MonthlyContribution.HasValue)
+            && !request.CompleteDate.HasValue
+        )
         {
-            _logger.LogError("Attempt to create goal without a monthly contribution and target date.");
-            throw new BudgetBoardServiceException("A goal must have a monthly contribution or target date.");
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["GoalCreateMissingContributionOrDateLog"]
+            );
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["GoalCreateMissingContributionOrDateError"]
+            );
         }
 
-        if (createdGoal.CompleteDate.HasValue && createdGoal.CompleteDate.Value < DateTime.Now)
+        if (request.CompleteDate.HasValue && request.CompleteDate.Value < _nowProvider.UtcNow)
         {
-            _logger.LogError("Attempt to create goal with a target date in the past.");
-            throw new BudgetBoardServiceException("A goal cannot have a target date in the past.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalCreatePastDateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalCreateInPastError"]);
         }
 
-        if (!createdGoal.AccountIds.Any())
+        if (!request.AccountIds.Any())
         {
-            _logger.LogError("Attempt to create goal without any accounts.");
-            throw new BudgetBoardServiceException("A goal must be associated with at least one account.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalCreateNoAccountsLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalCreateNoAccountsError"]);
         }
 
         decimal runningBalance = 0.0M;
         var accounts = new List<Account>();
-        foreach (var accountId in createdGoal.AccountIds)
+        foreach (var accountId in request.AccountIds)
         {
             var account = userData.Accounts.FirstOrDefault((a) => a.ID == accountId);
             if (account == null)
             {
-                _logger.LogError("Attempt to create goal with invalid account.");
-                throw new BudgetBoardServiceException("The account you are trying to use does not exist.");
+                _logger.LogError("{LogMessage}", _logLocalizer["GoalCreateInvalidAccountLog"]);
+                throw new BudgetBoardServiceException(
+                    _responseLocalizer["GoalCreateInvalidAccountError"]
+                );
             }
 
-            runningBalance += account.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0;
+            runningBalance +=
+                account.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0;
             accounts.Add(account);
         }
 
         var newGoal = new Goal
         {
-            Name = createdGoal.Name,
-            CompleteDate = createdGoal.CompleteDate,
-            Amount = createdGoal.Amount,
-            MonthlyContribution = createdGoal.MonthlyContribution,
+            Name = request.Name,
+            CompleteDate = request.CompleteDate,
+            Amount = request.Amount,
+            InitialAmount = request.ApplyExistingBalanceTowardsGoal ? 0.0M : runningBalance,
+            MonthlyContribution = request.MonthlyContribution,
             Accounts = accounts,
-            UserID = userData.Id
+            UserID = userData.Id,
         };
 
-        if (!createdGoal.InitialAmount.HasValue)
-        {
-            // The frontend will set the initial balance if we don't want to include existing balances
-            // in the goal.
-            newGoal.InitialAmount = runningBalance;
-        }
-        else
-        {
-            newGoal.InitialAmount = createdGoal.InitialAmount.Value;
-        }
-
-        userData.Goals.Add(newGoal);
+        _userDataContext.Goals.Add(newGoal);
         await _userDataContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<IGoalResponse>> ReadGoalsAsync(Guid userGuid, bool includeInterest)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<IGoalResponse>> ReadGoalsAsync(
+        Guid userGuid,
+        bool includeInterest
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var goalsResponse = new List<IGoalResponse>();
         var goals = userData.Goals.ToList();
         foreach (var goal in goals)
@@ -90,10 +109,11 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
                     MonthlyContribution = EstimateGoalMonthlyContribution(goal, includeInterest),
                     // Have to manually set this, since we override the MonthlyContribution in the constructor.
                     IsMonthlyContributionEditable = goal.MonthlyContribution != null,
-                    // This is a very shakey calculation, so only include it if requested.
-                    // For now, we will just apply this to loans.
-                    // The interest rate is estimated by month, so need to calculate the APR.
-                    EstimatedInterestRate = (includeInterest && goal.Amount == 0) ? EstimateInterestRate(goal) * 12 : null
+                    MonthlyContributionProgress = GetGoalMonthlyContributionProgress(
+                        goal.Accounts.SelectMany(a => a.Transactions)
+                    ),
+                    InterestRate = CalculateAverageInterestRate(goal),
+                    PercentComplete = CalculatePercentComplete(goal),
                 }
             );
         }
@@ -101,96 +121,139 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
         return goalsResponse;
     }
 
-    public async Task UpdateGoalAsync(Guid userGuid, IGoalUpdateRequest updatedGoal)
+    /// <inheritdoc />
+    public async Task UpdateGoalAsync(Guid userGuid, IGoalUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var goal = userData.Goals.FirstOrDefault(g => g.ID == updatedGoal.ID);
+
+        var goal = userData.Goals.FirstOrDefault(g => g.ID == request.ID);
         if (goal == null)
         {
-            _logger.LogError("Attempt to update goal that does not exist.");
-            throw new BudgetBoardServiceException("The goal you are trying to update does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalUpdateNotFoundError"]);
         }
 
-        if (updatedGoal.CompleteDate.HasValue && updatedGoal.IsCompleteDateEditable && updatedGoal.CompleteDate.Value < DateTime.Now)
+        if (
+            request.CompleteDate.HasValue
+            && request.IsCompleteDateEditable
+            && request.CompleteDate.Value < _nowProvider.UtcNow
+        )
         {
-            _logger.LogError("Attempt to update goal with a target date in the past.");
-            throw new BudgetBoardServiceException("A goal cannot have a target date in the past.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdatePastDateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalUpdatePastDateError"]);
         }
 
-        if (((updatedGoal.MonthlyContribution ?? -1) <= 0) && updatedGoal.IsMonthlyContributionEditable)
+        if (((request.MonthlyContribution ?? -1) <= 0) && request.IsMonthlyContributionEditable)
         {
-            _logger.LogError("Attempt to update goal without a monthly contribution.");
-            throw new BudgetBoardServiceException("A goal must have a monthly contribution greater than 0.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdateNoMonthlyContributionLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["GoalUpdateNoMonthlyContributionError"]
+            );
         }
 
-        goal.Name = updatedGoal.Name;
-        goal.Amount = updatedGoal.Amount;
-        goal.CompleteDate = updatedGoal.IsCompleteDateEditable ? updatedGoal.CompleteDate : goal.CompleteDate;
-        goal.MonthlyContribution = updatedGoal.IsMonthlyContributionEditable ? updatedGoal.MonthlyContribution : goal.MonthlyContribution;
+        goal.Name = request.Name;
+        goal.Amount = request.Amount;
+        goal.CompleteDate = request.IsCompleteDateEditable
+            ? request.CompleteDate
+            : goal.CompleteDate;
+        goal.MonthlyContribution = request.IsMonthlyContributionEditable
+            ? request.MonthlyContribution
+            : goal.MonthlyContribution;
 
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task DeleteGoalAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var goal = userData.Goals.FirstOrDefault(g => g.ID == guid);
         if (goal == null)
         {
-            _logger.LogError("Attempt to delete goal that does not exist.");
-            throw new BudgetBoardServiceException("The goal you are trying to delete does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalDeleteNotFoundError"]);
         }
 
         _userDataContext.Goals.Remove(goal);
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task CompleteGoalAsync(Guid userGuid, Guid goalID, DateTime completedDate)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+
         var goal = userData.Goals.FirstOrDefault(g => g.ID == goalID);
         if (goal == null)
         {
-            _logger.LogError("Attempt to complete goal that does not exist.");
-            throw new BudgetBoardServiceException("The goal you are trying to complete does not exist.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalCompleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["GoalCompleteNotFoundError"]);
         }
 
         if (goal.Completed.HasValue)
         {
-            _logger.LogError("Attempt to complete goal that has already been completed.");
-            throw new BudgetBoardServiceException("The goal you are trying to complete has already been completed.");
+            _logger.LogError("{LogMessage}", _logLocalizer["GoalCompleteAlreadyCompletedLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["GoalCompleteAlreadyCompletedError"]
+            );
         }
 
         goal.Completed = completedDate;
         await _userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
+    public async Task CompleteGoalsAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var goals = userData.Goals.ToList();
+        foreach (var goal in goals)
+        {
+            // Skip goals that are already completed
+            if (goal.Completed.HasValue)
+                continue;
+
+            var percentComplete = CalculatePercentComplete(goal);
+
+            // Complete the goal if it's 100% complete
+            if (percentComplete >= 100.0M)
+            {
+                goal.Completed = _nowProvider.UtcNow;
+            }
+        }
+
+        await _userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        List<ApplicationUser> users;
         ApplicationUser? foundUser;
         try
         {
-            users = await _userDataContext.ApplicationUsers
-                .Include(u => u.Goals)
+            foundUser = await _userDataContext
+                .ApplicationUsers.Include(u => u.Goals)
                 .ThenInclude((g) => g.Accounts)
                 .ThenInclude((a) => a.Transactions)
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Balances)
                 .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while retrieving the user data: {ExceptionMessage}", ex.Message);
-            throw new BudgetBoardServiceException("An error occurred while retrieving the user data.");
+            _logger.LogError(
+                "{LogMessage}",
+                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
         }
 
         if (foundUser == null)
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
+            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
         }
 
         return foundUser;
@@ -198,7 +261,8 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
 
     private DateTime EstimateGoalCompleteDate(Goal goal, bool includeInterest = false)
     {
-        if (goal.CompleteDate.HasValue) return goal.CompleteDate.Value;
+        if (goal.CompleteDate.HasValue)
+            return goal.CompleteDate.Value;
 
         if (goal.MonthlyContribution == null || goal.MonthlyContribution == 0)
         {
@@ -207,7 +271,9 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
             return DateTime.UnixEpoch;
         }
 
-        decimal totalBalance = goal.Accounts.Sum(a => a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0);
+        decimal totalBalance = goal.Accounts.Sum(a =>
+            a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+        );
         decimal amountLeft;
         if (goal.InitialAmount < 0)
         {
@@ -222,30 +288,64 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
             amountLeft = goal.Amount - goal.InitialAmount - totalBalance;
         }
 
-        var numberOfMonthsLeftWithoutInterest = Math.Ceiling(amountLeft / (goal.MonthlyContribution ?? 0));
+        var numberOfMonthsLeftWithoutInterest = Math.Ceiling(
+            amountLeft / (goal.MonthlyContribution ?? 0)
+        );
 
-        // This include interest calculation is very shakey, so only enable it if requested.
-        // For now, we will just apply this to loans.
-        if (includeInterest && goal.Amount == 0)
+        if (includeInterest)
         {
-            var interestRate = EstimateInterestRate(goal);
-            var numberOfMonthsLeftWithInterest = Math.Ceiling(-1 * Math.Log((double)(1 - (amountLeft * interestRate / goal.MonthlyContribution ?? 0))) / Math.Log((double)(1 + interestRate)));
+            var monthlyInterestRate = CalculateAverageInterestRate(goal) / 12;
+            double numberOfMonthsLeftWithInterest = (double)numberOfMonthsLeftWithoutInterest;
+            if (monthlyInterestRate > 0)
+            {
+                if (goal.Amount == 0)
+                {
+                    numberOfMonthsLeftWithInterest = Math.Ceiling(
+                        Math.Log(
+                            (double)(
+                                (goal.MonthlyContribution ?? 0)
+                                / monthlyInterestRate
+                                / (
+                                    ((goal.MonthlyContribution ?? 0) / monthlyInterestRate)
+                                    - amountLeft
+                                )
+                            )
+                        ) / Math.Log(1 + (double)monthlyInterestRate)
+                    );
+                }
+                else
+                {
+                    numberOfMonthsLeftWithInterest = Math.Ceiling(
+                        Math.Log(
+                            (double)(
+                                (
+                                    (goal.MonthlyContribution ?? 0)
+                                    + monthlyInterestRate * goal.Amount
+                                )
+                                / (
+                                    (goal.MonthlyContribution ?? 0)
+                                    + monthlyInterestRate * totalBalance
+                                )
+                            )
+                        ) / Math.Log(1 + (double)monthlyInterestRate)
+                    );
+                }
+            }
 
-            // If the interest rate calculation fails, return the value without the calculation.
-            return new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
-                .AddMonths(
-                    (Double.IsNaN(numberOfMonthsLeftWithInterest) ?
-                        (int)numberOfMonthsLeftWithoutInterest :
-                        (int)numberOfMonthsLeftWithInterest));
+            return new DateTime(_nowProvider.UtcNow.Year, _nowProvider.UtcNow.Month, 1).AddMonths(
+                (int)numberOfMonthsLeftWithInterest
+            );
         }
 
-        return new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
-            .AddMonths((int)numberOfMonthsLeftWithoutInterest);
+        return new DateTime(_nowProvider.UtcNow.Year, _nowProvider.UtcNow.Month, 1).AddMonths(
+            (int)numberOfMonthsLeftWithoutInterest
+        );
     }
 
     private decimal EstimateGoalMonthlyContribution(Goal goal, bool includeInterest = false)
     {
-        if (goal.MonthlyContribution.HasValue) return goal.MonthlyContribution.Value;
+        if (goal.MonthlyContribution.HasValue)
+            return goal.MonthlyContribution.Value;
 
         // If a monthly contribution has not been set, then a complete date is required.
         if (!goal.CompleteDate.HasValue)
@@ -254,7 +354,9 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
             return 0;
         }
 
-        decimal totalBalance = goal.Accounts.Sum(a => a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0);
+        decimal totalBalance = goal.Accounts.Sum(a =>
+            a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+        );
         decimal amountLeft;
         if (goal.Amount == 0)
         {
@@ -269,8 +371,9 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
             amountLeft = goal.Amount - (totalBalance - goal.InitialAmount);
         }
 
-        var numberOfMonthsLeft = (goal.CompleteDate.Value.Year - DateTime.Now.Year) * 12 +
-            (goal.CompleteDate.Value.Month - DateTime.Now.Month);
+        var numberOfMonthsLeft =
+            (goal.CompleteDate.Value.Year - _nowProvider.UtcNow.Year) * 12
+            + (goal.CompleteDate.Value.Month - _nowProvider.UtcNow.Month);
 
         if (numberOfMonthsLeft <= 0)
         {
@@ -281,16 +384,52 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
         var monthlyPaymentsWithoutInterest = amountLeft / numberOfMonthsLeft;
 
         // For now, we will just apply this to loans.
-        if (includeInterest && goal.Amount == 0)
+        if (includeInterest)
         {
-            var interestRate = EstimateInterestRate(goal);
+            var monthlyInterestRate = CalculateAverageInterestRate(goal) / 12;
+            decimal monthlyPaymentsWithInterest = monthlyPaymentsWithoutInterest;
 
-            // Interest rate calculation failed, so return the value without the calculation.
-            if (interestRate == 0) return monthlyPaymentsWithoutInterest;
-
-            var monthlyPaymentsWithInterest = amountLeft *
-                (interestRate * (decimal)Math.Pow(1 + (double)interestRate, numberOfMonthsLeft) /
-                (((decimal)Math.Pow(1 + (double)interestRate, numberOfMonthsLeft)) - 1));
+            if (monthlyInterestRate > 0)
+            {
+                if (goal.Amount == 0)
+                {
+                    monthlyPaymentsWithInterest =
+                        amountLeft
+                        * (
+                            monthlyInterestRate
+                            * (decimal)Math.Pow(1 + (double)monthlyInterestRate, numberOfMonthsLeft)
+                            / (
+                                (
+                                    (decimal)
+                                        Math.Pow(
+                                            1 + (double)monthlyInterestRate,
+                                            numberOfMonthsLeft
+                                        )
+                                ) - 1
+                            )
+                        );
+                }
+                else
+                {
+                    monthlyPaymentsWithInterest =
+                        (
+                            monthlyInterestRate
+                            * (
+                                goal.Amount
+                                - totalBalance
+                                    * (decimal)
+                                        Math.Pow(
+                                            (double)(1 + monthlyInterestRate),
+                                            numberOfMonthsLeft
+                                        )
+                            )
+                        )
+                        / (
+                            (decimal)Math.Pow((double)(1 + monthlyInterestRate), numberOfMonthsLeft)
+                            - 1
+                        );
+                }
+            }
 
             return monthlyPaymentsWithInterest;
         }
@@ -298,60 +437,72 @@ public class GoalService(ILogger<IGoalService> logger, UserDataContext userDataC
         return monthlyPaymentsWithoutInterest;
     }
 
-    private static decimal EstimateInterestRate(Goal goal)
+    private decimal GetGoalMonthlyContributionProgress(IEnumerable<Transaction> transactions)
     {
-        decimal currentBalance = 0;
-        decimal formerBalance = 0;
-        decimal totalTransactions = 0;
+        if (transactions == null || !transactions.Any())
+            return 0;
+
+        var monthlyContribution = transactions
+            .Where(t =>
+                t.Date.Year == _nowProvider.UtcNow.Year && t.Date.Month == _nowProvider.UtcNow.Month
+            )
+            .Sum(t => t.Amount);
+
+        return monthlyContribution;
+    }
+
+    private static decimal CalculatePercentComplete(Goal goal)
+    {
+        var accountsTotalBalance = goal.Accounts.Sum(a =>
+            a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+        );
+
+        decimal totalProgress = accountsTotalBalance - goal.InitialAmount;
+
+        decimal adjustedAmount;
+
+        // An initial amount less than zero indicates a debt.
+        if (goal.InitialAmount < 0)
+        {
+            adjustedAmount = Math.Abs(goal.InitialAmount);
+        }
+        else
+        {
+            adjustedAmount = goal.Amount;
+        }
+
+        if (adjustedAmount == 0)
+        {
+            return 0.0M;
+        }
+
+        decimal percentComplete = totalProgress / adjustedAmount * 100.0M;
+
+        return percentComplete > 100.0M ? 100.0M : percentComplete;
+    }
+
+    private static decimal CalculateAverageInterestRate(Goal goal)
+    {
+        var weightedInterestRates = new List<decimal>();
+        var totalBalance = 0.0M;
 
         foreach (var account in goal.Accounts)
         {
-            // Order balances by date in descending order and average any duplicate dates.
-            var orderedBalances = account.Balances.OrderByDescending(b => b.DateTime)
-                .GroupBy(b => b.DateTime.Date)
-                .Select(g => new Balance
-                {
-                    ID = g.First().ID,
-                    Amount = g.Average(b => b.Amount),
-                    DateTime = g.Key,
-                    AccountID = g.First().AccountID,
+            var balance = account.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault();
 
-                });
-            var mostRecentBalance = orderedBalances.FirstOrDefault();
-            if (mostRecentBalance == null)
-            {
-                // The account has no balances, so we can't estimate an interest rate.
-                return 0;
-            }
+            if (balance == null || balance.Amount == 0)
+                continue;
 
-            // We use balances from 1 and 2 months from the most recent balances to ensure that
-            var balances = orderedBalances.Where(b =>
-                b.DateTime <= mostRecentBalance.DateTime.AddMonths(-1));
+            var interestRate = account.InterestRate ?? 0;
+            var weightedInterestRate = interestRate * balance.Amount;
 
-            // Find two balances that are one month apart.
-            var groupedBalancesByDay = balances.GroupBy(b => b.DateTime.Date.Day);
-            var balancesFromSameDate = groupedBalancesByDay.FirstOrDefault(g => g.Count() >= 2);
+            if (weightedInterestRate == 0)
+                continue;
 
-            if (balancesFromSameDate == null)
-            {
-                // We need at least two balances to estimate an interest rate.
-                return 0;
-            }
-
-            currentBalance += balancesFromSameDate.ElementAt(0).Amount;
-            formerBalance += balancesFromSameDate.ElementAt(1).Amount;
-
-            totalTransactions += Math.Abs(account.Transactions
-                .Where(t =>
-                    !t.Deleted.HasValue &&
-                    !(t.Subcategory ?? string.Empty).Equals("Interest Income") &&
-                    t.Date.Date >= balancesFromSameDate.Last().DateTime.Date &&
-                    t.Date.Date <= balancesFromSameDate.First().DateTime.Date)
-                .Sum(t => t.Amount));
+            weightedInterestRates.Add(weightedInterestRate);
+            totalBalance += balance.Amount;
         }
 
-        var balanceDifference = Math.Abs(formerBalance - currentBalance);
-
-        return Math.Abs((totalTransactions - balanceDifference) / formerBalance);
+        return weightedInterestRates.Count > 0 ? weightedInterestRates.Sum() / totalBalance : 0;
     }
 }

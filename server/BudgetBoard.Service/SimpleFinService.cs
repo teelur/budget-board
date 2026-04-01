@@ -1,131 +1,231 @@
-﻿using BudgetBoard.Database.Data;
-using BudgetBoard.Database.Models;
-using BudgetBoard.Service.Interfaces;
-using BudgetBoard.Service.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
+using BudgetBoard.Database.Data;
+using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
+using BudgetBoard.Service.Interfaces;
+using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
 
 public class SimpleFinService(
     IHttpClientFactory clientFactory,
-    ILogger<ISimpleFinService> logger,
     UserDataContext userDataContext,
+    ILogger<ISimpleFinService> logger,
+    INowProvider nowProvider,
     IAccountService accountService,
-    IInstitutionService institutionService,
     ITransactionService transactionService,
     IBalanceService balanceService,
-    IGoalService goalService,
-    IApplicationUserService applicationUserService) : ISimpleFinService
+    ISimpleFinOrganizationService simpleFinOrganizationService,
+    ISimpleFinAccountService simpleFinAccountService,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer
+) : ISimpleFinService
 {
-    public const long UNIX_MONTH = 2629743;
-    public const long UNIX_WEEK = 604800;
+    private const int MAX_SYNC_LOOKBACK_UNIX = 7689600; // 89 days
+    private const long UNIX_MONTH = 2629743;
+    private const long UNIX_WEEK = 604800;
 
     private static readonly JsonSerializerOptions s_readOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        TypeInfoResolver = new DefaultJsonTypeInfoResolver
-        {
-            Modifiers =
-           {
-                 static typeInfo =>
-                 {
-                       if (typeInfo.Type == typeof(ISimpleFinAccountData))
-                       {
-                             typeInfo.CreateObject = () => new SimpleFinAccountData();
-                       }
-                       else if (typeInfo.Type == typeof(ISimpleFinAccount))
-                       {
-                             typeInfo.CreateObject = () => new SimpleFinAccount();
-                       }
-                       else if (typeInfo.Type == typeof(ISimpleFinTransaction))
-                       {
-                         typeInfo.CreateObject = () => new SimpleFinTransaction();
-                       }
-                       else if (typeInfo.Type == typeof(ISimpleFinOrganization))
-                       {
-                         typeInfo.CreateObject = () => new SimpleFinOrganization();
-                       }
-                 }
-           }
-        }
     };
 
-    private readonly IHttpClientFactory _clientFactory = clientFactory;
-    private readonly ILogger<ISimpleFinService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-
-    private readonly IAccountService _accountService = accountService;
-    private readonly IInstitutionService _institutionService = institutionService;
-    private readonly ITransactionService _transactionService = transactionService;
-    private readonly IBalanceService _balanceService = balanceService;
-    private readonly IGoalService _goalService = goalService;
-    private readonly IApplicationUserService _applicationUserService = applicationUserService;
-
-    public async Task<IEnumerable<string>> SyncAsync(Guid userGuid)
-    {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        long startDate;
-        if (userData.LastSync == DateTime.MinValue)
-        {
-            // If we haven't synced before, sync the full 90 days of history
-            startDate = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - (UNIX_MONTH * 3);
-        }
-        else
-        {
-            var oneMonthAgo = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - UNIX_MONTH;
-            var lastSyncWithBuffer = ((DateTimeOffset)userData.LastSync).ToUnixTimeSeconds() - UNIX_WEEK;
-
-            startDate = Math.Min(oneMonthAgo, lastSyncWithBuffer);
-        }
-
-        var simpleFinData = await GetAccountData(userData.AccessToken, startDate);
-        if (simpleFinData == null)
-        {
-            _logger.LogError("SimpleFin data not found.");
-            throw new BudgetBoardServiceException("SimpleFin data not found.");
-        }
-
-        await SyncInstitutionsAsync(userData, simpleFinData.Accounts);
-        await SyncAccountsAsync(userData, simpleFinData.Accounts);
-
-        await SyncGoalsAsync(userData);
-
-        await _applicationUserService.UpdateApplicationUserAsync(userData.Id, new ApplicationUserUpdateRequest
-        {
-            LastSync = DateTime.Now.ToUniversalTime(),
-        });
-
-        return simpleFinData.Errors;
-    }
-
-    public async Task UpdateAccessTokenFromSetupToken(Guid userGuid, string setupToken)
+    /// <inheritdoc />
+    public async Task ConfigureAccessTokenAsync(Guid userGuid, string setupToken)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var decodeAccessTokenResponse = await DecodeAccessToken(setupToken);
-
         if (!decodeAccessTokenResponse.IsSuccessStatusCode)
         {
-            _logger.LogError("Attempt to decode setup token was unsuccessful.");
-            throw new BudgetBoardServiceException("There was an issue decoding the setup token.");
+            logger.LogError("{LogMessage}", logLocalizer["SimpleFinDecodeTokenErrorLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["SimpleFinDecodeTokenError"]);
         }
 
         var accessToken = await decodeAccessTokenResponse.Content.ReadAsStringAsync();
 
         if (!await IsAccessTokenValid(accessToken))
         {
-            _logger.LogError("Attempt to update user with invalid access token.");
-            throw new BudgetBoardServiceException("Invalid access token.");
+            logger.LogError("{LogMessage}", logLocalizer["SimpleFinInvalidAccessTokenLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinInvalidAccessTokenError"]
+            );
         }
 
-        userData.AccessToken = accessToken;
-        await _userDataContext.SaveChangesAsync();
+        userData.SimpleFinAccessToken = accessToken;
+
+        userDataContext.Update(userData);
+        await userDataContext.SaveChangesAsync();
+
+        await RefreshAccountsAsync(userData.Id);
+    }
+
+    /// <inheritdoc />
+    public async Task<IList<string>> RefreshAccountsAsync(Guid userGuid)
+    {
+        var errors = new List<string>();
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        try
+        {
+            var simpleFinData = await GetSimpleFinAccountsDataAsync(
+                userData.SimpleFinAccessToken,
+                null,
+                false
+            );
+            if (simpleFinData == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["SimpleFinDataNotFoundLog"]);
+                return [responseLocalizer["SimpleFinDataNotFoundError"]];
+            }
+
+            errors.AddRange(simpleFinData.Errors);
+
+            if (simpleFinData.Accounts.Any())
+            {
+                errors.AddRange(
+                    await RefreshSimpleFinAccountsAsync(userData, simpleFinData.Accounts)
+                );
+            }
+
+            return errors;
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return [bbex.Message];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["SimpleFinDataRetrievalErrorLog", ex.Message]
+            );
+            return [responseLocalizer["SimpleFinDataRetrievalError"]];
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IList<string>> SyncTransactionHistoryAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        logger.LogInformation("{LogMessage}", logLocalizer["SimpleFinTokenConfiguredLog"]);
+
+        // Deleted accounts do not get updated during sync.
+        long earliestBalanceTimestamp = GetOldestLastSyncTimestamp(
+            userData.SimpleFinAccounts.Where(a =>
+                a.LinkedAccountId != null
+                && userData.Accounts.SingleOrDefault(ua => ua.ID == a.LinkedAccountId)?.Deleted
+                    == null
+            )
+        );
+
+        long syncStartDate = GetSyncStartDate(
+            userData.UserSettings?.ForceSyncLookbackMonths ?? 0,
+            earliestBalanceTimestamp
+        );
+
+        logger.LogInformation(
+            "{LogMessage}",
+            logLocalizer[
+                "SimpleFinSyncingTransactionsLog",
+                DateTimeOffset.FromUnixTimeSeconds(syncStartDate).UtcDateTime,
+                syncStartDate
+            ]
+        );
+
+        try
+        {
+            var simpleFinData = await GetSimpleFinAccountsDataAsync(
+                userData.SimpleFinAccessToken,
+                syncStartDate
+            );
+            if (simpleFinData == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["SimpleFinDataNotFoundLog"]);
+                return [responseLocalizer["SimpleFinDataNotFoundError"]];
+            }
+
+            List<string> errors = [.. simpleFinData.Errors];
+
+            errors.AddRange(await SyncAccountsAsync(userData, simpleFinData.Accounts));
+
+            userDataContext.Update(userData);
+            await userDataContext.SaveChangesAsync();
+
+            return errors;
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return [bbex.Message];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["SimpleFinDataRetrievalErrorLog", ex.Message]
+            );
+            return [responseLocalizer["SimpleFinDataRetrievalError"]];
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task RemoveAccessTokenAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        userData.SimpleFinAccessToken = string.Empty;
+
+        userDataContext.Update(userData);
+        await userDataContext.SaveChangesAsync();
+
+        await RemoveSimpleFinDataAsync(userGuid);
+    }
+
+    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    {
+        ApplicationUser? foundUser;
+        try
+        {
+            foundUser = await userDataContext
+                .ApplicationUsers.Include(u => u.Accounts)
+                .ThenInclude(a => a.Transactions)
+                .Include(u => u.Accounts)
+                .ThenInclude(a => a.Balances)
+                .Include(u => u.Institutions)
+                .Include(u => u.UserSettings)
+                .Include(u => u.SimpleFinOrganizations)
+                .ThenInclude(o => o.Accounts)
+                .Include(u => u.SimpleFinAccounts)
+                .Include(u => u.TransactionCategories)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["UserDataRetrievalErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
+        }
+
+        if (foundUser == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
+        }
+
+        return foundUser;
     }
 
     private async Task<HttpResponseMessage> DecodeAccessToken(string setupToken)
@@ -133,242 +233,535 @@ public class SimpleFinService(
         // SimpleFin tokens are Base64-encoded URLs on which a POST request will
         // return the access URL for getting bank data.
 
-        byte[] data = Convert.FromBase64String(setupToken);
-        string decodedString = Encoding.UTF8.GetString(data);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            decodedString);
-        var client = _clientFactory.CreateClient();
-        var response = await client.SendAsync(request);
-
-        return response;
-    }
-
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
-    {
-        List<ApplicationUser> users;
-        ApplicationUser? foundUser;
+        string decodedString;
         try
         {
-            users = await _userDataContext.ApplicationUsers
-                .Include(u => u.Accounts)
-                    .ThenInclude(a => a.Transactions)
-                .Include(u => u.Accounts)
-                    .ThenInclude(a => a.Balances)
-                .Include(u => u.Institutions)
-                .Include(u => u.Goals)
-                    .ThenInclude(g => g.Accounts)
-                .AsSplitQuery()
-                .ToListAsync();
-            foundUser = users.FirstOrDefault(u => u.Id == new Guid(id));
+            byte[] data = Convert.FromBase64String(setupToken);
+            decodedString = Encoding.UTF8.GetString(data);
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while retrieving the user data: {ExceptionMessage}", ex.Message);
-            throw new BudgetBoardServiceException("An error occurred while retrieving the user data.");
+            logger.LogError(ex, "{LogMessage}", logLocalizer["SimpleFinDecodeTokenInvalidLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinDecodeTokenInvalidError"]
+            );
         }
 
-        if (foundUser == null)
+        try
         {
-            _logger.LogError("Attempt to create an account for an invalid user.");
-            throw new BudgetBoardServiceException("Provided user not found.");
-        }
+            using var request = new HttpRequestMessage(HttpMethod.Post, decodedString);
+            var client = clientFactory.CreateClient();
+            var response = await client.SendAsync(request);
 
-        return foundUser;
+            return response;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["SimpleFinDecodeTokenRequestErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinDecodeTokenRequestError"]
+            );
+        }
     }
+
+    private async Task<bool> IsAccessTokenValid(string accessToken) =>
+        (await QuerySimpleFinAccountDataAsync(accessToken, null, true)).IsSuccessStatusCode;
 
     private static SimpleFinData GetUrlCredentials(string accessToken)
     {
-        string[] url = accessToken.Split("//");
-        string[] data = url.Last().Split("@");
-        var auth = data.First();
-        var baseUrl = url.First() + "//" + data.Last();
+        try
+        {
+            string[] url = accessToken.Split("//");
+            string[] data = url.Last().Split("@");
+            var auth = data.First();
+            var baseUrl = url.First() + "//" + data.Last();
 
-        return new SimpleFinData(auth, baseUrl);
+            return new SimpleFinData(auth, baseUrl);
+        }
+        catch (Exception)
+        {
+            throw new BudgetBoardServiceException("SimpleFinAccessTokenParseError");
+        }
     }
 
-    private async Task<HttpResponseMessage> GetSimpleFinAccountData(string accessToken, long? startDate)
+    private long GetOldestLastSyncTimestamp(IEnumerable<SimpleFinAccount> simpleFinAccounts)
     {
-        SimpleFinData data = GetUrlCredentials(accessToken);
+        long oldestLastSyncTimestamp = ((DateTimeOffset)nowProvider.UtcNow).ToUnixTimeSeconds();
 
-        var startArg = startDate.HasValue ? "?start-date=" + startDate.Value.ToString() : string.Empty;
+        foreach (var account in simpleFinAccounts)
+        {
+            if (!account.LastSync.HasValue)
+            {
+                return DateTimeOffset.UnixEpoch.ToUnixTimeSeconds();
+            }
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            data.BaseUrl + "/accounts" + startArg);
+            if (
+                ((DateTimeOffset)account.LastSync.Value).ToUnixTimeSeconds()
+                < oldestLastSyncTimestamp
+            )
+            {
+                oldestLastSyncTimestamp = (
+                    (DateTimeOffset)account.LastSync.Value
+                ).ToUnixTimeSeconds();
+            }
+        }
 
-        var client = _clientFactory.CreateClient();
-        var byteArray = Encoding.ASCII.GetBytes(data.Auth);
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-        return await client.SendAsync(request);
+        return oldestLastSyncTimestamp;
     }
 
-    private async Task<ISimpleFinAccountData> GetAccountData(string accessToken, long startDate)
+    private long GetSyncStartDate(int forceSyncLookbackMonths, long earliestBalanceTimestamp)
     {
-        var response = await GetSimpleFinAccountData(accessToken, startDate);
+        var nowUnix = ((DateTimeOffset)nowProvider.UtcNow).ToUnixTimeSeconds();
+
+        if (forceSyncLookbackMonths > 0)
+        {
+            // Cap the maximum lookback to prevent SimpleFIN from complaining.
+            var forceSyncLookbackUnix = UNIX_MONTH * forceSyncLookbackMonths;
+            return forceSyncLookbackUnix > MAX_SYNC_LOOKBACK_UNIX
+                ? nowUnix - MAX_SYNC_LOOKBACK_UNIX
+                : nowUnix - forceSyncLookbackUnix;
+        }
+
+        // SimpleFIN can lookback a maximum of 90 days (not inclusive).
+        if (earliestBalanceTimestamp < nowUnix - MAX_SYNC_LOOKBACK_UNIX)
+        {
+            return nowUnix - MAX_SYNC_LOOKBACK_UNIX;
+        }
+
+        var oneMonthAgo = nowUnix - UNIX_MONTH;
+        var lastSyncWithBuffer = earliestBalanceTimestamp - UNIX_WEEK;
+
+        // Start date is the earlier of one month ago or last sync minus one week.
+        return Math.Min(oneMonthAgo, lastSyncWithBuffer);
+    }
+
+    private async Task<ISimpleFinAccountsData?> GetSimpleFinAccountsDataAsync(
+        string accessToken,
+        long? startDate,
+        bool includeTransactions = true
+    )
+    {
+        var response = await QuerySimpleFinAccountDataAsync(
+            accessToken,
+            startDate,
+            includeTransactions
+        );
         var jsonString = await response.Content.ReadAsStringAsync();
 
-        return JsonSerializer.Deserialize<ISimpleFinAccountData>(jsonString, s_readOptions) ?? new SimpleFinAccountData();
-    }
-
-    private async Task<bool> IsAccessTokenValid(string accessToken) => (await GetSimpleFinAccountData(accessToken, null)).IsSuccessStatusCode;
-
-    private async Task SyncInstitutionsAsync(ApplicationUser userData, IEnumerable<ISimpleFinAccount> accountsData)
-    {
-        var institutions = accountsData.Select(a => a.Org).Distinct();
-        foreach (var institution in institutions)
+        try
         {
-            if (institution == null) continue;
-            if (userData.Institutions.Any(i => i.Name == institution.Name)) continue;
-
-            var newInstitution = new InstitutionCreateRequest
-            {
-                Name = institution.Name ?? string.Empty,
-            };
-
-            await _institutionService.CreateInstitutionAsync(userData.Id, newInstitution);
+            return JsonSerializer.Deserialize<SimpleFinAccountsData>(jsonString, s_readOptions)
+                ?? null;
+        }
+        catch (JsonException jex)
+        {
+            logger.LogError(
+                jex,
+                "{LogMessage}",
+                logLocalizer["SimpleFinDeserializationErrorLog", jex.Message]
+            );
+            return null;
         }
     }
 
-    private async Task SyncAccountsAsync(ApplicationUser userData, IEnumerable<ISimpleFinAccount> accountsData)
+    private async Task<HttpResponseMessage> QuerySimpleFinAccountDataAsync(
+        string accessToken,
+        long? startDate,
+        bool includeTransactions
+    )
     {
-        foreach (var accountData in accountsData)
+        if (string.IsNullOrEmpty(accessToken))
         {
-            var institutionId = userData.Institutions.FirstOrDefault(institution => institution.Name == accountData.Org.Name)?.ID;
+            logger.LogError("{LogMessage}", logLocalizer["SimpleFinMissingAccessTokenLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinMissingAccessTokenError"]
+            );
+        }
 
-            var foundAccount = userData.Accounts.SingleOrDefault(a => a.SyncID == accountData.Id);
-            if (foundAccount != null)
+        try
+        {
+            SimpleFinData data = GetUrlCredentials(accessToken);
+
+            var urlArgs = "?";
+            if (startDate.HasValue)
             {
-                foundAccount.InstitutionID = institutionId;
-                foundAccount.Source = AccountSource.SimpleFIN;
-                _userDataContext.SaveChanges();
+                urlArgs += "start-date=" + startDate.Value + "&";
             }
-            else
+            if (!includeTransactions)
             {
-                var newAccount = new AccountCreateRequest
-                {
-                    SyncID = accountData.Id,
-                    Name = accountData.Name,
-                    InstitutionID = institutionId,
-                    Source = AccountSource.SimpleFIN,
-                };
-
-                await _accountService.CreateAccountAsync(userData.Id, newAccount);
+                urlArgs += "balances-only=1";
             }
+            var requestUrl = data.BaseUrl + "/accounts" + urlArgs;
 
-            await SyncTransactionsAsync(userData, accountData.Id, accountData.Transactions);
-            await SyncBalancesAsync(userData, accountData.Id, accountData);
+            using var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            var client = clientFactory.CreateClient();
+            var byteArray = Encoding.ASCII.GetBytes(data.Auth);
+            client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue(
+                    "Basic",
+                    Convert.ToBase64String(byteArray)
+                );
+
+            return await client.SendAsync(request);
+        }
+        catch (BudgetBoardServiceException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["SimpleFinDataRequestErrorLog", ex.Message]
+            );
+            throw new BudgetBoardServiceException(responseLocalizer["SimpleFinDataRequestError"]);
         }
     }
 
-    private async Task SyncTransactionsAsync(ApplicationUser userData, string syncId, IEnumerable<ISimpleFinTransaction> transactionsData)
+    private async Task<List<string>> RefreshSimpleFinAccountsAsync(
+        ApplicationUser userData,
+        IEnumerable<ISimpleFinAccountData> simpleFinAccounts
+    )
     {
-        if (!transactionsData.Any()) return;
+        List<string> errors = [];
 
-        var userAccount = userData.Accounts.FirstOrDefault(a => (a.SyncID ?? string.Empty).Equals(syncId));
-        var userTransactions = userAccount?.Transactions.OrderByDescending(t => t.Date).ToList();
-
-        // User account should never be null here, but let's not make a bad problem worse.
-        if (userAccount != null)
+        foreach (var simpleFinAccount in simpleFinAccounts)
         {
-            foreach (var transactionData in transactionsData)
+            var existingOrganization = userData.SimpleFinOrganizations.SingleOrDefault(o =>
+                o.Domain == simpleFinAccount.Org.Domain
+            );
+            if (existingOrganization == null)
             {
-                if ((userTransactions ?? []).Any(t => (t.SyncID ?? string.Empty).Equals(transactionData.Id)))
+                var simpleFinOrganization = simpleFinAccount.Org;
+                await simpleFinOrganizationService.CreateSimpleFinOrganizationAsync(
+                    userData.Id,
+                    new SimpleFinOrganizationCreateRequest
+                    {
+                        Domain = simpleFinOrganization.Domain,
+                        SimpleFinUrl = simpleFinOrganization.SimpleFinUrl,
+                        Name = simpleFinOrganization.Name,
+                        Url = simpleFinOrganization.Url,
+                        SyncID = simpleFinOrganization.SyncID,
+                    }
+                );
+
+                existingOrganization = userData.SimpleFinOrganizations.SingleOrDefault(o =>
+                    o.Domain == simpleFinAccount.Org.Domain
+                );
+                if (existingOrganization == null)
                 {
-                    // Transaction already exists.
+                    logger.LogError(
+                        "{LogMessage}",
+                        logLocalizer[
+                            "SyncSimpleFinOrganizationCreationErrorLog",
+                            simpleFinAccount.Name
+                        ]
+                    );
+                    errors.Add(
+                        responseLocalizer[
+                            "SyncSimpleFinOrganizationCreationError",
+                            simpleFinAccount.Name
+                        ]
+                    );
                     continue;
                 }
-                else
-                {
-                    var newTransaction = new TransactionCreateRequest
-                    {
-                        SyncID = transactionData.Id,
-                        Amount = decimal.Parse(transactionData.Amount),
-                        Date = transactionData.Pending ? DateTime.UnixEpoch.AddSeconds(transactionData.TransactedAt) : DateTime.UnixEpoch.AddSeconds(transactionData.Posted),
-                        MerchantName = transactionData.Description,
-                        Source = TransactionSource.SimpleFin.Value,
-                        AccountID = userAccount.ID,
-                    };
-
-                    await _transactionService.CreateTransactionAsync(userData.Id, newTransaction);
-                }
-            }
-        }
-    }
-
-    private async Task SyncBalancesAsync(ApplicationUser userData, string syncId, ISimpleFinAccount accountData)
-    {
-        var foundAccount = userData.Accounts.SingleOrDefault(a => a.SyncID == syncId);
-
-        // User account should never be null here, but let's not make a bad problem worse.
-        if (foundAccount != null)
-        {
-            var balanceDates = foundAccount.Balances.Select(b => b.DateTime);
-            /**
-             * We should only update the balance if account has no balances or the
-             * last balance is older than the last balance in the SimpleFin data.
-             */
-            if (!balanceDates.Any() ||
-                balanceDates.Max() < DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate))
-            {
-                var newBalance = new BalanceCreateRequest
-                {
-                    Amount = decimal.Parse(accountData.Balance, CultureInfo.InvariantCulture.NumberFormat),
-                    DateTime = DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate),
-                    AccountID = foundAccount.ID,
-                };
-
-                await _balanceService.CreateBalancesAsync(userData.Id, newBalance);
-            }
-        }
-    }
-
-    private async Task SyncGoalsAsync(ApplicationUser userData)
-    {
-        var userGoals = userData.Goals.ToList();
-
-        foreach (var goal in userGoals)
-        {
-            // Skip goals that are already completed
-            if (goal.Completed.HasValue)
-            {
-                continue;
-            }
-
-            var accountsTotalBalance = goal.Accounts
-                .Sum(a => a.Balances
-                    .OrderByDescending(b => b.DateTime)
-                    .FirstOrDefault()?.Amount ?? 0);
-
-            var completeDate = goal.Accounts
-                .SelectMany(a => a.Balances)
-                .OrderByDescending(b => b.DateTime)
-                .FirstOrDefault()?.DateTime;
-
-            if (!completeDate.HasValue)
-            {
-                _logger.LogError("No balance found for goal {GoalName}", goal.Name);
-                continue;
-            }
-
-            if (goal.Amount == 0)
-            {
-                // Debt payoff goal: complete when balance is zero or negative
-                if (accountsTotalBalance >= 0)
-                {
-                    await _goalService.CompleteGoalAsync(userData.Id, goal.ID, completeDate.Value);
-                }
             }
             else
             {
-                // Savings goal: complete when balance reaches or exceeds target
-                if ((accountsTotalBalance - goal.InitialAmount) >= goal.Amount)
-                {
-                    await _goalService.CompleteGoalAsync(userData.Id, goal.ID, completeDate.Value);
-                }
+                await simpleFinOrganizationService.UpdateSimpleFinOrganizationAsync(
+                    userData.Id,
+                    new SimpleFinOrganizationUpdateRequest
+                    {
+                        ID = existingOrganization.ID,
+                        Domain = simpleFinAccount.Org.Domain,
+                        SimpleFinUrl = simpleFinAccount.Org.SimpleFinUrl,
+                        Name = simpleFinAccount.Org.Name,
+                        Url = simpleFinAccount.Org.Url,
+                    }
+                );
+            }
+
+            var existingAccount = userData.SimpleFinAccounts.SingleOrDefault(a =>
+                a.SyncID == simpleFinAccount.Id
+                && a.Organization?.Domain == simpleFinAccount.Org.Domain
+            );
+            if (existingAccount == null)
+            {
+                await simpleFinAccountService.CreateSimpleFinAccountAsync(
+                    userData.Id,
+                    new SimpleFinAccountCreateRequest
+                    {
+                        SyncID = simpleFinAccount.Id,
+                        Name = simpleFinAccount.Name,
+                        Currency = simpleFinAccount.Currency,
+                        Balance = decimal.Parse(
+                            simpleFinAccount.Balance,
+                            CultureInfo.InvariantCulture.NumberFormat
+                        ),
+                        BalanceDate = simpleFinAccount.BalanceDate,
+                        OrganizationId = existingOrganization.ID,
+                    }
+                );
+            }
+            else
+            {
+                await simpleFinAccountService.UpdateSimpleFinAccountAsync(
+                    userData.Id,
+                    new SimpleFinAccountUpdateRequest
+                    {
+                        ID = existingAccount.ID,
+                        SyncID = simpleFinAccount.Id,
+                        Name = simpleFinAccount.Name,
+                        Currency = simpleFinAccount.Currency,
+                        Balance = decimal.Parse(
+                            simpleFinAccount.Balance,
+                            CultureInfo.InvariantCulture.NumberFormat
+                        ),
+                        BalanceDate = DateTimeOffset
+                            .FromUnixTimeSeconds(simpleFinAccount.BalanceDate)
+                            .UtcDateTime,
+                        LastSync = existingAccount.LastSync,
+                    }
+                );
             }
         }
+
+        return errors;
+    }
+
+    private async Task<List<string>> SyncAccountsAsync(
+        ApplicationUser userData,
+        IEnumerable<ISimpleFinAccountData> accountsData
+    )
+    {
+        // Instantiate an autoCategorizer
+        var autoCategorizer =
+            await AutomaticTransactionCategorizerHelper.CreateAutoCategorizerAsync(
+                userDataContext,
+                userData
+            );
+
+        // Retrieve list of categories
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+
+        List<string> errors = [];
+        foreach (var accountData in accountsData)
+        {
+            var simpleFinAccount = userData.SimpleFinAccounts.FirstOrDefault(a =>
+                a.SyncID == accountData.Id
+            );
+            if (simpleFinAccount == null)
+            {
+                logger.LogError(
+                    "{LogMessage}",
+                    logLocalizer["SimpleFinAccountNotFoundForSyncLog", accountData.Name]
+                );
+                errors.Add(
+                    responseLocalizer["SimpleFinAccountNotFoundForSyncError", accountData.Name]
+                );
+
+                continue;
+            }
+
+            var linkedAccount = userData.Accounts.FirstOrDefault(a =>
+                a.ID == simpleFinAccount.LinkedAccountId
+            );
+            if (linkedAccount == null)
+            {
+                logger.LogInformation(
+                    "{LogMessage}",
+                    logLocalizer["SimpleFinAccountNotLinkedLog", accountData.Name]
+                );
+                continue;
+            }
+
+            // Deleted accounts do not get updated during sync.
+            if (linkedAccount.Deleted.HasValue)
+            {
+                logger.LogInformation(
+                    "{LogMessage}",
+                    logLocalizer["SimpleFinAccountDeletedSkipLog", linkedAccount.Name]
+                );
+                continue;
+            }
+
+            var transactionErrors = await SyncTransactionsAsync(
+                userData,
+                simpleFinAccount,
+                accountData.Transactions,
+                allCategories,
+                autoCategorizer
+            );
+            errors.AddRange(transactionErrors);
+
+            var balanceSyncErrors = await SyncBalancesAsync(
+                userData,
+                simpleFinAccount.ID,
+                accountData
+            );
+            errors.AddRange(balanceSyncErrors);
+
+            if (transactionErrors.Count == 0 && balanceSyncErrors.Count == 0)
+            {
+                simpleFinAccount.LastSync = nowProvider.UtcNow;
+            }
+        }
+
+        return errors;
+    }
+
+    private async Task<List<string>> SyncTransactionsAsync(
+        ApplicationUser userData,
+        SimpleFinAccount simpleFinAccount,
+        IEnumerable<ISimpleFinTransactionData> transactionsData,
+        IEnumerable<ICategory> allCategories,
+        AutomaticTransactionCategorizerHelper? autoCategorizer
+    )
+    {
+        List<string> errors = [];
+        if (!transactionsData.Any())
+            return errors;
+
+        var userAccount = userData.Accounts.FirstOrDefault(a =>
+            a.SimpleFinAccount != null && a.SimpleFinAccount.ID == simpleFinAccount.ID
+        );
+        if (userAccount == null)
+        {
+            logger.LogError(
+                "{LogMessage}",
+                logLocalizer["SimpleFinAccountNotFoundForTransactionLog", simpleFinAccount.ID]
+            );
+            errors.Add(
+                responseLocalizer[
+                    "SimpleFinAccountNotFoundForTransactionError",
+                    simpleFinAccount.ID
+                ]
+            );
+            return errors;
+        }
+
+        List<Transaction> userTransactions =
+        [
+            .. userAccount.Transactions.OrderByDescending(t => t.Date),
+        ];
+
+        // SyncStartDate allows the user to specify a date from which to start syncing transactions.
+        // If it is unset, all transactions will be synced.
+        var transactionsToSync = transactionsData.Where(t =>
+            !simpleFinAccount.SyncStartDate.HasValue
+            || DateOnly.FromDateTime(
+                DateTime.UnixEpoch.AddSeconds(t.Pending ? t.TransactedAt : t.Posted)
+            ) >= simpleFinAccount.SyncStartDate.Value
+        );
+
+        foreach (var transactionData in transactionsToSync)
+        {
+            if (
+                userTransactions.Any(t =>
+                    (t.SyncID ?? string.Empty).Equals(
+                        transactionData.Id,
+                        StringComparison.InvariantCulture
+                    )
+                )
+            )
+            {
+                // Transaction already exists.
+                continue;
+            }
+
+            var newTransaction = new TransactionCreateRequest
+            {
+                SyncID = transactionData.Id,
+                Amount = decimal.Parse(transactionData.Amount),
+                Date = transactionData.Pending
+                    ? DateTime.UnixEpoch.AddSeconds(transactionData.TransactedAt)
+                    : DateTime.UnixEpoch.AddSeconds(transactionData.Posted),
+                MerchantName = transactionData.Description,
+                Source = TransactionSource.SimpleFin.Value,
+                AccountID = userAccount.ID,
+            };
+
+            await transactionService.CreateTransactionAsync(
+                userData,
+                newTransaction,
+                allCategories,
+                autoCategorizer
+            );
+        }
+
+        return errors;
+    }
+
+    private async Task<List<string>> SyncBalancesAsync(
+        ApplicationUser userData,
+        Guid simpleFinAccountId,
+        ISimpleFinAccountData accountData
+    )
+    {
+        List<string> errors = [];
+        var error = await SyncHelpers.SyncBalance(
+            userData,
+            new BalanceCreateRequest
+            {
+                AccountID = userData
+                    .Accounts.First(a =>
+                        a.SimpleFinAccount != null && a.SimpleFinAccount.ID == simpleFinAccountId
+                    )
+                    .ID,
+                Amount = decimal.Parse(
+                    accountData.Balance,
+                    CultureInfo.InvariantCulture.NumberFormat
+                ),
+                DateTime = DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate),
+            },
+            balanceService
+        );
+        if (error.HasValue)
+        {
+            errors.Add(responseLocalizer[error.Value.ErrorKey, [.. error.Value.ErrorParams]]);
+        }
+
+        return errors;
+    }
+
+    private async Task<List<string>> RemoveSimpleFinDataAsync(Guid userGuid)
+    {
+        List<string> errors = [];
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        foreach (var simpleFinAccount in userData.SimpleFinAccounts.ToList())
+        {
+            var linkedAccount = userData.Accounts.SingleOrDefault(a =>
+                a.ID == simpleFinAccount.LinkedAccountId
+            );
+            if (linkedAccount != null)
+            {
+                await accountService.UpdateAccountSourceAsync(
+                    userData.Id,
+                    linkedAccount.ID,
+                    AccountSource.Manual
+                );
+            }
+
+            await simpleFinAccountService.DeleteSimpleFinAccountAsync(
+                userData.Id,
+                simpleFinAccount.ID
+            );
+        }
+
+        foreach (var simpleFinOrganization in userData.SimpleFinOrganizations.ToList())
+        {
+            await simpleFinOrganizationService.DeleteSimpleFinOrganizationAsync(
+                userData.Id,
+                simpleFinOrganization.ID
+            );
+        }
+
+        return errors;
     }
 }

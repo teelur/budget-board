@@ -1,17 +1,20 @@
-import classes from "./AccountsCard.module.css";
-
-import { Card, Group, Skeleton, Stack, Title, Text } from "@mantine/core";
+import { Skeleton, Stack } from "@mantine/core";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItems/InstitutionItem";
-import { IAccount } from "~/models/account";
-import AccountsSettings from "./AccountsSettings/AccountsSettings";
+import { IAccountResponse } from "~/models/account";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 const AccountsCard = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { t } = useTranslation();
+
+  const { request } = useAuth();
   const institutionQuery = useQuery({
     queryKey: ["institutions"],
     queryFn: async (): Promise<IInstitution[]> => {
@@ -30,14 +33,14 @@ const AccountsCard = (): React.ReactNode => {
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccount[]> => {
+    queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as IAccount[];
+        return res.data as IAccountResponse[];
       }
 
       return [];
@@ -52,33 +55,37 @@ const AccountsCard = (): React.ReactNode => {
     [institutionQuery.data]
   );
 
+  const sortedFilteredInstitutionsForDisplay = React.useMemo(
+    () =>
+      sortedFilteredInstitutions.filter(
+        (i) =>
+          i.accounts.filter(
+            (a) => a.deleted === null && a.hideAccount === false
+          ).length > 0
+      ),
+    [sortedFilteredInstitutions]
+  );
+
   return (
-    <Card
-      className={classes.card}
-      padding="xs"
-      radius="md"
-      shadow="sm"
-      withBorder
-    >
-      <Group className={classes.headerContainer}>
-        <Title order={2}>Accounts</Title>
-        <AccountsSettings
-          sortedFilteredInstitutions={sortedFilteredInstitutions}
-          accounts={accountsQuery.data ?? []}
-        />
-      </Group>
-      <Stack className={classes.accountsContainer}>
-        {institutionQuery.isPending || accountsQuery.isPending ? (
-          <Skeleton height={600} radius="lg" />
-        ) : (sortedFilteredInstitutions ?? []).length > 0 ? (
-          (sortedFilteredInstitutions ?? []).map(
-            (institution: IInstitution) => (
-              <InstitutionItem key={institution.id} institution={institution} />
+    <Card w="100%" elevation={1}>
+      <Stack gap="0.5rem">
+        <PrimaryText size="xl">{t("accounts")}</PrimaryText>
+        <Stack align="center" gap="0.5rem">
+          {institutionQuery.isPending || accountsQuery.isPending ? (
+            <Skeleton height={600} radius="lg" />
+          ) : (sortedFilteredInstitutionsForDisplay ?? []).length > 0 ? (
+            (sortedFilteredInstitutionsForDisplay ?? []).map(
+              (institution: IInstitution) => (
+                <InstitutionItem
+                  key={institution.id}
+                  institution={institution}
+                />
+              )
             )
-          )
-        ) : (
-          <Text>No accounts found</Text>
-        )}
+          ) : (
+            <DimmedText size="sm">{t("no_accounts_found")}</DimmedText>
+          )}
+        </Stack>
       </Stack>
     </Card>
   );

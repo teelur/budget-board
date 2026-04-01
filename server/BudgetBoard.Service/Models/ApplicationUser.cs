@@ -1,12 +1,13 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
 public interface IApplicationUserUpdateRequest
 {
-    DateTime LastSync { get; set; }
+    DateTime LastSync { get; }
 }
+
 public class ApplicationUserUpdateRequest : IApplicationUserUpdateRequest
 {
     public DateTime LastSync { get; set; }
@@ -20,28 +21,40 @@ public class ApplicationUserUpdateRequest : IApplicationUserUpdateRequest
 
 public interface IApplicationUserResponse
 {
-    Guid ID { get; set; }
-    bool AccessToken { get; set; }
-    DateTime LastSync { get; set; }
+    Guid ID { get; }
+    bool SimpleFinAccessToken { get; }
+    bool LunchFlowApiKey { get; }
+    DateTime LastSync { get; }
+    bool TwoFactorEnabled { get; }
+    bool HasOidcLogin { get; }
+    bool HasLocalLogin { get; }
 }
+
 public class ApplicationUserResponse : IApplicationUserResponse
 {
-    public Guid ID { get; set; }
-    public bool AccessToken { get; set; }
-    public DateTime LastSync { get; set; }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public bool SimpleFinAccessToken { get; set; } = false;
+    public bool LunchFlowApiKey { get; set; } = false;
+    public DateTime LastSync { get; set; } = DateTime.MinValue;
+    public bool TwoFactorEnabled { get; set; } = false;
+    public bool HasOidcLogin { get; set; } = false;
+    public bool HasLocalLogin { get; set; } = false;
 
     [JsonConstructor]
-    public ApplicationUserResponse()
-    {
-        ID = new Guid();
-        AccessToken = false;
-        LastSync = DateTime.MinValue;
-    }
+    public ApplicationUserResponse() { }
 
-    public ApplicationUserResponse(ApplicationUser user)
+    public ApplicationUserResponse(
+        ApplicationUser user,
+        bool hasOidcLogin = false,
+        bool hasLocalLogin = false
+    )
     {
         ID = user.Id;
-        AccessToken = (user.AccessToken != string.Empty);
+        SimpleFinAccessToken = user.SimpleFinAccessToken != string.Empty;
+        LunchFlowApiKey = user.LunchFlowApiKey != string.Empty;
         LastSync = user.LastSync;
+        TwoFactorEnabled = user.TwoFactorEnabled;
+        HasOidcLogin = hasOidcLogin;
+        HasLocalLogin = hasLocalLogin;
     }
 }

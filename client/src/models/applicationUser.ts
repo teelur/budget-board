@@ -1,12 +1,11 @@
 export interface IApplicationUser {
   id: string;
-  accessToken: boolean;
+  simpleFinAccessToken: boolean;
+  lunchFlowApiKey: boolean;
   lastSync: Date;
+  twoFactorEnabled: boolean;
+  hasOidcLogin: boolean;
+  hasLocalLogin: boolean;
 }
 
-export interface IUserInfoResponse {
-  email: string;
-  isEmailConfirmed: boolean;
-}
-
-export const defaultGuid: string = '00000000-0000-0000-0000-000000000000';
+export const defaultGuid: string = "00000000-0000-0000-0000-000000000000";

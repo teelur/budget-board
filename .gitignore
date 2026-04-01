@@ -61,3 +61,6 @@ build/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Other
+.config/dotnet-tools.json

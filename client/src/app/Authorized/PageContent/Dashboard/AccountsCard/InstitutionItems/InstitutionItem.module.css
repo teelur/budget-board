@@ -1,7 +1,0 @@
-.card {
-  width: 100%;
-  background-color: light-dark(
-    var(--mantine-color-gray-2),
-    var(--mantine-color-dark-7)
-  );
-}

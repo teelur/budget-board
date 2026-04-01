@@ -1,18 +1,48 @@
-import classes from "./Settings.module.css";
-
-import { Stack, Title } from "@mantine/core";
-import DarkModeToggle from "./DarkModeToggle";
-import LinkSimpleFin from "./LinkSimpleFin";
+import { Stack } from "@mantine/core";
+import DarkModeToggle from "./DarkModeToggle/DarkModeToggle";
 import React from "react";
-import ResetPassword from "./ResetPassword";
+import ResetPassword from "./ResetPassword/ResetPassword";
+import UserSettings from "./UserSettings/UserSettings";
+import TwoFactorAuth from "./TwoFactorAuth/TwoFactorAuth";
+import AdvancedSettings from "./AdvancedSettings/AdvancedSettings";
+import OidcSettings from "./OidcSettings/OidcSettings";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { IApplicationUser } from "~/models/applicationUser";
+import { AxiosResponse } from "axios";
+import CreatePassword from "./CreatePassword/CreatePassword";
 
 const Settings = (): React.ReactNode => {
+  const { request } = useAuth();
+
+  const userQuery = useQuery({
+    queryKey: ["user"],
+    queryFn: async (): Promise<IApplicationUser | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/applicationUser",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IApplicationUser;
+      }
+
+      return undefined;
+    },
+  });
+
   return (
-    <Stack className={classes.root}>
-      <Title order={1}>Settings</Title>
+    <Stack w="100%" maw={800} gap="1rem">
       <DarkModeToggle />
-      <LinkSimpleFin />
-      <ResetPassword />
+      <UserSettings />
+      <TwoFactorAuth />
+      <OidcSettings />
+      {userQuery.data?.hasLocalLogin ?? true ? (
+        <ResetPassword />
+      ) : (
+        <CreatePassword />
+      )}
+      <AdvancedSettings />
     </Stack>
   );
 };

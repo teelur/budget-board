@@ -1,14 +1,4 @@
-import classes from "./CustomCategoryCard.module.css";
-import parentClasses from "../CustomCategories.module.css";
-
-import {
-  ActionIcon,
-  Card,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Flex, Group, LoadingOverlay } from "@mantine/core";
 import { ICategoryResponse } from "~/models/category";
 import { TrashIcon } from "lucide-react";
 import React from "react";
@@ -16,7 +6,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 interface CustomCategoryCardProps {
   category: ICategoryResponse;
@@ -25,7 +18,9 @@ interface CustomCategoryCardProps {
 const CustomCategoryCard = (
   props: CustomCategoryCardProps
 ): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { t } = useTranslation();
+  const { request } = useAuth();
+
   const queryClient = useQueryClient();
   const doDeleteCategory = useMutation({
     mutationFn: async (guid: string) =>
@@ -36,25 +31,32 @@ const CustomCategoryCard = (
       }),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["transactionCategories"] });
-      notifications.show({ color: "green", message: "Category deleted!" });
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: t("category_deleted_successfully_message"),
+      });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
   return (
-    <Card className={classes.card} shadow="xs" padding="md" radius="md">
+    <Card elevation={2}>
       <LoadingOverlay visible={doDeleteCategory.isPending} />
-      <Group className={classes.group}>
-        <Flex className={parentClasses.nameContainer}>
-          <Text>{props.category.value}</Text>
+      <Group>
+        <Flex w="40%">
+          <PrimaryText size="sm">{props.category.value}</PrimaryText>
         </Flex>
-        <Flex className={parentClasses.parentContainer}>
-          <Text>{props.category.parent}</Text>
+        <Flex w="40%">
+          <PrimaryText size="sm">{props.category.parent}</PrimaryText>
         </Flex>
-        <Flex className={parentClasses.deleteContainer}>
+        <Flex justify="flex-end" flex="1 1 auto">
           <ActionIcon
             onClick={() => doDeleteCategory.mutate(props.category.id)}
+            bg="var(--button-color-destructive)"
           >
             <TrashIcon size="1.2rem" />
           </ActionIcon>

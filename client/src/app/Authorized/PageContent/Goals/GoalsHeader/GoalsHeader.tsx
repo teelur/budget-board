@@ -1,10 +1,7 @@
-import classes from "./GoalsHeader.module.css";
-
-import { ActionIcon, Button, Group } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { PlusIcon } from "lucide-react";
+import { Button, Group } from "@mantine/core";
 import React from "react";
 import AddGoalModal from "./AddGoalModal/AddGoalModal";
+import { useTranslation } from "react-i18next";
 
 interface GoalsHeaderProps {
   includeInterest: boolean;
@@ -12,21 +9,21 @@ interface GoalsHeaderProps {
 }
 
 const GoalsHeader = (props: GoalsHeaderProps): React.ReactNode => {
-  const [isOpen, { toggle }] = useDisclosure();
-
+  const { t } = useTranslation();
   return (
-    <Group className={classes.root}>
-      <AddGoalModal isOpen={isOpen} onClose={toggle} />
+    <Group justify="flex-end" align="center" gap="0.5rem">
       <Button
         variant="outline"
-        color={props.includeInterest ? "green" : "red"}
+        color={
+          props.includeInterest
+            ? "var(--button-color-confirm)"
+            : "var(--button-color-destructive)"
+        }
         onClick={props.toggleIncludeInterest}
       >
-        Include Interest
+        {t("include_interest")}
       </Button>
-      <ActionIcon size="input-sm" onClick={toggle}>
-        <PlusIcon />
-      </ActionIcon>
+      <AddGoalModal />
     </Group>
   );
 };

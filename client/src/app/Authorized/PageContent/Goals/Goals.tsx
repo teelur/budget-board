@@ -1,6 +1,4 @@
-import classes from "./Goals.module.css";
-
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Skeleton, Stack } from "@mantine/core";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { IGoalResponse } from "~/models/goal";
@@ -12,10 +10,18 @@ import GoalsHeader from "./GoalsHeader/GoalsHeader";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import CompletedGoalsAccordion from "./CompletedGoalsAccordion/CompletedGoalsAccordion";
+import GoalDetails from "./GoalDetails/GoalDetails";
 
 const Goals = (): React.ReactNode => {
-  const [includeInterest, { toggle }] = useDisclosure();
-  const { request } = React.useContext<any>(AuthContext);
+  const [includeInterest, { toggle: toggleIncludeInterest }] = useDisclosure();
+  const [isDetailsOpen, { open: openDetails, close: closeDetails }] =
+    useDisclosure();
+
+  const [selectedGoal, setSelectedGoal] = React.useState<IGoalResponse | null>(
+    null,
+  );
+
+  const { request } = useAuth();
 
   const goalsQuery = useQuery({
     queryKey: ["goals", { includeInterest }],
@@ -37,7 +43,7 @@ const Goals = (): React.ReactNode => {
   React.useEffect(() => {
     if (goalsQuery.isError) {
       notifications.show({
-        color: "red",
+        color: "var(--button-color-destructive)",
         message: translateAxiosError(goalsQuery.error as AxiosError),
       });
     }
@@ -49,21 +55,31 @@ const Goals = (): React.ReactNode => {
 
   const activeGoals = React.useMemo(
     () => (goalsQuery.data ?? []).filter((goal) => goal.completed == null),
-    [goalsQuery.data]
+    [goalsQuery.data],
   );
 
   const completedGoals = React.useMemo(
     () => (goalsQuery.data ?? []).filter((goal) => goal.completed != null),
-    [goalsQuery.data]
+    [goalsQuery.data],
   );
 
+  const openGoalDetails = (goal: IGoalResponse) => {
+    setSelectedGoal(goal);
+    openDetails();
+  };
+
   return (
-    <Stack className={classes.root}>
+    <Stack w="100%" maw={1400}>
+      <GoalDetails
+        goal={selectedGoal}
+        isOpen={isDetailsOpen}
+        doClose={closeDetails}
+      />
       <GoalsHeader
         includeInterest={includeInterest}
-        toggleIncludeInterest={toggle}
+        toggleIncludeInterest={toggleIncludeInterest}
       />
-      <Stack className={classes.goals}>
+      <Stack gap="0.5rem">
         {goalsQuery.isPending ? (
           <Skeleton h={100} w="100%" radius="lg" />
         ) : (
@@ -72,6 +88,7 @@ const Goals = (): React.ReactNode => {
               key={goal.id}
               goal={goal}
               includeInterest={includeInterest}
+              openGoalDetails={openGoalDetails}
             />
           ))
         )}

@@ -1,12 +1,13 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
 public interface IInstitutionCreateRequest
 {
-    string Name { get; set; }
+    string Name { get; }
 }
+
 public class InstitutionCreateRequest : IInstitutionCreateRequest
 {
     public string Name { get; set; }
@@ -15,39 +16,34 @@ public class InstitutionCreateRequest : IInstitutionCreateRequest
     public InstitutionCreateRequest()
     {
         Name = string.Empty;
-
     }
 }
 
 public interface IInstitutionUpdateRequest
 {
-    Guid ID { get; set; }
-    string Name { get; set; }
-    int Index { get; set; }
-    Guid UserID { get; set; }
+    Guid ID { get; }
+    string Name { get; }
 }
+
 public class InstitutionUpdateRequest : IInstitutionUpdateRequest
 {
     public Guid ID { get; set; }
     public string Name { get; set; }
-    public int Index { get; set; }
-    public Guid UserID { get; set; }
 
     [JsonConstructor]
     public InstitutionUpdateRequest()
     {
         ID = Guid.NewGuid();
         Name = string.Empty;
-        Index = 0;
-        UserID = Guid.NewGuid();
     }
 }
 
 public interface IInstitutionIndexRequest
 {
-    Guid ID { get; set; }
-    int Index { get; set; }
+    Guid ID { get; }
+    int Index { get; }
 }
+
 public class InstitutionIndexRequest : IInstitutionIndexRequest
 {
     public Guid ID { get; set; }
@@ -56,12 +52,13 @@ public class InstitutionIndexRequest : IInstitutionIndexRequest
 
 public interface IInstitutionResponse
 {
-    Guid ID { get; set; }
-    string Name { get; set; }
-    int Index { get; set; }
-    Guid UserID { get; set; }
-    IEnumerable<IAccountResponse> Accounts { get; set; }
+    Guid ID { get; }
+    string Name { get; }
+    int Index { get; }
+    Guid UserID { get; }
+    IEnumerable<IAccountResponse> Accounts { get; }
 }
+
 public class InstitutionResponse : IInstitutionResponse
 {
     public Guid ID { get; set; }

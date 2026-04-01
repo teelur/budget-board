@@ -1,8 +1,9 @@
-import { months } from "~/helpers/utils";
-import classes from "./MonthToolcard.module.css";
-
-import { Card, Paper, Stack, Text } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { CashFlowValue } from "~/models/budget";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface MonthToolcardProps {
   date: Date;
@@ -13,47 +14,57 @@ interface MonthToolcardProps {
 }
 
 const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
+  const { dayjs } = useLocale();
+
   const getLightColor = (
     cashFlowValue: CashFlowValue,
     isSelected: boolean,
-    isPending?: boolean
+    isPending?: boolean,
   ): string => {
     if (isSelected) {
       if (isPending) {
-        return "var(--mantine-color-dimmed)";
+        return "var(--light-color-off)";
       }
 
       switch (cashFlowValue) {
         case CashFlowValue.Positive:
-          return "green";
+          return "var(--button-color-confirm)";
         case CashFlowValue.Neutral:
-          return "var(--mantine-color-dimmed)";
+          return "var(--light-color-off)";
         case CashFlowValue.Negative:
-          return "red";
+          return "var(--button-color-destructive)";
       }
     }
-    return "var(--mantine-color-dimmed)";
+    return "var(--light-color-off)";
   };
 
   return (
     <Card
-      className={props.isSelected ? classes.rootSelected : classes.root}
-      radius="md"
-      withBorder
+      h="62px"
+      w="60px"
+      flex="0 0 auto"
+      p="0.125rem"
       onClick={() => props.handleClick(props.date)}
+      hoverEffect
+      elevation={props.isSelected ? 2 : 1}
     >
-      <Stack className={classes.content}>
-        <Paper
-          className={classes.indicator}
-          radius="md"
-          bg={getLightColor(props.cashFlowValue, props.isSelected)}
+      <Stack gap={0} style={{ userSelect: "none" }}>
+        <Card
+          h="20px"
+          w="100%"
+          bg={getLightColor(
+            props.cashFlowValue,
+            props.isSelected,
+            props.isPending,
+          )}
+          withBorder={false}
+          shadow="none"
+          elevation={1}
         />
-        <Text size="sm">
-          {months.at(props.date.getMonth())?.substring(0, 3)}
-        </Text>
-        <Text size="xs" c="var(--mantine-color-dimmed)">
-          {props.date.getFullYear()}
-        </Text>
+        <PrimaryText size="sm">{dayjs(props.date).format("MMM")}</PrimaryText>
+        <DimmedText size="xs" c="dimmed">
+          {dayjs(props.date).format("YYYY")}
+        </DimmedText>
       </Stack>
     </Card>
   );

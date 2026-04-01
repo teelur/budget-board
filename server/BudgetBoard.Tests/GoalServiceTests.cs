@@ -1,8 +1,10 @@
 ﻿using Bogus;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,46 +14,37 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class GoalServiceTests
 {
-    private readonly Faker<GoalCreateRequest> _goalCreateRequestFaker = new Faker<GoalCreateRequest>()
-        .RuleFor(g => g.Name, f => f.Lorem.Word())
-        .RuleFor(g => g.CompleteDate, f => f.Date.Future())
-        .RuleFor(g => g.Amount, f => f.Finance.Amount())
-        .RuleFor(g => g.InitialAmount, f => f.Finance.Amount())
-        .RuleFor(g => g.MonthlyContribution, f => f.Finance.Amount());
+    private readonly Faker<GoalCreateRequest> _goalCreateRequestFaker =
+        new Faker<GoalCreateRequest>()
+            .RuleFor(g => g.Name, f => f.Lorem.Word())
+            .RuleFor(g => g.CompleteDate, f => f.Date.Future())
+            .RuleFor(g => g.Amount, f => f.Finance.Amount())
+            .RuleFor(g => g.ApplyExistingBalanceTowardsGoal, f => f.Random.Bool())
+            .RuleFor(g => g.MonthlyContribution, f => f.Finance.Amount());
 
-    private readonly Faker<GoalUpdateRequest> _goalUpdateRequestFaker = new Faker<GoalUpdateRequest>()
-        .RuleFor(g => g.Amount, f => f.Finance.Amount())
-        .RuleFor(g => g.IsMonthlyContributionEditable, f => true)
-        .RuleFor(g => g.MonthlyContribution, f => f.Finance.Amount())
-        .RuleFor(g => g.IsCompleteDateEditable, f => true)
-        .RuleFor(g => g.CompleteDate, f => f.Date.Future());
-
-    [Fact]
-    public async Task CreateGoalAsync_InvalidUserId_ThrowsException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
-
-        var goal = _goalCreateRequestFaker.Generate();
-
-        // Act
-        Func<Task> act = async () => await goalService.CreateGoalAsync(Guid.NewGuid(), goal);
-
-        // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("Provided user not found.");
-    }
+    private readonly Faker<GoalUpdateRequest> _goalUpdateRequestFaker =
+        new Faker<GoalUpdateRequest>()
+            .RuleFor(g => g.Amount, f => f.Finance.Amount())
+            .RuleFor(g => g.IsMonthlyContributionEditable, f => true)
+            .RuleFor(g => g.MonthlyContribution, f => f.Finance.Amount())
+            .RuleFor(g => g.IsCompleteDateEditable, f => true)
+            .RuleFor(g => g.CompleteDate, f => f.Date.Future());
 
     [Fact]
     public async Task CreateGoalAsync_WhenValidData_ShouldCreateGoal()
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
         helper.UserDataContext.SaveChanges();
@@ -64,9 +57,136 @@ public class GoalServiceTests
 
         // Assert
         helper.UserDataContext.Goals.Should().ContainSingle();
-        helper.UserDataContext.Goals.Single().Should().BeEquivalentTo(goal, options => options
-        .Excluding(g => g.AccountIds));
+        helper
+            .UserDataContext.Goals.Single()
+            .Should()
+            .BeEquivalentTo(
+                goal,
+                options =>
+                    options
+                        .Excluding(g => g.AccountIds)
+                        .Excluding(g => g.ApplyExistingBalanceTowardsGoal)
+            );
         helper.UserDataContext.Goals.Single().Accounts.Should().BeEquivalentTo(accounts);
+    }
+
+    [Fact]
+    public async Task CreateGoalAsync_InvalidUserId_ThrowsException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var goal = _goalCreateRequestFaker.Generate();
+
+        // Act
+        Func<Task> act = async () => await goalService.CreateGoalAsync(Guid.NewGuid(), goal);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidUserError");
+    }
+
+    [Fact]
+    public async Task CreateGoalAsync_WhenNoMonthlyContributionOrCompleteDate_ShouldThrowError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(5);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        var goal = _goalCreateRequestFaker.Generate();
+        goal.AccountIds = [.. accounts.Select(a => a.ID)];
+        goal.MonthlyContribution = null;
+        goal.CompleteDate = null;
+
+        // Act
+        Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalCreateMissingContributionOrDateError");
+    }
+
+    [Fact]
+    public async Task CreateGoalAsync_WhenCompleteDateIsInPast_ShouldThrowError()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(5);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        var goal = _goalCreateRequestFaker.Generate();
+        goal.AccountIds = [.. accounts.Select(a => a.ID)];
+        goal.CompleteDate = fakeDate.AddMonths(-1);
+
+        // Act
+        Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalCreateInPastError");
+    }
+
+    [Fact]
+    public async Task CreateGoalAsync_WhenNoAccounts_ShouldThrowError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var goal = _goalCreateRequestFaker.Generate();
+        goal.AccountIds = [];
+
+        // Act
+        Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalCreateNoAccountsError");
     }
 
     [Fact]
@@ -74,7 +194,13 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
         var goal = _goalCreateRequestFaker.Generate();
         goal.AccountIds = [Guid.NewGuid()];
@@ -83,20 +209,28 @@ public class GoalServiceTests
         Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The account you are trying to use does not exist.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalCreateInvalidAccountError");
     }
 
     [Fact]
-    public async Task CreateGoalAsync_WhenInitialAmountNotSet_ShouldSetToAccountRunningBalance()
+    public async Task CreateGoalAsync_WhenApplyExistingBalanceTowardsGoalIsFalse_ShouldSetToAccountRunningBalance()
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
 
-        var balanceFaker = new BalanceFaker();
+        var balanceFaker = new BalanceFaker(accounts.Select(a => a.ID).ToList());
         accounts.ForEach(a =>
         {
             a.UserID = helper.demoUser.Id;
@@ -112,130 +246,70 @@ public class GoalServiceTests
 
         var goal = _goalCreateRequestFaker.Generate();
         goal.AccountIds = [.. accounts.Select(a => a.ID)];
-        goal.InitialAmount = null;
+        goal.ApplyExistingBalanceTowardsGoal = false;
 
         // Act
         await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
 
         // Assert
         helper.UserDataContext.Goals.Should().ContainSingle();
-        helper.UserDataContext.Goals.Single().InitialAmount.Should().Be(accounts.Select(a => a.Balances.Single().Amount).Sum());
-    }
-
-    [Fact]
-    public async Task CreateGoalAsync_WhenNoMonthlyContributionOrCompleteDate_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
-
-        var accountFaker = new AccountFaker();
-        var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
-
-        helper.UserDataContext.Accounts.AddRange(accounts);
-        helper.UserDataContext.SaveChanges();
-
-        var goal = _goalCreateRequestFaker.Generate();
-        goal.AccountIds = [.. accounts.Select(a => a.ID)];
-        goal.MonthlyContribution = null;
-        goal.CompleteDate = null;
-
-        // Act
-        Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
-
-        // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("A goal must have a monthly contribution or target date.");
-    }
-
-    [Fact]
-    public async Task CreateGoalAsync_WhenCompleteDateIsInPast_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
-
-        var accountFaker = new AccountFaker();
-        var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
-
-        helper.UserDataContext.Accounts.AddRange(accounts);
-        helper.UserDataContext.SaveChanges();
-
-        var goal = _goalCreateRequestFaker.Generate();
-        goal.AccountIds = [.. accounts.Select(a => a.ID)];
-        goal.CompleteDate = DateTime.Now.AddMonths(-1);
-
-        // Act
-        Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
-
-        // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("A goal cannot have a target date in the past.");
-    }
-
-    [Fact]
-    public async Task CreateGoalAsync_WhenNoAccounts_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
-
-        var goal = _goalCreateRequestFaker.Generate();
-        goal.AccountIds = [];
-
-        // Act
-        Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
-
-        // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("A goal must be associated with at least one account.");
+        helper
+            .UserDataContext.Goals.Single()
+            .InitialAmount.Should()
+            .Be(accounts.Select(a => a.Balances.Single().Amount).Sum());
     }
 
     // This test is created with an APR of 48%. The expected values were validated with an online calculator.
     [Theory]
-    [InlineData(false, 19)]
-    [InlineData(true, 33)]
-    public async Task ReadGoalsAsync_WhenNoCompleteDate_ShouldEstimateCompleteDate(bool includeInterest, int monthsToPayoff)
+    [InlineData(-54080, -60000, 0, false, 19)]
+    [InlineData(-54080, -60000, 0, true, 33)]
+    [InlineData(32000, 0, 600000, false, 190)]
+    [InlineData(32000, 0, 600000, true, 47)]
+    public async Task ReadGoalsAsync_WhenNoCompleteDate_ShouldEstimateCompleteDate(
+        int balance,
+        int goalInitialAmount,
+        int goalTargetAmount,
+        bool includeInterest,
+        int monthsToPayoff
+    )
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
+        account.InterestRate = 0.48M;
 
-        var balanceFaker = new BalanceFaker();
+        var balanceFaker = new BalanceFaker([account.ID]);
 
         var balance0 = balanceFaker.Generate();
-        balance0.AccountID = account.ID;
-        balance0.Amount = -54080;
-        balance0.DateTime = DateTime.Now;
+        balance0.Amount = balance;
+        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
 
-        var balance1 = balanceFaker.Generate();
-        balance1.AccountID = account.ID;
-        balance1.Amount = -52000;
-        balance1.DateTime = DateTime.Now.AddMonths(-1);
+        account.Balances = [balance0];
 
-        helper.UserDataContext.Balances.Add(balance1);
-
-        var balance2 = balanceFaker.Generate();
-        balance2.AccountID = account.ID;
-        balance2.Amount = -50000;
-        balance2.DateTime = DateTime.Now.AddMonths(-2);
-
-        account.Balances = [balance0, balance1, balance2];
-
-        helper.UserDataContext.Balances.AddRange([balance0, balance1, balance2]);
+        helper.UserDataContext.Balances.Add(balance0);
         helper.UserDataContext.Accounts.Add(account);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
 
         goal.Accounts = [account];
         goal.CompleteDate = null;
-        goal.Amount = 0;
-        goal.InitialAmount = -60000;
+        goal.Amount = goalTargetAmount;
+        goal.InitialAmount = goalInitialAmount;
         goal.MonthlyContribution = 3000;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -245,55 +319,69 @@ public class GoalServiceTests
         var result = await goalService.ReadGoalsAsync(helper.demoUser.Id, includeInterest);
 
         // Assert
-        result.Single().CompleteDate.Should().Be(new DateTime(DateTime.Now.AddMonths(monthsToPayoff).Year, DateTime.Now.AddMonths(monthsToPayoff).Month, 1));
+        result
+            .Single()
+            .CompleteDate.Should()
+            .Be(
+                new DateTime(
+                    fakeDate.AddMonths(monthsToPayoff).Year,
+                    fakeDate.AddMonths(monthsToPayoff).Month,
+                    1
+                )
+            );
     }
 
     // This test is created with an APR of 48%. The expected values were validated with an online calculator.
     [Theory]
-    [InlineData(false, 901)]
-    [InlineData(true, 2390)]
-    public async Task ReadGoalsAsync_WhenNoMonthlyContribution_ShouldEstimateMonthlyContribution(bool includeInterest, decimal monthlyContribution)
+    [InlineData(-54080, -60000, 0, false, 901)]
+    [InlineData(-54080, -60000, 0, true, 2390)]
+    [InlineData(32000, 0, 600000, false, 9466)]
+    [InlineData(32000, 0, 600000, true, 1106)]
+    public async Task ReadGoalsAsync_WhenNoMonthlyContribution_ShouldEstimateMonthlyContribution(
+        int balance,
+        int goalInitialAmount,
+        int goalTargetAmount,
+        bool includeInterest,
+        decimal monthlyContribution
+    )
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.UserID = helper.demoUser.Id;
+        account.InterestRate = 0.48M;
 
-        var balanceFaker = new BalanceFaker();
+        var balanceFaker = new BalanceFaker([account.ID]);
 
         var balance0 = balanceFaker.Generate();
-        balance0.AccountID = account.ID;
-        balance0.Amount = -54080;
-        balance0.DateTime = DateTime.Now;
+        balance0.Amount = balance;
+        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
 
-        var balance1 = balanceFaker.Generate();
-        balance1.AccountID = account.ID;
-        balance1.Amount = -52000;
-        balance1.DateTime = DateTime.Now.AddMonths(-1);
+        account.Balances = [balance0];
 
-        helper.UserDataContext.Balances.Add(balance1);
-
-        var balance2 = balanceFaker.Generate();
-        balance2.AccountID = account.ID;
-        balance2.Amount = -50000;
-        balance2.DateTime = DateTime.Now.AddMonths(-2);
-
-        account.Balances = [balance0, balance1, balance2];
-
-        helper.UserDataContext.Balances.AddRange([balance0, balance1, balance2]);
+        helper.UserDataContext.Balances.Add(balance0);
         helper.UserDataContext.Accounts.Add(account);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
 
         goal.Accounts = [account];
-        goal.CompleteDate = DateTime.Now.AddYears(5);
-        goal.Amount = 0;
-        goal.InitialAmount = -60000;
+        goal.CompleteDate = new DateTime(fakeDate.Year, fakeDate.Month, 1).AddYears(5);
+        goal.Amount = goalTargetAmount;
+        goal.InitialAmount = goalInitialAmount;
         goal.MonthlyContribution = null;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -307,21 +395,92 @@ public class GoalServiceTests
     }
 
     [Fact]
+    public async Task ReadGoalsAsync_WhenTransactionData_ShouldReturnProgressForMonth()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+
+        var transaction = transactionFaker.Generate();
+        transaction.AccountID = account.ID;
+        transaction.Date = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        transaction.Amount = 3000;
+
+        account.Transactions.Add(transaction);
+
+        var otherMonthTransaction = transactionFaker.Generate();
+        otherMonthTransaction.AccountID = account.ID;
+        otherMonthTransaction.Date = new DateTime(fakeDate.Year, fakeDate.Month, 2).AddMonths(-1);
+        otherMonthTransaction.Amount = 2000;
+
+        account.Transactions.Add(otherMonthTransaction);
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balance0 = balanceFaker.Generate();
+        balance0.Amount = 30000;
+        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+
+        account.Balances = [balance0];
+
+        helper.UserDataContext.Balances.Add(balance0);
+        helper.UserDataContext.Accounts.Add(account);
+
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
+        var goal = goalFaker.Generate();
+
+        goal.Accounts = [account];
+        goal.CompleteDate = null;
+        goal.Amount = 50000;
+        goal.InitialAmount = 10000;
+        goal.MonthlyContribution = 3000;
+
+        helper.UserDataContext.Goals.Add(goal);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var result = await goalService.ReadGoalsAsync(helper.demoUser.Id, false);
+
+        // Assert
+        result.Single().MonthlyContributionProgress.Should().BeApproximately(3000, 1);
+        result.Single().PercentComplete.Should().BeApproximately(40.0M, 0.01M);
+    }
+
+    [Fact]
     public async Task UpdateGoalAsync_WhenValidData_ShouldUpdateData()
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -335,9 +494,16 @@ public class GoalServiceTests
 
         // Assert
         helper.UserDataContext.Goals.Should().ContainSingle();
-        helper.UserDataContext.Goals.Single().Should().BeEquivalentTo(updatedGoal, options => options
-        .Excluding(g => g.IsCompleteDateEditable)
-        .Excluding(g => g.IsMonthlyContributionEditable));
+        helper
+            .UserDataContext.Goals.Single()
+            .Should()
+            .BeEquivalentTo(
+                updatedGoal,
+                options =>
+                    options
+                        .Excluding(g => g.IsCompleteDateEditable)
+                        .Excluding(g => g.IsMonthlyContributionEditable)
+            );
     }
 
     [Fact]
@@ -345,15 +511,24 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
         var updatedGoal = _goalUpdateRequestFaker.Generate();
 
         // Act
-        Func<Task> act = async () => await goalService.UpdateGoalAsync(helper.demoUser.Id, updatedGoal);
+        Func<Task> act = async () =>
+            await goalService.UpdateGoalAsync(helper.demoUser.Id, updatedGoal);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The goal you are trying to update does not exist.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalUpdateNotFoundError");
     }
 
     [Fact]
@@ -361,17 +536,21 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -386,7 +565,10 @@ public class GoalServiceTests
 
         // Assert
         helper.UserDataContext.Goals.Should().ContainSingle();
-        helper.UserDataContext.Goals.Single().MonthlyContribution.Should().Be(goal.MonthlyContribution);
+        helper
+            .UserDataContext.Goals.Single()
+            .MonthlyContribution.Should()
+            .Be(goal.MonthlyContribution);
     }
 
     [Fact]
@@ -394,17 +576,21 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -426,18 +612,27 @@ public class GoalServiceTests
     public async Task UpdateGoalAsync_WhenCompleteDateSetToPast_ShouldThrowError()
     {
         // Arrange
-        var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
-        var accountFaker = new AccountFaker();
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -445,35 +640,44 @@ public class GoalServiceTests
 
         var updatedGoal = _goalUpdateRequestFaker.Generate();
         updatedGoal.ID = goal.ID;
-        updatedGoal.CompleteDate = DateTime.Now.AddMonths(-1);
+        updatedGoal.CompleteDate = fakeDate.AddMonths(-1);
         updatedGoal.IsCompleteDateEditable = true;
 
         // Act
-        Func<Task> act = async () => await goalService.UpdateGoalAsync(helper.demoUser.Id, updatedGoal);
+        Func<Task> act = async () =>
+            await goalService.UpdateGoalAsync(helper.demoUser.Id, updatedGoal);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("A goal cannot have a target date in the past.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalUpdatePastDateError");
     }
 
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(null)]
-    public async Task UpdateGoalAsync_WhenMonthlyContributionInvalid_ShouldThrowError(int? monthlyContribution)
+    public async Task UpdateGoalAsync_WhenMonthlyContributionInvalid_ShouldThrowError(
+        int? monthlyContribution
+    )
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -485,10 +689,13 @@ public class GoalServiceTests
         updatedGoal.IsMonthlyContributionEditable = true;
 
         // Act
-        Func<Task> act = async () => await goalService.UpdateGoalAsync(helper.demoUser.Id, updatedGoal);
+        Func<Task> act = async () =>
+            await goalService.UpdateGoalAsync(helper.demoUser.Id, updatedGoal);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("A goal must have a monthly contribution greater than 0.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalUpdateNoMonthlyContributionError");
     }
 
     [Fact]
@@ -496,17 +703,21 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
 
         helper.UserDataContext.Goals.Add(goal);
@@ -521,40 +732,57 @@ public class GoalServiceTests
 
     [Fact]
     public async Task DeleteGoalAsync_WhenInvalidGoal_ShouldThrowError()
-    {   // Arrange
+    { // Arrange
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
         // Act
-        Func<Task> act = async () => await goalService.DeleteGoalAsync(helper.demoUser.Id, Guid.NewGuid());
+        Func<Task> act = async () =>
+            await goalService.DeleteGoalAsync(helper.demoUser.Id, Guid.NewGuid());
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The goal you are trying to delete does not exist.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalDeleteNotFoundError");
     }
 
     [Fact]
     public async Task CompleteGoalAsync_WhenIncomplete_ShouldMarkComplete()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
 
         helper.UserDataContext.Goals.Add(goal);
         helper.UserDataContext.SaveChanges();
 
-        var completedDate = DateTime.Now.AddDays(-1);
+        var completedDate = fakeDate.AddDays(-1);
 
         // Act
         await goalService.CompleteGoalAsync(helper.demoUser.Id, goal.ID, completedDate);
@@ -568,47 +796,136 @@ public class GoalServiceTests
     public async Task CompleteGoalAsync_WhenAlreadyComplete_ShouldThrowError()
     {
         // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
         var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
 
-        var accountFaker = new AccountFaker();
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
         var accounts = accountFaker.Generate(5);
-
-        accounts.ForEach(a => a.UserID = helper.demoUser.Id);
 
         helper.UserDataContext.Accounts.AddRange(accounts);
 
-        var goalFaker = new GoalFaker();
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
         var goal = goalFaker.Generate();
-        goal.UserID = helper.demoUser.Id;
         goal.Accounts = accounts;
-        goal.Completed = DateTime.Now;
+        goal.Completed = fakeDate;
 
         helper.UserDataContext.Goals.Add(goal);
         helper.UserDataContext.SaveChanges();
 
-        var completedDate = DateTime.Now.AddDays(-1);
+        var completedDate = fakeDate.AddDays(-1);
 
         // Act
-        Func<Task> act = async () => await goalService.CompleteGoalAsync(helper.demoUser.Id, goal.ID, completedDate);
+        Func<Task> act = async () =>
+            await goalService.CompleteGoalAsync(helper.demoUser.Id, goal.ID, completedDate);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The goal you are trying to complete has already been completed.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalCompleteAlreadyCompletedError");
     }
 
     [Fact]
     public async Task CompleteGoalAsync_WhenInvalidGoal_ShouldThrowError()
     {
         // Arrange
-        var helper = new TestHelper();
-        var goalService = new GoalService(Mock.Of<ILogger<IGoalService>>(), helper.UserDataContext);
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
-        var completedDate = DateTime.Now.AddDays(-1);
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var completedDate = fakeDate.AddDays(-1);
 
         // Act
-        Func<Task> act = async () => await goalService.CompleteGoalAsync(helper.demoUser.Id, Guid.NewGuid(), completedDate);
+        Func<Task> act = async () =>
+            await goalService.CompleteGoalAsync(helper.demoUser.Id, Guid.NewGuid(), completedDate);
 
         // Assert
-        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("The goal you are trying to complete does not exist.");
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalCompleteNotFoundError");
+    }
+
+    [Fact]
+    public async Task CompleteGoalsAsync_ShouldCompleteEligibleGoals()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(5);
+
+        var balanceFaker = new BalanceFaker([.. accounts.Select(a => a.ID)]);
+        var newBalance = balanceFaker.Generate();
+        newBalance.Amount = 5000;
+        newBalance.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        accounts.Where(a => a.ID == newBalance.AccountID).Single().Balances.Add(newBalance);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
+
+        var eligibleGoal = goalFaker.Generate();
+        eligibleGoal.Accounts = accounts;
+        eligibleGoal.Amount = 5000;
+        eligibleGoal.InitialAmount = 0;
+        eligibleGoal.CompleteDate = null;
+
+        helper.UserDataContext.Goals.Add(eligibleGoal);
+
+        var ineligibleGoal = goalFaker.Generate();
+        ineligibleGoal.Accounts = accounts;
+        ineligibleGoal.Amount = 6000;
+        ineligibleGoal.InitialAmount = 5000;
+        ineligibleGoal.CompleteDate = null;
+
+        helper.UserDataContext.Goals.Add(ineligibleGoal);
+
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await goalService.CompleteGoalsAsync(helper.demoUser.Id);
+
+        // Assert
+        helper.UserDataContext.Goals.Should().HaveCount(2);
+        helper
+            .UserDataContext.Goals.Single(g => g.ID == eligibleGoal.ID)
+            .Completed.Should()
+            .NotBeNull();
+        helper
+            .UserDataContext.Goals.Single(g => g.ID == ineligibleGoal.ID)
+            .Completed.Should()
+            .BeNull();
     }
 }

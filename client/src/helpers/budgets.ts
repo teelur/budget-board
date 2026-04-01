@@ -1,7 +1,8 @@
 import { CashFlowValue, IBudget } from "~/models/budget";
-import { ICategory } from "~/models/category";
+import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
 import { areStringsEqual } from "./utils";
 import {
+  getFormattedCategoryValue,
   getIsParentCategory,
   getParentCategory,
   getSubCategories,
@@ -128,30 +129,58 @@ export const sumBudgetAmounts = (budgetData: IBudget[]): number => {
   return budgetData.reduce((n, { limit }) => n + limit, 0);
 };
 
-/**
- * Determines the color for a budget value based on the completion percentage
- * and whether it represents income.
- *
- * @param {number} percentComplete - The completion percentage of the budget.
- * @param {boolean} isIncome - Indicates if the budget is for income (true) or spending (false).
- * @returns {string} - The color ("red" or "green") to visually represent the budget status.
- */
-export const getBudgetValueColor = (
+export enum StatusColorType {
+  Expense,
+  Income,
+  Total,
+  Target,
+}
+
+export const getStatusColor = (
   amount: number,
   total: number,
-  isIncome: boolean
+  type: StatusColorType,
+  warningThreshold: number
 ): string => {
-  if (isIncome) {
+  if (type === StatusColorType.Income) {
     if (amount < total) {
-      return "red";
+      return "var(--text-color-status-neutral)";
     }
-    return "green";
+    return "var(--text-color-status-good)";
   }
 
-  if (amount * -1 <= total) {
-    return "green";
+  if (type === StatusColorType.Expense) {
+    {
+      const invertedAmount = amount * -1;
+      if (invertedAmount > total) {
+        return "var(--text-color-status-bad)";
+      }
+      if (invertedAmount >= total * (warningThreshold / 100)) {
+        return "var(--text-color-status-warning)";
+      }
+      return "var(--text-color-status-good)";
+    }
   }
-  return "red";
+
+  if (type === StatusColorType.Total) {
+    if (amount < 0) {
+      return "var(--text-color-status-bad)";
+    } else if (amount >= 0) {
+      return "var(--text-color-status-good)";
+    }
+  }
+
+  if (type === StatusColorType.Target) {
+    if (amount < total * (warningThreshold / 100)) {
+      return "var(--text-color-status-bad)";
+    }
+    if (amount <= total) {
+      return "var(--text-color-status-warning)";
+    }
+    return "var(--text-color-status-good)";
+  }
+
+  return "var(--base-color-text-primary)";
 };
 
 /**
@@ -198,7 +227,7 @@ export const getBudgetAmount = (
  * @param {IBudget[]} budgets - An array of budget objects.
  * @returns {Map<string, IBudget[]>} - A map from category to list of budgets.
  */
-export const groupBudgetsByCategory = (
+export const buildCategoryToBudgetsMap = (
   budgets: IBudget[]
 ): Map<string, IBudget[]> =>
   budgets
@@ -212,9 +241,140 @@ export const groupBudgetsByCategory = (
     })
     .reduce(
       (budgetMap: any, item: IBudget) =>
-        budgetMap.set(item.category.toLowerCase(), [
-          ...(budgetMap.get(item.category.toLowerCase()) || []),
+        budgetMap.set(item.category.toLocaleLowerCase(), [
+          ...(budgetMap.get(item.category.toLocaleLowerCase()) || []),
           item,
         ]),
       new Map()
     );
+
+/**
+ * Builds a hierarchical tree structure of budget categories from the provided budgets and categories.
+ *
+ * Parent categories are added as root nodes, and subcategories are added as children under their
+ * respective parents. Only categories that are not parent categories themselves are added as subcategories.
+ *
+ * @param budgets - An array of budget objects to be organized into the category tree.
+ * @param categories - An array of all available categories used to determine parent-child relationships.
+ * @returns An array of `ICategoryNode` objects representing the root nodes of the category tree, each with their subcategories populated.
+ */
+export const buildBudgetCategoryTree = (
+  budgets: IBudget[],
+  categories: ICategory[]
+): ICategoryNode[] => {
+  const categoryTree: ICategoryNode[] = [];
+
+  budgets.forEach((budget) => {
+    const parentCategory = getParentCategory(budget.category, categories);
+
+    if (
+      !categoryTree.some((category) =>
+        areStringsEqual(category.value, parentCategory)
+      )
+    ) {
+      categoryTree.push(
+        new CategoryNode({
+          value: getFormattedCategoryValue(parentCategory, categories),
+          parent: "",
+        })
+      );
+    }
+
+    if (!getIsParentCategory(budget.category, categories)) {
+      const parent = categoryTree.find((category) =>
+        areStringsEqual(category.value, parentCategory)
+      );
+
+      if (parent) {
+        parent.subCategories.push(
+          new CategoryNode({
+            value: getFormattedCategoryValue(budget.category, categories),
+            parent: parentCategory,
+          })
+        );
+      }
+    }
+  });
+
+  return categoryTree;
+};
+
+export const getTotalLimitForCategory = (
+  budgets: IBudget[],
+  category: ICategoryNode
+): number => {
+  if (budgets.some((b) => areStringsEqual(b.category, category.value))) {
+    return budgets.reduce((total, budget) => {
+      if (areStringsEqual(budget.category, category.value)) {
+        return total + budget.limit;
+      }
+
+      return total;
+    }, 0);
+  }
+
+  return budgets.reduce((total, budget) => {
+    if (
+      category.subCategories.some((subCategory) =>
+        areStringsEqual(subCategory.value, budget.category)
+      )
+    ) {
+      return total + budget.limit;
+    }
+
+    return total;
+  }, 0);
+};
+
+export const buildCategoryToLimitsMap = (
+  budgets: IBudget[],
+  categories: ICategoryNode[]
+): Map<string, number> => {
+  const categoryToLimitsMap = new Map<string, number>();
+
+  budgets.forEach((budget) => {
+    if (categoryToLimitsMap.has(budget.category.toLocaleLowerCase())) {
+      categoryToLimitsMap.set(
+        budget.category.toLocaleLowerCase(),
+        categoryToLimitsMap.get(budget.category.toLocaleLowerCase())! +
+          budget.limit
+      );
+    } else {
+      categoryToLimitsMap.set(
+        budget.category.toLocaleLowerCase(),
+        budget.limit
+      );
+    }
+
+    // If the budget is for a subcategory, add the limit to the parent category
+    if (!categories.some((c) => areStringsEqual(c.value, budget.category))) {
+      const parentCategory =
+        categories
+          .flatMap((c) => c.subCategories)
+          .find((c) => areStringsEqual(c.value, budget.category))?.parent ?? "";
+
+      // We only want to add the limit to the parent category if it is not already in the budgets
+      if (
+        !parentCategory ||
+        budgets.some((b) => areStringsEqual(b.category, parentCategory))
+      ) {
+        return;
+      }
+
+      if (categoryToLimitsMap.has(parentCategory.toLocaleLowerCase())) {
+        categoryToLimitsMap.set(
+          parentCategory.toLocaleLowerCase(),
+          categoryToLimitsMap.get(parentCategory.toLocaleLowerCase())! +
+            budget.limit
+        );
+      } else {
+        categoryToLimitsMap.set(
+          parentCategory.toLocaleLowerCase(),
+          budget.limit
+        );
+      }
+    }
+  });
+
+  return categoryToLimitsMap;
+};

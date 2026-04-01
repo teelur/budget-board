@@ -17,7 +17,7 @@ namespace BudgetBoard.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -34,7 +34,7 @@ namespace BudgetBoard.Database.Migrations
 
                     b.HasIndex("GoalsID");
 
-                    b.ToTable("AccountGoal", (string)null);
+                    b.ToTable("AccountGoal");
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Account", b =>
@@ -58,6 +58,9 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<Guid?>("InstitutionID")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal?>("InterestRate")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -68,9 +71,6 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<string>("Subtype")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SyncID")
                         .HasColumnType("text");
 
                     b.Property<string>("Type")
@@ -98,10 +98,6 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("AccessToken")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -121,6 +117,10 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LunchFlowApiKey")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -142,6 +142,10 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<string>("SimpleFinAccessToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -161,6 +165,63 @@ namespace BudgetBoard.Database.Migrations
                     b.ToTable("User", (string)null);
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.Asset", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Index")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("PurchasePrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("SellDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("SellPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Asset", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("AutomaticRule", (string)null);
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.Balance", b =>
                 {
                     b.Property<Guid>("ID")
@@ -174,6 +235,9 @@ namespace BudgetBoard.Database.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Deleted")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ID");
@@ -294,6 +358,186 @@ namespace BudgetBoard.Database.Migrations
                     b.ToTable("Institution", (string)null);
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.LunchFlowAccount", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("BalanceDate")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("InstitutionLogo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("InstitutionName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastSync")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("LinkedAccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SyncID")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly?>("SyncStartDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("LinkedAccountId")
+                        .IsUnique();
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("LunchFlowAccount", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.RuleParameterBase", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Field")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Operator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ParameterKind")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("character varying(21)");
+
+                    b.Property<Guid>("RuleID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("RuleParameter", (string)null);
+
+                    b.HasDiscriminator<string>("ParameterKind").HasValue("RuleParameterBase");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinAccount", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("BalanceDate")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastSync")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("LinkedAccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SyncID")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly?>("SyncStartDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("LinkedAccountId")
+                        .IsUnique();
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SimpleFinAccount", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinOrganization", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Domain")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SimpleFinUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SyncID")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SimpleFinOrganization", (string)null);
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.Transaction", b =>
                 {
                     b.Property<Guid>("ID")
@@ -318,9 +562,6 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<string>("MerchantName")
                         .HasColumnType("text");
 
-                    b.Property<bool>("Pending")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("text");
@@ -336,6 +577,113 @@ namespace BudgetBoard.Database.Migrations
                     b.HasIndex("AccountID");
 
                     b.ToTable("Transaction", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.UserSettings", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("AutoCategorizerLastTrained")
+                        .HasColumnType("date");
+
+                    b.Property<int>("AutoCategorizerMinimumProbabilityPercentage")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly?>("AutoCategorizerModelEndDate")
+                        .HasColumnType("date");
+
+                    b.Property<long?>("AutoCategorizerModelOID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateOnly?>("AutoCategorizerModelStartDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("BudgetWarningThreshold")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DateFormat")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("DisableBuiltInTransactionCategories")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableAutoCategorizer")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ForceSyncLookbackMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
+
+                    b.ToTable("UserSettings", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.Value", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("AssetID")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("AssetID");
+
+                    b.ToTable("Value", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.WidgetSettings", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Configuration")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("WidgetType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("WidgetSettings", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -468,6 +816,24 @@ namespace BudgetBoard.Database.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.RuleAction", b =>
+                {
+                    b.HasBaseType("BudgetBoard.Database.Models.RuleParameterBase");
+
+                    b.HasIndex("RuleID");
+
+                    b.HasDiscriminator().HasValue("Action");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.RuleCondition", b =>
+                {
+                    b.HasBaseType("BudgetBoard.Database.Models.RuleParameterBase");
+
+                    b.HasIndex("RuleID");
+
+                    b.HasDiscriminator().HasValue("Condition");
+                });
+
             modelBuilder.Entity("AccountGoal", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.Account", null)
@@ -496,6 +862,28 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Institution");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.Asset", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("Assets")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("AutomaticRules")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -555,6 +943,57 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.LunchFlowAccount", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.Account", "LinkedAccount")
+                        .WithOne("LunchFlowAccount")
+                        .HasForeignKey("BudgetBoard.Database.Models.LunchFlowAccount", "LinkedAccountId");
+
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("LunchFlowAccounts")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LinkedAccount");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinAccount", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.Account", "LinkedAccount")
+                        .WithOne("SimpleFinAccount")
+                        .HasForeignKey("BudgetBoard.Database.Models.SimpleFinAccount", "LinkedAccountId");
+
+                    b.HasOne("BudgetBoard.Database.Models.SimpleFinOrganization", "Organization")
+                        .WithMany("Accounts")
+                        .HasForeignKey("OrganizationId");
+
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("SimpleFinAccounts")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LinkedAccount");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinOrganization", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("SimpleFinOrganizations")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.Transaction", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.Account", "Account")
@@ -564,6 +1003,39 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.UserSettings", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithOne("UserSettings")
+                        .HasForeignKey("BudgetBoard.Database.Models.UserSettings", "UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.Value", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.Asset", "Asset")
+                        .WithMany("Values")
+                        .HasForeignKey("AssetID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.WidgetSettings", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("WidgetSettings")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -617,9 +1089,35 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.RuleAction", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.AutomaticRule", "Rule")
+                        .WithMany("Actions")
+                        .HasForeignKey("RuleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rule");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.RuleCondition", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.AutomaticRule", "Rule")
+                        .WithMany("Conditions")
+                        .HasForeignKey("RuleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rule");
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.Account", b =>
                 {
                     b.Navigation("Balances");
+
+                    b.Navigation("LunchFlowAccount");
+
+                    b.Navigation("SimpleFinAccount");
 
                     b.Navigation("Transactions");
                 });
@@ -628,16 +1126,47 @@ namespace BudgetBoard.Database.Migrations
                 {
                     b.Navigation("Accounts");
 
+                    b.Navigation("Assets");
+
+                    b.Navigation("AutomaticRules");
+
                     b.Navigation("Budgets");
 
                     b.Navigation("Goals");
 
                     b.Navigation("Institutions");
 
+                    b.Navigation("LunchFlowAccounts");
+
+                    b.Navigation("SimpleFinAccounts");
+
+                    b.Navigation("SimpleFinOrganizations");
+
                     b.Navigation("TransactionCategories");
+
+                    b.Navigation("UserSettings");
+
+                    b.Navigation("WidgetSettings");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.Asset", b =>
+                {
+                    b.Navigation("Values");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.AutomaticRule", b =>
+                {
+                    b.Navigation("Actions");
+
+                    b.Navigation("Conditions");
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.Institution", b =>
+                {
+                    b.Navigation("Accounts");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinOrganization", b =>
                 {
                     b.Navigation("Accounts");
                 });

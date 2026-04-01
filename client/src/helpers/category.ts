@@ -1,5 +1,6 @@
 import { CategoryNode, ICategory } from "~/models/category";
 import { areStringsEqual } from "./utils";
+import { uncategorizedTransactionCategory } from "~/models/transaction";
 
 /**
  * Builds an alphabetized tree of category nodes and their children
@@ -56,7 +57,7 @@ export const getFormattedCategoryValue = (
     areStringsEqual(c.value, categoryString)
   );
 
-  return foundCategory?.value ?? "Uncategorized";
+  return foundCategory?.value ?? uncategorizedTransactionCategory;
 };
 
 /**
@@ -73,9 +74,17 @@ export const getFormattedCategoryValue = (
 export const getIsParentCategory = (
   categoryValue: string,
   categories: ICategory[]
-): boolean =>
-  categories.find((c) => areStringsEqual(c.value, categoryValue))?.parent
-    .length === 0;
+): boolean => {
+  // Handle the special case for "Uncategorized"
+  if (areStringsEqual(categoryValue, uncategorizedTransactionCategory)) {
+    return true;
+  }
+
+  return (
+    categories.find((c) => areStringsEqual(c.value, categoryValue))?.parent
+      .length === 0
+  );
+};
 
 /**
  * Retrieves the category's parent value, or returns the category's own value if it has no parent.
@@ -89,6 +98,11 @@ export const getParentCategory = (
   categoryValue: string,
   categories: ICategory[]
 ): string => {
+  // Handle the special case for "Uncategorized"
+  if (areStringsEqual(categoryValue, uncategorizedTransactionCategory)) {
+    return uncategorizedTransactionCategory;
+  }
+
   const category = categories.find((c) =>
     areStringsEqual(c.value, categoryValue)
   );

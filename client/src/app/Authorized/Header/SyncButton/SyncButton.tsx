@@ -3,11 +3,19 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse, AxiosError } from "axios";
 import React from "react";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import {
+  lunchFlowAccountQueryKey,
+  simpleFinAccountQueryKey,
+  simpleFinOrganizationQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
+import { useTranslation } from "react-i18next";
 
 const SyncButton = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { t } = useTranslation();
+
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doSyncMutation = useMutation({
@@ -18,16 +26,31 @@ const SyncButton = (): React.ReactNode => {
       await queryClient.invalidateQueries({ queryKey: ["institutions"] });
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
       await queryClient.invalidateQueries({ queryKey: ["goals"] });
+      await queryClient.invalidateQueries({
+        queryKey: [simpleFinOrganizationQueryKey],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [simpleFinAccountQueryKey],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [lunchFlowAccountQueryKey],
+      });
       if ((data.data?.length ?? 0) > 0) {
         {
           data.data.map((error: string) =>
-            notifications.show({ color: "red", message: error })
+            notifications.show({
+              color: "var(--button-color-destructive)",
+              message: error,
+            }),
           );
         }
       }
     },
     onError: (error: AxiosError) => {
-      notifications.show({ color: "red", message: translateAxiosError(error) });
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
     },
   });
 
@@ -36,7 +59,7 @@ const SyncButton = (): React.ReactNode => {
       onClick={() => doSyncMutation.mutate()}
       loading={doSyncMutation.isPending}
     >
-      Sync
+      {t("sync")}
     </Button>
   );
 };

@@ -1,8 +1,54 @@
 .root {
-  padding: 0.5rem;
+  width: 100%;
+  container-type: inline-size;
 }
-.group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+
+.container {
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 0.5rem;
+
+  @container (max-width: 660px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+.datePickerInput {
+  width: 35%;
+  max-width: 360px;
+
+  @container (max-width: 660px) {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.accountMultiSelect {
+  width: 50%;
+
+  @container (max-width: 660px) {
+    width: 100%;
+  }
+}
+
+.categorySelect {
+  width: 30%;
+  max-width: 220px;
+
+  @container (max-width: 660px) {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.clearButton {
+  max-width: 120px;
+  margin-top: 0;
+
+  @container (max-width: 660px) {
+    max-width: none;
+    margin-top: 0.25rem;
+  }
 }

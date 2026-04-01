@@ -1,0 +1,190 @@
+import { Button, Group, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import React from "react";
+
+import { translateAxiosError } from "~/helpers/requests";
+import {
+  ActionOperators,
+  FieldToOperatorType,
+  IAutomaticRuleRequest,
+  IRuleParameterEdit,
+  Operators,
+  OperatorTypes,
+  TransactionFields,
+} from "~/models/automaticRule";
+
+import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useTranslation } from "react-i18next";
+
+const AddAutomaticRule = (): React.ReactNode => {
+  const defaultField =
+    TransactionFields.find((field) => field.value === "merchant")?.value ?? "";
+
+  const [conditionItems, setConditionItems] = React.useState<
+    IRuleParameterEdit[]
+  >([
+    {
+      field: defaultField,
+      operator:
+        Operators.filter((op) =>
+          op.type.includes(
+            FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING
+          )
+        )
+          .map((op) => op.value)
+          .at(0) ?? "",
+      value: "",
+    },
+  ]);
+
+  const [actionItems, setActionItems] = React.useState<IRuleParameterEdit[]>([
+    {
+      field: defaultField,
+      operator: ActionOperators.at(0)!.value,
+      value: "",
+    },
+  ]);
+
+  const { t } = useTranslation();
+  const { request } = useAuth();
+
+  const queryClient = useQueryClient();
+  const doAddRule = useMutation({
+    mutationFn: async (automaticRule: IAutomaticRuleRequest) =>
+      await request({
+        url: "/api/automaticRule",
+        method: "POST",
+        data: automaticRule,
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["automaticRule"],
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
+    },
+  });
+
+  const doRunRule = useMutation({
+    mutationFn: async (automaticRule: IAutomaticRuleRequest) =>
+      await request({
+        url: "/api/automaticRule/run",
+        method: "POST",
+        data: automaticRule,
+      }),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["transactions"],
+      });
+
+      notifications.show({
+        title: t("rule_executed"),
+        message: data?.data ?? t("rule_run_successfully"),
+        color: "var(--button-color-confirm)",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        message: translateAxiosError(error),
+        color: "var(--button-color-destructive)",
+      });
+    },
+  });
+
+  return (
+    <Stack gap="0.5rem">
+      <EditableAutomaticRuleContent
+        conditionItems={conditionItems}
+        actionItems={actionItems}
+        setConditionItems={setConditionItems}
+        setActionItems={setActionItems}
+      />
+      <Group w="100%">
+        <Button
+          flex="1 1 auto"
+          loading={doAddRule.isPending}
+          onClick={() => {
+            doAddRule.mutate({
+              conditions: conditionItems.map((item) => ({
+                field: item.field,
+                operator: item.operator,
+                value: item.value,
+                type: "",
+              })),
+              actions: actionItems.map((item) => ({
+                field: item.field,
+                operator: item.operator,
+                value: item.value,
+                type: "",
+              })),
+            });
+
+            // Reset to default
+            setConditionItems([
+              {
+                field: defaultField,
+                operator:
+                  Operators.filter((op) =>
+                    op.type.includes(
+                      FieldToOperatorType.get(defaultField) ??
+                        OperatorTypes.STRING
+                    )
+                  )
+                    .map((op) => op.value)
+                    .at(0) ?? "",
+                value: "",
+              },
+            ]);
+            setActionItems([
+              {
+                field: defaultField,
+                operator:
+                  Operators.find((op) =>
+                    op.type.includes(
+                      FieldToOperatorType.get(defaultField) ??
+                        OperatorTypes.STRING
+                    )
+                  )?.value ?? "",
+                value: "",
+              },
+            ]);
+          }}
+        >
+          {t("add_rule")}
+        </Button>
+        <Button
+          variant="outline"
+          flex="1 1 auto"
+          loading={doRunRule.isPending}
+          onClick={() => {
+            doRunRule.mutate({
+              conditions: conditionItems.map((item) => ({
+                field: item.field,
+                operator: item.operator,
+                value: item.value,
+                type: "",
+              })),
+              actions: actionItems.map((item) => ({
+                field: item.field,
+                operator: item.operator,
+                value: item.value,
+                type: "",
+              })),
+            });
+          }}
+        >
+          {t("run_rule")}
+        </Button>
+      </Group>
+    </Stack>
+  );
+};
+
+export default AddAutomaticRule;

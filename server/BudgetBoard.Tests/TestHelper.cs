@@ -2,6 +2,8 @@
 using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Moq;
 
 namespace BudgetBoard.IntegrationTests;
 
@@ -15,7 +17,9 @@ internal class TestHelper
     public TestHelper()
     {
         var builder = new DbContextOptionsBuilder<UserDataContext>();
-        builder.UseInMemoryDatabase(new Guid().ToString());
+        builder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .AddInterceptors(new StringSanitizationInterceptor());
 
         var dbContextOptions = builder.Options;
         UserDataContext = new UserDataContext(dbContextOptions);
@@ -26,5 +30,17 @@ internal class TestHelper
         // Seed a demo user
         UserDataContext.Users.Add(demoUser);
         UserDataContext.SaveChanges();
+    }
+
+    public static IStringLocalizer<T> CreateMockLocalizer<T>()
+    {
+        var mock = new Mock<IStringLocalizer<T>>();
+        mock.Setup(l => l[It.IsAny<string>()])
+            .Returns((string key) => new LocalizedString(key, key));
+        mock.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
+            .Returns(
+                (string key, object[] args) => new LocalizedString(key, string.Format(key, args))
+            );
+        return mock.Object;
     }
 }

@@ -1,0 +1,54 @@
+.content {
+  flex-direction: row;
+
+  @container (max-width: 634px) {
+    flex-direction: column;
+  }
+}
+
+.dateText {
+  width: 135px;
+  font-size: var(--mantine-font-size-sm);
+
+  @container (max-width: 634px) {
+    width: 100%;
+  }
+
+  @container (max-width: 400px) {
+    font-size: var(--mantine-font-size-xs);
+  }
+}
+
+.merchantNameText {
+  font-size: var(--mantine-font-size-md);
+
+  @container (max-width: 400px) {
+    font-size: var(--mantine-font-size-sm);
+  }
+}
+
+.contentSubcontainer {
+  width: auto;
+
+  @container (max-width: 634px) {
+    width: 100%;
+  }
+}
+
+.categoryContainer {
+  width: 160px;
+
+  @container (max-width: 634px) {
+    width: 100%;
+  }
+}
+
+.amountContainer {
+  width: 100px;
+  justify-content: flex-start;
+
+  @container (max-width: 634px) {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

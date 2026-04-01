@@ -1,10 +1,10 @@
-import { IAccount } from "./account";
+import { IAccountResponse } from "./account";
 
 export interface IGoalCreateRequest {
   name: string;
   completeDate: Date | null;
   amount: number;
-  initialAmount: number | null;
+  applyExistingBalanceTowardsGoal: boolean;
   monthlyContribution: number | null;
   accountIds: string[];
 }
@@ -28,9 +28,11 @@ export interface IGoalResponse {
   initialAmount: number;
   monthlyContribution: number;
   isMonthlyContributionEditable: boolean;
-  estimatedInterestRate: number | null;
+  monthlyContributionProgress: number;
+  interestRate: number | null;
   completed: Date | null;
-  accounts: IAccount[];
+  percentComplete: number;
+  accounts: IAccountResponse[];
   userID: string;
 }
 

@@ -1,32 +1,35 @@
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
-import CategorySelect from "~/components/CategorySelect";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
-import {
-  Button,
-  Card,
-  LoadingOverlay,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { Button, LoadingOverlay, Switch, Stack, Group } from "@mantine/core";
+import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { ICategory, ICategoryCreateRequest } from "~/models/category";
+import { ICategoryCreateRequest } from "~/models/category";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import Card from "~/components/core/Card/Card";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import { useTranslation } from "react-i18next";
 
-interface AddCategoryProps {
-  categories: ICategory[];
-}
+const AddCategory = (): React.ReactNode => {
+  const [isChildCategory, setIsChildCategory] = React.useState(false);
 
-interface FormValues {
-  name: string;
-  parent: string;
-}
+  const { t } = useTranslation();
+  const { transactionCategories } = useTransactionCategories();
 
-const AddCategory = (props: AddCategoryProps): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const nameField = useField<string>({
+    initialValue: "",
+    validate: (value) => (value.length === 0 ? t("name_is_required") : null),
+  });
+  const parentField = useField<string>({
+    initialValue: "",
+  });
+
+  const { request } = useAuth();
 
   const queryClient = useQueryClient();
   const doAddCategory = useMutation({
@@ -38,58 +41,68 @@ const AddCategory = (props: AddCategoryProps): React.ReactNode => {
       }),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["transactionCategories"] });
-      notifications.show({ color: "green", message: "Category added!" });
     },
     onError: (error: AxiosError) =>
-      notifications.show({ color: "red", message: translateAxiosError(error) }),
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
   });
 
-  const form = useForm({
-    mode: "controlled",
-    initialValues: { name: "", parent: "" },
-    validate: {
-      name: isNotEmpty("Name is required"),
-    },
-  });
-
-  const parentCategories = props.categories.filter(
-    (category) => category.parent?.length === 0
+  const parentCategories = transactionCategories.filter(
+    (category) => category.parent?.length === 0,
   );
 
-  const handleSubmit = (values: FormValues) => {
-    doAddCategory.mutate({
-      value: values.name,
-      parent: values.parent,
-    });
-    form.reset();
-  };
-
   return (
-    <Card withBorder shadow="xs">
+    <Card elevation={2}>
       <LoadingOverlay visible={doAddCategory.isPending} />
-      <form style={{ width: "100%" }} onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack>
-          <TextInput
-            {...form.getInputProps("name")}
-            key={form.key("name")}
-            label="Category Name"
-            w="100%"
-          />
+      <Stack>
+        <TextInput
+          {...nameField.getInputProps()}
+          label={<PrimaryText size="sm">{t("category_name")}</PrimaryText>}
+          elevation={2}
+        />
+        <Stack gap="0.5rem" justify="center">
+          <PrimaryText size="sm">{t("category_type")}</PrimaryText>
+          <Group gap="0.5rem">
+            <DimmedText size="sm">{t("parent")}</DimmedText>
+            <Switch
+              checked={isChildCategory}
+              onChange={(event) => {
+                setIsChildCategory(event.currentTarget.checked);
+                if (!event.currentTarget.checked) {
+                  parentField.setValue("");
+                }
+              }}
+              size="md"
+            />
+            <DimmedText size="sm">{t("child")}</DimmedText>
+          </Group>
+        </Stack>
+        {isChildCategory && (
           <Stack gap="0.25rem">
-            <Text size="0.875rem">Parent Category</Text>
+            <PrimaryText size="sm">{t("parent_category")}</PrimaryText>
             <CategorySelect
               w="100%"
               categories={parentCategories}
-              value={form.getValues().parent}
-              onChange={(value) => form.setFieldValue("parent", value)}
+              {...parentField.getInputProps()}
               withinPortal
+              elevation={2}
             />
           </Stack>
-          <Button w="100%" type="submit">
-            Add Category
-          </Button>
-        </Stack>
-      </form>
+        )}
+        <Button
+          w="100%"
+          onClick={() =>
+            doAddCategory.mutate({
+              value: nameField.getValue(),
+              parent: parentField.getValue(),
+            })
+          }
+        >
+          {t("add_category")}
+        </Button>
+      </Stack>
     </Card>
   );
 };

@@ -1,0 +1,287 @@
+import { ActionIcon, Flex, Group } from "@mantine/core";
+import { useField } from "@mantine/form";
+import { useDidUpdate } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { ChevronRightIcon, PencilIcon, TrashIcon } from "lucide-react";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import Select from "~/components/core/Select/Select/Select";
+import { translateAxiosError } from "~/helpers/requests";
+import { areStringsEqual } from "~/helpers/utils";
+import { getSubtypeOptions, NET_WORTH_CATEGORY_TYPES } from "~/helpers/widgets";
+import { accountCategories } from "~/models/account";
+import { INetWorthWidgetCategoryUpdateRequest } from "~/models/netWorthWidgetConfiguration";
+import {
+  INetWorthWidgetCategory,
+  INetWorthWidgetLine,
+} from "~/models/widgetSettings";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+
+interface EditableNetWorthLineCategoryContentProps {
+  category: INetWorthWidgetCategory;
+  lineId: string;
+  currentLineName: string;
+  lines: INetWorthWidgetLine[];
+  settingsId: string;
+  disableEdit: () => void;
+}
+
+const EditableNetWorthLineCategoryContent = (
+  props: EditableNetWorthLineCategoryContentProps,
+): React.ReactNode => {
+  // These two need to be coerced to lowercase because pre-localization these were stored with a capitalized first letter.
+  const typeField = useField<string | null>({
+    initialValue: props.category.type.toLowerCase(),
+  });
+  const subtypeField = useField<string | null>({
+    initialValue: props.category.subtype.toLowerCase(),
+  });
+  const valueField = useField<string | null>({
+    initialValue: props.category.value,
+  });
+
+  const { t } = useTranslation();
+
+  const { request } = useAuth();
+
+  const queryClient = useQueryClient();
+  const doUpdateCategory = useMutation({
+    mutationFn: async (updatedCategory: INetWorthWidgetCategoryUpdateRequest) =>
+      await request({
+        url: `/api/netWorthWidgetCategory`,
+        method: "PUT",
+        data: updatedCategory,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
+  const doDeleteCategory = useMutation({
+    mutationFn: async () =>
+      await request({
+        url: `/api/netWorthWidgetCategory`,
+        method: "DELETE",
+        params: {
+          categoryId: props.category.id,
+          lineId: props.lineId,
+          widgetSettingsId: props.settingsId,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: t("net_worth_setting_deleted_successfully_message"),
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
+
+  const type = typeField.getValue();
+  const subtype = subtypeField.getValue();
+  const value = valueField.getValue();
+
+  const isValueValid = (type: string, subtype: string, value: string) => {
+    if (
+      areStringsEqual(type, "account") &&
+      areStringsEqual(subtype, "category")
+    ) {
+      return !!value;
+    } else if (areStringsEqual(type, "asset")) {
+      if (areStringsEqual(subtype, "all")) {
+        return true;
+      } else if (areStringsEqual(subtype, "specific")) {
+        return !!value;
+      }
+    } else if (areStringsEqual(type, "line")) {
+      if (areStringsEqual(subtype, "name")) {
+        return !!value && value !== props.currentLineName;
+      }
+    }
+
+    return false;
+  };
+
+  useDidUpdate(() => {
+    subtypeField.setValue(null);
+  }, [type]);
+
+  useDidUpdate(() => {
+    valueField.setValue(null);
+  }, [subtype]);
+
+  useDidUpdate(() => {
+    if (type && subtype && isValueValid(type, subtype, value ?? "")) {
+      doUpdateCategory.mutate({
+        id: props.category.id,
+        type,
+        subtype,
+        value: value ?? "",
+        lineId: props.lineId,
+        widgetSettingsId: props.settingsId,
+      } as INetWorthWidgetCategoryUpdateRequest);
+    }
+  }, [type, subtype, value]);
+
+  const validLineNames = React.useMemo(() => {
+    const wouldCreateCircularDependency = (targetLineName: string): boolean => {
+      // Track nodes in the current DFS path to detect back edges (circular references)
+      const visited = new Set<string>();
+
+      const hasCircularReference = (lineName: string): boolean => {
+        // Base case: if we encounter the line being edited, we've found a circular dependency
+        // This detects when a dependency chain would circle back to the current line
+        if (areStringsEqual(lineName, props.currentLineName)) {
+          return true;
+        }
+
+        // If already in current path, we've already explored this branch
+        if (visited.has(lineName.toLowerCase())) {
+          return false;
+        }
+
+        // Add to current path
+        visited.add(lineName.toLowerCase());
+
+        const line = props.lines.find((l) => areStringsEqual(l.name, lineName));
+        if (!line) {
+          return false;
+        }
+
+        // Recursively check all dependencies of this line
+        for (const category of line.categories) {
+          if (
+            areStringsEqual(category.type, "line") &&
+            areStringsEqual(category.subtype, "name") &&
+            category.value
+          ) {
+            if (hasCircularReference(category.value)) {
+              return true;
+            }
+          }
+        }
+
+        // Backtrack: remove from current path to allow exploring other dependency paths
+        // This enables checking multiple paths from the same node in different contexts
+        visited.delete(lineName.toLowerCase());
+        return false;
+      };
+
+      return hasCircularReference(targetLineName);
+    };
+
+    // We want to filter out any line names that would create a circular dependency
+    const validLineNames = props.lines
+      .map((line) => line.name)
+      .filter(
+        (name) =>
+          !areStringsEqual(name, props.currentLineName) &&
+          !wouldCreateCircularDependency(name),
+      );
+
+    return [...new Set(validLineNames)];
+  }, [props.lines, props.currentLineName]);
+
+  const getValidNetWorthValuesForTypeAndSubtype = (
+    type: string,
+    subtype: string,
+  ): React.ReactNode => {
+    if (areStringsEqual(type, "account")) {
+      if (areStringsEqual(subtype, "category")) {
+        return (
+          <CategorySelect
+            size="xs"
+            categories={accountCategories}
+            {...valueField.getInputProps()}
+            withinPortal
+            elevation={2}
+          />
+        );
+      }
+    } else if (areStringsEqual(type, "asset")) {
+      if (areStringsEqual(subtype, "all")) {
+        return null;
+      }
+    } else if (areStringsEqual(type, "line")) {
+      if (areStringsEqual(subtype, "name")) {
+        return (
+          <Select
+            w="150px"
+            size="xs"
+            data={validLineNames.map((n) => ({ value: n, label: n }))}
+            {...valueField.getInputProps()}
+            elevation={2}
+          />
+        );
+      }
+    }
+
+    return null;
+  };
+
+  return (
+    <Group justify="space-between">
+      <Group gap="0.25rem">
+        <Select
+          w="100px"
+          size="xs"
+          data={NET_WORTH_CATEGORY_TYPES.map((i) => ({
+            value: i.value,
+            label: t(i.label),
+          }))}
+          {...typeField.getInputProps()}
+          elevation={2}
+        />
+        <ChevronRightIcon size={14} />
+        <Select
+          w="100px"
+          size="xs"
+          data={getSubtypeOptions(typeField.getValue() ?? "").map((i) => ({
+            value: i.value,
+            label: t(i.label),
+          }))}
+          {...subtypeField.getInputProps()}
+          elevation={2}
+        />
+        <ActionIcon variant="outline" size="sm" onClick={props.disableEdit}>
+          <PencilIcon size={14} />
+        </ActionIcon>
+      </Group>
+      <Group gap="0.25rem">
+        {getValidNetWorthValuesForTypeAndSubtype(
+          typeField.getValue() ?? "",
+          subtypeField.getValue() ?? "",
+        )}
+        <Flex style={{ alignSelf: "stretch" }}>
+          <ActionIcon
+            color="var(--button-color-destructive)"
+            h="100%"
+            size="md"
+            loading={doDeleteCategory.isPending}
+            onClick={async () => await doDeleteCategory.mutateAsync()}
+          >
+            <TrashIcon size={16} />
+          </ActionIcon>
+        </Flex>
+      </Group>
+    </Group>
+  );
+};
+
+export default EditableNetWorthLineCategoryContent;

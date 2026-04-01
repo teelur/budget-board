@@ -1,0 +1,27 @@
+.root {
+  background-color: var(--background-color-elevated);
+  border-color: var(--elevated-color-border);
+}
+
+.input {
+  background-color: var(--elevated-color-input-background);
+  border-color: var(--elevated-color-input-border);
+  color: var(--base-color-text-primary);
+  font-weight: 600;
+}
+
+.input::placeholder {
+  color: var(--elevated-color-text-dimmed);
+}
+
+.code {
+  background-color: var(--elevated-color-input-background);
+  color: var(--base-color-text-primary);
+  font-weight: 600;
+}
+
+.accordion {
+  background-color: var(--background-color-elevated);
+  border-color: var(--elevated-color-border);
+  border-radius: 8px;
+}

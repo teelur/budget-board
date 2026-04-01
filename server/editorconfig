@@ -7,6 +7,7 @@ root = true
 # All files
 [*]
 indent_style = space
+max_line_length = 120
 
 # XML config files
 [*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]

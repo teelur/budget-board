@@ -1,12 +1,12 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
 public interface ICategory
 {
-    public string Value { get; set; }
-    public string Parent { get; set; }
+    public string Value { get; }
+    public string Parent { get; }
 }
 
 public class CategoryBase : ICategory
@@ -22,9 +22,7 @@ public class CategoryBase : ICategory
     }
 }
 
-public interface ICategoryCreateRequest : ICategory
-{
-}
+public interface ICategoryCreateRequest : ICategory { }
 
 public class CategoryCreateRequest : ICategoryCreateRequest
 {
@@ -41,10 +39,11 @@ public class CategoryCreateRequest : ICategoryCreateRequest
 
 public interface ICategoryUpdateRequest
 {
-    Guid ID { get; set; }
-    string Value { get; set; }
-    string Parent { get; set; }
+    Guid ID { get; }
+    string Value { get; }
+    string Parent { get; }
 }
+
 public class CategoryUpdateRequest : ICategoryUpdateRequest
 {
     public Guid ID { get; set; }
@@ -62,11 +61,12 @@ public class CategoryUpdateRequest : ICategoryUpdateRequest
 
 public interface ICategoryResponse
 {
-    Guid ID { get; set; }
-    string Value { get; set; }
-    string Parent { get; set; }
-    Guid UserID { get; set; }
+    Guid ID { get; }
+    string Value { get; }
+    string Parent { get; }
+    Guid UserID { get; }
 }
+
 public class CategoryResponse : ICategoryResponse
 {
     public Guid ID { get; set; }

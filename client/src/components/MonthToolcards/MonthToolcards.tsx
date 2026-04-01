@@ -1,12 +1,10 @@
-import classes from "./MonthToolcards.module.css";
-
-import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { ActionIcon, Group } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import React from "react";
 import MonthToolcard from "./MonthToolcard/MonthToolcard";
 import { getCashFlowValue } from "~/helpers/budgets";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface MonthToolcardsProps {
   selectedDates: Date[];
@@ -14,11 +12,14 @@ interface MonthToolcardsProps {
   timeToMonthlyTotalsMap: Map<number, number>;
   isPending: boolean;
   allowSelectMultiple: boolean;
+  allowFutureMonths?: boolean;
 }
 
 const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
   const PAGE_BUTTON_WIDTH = 36;
   const MONTH_CARD_WIDTH = 68;
+
+  const { dayjs } = useLocale();
 
   const [index, setIndex] = React.useState(0);
   const { ref, width } = useElementSize();
@@ -26,10 +27,14 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
   const dates = Array.from(
     {
       length: Math.floor(
-        ((width ?? 0) - PAGE_BUTTON_WIDTH * 2) / MONTH_CARD_WIDTH
+        ((width ?? 0) - PAGE_BUTTON_WIDTH * 2) / MONTH_CARD_WIDTH,
       ),
     },
-    (_, i) => getDateFromMonthsAgo(i + index)
+    (_, i) =>
+      dayjs()
+        .subtract(i + index, "month")
+        .startOf("month")
+        .toDate(),
   );
 
   const handleClick = (date: Date) => {
@@ -40,8 +45,8 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
       ) {
         props.setSelectedDates(
           props.selectedDates.filter(
-            (selectedDate: Date) => selectedDate.getTime() !== date.getTime()
-          )
+            (selectedDate: Date) => selectedDate.getTime() !== date.getTime(),
+          ),
         );
       } else {
         // If it isn't present, then add to selected.
@@ -54,15 +59,22 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
   };
 
   return (
-    <Group className={classes.root} ref={ref}>
+    <Group wrap="nowrap" gap="0.5rem" ref={ref}>
       <ActionIcon
-        className={classes.pageButton}
-        variant="light"
+        h="62px"
+        w="32px"
+        flex="0 0"
+        variant="outline"
         onClick={() => setIndex(index + 1)}
       >
         <ChevronLeftIcon />
       </ActionIcon>
-      <Group className={classes.monthCards}>
+      <Group
+        style={{ flexDirection: "row-reverse", flexGrow: 1 }}
+        wrap="nowrap"
+        justify="space-around"
+        gap={0}
+      >
         {dates.map((date: Date, i: number) => (
           <MonthToolcard
             key={i}
@@ -79,9 +91,11 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
         ))}
       </Group>
       <ActionIcon
-        className={classes.pageButton}
-        variant="light"
-        disabled={index <= 0}
+        h="62px"
+        w="32px"
+        flex="0 0"
+        variant="outline"
+        disabled={index <= 0 && !props.allowFutureMonths}
         onClick={() => setIndex(index - 1)}
       >
         <ChevronRightIcon />

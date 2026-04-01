@@ -1,20 +1,30 @@
 ﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.WebAPI.Utils;
+using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TransactionController(ILogger<TransactionController> logger, UserManager<ApplicationUser> userManager, ITransactionService transactionService) : ControllerBase
+public class TransactionController(
+    ILogger<TransactionController> logger,
+    UserManager<ApplicationUser> userManager,
+    ITransactionService transactionService,
+    IStringLocalizer<ApiLogStrings> logLocalizer,
+    IStringLocalizer<ApiResponseStrings> responseLocalizer
+) : ControllerBase
 {
     private readonly ILogger<TransactionController> _logger = logger;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly ITransactionService _transactionService = transactionService;
+    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
+    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
 
     [HttpPost]
     [Authorize]
@@ -22,16 +32,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.CreateTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), transaction);
+            await _transactionService.CreateTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                transaction
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -39,18 +53,25 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     [Authorize]
     public async Task<IActionResult> Read(int? year, int? month, bool getHidden = false)
     {
-
         try
         {
-            return Ok(await _transactionService.ReadTransactionsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), year, month, getHidden));
+            return Ok(
+                await _transactionService.ReadTransactionsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    year,
+                    month,
+                    getHidden
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -60,15 +81,24 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            return Ok(await _transactionService.ReadTransactionsAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), null, null, false, guid));
+            return Ok(
+                await _transactionService.ReadTransactionsAsync(
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    null,
+                    null,
+                    false,
+                    guid
+                )
+            );
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -78,16 +108,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.UpdateTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), newTransaction);
+            await _transactionService.UpdateTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                newTransaction
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -97,16 +131,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.DeleteTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid);
+            await _transactionService.DeleteTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -117,16 +155,20 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.RestoreTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), guid);
+            await _transactionService.RestoreTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guid
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -137,16 +179,44 @@ public class TransactionController(ILogger<TransactionController> logger, UserMa
     {
         try
         {
-            await _transactionService.SplitTransactionAsync(new Guid(_userManager.GetUserId(User) ?? string.Empty), splitTransaction);
+            await _transactionService.SplitTransactionAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                splitTransaction
+            );
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
         {
             return Helpers.BuildErrorResponse(bbex.Message);
         }
-        catch
+        catch (Exception ex)
         {
-            return Helpers.BuildErrorResponse();
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> Import([FromBody] TransactionImportRequest importTransaction)
+    {
+        try
+        {
+            await _transactionService.ImportTransactionsAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                importTransaction
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
 }

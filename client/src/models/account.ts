@@ -3,16 +3,17 @@ import { ICategory } from "./category";
 export enum AccountSource {
   Manual = "Manual",
   SimpleFIN = "SimpleFIN",
+  LunchFlow = "LunchFlow",
 }
 
 export interface IAccountCreateRequest {
-  syncID?: string;
   name: string;
   institutionID?: string;
   type: string;
   subtype: string;
   hideTransactions: boolean;
   hideAccount: boolean;
+  source: AccountSource;
 }
 
 export interface IAccountUpdateRequest {
@@ -22,6 +23,7 @@ export interface IAccountUpdateRequest {
   subtype: string;
   hideTransactions: boolean;
   hideAccount: boolean;
+  interestRate: number | null;
 }
 
 export interface IAccountIndexRequest {
@@ -29,9 +31,8 @@ export interface IAccountIndexRequest {
   index: number;
 }
 
-export interface IAccount {
+export interface IAccountResponse {
   id: string;
-  syncID: string;
   name: string;
   institutionID: string;
   type: string;
@@ -42,6 +43,7 @@ export interface IAccount {
   hideAccount: boolean;
   deleted: Date | null;
   index: number;
+  interestRate: number | null;
   source: string;
   userID: string;
 }

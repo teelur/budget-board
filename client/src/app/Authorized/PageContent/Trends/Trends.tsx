@@ -2,42 +2,42 @@ import classes from "./Trends.module.css";
 
 import { Stack, Tabs } from "@mantine/core";
 import React from "react";
-import SpendingTab from "./SpendingTab/SpendingTab";
-import NetCashFlowTab from "./NetCashFlowTab/NetCashFlowTab";
+import TransactionsTab from "./TransactionsTab/TransactionsTab";
+import AccountsTab from "./AccountsTab/AccountsTab";
 import AssetsTab from "./AssetsTab/AssetsTab";
-import LiabilitiesTab from "./LiabilitiesTab/LiabilitiesTab";
-import NetWorthTab from "./NetWorthTab/NetWorthTab";
-import SpendingCategoriesTab from "./SpendingCategoriesTab/SpendingCategoriesTab";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 const Trends = (): React.ReactNode => {
+  const { t } = useTranslation();
+
   return (
     <Stack className={classes.root}>
-      <Tabs variant="outline" defaultValue="spending" keepMounted={false}>
+      <Tabs
+        variant="pills"
+        defaultValue="transactions"
+        keepMounted={false}
+        radius="md"
+      >
         <Tabs.List grow>
-          <Tabs.Tab value="spending">Spending</Tabs.Tab>
-          <Tabs.Tab value="spendigCategories">Spending Categories</Tabs.Tab>
-          <Tabs.Tab value="netCashFlow">Net Cash Flow</Tabs.Tab>
-          <Tabs.Tab value="assets">Assets</Tabs.Tab>
-          <Tabs.Tab value="liabilities">Liabilities</Tabs.Tab>
-          <Tabs.Tab value="netWorth">Net Worth</Tabs.Tab>
+          <Tabs.Tab value="transactions">
+            <PrimaryText size="sm">{t("transactions")}</PrimaryText>
+          </Tabs.Tab>
+          <Tabs.Tab value="accounts">
+            <PrimaryText size="sm">{t("accounts")}</PrimaryText>
+          </Tabs.Tab>
+          <Tabs.Tab value="assets">
+            <PrimaryText size="sm">{t("assets")}</PrimaryText>
+          </Tabs.Tab>
         </Tabs.List>
-        <Tabs.Panel value="spending">
-          <SpendingTab />
+        <Tabs.Panel value="transactions">
+          <TransactionsTab />
         </Tabs.Panel>
-        <Tabs.Panel value="spendigCategories">
-          <SpendingCategoriesTab />
-        </Tabs.Panel>
-        <Tabs.Panel value="netCashFlow">
-          <NetCashFlowTab />
+        <Tabs.Panel value="accounts">
+          <AccountsTab />
         </Tabs.Panel>
         <Tabs.Panel value="assets">
           <AssetsTab />
-        </Tabs.Panel>
-        <Tabs.Panel value="liabilities">
-          <LiabilitiesTab />
-        </Tabs.Panel>
-        <Tabs.Panel value="netWorth">
-          <NetWorthTab />
         </Tabs.Panel>
       </Tabs>
     </Stack>

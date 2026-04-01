@@ -1,16 +1,18 @@
-import classes from "./CustomCategories.module.css";
-
-import { Flex, Group, Stack, Text } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import AddCategory from "./AddCategory/AddCategory";
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ICategoryResponse } from "~/models/category";
 import CustomCategoryCard from "./CustomCategoryCard/CustomCategoryCard";
-import { defaultTransactionCategories } from "~/models/transaction";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTranslation } from "react-i18next";
 
 const CustomCategories = (): React.ReactNode => {
-  const { request } = React.useContext<any>(AuthContext);
+  const { t } = useTranslation();
+  const { request } = useAuth();
+
   const transactionCategoriesQuery = useQuery({
     queryKey: ["transactionCategories"],
     queryFn: async () => {
@@ -27,23 +29,20 @@ const CustomCategories = (): React.ReactNode => {
     },
   });
 
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
-  );
-
   return (
-    <Stack>
-      <AddCategory categories={transactionCategoriesWithCustom} />
-      <Stack>
+    <Stack gap="0.5rem">
+      <DimmedText size="sm">{t("custom_categories_description")}</DimmedText>
+      <AddCategory />
+      <Stack gap="0.25rem">
         <Group px="0.5rem" justify="space-between">
-          <Flex className={classes.nameContainer}>
-            <Text fw={600}>Name</Text>
+          <Flex w="40%">
+            <PrimaryText>{t("name")}</PrimaryText>
           </Flex>
-          <Flex className={classes.parentContainer}>
-            <Text fw={600}>Parent</Text>
+          <Flex w="40%">
+            <PrimaryText>{t("parent")}</PrimaryText>
           </Flex>
-          <Flex className={classes.deleteContainer}>
-            <Text />
+          <Flex justify="flex-end" flex="1 1 auto">
+            <Flex />
           </Flex>
         </Group>
         {(transactionCategoriesQuery.data ?? []).length > 0 ? (
@@ -53,7 +52,9 @@ const CustomCategories = (): React.ReactNode => {
             )
           )
         ) : (
-          <Text>No custom categories.</Text>
+          <Group justify="center">
+            <DimmedText size="sm">{t("no_custom_categories")}</DimmedText>
+          </Group>
         )}
       </Stack>
     </Stack>

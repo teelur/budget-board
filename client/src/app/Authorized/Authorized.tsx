@@ -1,5 +1,3 @@
-import classes from "./Authorized.module.css";
-
 import {
   AppShell,
   AppShellHeader,
@@ -11,6 +9,8 @@ import React from "react";
 import PageContent, { Pages } from "./PageContent/PageContent";
 import Header from "./Header/Header";
 import { useDisclosure } from "@mantine/hooks";
+import { TransactionFiltersProvider } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
+import { TransactionCategoryProvider } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 const Authorized = (): React.ReactNode => {
   const [currentPage, setCurrentPage] = React.useState(Pages.Dashboard);
@@ -35,10 +35,10 @@ const Authorized = (): React.ReactNode => {
       }}
       padding={12}
     >
-      <AppShellHeader className={classes.header}>
+      <AppShellHeader bg="var(--background-color-header)">
         <Header isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
       </AppShellHeader>
-      <AppShellNavbar className={classes.navbar}>
+      <AppShellNavbar bg="var(--background-color-sidebar)">
         <Navbar
           currentPage={currentPage}
           setCurrentPage={onPageSelect}
@@ -46,8 +46,15 @@ const Authorized = (): React.ReactNode => {
           toggleNavbar={toggle}
         />
       </AppShellNavbar>
-      <AppShellMain className={classes.main}>
-        <PageContent currentPage={currentPage} />
+      <AppShellMain
+        bg="var(--background-color-base)"
+        flex={{ direction: "column" }}
+      >
+        <TransactionCategoryProvider>
+          <TransactionFiltersProvider setCurrentPage={setCurrentPage}>
+            <PageContent currentPage={currentPage} />
+          </TransactionFiltersProvider>
+        </TransactionCategoryProvider>
       </AppShellMain>
     </AppShell>
   );

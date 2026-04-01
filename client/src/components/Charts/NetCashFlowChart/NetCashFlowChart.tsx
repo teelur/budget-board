@@ -1,11 +1,18 @@
-import { convertNumberToCurrency } from "~/helpers/currency";
-import { getMonthAndYearDateString } from "~/helpers/datetime";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { getTransactionsForMonth } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
-import { CompositeChart } from "@mantine/charts";
-import { Group, Skeleton, Text } from "@mantine/core";
+import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
+import { Group, Skeleton } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { IUserSettings } from "~/models/userSettings";
+import { AxiosResponse } from "axios";
+import ChartTooltip from "../ChartTooltip/ChartTooltip";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface ChartDatum {
   month: string;
@@ -23,8 +30,29 @@ interface NetCashFlowChartProps {
 }
 
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
+  const { t } = useTranslation();
+  const { dayjs, intlLocale } = useLocale();
+  const { request } = useAuth();
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   const sortedMonths = props.months.sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    (a, b) =>
+      dayjs(a).startOf("month").valueOf() - dayjs(b).startOf("month").valueOf(),
   );
 
   const buildChartData = (): ChartDatum[] => {
@@ -33,7 +61,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
     sortedMonths.forEach((month) => {
       const transactionsForMonth = getTransactionsForMonth(
         props.transactions,
-        month
+        month,
       );
 
       const incomeTotal = transactionsForMonth.reduce(
@@ -41,7 +69,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
           areStringsEqual(curr.category ?? "", "Income")
             ? acc + curr.amount
             : acc,
-        0
+        0,
       );
 
       const spendingTotal = transactionsForMonth.reduce(
@@ -49,17 +77,35 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
           !areStringsEqual(curr.category ?? "", "Income")
             ? acc + curr.amount
             : acc,
-        0
+        0,
       );
 
       spendingTrendsChartData.push({
-        month: getMonthAndYearDateString(month),
+        month: dayjs(month).format("MMMM YYYY"),
         Income: incomeTotal,
         Spending: spendingTotal,
         Net: incomeTotal + spendingTotal,
       });
     });
     return spendingTrendsChartData;
+  };
+
+  const chartSeries: CompositeChartSeries[] = [
+    { name: "Income", label: t("income"), color: "green.6", type: "bar" },
+    { name: "Spending", label: t("spending"), color: "red.6", type: "bar" },
+    { name: "Net", label: t("net"), color: "gray.0", type: "line" },
+  ];
+
+  const chartValueFormatter = (value: number): string => {
+    return userSettingsQuery.isPending
+      ? ""
+      : convertNumberToCurrency(
+          value,
+          false,
+          userSettingsQuery.data?.currency ?? "USD",
+          SignDisplay.Auto,
+          intlLocale,
+        );
   };
 
   if (props.isPending) {
@@ -69,7 +115,9 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   if (props.months.length === 0) {
     return (
       <Group justify="center">
-        <Text>Select a month to display the chart.</Text>
+        <DimmedText size="sm">
+          {t("select_a_month_to_display_the_chart")}
+        </DimmedText>
       </Group>
     );
   }
@@ -79,11 +127,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
       h={400}
       w="100%"
       data={buildChartData()}
-      series={[
-        { name: "Income", color: "green.6", type: "bar" },
-        { name: "Spending", color: "red.6", type: "bar" },
-        { name: "Net", color: "gray.0", type: "line" },
-      ]}
+      series={chartSeries}
       withLegend
       dataKey="month"
       composedChartProps={{ stackOffset: "sign" }}
@@ -94,7 +138,17 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
       }}
       lineProps={{ type: "linear" }}
       tooltipAnimationDuration={200}
-      valueFormatter={(value) => convertNumberToCurrency(value, true)}
+      tooltipProps={{
+        content: ({ label, payload }) => (
+          <ChartTooltip
+            label={label}
+            payload={payload}
+            series={chartSeries}
+            valueFormatter={chartValueFormatter}
+          />
+        ),
+      }}
+      valueFormatter={chartValueFormatter}
     />
   );
 };

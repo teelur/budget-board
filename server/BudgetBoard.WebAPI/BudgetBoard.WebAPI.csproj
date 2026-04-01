@@ -1,53 +1,42 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BudgetBoard</RootNamespace>
     <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
-    <UserSecretsId>23b824e9-5a44-4fa5-b8f2-e84a19a59819</UserSecretsId>
+    <UserSecretsId>cdf192e4-cb37-4c48-9fa4-8973a74bbb8b</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="BudgetBoard-Database\**" />
     <Content Remove="BudgetBoard-Database\**" />
     <EmbeddedResource Remove="BudgetBoard-Database\**" />
     <None Remove="BudgetBoard-Database\**" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.4" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.14.0" />
-    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.14.0" />
-    <PackageReference Include="Serilog" Version="4.2.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.8.0" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
+    <PackageReference Include="Quartz.AspNetCore" Version="3.16.1" />
+    <PackageReference Include="MailKit" Version="4.15.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Overrides\" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\BudgetBoard.Database\BudgetBoard.Database.csproj" />
     <ProjectReference Include="..\BudgetBoard.Service\BudgetBoard.Service.csproj" />
   </ItemGroup>
-
 </Project>

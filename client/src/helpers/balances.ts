@@ -1,23 +1,5 @@
-import { IBalance } from "~/models/balance";
+import { IBalanceResponse } from "~/models/balance";
 import { getStandardDate } from "./datetime";
-
-/**
- * Generates a sorted array of Date objects from an array of IBalance entries.
- * @param balances - Collection of balance objects.
- * @returns Sorted list of Date objects in ascending order.
- */
-export const getSortedBalanceDates = (balances: IBalance[]): Date[] =>
-  balances
-    .map((balance) =>
-      getStandardDate(
-        new Date(
-          new Date(balance.dateTime).getFullYear(),
-          new Date(balance.dateTime).getMonth(),
-          new Date(balance.dateTime).getDate()
-        )
-      )
-    )
-    .sort((a, b) => a.getTime() - b.getTime());
 
 /**
  * Groups balances by account ID, sorted by dateTime in ascending order.
@@ -25,15 +7,15 @@ export const getSortedBalanceDates = (balances: IBalance[]): Date[] =>
  * @returns Map keyed by account ID with corresponding sorted balances
  */
 export const mapAccountsToSortedBalances = (
-  balances: IBalance[]
-): Map<string, IBalance[]> => {
+  balances: IBalanceResponse[]
+): Map<string, IBalanceResponse[]> => {
   const sortedBalances = balances.sort(
     (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
   );
 
   const accountBalanceMap = Map.groupBy(
     sortedBalances,
-    (balance: IBalance) => balance.accountID
+    (balance: IBalanceResponse) => balance.accountID
   );
 
   return accountBalanceMap;
@@ -49,7 +31,7 @@ export const mapAccountsToSortedBalances = (
  * @returns The standardized date that meets the criteria or the start date if none are found
  */
 export const getInitialBalanceDate = (
-  balances: IBalance[],
+  balances: IBalanceResponse[],
   startDate: Date
 ): Date =>
   // If an account is missing data for the specified startDate, we should try to find the closest date before the startDate.
@@ -72,10 +54,10 @@ export const getInitialBalanceDate = (
  * @returns A new array of balance entries within the specified range
  */
 export const filterBalancesByDateRange = (
-  balances: IBalance[],
+  balances: IBalanceResponse[],
   startDate: Date,
   endDate: Date
-): IBalance[] =>
+): IBalanceResponse[] =>
   balances.filter(
     (balance) =>
       getStandardDate(balance.dateTime).getTime() >=

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -19,7 +18,7 @@ namespace BudgetBoard.Database.Migrations
                     Label = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: false),
                     Parent = table.Column<string>(type: "text", nullable: false),
-                    UserID = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserID = table.Column<Guid>(type: "uuid", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -29,20 +28,22 @@ namespace BudgetBoard.Database.Migrations
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Category_UserID",
                 table: "Category",
-                column: "UserID");
+                column: "UserID"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Category");
+            migrationBuilder.DropTable(name: "Category");
         }
     }
 }

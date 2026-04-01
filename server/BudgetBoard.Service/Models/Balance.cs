@@ -1,61 +1,47 @@
-﻿using BudgetBoard.Database.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
 public interface IBalanceCreateRequest
 {
-    decimal Amount { get; set; }
-    DateTime DateTime { get; set; }
-    Guid AccountID { get; set; }
+    decimal Amount { get; }
+    DateTime DateTime { get; }
+    Guid AccountID { get; }
 }
 
-public class BalanceCreateRequest : IBalanceCreateRequest
+[method: JsonConstructor]
+public class BalanceCreateRequest() : IBalanceCreateRequest
 {
-    public decimal Amount { get; set; }
-    public DateTime DateTime { get; set; }
-    public Guid AccountID { get; set; }
-
-    [JsonConstructor]
-    public BalanceCreateRequest()
-    {
-        Amount = 0;
-        DateTime = DateTime.MinValue;
-        AccountID = Guid.NewGuid();
-    }
+    public decimal Amount { get; set; } = 0;
+    public DateTime DateTime { get; set; } = DateTime.MinValue;
+    public Guid AccountID { get; set; } = Guid.NewGuid();
 }
 
 public interface IBalanceUpdateRequest
 {
-    Guid ID { get; set; }
-    decimal Amount { get; set; }
-    DateTime DateTime { get; set; }
-    Guid AccountID { get; set; }
+    Guid ID { get; }
+    decimal Amount { get; }
+    DateTime DateTime { get; }
+    Guid AccountID { get; }
 }
 
-public class BalanceUpdateRequest : IBalanceUpdateRequest
+[method: JsonConstructor]
+public class BalanceUpdateRequest() : IBalanceUpdateRequest
 {
-    public Guid ID { get; set; }
-    public decimal Amount { get; set; }
-    public DateTime DateTime { get; set; }
-    public Guid AccountID { get; set; }
-
-    [JsonConstructor]
-    public BalanceUpdateRequest()
-    {
-        ID = Guid.NewGuid();
-        Amount = 0;
-        DateTime = DateTime.MinValue;
-        AccountID = Guid.NewGuid();
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public decimal Amount { get; set; } = 0;
+    public DateTime DateTime { get; set; } = DateTime.MinValue;
+    public Guid AccountID { get; set; } = Guid.NewGuid();
 }
 
 public interface IBalanceResponse
 {
-    Guid ID { get; set; }
-    decimal Amount { get; set; }
-    DateTime DateTime { get; set; }
-    Guid AccountID { get; set; }
+    Guid ID { get; }
+    decimal Amount { get; }
+    DateTime DateTime { get; }
+    DateTime? Deleted { get; }
+    Guid AccountID { get; }
 }
 
 public class BalanceResponse : IBalanceResponse
@@ -63,6 +49,7 @@ public class BalanceResponse : IBalanceResponse
     public Guid ID { get; set; }
     public decimal Amount { get; set; }
     public DateTime DateTime { get; set; }
+    public DateTime? Deleted { get; set; }
     public Guid AccountID { get; set; }
 
     [JsonConstructor]
@@ -71,6 +58,7 @@ public class BalanceResponse : IBalanceResponse
         ID = Guid.NewGuid();
         Amount = 0;
         DateTime = DateTime.MinValue;
+        Deleted = null;
         AccountID = Guid.NewGuid();
     }
 
@@ -79,6 +67,7 @@ public class BalanceResponse : IBalanceResponse
         ID = balance.ID;
         Amount = balance.Amount;
         DateTime = balance.DateTime;
+        Deleted = balance.Deleted;
         AccountID = balance.AccountID;
     }
 }

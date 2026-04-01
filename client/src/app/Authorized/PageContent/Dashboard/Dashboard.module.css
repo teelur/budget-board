@@ -1,16 +1,11 @@
-.root {
-  width: 100%;
-  max-width: 1400px;
-}
-
 .mainContent {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  flex-grow: 1;
   flex-wrap: nowrap;
   gap: 12px;
+  flex: 1;
 
   @media (max-width: $mantine-breakpoint-sm) {
     flex-direction: column;

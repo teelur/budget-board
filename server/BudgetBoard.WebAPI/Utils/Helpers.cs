@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace BudgetBoard.WebAPI.Utils;
+namespace BudgetBoard.Utils;
 
 public static class Helpers
 {
@@ -13,7 +13,7 @@ public static class Helpers
     {
         var errorObjectResult = new ObjectResult(message)
         {
-            StatusCode = StatusCodes.Status500InternalServerError
+            StatusCode = StatusCodes.Status500InternalServerError,
         };
 
         return errorObjectResult;
@@ -47,6 +47,19 @@ public static class Helpers
 
     public static string GetProto(HttpRequest request)
     {
-        return request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? request.Protocol;
+        var protoHeader = request.Headers["X-Forwarded-Proto"].FirstOrDefault();
+
+        if (!string.IsNullOrEmpty(protoHeader))
+        {
+            // X-Forwarded-Proto can contain a comma-separated list (e.g. "https,http").
+            // Take the first non-empty, trimmed token.
+            var firstToken = protoHeader.Split(',')[0].Trim();
+            if (!string.IsNullOrEmpty(firstToken))
+            {
+                return firstToken;
+            }
+        }
+
+        return request.Scheme;
     }
 }

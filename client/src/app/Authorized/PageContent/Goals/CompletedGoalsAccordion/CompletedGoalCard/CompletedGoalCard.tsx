@@ -1,47 +1,88 @@
-import { Card, Flex, Group, Text } from "@mantine/core";
+import { Flex, Group } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import React from "react";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
+import { IUserSettings } from "~/models/userSettings";
+import Card from "~/components/core/Card/Card";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { Trans } from "react-i18next";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface CompletedGoalCardProps {
   goal: IGoalResponse;
 }
 
 const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
+  const { request } = useAuth();
+  const { dayjs, intlLocale } = useLocale();
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
   return (
-    <Card padding="0.5rem" radius="md">
+    <Card elevation={2}>
       <Flex
         justify="space-between"
         align={{ base: "start", xs: "center" }}
         direction={{ base: "column", xs: "row" }}
       >
-        <Text size="lg" fw={600}>
-          {props.goal.name}
-        </Text>
+        <PrimaryText size="lg">{props.goal.name}</PrimaryText>
         <Flex
           gap={0}
           direction={{ base: "row", xs: "column" }}
           justify={{ base: "space-between", xs: "flex-end" }}
           w={{ base: "100%", xs: "auto" }}
         >
-          <Group gap={5}>
-            <Text>Total:</Text>
-            <Text fw={600}>
-              {convertNumberToCurrency(
-                getGoalTargetAmount(
-                  props.goal.amount,
-                  props.goal.initialAmount
+          <Group gap="0.25rem">
+            <Trans
+              i18nKey="goal_completed_total_styled"
+              values={{
+                amount: convertNumberToCurrency(
+                  getGoalTargetAmount(
+                    props.goal.amount,
+                    props.goal.initialAmount,
+                  ),
+                  true,
+                  userSettingsQuery.data?.currency ?? "USD",
+                  SignDisplay.Auto,
+                  intlLocale,
                 ),
-                true
-              )}
-            </Text>
+              }}
+              components={[
+                <DimmedText size="sm" key="label" />,
+                <PrimaryText size="md" key="amount" />,
+              ]}
+            />
           </Group>
-          <Group gap={5}>
-            <Text>Completed:</Text>
-            <Text fw={600}>
-              {new Date(props.goal.completed ?? 0).toLocaleDateString()}
-            </Text>
+          <Group gap="0.25rem">
+            <Trans
+              i18nKey="goal_completed_date_styled"
+              values={{
+                date: dayjs(props.goal.completed).format("MMMM YYYY"),
+              }}
+              components={[
+                <DimmedText size="sm" key="label" />,
+                <PrimaryText size="md" key="amount" />,
+              ]}
+            />
           </Group>
         </Flex>
       </Flex>

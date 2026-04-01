@@ -1,5 +1,6 @@
 .root {
   width: 100%;
+  container-type: inline-size;
 }
 
 .header {
@@ -8,10 +9,18 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+
+  @container (max-width: 820px) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 
 .buttonGroup {
   gap: 0.5rem;
   justify-content: flex-end;
+
+  @container (max-width: 820px) {
+    align-self: flex-end;
+  }
 }
