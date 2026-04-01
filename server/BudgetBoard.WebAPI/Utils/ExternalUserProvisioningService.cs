@@ -25,7 +25,8 @@ namespace BudgetBoard.Utils
         public async Task<bool> ProvisionExternalUserAsync(
             ClaimsPrincipal principal,
             HttpContext httpContext,
-            string schemeName
+            string schemeName,
+            bool isPersistent = false
         )
         {
             ArgumentNullException.ThrowIfNull(principal);
@@ -129,7 +130,8 @@ namespace BudgetBoard.Utils
             var identity = new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme);
             await httpContext.SignInAsync(
                 IdentityConstants.ApplicationScheme,
-                new ClaimsPrincipal(identity)
+                new ClaimsPrincipal(identity),
+                new AuthenticationProperties { IsPersistent = isPersistent }
             );
 
             return true;
