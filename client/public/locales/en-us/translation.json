@@ -450,6 +450,7 @@
   "two_factor_auth_recovery_codes_info": "Two-factor authentication recovery codes can be used to access your account if you lose access to your authenticator app.",
   "two_factor_auth_successfully_updated": "Two-factor authentication settings successfully updated.",
   "two_factor_authentication": "Two-Factor Authentication",
+  "unauthorized_message": "Your session has expired. Please log in again.",
   "unbudgeted": "Unbudgeted",
   "uncategorized": "Uncategorized",
   "uncategorized_transactions": "Uncategorized Transactions",
