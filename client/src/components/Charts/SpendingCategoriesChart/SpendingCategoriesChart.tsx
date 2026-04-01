@@ -4,7 +4,9 @@ import React from "react";
 import { BuildSpendingCategoryChartData } from "~/helpers/charts";
 import { Group, Skeleton, Text } from "@mantine/core";
 import { ICategory } from "~/models/category";
-import { convertNumberToCurrency } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -13,8 +15,11 @@ interface SpendingChartProps {
 }
 
 const SpendingCategoriesChart = (
-  props: SpendingChartProps
+  props: SpendingChartProps,
 ): React.ReactNode => {
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
   }
@@ -29,7 +34,7 @@ const SpendingCategoriesChart = (
 
   const chartData = React.useMemo(
     () => BuildSpendingCategoryChartData(props.transactions, props.categories),
-    [props.transactions]
+    [props.transactions, props.categories],
   );
 
   return (
@@ -39,7 +44,15 @@ const SpendingCategoriesChart = (
       thickness={40}
       withTooltip
       tooltipDataSource="segment"
-      valueFormatter={(value) => convertNumberToCurrency(value, true)}
+      valueFormatter={(value) =>
+        convertNumberToCurrency(
+          value,
+          true,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        )
+      }
     />
   );
 };

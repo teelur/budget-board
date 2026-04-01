@@ -1,4 +1,3 @@
-import { AuthContext } from "~/components/AuthProvider/AuthProvider";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import { getUniqueYears, initCurrentMonth } from "~/helpers/datetime";
 import {
@@ -15,6 +14,7 @@ import { AxiosResponse } from "axios";
 import React from "react";
 import SpendingCategoriesChart from "~/components/Charts/SpendingCategoriesChart/SpendingCategoriesChart";
 import { ICategoryResponse } from "~/models/category";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 const SpendingCategoriesTab = (): React.ReactNode => {
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
@@ -23,7 +23,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
 
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
-  const { request } = React.useContext<any>(AuthContext);
+  const { request } = useAuth();
   const transactionsQuery = useQueries({
     queries: getUniqueYears(selectedMonths).map((year: number) => ({
       queryKey: ["transactions", { year }],
@@ -51,7 +51,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
 
   // We need to filter out the transactions labelled with 'Hide From Budgets'
   const transactionsWithoutHidden = filterHiddenTransactions(
-    transactionsQuery.data ?? []
+    transactionsQuery.data ?? [],
   );
 
   const transactionCategoriesQuery = useQuery({
@@ -71,7 +71,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
   });
 
   const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? []
+    transactionCategoriesQuery.data ?? [],
   );
 
   return (
@@ -81,7 +81,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
         setSelectedDates={setSelectedMonths}
         timeToMonthlyTotalsMap={buildTimeToMonthlyTotalsMap(
           selectedMonths,
-          transactionsWithoutHidden
+          transactionsWithoutHidden,
         )}
         isPending={transactionsQuery.isPending}
         allowSelectMultiple
