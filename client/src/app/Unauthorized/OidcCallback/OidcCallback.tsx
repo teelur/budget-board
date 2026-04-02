@@ -41,6 +41,7 @@ const OidcCallback = (): React.ReactNode => {
       if (error) {
         if (savedState) {
           sessionStorage.removeItem(`oidc_state_${state}`);
+          sessionStorage.removeItem(`oidc_remember_me_${state}`);
         }
         notifications.show({
           color: "var(--button-color-destructive)",
@@ -53,6 +54,7 @@ const OidcCallback = (): React.ReactNode => {
       if (!code) {
         if (savedState) {
           sessionStorage.removeItem(`oidc_state_${state}`);
+          sessionStorage.removeItem(`oidc_remember_me_${state}`);
         }
         notifications.show({
           color: "var(--button-color-destructive)",
@@ -65,6 +67,7 @@ const OidcCallback = (): React.ReactNode => {
       if (!state || state !== savedState) {
         if (savedState) {
           sessionStorage.removeItem(`oidc_state_${state}`);
+          sessionStorage.removeItem(`oidc_remember_me_${state}`);
         }
         notifications.show({
           color: "var(--button-color-destructive)",
@@ -75,17 +78,22 @@ const OidcCallback = (): React.ReactNode => {
       }
 
       try {
+        const rememberMe =
+          sessionStorage.getItem(`oidc_remember_me_${state}`) === "true";
+
         const response: AxiosResponse<IOidcCallbackResponse> = await request({
           url: "/api/oidc/callback",
           method: "POST",
           data: {
             code,
             redirect_uri: `${window.location.origin}/oidc-callback`,
+            remember_me: rememberMe,
           } as IOidcCallbackRequest,
         });
 
         if (savedState) {
           sessionStorage.removeItem(`oidc_state_${state}`);
+          sessionStorage.removeItem(`oidc_remember_me_${state}`);
         }
 
         setIsUserAuthenticated(response.data?.success ?? false);
@@ -103,6 +111,7 @@ const OidcCallback = (): React.ReactNode => {
       } catch (e) {
         if (savedState) {
           sessionStorage.removeItem(`oidc_state_${state}`);
+          sessionStorage.removeItem(`oidc_remember_me_${state}`);
         }
         const err = e as AxiosError;
         notifications.show({
