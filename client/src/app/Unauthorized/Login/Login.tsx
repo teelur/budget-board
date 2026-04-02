@@ -1,11 +1,4 @@
-import {
-  Anchor,
-  Button,
-  LoadingOverlay,
-  Stack,
-  Divider,
-  Group,
-} from "@mantine/core";
+import { Button, LoadingOverlay, Stack, Divider, Group } from "@mantine/core";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -19,17 +12,23 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import Checkbox from "~/components/core/Checkbox/Checkbox";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
   setUserEmail: React.Dispatch<React.SetStateAction<string>>;
   setUserPassword: React.Dispatch<React.SetStateAction<string>>;
+  rememberMe: boolean;
+  setRememberMe: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Login = (props: LoginProps): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
 
   const { t } = useTranslation();
+  const { request, setIsUserAuthenticated, startOidcLogin, oidcLoading } =
+    useAuth();
+  const queryClient = useQueryClient();
 
   const { envVariables } = getProjectEnvVariables();
 
@@ -48,11 +47,6 @@ const Login = (props: LoginProps): React.ReactNode => {
       }),
     ),
   });
-
-  const { request, setIsUserAuthenticated, startOidcLogin, oidcLoading } =
-    useAuth();
-
-  const queryClient = useQueryClient();
 
   const doResendVerificationEmail = (): void => {
     request({
@@ -93,6 +87,9 @@ const Login = (props: LoginProps): React.ReactNode => {
       data: {
         email: emailField.getValue(),
         password: passwordField.getValue(),
+      },
+      params: {
+        rememberMe: props.rememberMe,
       },
     })
       .then((res: AxiosResponse) => {
@@ -206,13 +203,24 @@ const Login = (props: LoginProps): React.ReactNode => {
           <Button variant="filled" fullWidth onClick={doLogin}>
             {t("login")}
           </Button>
-          <Anchor
-            size="sm"
-            fw={600}
-            onClick={submitPasswordReset.bind(null, emailField.getValue())}
-          >
-            {t("reset_password")}
-          </Anchor>
+          <Group justify="space-between" w="100%">
+            <Checkbox
+              label={<PrimaryText size="sm">{t("remember_me")}</PrimaryText>}
+              checked={props.rememberMe}
+              onChange={(event) =>
+                props.setRememberMe(event.currentTarget.checked)
+              }
+              elevation={1}
+            />
+            <Button
+              size="xs"
+              variant="default"
+              fw={600}
+              onClick={submitPasswordReset.bind(null, emailField.getValue())}
+            >
+              {t("reset_password")}
+            </Button>
+          </Group>
         </Stack>
       )}
       {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" &&
@@ -223,7 +231,7 @@ const Login = (props: LoginProps): React.ReactNode => {
         <Button
           variant="outline"
           fullWidth
-          onClick={() => startOidcLogin && startOidcLogin()}
+          onClick={() => startOidcLogin && startOidcLogin(props.rememberMe)}
           loading={oidcLoading}
         >
           {t("login_with_oidc")}

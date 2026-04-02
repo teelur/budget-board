@@ -22,10 +22,11 @@ export enum LoginCardState {
 
 const Welcome = (): React.ReactNode => {
   const [loginCardState, setLoginCardState] = React.useState<LoginCardState>(
-    LoginCardState.Login
+    LoginCardState.Login,
   );
   const [userEmail, setUserEmail] = React.useState<string>("");
   const [userPassword, setUserPassword] = React.useState<string>("");
+  const [rememberMe, setRememberMe] = React.useState<boolean>(false);
 
   const { t } = useTranslation();
 
@@ -41,6 +42,8 @@ const Welcome = (): React.ReactNode => {
             setLoginCardState={setLoginCardState}
             setUserEmail={setUserEmail}
             setUserPassword={setUserPassword}
+            rememberMe={rememberMe}
+            setRememberMe={setRememberMe}
           />
         );
       case LoginCardState.LoginWith2fa:
@@ -49,6 +52,7 @@ const Welcome = (): React.ReactNode => {
             setLoginCardState={setLoginCardState}
             userEmail={userEmail}
             userPassword={userPassword}
+            rememberMe={rememberMe}
           />
         );
       case LoginCardState.LoginWithRecovery:
@@ -57,6 +61,7 @@ const Welcome = (): React.ReactNode => {
             setLoginCardState={setLoginCardState}
             userEmail={userEmail}
             userPassword={userPassword}
+            rememberMe={rememberMe}
           />
         );
       case LoginCardState.ResetPassword:
