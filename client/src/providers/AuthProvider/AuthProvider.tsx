@@ -48,7 +48,7 @@ export const AuthProvider = ({
   const request = async ({ ...options }): Promise<AxiosResponse> => {
     const onSuccess = (response: AxiosResponse): AxiosResponse => response;
     const onError = (error: AxiosError): any => {
-      if (error.response?.status === 401) {
+      if (isUserAuthenticated && error.response?.status === 401) {
         notifications.show({
           message: t("unauthorized_message"),
           color: "var(--button-color-destructive)",
