@@ -85,7 +85,8 @@ public class OidcController(
             var provisioned = await _provisioner.ProvisionExternalUserAsync(
                 principal,
                 HttpContext,
-                IdentityApiEndpointRouteBuilderConstants.OidcLoginProvider
+                IdentityApiEndpointRouteBuilderConstants.OidcLoginProvider,
+                request.RememberMe
             );
 
             if (!provisioned)

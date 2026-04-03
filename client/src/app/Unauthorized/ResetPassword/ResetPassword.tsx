@@ -32,7 +32,7 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
       { min: passwordMinLength },
       t("password_min_length_message", {
         minLength: passwordMinLength,
-      })
+      }),
     ),
   });
   const confirmPasswordField = useField<string>({
@@ -87,7 +87,7 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="0.75rem" align="center">
+    <Stack gap="0.75rem" align="center" p="1rem">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}

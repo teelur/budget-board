@@ -1,6 +1,7 @@
 export interface IOidcCallbackRequest {
   code: string;
   redirect_uri: string;
+  remember_me: boolean;
 }
 
 export interface IOidcCallbackResponse {

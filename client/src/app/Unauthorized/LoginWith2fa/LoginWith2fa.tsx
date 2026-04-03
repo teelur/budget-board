@@ -16,6 +16,7 @@ interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
   userEmail: string;
   userPassword: string;
+  rememberMe: boolean;
 }
 
 const LoginWith2fa = (props: LoginProps): React.ReactNode => {
@@ -51,6 +52,9 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
         password: props.userPassword,
         twoFactorCode: authenticationCodeField.getValue(),
       },
+      params: {
+        rememberMe: props.rememberMe,
+      },
     })
       .then(() => {
         setIsUserAuthenticated(true);
@@ -78,7 +82,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center" w="100%">
+    <Stack gap="md" align="center" w="100%" p="1rem">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}

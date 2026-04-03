@@ -102,7 +102,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="0.75rem" align="center">
+    <Stack gap="0.75rem" align="center" p="1rem">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}
@@ -132,7 +132,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
         </Button>
       </Stack>
       <Button
-        variant="light"
+        variant="default"
         fullWidth
         onClick={() => props.setLoginCardState(LoginCardState.Login)}
       >

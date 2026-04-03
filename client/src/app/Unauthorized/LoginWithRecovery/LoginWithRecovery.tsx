@@ -16,6 +16,7 @@ interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
   userEmail: string;
   userPassword: string;
+  rememberMe: boolean;
 }
 
 const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
@@ -51,6 +52,9 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
         password: props.userPassword,
         recoveryCode: recoveryCodeField.getValue(),
       },
+      params: {
+        rememberMe: props.rememberMe,
+      },
     })
       .then(() => {
         setIsUserAuthenticated(true);
@@ -78,7 +82,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center">
+    <Stack gap="md" align="center" p="1rem">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}
