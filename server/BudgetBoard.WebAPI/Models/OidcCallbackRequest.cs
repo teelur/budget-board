@@ -9,5 +9,8 @@ namespace BudgetBoard.WebAPI.Models
 
         [JsonPropertyName("redirect_uri")]
         public string RedirectUri { get; set; } = string.Empty;
+
+        [JsonPropertyName("remember_me")]
+        public bool RememberMe { get; set; } = false;
     }
 }

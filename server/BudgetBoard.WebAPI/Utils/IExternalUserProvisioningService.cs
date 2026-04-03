@@ -12,7 +12,8 @@ namespace BudgetBoard.Utils
         Task<bool> ProvisionExternalUserAsync(
             ClaimsPrincipal principal,
             HttpContext httpContext,
-            string schemeName
+            string schemeName,
+            bool isPersistent = false
         );
     }
 }

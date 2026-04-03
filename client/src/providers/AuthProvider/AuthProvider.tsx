@@ -3,13 +3,14 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
 import { notifications } from "@mantine/notifications";
 import { IOidcDiscoveryDocument } from "~/models/oidc";
+import { t } from "i18next";
 
 export interface AuthContextValue {
   isUserAuthenticated: boolean;
   setIsUserAuthenticated: (isLoggedIn: boolean) => void;
   loading: boolean;
   request: ({ ...options }) => Promise<AxiosResponse>;
-  startOidcLogin?: () => void;
+  startOidcLogin?: (rememberMe: boolean) => void;
   oidcLoading: boolean;
 }
 
@@ -20,7 +21,7 @@ export const AuthContext = createContext<AuthContextValue>({
   request: async () => {
     return {} as AxiosResponse;
   },
-  startOidcLogin: () => {},
+  startOidcLogin: undefined,
   oidcLoading: false,
 });
 
@@ -47,6 +48,15 @@ export const AuthProvider = ({
   const request = async ({ ...options }): Promise<AxiosResponse> => {
     const onSuccess = (response: AxiosResponse): AxiosResponse => response;
     const onError = (error: AxiosError): any => {
+      if (isUserAuthenticated && error.response?.status === 401) {
+        notifications.show({
+          message: t("unauthorized_message"),
+          color: "var(--button-color-destructive)",
+        });
+
+        setIsUserAuthenticated(false);
+      }
+
       throw error;
     };
 
@@ -75,7 +85,7 @@ export const AuthProvider = ({
       });
   }, []);
 
-  const startOidcLogin = async (): Promise<void> => {
+  const startOidcLogin = async (rememberMe: boolean): Promise<void> => {
     setOidcLoading(true);
     try {
       let authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
@@ -96,6 +106,7 @@ export const AuthProvider = ({
 
       const state = crypto.randomUUID();
       sessionStorage.setItem(`oidc_state_${state}`, state);
+      sessionStorage.setItem(`oidc_remember_me_${state}`, String(rememberMe));
 
       const params = new URLSearchParams({
         client_id: clientId,
