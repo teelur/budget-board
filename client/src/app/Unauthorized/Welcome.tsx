@@ -96,12 +96,7 @@ const Welcome = (): React.ReactNode => {
             {t("a_simple_app_for_managing_monthly_budgets")}
           </DimmedText>
         </Stack>
-        <Card
-          p="1rem"
-          w="100%"
-          maw={{ base: "95%", sm: "500px" }}
-          elevation={1}
-        >
+        <Card p={0} w="100%" maw={{ base: "95%", sm: "500px" }} elevation={1}>
           {getCardState()}
         </Card>
         {loginCardState !== LoginCardState.Register &&

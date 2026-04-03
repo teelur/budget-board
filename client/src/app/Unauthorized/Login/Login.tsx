@@ -180,14 +180,14 @@ const Login = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="1rem" align="center">
+    <Stack gap={0} align="center" w="100%">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       {envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-        <Stack w="100%" align="center" gap="0.75rem">
+        <Stack w="100%" align="center" gap="0.75rem" pb={"0.5rem"} p={"1rem"}>
           <TextInput
             {...emailField.getInputProps()}
             label={<PrimaryText size="sm">{t("email_address")}</PrimaryText>}
@@ -203,18 +203,10 @@ const Login = (props: LoginProps): React.ReactNode => {
           <Button variant="filled" fullWidth onClick={doLogin}>
             {t("login")}
           </Button>
-          <Group justify="space-between" w="100%">
-            <Checkbox
-              label={<PrimaryText size="sm">{t("remember_me")}</PrimaryText>}
-              checked={props.rememberMe}
-              onChange={(event) =>
-                props.setRememberMe(event.currentTarget.checked)
-              }
-              elevation={1}
-            />
+          <Group justify="center" w="100%">
             <Button
               size="xs"
-              variant="default"
+              variant="subtle"
               fw={600}
               onClick={submitPasswordReset.bind(null, emailField.getValue())}
             >
@@ -228,15 +220,26 @@ const Login = (props: LoginProps): React.ReactNode => {
           <Divider w="100%" label={t("or")} />
         )}
       {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" && (
-        <Button
-          variant="outline"
-          fullWidth
-          onClick={() => startOidcLogin && startOidcLogin(props.rememberMe)}
-          loading={oidcLoading}
-        >
-          {t("login_with_oidc")}
-        </Button>
+        <Stack w="100%" pt="0.5rem" p="1rem">
+          <Button
+            variant="outline"
+            fullWidth
+            onClick={() => startOidcLogin && startOidcLogin(props.rememberMe)}
+            loading={oidcLoading}
+          >
+            {t("login_with_oidc")}
+          </Button>
+        </Stack>
       )}
+      <Divider w="100%" />
+      <Stack w="100%" p="1rem">
+        <Checkbox
+          label={<PrimaryText size="sm">{t("remember_device")}</PrimaryText>}
+          checked={props.rememberMe}
+          onChange={(event) => props.setRememberMe(event.currentTarget.checked)}
+          elevation={1}
+        />
+      </Stack>
     </Stack>
   );
 };

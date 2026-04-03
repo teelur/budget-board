@@ -82,7 +82,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center">
+    <Stack gap="md" align="center" p="1rem">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}

@@ -82,7 +82,7 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center" w="100%">
+    <Stack gap="md" align="center" w="100%" p="1rem">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}
