@@ -33,7 +33,8 @@ const Authorized = (): React.ReactNode => {
       header={{
         height: 60,
       }}
-      padding={12}
+      pt={"0.5rem"}
+      pl={"0.5rem"}
     >
       <AppShellHeader
         bg="var(--background-color-header)"
@@ -55,6 +56,7 @@ const Authorized = (): React.ReactNode => {
       <AppShellMain
         bg="var(--background-color-base)"
         flex={{ direction: "column" }}
+        style={{ height: "100dvh" }}
       >
         <TransactionCategoryProvider>
           <TransactionFiltersProvider setCurrentPage={setCurrentPage}>
