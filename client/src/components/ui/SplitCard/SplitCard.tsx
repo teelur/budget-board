@@ -19,6 +19,7 @@ const SplitCard = ({
   border,
   header,
   elevation,
+  style,
   children,
   ...props
 }: SplitCardProps): React.ReactNode => {
@@ -26,8 +27,11 @@ const SplitCard = ({
     <Card
       w="100%"
       p={0}
-      style={{ borderWidth: border === BorderThickness.Thick ? "2px" : "1px" }}
       {...props}
+      style={{
+        ...style,
+        borderWidth: border === BorderThickness.Thick ? "2px" : "1px",
+      }}
       elevation={elevation}
     >
       <Stack gap={0}>

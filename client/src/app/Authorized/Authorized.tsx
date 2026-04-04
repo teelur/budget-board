@@ -55,8 +55,8 @@ const Authorized = (): React.ReactNode => {
       </AppShellNavbar>
       <AppShellMain
         bg="var(--background-color-base)"
+        h={"100dvh"}
         flex={{ direction: "column" }}
-        style={{ height: "100dvh" }}
       >
         <TransactionCategoryProvider>
           <TransactionFiltersProvider setCurrentPage={setCurrentPage}>
