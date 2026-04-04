@@ -35,10 +35,16 @@ const Authorized = (): React.ReactNode => {
       }}
       padding={12}
     >
-      <AppShellHeader bg="var(--background-color-header)">
+      <AppShellHeader
+        bg="var(--background-color-header)"
+        style={{ borderWidth: "2px" }}
+      >
         <Header isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
       </AppShellHeader>
-      <AppShellNavbar bg="var(--background-color-sidebar)">
+      <AppShellNavbar
+        bg="var(--background-color-sidebar)"
+        style={{ borderWidth: "2px" }}
+      >
         <Navbar
           currentPage={currentPage}
           setCurrentPage={onPageSelect}
