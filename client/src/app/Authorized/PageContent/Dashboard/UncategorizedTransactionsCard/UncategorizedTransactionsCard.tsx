@@ -3,16 +3,19 @@ import {
   getTransactionsByCategory,
   getVisibleTransactions,
 } from "~/helpers/transactions";
-import { Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Group, Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import { useTranslation } from "react-i18next";
+import SplitCard, {
+  BorderThickness,
+} from "~/components/ui/SplitCard/SplitCard";
+import { TagsIcon } from "lucide-react";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;
@@ -41,9 +44,9 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   const sortedFilteredTransactions = React.useMemo(
     () =>
       getVisibleTransactions(
-        getTransactionsByCategory(transactionsQuery.data ?? [], "")
+        getTransactionsByCategory(transactionsQuery.data ?? [], ""),
       ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-    [transactionsQuery.data]
+    [transactionsQuery.data],
   );
 
   if (sortedFilteredTransactions.length === 0) {
@@ -51,9 +54,20 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   }
 
   return (
-    <Card w="100%" elevation={1}>
+    <SplitCard
+      w="100%"
+      border={BorderThickness.Thick}
+      header={
+        <Group gap={"0.25rem"}>
+          <TagsIcon color="var(--base-color-text-dimmed)" />
+          <PrimaryText size="xl" lh={1}>
+            {t("uncategorized_transactions")}
+          </PrimaryText>
+        </Group>
+      }
+      elevation={1}
+    >
       <Stack gap="0.5rem" align="center" w="100%">
-        <PrimaryText size="xl">{t("uncategorized_transactions")}</PrimaryText>
         {transactionsQuery.isPending ? (
           <Skeleton height={350} radius="lg" />
         ) : (
@@ -68,7 +82,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
               {sortedFilteredTransactions
                 .slice(
                   (activePage - 1) * itemsPerPage,
-                  (activePage - 1) * itemsPerPage + itemsPerPage
+                  (activePage - 1) * itemsPerPage + itemsPerPage,
                 )
                 .map((transaction: ITransaction) => (
                   <TransactionCard
@@ -90,7 +104,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
           />
         )}
       </Stack>
-    </Card>
+    </SplitCard>
   );
 };
 
