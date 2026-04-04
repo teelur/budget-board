@@ -35,14 +35,14 @@ const SplitCard = ({
       elevation={elevation}
     >
       <Stack gap={0}>
-        <Flex w="100%" p={"0.5rem"}>
+        <Flex w="100%" p={"0.5rem"} direction="column" align="stretch">
           {header}
         </Flex>
         <Divider
           size={border === BorderThickness.Thick ? "sm" : "xs"}
           elevation={elevation}
         />
-        <Flex w="100%" p={"0.5rem"}>
+        <Flex w="100%" p={"0.5rem"} direction="column" align="stretch">
           {children}
         </Flex>
       </Stack>
