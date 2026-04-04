@@ -118,11 +118,11 @@ const NetWorthCardSettings = (): React.ReactNode => {
   React.useEffect(() => {
     if (widgetSettingsQuery.data) {
       const foundWidget = widgetSettingsQuery.data.find((ws) =>
-        isNetWorthWidgetType(ws.widgetType)
+        isNetWorthWidgetType(ws.widgetType),
       );
       if (foundWidget) {
         const configuration = parseNetWorthConfiguration(
-          foundWidget.configuration
+          foundWidget.configuration,
         );
 
         setSettingsId(foundWidget.id);
@@ -134,7 +134,7 @@ const NetWorthCardSettings = (): React.ReactNode => {
               .map((line, index) => ({
                 ...line,
                 index,
-              })) ?? []
+              })) ?? [],
           );
         }
       }
@@ -164,7 +164,7 @@ const NetWorthCardSettings = (): React.ReactNode => {
     <>
       <ActionIcon
         variant="subtle"
-        size="md"
+        size="sm"
         c="var(--base-color-text-dimmed)"
         onClick={open}
       >
@@ -202,7 +202,7 @@ const NetWorthCardSettings = (): React.ReactNode => {
               onDragEnd={(event) => {
                 const updatedList = move(
                   sortedGroups,
-                  event
+                  event,
                 ).map<INetWorthWidgetGroup>((group, index) => ({
                   ...group,
                   index,

@@ -6,17 +6,20 @@ import {
   filterHiddenTransactions,
   getRollingTotalSpendingForMonth,
 } from "~/helpers/transactions";
-import { Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { IUserSettings } from "~/models/userSettings";
-import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import SplitCard, {
+  BorderThickness,
+} from "~/components/ui/SplitCard/SplitCard";
+import { LineChartIcon } from "lucide-react";
 
 const SpendingTrendsCard = (): React.ReactNode => {
   const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
@@ -151,17 +154,32 @@ const SpendingTrendsCard = (): React.ReactNode => {
   };
 
   return (
-    <Card w="100%" elevation={1}>
-      <Stack align="center" gap={0}>
-        <PrimaryText size="xl">{t("spending_trends")}</PrimaryText>
-        <DimmedText size="sm">{getSpendingComparisonString()}</DimmedText>
+    <SplitCard
+      w="100%"
+      border={BorderThickness.Thick}
+      header={
+        <Group gap={"0.25rem"}>
+          <LineChartIcon color="var(--base-color-text-dimmed)" />
+          <PrimaryText size="xl" lh={1}>
+            {t("spending_trends")}
+          </PrimaryText>
+        </Group>
+      }
+      elevation={1}
+    >
+      <Stack gap={0} w="100%">
+        <DimmedText size="sm" ta="right">
+          {getSpendingComparisonString()}
+        </DimmedText>
+        <SpendingChart
+          months={months}
+          transactions={filterHiddenTransactions(
+            transactionsQueries.data ?? [],
+          )}
+          includeYAxis={false}
+        />
       </Stack>
-      <SpendingChart
-        months={months}
-        transactions={filterHiddenTransactions(transactionsQueries.data ?? [])}
-        includeYAxis={false}
-      />
-    </Card>
+    </SplitCard>
   );
 };
 

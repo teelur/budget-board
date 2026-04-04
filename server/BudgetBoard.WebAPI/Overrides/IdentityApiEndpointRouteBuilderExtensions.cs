@@ -154,8 +154,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                     Results<Ok<AccessTokenResponse>, Ok<string>, EmptyHttpResult, ProblemHttpResult>
                 > (
                     [FromBody] LoginRequest login,
-                    [FromQuery] bool? useCookies,
-                    [FromQuery] bool? useSessionCookies,
+                    [FromQuery] bool? rememberMe,
                     [FromServices] IServiceProvider sp
                 ) =>
                 {
@@ -163,8 +162,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                     var userManager = signInManager.UserManager;
                     var basicEmailSender = sp.GetService<Identity.UI.Services.IEmailSender>();
 
-                    // TODO: Probably should add a Remember Me? option to login.
-                    var isPersistent = true;
+                    var isPersistent = rememberMe ?? false;
 
                     // Check if user exists and verify password manually first
                     // This allows us to differentiate between wrong password vs unverified email

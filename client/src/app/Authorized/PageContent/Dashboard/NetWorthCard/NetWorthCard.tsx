@@ -23,6 +23,10 @@ import {
 } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
 import { useTranslation } from "react-i18next";
+import SplitCard, {
+  BorderThickness,
+} from "~/components/ui/SplitCard/SplitCard";
+import { TrendingUpIcon } from "lucide-react";
 
 const NetWorthCard = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -119,7 +123,7 @@ const NetWorthCard = (): React.ReactNode => {
     }
 
     const configuration = parseNetWorthConfiguration(
-      netWorthWidgetSettingsList[0]!.configuration
+      netWorthWidgetSettingsList[0]!.configuration,
     );
 
     if (!configuration) {
@@ -151,7 +155,7 @@ const NetWorthCard = (): React.ReactNode => {
             .slice()
             .sort(
               (a: INetWorthWidgetLine, b: INetWorthWidgetLine) =>
-                a.index - b.index
+                a.index - b.index,
             );
 
           return (
@@ -165,7 +169,7 @@ const NetWorthCard = (): React.ReactNode => {
                       line,
                       validAccounts,
                       validAssets,
-                      orderedGroups.flatMap((g) => g.lines)
+                      orderedGroups.flatMap((g) => g.lines),
                     )}
                     userCurrency={userSettingsQuery.data?.currency ?? "USD"}
                   />
@@ -179,15 +183,26 @@ const NetWorthCard = (): React.ReactNode => {
   };
 
   return (
-    <Card w="100%" elevation={1}>
-      <Stack gap="0.5rem">
-        <Group justify="space-between">
-          <PrimaryText size="xl">{t("net_worth")}</PrimaryText>
+    <SplitCard
+      w="100%"
+      border={BorderThickness.Thick}
+      header={
+        <Group w={"100%"} justify="space-between">
+          <Group gap={"0.25rem"}>
+            <TrendingUpIcon color="var(--base-color-text-dimmed)" />
+            <PrimaryText size="xl" lh={1}>
+              {t("net_worth")}
+            </PrimaryText>
+          </Group>
           <NetWorthCardSettings />
         </Group>
+      }
+      elevation={1}
+    >
+      <Stack w={"100%"} gap="0.5rem">
         {getNetWorthLines()}
       </Stack>
-    </Card>
+    </SplitCard>
   );
 };
 

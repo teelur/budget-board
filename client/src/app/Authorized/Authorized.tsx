@@ -33,12 +33,19 @@ const Authorized = (): React.ReactNode => {
       header={{
         height: 60,
       }}
-      padding={12}
+      pt={"0.5rem"}
+      pl={"0.5rem"}
     >
-      <AppShellHeader bg="var(--background-color-header)">
+      <AppShellHeader
+        bg="var(--background-color-header)"
+        style={{ borderWidth: "2px" }}
+      >
         <Header isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
       </AppShellHeader>
-      <AppShellNavbar bg="var(--background-color-sidebar)">
+      <AppShellNavbar
+        bg="var(--background-color-sidebar)"
+        style={{ borderWidth: "2px" }}
+      >
         <Navbar
           currentPage={currentPage}
           setCurrentPage={onPageSelect}
@@ -48,6 +55,7 @@ const Authorized = (): React.ReactNode => {
       </AppShellNavbar>
       <AppShellMain
         bg="var(--background-color-base)"
+        h={"100dvh"}
         flex={{ direction: "column" }}
       >
         <TransactionCategoryProvider>
