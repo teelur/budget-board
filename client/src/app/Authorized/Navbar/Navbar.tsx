@@ -1,6 +1,6 @@
 import classes from "./Navbar.module.css";
 
-import { Burger, Stack } from "@mantine/core";
+import { Burger, ScrollArea, Stack } from "@mantine/core";
 import {
   BanknoteArrowDownIcon,
   BanknoteIcon,
@@ -103,40 +103,42 @@ const Navbar = (props: NavbarProps) => {
   ));
 
   return (
-    <Stack justify="space-between" h="100%" p="6px">
-      <Stack justify="center" align="center" gap={5}>
-        <Burger
-          opened={props.isNavbarOpen}
-          className={classes.burger}
-          m="0.25rem"
-          onClick={props.toggleNavbar}
-          hiddenFrom="xs"
-          size="md"
-        />
-        {links}
+    <ScrollArea h="100%" type="hover">
+      <Stack justify="space-between" mih="100vh" p="6px">
+        <Stack justify="center" align="center" gap={5}>
+          <Burger
+            opened={props.isNavbarOpen}
+            className={classes.burger}
+            m="0.25rem"
+            onClick={props.toggleNavbar}
+            hiddenFrom="xs"
+            size="md"
+          />
+          {links}
+        </Stack>
+        <Stack justify="center" align="center" gap={5}>
+          <NavbarLink
+            icon={
+              <BanknoteArrowDownIcon color="var(--base-color-text-primary)" />
+            }
+            label={t("external_accounts")}
+            active={props.currentPage === Pages.ExternalAccounts}
+            onClick={() => props.setCurrentPage(Pages.ExternalAccounts)}
+          />
+          <NavbarLink
+            icon={<SettingsIcon color="var(--base-color-text-primary)" />}
+            label={t("settings")}
+            active={props.currentPage === Pages.Settings}
+            onClick={() => props.setCurrentPage(Pages.Settings)}
+          />
+          <NavbarLink
+            icon={<LogOutIcon color="var(--base-color-text-primary)" />}
+            label={t("logout")}
+            onClick={Logout}
+          />
+        </Stack>
       </Stack>
-      <Stack justify="center" align="center" gap={5}>
-        <NavbarLink
-          icon={
-            <BanknoteArrowDownIcon color="var(--base-color-text-primary)" />
-          }
-          label={t("external_accounts")}
-          active={props.currentPage === Pages.ExternalAccounts}
-          onClick={() => props.setCurrentPage(Pages.ExternalAccounts)}
-        />
-        <NavbarLink
-          icon={<SettingsIcon color="var(--base-color-text-primary)" />}
-          label={t("settings")}
-          active={props.currentPage === Pages.Settings}
-          onClick={() => props.setCurrentPage(Pages.Settings)}
-        />
-        <NavbarLink
-          icon={<LogOutIcon color="var(--base-color-text-primary)" />}
-          label={t("logout")}
-          onClick={Logout}
-        />
-      </Stack>
-    </Stack>
+    </ScrollArea>
   );
 };
 
