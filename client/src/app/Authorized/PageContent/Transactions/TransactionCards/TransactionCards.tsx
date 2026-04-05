@@ -26,7 +26,7 @@ interface TransactionCardsProps {
 
 const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const [page, setPage] = React.useState(1);
-  const [itemsPerPage, _setItemsPerPage] = React.useState(25);
+  const [itemsPerPage, _setItemsPerPage] = React.useState(50);
 
   const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
