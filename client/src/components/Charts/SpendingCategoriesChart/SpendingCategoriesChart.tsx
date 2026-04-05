@@ -170,10 +170,10 @@ const SpendingCategoriesChart = (
       const sin = Math.sin(angle);
       const sx = cx + or * cos;
       const sy = cy + or * sin;
-      const mx = cx + (or + 18) * cos;
-      const my = cy + (or + 18) * sin;
+      const mx = cx + (or + 50) * cos;
+      const my = cy + (or + 50) * sin;
       const isRight = cos >= 0;
-      const ex = mx + (isRight ? 14 : -14);
+      const ex = mx + (isRight ? 40 : -40);
 
       rawLabels.push({
         index: i,
