@@ -2,13 +2,12 @@
   transition: background-color 0.2s ease;
 }
 
-.card:hover {
+.card[data-selection-mode]:hover {
   background-color: color-mix(
     in srgb,
     var(--mantine-primary-color-filled) 5%,
     var(--card-bg)
   );
-  cursor: pointer;
 }
 
 .checkboxWrapper {
