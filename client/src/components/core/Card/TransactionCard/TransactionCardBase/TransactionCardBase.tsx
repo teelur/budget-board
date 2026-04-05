@@ -25,6 +25,7 @@ const TransactionCardBase = (
     <Card
       w={props.w ?? "100%"}
       p={props.p ?? "0.2rem"}
+      {...props}
       style={{ containerType: "inline-size" }}
       onClick={
         selectionMode
@@ -32,7 +33,6 @@ const TransactionCardBase = (
           : undefined
       }
       elevation={props.elevation ?? 0}
-      {...props}
       className={`${classes.card}${props.className ? ` ${props.className}` : ""}`}
       data-selection-mode={selectionMode ? "true" : undefined}
     >

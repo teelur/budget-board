@@ -5,8 +5,8 @@ import TransactionsHeader from "./TransactionsHeader/TransactionsHeader";
 import React from "react";
 import { SortDirection } from "~/components/SortButton";
 import { Sorts } from "./TransactionsHeader/SortMenu/SortMenuHelpers";
-import TransactionCards from "./TransactionCards.tsx/TransactionCards";
-import BulkActionBar from "./BulkActionBar/BulkActionBar";
+import TransactionCards from "./TransactionCards/TransactionCards";
+import BulkActionBar from "../../../../components/BulkActionBar/BulkActionBar";
 import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
@@ -39,7 +39,7 @@ const Transactions = (): React.ReactNode => {
   const onSelectAll = (ids: string[]) => setSelectedIds(new Set(ids));
 
   return (
-    <Stack className={classes.root} pb="var(--bulk-bar-height, 0)">
+    <Stack className={classes.root}>
       <TransactionsHeader
         sort={sort}
         setSort={setSort}

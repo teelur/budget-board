@@ -5,7 +5,7 @@ import React from "react";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import BulkActionBar from "~/app/Authorized/PageContent/Transactions/BulkActionBar/BulkActionBar";
+import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];

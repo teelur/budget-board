@@ -304,7 +304,10 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     touch(FIELDS.date);
   };
 
-  const isApplyDisabled = touched.size === 0 || props.selectedIds.size === 0;
+  const isAmountInvalid =
+    touched.has(FIELDS.amount) && typeof amountValue !== "number";
+  const isApplyDisabled =
+    touched.size === 0 || props.selectedIds.size === 0 || isAmountInvalid;
   const isPending = doBulkUpdate.isPending || doBulkDelete.isPending;
 
   return (
@@ -401,7 +404,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 value={amountValue}
                 onChange={(val) => {
                   setAmountValue(val);
-                  if (val !== "") touch(FIELDS.amount);
+                  if (typeof val === "number") touch(FIELDS.amount);
                   else
                     setTouched((prev) => {
                       const next = new Set(prev);

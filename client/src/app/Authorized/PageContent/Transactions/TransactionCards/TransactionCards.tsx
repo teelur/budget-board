@@ -71,6 +71,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   }, [
     page,
     sortedFilteredTransactions.length,
+    currentPageItems,
     props.sort,
     props.sortDirection,
   ]);

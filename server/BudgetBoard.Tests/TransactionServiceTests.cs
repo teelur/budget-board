@@ -1422,6 +1422,64 @@ public class TransactionServiceTests
     }
 
     [Fact]
+    public async Task UpdateTransactionBatchAsync_WhenDuplicateIdsInRequest_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transaction = transactionFaker.Generate(1).First();
+
+        account.Transactions = [transaction];
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var duplicateId = transaction.ID;
+        var editRequests = new List<TransactionUpdateRequest>
+        {
+            new()
+            {
+                ID = duplicateId,
+                Amount = 50.0M,
+                Date = new Faker().Date.Past().ToUniversalTime(),
+                Category = "cat",
+                Subcategory = "sub",
+                MerchantName = "merchant",
+            },
+            new()
+            {
+                ID = duplicateId, // same ID as above
+                Amount = 75.0M,
+                Date = new Faker().Date.Past().ToUniversalTime(),
+                Category = "cat2",
+                Subcategory = "sub2",
+                MerchantName = "merchant2",
+            },
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionService.UpdateTransactionBatchAsync(helper.demoUser.Id, editRequests);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionBatchUpdateDuplicateIdsError");
+    }
+
+    [Fact]
     public async Task UpdateTransactionBatchAsync_WhenAmountUpdated_ShouldUpdateBalances()
     {
         // Arrange
@@ -1597,6 +1655,46 @@ public class TransactionServiceTests
     }
 
     [Fact]
+    public async Task DeleteTransactionBatchAsync_WhenDuplicateIdsInRequest_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transaction = transactionFaker.Generate(1).First();
+
+        account.Transactions = [transaction];
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var duplicateId = transaction.ID;
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionService.DeleteTransactionBatchAsync(
+                helper.demoUser.Id,
+                [duplicateId, duplicateId]
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionBatchDeleteDuplicateIdsError");
+    }
+
+    [Fact]
     public async Task DeleteTransactionBatchAsync_WhenDeleteTransactions_ShouldUpdateBalances()
     {
         // Arrange
@@ -1656,5 +1754,244 @@ public class TransactionServiceTests
             .Last()
             .Amount.Should()
             .Be(oldLastBalance - 50.0M - 30.0M);
+    }
+
+    [Fact]
+    public async Task UpdateTransactionAsync_WhenTransactionDateHasTimeComponent_ShouldUpdateSameDayBalance()
+    {
+        // Arrange — balance stored at midnight, transaction on the same day but at 14:30
+        var fakeDate = new DateTime(2025, 3, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Source = AccountSource.Manual;
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balances = balanceFaker.Generate(2);
+
+        balances[0].DateTime = fakeDate.AddDays(-1); // midnight the day before
+        balances[1].DateTime = fakeDate; // midnight on the transaction day
+
+        account.Balances = balances;
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transaction = transactionFaker.Generate(1).First();
+        transaction.Date = fakeDate.AddHours(14).AddMinutes(30); // 14:30 same day
+        transaction.Amount = 50.0M;
+
+        account.Transactions = [transaction];
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var oldSameDayBalance = balances[1].Amount;
+
+        var editRequest = new TransactionUpdateRequest
+        {
+            ID = transaction.ID,
+            Amount = 100.0M,
+            Date = transaction.Date,
+            Category = transaction.Category,
+            Subcategory = transaction.Subcategory,
+            MerchantName = transaction.MerchantName,
+        };
+
+        // Act
+        await transactionService.UpdateTransactionAsync(helper.demoUser.Id, editRequest);
+
+        // Assert — same-day balance (stored at midnight) must be updated
+        helper
+            .UserDataContext.Balances.ToList()
+            .Last()
+            .Amount.Should()
+            .Be(oldSameDayBalance + (100.0M - 50.0M));
+    }
+
+    [Fact]
+    public async Task UpdateTransactionBatchAsync_WhenTransactionDateHasTimeComponent_ShouldUpdateSameDayBalance()
+    {
+        // Arrange — balance stored at midnight, transaction on the same day but at 14:30
+        var fakeDate = new DateTime(2025, 3, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Source = AccountSource.Manual;
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balances = balanceFaker.Generate(2);
+
+        balances[0].DateTime = fakeDate.AddDays(-1);
+        balances[1].DateTime = fakeDate;
+
+        account.Balances = balances;
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transaction = transactionFaker.Generate(1).First();
+        transaction.Date = fakeDate.AddHours(14).AddMinutes(30);
+        transaction.Amount = 50.0M;
+
+        account.Transactions = [transaction];
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var oldSameDayBalance = balances[1].Amount;
+
+        var editRequests = new List<TransactionUpdateRequest>
+        {
+            new()
+            {
+                ID = transaction.ID,
+                Amount = 100.0M,
+                Date = transaction.Date,
+                Category = transaction.Category,
+                Subcategory = transaction.Subcategory,
+                MerchantName = transaction.MerchantName,
+            },
+        };
+
+        // Act
+        await transactionService.UpdateTransactionBatchAsync(helper.demoUser.Id, editRequests);
+
+        // Assert
+        helper
+            .UserDataContext.Balances.ToList()
+            .Last()
+            .Amount.Should()
+            .Be(oldSameDayBalance + (100.0M - 50.0M));
+    }
+
+    [Fact]
+    public async Task DeleteTransactionAsync_WhenTransactionDateHasTimeComponent_ShouldUpdateSameDayBalance()
+    {
+        // Arrange — balance stored at midnight, transaction on the same day but at 14:30
+        var fakeDate = new DateTime(2025, 3, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Source = AccountSource.Manual;
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balances = balanceFaker.Generate(2);
+
+        balances[0].DateTime = fakeDate.AddDays(-1);
+        balances[1].DateTime = fakeDate;
+
+        account.Balances = balances;
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transaction = transactionFaker.Generate(1).First();
+        transaction.Date = fakeDate.AddHours(14).AddMinutes(30);
+        transaction.Amount = 50.0M;
+
+        account.Transactions = [transaction];
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var oldSameDayBalance = balances[1].Amount;
+
+        // Act
+        await transactionService.DeleteTransactionAsync(helper.demoUser.Id, transaction.ID);
+
+        // Assert
+        helper
+            .UserDataContext.Balances.ToList()
+            .Last()
+            .Amount.Should()
+            .Be(oldSameDayBalance - 50.0M);
+    }
+
+    [Fact]
+    public async Task DeleteTransactionBatchAsync_WhenTransactionDateHasTimeComponent_ShouldUpdateSameDayBalance()
+    {
+        // Arrange — balance stored at midnight, transaction on the same day but at 14:30
+        var fakeDate = new DateTime(2025, 3, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Source = AccountSource.Manual;
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balances = balanceFaker.Generate(2);
+
+        balances[0].DateTime = fakeDate.AddDays(-1);
+        balances[1].DateTime = fakeDate;
+
+        account.Balances = balances;
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transaction = transactionFaker.Generate(1).First();
+        transaction.Date = fakeDate.AddHours(14).AddMinutes(30);
+        transaction.Amount = 50.0M;
+
+        account.Transactions = [transaction];
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var oldSameDayBalance = balances[1].Amount;
+
+        // Act
+        await transactionService.DeleteTransactionBatchAsync(helper.demoUser.Id, [transaction.ID]);
+
+        // Assert
+        helper
+            .UserDataContext.Balances.ToList()
+            .Last()
+            .Amount.Should()
+            .Be(oldSameDayBalance - 50.0M);
     }
 }

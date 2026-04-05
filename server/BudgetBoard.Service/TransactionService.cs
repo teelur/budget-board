@@ -192,7 +192,7 @@ public class TransactionService(
         {
             // Update all following balances to include the edited transaction.
             var balancesAfterEdited = transaction
-                .Account.Balances.Where(b => b.DateTime >= transaction.Date)
+                .Account.Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
                 .ToList();
             foreach (var balance in balancesAfterEdited)
             {
@@ -209,10 +209,24 @@ public class TransactionService(
         IEnumerable<ITransactionUpdateRequest> requests
     )
     {
+        var requestList = requests.ToList();
+        var duplicateIds = requestList
+            .GroupBy(r => r.ID)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+        if (duplicateIds.Count > 0)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionBatchUpdateDuplicateIdsLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionBatchUpdateDuplicateIdsError"]
+            );
+        }
+
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
 
-        foreach (var editedTransaction in requests)
+        foreach (var editedTransaction in requestList)
         {
             var transaction = allTransactions.FirstOrDefault(t => t.ID == editedTransaction.ID);
             if (transaction == null)
@@ -234,7 +248,7 @@ public class TransactionService(
             if (transaction.Account?.Source == AccountSource.Manual)
             {
                 var balancesAfterEdited = transaction
-                    .Account.Balances.Where(b => b.DateTime >= transaction.Date)
+                    .Account.Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
                     .ToList();
                 foreach (var balance in balancesAfterEdited)
                 {
@@ -270,7 +284,7 @@ public class TransactionService(
         {
             // Update all following balances to not include the deleted transaction.
             var balancesAfterDeleted = account
-                .Balances.Where(b => b.DateTime >= transaction.Date)
+                .Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
                 .ToList();
             foreach (var balance in balancesAfterDeleted)
             {
@@ -284,10 +298,24 @@ public class TransactionService(
     /// <inheritdoc />
     public async Task DeleteTransactionBatchAsync(Guid userGuid, IEnumerable<Guid> guids)
     {
+        var guidList = guids.ToList();
+        var duplicateIds = guidList
+            .GroupBy(id => id)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+        if (duplicateIds.Count > 0)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionBatchDeleteDuplicateIdsLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionBatchDeleteDuplicateIdsError"]
+            );
+        }
+
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
 
-        foreach (var guid in guids)
+        foreach (var guid in guidList)
         {
             var transaction = allTransactions.FirstOrDefault(t => t.ID == guid);
             if (transaction == null)
@@ -304,7 +332,7 @@ public class TransactionService(
             if (account.Source == AccountSource.Manual)
             {
                 var balancesAfterDeleted = account
-                    .Balances.Where(b => b.DateTime >= transaction.Date)
+                    .Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
                     .ToList();
                 foreach (var balance in balancesAfterDeleted)
                 {

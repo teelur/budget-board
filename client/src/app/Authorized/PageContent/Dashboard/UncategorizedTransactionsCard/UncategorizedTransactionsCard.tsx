@@ -16,7 +16,7 @@ import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
 import { TagsIcon } from "lucide-react";
-import BulkActionBar from "~/app/Authorized/PageContent/Transactions/BulkActionBar/BulkActionBar";
+import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;
