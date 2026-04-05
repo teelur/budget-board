@@ -133,6 +133,69 @@ export const BuildSpendingCategoryChartData = (
   return chartData;
 };
 
+/**
+ * Builds subcategory-level chart data for the outer ring of a two-ring pie chart.
+ * Entries are ordered to align with the inner ring (grouped by parent).
+ * Color shades are derived from the parent's color family.
+ */
+export const BuildSpendingSubcategoryChartData = (
+  transactions: ITransaction[],
+  categories: ICategory[],
+  innerChartData: { name: string; color: string }[],
+): any[] => {
+  const filteredTransactions = transactions.filter(
+    (transaction) =>
+      !areStringsEqual(transaction.category ?? "", "Income") &&
+      !areStringsEqual(transaction.category ?? "", "Hide from Budgets"),
+  );
+
+  const subMap = new Map<
+    string,
+    { name: string; value: number; parent: string }
+  >();
+
+  filteredTransactions.forEach((transaction) => {
+    const parentName = getFormattedCategoryValue(
+      transaction.category ?? "",
+      categories,
+    );
+    const subName = transaction.subcategory
+      ? getFormattedCategoryValue(transaction.subcategory, categories)
+      : parentName;
+    const key = `${parentName}::${subName}`;
+    const existing = subMap.get(key);
+    if (existing) {
+      existing.value += transaction.amount * -1;
+    } else {
+      subMap.set(key, {
+        name: subName,
+        value: transaction.amount * -1,
+        parent: parentName,
+      });
+    }
+  });
+
+  const shadeSteps = [4, 7, 3, 8, 2, 9, 5];
+  const result: any[] = [];
+
+  innerChartData.forEach((parent) => {
+    const colorFamily = parent.color.split(".")[0] ?? "gray";
+    const subs = [...subMap.values()].filter((s) => s.parent === parent.name);
+    subs.forEach((sub, i) => {
+      const shade =
+        subs.length === 1 ? 6 : (shadeSteps[i % shadeSteps.length] ?? 6);
+      result.push({
+        name: sub.name,
+        value: sub.value,
+        color: `${colorFamily}.${shade}`,
+        parent: sub.parent,
+      });
+    });
+  });
+
+  return result;
+};
+
 interface MonthlySpendingData {
   month: string;
   total: number;

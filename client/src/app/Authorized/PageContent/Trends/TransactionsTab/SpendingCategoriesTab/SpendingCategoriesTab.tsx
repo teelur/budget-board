@@ -1,8 +1,9 @@
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
-import { getUniqueYears, initCurrentMonth } from "~/helpers/datetime";
+import { getUniqueYears } from "~/helpers/datetime";
 import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
+  getTransactionsForMonth,
 } from "~/helpers/transactions";
 import { Button, Flex, Group, Stack } from "@mantine/core";
 import {
@@ -15,15 +16,22 @@ import React from "react";
 import SpendingCategoriesChart from "~/components/Charts/SpendingCategoriesChart/SpendingCategoriesChart";
 import { ICategoryResponse } from "~/models/category";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useTranslation } from "react-i18next";
 
 const SpendingCategoriesTab = (): React.ReactNode => {
+  const { request } = useAuth();
+  const { t } = useTranslation();
+  const { dayjs } = useLocale();
+
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
-    initCurrentMonth(),
+    dayjs().startOf("month").toDate(),
   ]);
+  const [showSubcategories, setShowSubcategories] = React.useState(true);
+  const monthButtons = [3, 6, 12];
 
   // Querying by year is the best balance of covering probable dates a user will select,
   // while also not potentially querying for a large amount of data.
-  const { request } = useAuth();
   const transactionsQuery = useQueries({
     queries: getUniqueYears(selectedMonths).map((year: number) => ({
       queryKey: ["transactions", { year }],
@@ -53,6 +61,15 @@ const SpendingCategoriesTab = (): React.ReactNode => {
   const transactionsWithoutHidden = filterHiddenTransactions(
     transactionsQuery.data ?? [],
   );
+
+  const transactionsForSelectedMonths =
+    selectedMonths.length > 0
+      ? transactionsWithoutHidden.filter((t) =>
+          selectedMonths.some(
+            (m) => getTransactionsForMonth([t], m).length > 0,
+          ),
+        )
+      : transactionsWithoutHidden;
 
   const transactionCategoriesQuery = useQuery({
     queryKey: ["transactionCategories"],
@@ -86,19 +103,49 @@ const SpendingCategoriesTab = (): React.ReactNode => {
         isPending={transactionsQuery.isPending}
         allowSelectMultiple
       />
-      <Group w="100%" justify="end">
+      <Group w="100%" justify="space-between">
         <Button
           size="compact-sm"
-          variant="primary"
-          onClick={() => setSelectedMonths([])}
+          variant={showSubcategories ? "outline" : "subtle"}
+          onClick={() => setShowSubcategories((v) => !v)}
         >
-          Clear Selection
+          {showSubcategories
+            ? t("show_subcategories")
+            : t("hide_subcategories")}
         </Button>
+        <Group gap="xs">
+          {monthButtons.map((months) => (
+            <Button
+              key={months}
+              size="compact-sm"
+              variant="light"
+              onClick={() => {
+                const newMonths: Date[] = [];
+                for (let i = 0; i < months; i++) {
+                  newMonths.push(
+                    dayjs().subtract(i, "month").startOf("month").toDate(),
+                  );
+                }
+                setSelectedMonths(newMonths);
+              }}
+            >
+              {t("last_n_months", { count: months })}
+            </Button>
+          ))}
+          <Button
+            size="compact-sm"
+            variant="primary"
+            onClick={() => setSelectedMonths([])}
+          >
+            {t("clear_selection")}
+          </Button>
+        </Group>
       </Group>
       <Flex justify="center">
         <SpendingCategoriesChart
-          transactions={transactionsWithoutHidden}
+          transactions={transactionsForSelectedMonths}
           categories={transactionCategoriesWithCustom}
+          showSubcategories={showSubcategories}
         />
       </Flex>
     </Stack>
