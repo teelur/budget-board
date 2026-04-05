@@ -12,6 +12,7 @@ export interface TransactionCardBaseProps extends CardProps {
   transaction: ITransaction;
   categories: ICategory[];
   elevation?: number;
+  currency: string;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
 }
@@ -57,6 +58,7 @@ const TransactionCardBase = (
             transaction={props.transaction}
             categories={props.categories}
             elevation={props.elevation ?? 0}
+            currency={props.currency}
           />
         </Group>
       ) : (
@@ -64,6 +66,7 @@ const TransactionCardBase = (
           transaction={props.transaction}
           categories={props.categories}
           elevation={props.elevation ?? 0}
+          currency={props.currency}
         />
       )}
     </Card>

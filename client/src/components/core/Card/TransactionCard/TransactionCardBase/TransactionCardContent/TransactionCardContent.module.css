@@ -36,10 +36,11 @@
 }
 
 .categoryContainer {
-  width: 160px;
+  width: 180px;
 
   @container (max-width: 634px) {
     width: 100%;
+    min-width: 180px;
   }
 }
 
