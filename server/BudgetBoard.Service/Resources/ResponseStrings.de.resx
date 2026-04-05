@@ -472,4 +472,10 @@
   <data name="AccountPermanentDeleteNotFoundError" xml:space="preserve">
     <value>Das Konto, das Sie dauerhaft löschen möchten, existiert nicht.</value>
   </data>
+  <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
+    <value>The batch update request contains duplicate transaction IDs.</value>
+  </data>
+  <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
+    <value>The batch delete request contains duplicate transaction IDs.</value>
+  </data>
 </root>
