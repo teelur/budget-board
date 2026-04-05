@@ -5,6 +5,7 @@ import React from "react";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import BulkActionBar from "~/app/Authorized/PageContent/Transactions/BulkActionBar/BulkActionBar";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -14,13 +15,30 @@ interface TransactionCardsProps {
 const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 5;
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
   const { t } = useTranslation();
 
   const paginatedItems: ITransaction[] = props.transactions.slice(
     (page - 1) * itemsPerPage,
-    page * itemsPerPage
+    page * itemsPerPage,
   );
+
+  const onToggleSelect = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  const onClearSelection = () => setSelectedIds(new Set());
+
+  const onSelectAll = (ids: string[]) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
 
   if (props.transactions.length === 0) {
     return (
@@ -31,25 +49,37 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   }
 
   return (
-    <Stack gap="0.5rem">
-      {paginatedItems.map((transaction) => (
-        <TransactionCard
-          key={transaction.id}
-          transaction={transaction}
-          categories={props.categories}
-          elevation={2}
-        />
-      ))}
-      {props.transactions.length > itemsPerPage && (
-        <Group justify="center">
-          <Pagination
-            total={Math.ceil(props.transactions.length / itemsPerPage)}
-            value={page}
-            onChange={setPage}
+    <>
+      <Stack gap="0.5rem" pb="var(--bulk-bar-height, 0)">
+        {paginatedItems.map((transaction) => (
+          <TransactionCard
+            key={transaction.id}
+            transaction={transaction}
+            categories={props.categories}
+            elevation={2}
+            isSelected={selectedIds.has(transaction.id)}
+            onToggleSelect={onToggleSelect}
           />
-        </Group>
-      )}
-    </Stack>
+        ))}
+        {props.transactions.length > itemsPerPage && (
+          <Group justify="center">
+            <Pagination
+              total={Math.ceil(props.transactions.length / itemsPerPage)}
+              value={page}
+              onChange={setPage}
+            />
+          </Group>
+        )}
+      </Stack>
+      <BulkActionBar
+        selectedIds={selectedIds}
+        currentPageTransactions={paginatedItems}
+        onClearSelection={onClearSelection}
+        onSelectAll={onSelectAll}
+        categories={props.categories}
+        zIndex="calc(var(--mantine-z-index-modal) + 1)"
+      />
+    </>
   );
 };
 

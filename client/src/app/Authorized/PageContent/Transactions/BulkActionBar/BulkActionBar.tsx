@@ -3,6 +3,7 @@ import {
   Collapse,
   Flex,
   Group,
+  Portal,
   Stack,
   Text,
   ActionIcon,
@@ -29,6 +30,7 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import useIsMobile from "~/hooks/useIsMobile";
 
 interface BulkActionBarProps {
   selectedIds: Set<string>;
@@ -36,6 +38,7 @@ interface BulkActionBarProps {
   onClearSelection: () => void;
   onSelectAll: (ids: string[]) => void;
   categories: ICategory[];
+  zIndex?: number | string;
 }
 
 const FIELDS = {
@@ -47,6 +50,47 @@ const FIELDS = {
 
 const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
+
+  // Hold the bar element in state so the effect re-runs as soon as Mantine's
+  // Transition renders it (which happens in a child render cycle, not the same
+  // commit as selectedIds changing).
+  const [barElement, setBarElement] = React.useState<HTMLDivElement | null>(
+    null,
+  );
+  const barRefCallback = React.useCallback(
+    (node: HTMLDivElement | null) => setBarElement(node),
+    [],
+  );
+
+  React.useEffect(() => {
+    if (props.selectedIds.size === 0 || !barElement) {
+      document.documentElement.style.setProperty("--bulk-bar-height", "0px");
+      return;
+    }
+
+    // offsetHeight reads synchronously and includes padding — no async ResizeObserver
+    // delay on first mount.
+    const update = () =>
+      document.documentElement.style.setProperty(
+        "--bulk-bar-height",
+        `${barElement.offsetHeight}px`,
+      );
+
+    update();
+
+    // Keep updating when content changes (e.g. Collapse opens edit fields)
+    const observer = new ResizeObserver(update);
+    observer.observe(barElement);
+    return () => observer.disconnect();
+  }, [props.selectedIds.size, barElement]);
+
+  React.useEffect(() => {
+    return () => {
+      document.documentElement.style.setProperty("--bulk-bar-height", "0px");
+    };
+  }, []);
+
   const { request } = useAuth();
   const {
     dayjsLocale,
@@ -264,183 +308,190 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const isPending = doBulkUpdate.isPending || doBulkDelete.isPending;
 
   return (
-    <Transition
-      mounted={props.selectedIds.size > 0}
-      transition="slide-up"
-      duration={200}
-      timingFunction="ease"
-    >
-      {(transitionStyles) => (
-        <Stack
-          gap="0.5rem"
-          p="0.75rem"
-          style={{
-            ...transitionStyles,
-            position: "fixed",
-            bottom: 0,
-            left: "var(--app-shell-navbar-width, 60px)",
-            right: 0,
-            zIndex: 100,
-            backgroundColor: "var(--background-color-surface)",
-            borderTop: "2px solid var(--surface-color-border)",
-            boxShadow: "0 -4px 12px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          {/* Selection controls row */}
-          <Group gap="0.5rem" wrap="wrap">
-            <Text size="sm" fw={600}>
-              {t("n_selected", { count: props.selectedIds.size })}
-            </Text>
-            <Button
-              size="compact-xs"
-              variant="subtle"
-              onClick={() =>
-                props.onSelectAll(
-                  props.currentPageTransactions.map((t) => t.id),
-                )
-              }
-            >
-              {t("select_all")} ({props.currentPageTransactions.length})
-            </Button>
-            <Button
-              size="compact-xs"
-              variant="subtle"
-              onClick={() => {
-                props.onClearSelection();
-                resetFields();
-              }}
-            >
-              {t("clear_selection")}
-            </Button>
-          </Group>
-
-          {/* Fields + actions row */}
-          <Flex gap="0.5rem" wrap="wrap" align="flex-end">
-            <DateInput
-              label={<Text size="xs">{t("date")}</Text>}
-              value={dateValue}
-              valueFormat={longDateFormat}
-              locale={dayjsLocale}
-              onChange={handleDateChange}
-              clearable
-              w={190}
-              elevation={1}
-            />
-            <TextInput
-              label={<Text size="xs">{t("merchant_name")}</Text>}
-              value={merchantValue}
-              onChange={(e) => {
-                setMerchantValue(e.currentTarget.value);
-                touch(FIELDS.merchant);
-              }}
-              placeholder={t("enter_merchant_name")}
-              miw={180}
-              style={{ flex: "1 1 180px" }}
-              elevation={1}
-            />
-            <CategorySelect
-              label={<Text size="xs">{t("category")}</Text>}
-              categories={props.categories}
-              value={categoryValue || null}
-              onChange={(val) => {
-                setCategoryValue(val);
-                touch(FIELDS.category);
-              }}
-              withinPortal
-              w={220}
-              elevation={1}
-            />
-            <NumberInput
-              label={<Text size="xs">{t("amount")}</Text>}
-              value={amountValue}
-              onChange={(val) => {
-                setAmountValue(val);
-                if (val !== "") touch(FIELDS.amount);
-                else
-                  setTouched((prev) => {
-                    const next = new Set(prev);
-                    next.delete(FIELDS.amount);
-                    return next;
-                  });
-              }}
-              prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
-              thousandSeparator={thousandsSeparator}
-              decimalSeparator={decimalSeparator}
-              decimalScale={2}
-              fixedDecimalScale
-              w={140}
-              elevation={1}
-            />
-
-            <Group gap="0.5rem" align="flex-end" style={{ marginLeft: "auto" }}>
-              {singleSelected && (
-                <SplitTransaction
-                  id={singleSelected.id}
-                  originalAmount={singleSelected.amount}
-                  categories={props.categories}
-                  elevation={1}
-                />
-              )}
-              <ActionIcon
-                color="var(--button-color-destructive)"
-                onClick={handleDeleteClick}
-                loading={doBulkDelete.isPending}
-                title={t("delete_transactions")}
-              >
-                <TrashIcon size="1rem" />
-              </ActionIcon>
+    <Portal>
+      <Transition
+        mounted={props.selectedIds.size > 0}
+        transition="slide-up"
+        duration={200}
+        timingFunction="ease"
+      >
+        {(transitionStyles) => (
+          <Stack
+            ref={barRefCallback}
+            gap="0.5rem"
+            p="0.75rem"
+            style={{
+              ...transitionStyles,
+              position: "fixed",
+              bottom: 0,
+              left: isMobile ? 0 : "var(--app-shell-navbar-width, 60px)",
+              right: 0,
+              zIndex: props.zIndex ?? 200,
+              backgroundColor: "var(--background-color-surface)",
+              borderTop: "2px solid var(--surface-color-border)",
+              boxShadow: "0 -4px 12px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            {/* Selection controls row */}
+            <Group gap="0.5rem" wrap="wrap">
+              <Text size="sm" fw={600}>
+                {t("n_selected", { count: props.selectedIds.size })}
+              </Text>
               <Button
-                size="compact-sm"
+                size="compact-xs"
+                variant="subtle"
+                onClick={() =>
+                  props.onSelectAll(
+                    props.currentPageTransactions.map((t) => t.id),
+                  )
+                }
+              >
+                {t("select_all")} ({props.currentPageTransactions.length})
+              </Button>
+              <Button
+                size="compact-xs"
                 variant="subtle"
                 onClick={() => {
                   props.onClearSelection();
                   resetFields();
                 }}
               >
-                {t("cancel")}
-              </Button>
-              <Button
-                size="compact-sm"
-                disabled={isApplyDisabled}
-                loading={doBulkUpdate.isPending}
-                onClick={handleApply}
-              >
-                {t("apply_changes")}
+                {t("clear_selection")}
               </Button>
             </Group>
-          </Flex>
 
-          {/* Inline delete confirmation */}
-          <Collapse in={showDeleteConfirm}>
-            <Group gap="0.5rem" align="center">
-              <Text size="sm">
-                {t("confirm_delete_transactions_message", {
-                  count: props.selectedIds.size,
-                })}
-              </Text>
-              <Button
-                size="compact-sm"
-                color="var(--button-color-destructive)"
-                loading={isPending}
-                onClick={() => {
-                  doBulkDelete.mutate(Array.from(props.selectedIds));
-                  setShowDeleteConfirm(false);
+            {/* Fields + actions row */}
+            <Flex gap="0.5rem" wrap="wrap" align="flex-end">
+              <DateInput
+                label={<Text size="xs">{t("date")}</Text>}
+                value={dateValue}
+                valueFormat={longDateFormat}
+                locale={dayjsLocale}
+                onChange={handleDateChange}
+                clearable
+                w={190}
+                elevation={1}
+              />
+              <TextInput
+                label={<Text size="xs">{t("merchant_name")}</Text>}
+                value={merchantValue}
+                onChange={(e) => {
+                  setMerchantValue(e.currentTarget.value);
+                  touch(FIELDS.merchant);
                 }}
+                placeholder={t("enter_merchant_name")}
+                miw={180}
+                style={{ flex: "1 1 180px" }}
+                elevation={1}
+              />
+              <CategorySelect
+                label={<Text size="xs">{t("category")}</Text>}
+                categories={props.categories}
+                value={categoryValue || null}
+                onChange={(val) => {
+                  setCategoryValue(val);
+                  touch(FIELDS.category);
+                }}
+                withinPortal
+                w={220}
+                elevation={1}
+              />
+              <NumberInput
+                label={<Text size="xs">{t("amount")}</Text>}
+                value={amountValue}
+                onChange={(val) => {
+                  setAmountValue(val);
+                  if (val !== "") touch(FIELDS.amount);
+                  else
+                    setTouched((prev) => {
+                      const next = new Set(prev);
+                      next.delete(FIELDS.amount);
+                      return next;
+                    });
+                }}
+                prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+                thousandSeparator={thousandsSeparator}
+                decimalSeparator={decimalSeparator}
+                decimalScale={2}
+                fixedDecimalScale
+                w={140}
+                elevation={1}
+              />
+
+              <Group
+                gap="0.5rem"
+                align="flex-end"
+                style={{ marginLeft: "auto" }}
               >
-                {t("delete")}
-              </Button>
-              <Button
-                size="compact-sm"
-                variant="subtle"
-                onClick={() => setShowDeleteConfirm(false)}
-              >
-                {t("cancel")}
-              </Button>
-            </Group>
-          </Collapse>
-        </Stack>
-      )}
-    </Transition>
+                {singleSelected && (
+                  <SplitTransaction
+                    id={singleSelected.id}
+                    originalAmount={singleSelected.amount}
+                    categories={props.categories}
+                    elevation={1}
+                  />
+                )}
+                <ActionIcon
+                  color="var(--button-color-destructive)"
+                  onClick={handleDeleteClick}
+                  loading={doBulkDelete.isPending}
+                  title={t("delete_transactions")}
+                >
+                  <TrashIcon size="1rem" />
+                </ActionIcon>
+                <Button
+                  size="compact-sm"
+                  variant="subtle"
+                  onClick={() => {
+                    props.onClearSelection();
+                    resetFields();
+                  }}
+                >
+                  {t("cancel")}
+                </Button>
+                <Button
+                  size="compact-sm"
+                  disabled={isApplyDisabled}
+                  loading={doBulkUpdate.isPending}
+                  onClick={handleApply}
+                >
+                  {t("apply_changes")}
+                </Button>
+              </Group>
+            </Flex>
+
+            {/* Inline delete confirmation */}
+            <Collapse in={showDeleteConfirm}>
+              <Group gap="0.5rem" align="center">
+                <Text size="sm">
+                  {t("confirm_delete_transactions_message", {
+                    count: props.selectedIds.size,
+                  })}
+                </Text>
+                <Button
+                  size="compact-sm"
+                  color="var(--button-color-destructive)"
+                  loading={isPending}
+                  onClick={() => {
+                    doBulkDelete.mutate(Array.from(props.selectedIds));
+                    setShowDeleteConfirm(false);
+                  }}
+                >
+                  {t("delete")}
+                </Button>
+                <Button
+                  size="compact-sm"
+                  variant="subtle"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  {t("cancel")}
+                </Button>
+              </Group>
+            </Collapse>
+          </Stack>
+        )}
+      </Transition>
+    </Portal>
   );
 };
 

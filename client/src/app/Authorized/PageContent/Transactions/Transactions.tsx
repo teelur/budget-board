@@ -39,7 +39,7 @@ const Transactions = (): React.ReactNode => {
   const onSelectAll = (ids: string[]) => setSelectedIds(new Set(ids));
 
   return (
-    <Stack className={classes.root} pb={selectedIds.size > 0 ? "10rem" : 0}>
+    <Stack className={classes.root} pb="var(--bulk-bar-height, 0)">
       <TransactionsHeader
         sort={sort}
         setSort={setSort}
