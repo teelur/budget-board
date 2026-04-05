@@ -1,10 +1,13 @@
-import { ITransaction } from "~/models/transaction";
+import { hiddenTransactionCategory, ITransaction } from "~/models/transaction";
 import {
   getRollingTotalSpendingForMonth,
   getTransactionsForMonth,
   RollingTotalSpendingPerDay,
 } from "./transactions";
 import { getDaysInMonth } from "./datetime";
+import { areStringsEqual } from "./utils";
+import { getFormattedCategoryValue } from "./category";
+import { ICategory } from "~/models/category";
 
 export const chartColors = [
   "indigo.6",
@@ -83,6 +86,111 @@ export const buildTransactionChartSeries = (
     name: formatDateString(month),
     color: chartColors[i % chartColors.length] ?? "gray.6",
   }));
+
+/**
+ * Builds chart data for spending categories based on a list of transactions and categories.
+ *
+ * Iterates through each transaction, determines its formatted category name,
+ * and aggregates the transaction amounts by category. The result is an array
+ * of objects, each representing a category and the total amount spent in that category.
+ *
+ * @param transactions - An array of transaction objects to be aggregated.
+ * @param categories - An array of category objects used to format and match transaction categories.
+ * @returns An array of objects, each containing a `name` (category) and `value` (total amount spent).
+ */
+export const buildSpendingCategoryChartData = (
+  transactions: ITransaction[],
+  categories: ICategory[],
+) => {
+  const filteredTransactions = transactions.filter(
+    (transaction) =>
+      !areStringsEqual(transaction.category ?? "", "Income") &&
+      !areStringsEqual(transaction.category ?? "", hiddenTransactionCategory),
+  );
+
+  const totalsMap = new Map<string, number>();
+
+  filteredTransactions.forEach((transaction) => {
+    const formattedTransactionCategory = getFormattedCategoryValue(
+      transaction.category ?? "",
+      categories,
+    );
+    totalsMap.set(
+      formattedTransactionCategory,
+      (totalsMap.get(formattedTransactionCategory) ?? 0) +
+        transaction.amount * -1,
+    );
+  });
+
+  return Array.from(totalsMap.entries()).map(([name, value], i) => ({
+    name,
+    value,
+    color: chartColors[i % chartColors.length] ?? "gray.6",
+  }));
+};
+
+/**
+ * Builds subcategory-level chart data for the outer ring of a two-ring pie chart.
+ * Entries are ordered to align with the inner ring (grouped by parent).
+ * Color shades are derived from the parent's color family.
+ */
+export const buildSpendingSubcategoryChartData = (
+  transactions: ITransaction[],
+  categories: ICategory[],
+  innerChartData: { name: string; color: string }[],
+): any[] => {
+  const filteredTransactions = transactions.filter(
+    (transaction) =>
+      !areStringsEqual(transaction.category ?? "", "Income") &&
+      !areStringsEqual(transaction.category ?? "", hiddenTransactionCategory),
+  );
+
+  const subMap = new Map<
+    string,
+    { name: string; value: number; parent: string }
+  >();
+
+  filteredTransactions.forEach((transaction) => {
+    const parentName = getFormattedCategoryValue(
+      transaction.category ?? "",
+      categories,
+    );
+    const subName = transaction.subcategory
+      ? getFormattedCategoryValue(transaction.subcategory, categories)
+      : parentName;
+    const key = `${parentName}::${subName}`;
+    const existing = subMap.get(key);
+    if (existing) {
+      existing.value += transaction.amount * -1;
+    } else {
+      subMap.set(key, {
+        name: subName,
+        value: transaction.amount * -1,
+        parent: parentName,
+      });
+    }
+  });
+
+  const shadeSteps = [4, 7, 3, 8, 2, 9, 5];
+  const result: any[] = [];
+
+  innerChartData.forEach((parent) => {
+    const colorFamily = parent.color.split(".")[0] ?? "gray";
+    const subs = [...subMap.values()].filter((s) => s.parent === parent.name);
+    subs.forEach((sub, i) => {
+      const shade =
+        subs.length === 1 ? 6 : (shadeSteps[i % shadeSteps.length] ?? 6);
+      result.push({
+        name: sub.name,
+        value: sub.value,
+        color: `${colorFamily}.${shade}`,
+        parent: sub.parent,
+      });
+    });
+  });
+
+  return result;
+};
 
 interface MonthlySpendingData {
   month: string;

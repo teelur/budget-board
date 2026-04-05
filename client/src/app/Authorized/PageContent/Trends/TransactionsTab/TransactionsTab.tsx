@@ -4,6 +4,7 @@ import NetCashFlowTab from "./NetCashFlowTab/NetCashFlowTab";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import SpendingCategoriesTab from "./SpendingCategoriesTab/SpendingCategoriesTab";
 
 const TransactionsTab = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -20,12 +21,18 @@ const TransactionsTab = (): React.ReactNode => {
           <Tabs.Tab value="spending">
             <PrimaryText size="sm">{t("spending")}</PrimaryText>
           </Tabs.Tab>
+          <Tabs.Tab value="spendingCategories">
+            <PrimaryText size="sm">{t("spending_categories")}</PrimaryText>
+          </Tabs.Tab>
           <Tabs.Tab value="netCashFlow">
             <PrimaryText size="sm">{t("net_cash_flow")}</PrimaryText>
           </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="spending">
           <SpendingTab />
+        </Tabs.Panel>
+        <Tabs.Panel value="spendingCategories">
+          <SpendingCategoriesTab />
         </Tabs.Panel>
         <Tabs.Panel value="netCashFlow">
           <NetCashFlowTab />
