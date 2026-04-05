@@ -15,6 +15,7 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
+import { IUserSettings } from "~/models/userSettings";
 
 interface TransactionCardsProps {
   sort: Sorts;
@@ -26,7 +27,8 @@ interface TransactionCardsProps {
 
 const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const [page, setPage] = React.useState(1);
-  const [itemsPerPage, _setItemsPerPage] = React.useState(25);
+  const itemsPerPage = 50;
+  const skeletonCount = 10;
 
   const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
@@ -48,6 +50,24 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
       return [];
     },
   });
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
+
+      return undefined;
+    },
+  });
+
+  const currency = userSettingsQuery.data?.currency ?? "USD";
 
   const filteredTransactions = getFilteredTransactions(
     transactionsQuery.data ?? [],
@@ -79,7 +99,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   return (
     <Stack gap={"0.5rem"}>
       {transactionsQuery.isPending ? (
-        Array.from({ length: itemsPerPage }).map((_, index) => (
+        Array.from({ length: skeletonCount }).map((_, index) => (
           <Skeleton key={index} height={40} radius="md" />
         ))
       ) : (
@@ -91,6 +111,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                 transaction={transaction}
                 categories={transactionCategories}
                 elevation={1}
+                currency={currency}
                 isSelected={props.selectedIds.has(transaction.id)}
                 onToggleSelect={props.onToggleSelect}
               />

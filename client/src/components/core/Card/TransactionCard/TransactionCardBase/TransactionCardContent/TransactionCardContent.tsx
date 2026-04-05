@@ -6,10 +6,6 @@ import React from "react";
 import { ICategory } from "~/models/category";
 import { getFormattedCategoryValue } from "~/helpers/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
@@ -17,29 +13,13 @@ interface TransactionCardContentProps {
   transaction: ITransaction;
   categories: ICategory[];
   elevation: number;
+  currency: string;
 }
 
 const TransactionCardContent = (
   props: TransactionCardContentProps,
 ): React.ReactNode => {
   const { dayjs, longDateFormat, intlLocale } = useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
 
   const getPrimaryTextColor = (): string => {
     switch (props.elevation) {
@@ -104,17 +84,15 @@ const TransactionCardContent = (
           </Badge>
         </Flex>
         <Flex className={classes.amountContainer}>
-          {userSettingsQuery.isPending ? null : (
-            <StatusText amount={props.transaction.amount} size="md">
-              {convertNumberToCurrency(
-                props.transaction.amount,
-                true,
-                userSettingsQuery.data?.currency ?? "USD",
-                SignDisplay.Auto,
-                intlLocale,
-              )}
-            </StatusText>
-          )}
+          <StatusText amount={props.transaction.amount} size="md">
+            {convertNumberToCurrency(
+              props.transaction.amount,
+              true,
+              props.currency,
+              SignDisplay.Auto,
+              intlLocale,
+            )}
+          </StatusText>
         </Flex>
       </Flex>
     </Flex>

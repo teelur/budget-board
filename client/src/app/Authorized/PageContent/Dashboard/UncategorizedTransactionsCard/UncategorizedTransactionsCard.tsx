@@ -5,6 +5,7 @@ import {
 } from "~/helpers/transactions";
 import { Group, Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
+import { IUserSettings } from "~/models/userSettings";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -42,6 +43,20 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
       return [];
     },
   });
+
+  const userSettingsQuery = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: async (): Promise<IUserSettings | undefined> => {
+      const res: AxiosResponse = await request({
+        url: "/api/userSettings",
+        method: "GET",
+      });
+      if (res.status === 200) return res.data as IUserSettings;
+      return undefined;
+    },
+  });
+
+  const currency = userSettingsQuery.data?.currency ?? "USD";
 
   const sortedFilteredTransactions = React.useMemo(
     () =>
@@ -109,6 +124,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
                     transaction={transaction}
                     categories={transactionCategories}
                     elevation={2}
+                    currency={currency}
                     isSelected={selectedIds.has(transaction.id)}
                     onToggleSelect={onToggleSelect}
                   />
