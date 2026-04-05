@@ -75,10 +75,6 @@ const SpendingTrendsCard = (): React.ReactNode => {
     },
   });
 
-  if (transactionsQueries.isPending) {
-    return <Skeleton height={500} radius="lg" />;
-  }
-
   const getSpendingComparison = (): number => {
     const today = dayjs().date();
 
@@ -168,16 +164,22 @@ const SpendingTrendsCard = (): React.ReactNode => {
       elevation={1}
     >
       <Stack gap={0} w="100%">
-        <DimmedText size="sm" ta="right">
-          {getSpendingComparisonString()}
-        </DimmedText>
-        <SpendingChart
-          months={months}
-          transactions={filterHiddenTransactions(
-            transactionsQueries.data ?? [],
-          )}
-          includeYAxis={false}
-        />
+        {transactionsQueries.isPending ? (
+          <Skeleton height={400} radius="md" />
+        ) : (
+          <>
+            <DimmedText size="sm" ta="right">
+              {getSpendingComparisonString()}
+            </DimmedText>
+            <SpendingChart
+              months={months}
+              transactions={filterHiddenTransactions(
+                transactionsQueries.data ?? [],
+              )}
+              includeYAxis={false}
+            />
+          </>
+        )}
       </Stack>
     </SplitCard>
   );
