@@ -1,3 +1,5 @@
+import classes from "./TransactionCardBase.module.css";
+
 import { useDisclosure } from "@mantine/hooks";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
@@ -36,20 +38,31 @@ const TransactionCardBase = (
   return (
     <Card
       w={props.w ?? "100%"}
+      p={props.p ?? "0.2rem"}
       style={{ containerType: "inline-size" }}
       onClick={handleCardClick}
       hoverEffect={props.hoverEffect ?? false}
       elevation={props.elevation ?? 0}
       {...props}
+      className={`${classes.card}${props.className ? ` ${props.className}` : ""}`}
     >
       {selectionMode ? (
-        <Group wrap="nowrap" gap="0.5rem" align="center">
-          <Checkbox
-            checked={props.isSelected ?? false}
-            onChange={() => props.onToggleSelect!(props.transaction.id)}
-            onClick={(e) => e.stopPropagation()}
-            elevation={props.elevation ?? 0}
-          />
+        <Group
+          className={classes.selectionGroup}
+          data-selected={props.isSelected ? "true" : "false"}
+          wrap="nowrap"
+          gap="0.5rem"
+          align="center"
+        >
+          <div className={classes.checkboxWrapper}>
+            <Checkbox
+              size="xs"
+              checked={props.isSelected ?? false}
+              onChange={() => props.onToggleSelect!(props.transaction.id)}
+              onClick={(e) => e.stopPropagation()}
+              elevation={props.elevation ?? 0}
+            />
+          </div>
           <TransactionCardContent
             transaction={props.transaction}
             categories={props.categories}

@@ -76,13 +76,13 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   ]);
 
   return (
-    <Stack gap={10}>
+    <Stack gap={"0.5rem"}>
       {transactionsQuery.isPending ? (
         Array.from({ length: itemsPerPage }).map((_, index) => (
           <Skeleton key={index} height={40} radius="md" />
         ))
       ) : (
-        <Stack gap={10} align="center">
+        <Stack gap={"0.3rem"} align="center">
           {sortedFilteredTransactions.length > 0 ? (
             currentPageItems.map((transaction) => (
               <TransactionCard
