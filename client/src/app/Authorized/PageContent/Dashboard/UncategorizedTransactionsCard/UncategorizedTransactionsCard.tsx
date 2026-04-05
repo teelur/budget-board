@@ -16,10 +16,12 @@ import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
 import { TagsIcon } from "lucide-react";
+import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 
 const UncategorizedTransactionsCard = (): React.ReactNode => {
   const itemsPerPage = 20;
   const [activePage, setPage] = React.useState(1);
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
   const { t } = useTranslation();
   const { transactionCategories } = useTransactionCategories();
@@ -49,62 +51,90 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
     [transactionsQuery.data],
   );
 
+  const currentPageTransactions = sortedFilteredTransactions.slice(
+    (activePage - 1) * itemsPerPage,
+    (activePage - 1) * itemsPerPage + itemsPerPage,
+  );
+
+  const onToggleSelect = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  const onClearSelection = () => setSelectedIds(new Set());
+
+  const onSelectAll = (ids: string[]) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
+
   if (sortedFilteredTransactions.length === 0) {
     return null;
   }
 
   return (
-    <SplitCard
-      w="100%"
-      border={BorderThickness.Thick}
-      header={
-        <Group gap={"0.25rem"}>
-          <TagsIcon color="var(--base-color-text-dimmed)" />
-          <PrimaryText size="xl" lh={1}>
-            {t("uncategorized_transactions")}
-          </PrimaryText>
-        </Group>
-      }
-      elevation={1}
-    >
-      <Stack gap="0.5rem" align="center" w="100%">
-        {transactionsQuery.isPending ? (
-          <Skeleton height={350} radius="lg" />
-        ) : (
-          <ScrollArea.Autosize
-            w="100%"
-            p="0.125rem"
-            mah={350}
-            type="auto"
-            offsetScrollbars
-          >
-            <Stack gap="0.5rem">
-              {sortedFilteredTransactions
-                .slice(
-                  (activePage - 1) * itemsPerPage,
-                  (activePage - 1) * itemsPerPage + itemsPerPage,
-                )
-                .map((transaction: ITransaction) => (
+    <>
+      <SplitCard
+        w="100%"
+        border={BorderThickness.Thick}
+        header={
+          <Group gap={"0.25rem"}>
+            <TagsIcon color="var(--base-color-text-dimmed)" />
+            <PrimaryText size="xl" lh={1}>
+              {t("uncategorized_transactions")}
+            </PrimaryText>
+          </Group>
+        }
+        elevation={1}
+      >
+        <Stack gap="0.5rem" align="center" w="100%">
+          {transactionsQuery.isPending ? (
+            <Skeleton height={350} radius="lg" />
+          ) : (
+            <ScrollArea.Autosize
+              w="100%"
+              p="0.125rem"
+              mah={350}
+              type="auto"
+              offsetScrollbars
+            >
+              <Stack gap="0.3rem">
+                {currentPageTransactions.map((transaction: ITransaction) => (
                   <TransactionCard
                     key={transaction.id}
                     transaction={transaction}
                     categories={transactionCategories}
-                    hoverEffect
                     elevation={2}
+                    isSelected={selectedIds.has(transaction.id)}
+                    onToggleSelect={onToggleSelect}
                   />
                 ))}
-            </Stack>
-          </ScrollArea.Autosize>
-        )}
-        {sortedFilteredTransactions.length > itemsPerPage && (
-          <Pagination
-            value={activePage}
-            onChange={setPage}
-            total={Math.ceil(sortedFilteredTransactions.length / itemsPerPage)}
-          />
-        )}
-      </Stack>
-    </SplitCard>
+              </Stack>
+            </ScrollArea.Autosize>
+          )}
+          {sortedFilteredTransactions.length > itemsPerPage && (
+            <Pagination
+              value={activePage}
+              onChange={setPage}
+              total={Math.ceil(
+                sortedFilteredTransactions.length / itemsPerPage,
+              )}
+            />
+          )}
+        </Stack>
+      </SplitCard>
+      <BulkActionBar
+        selectedIds={selectedIds}
+        currentPageTransactions={currentPageTransactions}
+        onClearSelection={onClearSelection}
+        onSelectAll={onSelectAll}
+        categories={transactionCategories}
+      />
+    </>
   );
 };
 

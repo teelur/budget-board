@@ -192,11 +192,78 @@ public class TransactionService(
         {
             // Update all following balances to include the edited transaction.
             var balancesAfterEdited = transaction
-                .Account.Balances.Where(b => b.DateTime >= transaction.Date)
+                .Account.Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
                 .ToList();
             foreach (var balance in balancesAfterEdited)
             {
                 balance.Amount += amountDifference;
+            }
+        }
+
+        await userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task UpdateTransactionBatchAsync(
+        Guid userGuid,
+        IEnumerable<ITransactionUpdateRequest> requests
+    )
+    {
+        var requestList = requests.ToList();
+        var duplicateIds = requestList
+            .GroupBy(r => r.ID)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+        if (duplicateIds.Count > 0)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionBatchUpdateDuplicateIdsLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionBatchUpdateDuplicateIdsError"]
+            );
+        }
+
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
+
+        foreach (var editedTransaction in requestList)
+        {
+            var transaction = allTransactions.FirstOrDefault(t => t.ID == editedTransaction.ID);
+            if (transaction == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["TransactionUpdateNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionUpdateNotFoundError"]
+                );
+            }
+
+            var originalAmount = transaction.Amount;
+            var originalDate = transaction.Date;
+            var editedDate = editedTransaction.Date.ToUniversalTime();
+
+            transaction.Amount = editedTransaction.Amount;
+            transaction.Date = editedDate;
+            transaction.Category = editedTransaction.Category;
+            transaction.Subcategory = editedTransaction.Subcategory;
+            transaction.MerchantName = editedTransaction.MerchantName;
+
+            if (transaction.Account?.Source == AccountSource.Manual)
+            {
+                var balancesAfterOriginal = transaction
+                    .Account.Balances.Where(b => b.DateTime.Date >= originalDate.Date)
+                    .ToList();
+                foreach (var balance in balancesAfterOriginal)
+                {
+                    balance.Amount -= originalAmount;
+                }
+
+                var balancesAfterEdited = transaction
+                    .Account.Balances.Where(b => b.DateTime.Date >= editedDate.Date)
+                    .ToList();
+                foreach (var balance in balancesAfterEdited)
+                {
+                    balance.Amount += editedTransaction.Amount;
+                }
             }
         }
 
@@ -227,11 +294,60 @@ public class TransactionService(
         {
             // Update all following balances to not include the deleted transaction.
             var balancesAfterDeleted = account
-                .Balances.Where(b => b.DateTime >= transaction.Date)
+                .Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
                 .ToList();
             foreach (var balance in balancesAfterDeleted)
             {
                 balance.Amount -= transaction.Amount;
+            }
+        }
+
+        await userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteTransactionBatchAsync(Guid userGuid, IEnumerable<Guid> guids)
+    {
+        var guidList = guids.ToList();
+        var duplicateIds = guidList
+            .GroupBy(id => id)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+        if (duplicateIds.Count > 0)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionBatchDeleteDuplicateIdsLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionBatchDeleteDuplicateIdsError"]
+            );
+        }
+
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
+
+        foreach (var guid in guidList)
+        {
+            var transaction = allTransactions.FirstOrDefault(t => t.ID == guid);
+            if (transaction == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["TransactionDeleteNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionDeleteNotFoundError"]
+                );
+            }
+
+            transaction.Deleted = nowProvider.UtcNow;
+
+            Account account = transaction.Account!;
+            if (account.Source == AccountSource.Manual)
+            {
+                var balancesAfterDeleted = account
+                    .Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
+                    .ToList();
+                foreach (var balance in balancesAfterDeleted)
+                {
+                    balance.Amount -= transaction.Amount;
+                }
             }
         }
 

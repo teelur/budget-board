@@ -1,4 +1,5 @@
 .root {
+  --card-bg: var(--background-color-elevated);
   background-color: var(--background-color-elevated);
   border-color: var(--elevated-color-border);
 }

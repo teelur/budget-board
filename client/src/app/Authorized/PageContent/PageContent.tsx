@@ -61,6 +61,7 @@ const PageContent = (props: PageContentProps): React.ReactNode => {
         w="100%"
         h="100%"
         flex="1 1 auto"
+        pb="var(--bulk-bar-height, 0)"
       >
         {getPageContent(props.currentPage)}
       </Stack>
