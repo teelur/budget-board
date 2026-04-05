@@ -223,22 +223,32 @@ public class TransactionService(
                 );
             }
 
-            var amountDifference = editedTransaction.Amount - transaction.Amount;
+            var originalAmount = transaction.Amount;
+            var originalDate = transaction.Date;
+            var editedDate = editedTransaction.Date.ToUniversalTime();
 
             transaction.Amount = editedTransaction.Amount;
-            transaction.Date = editedTransaction.Date.ToUniversalTime();
+            transaction.Date = editedDate;
             transaction.Category = editedTransaction.Category;
             transaction.Subcategory = editedTransaction.Subcategory;
             transaction.MerchantName = editedTransaction.MerchantName;
 
             if (transaction.Account?.Source == AccountSource.Manual)
             {
+                var balancesAfterOriginal = transaction
+                    .Account.Balances.Where(b => b.DateTime >= originalDate)
+                    .ToList();
+                foreach (var balance in balancesAfterOriginal)
+                {
+                    balance.Amount -= originalAmount;
+                }
+
                 var balancesAfterEdited = transaction
-                    .Account.Balances.Where(b => b.DateTime >= transaction.Date)
+                    .Account.Balances.Where(b => b.DateTime >= editedDate)
                     .ToList();
                 foreach (var balance in balancesAfterEdited)
                 {
-                    balance.Amount += amountDifference;
+                    balance.Amount += editedTransaction.Amount;
                 }
             }
         }
