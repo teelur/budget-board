@@ -3,7 +3,6 @@ import { getUniqueYears } from "~/helpers/datetime";
 import {
   buildTimeToMonthlyTotalsMap,
   filterHiddenTransactions,
-  getTransactionsForMonth,
 } from "~/helpers/transactions";
 import { Button, Flex, Group, Stack } from "@mantine/core";
 import {
@@ -62,13 +61,15 @@ const SpendingCategoriesTab = (): React.ReactNode => {
     transactionsQuery.data ?? [],
   );
 
+  const selectedMonthKeys = new Set(
+    selectedMonths.map((m) => `${m.getMonth()}-${m.getUTCFullYear()}`),
+  );
   const transactionsForSelectedMonths =
     selectedMonths.length > 0
-      ? transactionsWithoutHidden.filter((t) =>
-          selectedMonths.some(
-            (m) => getTransactionsForMonth([t], m).length > 0,
-          ),
-        )
+      ? transactionsWithoutHidden.filter((t) => {
+          const d = new Date(t.date);
+          return selectedMonthKeys.has(`${d.getMonth()}-${d.getUTCFullYear()}`);
+        })
       : transactionsWithoutHidden;
 
   const transactionCategoriesQuery = useQuery({
@@ -106,12 +107,12 @@ const SpendingCategoriesTab = (): React.ReactNode => {
       <Group w="100%" justify="space-between">
         <Button
           size="compact-sm"
-          variant={showSubcategories ? "outline" : "subtle"}
+          variant="subtle"
           onClick={() => setShowSubcategories((v) => !v)}
         >
           {showSubcategories
-            ? t("show_subcategories")
-            : t("hide_subcategories")}
+            ? t("hide_subcategories")
+            : t("show_subcategories")}
         </Button>
         <Group gap="xs">
           {monthButtons.map((months) => (
@@ -146,6 +147,9 @@ const SpendingCategoriesTab = (): React.ReactNode => {
           transactions={transactionsForSelectedMonths}
           categories={transactionCategoriesWithCustom}
           showSubcategories={showSubcategories}
+          isPending={
+            transactionsQuery.isPending || transactionCategoriesQuery.isPending
+          }
         />
       </Flex>
     </Stack>

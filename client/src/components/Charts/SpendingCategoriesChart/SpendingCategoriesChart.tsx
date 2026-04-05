@@ -1,8 +1,8 @@
-import { ITransaction } from "~/models/transaction";
+import { hiddenTransactionCategory, ITransaction } from "~/models/transaction";
 import React from "react";
 import {
-  BuildSpendingCategoryChartData,
-  BuildSpendingSubcategoryChartData,
+  buildSpendingCategoryChartData,
+  buildSpendingSubcategoryChartData,
 } from "~/helpers/charts";
 import {
   getThemeColor,
@@ -104,11 +104,11 @@ const SpendingCategoriesChart = (
     const translateName = (name: string) =>
       name === uncategorizedTransactionCategory ? t("uncategorized") : name;
 
-    const rawInner = BuildSpendingCategoryChartData(
+    const rawInner = buildSpendingCategoryChartData(
       props.transactions,
       props.categories,
     );
-    const rawOuter = BuildSpendingSubcategoryChartData(
+    const rawOuter = buildSpendingSubcategoryChartData(
       props.transactions,
       props.categories,
       rawInner,
@@ -136,7 +136,7 @@ const SpendingCategoriesChart = (
         .filter(
           (tx) =>
             !areStringsEqual(tx.category ?? "", "Income") &&
-            !areStringsEqual(tx.category ?? "", "Hide from Budgets"),
+            !areStringsEqual(tx.category ?? "", hiddenTransactionCategory),
         )
         .reduce((sum, tx) => sum + tx.amount * -1, 0),
     [props.transactions],
@@ -308,9 +308,9 @@ const SpendingCategoriesChart = (
           }}
         >
           {(showSubcategories ? outerChartData : innerChartData).map(
-            (entry, i) => (
+            (entry) => (
               <div
-                key={i}
+                key={`${showSubcategories ? "subcategory" : "category"}-${entry.name}`}
                 style={{
                   display: "flex",
                   alignItems: "center",

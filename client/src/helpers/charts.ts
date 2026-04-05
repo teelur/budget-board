@@ -1,4 +1,4 @@
-import { ITransaction } from "~/models/transaction";
+import { hiddenTransactionCategory, ITransaction } from "~/models/transaction";
 import {
   getRollingTotalSpendingForMonth,
   getTransactionsForMonth,
@@ -98,39 +98,35 @@ export const buildTransactionChartSeries = (
  * @param categories - An array of category objects used to format and match transaction categories.
  * @returns An array of objects, each containing a `name` (category) and `value` (total amount spent).
  */
-export const BuildSpendingCategoryChartData = (
+export const buildSpendingCategoryChartData = (
   transactions: ITransaction[],
   categories: ICategory[],
 ) => {
-  const chartData: any[] = [];
-
   const filteredTransactions = transactions.filter(
     (transaction) =>
       !areStringsEqual(transaction.category ?? "", "Income") &&
-      !areStringsEqual(transaction.category ?? "", "Hide from Budgets"),
+      !areStringsEqual(transaction.category ?? "", hiddenTransactionCategory),
   );
+
+  const totalsMap = new Map<string, number>();
 
   filteredTransactions.forEach((transaction) => {
     const formattedTransactionCategory = getFormattedCategoryValue(
       transaction.category ?? "",
       categories,
     );
-    const chartDataPoint = chartData.find((data) =>
-      areStringsEqual(data.name, formattedTransactionCategory),
+    totalsMap.set(
+      formattedTransactionCategory,
+      (totalsMap.get(formattedTransactionCategory) ?? 0) +
+        transaction.amount * -1,
     );
-
-    if (chartDataPoint == null) {
-      chartData.push({
-        name: formattedTransactionCategory,
-        value: transaction.amount * -1,
-        color: chartColors[chartData.length % chartColors.length] ?? "gray.6",
-      });
-    } else {
-      chartDataPoint.value += transaction.amount * -1;
-    }
   });
 
-  return chartData;
+  return Array.from(totalsMap.entries()).map(([name, value], i) => ({
+    name,
+    value,
+    color: chartColors[i % chartColors.length] ?? "gray.6",
+  }));
 };
 
 /**
@@ -138,7 +134,7 @@ export const BuildSpendingCategoryChartData = (
  * Entries are ordered to align with the inner ring (grouped by parent).
  * Color shades are derived from the parent's color family.
  */
-export const BuildSpendingSubcategoryChartData = (
+export const buildSpendingSubcategoryChartData = (
   transactions: ITransaction[],
   categories: ICategory[],
   innerChartData: { name: string; color: string }[],
@@ -146,7 +142,7 @@ export const BuildSpendingSubcategoryChartData = (
   const filteredTransactions = transactions.filter(
     (transaction) =>
       !areStringsEqual(transaction.category ?? "", "Income") &&
-      !areStringsEqual(transaction.category ?? "", "Hide from Budgets"),
+      !areStringsEqual(transaction.category ?? "", hiddenTransactionCategory),
   );
 
   const subMap = new Map<
