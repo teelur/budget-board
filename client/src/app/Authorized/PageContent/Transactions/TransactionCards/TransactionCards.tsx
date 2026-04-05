@@ -19,6 +19,9 @@ import TransactionCard from "~/components/core/Card/TransactionCard/TransactionC
 interface TransactionCardsProps {
   sort: Sorts;
   sortDirection: SortDirection;
+  selectedIds: Set<string>;
+  onToggleSelect: (id: string) => void;
+  onCurrentPageChange: (transactions: ITransaction[]) => void;
 }
 
 const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
@@ -49,37 +52,49 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const filteredTransactions = getFilteredTransactions(
     transactionsQuery.data ?? [],
     transactionFilters ?? new Filters(),
-    transactionCategories
+    transactionCategories,
   );
 
   const sortedFilteredTransactions = sortTransactions(
     filteredTransactions,
     props.sort,
-    props.sortDirection
+    props.sortDirection,
   );
 
+  const currentPageItems = sortedFilteredTransactions.slice(
+    (page - 1) * itemsPerPage,
+    (page - 1) * itemsPerPage + itemsPerPage,
+  );
+
+  React.useEffect(() => {
+    props.onCurrentPageChange(currentPageItems);
+  }, [
+    page,
+    sortedFilteredTransactions.length,
+    currentPageItems,
+    props.sort,
+    props.sortDirection,
+  ]);
+
   return (
-    <Stack gap={10}>
+    <Stack gap={"0.5rem"}>
       {transactionsQuery.isPending ? (
         Array.from({ length: itemsPerPage }).map((_, index) => (
           <Skeleton key={index} height={40} radius="md" />
         ))
       ) : (
-        <Stack gap={10} align="center">
+        <Stack gap={"0.3rem"} align="center">
           {sortedFilteredTransactions.length > 0 ? (
-            sortedFilteredTransactions
-              .slice(
-                (page - 1) * itemsPerPage,
-                (page - 1) * itemsPerPage + itemsPerPage
-              )
-              .map((transaction) => (
-                <TransactionCard
-                  key={transaction.id}
-                  transaction={transaction}
-                  categories={transactionCategories}
-                  elevation={1}
-                />
-              ))
+            currentPageItems.map((transaction) => (
+              <TransactionCard
+                key={transaction.id}
+                transaction={transaction}
+                categories={transactionCategories}
+                elevation={1}
+                isSelected={props.selectedIds.has(transaction.id)}
+                onToggleSelect={props.onToggleSelect}
+              />
+            ))
           ) : (
             <PrimaryText>{t("no_transactions")}</PrimaryText>
           )}

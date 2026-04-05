@@ -292,8 +292,14 @@
   <data name="TransactionUpdateNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to update does not exist.</value>
   </data>
+  <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
+    <value>The batch update request contains duplicate transaction IDs.</value>
+  </data>
   <data name="TransactionDeleteNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to delete does not exist.</value>
+  </data>
+  <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
+    <value>The batch delete request contains duplicate transaction IDs.</value>
   </data>
   <data name="TransactionRestoreNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to restore does not exist.</value>

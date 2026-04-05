@@ -292,8 +292,14 @@
   <data name="TransactionUpdateNotFoundLog" xml:space="preserve">
     <value>Attempted to update a transaction that does not exist.</value>
   </data>
+  <data name="TransactionBatchUpdateDuplicateIdsLog" xml:space="preserve">
+    <value>Attempted a batch update with duplicate transaction IDs.</value>
+  </data>
   <data name="TransactionDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a transaction that does not exist.</value>
+  </data>
+  <data name="TransactionBatchDeleteDuplicateIdsLog" xml:space="preserve">
+    <value>Attempted a batch delete with duplicate transaction IDs.</value>
   </data>
   <data name="TransactionRestoreNotFoundLog" xml:space="preserve">
     <value>Attempted to restore a transaction that does not exist.</value>

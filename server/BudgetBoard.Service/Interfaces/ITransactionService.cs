@@ -62,11 +62,28 @@ public interface ITransactionService
     Task UpdateTransactionAsync(Guid userGuid, ITransactionUpdateRequest request);
 
     /// <summary>
+    /// Updates multiple transactions in a single operation.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="requests">The collection of transaction update details.</param>
+    Task UpdateTransactionBatchAsync(
+        Guid userGuid,
+        IEnumerable<ITransactionUpdateRequest> requests
+    );
+
+    /// <summary>
     /// Deletes (soft deletes) a transaction.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="transactionID">The unique identifier of the transaction to delete.</param>
     Task DeleteTransactionAsync(Guid userGuid, Guid transactionID);
+
+    /// <summary>
+    /// Deletes (soft deletes) multiple transactions in a single operation.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="transactionIDs">The collection of unique identifiers of the transactions to delete.</param>
+    Task DeleteTransactionBatchAsync(Guid userGuid, IEnumerable<Guid> transactionIDs);
 
     /// <summary>
     /// Restores a previously deleted transaction.

@@ -1,4 +1,5 @@
 .root {
+  --card-bg: var(--background-color-surface);
   background-color: var(--background-color-surface);
   border-color: var(--surface-color-border);
 }

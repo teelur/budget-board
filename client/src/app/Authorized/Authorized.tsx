@@ -33,6 +33,7 @@ const Authorized = (): React.ReactNode => {
       header={{
         height: 60,
       }}
+      bg="var(--background-color-base)"
       pt={"0.5rem"}
       pl={"0.5rem"}
     >

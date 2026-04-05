@@ -1,4 +1,5 @@
 .root {
+  --card-bg: var(--background-color-base);
   background-color: var(--background-color-base);
 }
 

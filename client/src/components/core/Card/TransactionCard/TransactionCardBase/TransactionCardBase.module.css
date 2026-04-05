@@ -1,0 +1,21 @@
+.card {
+  transition: background-color 0.2s ease;
+}
+
+.card[data-selection-mode]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-primary-color-filled) 5%,
+    var(--card-bg)
+  );
+}
+
+.checkboxWrapper {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.selectionGroup:hover .checkboxWrapper,
+.selectionGroup[data-selected="true"] .checkboxWrapper {
+  opacity: 1;
+}
