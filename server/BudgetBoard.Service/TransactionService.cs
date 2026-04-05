@@ -204,6 +204,49 @@ public class TransactionService(
     }
 
     /// <inheritdoc />
+    public async Task UpdateTransactionBatchAsync(
+        Guid userGuid,
+        IEnumerable<ITransactionUpdateRequest> requests
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
+
+        foreach (var editedTransaction in requests)
+        {
+            var transaction = allTransactions.FirstOrDefault(t => t.ID == editedTransaction.ID);
+            if (transaction == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["TransactionUpdateNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionUpdateNotFoundError"]
+                );
+            }
+
+            var amountDifference = editedTransaction.Amount - transaction.Amount;
+
+            transaction.Amount = editedTransaction.Amount;
+            transaction.Date = editedTransaction.Date.ToUniversalTime();
+            transaction.Category = editedTransaction.Category;
+            transaction.Subcategory = editedTransaction.Subcategory;
+            transaction.MerchantName = editedTransaction.MerchantName;
+
+            if (transaction.Account?.Source == AccountSource.Manual)
+            {
+                var balancesAfterEdited = transaction
+                    .Account.Balances.Where(b => b.DateTime >= transaction.Date)
+                    .ToList();
+                foreach (var balance in balancesAfterEdited)
+                {
+                    balance.Amount += amountDifference;
+                }
+            }
+        }
+
+        await userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
     public async Task DeleteTransactionAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
@@ -232,6 +275,41 @@ public class TransactionService(
             foreach (var balance in balancesAfterDeleted)
             {
                 balance.Amount -= transaction.Amount;
+            }
+        }
+
+        await userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteTransactionBatchAsync(Guid userGuid, IEnumerable<Guid> guids)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
+
+        foreach (var guid in guids)
+        {
+            var transaction = allTransactions.FirstOrDefault(t => t.ID == guid);
+            if (transaction == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["TransactionDeleteNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionDeleteNotFoundError"]
+                );
+            }
+
+            transaction.Deleted = nowProvider.UtcNow;
+
+            Account account = transaction.Account!;
+            if (account.Source == AccountSource.Manual)
+            {
+                var balancesAfterDeleted = account
+                    .Balances.Where(b => b.DateTime >= transaction.Date)
+                    .ToList();
+                foreach (var balance in balancesAfterDeleted)
+                {
+                    balance.Amount -= transaction.Amount;
+                }
             }
         }
 

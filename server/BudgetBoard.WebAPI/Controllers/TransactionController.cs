@@ -125,6 +125,31 @@ public class TransactionController(
         }
     }
 
+    [HttpPut("batch")]
+    [Authorize]
+    public async Task<IActionResult> UpdateBatch(
+        [FromBody] IEnumerable<TransactionUpdateRequest> transactions
+    )
+    {
+        try
+        {
+            await _transactionService.UpdateTransactionBatchAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                transactions
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+        }
+    }
+
     [HttpDelete]
     [Authorize]
     public async Task<IActionResult> Delete(Guid guid)
@@ -134,6 +159,29 @@ public class TransactionController(
             await _transactionService.DeleteTransactionAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
                 guid
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+        }
+    }
+
+    [HttpDelete("batch")]
+    [Authorize]
+    public async Task<IActionResult> DeleteBatch([FromBody] IEnumerable<Guid> guids)
+    {
+        try
+        {
+            await _transactionService.DeleteTransactionBatchAsync(
+                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                guids
             );
             return Ok();
         }

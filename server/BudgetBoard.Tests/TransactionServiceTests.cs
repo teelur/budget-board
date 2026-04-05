@@ -1313,4 +1313,348 @@ public class TransactionServiceTests
         var createdTransaction = helper.UserDataContext.Transactions.OrderBy(t => t.Date).Last();
         createdTransaction.Category.Should().Be("Dining");
     }
+
+    [Fact]
+    public async Task UpdateTransactionBatchAsync_ShouldUpdateAllTransactions()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(3);
+
+        account.Transactions = transactions;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var editRequests = transactions
+            .Select(t => new TransactionUpdateRequest
+            {
+                ID = t.ID,
+                Amount = 99.0M,
+                Date = new Faker().Date.Past().ToUniversalTime(),
+                Category = "batchCategory",
+                Subcategory = "batchSubcategory",
+                MerchantName = "batchMerchant",
+            })
+            .ToList();
+
+        // Act
+        await transactionService.UpdateTransactionBatchAsync(helper.demoUser.Id, editRequests);
+
+        // Assert
+        foreach (var req in editRequests)
+        {
+            helper
+                .UserDataContext.Transactions.Single(t => t.ID == req.ID)
+                .Should()
+                .BeEquivalentTo(req);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateTransactionBatchAsync_WhenAnyTransactionDoesNotExist_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(2);
+
+        account.Transactions = transactions;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var editRequests = new List<TransactionUpdateRequest>
+        {
+            new()
+            {
+                ID = transactions.First().ID,
+                Amount = 50.0M,
+                Date = new Faker().Date.Past().ToUniversalTime(),
+                Category = "cat",
+                Subcategory = "sub",
+                MerchantName = "merchant",
+            },
+            new()
+            {
+                ID = Guid.NewGuid(), // does not exist
+                Amount = 50.0M,
+                Date = new Faker().Date.Past().ToUniversalTime(),
+                Category = "cat",
+                Subcategory = "sub",
+                MerchantName = "merchant",
+            },
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionService.UpdateTransactionBatchAsync(helper.demoUser.Id, editRequests);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionUpdateNotFoundError");
+    }
+
+    [Fact]
+    public async Task UpdateTransactionBatchAsync_WhenAmountUpdated_ShouldUpdateBalances()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Source = AccountSource.Manual;
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balances = balanceFaker.Generate(5);
+
+        balances[0].DateTime = fakeDate.AddDays(-10);
+        balances[1].DateTime = fakeDate.AddDays(-5);
+        balances[2].DateTime = fakeDate.AddDays(-3);
+        balances[3].DateTime = fakeDate.AddDays(-1);
+        balances[4].DateTime = fakeDate;
+
+        account.Balances = balances;
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(2);
+
+        transactions[0].Date = balances[0].DateTime;
+        transactions[0].Amount = 50.0M;
+        transactions[1].Date = balances[1].DateTime;
+        transactions[1].Amount = 30.0M;
+
+        account.Transactions = transactions;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var oldLastBalance = balances.Last().Amount;
+
+        var editRequests = new List<TransactionUpdateRequest>
+        {
+            new()
+            {
+                ID = transactions[0].ID,
+                Amount = 100.0M,
+                Date = transactions[0].Date,
+                Category = transactions[0].Category,
+                Subcategory = transactions[0].Subcategory,
+                MerchantName = transactions[0].MerchantName,
+            },
+            new()
+            {
+                ID = transactions[1].ID,
+                Amount = 60.0M,
+                Date = transactions[1].Date,
+                Category = transactions[1].Category,
+                Subcategory = transactions[1].Subcategory,
+                MerchantName = transactions[1].MerchantName,
+            },
+        };
+
+        // Act
+        await transactionService.UpdateTransactionBatchAsync(helper.demoUser.Id, editRequests);
+
+        // Assert
+        helper.UserDataContext.Balances.Should().HaveCount(5);
+        helper
+            .UserDataContext.Balances.ToList()
+            .Last()
+            .Amount.Should()
+            .Be(oldLastBalance + (100.0M - 50.0M) + (60.0M - 30.0M));
+    }
+
+    [Fact]
+    public async Task DeleteTransactionBatchAsync_ShouldDeleteAllTransactions()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(5);
+
+        account.Transactions = transactions;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var idsToDelete = transactions.Take(3).Select(t => t.ID).ToList();
+
+        // Act
+        await transactionService.DeleteTransactionBatchAsync(helper.demoUser.Id, idsToDelete);
+
+        // Assert
+        foreach (var id in idsToDelete)
+        {
+            helper
+                .UserDataContext.Transactions.Single(t => t.ID == id)
+                .Deleted.Should()
+                .NotBeNull();
+        }
+
+        helper
+            .UserDataContext.Transactions.Where(t => !idsToDelete.Contains(t.ID))
+            .All(t => t.Deleted == null)
+            .Should()
+            .BeTrue();
+    }
+
+    [Fact]
+    public async Task DeleteTransactionBatchAsync_WhenAnyTransactionDoesNotExist_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(2);
+
+        account.Transactions = transactions;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var idsToDelete = new List<Guid>
+        {
+            transactions.First().ID,
+            Guid.NewGuid(), // does not exist
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionService.DeleteTransactionBatchAsync(helper.demoUser.Id, idsToDelete);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionDeleteNotFoundError");
+    }
+
+    [Fact]
+    public async Task DeleteTransactionBatchAsync_WhenDeleteTransactions_ShouldUpdateBalances()
+    {
+        // Arrange
+        var fakeDate = new Faker().Date.Past().ToUniversalTime();
+
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
+
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Source = AccountSource.Manual;
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balances = balanceFaker.Generate(5);
+
+        balances[0].DateTime = fakeDate.AddDays(-10);
+        balances[1].DateTime = fakeDate.AddDays(-5);
+        balances[2].DateTime = fakeDate.AddDays(-3);
+        balances[3].DateTime = fakeDate.AddDays(-1);
+        balances[4].DateTime = fakeDate;
+
+        account.Balances = balances;
+
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var transactions = transactionFaker.Generate(2);
+
+        transactions[0].Date = balances[0].DateTime;
+        transactions[0].Amount = 50.0M;
+        transactions[1].Date = balances[1].DateTime;
+        transactions[1].Amount = 30.0M;
+
+        account.Transactions = transactions;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var oldLastBalance = balances.Last().Amount;
+        var idsToDelete = transactions.Select(t => t.ID).ToList();
+
+        // Act
+        await transactionService.DeleteTransactionBatchAsync(helper.demoUser.Id, idsToDelete);
+
+        // Assert
+        helper.UserDataContext.Balances.Should().HaveCount(5);
+        helper
+            .UserDataContext.Balances.ToList()
+            .Last()
+            .Amount.Should()
+            .Be(oldLastBalance - 50.0M - 30.0M);
+    }
 }
