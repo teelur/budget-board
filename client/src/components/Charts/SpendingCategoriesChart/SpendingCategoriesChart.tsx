@@ -8,17 +8,20 @@ import {
   getThemeColor,
   Group,
   Skeleton,
-  Text,
+  Stack,
   useMantineTheme,
 } from "@mantine/core";
 import { ICategory } from "~/models/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
 import SpendingCategoriesTooltip from "./SpendingCategoriesTooltip/SpendingCategoriesTooltip";
+import { areStringsEqual } from "~/helpers/utils";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -127,6 +130,18 @@ const SpendingCategoriesChart = (
     return { innerChartData: inner, outerChartData: outer };
   }, [props.transactions, props.categories, theme, t]);
 
+  const totalSpending = React.useMemo(
+    () =>
+      props.transactions
+        .filter(
+          (tx) =>
+            !areStringsEqual(tx.category ?? "", "Income") &&
+            !areStringsEqual(tx.category ?? "", "Hide from Budgets"),
+        )
+        .reduce((sum, tx) => sum + tx.amount * -1, 0),
+    [props.transactions],
+  );
+
   // Pre-compute collision-detected label positions from chart geometry.
   // recharts Pie (startAngle=0, clockWise=true): midAngle = (cumPercent + percent/2) * 360
   const labelPositions = React.useMemo<Map<number, LabelEntry> | null>(() => {
@@ -207,13 +222,15 @@ const SpendingCategoriesChart = (
   );
 
   if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
+    return <Skeleton height={isNarrow ? 270 : 425} radius="lg" />;
   }
 
   if (props.transactions.length === 0) {
     return (
       <Group justify="center">
-        <Text>Select a month to display the chart.</Text>
+        <DimmedText size="sm">
+          {t("select_an_account_to_display_the_chart")}
+        </DimmedText>
       </Group>
     );
   }
@@ -237,66 +254,99 @@ const SpendingCategoriesChart = (
     );
 
   return (
-    <ResponsiveContainer
-      width="100%"
-      height={isNarrow ? 550 : 425}
-      onResize={(w) => setChartWidth(w)}
-    >
-      <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-        <Pie
-          data={innerChartData}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
-          innerRadius={0}
-          outerRadius={innerRadius}
-          isAnimationActive={false}
-          label={!showSubcategories ? renderLabelFromMap : false}
-          labelLine={false}
-        />
-        {showSubcategories && (
+    <Stack w="100%" gap="xs">
+      <ResponsiveContainer
+        width="100%"
+        height={isNarrow ? 270 : 425}
+        onResize={(w) => setChartWidth(w)}
+      >
+        <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <Pie
-            data={outerChartData}
+            data={innerChartData}
             dataKey="value"
             nameKey="name"
             cx="50%"
             cy="50%"
-            innerRadius={outerRadius}
-            outerRadius={isNarrow ? 120 : 140}
+            innerRadius={0}
+            outerRadius={innerRadius}
             isAnimationActive={false}
-            label={renderLabelFromMap}
+            label={!showSubcategories ? renderLabelFromMap : false}
             labelLine={false}
           />
-        )}
-        <Tooltip
-          content={
-            <SpendingCategoriesTooltip
-              valueFormatter={formatValue}
-              total={innerChartData.reduce((sum, e) => sum + e.value, 0)}
+          {showSubcategories && (
+            <Pie
+              data={outerChartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={outerRadius}
+              outerRadius={isNarrow ? 120 : 140}
+              isAnimationActive={false}
+              label={renderLabelFromMap}
+              labelLine={false}
             />
-          }
-        />
-        {isNarrow && (
-          <Legend
-            layout="horizontal"
-            align="center"
-            verticalAlign="bottom"
-            formatter={(value) => (
-              <span
+          )}
+          <Tooltip
+            content={
+              <SpendingCategoriesTooltip
+                valueFormatter={formatValue}
+                total={innerChartData.reduce((sum, e) => sum + e.value, 0)}
+              />
+            }
+          />
+        </PieChart>
+      </ResponsiveContainer>
+      {isNarrow && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "0.25rem 1rem",
+            padding: "0.25rem 0",
+          }}
+        >
+          {(showSubcategories ? outerChartData : innerChartData).map(
+            (entry, i) => (
+              <div
+                key={i}
                 style={{
-                  color: "var(--base-color-text-dimmed)",
-                  fontWeight: 600,
-                  fontSize: "0.875rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.375rem",
                 }}
               >
-                {value}
-              </span>
-            )}
-          />
-        )}
-      </PieChart>
-    </ResponsiveContainer>
+                <div
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: "50%",
+                    backgroundColor: entry.fill,
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    color: "var(--base-color-text-dimmed)",
+                    fontWeight: 600,
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  {entry.name}
+                </span>
+              </div>
+            ),
+          )}
+        </div>
+      )}
+      <DimmedText ta="center" size="sm">
+        {t("total_spending")}:{" "}
+        <PrimaryText span fw={600}>
+          {formatValue(totalSpending)}
+        </PrimaryText>
+      </DimmedText>
+    </Stack>
   );
 };
 

@@ -436,6 +436,7 @@
   "thousands_separator_required_message": "Thousands separator is required.",
   "to": "to",
   "total": "Total",
+  "total_spending": "Total Spending",
   "train_auto_categorizer": "Train Auto-Categorizer",
   "train_auto_categorizer_button": "Train",
   "train_auto_categorizer_date_range_description": "Select optional date range for training data. Leave empty to use all transactions.",
