@@ -103,7 +103,7 @@ const Navbar = (props: NavbarProps) => {
   ));
 
   return (
-    <ScrollArea h="100%" type="hover">
+    <ScrollArea h="100%" type="never">
       <Stack justify="space-between" mih="100vh" p="6px">
         <Stack justify="center" align="center" gap={5}>
           <Burger
