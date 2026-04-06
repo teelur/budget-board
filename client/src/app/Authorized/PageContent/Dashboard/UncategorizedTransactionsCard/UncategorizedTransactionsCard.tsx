@@ -115,7 +115,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
               p="0.125rem"
               mah={350}
               type="auto"
-              offsetScrollbars
+              offsetScrollbars="present"
             >
               <Stack gap="0.3rem">
                 {currentPageTransactions.map((transaction: ITransaction) => (
