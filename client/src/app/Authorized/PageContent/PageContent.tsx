@@ -53,7 +53,7 @@ const PageContent = (props: PageContentProps): React.ReactNode => {
     <ScrollArea
       style={{ width: "100%", height: "100%" }}
       type="auto"
-      offsetScrollbars
+      offsetScrollbars="present"
     >
       <Stack
         align="center"
