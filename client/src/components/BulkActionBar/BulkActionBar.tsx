@@ -464,7 +464,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
             </Flex>
 
             {/* Inline delete confirmation */}
-            <Collapse in={showDeleteConfirm}>
+            <Collapse expanded={showDeleteConfirm}>
               <Group gap="0.5rem" align="center">
                 <Text size="sm">
                   {t("confirm_delete_transactions_message", {
