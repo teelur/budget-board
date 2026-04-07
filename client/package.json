@@ -44,9 +44,12 @@
     "recharts": "3.8.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
     "@eslint/js": "^9.9.1",
+    "@rolldown/plugin-babel": "^0.2.2",
     "@tanstack/eslint-plugin-query": "^5.96.2",
     "@tanstack/react-query-devtools": "^5.96.2",
+    "@types/babel__core": "^7",
     "@types/node": "^25.5.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
