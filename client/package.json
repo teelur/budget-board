@@ -44,7 +44,7 @@
     "recharts": "3.8.1"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.9.1",
     "@tanstack/eslint-plugin-query": "^5.96.2",
     "@tanstack/react-query-devtools": "^5.96.2",
     "@types/node": "^25.5.2",
@@ -52,7 +52,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "babel-plugin-react-compiler": "^1.0.0",
-    "eslint": "^10.2.0",
+    "eslint": "^9.9.1",
     "eslint-config-mantine": "^4.0.3",
     "eslint-plugin-i18n-json": "^4.0.1",
     "eslint-plugin-jsonc": "^3.1.2",
