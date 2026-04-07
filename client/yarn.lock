@@ -2325,6 +2325,7 @@ __metadata:
     react: "npm:^19.2.4"
     react-dom: "npm:^19.2.4"
     react-i18next: "npm:^17.0.2"
+    react-is: "npm:^19.0.0"
     react-router: "npm:^7.14.0"
     react-scan: "npm:^0.5.3"
     recharts: "npm:3.8.1"
