@@ -130,7 +130,7 @@ const CreateTransactionModal = (): React.ReactNode => {
 
   return (
     <>
-      <ActionIcon size="input-sm" onClick={open}>
+      <ActionIcon size="input-xs" onClick={open}>
         <PlusIcon />
       </ActionIcon>
       <Modal

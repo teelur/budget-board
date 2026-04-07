@@ -51,14 +51,14 @@ const TransactionsHeader = (
           <ExportTransactionsModal />
           <Button
             variant={isFiltersPanelOpen ? "outline" : "primary"}
-            size="sm"
+            size="xs"
             rightSection={<FilterIcon size="1rem" />}
             onClick={toggleFiltersPanel}
           >
             {t("filters")}
           </Button>
           <CreateTransactionModal />
-          <ActionIcon variant="subtle" size="input-sm" onClick={open}>
+          <ActionIcon variant="subtle" size="input-xs" onClick={open}>
             <SettingsIcon />
           </ActionIcon>
           <TransactionsSettings modalOpened={settingsOpen} closeModal={close} />
