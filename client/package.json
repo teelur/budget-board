@@ -74,7 +74,8 @@
     "vite": "^8.0.5"
   },
   "resolutions": {
-    "react-is": "^19.0.0"
+    "react-is": "^19.0.0",
+    "minimatch": "^9.0.7"
   },
   "packageManager": "yarn@4.9.3"
 }
