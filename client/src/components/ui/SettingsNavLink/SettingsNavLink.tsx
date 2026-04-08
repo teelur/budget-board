@@ -15,7 +15,12 @@ const SettingsNavLink = (props: SettingsNavLinkProps): React.ReactNode => {
       data-active={props.active || undefined}
       onClick={props.onClick}
     >
-      <PrimaryText size="sm">{props.label}</PrimaryText>
+      <PrimaryText
+        size="sm"
+        c={props.active ? "var(--mantine-primary-color-contrast)" : undefined}
+      >
+        {props.label}
+      </PrimaryText>
     </UnstyledButton>
   );
 };
