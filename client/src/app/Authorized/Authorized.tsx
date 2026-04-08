@@ -6,20 +6,14 @@ import {
 } from "@mantine/core";
 import Navbar from "./Navbar/Navbar";
 import React from "react";
-import PageContent, { Pages } from "./PageContent/PageContent";
+import PageContent from "./PageContent/PageContent";
 import Header from "./Header/Header";
 import { useDisclosure } from "@mantine/hooks";
 import { TransactionFiltersProvider } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { TransactionCategoryProvider } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 const Authorized = (): React.ReactNode => {
-  const [currentPage, setCurrentPage] = React.useState(Pages.Dashboard);
   const [isNavbarOpen, { toggle }] = useDisclosure();
-
-  const onPageSelect = (page: Pages): void => {
-    setCurrentPage(page);
-    toggle();
-  };
 
   return (
     <AppShell
@@ -34,8 +28,8 @@ const Authorized = (): React.ReactNode => {
         height: 60,
       }}
       bg="var(--background-color-base)"
-      pt={"0.5rem"}
-      pl={"0.5rem"}
+      pt="0.5rem"
+      pl="0.5rem"
     >
       <AppShellHeader
         bg="var(--background-color-header)"
@@ -47,21 +41,16 @@ const Authorized = (): React.ReactNode => {
         bg="var(--background-color-sidebar)"
         style={{ borderWidth: "2px" }}
       >
-        <Navbar
-          currentPage={currentPage}
-          setCurrentPage={onPageSelect}
-          isNavbarOpen={isNavbarOpen}
-          toggleNavbar={toggle}
-        />
+        <Navbar isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
       </AppShellNavbar>
       <AppShellMain
         bg="var(--background-color-base)"
-        h={"100dvh"}
+        h="100dvh"
         flex={{ direction: "column" }}
       >
         <TransactionCategoryProvider>
-          <TransactionFiltersProvider setCurrentPage={setCurrentPage}>
-            <PageContent currentPage={currentPage} />
+          <TransactionFiltersProvider>
+            <PageContent />
           </TransactionFiltersProvider>
         </TransactionCategoryProvider>
       </AppShellMain>

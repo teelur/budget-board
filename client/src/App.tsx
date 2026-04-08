@@ -197,7 +197,7 @@ function App() {
                 }
               />
               <Route
-                path="/dashboard"
+                path="/*"
                 element={
                   <AuthorizedRoute>
                     <UserSettingsProvider>

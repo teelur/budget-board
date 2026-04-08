@@ -1,54 +1,21 @@
 import { ScrollArea, Stack } from "@mantine/core";
-import Budgets from "./Budgets/Budgets";
-import Dashboard from "./Dashboard/Dashboard";
-import Goals from "./Goals/Goals";
-import Settings from "./Settings/Settings";
-import Transactions from "./Transactions/Transactions";
-import Trends from "./Trends/Trends";
-import Accounts from "./Accounts/Accounts";
-import Assets from "./Assets/Assets";
-import ExternalAccounts from "./ExternalAccounts/ExternalAccounts";
+import { Route, Routes } from "react-router";
+import { Suspense, lazy } from "react";
+import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
 
-export enum Pages {
-  Dashboard,
-  Accounts,
-  Assets,
-  Transactions,
-  Budgets,
-  Goals,
-  Trends,
-  ExternalAccounts,
-  Settings,
-}
+const Dashboard = lazy(() => import("./Dashboard/Dashboard"));
+const Accounts = lazy(() => import("./Accounts/Accounts"));
+const Assets = lazy(() => import("./Assets/Assets"));
+const Transactions = lazy(() => import("./Transactions/Transactions"));
+const Budgets = lazy(() => import("./Budgets/Budgets"));
+const Goals = lazy(() => import("./Goals/Goals"));
+const Trends = lazy(() => import("./Trends/Trends"));
+const ExternalAccounts = lazy(
+  () => import("./ExternalAccounts/ExternalAccounts"),
+);
+const Settings = lazy(() => import("./Settings/Settings"));
 
-interface PageContentProps {
-  currentPage: Pages;
-}
-
-const PageContent = (props: PageContentProps): React.ReactNode => {
-  const getPageContent = (page: Pages): React.ReactNode => {
-    switch (page) {
-      case Pages.Dashboard:
-        return <Dashboard />;
-      case Pages.Accounts:
-        return <Accounts />;
-      case Pages.Assets:
-        return <Assets />;
-      case Pages.Transactions:
-        return <Transactions />;
-      case Pages.Budgets:
-        return <Budgets />;
-      case Pages.Goals:
-        return <Goals />;
-      case Pages.Trends:
-        return <Trends />;
-      case Pages.ExternalAccounts:
-        return <ExternalAccounts />;
-      case Pages.Settings:
-        return <Settings />;
-    }
-  };
-
+const PageContent = (): React.ReactNode => {
   return (
     <ScrollArea
       style={{ width: "100%", height: "100%" }}
@@ -63,7 +30,19 @@ const PageContent = (props: PageContentProps): React.ReactNode => {
         flex="1 1 auto"
         pb="var(--bulk-bar-height, 0)"
       >
-        {getPageContent(props.currentPage)}
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/accounts" element={<Accounts />} />
+            <Route path="/assets" element={<Assets />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/budgets" element={<Budgets />} />
+            <Route path="/goals" element={<Goals />} />
+            <Route path="/trends" element={<Trends />} />
+            <Route path="/external-accounts" element={<ExternalAccounts />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </Suspense>
       </Stack>
     </ScrollArea>
   );
