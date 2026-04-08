@@ -79,21 +79,21 @@ const resolver: CSSVariablesResolver = () => ({
     "--background-color-sidebar": backgroundEggshell[2],
     "--background-color-header": backgroundEggshell[1],
     // Surface colors
-    "--background-color-surface": backgroundEggshell[2],
-    "--surface-color-border": borderEggshell[2],
+    "--background-color-surface": backgroundEggshell[3],
+    "--surface-color-border": borderEggshell[3],
     "--surface-color-text-primary": textBlack[1],
     "--surface-color-text-dimmed": textEggshellDimmed[6],
     "--surface-color-input-background": backgroundEggshell[5],
     "--surface-color-input-border": backgroundEggshell[8],
     "--surface-color-progress": backgroundEggshell[5],
     // Elevated colors
-    "--background-color-elevated": backgroundEggshell[4],
-    "--elevated-color-border": borderEggshell[3],
+    "--background-color-elevated": backgroundEggshell[6],
+    "--elevated-color-border": borderEggshell[4],
     "--elevated-color-text-primary": textBlack[1],
     "--elevated-color-text-dimmed": textEggshellDimmed[7],
-    "--elevated-color-input-background": backgroundEggshell[6],
+    "--elevated-color-input-background": backgroundEggshell[7],
     "--elevated-color-input-border": backgroundEggshell[9],
-    "--elevated-color-progress": backgroundEggshell[7],
+    "--elevated-color-progress": backgroundEggshell[8],
     // Text Status colors
     "--text-color-status-good": green[9],
     "--text-color-status-neutral": blue[7],
@@ -110,7 +110,7 @@ const resolver: CSSVariablesResolver = () => ({
     "--accent-color-red": red[5],
     "--accent-color-purple": purple[4],
     // Other
-    "--light-color-off": backgroundEggshell[7],
+    "--light-color-off": backgroundEggshell[8],
   },
   dark: {
     // Base colors
