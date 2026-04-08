@@ -1,5 +1,5 @@
 import { ScrollArea, Stack } from "@mantine/core";
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import { Suspense, lazy } from "react";
 import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
 
@@ -7,6 +7,21 @@ const Dashboard = lazy(() => import("./Dashboard/Dashboard"));
 const Accounts = lazy(() => import("./Accounts/Accounts"));
 const Assets = lazy(() => import("./Assets/Assets"));
 const Transactions = lazy(() => import("./Transactions/Transactions"));
+const TransactionsSettings = lazy(
+  () => import("./Transactions/TransactionsSettings/TransactionsSettings"),
+);
+const TransactionsSettingsCategories = lazy(
+  () =>
+    import("./Transactions/TransactionsSettings/CustomCategories/CustomCategories"),
+);
+const TransactionsSettingsRules = lazy(
+  () =>
+    import("./Transactions/TransactionsSettings/AutomaticRules/AutomaticRules"),
+);
+const TransactionsSettingsDeleted = lazy(
+  () =>
+    import("./Transactions/TransactionsSettings/DeletedTransactions/DeletedTransactions"),
+);
 const Budgets = lazy(() => import("./Budgets/Budgets"));
 const Goals = lazy(() => import("./Goals/Goals"));
 const Trends = lazy(() => import("./Trends/Trends"));
@@ -35,7 +50,21 @@ const PageContent = (): React.ReactNode => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/assets" element={<Assets />} />
-            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/transactions">
+              <Route index element={<Transactions />} />
+              <Route path="settings" element={<TransactionsSettings />}>
+                <Route index element={<Navigate to="categories" replace />} />
+                <Route
+                  path="categories"
+                  element={<TransactionsSettingsCategories />}
+                />
+                <Route path="rules" element={<TransactionsSettingsRules />} />
+                <Route
+                  path="deleted"
+                  element={<TransactionsSettingsDeleted />}
+                />
+              </Route>
+            </Route>
             <Route path="/budgets" element={<Budgets />} />
             <Route path="/goals" element={<Goals />} />
             <Route path="/trends" element={<Trends />} />
