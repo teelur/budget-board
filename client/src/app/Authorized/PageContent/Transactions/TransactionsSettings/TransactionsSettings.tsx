@@ -23,7 +23,7 @@ const TransactionsSettings = (): React.ReactNode => {
   );
 
   return (
-    <Stack w="100%" p="md">
+    <Stack w="100%" p="0.5rem">
       <Group gap="xs">
         <ActionIcon variant="subtle" onClick={() => navigate("/transactions")}>
           <ChevronLeftIcon />

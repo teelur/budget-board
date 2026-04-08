@@ -31,7 +31,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
     IRuleParameterEdit[]
   >(props.rule.conditions ?? []);
   const [actionItems, setActionItems] = React.useState<IRuleParameterEdit[]>(
-    props.rule.actions ?? []
+    props.rule.actions ?? [],
   );
 
   const { t } = useTranslation();
@@ -126,7 +126,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
 
   if (isSelected) {
     return (
-      <Card elevation={1}>
+      <Card elevation={0}>
         <Stack gap="0.5rem">
           <EditableAutomaticRuleContent
             conditionItems={conditionItems}
@@ -174,7 +174,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   }
 
   return (
-    <Card elevation={2}>
+    <Card elevation={1}>
       <Group gap={0} justify="space-between" wrap="nowrap">
         <Stack>
           <Group gap="0.25rem">

@@ -55,7 +55,7 @@ const ActionItem = (props: ActionItemProps) => {
   )?.label;
 
   return (
-    <Card p="0.25rem" shadow="xs" elevation={1}>
+    <Card p="0.25rem" shadow="xs" elevation={2}>
       <Group gap="0.3rem">
         <PrimaryText size="sm">
           {operatorLabelKey ? t(operatorLabelKey) : props.action.operator}

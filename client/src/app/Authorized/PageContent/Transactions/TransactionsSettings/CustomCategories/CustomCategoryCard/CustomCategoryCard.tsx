@@ -16,7 +16,7 @@ interface CustomCategoryCardProps {
 }
 
 const CustomCategoryCard = (
-  props: CustomCategoryCardProps
+  props: CustomCategoryCardProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
@@ -44,7 +44,7 @@ const CustomCategoryCard = (
   });
 
   return (
-    <Card elevation={2}>
+    <Card elevation={1}>
       <LoadingOverlay visible={doDeleteCategory.isPending} />
       <Group>
         <Flex w="40%">

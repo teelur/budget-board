@@ -33,7 +33,7 @@ const ConditionItem = (props: ConditionItemProps) => {
     dayjs(dateStr).format(dateFormat);
 
   return (
-    <Card p="0.25rem" shadow="xs" elevation={1}>
+    <Card p="0.25rem" shadow="xs" elevation={2}>
       <Group gap="0.3rem">
         <Badge bg="var(--accent-color-purple)" size="sm">
           {fieldLabelKey ? t(fieldLabelKey) : props.condition.field}

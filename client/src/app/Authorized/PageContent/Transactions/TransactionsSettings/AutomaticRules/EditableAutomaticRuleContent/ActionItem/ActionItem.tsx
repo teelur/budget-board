@@ -67,7 +67,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
               value: event.currentTarget.value,
             })
           }
-          elevation={2}
+          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "amount") {
@@ -86,7 +86,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           decimalScale={2}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
-          elevation={2}
+          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "date") {
@@ -103,7 +103,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
               value: value ?? "",
             })
           }
-          elevation={2}
+          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "category") {
@@ -119,7 +119,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           }
           categories={props.categories}
           withinPortal
-          elevation={2}
+          elevation={1}
         />
       );
     }
@@ -156,7 +156,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
                 value: getDefaultValue(foundValue.value),
               });
             }}
-            elevation={2}
+            elevation={1}
           />
           <PrimaryText size="sm">{t("to")}</PrimaryText>
           {getValueInput()}
@@ -167,7 +167,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
   };
 
   return (
-    <Card elevation={2}>
+    <Card elevation={1}>
       <Group gap="0.5rem">
         <Select
           data={ActionOperators.map((op) => ({
@@ -187,7 +187,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
                 ActionOperators[0]!.value,
             });
           }}
-          elevation={2}
+          elevation={1}
         />
         {getCardContent()}
         {props.allowDelete && (

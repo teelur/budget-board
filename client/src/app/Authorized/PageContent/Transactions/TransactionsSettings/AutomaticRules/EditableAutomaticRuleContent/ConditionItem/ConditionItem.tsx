@@ -68,7 +68,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               value: event.currentTarget.value,
             })
           }
-          elevation={2}
+          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "amount") {
@@ -87,7 +87,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           decimalScale={2}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
-          elevation={2}
+          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "date") {
@@ -104,7 +104,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               value: value ?? "",
             })
           }
-          elevation={2}
+          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "category") {
@@ -120,7 +120,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           }
           categories={props.categories}
           withinPortal
-          elevation={2}
+          elevation={1}
         />
       );
     }
@@ -129,7 +129,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   };
 
   return (
-    <Card elevation={2}>
+    <Card elevation={1}>
       <Group gap="0.5rem">
         <Select
           data={TransactionFields.map((i) => ({
@@ -164,7 +164,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             } as IRuleParameterEdit);
           }}
           allowDeselect={false}
-          elevation={2}
+          elevation={1}
         />
         <Select
           data={Operators.filter((op) =>
@@ -196,7 +196,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             });
           }}
           allowDeselect={false}
-          elevation={2}
+          elevation={1}
         />
         {getValueInput()}
         {props.allowDelete && (

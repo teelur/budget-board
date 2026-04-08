@@ -20,7 +20,7 @@ interface DeletedTransactionCardProps {
 }
 
 const DeletedTransactionsCard = (
-  props: DeletedTransactionCardProps
+  props: DeletedTransactionCardProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
@@ -50,7 +50,7 @@ const DeletedTransactionsCard = (
   });
 
   return (
-    <Card elevation={2}>
+    <Card elevation={1}>
       <LoadingOverlay visible={doRestoreTransaction.isPending} />
       <Group justify="space-between" wrap="nowrap">
         <Stack gap={0}>

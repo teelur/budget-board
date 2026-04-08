@@ -54,13 +54,13 @@ const AddCategory = (): React.ReactNode => {
   );
 
   return (
-    <Card elevation={2}>
+    <Card elevation={1}>
       <LoadingOverlay visible={doAddCategory.isPending} />
       <Stack>
         <TextInput
           {...nameField.getInputProps()}
           label={<PrimaryText size="sm">{t("category_name")}</PrimaryText>}
-          elevation={2}
+          elevation={1}
         />
         <Stack gap="0.5rem" justify="center">
           <PrimaryText size="sm">{t("category_type")}</PrimaryText>
