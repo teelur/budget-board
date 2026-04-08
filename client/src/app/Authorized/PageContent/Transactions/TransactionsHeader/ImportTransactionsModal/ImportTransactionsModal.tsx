@@ -153,7 +153,7 @@ const ImportTransactionsModal = () => {
   return (
     <>
       <Button
-        size="xs"
+        size="sm"
         rightSection={<FileDownIcon size="1rem" />}
         onClick={() => {
           resetData();

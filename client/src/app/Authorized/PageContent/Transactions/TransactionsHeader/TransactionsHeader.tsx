@@ -50,7 +50,7 @@ const TransactionsHeader = (
           <ExportTransactionsModal />
           <Button
             variant={isFiltersPanelOpen ? "outline" : "primary"}
-            size="xs"
+            size="sm"
             rightSection={<FilterIcon size="1rem" />}
             onClick={toggleFiltersPanel}
           >
@@ -59,7 +59,7 @@ const TransactionsHeader = (
           <CreateTransactionModal />
           <ActionIcon
             variant="subtle"
-            size="input-xs"
+            size="input-sm"
             onClick={() => navigate("/transactions/settings")}
           >
             <SettingsIcon />

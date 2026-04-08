@@ -141,7 +141,7 @@ const ExportTransactionsModal = (): React.ReactNode => {
   return (
     <>
       <Button
-        size="xs"
+        size="sm"
         rightSection={<FileUpIcon size="1rem" />}
         onClick={open}
       >
