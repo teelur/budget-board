@@ -33,7 +33,10 @@ const Settings = lazy(() => import("./Settings/Settings"));
 const PageContent = (): React.ReactNode => {
   return (
     <ScrollArea
-      style={{ width: "100%", height: "100%" }}
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
       type="auto"
       offsetScrollbars="present"
     >
@@ -43,6 +46,7 @@ const PageContent = (): React.ReactNode => {
         w="100%"
         h="100%"
         flex="1 1 auto"
+        p="0.5rem"
         pb="var(--bulk-bar-height, 0)"
       >
         <Suspense fallback={<LoadingScreen />}>

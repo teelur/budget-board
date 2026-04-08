@@ -28,8 +28,7 @@ const Authorized = (): React.ReactNode => {
         height: 60,
       }}
       bg="var(--background-color-base)"
-      pt="0.5rem"
-      pl="0.5rem"
+      p={0}
     >
       <AppShellHeader
         bg="var(--background-color-header)"
