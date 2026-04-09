@@ -16,6 +16,7 @@ const TransactionsSettings = (): React.ReactNode => {
     { path: "categories", label: t("custom_categories") },
     { path: "rules", label: t("automatic_rules") },
     { path: "deleted", label: t("deleted_transactions") },
+    { path: "auto-categorizer", label: t("auto_categorizer") },
   ];
 
   const activeItem = navItems.find((item) =>

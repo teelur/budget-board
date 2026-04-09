@@ -34,6 +34,10 @@ const TransactionsSettingsDeleted = lazy(
   () =>
     import("./Transactions/TransactionsSettings/DeletedTransactions/DeletedTransactions"),
 );
+const TransactionsSettingsAutoCategorizer = lazy(
+  () =>
+    import("./Transactions/TransactionsSettings/AutoCategorizer/AutoCategorizer"),
+);
 const Budgets = lazy(() => import("./Budgets/Budgets"));
 const BudgetsSettings = lazy(
   () => import("./Budgets/BudgetsSettings/BudgetsSettings"),
@@ -100,6 +104,10 @@ const PageContent = (): React.ReactNode => {
                 <Route
                   path="deleted"
                   element={<TransactionsSettingsDeleted />}
+                />
+                <Route
+                  path="auto-categorizer"
+                  element={<TransactionsSettingsAutoCategorizer />}
                 />
               </Route>
             </Route>

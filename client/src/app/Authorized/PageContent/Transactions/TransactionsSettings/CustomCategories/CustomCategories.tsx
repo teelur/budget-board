@@ -8,6 +8,7 @@ import CustomCategoryCard from "./CustomCategoryCard/CustomCategoryCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import DisableBuiltInTransactionCategories from "./DisableBuiltInTransactionCategories/DisableBuiltInTransactionCategories";
 
 const CustomCategories = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -31,6 +32,7 @@ const CustomCategories = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
+      <DisableBuiltInTransactionCategories />
       <DimmedText size="sm">{t("custom_categories_description")}</DimmedText>
       <AddCategory />
       <Stack gap="0.25rem">
@@ -49,7 +51,7 @@ const CustomCategories = (): React.ReactNode => {
           transactionCategoriesQuery.data?.map(
             (category: ICategoryResponse) => (
               <CustomCategoryCard key={category.id} category={category} />
-            )
+            ),
           )
         ) : (
           <Group justify="center">
