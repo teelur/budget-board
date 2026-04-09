@@ -44,6 +44,13 @@ const ExternalAccounts = lazy(
   () => import("./ExternalAccounts/ExternalAccounts"),
 );
 const Settings = lazy(() => import("./Settings/Settings"));
+const SettingsUser = lazy(() => import("./Settings/SettingsUser/SettingsUser"));
+const SettingsSecurity = lazy(
+  () => import("./Settings/SettingsSecurity/SettingsSecurity"),
+);
+const SettingsAdvanced = lazy(
+  () => import("./Settings/AdvancedSettings/AdvancedSettings"),
+);
 
 const PageContent = (): React.ReactNode => {
   return (
@@ -103,7 +110,12 @@ const PageContent = (): React.ReactNode => {
             <Route path="/goals" element={<Goals />} />
             <Route path="/trends" element={<Trends />} />
             <Route path="/external-accounts" element={<ExternalAccounts />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings" element={<Settings />}>
+              <Route index element={<Navigate to="user" replace />} />
+              <Route path="user" element={<SettingsUser />} />
+              <Route path="security" element={<SettingsSecurity />} />
+              <Route path="advanced" element={<SettingsAdvanced />} />
+            </Route>
           </Routes>
         </Suspense>
       </Stack>

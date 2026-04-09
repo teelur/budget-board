@@ -1,48 +1,60 @@
-import { Stack } from "@mantine/core";
-import DarkModeToggle from "./DarkModeToggle/DarkModeToggle";
+import { Box, Group, Stack } from "@mantine/core";
 import React from "react";
-import ResetPassword from "./ResetPassword/ResetPassword";
-import UserSettings from "./UserSettings/UserSettings";
-import TwoFactorAuth from "./TwoFactorAuth/TwoFactorAuth";
-import AdvancedSettings from "./AdvancedSettings/AdvancedSettings";
-import OidcSettings from "./OidcSettings/OidcSettings";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { IApplicationUser } from "~/models/applicationUser";
-import { AxiosResponse } from "axios";
-import CreatePassword from "./CreatePassword/CreatePassword";
+import { useTranslation } from "react-i18next";
+import { Outlet, useLocation, useNavigate } from "react-router";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { ChevronRightIcon } from "lucide-react";
+import SettingsNavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
 
 const Settings = (): React.ReactNode => {
-  const { request } = useAuth();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const userQuery = useQuery({
-    queryKey: ["user"],
-    queryFn: async (): Promise<IApplicationUser | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/applicationUser",
-        method: "GET",
-      });
+  const navItems = [
+    { path: "user", label: t("user_settings") },
+    { path: "security", label: t("security") },
+    { path: "advanced", label: t("advanced_settings") },
+  ];
 
-      if (res.status === 200) {
-        return res.data as IApplicationUser;
-      }
-
-      return undefined;
-    },
-  });
+  const activeItem = navItems.find((item) =>
+    location.pathname.endsWith(item.path),
+  );
 
   return (
-    <Stack w="100%" maw={800} gap="1rem">
-      <DarkModeToggle />
-      <UserSettings />
-      <TwoFactorAuth />
-      <OidcSettings />
-      {userQuery.data?.hasLocalLogin ?? true ? (
-        <ResetPassword />
-      ) : (
-        <CreatePassword />
-      )}
-      <AdvancedSettings />
+    <Stack w="100%" p="0.5rem">
+      <Group gap="xs">
+        <PrimaryText size="lg">{t("settings")}</PrimaryText>
+        {activeItem && (
+          <>
+            <ChevronRightIcon
+              size="1rem"
+              color="var(--base-color-text-dimmed)"
+            />
+            <DimmedText size="lg">{activeItem.label}</DimmedText>
+          </>
+        )}
+      </Group>
+      <Group align="flex-start" gap="md" wrap="wrap">
+        <Stack
+          w={{ base: "100%", sm: "200px" }}
+          style={{ flexShrink: 0 }}
+          gap={4}
+        >
+          {navItems.map((item) => (
+            <SettingsNavLink
+              key={item.path}
+              label={item.label}
+              active={location.pathname.endsWith(item.path)}
+              onClick={() => navigate(item.path)}
+            />
+          ))}
+        </Stack>
+        <Box w={{ base: "100%", sm: "auto" }} style={{ flex: 1, minWidth: 0 }}>
+          <Outlet />
+        </Box>
+      </Group>
     </Stack>
   );
 };

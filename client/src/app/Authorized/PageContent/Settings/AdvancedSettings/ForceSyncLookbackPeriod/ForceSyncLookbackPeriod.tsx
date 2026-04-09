@@ -64,7 +64,7 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
   React.useEffect(() => {
     if (userSettingsQuery.data?.forceSyncLookbackMonths !== undefined) {
       forceSyncLookbackMonthsField.setValue(
-        userSettingsQuery.data.forceSyncLookbackMonths
+        userSettingsQuery.data.forceSyncLookbackMonths,
       );
     }
   }, [userSettingsQuery.data]);
@@ -110,7 +110,7 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
             forceSyncLookbackMonths: intValue,
           });
         }}
-        elevation={1}
+        elevation={0}
       />
     </Stack>
   );

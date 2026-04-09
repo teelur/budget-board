@@ -91,7 +91,7 @@ const AutoCategorizerMinimumProbability = (): React.ReactNode => {
         min={0}
         max={100}
         suffix="%"
-        elevation={1}
+        elevation={0}
       />
     </Stack>
   );
