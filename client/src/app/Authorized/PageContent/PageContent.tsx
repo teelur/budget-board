@@ -16,6 +16,12 @@ const AccountsSettings = lazy(
 const AccountsSettingsDeleted = lazy(
   () => import("./Accounts/AccountsSettings/DeletedAccounts/DeletedAccounts"),
 );
+const AssetsSettings = lazy(
+  () => import("./Assets/AssetsSettings/AssetsSettings"),
+);
+const AssetsSettingsDeleted = lazy(
+  () => import("./Assets/AssetsSettings/DeletedAssets/DeletedAssets"),
+);
 const TransactionsSettingsCategories = lazy(
   () =>
     import("./Transactions/TransactionsSettings/CustomCategories/CustomCategories"),
@@ -65,7 +71,13 @@ const PageContent = (): React.ReactNode => {
                 <Route path="deleted" element={<AccountsSettingsDeleted />} />
               </Route>
             </Route>
-            <Route path="/assets" element={<Assets />} />
+            <Route path="/assets">
+              <Route index element={<Assets />} />
+              <Route path="settings" element={<AssetsSettings />}>
+                <Route index element={<Navigate to="deleted" replace />} />
+                <Route path="deleted" element={<AssetsSettingsDeleted />} />
+              </Route>
+            </Route>
             <Route path="/transactions">
               <Route index element={<Transactions />} />
               <Route path="settings" element={<TransactionsSettings />}>
