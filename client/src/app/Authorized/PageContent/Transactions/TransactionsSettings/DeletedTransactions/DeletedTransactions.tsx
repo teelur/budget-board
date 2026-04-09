@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
 import { getDeletedTransactions } from "~/helpers/transactions";
-import DeletedTransactionCards from "../DeletedTransactionCards/DeletedTransactionCards";
+import DeletedTransactionCards from "./DeletedTransactionCards/DeletedTransactionCards";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 
@@ -31,7 +31,7 @@ const Deleted = (): React.ReactNode => {
   });
 
   const deletedTransactions = getDeletedTransactions(
-    (transactionsQuery.data ?? []).sort(
+    [...(transactionsQuery.data ?? [])].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     ),
   );
