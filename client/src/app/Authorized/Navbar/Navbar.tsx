@@ -97,7 +97,7 @@ const Navbar = (props: NavbarProps) => {
     <NavbarLink
       {...link}
       key={link.label}
-      active={location.pathname === link.path}
+      active={location.pathname.startsWith(link.path)}
       onClick={() => {
         navigate(link.path);
         props.toggleNavbar();
@@ -125,7 +125,7 @@ const Navbar = (props: NavbarProps) => {
               <BanknoteArrowDownIcon color="var(--base-color-text-primary)" />
             }
             label={t("external_accounts")}
-            active={location.pathname === "/external-accounts"}
+            active={location.pathname.startsWith("/external-accounts")}
             onClick={() => {
               navigate("/external-accounts");
               props.toggleNavbar();
@@ -134,7 +134,7 @@ const Navbar = (props: NavbarProps) => {
           <NavbarLink
             icon={<SettingsIcon color="var(--base-color-text-primary)" />}
             label={t("settings")}
-            active={location.pathname === "/settings"}
+            active={location.pathname.startsWith("/settings")}
             onClick={() => {
               navigate("/settings");
               props.toggleNavbar();
