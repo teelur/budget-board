@@ -51,7 +51,11 @@ const Settings = (): React.ReactNode => {
             />
           ))}
         </Stack>
-        <Box w={{ base: "100%", sm: "auto" }} style={{ flex: 1, minWidth: 0 }}>
+        <Box
+          w={{ base: "100%", sm: "auto" }}
+          maw={800}
+          style={{ flex: 1, minWidth: 0 }}
+        >
           <Outlet />
         </Box>
       </Group>

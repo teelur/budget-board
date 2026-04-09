@@ -1,4 +1,4 @@
-import { ActionIcon, Flex, Group, Stack } from "@mantine/core";
+import { ActionIcon, Box, Flex, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -81,45 +81,50 @@ const BudgetsSettings = (): React.ReactNode => {
         </ActionIcon>
         <PrimaryText size="lg">{t("budget_settings")}</PrimaryText>
       </Group>
-      <Group gap="0.5rem" wrap="nowrap">
-        <NumberInput
-          flex="1 1 auto"
-          label={
-            <PrimaryText size="sm">{t("budget_warning_threshold")}</PrimaryText>
-          }
-          description={
-            <DimmedText size="xs">
-              {t("budget_warning_threshold_description")}
-            </DimmedText>
-          }
-          min={0}
-          max={100}
-          suffix="%"
-          {...budgetWarningThresholdField.getInputProps()}
-        />
-        <Flex style={{ alignSelf: "stretch" }} p={0}>
-          <ActionIcon
-            h="100%"
-            size="md"
-            onClick={() => {
-              if (budgetWarningThresholdField.error) {
-                notifications.show({
-                  color: "var(--button-color-destructive)",
-                  message: budgetWarningThresholdField.error,
-                });
-                return;
-              }
+      <Box maw={800} mx="auto" w="100%">
+        <Group gap="0.5rem" wrap="nowrap">
+          <NumberInput
+            flex="1 1 auto"
+            label={
+              <PrimaryText size="sm">
+                {t("budget_warning_threshold")}
+              </PrimaryText>
+            }
+            description={
+              <DimmedText size="xs">
+                {t("budget_warning_threshold_description")}
+              </DimmedText>
+            }
+            min={0}
+            max={100}
+            suffix="%"
+            {...budgetWarningThresholdField.getInputProps()}
+          />
+          <Flex style={{ alignSelf: "stretch" }} p={0}>
+            <ActionIcon
+              h="100%"
+              size="md"
+              onClick={() => {
+                if (budgetWarningThresholdField.error) {
+                  notifications.show({
+                    color: "var(--button-color-destructive)",
+                    message: budgetWarningThresholdField.error,
+                  });
+                  return;
+                }
 
-              doUpdateUserSettings.mutate({
-                budgetWarningThreshold: budgetWarningThresholdField.getValue(),
-              });
-            }}
-            loading={doUpdateUserSettings.isPending}
-          >
-            <SendIcon size={20} />
-          </ActionIcon>
-        </Flex>
-      </Group>
+                doUpdateUserSettings.mutate({
+                  budgetWarningThreshold:
+                    budgetWarningThresholdField.getValue(),
+                });
+              }}
+              loading={doUpdateUserSettings.isPending}
+            >
+              <SendIcon size={20} />
+            </ActionIcon>
+          </Flex>
+        </Group>
+      </Box>
     </Stack>
   );
 };
