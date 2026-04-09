@@ -1,21 +1,22 @@
-import { Box, Group, Stack } from "@mantine/core";
+import { ActionIcon, Box, Group, Stack } from "@mantine/core";
 import React from "react";
-import { useTranslation } from "react-i18next";
-import { Outlet, useLocation, useNavigate } from "react-router";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { ChevronRightIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Outlet, useLocation, useNavigate } from "react-router";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import SettingsNavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
 
-const Settings = (): React.ReactNode => {
+const TransactionsSettings = (): React.ReactNode => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
 
   const navItems = [
-    { path: "user", label: t("user_settings") },
-    { path: "security", label: t("security") },
-    { path: "advanced", label: t("advanced_settings") },
+    { path: "categories", label: t("custom_categories") },
+    { path: "rules", label: t("automatic_rules") },
+    { path: "deleted", label: t("deleted_transactions") },
+    { path: "auto-categorizer", label: t("auto_categorizer") },
   ];
 
   const activeItem = navItems.find((item) =>
@@ -25,7 +26,10 @@ const Settings = (): React.ReactNode => {
   return (
     <Stack w="100%" p="0.5rem">
       <Group gap="xs">
-        <PrimaryText size="lg">{t("settings")}</PrimaryText>
+        <ActionIcon variant="subtle" onClick={() => navigate("/transactions")}>
+          <ChevronLeftIcon />
+        </ActionIcon>
+        <PrimaryText size="lg">{t("transactions_settings")}</PrimaryText>
         {activeItem && (
           <>
             <ChevronRightIcon
@@ -63,4 +67,4 @@ const Settings = (): React.ReactNode => {
   );
 };
 
-export default Settings;
+export default TransactionsSettings;

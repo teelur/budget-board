@@ -14,13 +14,12 @@ import SortMenu from "./SortMenu/SortMenu";
 import { SortDirection } from "~/components/SortButton";
 import { Sorts } from "./SortMenu/SortMenuHelpers";
 import FilterCard from "./FilterCard/FilterCard";
-import { useDisclosure } from "@mantine/hooks";
-import TransactionsSettings from "./TransactionsSettings/TransactionsSettings";
 import CreateTransactionModal from "./CreateTransactionModal/CreateTransactionModal";
 import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransactionsModal";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTranslation } from "react-i18next";
 import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransactionsModal";
+import { useNavigate } from "react-router";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
@@ -32,7 +31,7 @@ interface TransactionsHeaderProps {
 const TransactionsHeader = (
   props: TransactionsHeaderProps,
 ): React.ReactNode => {
-  const [settingsOpen, { open, close }] = useDisclosure(false);
+  const navigate = useNavigate();
 
   const { t } = useTranslation();
   const { isFiltersPanelOpen, toggleFiltersPanel } = useTransactionFilters();
@@ -58,10 +57,13 @@ const TransactionsHeader = (
             {t("filters")}
           </Button>
           <CreateTransactionModal />
-          <ActionIcon variant="subtle" size="input-sm" onClick={open}>
+          <ActionIcon
+            variant="subtle"
+            size="input-sm"
+            onClick={() => navigate("/transactions/settings")}
+          >
             <SettingsIcon />
           </ActionIcon>
-          <TransactionsSettings modalOpened={settingsOpen} closeModal={close} />
         </Group>
       </Flex>
       <Collapse expanded={isFiltersPanelOpen} transitionDuration={100}>

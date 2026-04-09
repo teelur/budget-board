@@ -1,6 +1,6 @@
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import { initCurrentMonth } from "~/helpers/datetime";
-import { Button, Group, Stack } from "@mantine/core";
+import { Button, Group, Stack, ActionIcon } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import AddBudget from "./AddBudget/AddBudget";
@@ -11,8 +11,9 @@ import { IBudget, IBudgetCreateRequest } from "~/models/budget";
 import { AxiosError, AxiosResponse } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
-import BudgetSettings from "./BudgetSettings/BudgetSettings";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
+import { SettingsIcon } from "lucide-react";
 
 interface BudgetsToolbarProps {
   categories: ICategory[];
@@ -27,6 +28,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   const [canSelectMultiple, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -131,7 +133,13 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
               categories={props.categories}
             />
           )}
-          <BudgetSettings />
+          <ActionIcon
+            variant="subtle"
+            size="input-sm"
+            onClick={() => navigate("/budgets/settings")}
+          >
+            <SettingsIcon />
+          </ActionIcon>
         </Group>
       </Group>
     </Stack>
