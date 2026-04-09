@@ -84,7 +84,9 @@ const ExportTransactionsModal = (): React.ReactNode => {
   });
 
   const accountLookup = React.useMemo<Record<string, string>>(() => {
-    if (!institutionsQuery.data) return {};
+    if (!institutionsQuery.data) {
+      return {};
+    }
 
     return institutionsQuery.data.reduce<Record<string, string>>(
       (acc, institution) => {
@@ -149,7 +151,7 @@ const ExportTransactionsModal = (): React.ReactNode => {
         opened={opened}
         onClose={close}
         fullScreen={isMobile}
-        size={"80rem"}
+        size="80rem"
         title={<PrimaryText>{t("export_transactions")}</PrimaryText>}
       >
         <Stack className={classes.container} gap="0.5rem">

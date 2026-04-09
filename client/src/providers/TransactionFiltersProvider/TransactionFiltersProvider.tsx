@@ -1,7 +1,7 @@
 import React from "react";
 import { Filters } from "~/models/transaction";
-import { Pages } from "~/app/Authorized/PageContent/PageContent";
 import { useDisclosure } from "@mantine/hooks";
+import { useNavigate } from "react-router";
 
 interface TransactionFiltersContextType {
   transactionFilters: Filters;
@@ -22,14 +22,14 @@ export const TransactionFiltersContext =
 
 interface TransactionFiltersProviderProps {
   children: React.ReactNode;
-  setCurrentPage: (page: Pages) => void;
 }
 
 export const TransactionFiltersProvider = (
-  props: TransactionFiltersProviderProps
+  props: TransactionFiltersProviderProps,
 ): React.ReactNode => {
+  const navigate = useNavigate();
   const [transactionFilters, setTransactionFilters] = React.useState<Filters>(
-    new Filters()
+    new Filters(),
   );
   const [
     isFiltersPanelOpen,
@@ -40,9 +40,9 @@ export const TransactionFiltersProvider = (
     (filters: Filters): void => {
       setTransactionFilters(filters);
       openFiltersPanel();
-      props.setCurrentPage(Pages.Transactions);
+      navigate("/transactions");
     },
-    [props.setCurrentPage, openFiltersPanel]
+    [navigate, openFiltersPanel],
   );
 
   const value = React.useMemo(
@@ -58,7 +58,7 @@ export const TransactionFiltersProvider = (
       isFiltersPanelOpen,
       toggleFiltersPanel,
       navigateToTransactions,
-    ]
+    ],
   );
 
   return (

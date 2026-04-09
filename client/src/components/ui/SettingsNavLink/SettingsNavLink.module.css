@@ -1,0 +1,19 @@
+.link {
+  border-radius: var(--mantine-radius-md);
+  padding: 0.75rem 0.5rem;
+  width: 100%;
+
+  &:hover {
+    background-color: var(--elevated-color-input-background);
+  }
+
+  &[data-active] {
+    &,
+    &:hover {
+      background-color: light-dark(
+        var(--mantine-primary-color-5),
+        var(--mantine-primary-color-8)
+      );
+    }
+  }
+}

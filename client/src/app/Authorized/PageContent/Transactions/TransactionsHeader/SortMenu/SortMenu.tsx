@@ -60,6 +60,7 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
           <SortButton
             key={sortOption.value}
             label={sortOption.label}
+            size="sm"
             variant="light"
             sortDirection={
               sortOption.value === props.currentSort
