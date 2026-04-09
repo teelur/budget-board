@@ -35,6 +35,9 @@ const TransactionsSettingsDeleted = lazy(
     import("./Transactions/TransactionsSettings/DeletedTransactions/DeletedTransactions"),
 );
 const Budgets = lazy(() => import("./Budgets/Budgets"));
+const BudgetsSettings = lazy(
+  () => import("./Budgets/BudgetsSettings/BudgetsSettings"),
+);
 const Goals = lazy(() => import("./Goals/Goals"));
 const Trends = lazy(() => import("./Trends/Trends"));
 const ExternalAccounts = lazy(
@@ -93,7 +96,10 @@ const PageContent = (): React.ReactNode => {
                 />
               </Route>
             </Route>
-            <Route path="/budgets" element={<Budgets />} />
+            <Route path="/budgets">
+              <Route index element={<Budgets />} />
+              <Route path="settings" element={<BudgetsSettings />} />
+            </Route>
             <Route path="/goals" element={<Goals />} />
             <Route path="/trends" element={<Trends />} />
             <Route path="/external-accounts" element={<ExternalAccounts />} />
