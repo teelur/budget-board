@@ -7,11 +7,11 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { IAccountResponse } from "~/models/account";
-import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import PermaDeleteAccountPopover from "./PermaDeleteAccountPopover/PermaDeleteAccountPopover";
+import Card from "~/components/core/Card/Card";
 
 interface DeletedAccountCardProps {
   account: IAccountResponse;
@@ -46,7 +46,7 @@ const DeletedAccountCard = (
   });
 
   return (
-    <ElevatedCard>
+    <Card elevation={1}>
       <LoadingOverlay visible={doRestoreAccount.isPending} />
       <Group justify="space-between" wrap="nowrap">
         <Group gap="0.5rem">
@@ -64,14 +64,14 @@ const DeletedAccountCard = (
           </Stack>
           <Badge bg="blue">{t(props.account.source)}</Badge>
         </Group>
-        <Group style={{ alignSelf: "stretch" }} gap={"0.5rem"}>
+        <Group style={{ alignSelf: "stretch" }} wrap="nowrap" gap="0.5rem">
           <ActionIcon h="100%" onClick={() => doRestoreAccount.mutate()}>
             <Undo2Icon size="1.2rem" />
           </ActionIcon>
           <PermaDeleteAccountPopover accountId={props.account.id} />
         </Group>
       </Group>
-    </ElevatedCard>
+    </Card>
   );
 };
 
