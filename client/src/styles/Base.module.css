@@ -2,7 +2,7 @@
   --card-bg: var(--background-color-base);
 }
 
-:is([data-mantine-color-scheme]) .root {
+[data-mantine-color-scheme] .root {
   background-color: var(--background-color-base);
 }
 

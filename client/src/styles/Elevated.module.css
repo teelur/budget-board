@@ -3,7 +3,7 @@
   border-color: var(--elevated-color-border);
 }
 
-:is([data-mantine-color-scheme]) .root {
+[data-mantine-color-scheme] .root {
   background-color: var(--background-color-elevated);
 }
 
