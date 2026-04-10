@@ -1,4 +1,4 @@
-import { Stack } from "@mantine/core";
+import { Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -36,12 +36,28 @@ const Deleted = (): React.ReactNode => {
     ),
   );
 
+  const getDeletedTransactionContent = (): React.ReactNode => {
+    if (transactionsQuery.isPending) {
+      return <Skeleton height={63} radius="md" />;
+    }
+
+    if (deletedTransactions.length === 0) {
+      return (
+        <Stack align="center" p="1rem">
+          <DimmedText size="sm">{t("no_deleted_transactions")}</DimmedText>
+        </Stack>
+      );
+    }
+
+    return <DeletedTransactionCards transactions={deletedTransactions} />;
+  };
+
   return (
     <Stack gap="0.5rem">
       <DimmedText size="sm">
         {t("view_and_restore_deleted_transactions")}
       </DimmedText>
-      <DeletedTransactionCards transactions={deletedTransactions} />
+      {getDeletedTransactionContent()}
     </Stack>
   );
 };

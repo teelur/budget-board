@@ -1,4 +1,4 @@
-import { Group, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -44,31 +44,42 @@ const DeletedAccounts = (): React.ReactNode => {
     },
   });
 
-  const deletedAccounts =
-    accountsQuery.data?.filter((account) => account.deleted) ?? [];
+  const getDeletedAccountsContent = (): React.ReactNode => {
+    if (accountsQuery.isPending) {
+      return <Skeleton height={55} radius="md" />;
+    }
+
+    const deletedAccounts = (accountsQuery.data ?? []).filter(
+      (account) => account.deleted,
+    );
+
+    if (deletedAccounts.length === 0) {
+      return (
+        <Group justify="center">
+          <DimmedText size="sm">{t("no_deleted_accounts")}</DimmedText>
+        </Group>
+      );
+    }
+
+    return deletedAccounts.map((account) => (
+      <DeletedAccountCard
+        key={account.id}
+        account={account}
+        institutionName={
+          institutionsQuery.data?.find(
+            (inst) => inst.id === account.institutionID,
+          )?.name
+        }
+      />
+    ));
+  };
 
   return (
     <Stack gap="0.5rem">
       <DimmedText size="sm">
         {t("view_and_restore_deleted_accounts")}
       </DimmedText>
-      {deletedAccounts.length !== 0 ? (
-        deletedAccounts.map((account) => (
-          <DeletedAccountCard
-            key={account.id}
-            account={account}
-            institutionName={
-              institutionsQuery.data?.find(
-                (inst) => inst.id === account.institutionID,
-              )?.name
-            }
-          />
-        ))
-      ) : (
-        <Group justify="center">
-          <DimmedText size="sm">{t("no_deleted_accounts")}</DimmedText>
-        </Group>
-      )}
+      {getDeletedAccountsContent()}
     </Stack>
   );
 };

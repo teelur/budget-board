@@ -1,4 +1,4 @@
-import { Group, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -27,21 +27,32 @@ const DeletedAssets = (): React.ReactNode => {
     },
   });
 
-  const deletedAssets =
-    assetsQuery.data?.filter((asset) => asset.deleted) ?? [];
+  const getDeletedAssetsContent = (): React.ReactNode => {
+    if (assetsQuery.isPending) {
+      return <Skeleton height={46} radius="md" />;
+    }
+
+    const deletedAssets = (assetsQuery.data ?? []).filter(
+      (asset) => asset.deleted,
+    );
+
+    if (deletedAssets.length === 0) {
+      return (
+        <Group justify="center">
+          <DimmedText size="sm">{t("no_deleted_assets")}</DimmedText>
+        </Group>
+      );
+    }
+
+    return deletedAssets.map((asset) => (
+      <DeletedAssetCard key={asset.id} asset={asset} />
+    ));
+  };
 
   return (
     <Stack gap="0.5rem">
       <DimmedText size="sm">{t("view_and_restore_deleted_assets")}</DimmedText>
-      {deletedAssets.length !== 0 ? (
-        deletedAssets.map((asset) => (
-          <DeletedAssetCard key={asset.id} asset={asset} />
-        ))
-      ) : (
-        <Group justify="center">
-          <DimmedText size="xs">{t("no_deleted_assets")}</DimmedText>
-        </Group>
-      )}
+      {getDeletedAssetsContent()}
     </Stack>
   );
 };
