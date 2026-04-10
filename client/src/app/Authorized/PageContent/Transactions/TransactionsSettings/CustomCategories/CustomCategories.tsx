@@ -1,4 +1,4 @@
-import { Flex, Group, Stack } from "@mantine/core";
+import { Flex, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import AddCategory from "./AddCategory/AddCategory";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -30,6 +30,26 @@ const CustomCategories = (): React.ReactNode => {
     },
   });
 
+  const getCustomCategoryContent = (): React.ReactNode => {
+    if (transactionCategoriesQuery.isPending) {
+      return <Skeleton height={46} radius="md" />;
+    }
+
+    if ((transactionCategoriesQuery.data ?? []).length === 0) {
+      return (
+        <Group justify="center" p="1rem">
+          <DimmedText size="sm">{t("no_custom_categories")}</DimmedText>
+        </Group>
+      );
+    }
+
+    return transactionCategoriesQuery.data?.map(
+      (category: ICategoryResponse) => (
+        <CustomCategoryCard key={category.id} category={category} />
+      ),
+    );
+  };
+
   return (
     <Stack gap="0.5rem">
       <DisableBuiltInTransactionCategories />
@@ -47,17 +67,7 @@ const CustomCategories = (): React.ReactNode => {
             <Flex />
           </Flex>
         </Group>
-        {(transactionCategoriesQuery.data ?? []).length > 0 ? (
-          transactionCategoriesQuery.data?.map(
-            (category: ICategoryResponse) => (
-              <CustomCategoryCard key={category.id} category={category} />
-            ),
-          )
-        ) : (
-          <Group justify="center">
-            <DimmedText size="sm">{t("no_custom_categories")}</DimmedText>
-          </Group>
-        )}
+        {getCustomCategoryContent()}
       </Stack>
     </Stack>
   );
