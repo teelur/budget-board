@@ -23,31 +23,46 @@ namespace BudgetBoard.Database.Migrations
                 """
             );
 
-            migrationBuilder.DropColumn(
-                name: "DateTime",
-                table: "Balance");
-
             migrationBuilder.AddColumn<DateOnly>(
                 name: "Date",
                 table: "Balance",
                 type: "date",
+                nullable: true
+            );
+
+            // Copy existing DateTime values into the new Date column.
+            migrationBuilder.Sql(
+                """
+                UPDATE "Balance" SET "Date" = "DateTime"::date;
+                """
+            );
+
+            migrationBuilder.AlterColumn<DateOnly>(
+                name: "Date",
+                table: "Balance",
+                type: "date",
                 nullable: false,
-                defaultValue: new DateOnly(1, 1, 1));
+                defaultValue: new DateOnly(1, 1, 1),
+                oldClrType: typeof(DateOnly),
+                oldType: "date",
+                oldNullable: true
+            );
+
+            migrationBuilder.DropColumn(name: "DateTime", table: "Balance");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Date",
-                table: "Balance");
+            migrationBuilder.DropColumn(name: "Date", table: "Balance");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "DateTime",
                 table: "Balance",
                 type: "timestamp with time zone",
                 nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+            );
         }
     }
 }
