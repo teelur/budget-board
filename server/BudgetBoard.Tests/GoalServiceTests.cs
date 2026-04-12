@@ -419,14 +419,14 @@ public class GoalServiceTests
 
         var transaction = transactionFaker.Generate();
         transaction.AccountID = account.ID;
-        transaction.Date = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        transaction.Date = new DateOnly(fakeDate.Year, fakeDate.Month, 1);
         transaction.Amount = 3000;
 
         account.Transactions.Add(transaction);
 
         var otherMonthTransaction = transactionFaker.Generate();
         otherMonthTransaction.AccountID = account.ID;
-        otherMonthTransaction.Date = new DateTime(fakeDate.Year, fakeDate.Month, 2).AddMonths(-1);
+        otherMonthTransaction.Date = new DateOnly(fakeDate.Year, fakeDate.Month, 2).AddMonths(-1);
         otherMonthTransaction.Amount = 2000;
 
         account.Transactions.Add(otherMonthTransaction);
