@@ -1065,7 +1065,7 @@ public class TransactionServiceTests
         {
             Transactions = transactions.Select(t => new TransactionImport
             {
-                Date = t.Date.ToDateTime(TimeOnly.MinValue),
+                Date = t.Date,
                 MerchantName = t.MerchantName ?? string.Empty,
                 Category = t.Category,
                 Amount = t.Amount,
@@ -1108,7 +1108,7 @@ public class TransactionServiceTests
         {
             Transactions = transactions.Select(t => new TransactionImport
             {
-                Date = t.Date.ToDateTime(TimeOnly.MinValue),
+                Date = t.Date,
                 MerchantName = t.MerchantName ?? string.Empty,
                 Category = t.Category,
                 Amount = t.Amount,

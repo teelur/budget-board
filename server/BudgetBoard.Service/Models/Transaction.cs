@@ -135,7 +135,7 @@ public class TransactionSplitRequest : ITransactionSplitRequest
 
 public class TransactionImport
 {
-    public DateTime? Date { get; set; }
+    public DateOnly? Date { get; set; }
     public string? MerchantName { get; set; }
     public string? Category { get; set; }
     public decimal? Amount { get; set; }
@@ -144,7 +144,7 @@ public class TransactionImport
     [JsonConstructor]
     public TransactionImport()
     {
-        Date = DateTime.MinValue;
+        Date = DateOnly.MinValue;
         MerchantName = string.Empty;
         Category = null;
         Amount = 0.0M;

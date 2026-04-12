@@ -471,7 +471,7 @@ public class TransactionService(
             {
                 SyncID = string.Empty,
                 Amount = transaction.Amount ?? 0,
-                Date = DateOnly.FromDateTime(transaction.Date ?? nowProvider.UtcNow),
+                Date = transaction.Date ?? DateOnly.FromDateTime(nowProvider.Now),
                 MerchantName = transaction.MerchantName,
                 Source = TransactionSource.Manual.Value,
                 AccountID = account.ID,
