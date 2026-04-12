@@ -678,9 +678,11 @@ public class SimpleFinService(
             {
                 SyncID = transactionData.Id,
                 Amount = decimal.Parse(transactionData.Amount),
-                Date = transactionData.Pending
-                    ? DateTime.UnixEpoch.AddSeconds(transactionData.TransactedAt)
-                    : DateTime.UnixEpoch.AddSeconds(transactionData.Posted),
+                Date = DateOnly.FromDateTime(
+                    transactionData.Pending
+                        ? DateTime.UnixEpoch.AddSeconds(transactionData.TransactedAt)
+                        : DateTime.UnixEpoch.AddSeconds(transactionData.Posted)
+                ),
                 MerchantName = transactionData.Description,
                 Source = TransactionSource.SimpleFin.Value,
                 AccountID = userAccount.ID,

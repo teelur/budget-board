@@ -39,7 +39,7 @@ public class TransactionService(
         {
             SyncID = request.SyncID,
             Amount = request.Amount,
-            Date = request.Date.ToUniversalTime(),
+            Date = request.Date,
             Category = request.Category,
             Subcategory = request.Subcategory,
             MerchantName = request.MerchantName,
@@ -183,7 +183,7 @@ public class TransactionService(
         var amountDifference = editedTransaction.Amount - transaction.Amount;
 
         transaction.Amount = editedTransaction.Amount;
-        transaction.Date = editedTransaction.Date.ToUniversalTime();
+        transaction.Date = editedTransaction.Date;
         transaction.Category = editedTransaction.Category;
         transaction.Subcategory = editedTransaction.Subcategory;
         transaction.MerchantName = editedTransaction.MerchantName;
@@ -192,7 +192,7 @@ public class TransactionService(
         {
             // Update all following balances to include the edited transaction.
             var balancesAfterEdited = transaction
-                .Account.Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
+                .Account.Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= transaction.Date)
                 .ToList();
             foreach (var balance in balancesAfterEdited)
             {
@@ -239,7 +239,7 @@ public class TransactionService(
 
             var originalAmount = transaction.Amount;
             var originalDate = transaction.Date;
-            var editedDate = editedTransaction.Date.ToUniversalTime();
+            var editedDate = editedTransaction.Date;
 
             transaction.Amount = editedTransaction.Amount;
             transaction.Date = editedDate;
@@ -250,7 +250,7 @@ public class TransactionService(
             if (transaction.Account?.Source == AccountSource.Manual)
             {
                 var balancesAfterOriginal = transaction
-                    .Account.Balances.Where(b => b.DateTime.Date >= originalDate.Date)
+                    .Account.Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= originalDate)
                     .ToList();
                 foreach (var balance in balancesAfterOriginal)
                 {
@@ -258,7 +258,7 @@ public class TransactionService(
                 }
 
                 var balancesAfterEdited = transaction
-                    .Account.Balances.Where(b => b.DateTime.Date >= editedDate.Date)
+                    .Account.Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= editedDate)
                     .ToList();
                 foreach (var balance in balancesAfterEdited)
                 {
@@ -294,7 +294,7 @@ public class TransactionService(
         {
             // Update all following balances to not include the deleted transaction.
             var balancesAfterDeleted = account
-                .Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
+                .Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= transaction.Date)
                 .ToList();
             foreach (var balance in balancesAfterDeleted)
             {
@@ -342,7 +342,7 @@ public class TransactionService(
             if (account.Source == AccountSource.Manual)
             {
                 var balancesAfterDeleted = account
-                    .Balances.Where(b => b.DateTime.Date >= transaction.Date.Date)
+                    .Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= transaction.Date)
                     .ToList();
                 foreach (var balance in balancesAfterDeleted)
                 {
@@ -405,7 +405,7 @@ public class TransactionService(
         {
             SyncID = transaction.SyncID,
             Amount = transactionSplitRequest.Amount,
-            Date = transaction.Date.ToUniversalTime(),
+            Date = transaction.Date,
             Category = transactionSplitRequest.Category,
             Subcategory = transactionSplitRequest.Subcategory,
             MerchantName = transaction.MerchantName,
@@ -471,7 +471,7 @@ public class TransactionService(
             {
                 SyncID = string.Empty,
                 Amount = transaction.Amount ?? 0,
-                Date = transaction.Date ?? nowProvider.UtcNow,
+                Date = DateOnly.FromDateTime(transaction.Date ?? nowProvider.UtcNow),
                 MerchantName = transaction.MerchantName,
                 Source = TransactionSource.Manual.Value,
                 AccountID = account.ID,
@@ -520,20 +520,20 @@ public class TransactionService(
     )
     {
         var currentBalance = account
-            .Balances.Where(b => b.DateTime.Date <= transaction.Date.ToUniversalTime().Date)
+            .Balances.Where(b => DateOnly.FromDateTime(b.DateTime) <= transaction.Date)
             .OrderByDescending(b => b.DateTime)
             .FirstOrDefault();
 
         // First, add the new balance for the new transaction if no balance exists for that date.
         if (
             currentBalance == null
-            || currentBalance.DateTime.Date != transaction.Date.ToUniversalTime().Date
+            || DateOnly.FromDateTime(currentBalance.DateTime) != transaction.Date
         )
         {
             var newBalance = new Balance
             {
                 Amount = currentBalance?.Amount ?? 0,
-                DateTime = transaction.Date.ToUniversalTime().Date,
+                DateTime = transaction.Date.ToDateTime(TimeOnly.MinValue),
                 AccountID = account.ID,
             };
 
@@ -542,7 +542,7 @@ public class TransactionService(
 
         // Then, update all following balances to include the new transaction.
         var balancesAfterNew = account
-            .Balances.Where(b => b.DateTime.Date >= transaction.Date.ToUniversalTime().Date)
+            .Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= transaction.Date)
             .ToList();
         foreach (var balance in balancesAfterNew)
         {

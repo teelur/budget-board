@@ -410,7 +410,7 @@ public class LunchFlowService(
                         AccountID = userAccount.ID,
                         SyncID = transaction.ID,
                         Amount = transaction.Amount,
-                        Date = DateTime.Parse(transaction.Date),
+                        Date = DateOnly.Parse(transaction.Date),
                         MerchantName = transaction.Merchant,
                         Source = TransactionSource.LunchFlow.Value,
                     }
