@@ -18,10 +18,48 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { ITransaction, Filters } from "~/models/transaction";
 import { IInstitution } from "~/models/institution";
-import {
-  getFilteredTransactions,
-  buildTransactionsCsv,
-} from "~/helpers/transactions";
+import { getFilteredTransactions } from "~/helpers/transactions";
+
+const escapeCsvValue = (value: string): string =>
+  `"${value.replace(/"/g, '""')}"`;
+
+const buildTransactionsCsv = (
+  transactions: ITransaction[],
+  orderedFields: string[],
+  fieldLabels: Record<string, string>,
+  accountLookup: Record<string, string>,
+): string => {
+  const getFieldValue = (t: ITransaction, key: string): string => {
+    switch (key) {
+      case "date":
+        return t.date;
+      case "merchantName":
+        return t.merchantName ?? "";
+      case "amount":
+        return t.amount.toString();
+      case "category":
+        return t.subcategory?.trim() ? t.subcategory : (t.category ?? "");
+      case "account":
+        return accountLookup[t.accountID] ?? "";
+      case "pending":
+        return t.pending ? "true" : "false";
+      case "source":
+        return t.source;
+      default:
+        return "";
+    }
+  };
+
+  const headers = orderedFields
+    .map((k) => escapeCsvValue(fieldLabels[k] ?? k))
+    .join(",");
+
+  const rows = transactions.map((t) =>
+    orderedFields.map((key) => escapeCsvValue(getFieldValue(t, key))).join(","),
+  );
+
+  return [headers, ...rows].join("\n");
+};
 
 export interface IExportField {
   key: string;
