@@ -533,7 +533,7 @@ public class TransactionService(
             var newBalance = new Balance
             {
                 Amount = currentBalance?.Amount ?? 0,
-                DateTime = transaction.Date.ToDateTime(TimeOnly.MinValue),
+                DateTime = transaction.Date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
                 AccountID = account.ID,
             };
 
