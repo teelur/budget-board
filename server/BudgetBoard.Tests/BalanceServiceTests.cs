@@ -17,12 +17,12 @@ public class BalanceServiceTests
     private readonly Faker<BalanceCreateRequest> _balanceCreateRequestFaker =
         new Faker<BalanceCreateRequest>()
             .RuleFor(b => b.Amount, f => f.Finance.Amount())
-            .RuleFor(b => b.DateTime, f => f.Date.Past());
+            .RuleFor(b => b.Date, f => DateOnly.FromDateTime(f.Date.Past()));
 
     private readonly Faker<BalanceUpdateRequest> _balanceUpdateRequestFaker =
         new Faker<BalanceUpdateRequest>()
             .RuleFor(b => b.Amount, f => f.Finance.Amount())
-            .RuleFor(b => b.DateTime, f => f.Date.Past());
+            .RuleFor(b => b.Date, f => DateOnly.FromDateTime(f.Date.Past()));
 
     [Fact]
     public async Task CreateBalancesAsync_WhenCalledWithValidData_ShouldCreateBalances()

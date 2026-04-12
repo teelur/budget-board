@@ -154,9 +154,6 @@
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
     <value>Das Konto, auf das Sie zugreifen möchten, existiert nicht.</value>
   </data>
-  <data name="BalanceAccountUpdateNotFoundError" xml:space="preserve">
-    <value>Das Konto, das Sie aktualisieren möchten, existiert nicht.</value>
-  </data>
   <data name="BalanceAccountDeleteNotFoundError" xml:space="preserve">
     <value>Das Konto, das Sie löschen möchten, existiert nicht.</value>
   </data>

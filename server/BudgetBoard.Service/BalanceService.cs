@@ -38,14 +38,24 @@ public class BalanceService(
             );
         }
 
-        var newBalance = new Balance
+        // We only want to create a balance if a balance doesn't already exist for the same date.
+        var existingBalance = account.Balances.FirstOrDefault(b => b.Date == request.Date);
+        if (existingBalance != null)
         {
-            DateTime = request.DateTime,
-            Amount = request.Amount,
-            AccountID = request.AccountID,
-        };
+            existingBalance.Amount = request.Amount;
+        }
+        else
+        {
+            var newBalance = new Balance
+            {
+                Date = request.Date,
+                Amount = request.Amount,
+                AccountID = request.AccountID,
+            };
 
-        _userDataContext.Balances.Add(newBalance);
+            _userDataContext.Balances.Add(newBalance);
+        }
+
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -83,7 +93,16 @@ public class BalanceService(
             throw new BudgetBoardServiceException(_responseLocalizer["BalanceUpdateNotFoundError"]);
         }
 
-        balance.DateTime = request.DateTime;
+        var duplicateBalance = userData
+            .Accounts.SelectMany(a => a.Balances)
+            .FirstOrDefault(b => b.Date == request.Date && b.ID != request.ID);
+        if (duplicateBalance != null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["BalanceDuplicateDateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["BalanceDuplicateDateError"]);
+        }
+
+        balance.Date = request.Date;
         balance.Amount = request.Amount;
 
         await _userDataContext.SaveChangesAsync();

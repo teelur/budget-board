@@ -148,8 +148,11 @@
   <data name="BalanceAccountNotFoundLog" xml:space="preserve">
     <value>Attempted to access balances for an account that does not exist.</value>
   </data>
-  <data name="BalanceAccountUpdateNotFoundLog" xml:space="preserve">
+  <data name="BalanceUpdateNotFoundLog" xml:space="preserve">
     <value>Attempted to update a balance that does not exist.</value>
+  </data>
+  <data name="BalanceDuplicateDateLog" xml:space="preserve">
+    <value>Attempted to update a balance to a date that already exists for this account.</value>
   </data>
   <data name="BalanceDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a balance that does not exist.</value>

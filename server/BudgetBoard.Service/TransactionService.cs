@@ -192,7 +192,7 @@ public class TransactionService(
         {
             // Update all following balances to include the edited transaction.
             var balancesAfterEdited = transaction
-                .Account.Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= transaction.Date)
+                .Account.Balances.Where(b => b.Date >= transaction.Date)
                 .ToList();
             foreach (var balance in balancesAfterEdited)
             {
@@ -250,7 +250,7 @@ public class TransactionService(
             if (transaction.Account?.Source == AccountSource.Manual)
             {
                 var balancesAfterOriginal = transaction
-                    .Account.Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= originalDate)
+                    .Account.Balances.Where(b => b.Date >= originalDate)
                     .ToList();
                 foreach (var balance in balancesAfterOriginal)
                 {
@@ -258,7 +258,7 @@ public class TransactionService(
                 }
 
                 var balancesAfterEdited = transaction
-                    .Account.Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= editedDate)
+                    .Account.Balances.Where(b => b.Date >= editedDate)
                     .ToList();
                 foreach (var balance in balancesAfterEdited)
                 {
@@ -294,7 +294,7 @@ public class TransactionService(
         {
             // Update all following balances to not include the deleted transaction.
             var balancesAfterDeleted = account
-                .Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= transaction.Date)
+                .Balances.Where(b => b.Date >= transaction.Date)
                 .ToList();
             foreach (var balance in balancesAfterDeleted)
             {
@@ -342,7 +342,7 @@ public class TransactionService(
             if (account.Source == AccountSource.Manual)
             {
                 var balancesAfterDeleted = account
-                    .Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= transaction.Date)
+                    .Balances.Where(b => b.Date >= transaction.Date)
                     .ToList();
                 foreach (var balance in balancesAfterDeleted)
                 {
@@ -520,20 +520,17 @@ public class TransactionService(
     )
     {
         var currentBalance = account
-            .Balances.Where(b => DateOnly.FromDateTime(b.DateTime) <= transaction.Date)
-            .OrderByDescending(b => b.DateTime)
+            .Balances.Where(b => b.Date <= transaction.Date)
+            .OrderByDescending(b => b.Date)
             .FirstOrDefault();
 
         // First, add the new balance for the new transaction if no balance exists for that date.
-        if (
-            currentBalance == null
-            || DateOnly.FromDateTime(currentBalance.DateTime) != transaction.Date
-        )
+        if (currentBalance == null || currentBalance.Date != transaction.Date)
         {
             var newBalance = new Balance
             {
                 Amount = currentBalance?.Amount ?? 0,
-                DateTime = transaction.Date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
+                Date = transaction.Date,
                 AccountID = account.ID,
             };
 
@@ -541,9 +538,7 @@ public class TransactionService(
         }
 
         // Then, update all following balances to include the new transaction.
-        var balancesAfterNew = account
-            .Balances.Where(b => DateOnly.FromDateTime(b.DateTime) >= transaction.Date)
-            .ToList();
+        var balancesAfterNew = account.Balances.Where(b => b.Date >= transaction.Date).ToList();
         foreach (var balance in balancesAfterNew)
         {
             balance.Amount += transaction.Amount;

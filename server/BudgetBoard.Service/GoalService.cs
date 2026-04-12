@@ -69,7 +69,7 @@ public class GoalService(
             }
 
             runningBalance +=
-                account.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0;
+                account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0;
             accounts.Add(account);
         }
 
@@ -272,7 +272,7 @@ public class GoalService(
         }
 
         decimal totalBalance = goal.Accounts.Sum(a =>
-            a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+            a.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0
         );
         decimal amountLeft;
         if (goal.InitialAmount < 0)
@@ -355,7 +355,7 @@ public class GoalService(
         }
 
         decimal totalBalance = goal.Accounts.Sum(a =>
-            a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+            a.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0
         );
         decimal amountLeft;
         if (goal.Amount == 0)
@@ -454,7 +454,7 @@ public class GoalService(
     private static decimal CalculatePercentComplete(Goal goal)
     {
         var accountsTotalBalance = goal.Accounts.Sum(a =>
-            a.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault()?.Amount ?? 0
+            a.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0
         );
 
         decimal totalProgress = accountsTotalBalance - goal.InitialAmount;
@@ -488,7 +488,7 @@ public class GoalService(
 
         foreach (var account in goal.Accounts)
         {
-            var balance = account.Balances.OrderByDescending(b => b.DateTime).FirstOrDefault();
+            var balance = account.Balances.OrderByDescending(b => b.Date).FirstOrDefault();
 
             if (balance == null || balance.Amount == 0)
                 continue;

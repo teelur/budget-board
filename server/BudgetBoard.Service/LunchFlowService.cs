@@ -494,7 +494,7 @@ public class LunchFlowService(
                 {
                     AccountID = lunchFlowAccount.LinkedAccountId!.Value,
                     Amount = lunchFlowBalancesData.Balance.Amount,
-                    DateTime = nowProvider.UtcNow,
+                    Date = DateOnly.FromDateTime(nowProvider.Now),
                 },
                 balanceService
             );

@@ -16,9 +16,9 @@ public class Balance
     public required decimal Amount { get; set; }
 
     /// <summary>
-    /// The date and time the balance was recorded.
+    /// The date the balance was recorded.
     /// </summary>
-    public required DateTime DateTime { get; set; }
+    public required DateOnly Date { get; set; }
 
     /// <summary>
     /// The date and time when the balance record was deleted; null if active.

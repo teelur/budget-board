@@ -28,7 +28,7 @@ public class SyncHelpersTests
         {
             AccountID = account.ID,
             Amount = 1000.00m,
-            DateTime = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
         };
 
         // Act
@@ -56,13 +56,13 @@ public class SyncHelpersTests
         var account = accountFaker.Generate();
         helper.UserDataContext.Accounts.Add(account);
 
-        var existingDate = DateTime.UtcNow.Date;
+        var existingDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var existingBalance = new Balance
         {
             ID = Guid.NewGuid(),
             AccountID = account.ID,
             Amount = 500.00m,
-            DateTime = existingDate,
+            Date = existingDate,
         };
         helper.UserDataContext.Balances.Add(existingBalance);
         await helper.UserDataContext.SaveChangesAsync();
@@ -73,7 +73,7 @@ public class SyncHelpersTests
         {
             AccountID = account.ID,
             Amount = 1000.00m,
-            DateTime = existingDate.AddHours(12), // Same date, different time
+            Date = existingDate, // Same date
         };
 
         // Act
@@ -86,18 +86,8 @@ public class SyncHelpersTests
         // Assert
         error.Should().BeNull();
         balanceServiceMock.Verify(
-            _ =>
-                _.UpdateBalanceAsync(
-                    helper.demoUser.Id,
-                    It.Is<IBalanceUpdateRequest>(req =>
-                        req.ID == existingBalance.ID && req.Amount == 1000.00m
-                    )
-                ),
+            _ => _.CreateBalancesAsync(helper.demoUser.Id, newBalanceRequest),
             Times.Once
-        );
-        balanceServiceMock.Verify(
-            _ => _.CreateBalancesAsync(It.IsAny<Guid>(), It.IsAny<IBalanceCreateRequest>()),
-            Times.Never
         );
     }
 
@@ -111,13 +101,13 @@ public class SyncHelpersTests
         var account = accountFaker.Generate();
         helper.UserDataContext.Accounts.Add(account);
 
-        var newerDate = DateTime.UtcNow;
+        var newerDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var existingBalance = new Balance
         {
             ID = Guid.NewGuid(),
             AccountID = account.ID,
             Amount = 1000.00m,
-            DateTime = newerDate,
+            Date = newerDate,
         };
         helper.UserDataContext.Balances.Add(existingBalance);
         await helper.UserDataContext.SaveChangesAsync();
@@ -128,7 +118,7 @@ public class SyncHelpersTests
         {
             AccountID = account.ID,
             Amount = 500.00m,
-            DateTime = newerDate.AddDays(-5), // Older than existing
+            Date = newerDate.AddDays(-5), // Older than existing
         };
 
         // Act
@@ -141,12 +131,8 @@ public class SyncHelpersTests
         // Assert
         error.Should().BeNull();
         balanceServiceMock.Verify(
-            _ => _.CreateBalancesAsync(It.IsAny<Guid>(), It.IsAny<IBalanceCreateRequest>()),
-            Times.Never
-        );
-        balanceServiceMock.Verify(
-            _ => _.UpdateBalanceAsync(It.IsAny<Guid>(), It.IsAny<IBalanceUpdateRequest>()),
-            Times.Never
+            _ => _.CreateBalancesAsync(helper.demoUser.Id, olderBalanceRequest),
+            Times.Once
         );
     }
 
@@ -162,7 +148,7 @@ public class SyncHelpersTests
         {
             AccountID = Guid.NewGuid(), // Non-existent account
             Amount = 1000.00m,
-            DateTime = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
         };
 
         // Act
@@ -199,7 +185,7 @@ public class SyncHelpersTests
         {
             AccountID = account.ID,
             Amount = 500.00m,
-            DateTime = DateTime.UtcNow.AddDays(-30), // Older date, but no existing balances
+            Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-30)), // Older date, but no existing balances
         };
 
         // Act
@@ -227,13 +213,13 @@ public class SyncHelpersTests
         var account = accountFaker.Generate();
         helper.UserDataContext.Accounts.Add(account);
 
-        var olderDate = DateTime.UtcNow.AddDays(-10);
+        var olderDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10));
         var existingBalance = new Balance
         {
             ID = Guid.NewGuid(),
             AccountID = account.ID,
             Amount = 500.00m,
-            DateTime = olderDate,
+            Date = olderDate,
         };
         helper.UserDataContext.Balances.Add(existingBalance);
         await helper.UserDataContext.SaveChangesAsync();
@@ -244,7 +230,7 @@ public class SyncHelpersTests
         {
             AccountID = account.ID,
             Amount = 1000.00m,
-            DateTime = DateTime.UtcNow, // Newer than existing
+            Date = DateOnly.FromDateTime(DateTime.UtcNow), // Newer than existing
         };
 
         // Act
@@ -272,13 +258,13 @@ public class SyncHelpersTests
         var account = accountFaker.Generate();
         helper.UserDataContext.Accounts.Add(account);
 
-        var existingDate = new DateTime(2024, 1, 15, 10, 0, 0);
+        var existingDate = new DateOnly(2024, 1, 15);
         var existingBalance = new Balance
         {
             ID = Guid.NewGuid(),
             AccountID = account.ID,
             Amount = 500.00m,
-            DateTime = existingDate,
+            Date = existingDate,
         };
         helper.UserDataContext.Balances.Add(existingBalance);
         await helper.UserDataContext.SaveChangesAsync();
@@ -289,7 +275,7 @@ public class SyncHelpersTests
         {
             AccountID = account.ID,
             Amount = 750.00m,
-            DateTime = new DateTime(2024, 1, 15, 18, 30, 0), // Same date, different time
+            Date = new DateOnly(2024, 1, 15), // Same date
         };
 
         // Act
@@ -301,17 +287,8 @@ public class SyncHelpersTests
 
         // Assert
         error.Should().BeNull();
-        existingBalance.Amount.Should().Be(750.00m);
         balanceServiceMock.Verify(
-            _ =>
-                _.UpdateBalanceAsync(
-                    helper.demoUser.Id,
-                    It.Is<IBalanceUpdateRequest>(req =>
-                        req.ID == existingBalance.ID
-                        && req.Amount == 750.00m
-                        && req.AccountID == account.ID
-                    )
-                ),
+            _ => _.CreateBalancesAsync(helper.demoUser.Id, newBalanceRequest),
             Times.Once
         );
     }
@@ -331,7 +308,7 @@ public class SyncHelpersTests
             ID = Guid.NewGuid(),
             AccountID = account.ID,
             Amount = 100.00m,
-            DateTime = DateTime.UtcNow.AddDays(-20),
+            Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-20)),
         };
 
         var latestBalance = new Balance
@@ -339,7 +316,7 @@ public class SyncHelpersTests
             ID = Guid.NewGuid(),
             AccountID = account.ID,
             Amount = 500.00m,
-            DateTime = DateTime.UtcNow.AddDays(-5),
+            Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)),
         };
 
         helper.UserDataContext.Balances.AddRange(oldBalance, latestBalance);
@@ -351,7 +328,7 @@ public class SyncHelpersTests
         {
             AccountID = account.ID,
             Amount = 300.00m,
-            DateTime = DateTime.UtcNow.AddDays(-10), // Older than latest but newer than old
+            Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10)), // Older than latest but newer than old
         };
 
         // Act
@@ -364,12 +341,8 @@ public class SyncHelpersTests
         // Assert
         error.Should().BeNull();
         balanceServiceMock.Verify(
-            _ => _.CreateBalancesAsync(It.IsAny<Guid>(), It.IsAny<IBalanceCreateRequest>()),
-            Times.Never
-        );
-        balanceServiceMock.Verify(
-            _ => _.UpdateBalanceAsync(It.IsAny<Guid>(), It.IsAny<IBalanceUpdateRequest>()),
-            Times.Never
+            _ => _.CreateBalancesAsync(helper.demoUser.Id, olderThanLatestRequest),
+            Times.Once
         );
     }
 }

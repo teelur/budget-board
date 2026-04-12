@@ -719,7 +719,9 @@ public class SimpleFinService(
                     accountData.Balance,
                     CultureInfo.InvariantCulture.NumberFormat
                 ),
-                DateTime = DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate),
+                Date = DateOnly.FromDateTime(
+                    DateTime.UnixEpoch.AddSeconds(accountData.BalanceDate)
+                ),
             },
             balanceService
         );

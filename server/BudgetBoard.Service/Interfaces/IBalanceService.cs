@@ -9,6 +9,8 @@ public interface IBalanceService
 {
     /// <summary>
     /// Creates a new balance entry for a specific account.
+    /// If a balance already exists for the same date, it will be updated instead of creating a new entry.
+    ///
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The balance creation details.</param>
