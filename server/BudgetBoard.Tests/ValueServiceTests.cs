@@ -104,7 +104,7 @@ public class ValueServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("ValueCreateAssetNotFoundError");
+            .WithMessage("ValueAssetNotFoundError");
     }
 
     [Fact]
