@@ -21,11 +21,6 @@ public class Balance
     public required DateOnly Date { get; set; }
 
     /// <summary>
-    /// The date and time when the balance record was deleted; null if active.
-    /// </summary>
-    public DateTime? Deleted { get; set; } = null;
-
-    /// <summary>
     /// Identifier for the associated account.
     /// </summary>
     public required Guid AccountID { get; set; }

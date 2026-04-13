@@ -139,15 +139,8 @@ public class AccountResponse : IAccountResponse
         Type = account.Type;
         Subtype = account.Subtype;
         CurrentBalance =
-            account
-                .Balances.OrderByDescending(b => b.Date)
-                .FirstOrDefault(b => b.Deleted == null)
-                ?.Amount
-            ?? 0;
-        BalanceDate = account
-            .Balances.OrderByDescending(b => b.Date)
-            .FirstOrDefault(b => b.Deleted == null)
-            ?.Date;
+            account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0;
+        BalanceDate = account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Date;
         HideTransactions = account.HideTransactions;
         HideAccount = account.HideAccount;
         Deleted = account.Deleted;

@@ -2,7 +2,6 @@ export interface IBalanceResponse {
   id: string;
   amount: number;
   date: string;
-  deleted: Date | null;
   accountID: string;
 }
 

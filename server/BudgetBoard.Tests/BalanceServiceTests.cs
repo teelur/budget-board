@@ -375,7 +375,7 @@ public class BalanceServiceTests
         await balanceService.DeleteBalanceAsync(helper.demoUser.Id, balance.ID);
 
         // Assert
-        helper.UserDataContext.Balances.Single().Deleted.Should().NotBeNull();
+        helper.UserDataContext.Balances.Should().BeEmpty();
     }
 
     [Fact]
@@ -399,60 +399,5 @@ public class BalanceServiceTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("BalanceDeleteNotFoundError");
-    }
-
-    [Fact]
-    public async Task RestoreBalanceAsync_WhenCalledWithValidData_ShouldRestoreBalance()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var balanceService = new BalanceService(
-            Mock.Of<ILogger<IBalanceService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountFaker = new AccountFaker(helper.demoUser.Id);
-        var account = accountFaker.Generate();
-
-        var balanceFaker = new BalanceFaker([account.ID]);
-        var balance = balanceFaker.Generate();
-        balance.Deleted = DateTime.UtcNow;
-
-        account.Balances.Add(balance);
-
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        await balanceService.RestoreBalanceAsync(helper.demoUser.Id, balance.ID);
-
-        // Assert
-        helper.UserDataContext.Balances.Single().Deleted.Should().BeNull();
-    }
-
-    [Fact]
-    public async Task RestoreBalanceAsync_WhenCalledWithInvalidBalanceID_ShouldThrowException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var balanceService = new BalanceService(
-            Mock.Of<ILogger<IBalanceService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        // Act
-        Func<Task> act = async () =>
-            await balanceService.RestoreBalanceAsync(helper.demoUser.Id, Guid.NewGuid());
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("BalanceRestoreNotFoundError");
     }
 }

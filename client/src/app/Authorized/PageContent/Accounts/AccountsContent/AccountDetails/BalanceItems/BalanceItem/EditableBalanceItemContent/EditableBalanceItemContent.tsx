@@ -4,7 +4,7 @@ import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
@@ -171,24 +171,14 @@ const EditableBalanceItemContent = (
         >
           <PencilIcon size={16} />
         </ActionIcon>
-        {props.balance.deleted ? (
-          <ActionIcon
-            h="100%"
-            size="sm"
-            onClick={() => doRestoreBalance.mutate()}
-          >
-            <Undo2Icon size={16} />
-          </ActionIcon>
-        ) : (
-          <ActionIcon
-            h="100%"
-            size="sm"
-            bg="var(--button-color-destructive)"
-            onClick={() => doDeleteBalance.mutate()}
-          >
-            <Trash2Icon size={16} />
-          </ActionIcon>
-        )}
+        <ActionIcon
+          h="100%"
+          size="sm"
+          bg="var(--button-color-destructive)"
+          onClick={() => doDeleteBalance.mutate()}
+        >
+          <Trash2Icon size={16} />
+        </ActionIcon>
       </Group>
     </Group>
   );

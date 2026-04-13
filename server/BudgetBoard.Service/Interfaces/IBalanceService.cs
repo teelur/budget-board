@@ -32,16 +32,9 @@ public interface IBalanceService
     Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest request);
 
     /// <summary>
-    /// Deletes (soft deletes) a balance entry.
+    /// Deletes a balance entry.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="guid">The unique identifier of the balance to delete.</param>
     Task DeleteBalanceAsync(Guid userGuid, Guid guid);
-
-    /// <summary>
-    /// Restores a previously deleted balance entry.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="guid">The unique identifier of the balance to restore.</param>
-    Task RestoreBalanceAsync(Guid userGuid, Guid guid);
 }

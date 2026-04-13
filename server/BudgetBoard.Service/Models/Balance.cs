@@ -38,7 +38,6 @@ public interface IBalanceResponse
     Guid ID { get; }
     decimal Amount { get; }
     DateOnly Date { get; }
-    DateTime? Deleted { get; }
     Guid AccountID { get; }
 }
 
@@ -47,7 +46,6 @@ public class BalanceResponse : IBalanceResponse
     public Guid ID { get; set; }
     public decimal Amount { get; set; }
     public DateOnly Date { get; set; }
-    public DateTime? Deleted { get; set; }
     public Guid AccountID { get; set; }
 
     [JsonConstructor]
@@ -56,7 +54,6 @@ public class BalanceResponse : IBalanceResponse
         ID = Guid.NewGuid();
         Amount = 0;
         Date = DateOnly.MinValue;
-        Deleted = null;
         AccountID = Guid.NewGuid();
     }
 
@@ -65,7 +62,6 @@ public class BalanceResponse : IBalanceResponse
         ID = balance.ID;
         Amount = balance.Amount;
         Date = balance.Date;
-        Deleted = balance.Deleted;
         AccountID = balance.AccountID;
     }
 }

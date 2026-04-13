@@ -131,27 +131,7 @@ public class BalanceService(
             throw new BudgetBoardServiceException(_responseLocalizer["BalanceDeleteNotFoundError"]);
         }
 
-        balance.Deleted = _nowProvider.UtcNow;
-        await _userDataContext.SaveChangesAsync();
-    }
-
-    /// <inheritdoc />
-    public async Task RestoreBalanceAsync(Guid userGuid, Guid guid)
-    {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var balance = userData
-            .Accounts.SelectMany(a => a.Balances)
-            .FirstOrDefault(b => b.ID == guid);
-        if (balance == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["BalanceRestoreNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["BalanceRestoreNotFoundError"]
-            );
-        }
-
-        balance.Deleted = null;
+        _userDataContext.Balances.Remove(balance);
         await _userDataContext.SaveChangesAsync();
     }
 
