@@ -17,30 +17,34 @@ export interface TransactionCardBaseProps extends CardProps {
   onToggleSelect?: (id: string) => void;
 }
 
-const TransactionCardBase = (
-  props: TransactionCardBaseProps,
-): React.ReactNode => {
-  const selectionMode = props.onToggleSelect !== undefined;
+const TransactionCardBase = ({
+  transaction,
+  categories,
+  elevation,
+  currency,
+  isSelected,
+  onToggleSelect,
+  ...cardProps
+}: TransactionCardBaseProps): React.ReactNode => {
+  const selectionMode = onToggleSelect !== undefined;
 
   return (
     <Card
-      w={props.w ?? "100%"}
-      p={props.p ?? "0.2rem"}
-      {...props}
+      w={cardProps.w ?? "100%"}
+      p={cardProps.p ?? "0.2rem"}
+      {...cardProps}
       style={{ containerType: "inline-size" }}
       onClick={
-        selectionMode
-          ? () => props.onToggleSelect!(props.transaction.id)
-          : undefined
+        selectionMode ? () => onToggleSelect!(transaction.id) : undefined
       }
-      elevation={props.elevation ?? 0}
-      className={`${classes.card}${props.className ? ` ${props.className}` : ""}`}
+      elevation={elevation ?? 0}
+      className={`${classes.card}${cardProps.className ? ` ${cardProps.className}` : ""}`}
       data-selection-mode={selectionMode ? "true" : undefined}
     >
       {selectionMode ? (
         <Group
           className={classes.selectionGroup}
-          data-selected={props.isSelected ? "true" : "false"}
+          data-selected={isSelected ? "true" : "false"}
           wrap="nowrap"
           gap="0.5rem"
           align="center"
@@ -48,25 +52,25 @@ const TransactionCardBase = (
           <div className={classes.checkboxWrapper}>
             <Checkbox
               size="xs"
-              checked={props.isSelected ?? false}
-              onChange={() => props.onToggleSelect!(props.transaction.id)}
+              checked={isSelected ?? false}
+              onChange={() => onToggleSelect!(transaction.id)}
               onClick={(e) => e.stopPropagation()}
-              elevation={props.elevation ?? 0}
+              elevation={elevation ?? 0}
             />
           </div>
           <TransactionCardContent
-            transaction={props.transaction}
-            categories={props.categories}
-            elevation={props.elevation ?? 0}
-            currency={props.currency}
+            transaction={transaction}
+            categories={categories}
+            elevation={elevation ?? 0}
+            currency={currency}
           />
         </Group>
       ) : (
         <TransactionCardContent
-          transaction={props.transaction}
-          categories={props.categories}
-          elevation={props.elevation ?? 0}
-          currency={props.currency}
+          transaction={transaction}
+          categories={categories}
+          elevation={elevation ?? 0}
+          currency={currency}
         />
       )}
     </Card>
