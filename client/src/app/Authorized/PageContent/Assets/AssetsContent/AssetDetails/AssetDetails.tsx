@@ -59,17 +59,15 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const sortedValues =
     valuesQuery.data
       ?.filter((value) => value.deleted === null)
-      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+      .sort((a, b) => dayjs(b.date).diff(dayjs(a.date))) ?? [];
 
   const sortedDeletedValues =
     valuesQuery.data
       ?.filter((value) => value.deleted !== null)
-      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+      .sort((a, b) => dayjs(b.date).diff(dayjs(a.date))) ?? [];
 
   const valuesForChart = sortedValues.filter((value) =>
-    dayjs(value.dateTime).isAfter(
-      dayjs().subtract(chartLookbackMonths, "months"),
-    ),
+    dayjs(value.date).isAfter(dayjs().subtract(chartLookbackMonths, "months")),
   );
 
   return (
