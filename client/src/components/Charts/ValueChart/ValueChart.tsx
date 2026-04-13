@@ -84,7 +84,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
     );
   }
 
-  const sortedChartValues = () => {
+  const sortedChartValues = React.useMemo(() => {
     const startDate: Date = props.dateRange[0]
       ? dayjs(props.dateRange[0]).toDate()
       : dayjs().subtract(1, "month").toDate();
@@ -97,14 +97,14 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
         dayjs(value.date).isBetween(startDate, endDate, "date", "[]"),
       )
       .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
-  };
+  }, [props.values, props.dateRange, dayjs]);
 
   return (
     <BarChart
       h={400}
       w="100%"
       data={buildValueChartData(
-        sortedChartValues(),
+        sortedChartValues,
         React.useCallback(
           (date: DateString): string => dayjs(date).format(dateFormat),
           [dayjs, dateFormat],

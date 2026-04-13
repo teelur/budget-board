@@ -21,7 +21,7 @@ export interface IAssetResponse {
   id: string;
   name: string;
   currentValue: number;
-  valueDate: Date;
+  valueDate: string;
   purchaseDate: Date | null;
   purchasePrice: number | null;
   sellDate: Date | null;

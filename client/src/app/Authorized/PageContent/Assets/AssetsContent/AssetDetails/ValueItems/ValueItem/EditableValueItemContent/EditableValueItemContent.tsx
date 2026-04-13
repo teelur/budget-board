@@ -24,8 +24,13 @@ const EditableValueItemContent = (
   props: EditableValueItemContentProps,
 ): React.ReactNode => {
   const { request } = useAuth();
-  const { dayjsLocale, longDateFormat, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const {
+    dayjs,
+    dayjsLocale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
 
   const valueAmountField = useField<string | number | undefined>({
     initialValue: props.value.amount,
@@ -38,7 +43,7 @@ const EditableValueItemContent = (
     },
   });
   const valueDateField = useField<Date>({
-    initialValue: props.value.dateTime,
+    initialValue: dayjs(props.value.date).toDate(),
   });
 
   const queryClient = useQueryClient();
@@ -50,7 +55,7 @@ const EditableValueItemContent = (
         data: {
           id: props.value.id,
           amount: Number(valueAmountField.getValue()),
-          dateTime: valueDateField.getValue(),
+          date: dayjs(valueDateField.getValue()).format("YYYY-MM-DD"),
         } as IValueUpdateRequest,
       }),
     onSuccess: async () => {

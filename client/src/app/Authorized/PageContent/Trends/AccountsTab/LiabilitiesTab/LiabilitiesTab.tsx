@@ -20,8 +20,8 @@ const LiabilitiesTab = (): React.ReactNode => {
     [],
   );
   const [dateRange, setDateRange] = React.useState<DatesRangeValue<string>>([
-    dayjs().subtract(1, "month").startOf("month").format(mantineDateFormat),
-    dayjs().startOf("month").format(mantineDateFormat),
+    dayjs().subtract(1, "month").format(mantineDateFormat),
+    dayjs().format(mantineDateFormat),
   ]);
 
   const balancesQuery = useQueries({
@@ -66,7 +66,7 @@ const LiabilitiesTab = (): React.ReactNode => {
   });
 
   return (
-    <Stack p={"0.5rem"}>
+    <Stack p="0.5rem">
       <AccountsSelectHeader
         selectedAccountIds={selectedAccountIds}
         setSelectedAccountIds={setSelectedAccountIds}

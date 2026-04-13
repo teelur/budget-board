@@ -17,8 +17,8 @@ const ValuesTab = (): React.ReactNode => {
 
   const [selectedAssetIds, setSelectedAssetIds] = React.useState<string[]>([]);
   const [dateRange, setDateRange] = React.useState<DatesRangeValue<string>>([
-    dayjs().subtract(1, "month").startOf("month").format(mantineDateFormat),
-    dayjs().startOf("month").format(mantineDateFormat),
+    dayjs().subtract(1, "month").format(mantineDateFormat),
+    dayjs().format(mantineDateFormat),
   ]);
 
   const valuesQuery = useQueries({
