@@ -47,6 +47,7 @@ const AccountsSelectHeader = (
           type="range"
           value={props.dateRange}
           onChange={props.setDateRange}
+          miw={200}
           elevation={1}
         />
         <AccountMultiSelect
@@ -54,9 +55,8 @@ const AccountsSelectHeader = (
           onChange={props.setSelectedAccountIds}
           hideHidden
           filterTypes={props.filters}
-          w="auto"
+          flex={1}
           miw="230px"
-          maw="600px"
           elevation={1}
         />
         <Button

@@ -30,18 +30,6 @@ const SelectLastNMonthsRange = (props: SelectLastNMonthsRangeProps) => {
           {t("last_n_months", { count: months })}
         </Button>
       ))}
-      <Button
-        size="compact-sm"
-        variant="primary"
-        onClick={() =>
-          props.setDateRange([
-            dayjs().add(-1, "month").format(mantineDateFormat),
-            dayjs().format(mantineDateFormat),
-          ])
-        }
-      >
-        {t("clear_selection")}
-      </Button>
     </Group>
   );
 };
