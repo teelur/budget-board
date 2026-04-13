@@ -83,7 +83,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
           doCreateBalance.mutate({
             accountID: props.accountId,
             amount: Number(amountField.getValue()),
-            dateTime: dayjs(dateField.getValue()).format("YYYY-MM-DD"),
+            date: dayjs(dateField.getValue()).format("YYYY-MM-DD"),
           })
         }
       >

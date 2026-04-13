@@ -1,19 +1,19 @@
 export interface IBalanceResponse {
   id: string;
   amount: number;
-  dateTime: string;
+  date: string;
   deleted: Date | null;
   accountID: string;
 }
 
 export interface IBalanceCreateRequest {
   amount: number;
-  dateTime: string;
+  date: string;
   accountID: string;
 }
 
 export interface IBalanceUpdateRequest {
   id: string;
   amount: number;
-  dateTime: string;
+  date: string;
 }

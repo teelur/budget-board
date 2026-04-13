@@ -93,9 +93,18 @@ public class BalanceService(
             throw new BudgetBoardServiceException(_responseLocalizer["BalanceUpdateNotFoundError"]);
         }
 
-        var duplicateBalance = userData
-            .Accounts.SelectMany(a => a.Balances)
-            .FirstOrDefault(b => b.Date == request.Date && b.ID != request.ID);
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == balance.AccountID);
+        if (account == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["BalanceAccountNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                _responseLocalizer["BalanceAccountNotFoundError"]
+            );
+        }
+
+        var duplicateBalance = account.Balances.FirstOrDefault(b =>
+            b.Date == request.Date && b.ID != request.ID
+        );
         if (duplicateBalance != null)
         {
             _logger.LogError("{LogMessage}", _logLocalizer["BalanceDuplicateDateLog"]);

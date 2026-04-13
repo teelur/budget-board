@@ -45,7 +45,7 @@ const EditableBalanceItemContent = (
     },
   });
   const balanceDateField = useField<Date>({
-    initialValue: dayjs(props.balance.dateTime).toDate(),
+    initialValue: dayjs(props.balance.date).toDate(),
   });
 
   const queryClient = useQueryClient();
@@ -57,7 +57,7 @@ const EditableBalanceItemContent = (
         data: {
           id: props.balance.id,
           amount: Number(balanceAmountField.getValue()),
-          dateTime: dayjs(balanceDateField.getValue()).format("YYYY-MM-DD"),
+          date: dayjs(balanceDateField.getValue()).format("YYYY-MM-DD"),
         } as IBalanceUpdateRequest,
       }),
     onSuccess: async () => {

@@ -1,10 +1,10 @@
-import { getStandardDate, getUniqueDates } from "~/helpers/datetime";
+import { DateString, getUniqueDates } from "~/helpers/datetime";
 import { chartColors } from "~/helpers/charts";
 import dayjs from "dayjs";
 
 export interface IValue {
   id: string;
-  dateTime: Date;
+  date: DateString;
   amount: number;
   parentId: string;
 }
@@ -15,9 +15,8 @@ export interface IItem {
 }
 
 interface ValueChartData {
-  date: Date;
-  dateString: string;
-  [key: string]: number | Date | string;
+  date: string;
+  [key: string]: number | string;
 }
 
 /**
@@ -35,16 +34,6 @@ export const buildValueChartSeries = (items: IItem[]) =>
   });
 
 /**
- * Generates a sorted array of Date objects from an array of IValues entries.
- * @param values - Collection of value objects.
- * @returns Sorted list of Date objects in ascending order.
- */
-export const getSortedValueDates = (values: IValue[]): Date[] =>
-  values
-    .map((value) => getStandardDate(dayjs(value.dateTime).toDate()))
-    .sort((a, b) => a.getTime() - b.getTime());
-
-/**
  * Builds data for a value chart based on provided values and date range.
  *
  * @param values An array of IValue objects representing values.
@@ -55,39 +44,36 @@ export const getSortedValueDates = (values: IValue[]): Date[] =>
  */
 export const buildValueChartData = (
   sortedValues: IValue[],
-  formatDateString: (date: Date) => string,
+  formatDateString: (date: DateString) => string,
   invertData = false,
 ): ValueChartData[] => {
-  const itemIdToSortedValuesMap = Map.groupBy(
+  // When multiple items are selected, some dates might not be represented on all items.
+  // We need to aggregate all dates that have an associated balance for at least one item.
+  const distinctSortedValueDates: DateString[] = getUniqueDates(
+    sortedValues
+      .map((value) => value.date)
+      .sort((a, b) => dayjs(a).diff(dayjs(b))),
+  );
+
+  const valuesByItemId = Map.groupBy(
     sortedValues,
     (value: IValue) => value.parentId,
   );
-
-  // When multiple accounts are selected, some dates might not be represented on all accounts.
-  // We need to aggregate all dates that have an associated balance for at least one account.
-  const distinctSortedValueDates: Date[] = getUniqueDates(
-    getSortedValueDates(sortedValues),
-  );
-
   const chartData: ValueChartData[] = [];
 
-  distinctSortedValueDates.forEach((date: Date, index: number) => {
-    const dateString = formatDateString(date);
+  distinctSortedValueDates.forEach((date: DateString, index: number) => {
+    const formattedDateString = formatDateString(date);
 
-    const chartDataPoint: ValueChartData = { date, dateString };
+    const chartDataPoint: ValueChartData = {
+      date: formattedDateString,
+    };
 
-    itemIdToSortedValuesMap.forEach((itemValues, itemId) => {
-      const valuesForDate = itemValues.filter(
-        (value) =>
-          getStandardDate(new Date(value.dateTime)).getTime() ===
-          getStandardDate(date).getTime(),
-      );
+    valuesByItemId.forEach((itemValues, itemId) => {
+      const valuesForDate = itemValues.filter((value) => value.date === date);
 
       if (valuesForDate.length > 0) {
         chartDataPoint[itemId] =
-          (valuesForDate.reduce((acc, v) => acc + v.amount, 0) /
-            valuesForDate.length) *
-          (invertData ? -1 : 1);
+          valuesForDate[0]!.amount * (invertData ? -1 : 1);
       } else if (index > 0) {
         chartDataPoint[itemId] = chartData[index - 1]![itemId]!;
       } else {
@@ -100,20 +86,3 @@ export const buildValueChartData = (
 
   return chartData;
 };
-
-/**
- * Filters a collection of value entries by a specified date range.
- *
- * @param values - A list of value entries
- * @param startDate - The start date of the range
- * @param endDate - The end date of the range
- * @returns A new array of value entries within the specified range
- */
-export const filterValuesByDateRange = (
-  values: IValue[],
-  startDate: Date,
-  endDate: Date,
-): IValue[] =>
-  values.filter((value) =>
-    dayjs(value.dateTime).isBetween(startDate, endDate, "date", "[]"),
-  );

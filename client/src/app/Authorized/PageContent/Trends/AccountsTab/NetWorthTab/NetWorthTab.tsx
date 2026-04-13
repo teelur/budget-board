@@ -64,7 +64,7 @@ const NetWorthTab = (): React.ReactNode => {
   });
 
   return (
-    <Stack p={"0.5rem"}>
+    <Stack p="0.5rem">
       <AccountsSelectHeader
         selectedAccountIds={selectedAccountIds}
         setSelectedAccountIds={setSelectedAccountIds}

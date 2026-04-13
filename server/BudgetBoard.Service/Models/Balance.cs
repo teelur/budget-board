@@ -23,7 +23,6 @@ public interface IBalanceUpdateRequest
     Guid ID { get; }
     decimal Amount { get; }
     DateOnly Date { get; }
-    Guid AccountID { get; }
 }
 
 [method: JsonConstructor]
@@ -32,7 +31,6 @@ public class BalanceUpdateRequest() : IBalanceUpdateRequest
     public Guid ID { get; set; } = Guid.NewGuid();
     public decimal Amount { get; set; } = 0;
     public DateOnly Date { get; set; } = DateOnly.MinValue;
-    public Guid AccountID { get; set; } = Guid.NewGuid();
 }
 
 public interface IBalanceResponse

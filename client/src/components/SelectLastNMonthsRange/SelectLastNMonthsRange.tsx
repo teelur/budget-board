@@ -33,7 +33,12 @@ const SelectLastNMonthsRange = (props: SelectLastNMonthsRangeProps) => {
       <Button
         size="compact-sm"
         variant="primary"
-        onClick={() => props.setDateRange([null, null])}
+        onClick={() =>
+          props.setDateRange([
+            dayjs().add(-1, "month").format(mantineDateFormat),
+            dayjs().format(mantineDateFormat),
+          ])
+        }
       >
         {t("clear_selection")}
       </Button>
