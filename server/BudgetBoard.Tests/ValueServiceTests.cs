@@ -328,6 +328,50 @@ public class ValueServiceTests
     }
 
     [Fact]
+    public async Task UpdateValueAsync_WhenDuplicateDateExistsInDifferentAsset_ShouldNotThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var valueService = new ValueService(
+            Mock.Of<ILogger<IValueService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var asset1 = new AssetFaker(helper.demoUser.Id).Generate();
+        var asset2 = new AssetFaker(helper.demoUser.Id).Generate();
+
+        var value1 = new ValueFaker().Generate();
+        value1.AssetID = asset1.ID;
+        var value2 = new ValueFaker().Generate();
+        value2.AssetID = asset2.ID;
+
+        asset1.Values.Add(value1);
+        asset2.Values.Add(value2);
+
+        helper.UserDataContext.Assets.Add(asset1);
+        helper.UserDataContext.Assets.Add(asset2);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Update value1 to have the same date as value2 (different asset — should be allowed)
+        var editedValue = new ValueUpdateRequest
+        {
+            ID = value1.ID,
+            Amount = value1.Amount,
+            Date = value2.Date,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await valueService.UpdateValueAsync(helper.demoUser.Id, editedValue);
+
+        // Assert
+        await act.Should().NotThrowAsync();
+    }
+
+    [Fact]
     public async Task DeleteValueAsync_WhenValueExists_ShouldMarkValueAsDeleted()
     {
         // Arrange

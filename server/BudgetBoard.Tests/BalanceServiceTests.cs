@@ -302,6 +302,52 @@ public class BalanceServiceTests
     }
 
     [Fact]
+    public async Task UpdateBalanceAsync_WhenDuplicateDateExistsInDifferentAccount_ShouldNotThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var balanceService = new BalanceService(
+            Mock.Of<ILogger<IBalanceService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account1 = accountFaker.Generate();
+        var account2 = accountFaker.Generate();
+
+        var balanceFaker1 = new BalanceFaker([account1.ID]);
+        var balanceFaker2 = new BalanceFaker([account2.ID]);
+
+        var balance1 = balanceFaker1.Generate();
+        var balance2 = balanceFaker2.Generate();
+
+        account1.Balances.Add(balance1);
+        account2.Balances.Add(balance2);
+
+        helper.UserDataContext.Accounts.Add(account1);
+        helper.UserDataContext.Accounts.Add(account2);
+        helper.UserDataContext.SaveChanges();
+
+        // Update balance1 to have the same date as balance2 (different account — should be allowed)
+        var balanceUpdateRequest = new BalanceUpdateRequest
+        {
+            ID = balance1.ID,
+            Amount = balance1.Amount,
+            Date = balance2.Date,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await balanceService.UpdateBalanceAsync(helper.demoUser.Id, balanceUpdateRequest);
+
+        // Assert
+        await act.Should().NotThrowAsync();
+    }
+
+    [Fact]
     public async Task DeleteBalanceAsync_WhenCalledWithValidData_ShouldDeleteBalance()
     {
         // Arrange
