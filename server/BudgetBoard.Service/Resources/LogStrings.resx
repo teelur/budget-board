@@ -349,6 +349,12 @@
   <data name="ValueUpdateAssetNotFoundLog" xml:space="preserve">
     <value>Attempted to update a value for an asset that does not exist.</value>
   </data>
+  <data name="ValueUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update a value that does not exist.</value>
+  </data>
+  <data name="ValueDuplicateDateLog" xml:space="preserve">
+    <value>Attempted to update a value with a date that already exists for this asset.</value>
+  </data>
   <data name="ValueDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a value that does not exist.</value>
   </data>
