@@ -72,18 +72,6 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
         );
   };
 
-  if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
-  }
-
-  if (props.items?.length === 0 || props.values?.length === 0) {
-    return (
-      <Group justify="center" p="0.5rem">
-        <DimmedText size="sm">{t("no_data_available")}</DimmedText>
-      </Group>
-    );
-  }
-
   const sortedChartValues = React.useMemo(() => {
     const startDate: Date = props.dateRange[0]
       ? dayjs(props.dateRange[0]).toDate()
@@ -99,16 +87,30 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
       .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
   }, [props.values, props.dateRange, dayjs]);
 
+  const dateLabelFormatter = React.useCallback(
+    (date: DateString): string => dayjs(date).format(dateFormat),
+    [dayjs, dateFormat],
+  );
+
+  if (props.isPending) {
+    return <Skeleton height={425} radius="lg" />;
+  }
+
+  if (props.items?.length === 0 || props.values?.length === 0) {
+    return (
+      <Group justify="center" p="0.5rem">
+        <DimmedText size="sm">{t("no_data_available")}</DimmedText>
+      </Group>
+    );
+  }
+
   return (
     <BarChart
       h={400}
       w="100%"
       data={buildValueChartData(
         sortedChartValues,
-        React.useCallback(
-          (date: DateString): string => dayjs(date).format(dateFormat),
-          [dayjs, dateFormat],
-        ),
+        dateLabelFormatter,
         props.invertYAxis,
       )}
       series={chartSeries}
