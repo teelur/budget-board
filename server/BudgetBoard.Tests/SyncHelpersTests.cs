@@ -92,7 +92,7 @@ public class SyncHelpersTests
     }
 
     [Fact]
-    public async Task SyncBalance_WhenBalanceIsOlder_ShouldNotCreateOrUpdate()
+    public async Task SyncBalance_WhenBalanceIsOlder_ShouldStillCreateBalance()
     {
         // Arrange
         var helper = new TestHelper();
