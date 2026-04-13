@@ -18,7 +18,7 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
         <PrimaryText size="md">
-          {dayjs(props.value.dateTime).format(longDateFormat)}
+          {dayjs(props.value.date).format(longDateFormat)}
         </PrimaryText>
         <ActionIcon
           variant="transparent"

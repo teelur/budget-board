@@ -154,9 +154,6 @@
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
     <value>您尝试访问的账户不存在。</value>
   </data>
-  <data name="BalanceAccountUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的账户不存在。</value>
-  </data>
   <data name="BalanceAccountDeleteNotFoundError" xml:space="preserve">
     <value>您尝试删除的账户不存在。</value>
   </data>

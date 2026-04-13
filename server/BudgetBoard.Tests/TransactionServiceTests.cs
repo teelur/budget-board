@@ -18,7 +18,7 @@ public class TransactionServiceTests
         new Faker<TransactionCreateRequest>()
             .RuleFor(t => t.SyncID, f => f.Random.String(20))
             .RuleFor(t => t.Amount, f => f.Finance.Amount())
-            .RuleFor(t => t.Date, f => f.Date.Past())
+            .RuleFor(t => t.Date, f => DateOnly.FromDateTime(f.Date.Past()))
             .RuleFor(t => t.Category, f => f.Random.String(10))
             .RuleFor(t => t.Subcategory, f => f.Random.String(10))
             .RuleFor(t => t.MerchantName, f => f.Random.String(10))
@@ -46,7 +46,6 @@ public class TransactionServiceTests
 
         var transaction = _transactionCreateRequestFaker.Generate();
         transaction.AccountID = account.ID;
-        transaction.Date = transaction.Date.ToUniversalTime();
 
         // Act
         await transactionService.CreateTransactionAsync(helper.demoUser, transaction);
@@ -110,10 +109,7 @@ public class TransactionServiceTests
         await transactionService.CreateTransactionAsync(helper.demoUser, transaction);
         // Assert
         helper.UserDataContext.Balances.Should().ContainSingle();
-        helper
-            .UserDataContext.Balances.Single()
-            .DateTime.Should()
-            .Be(transaction.Date.ToUniversalTime().Date);
+        helper.UserDataContext.Balances.Single().Date.Should().Be(transaction.Date);
         helper.UserDataContext.Balances.Single().Amount.Should().Be(transaction.Amount);
     }
 
@@ -143,11 +139,11 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
-        balances[0].DateTime = fakeDate.AddDays(-10);
-        balances[1].DateTime = fakeDate.AddDays(-5);
-        balances[2].DateTime = fakeDate.AddDays(-3);
-        balances[3].DateTime = fakeDate.AddDays(-1);
-        balances[4].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-10));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate.AddDays(-5));
+        balances[2].Date = DateOnly.FromDateTime(fakeDate.AddDays(-3));
+        balances[3].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[4].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
@@ -156,7 +152,7 @@ public class TransactionServiceTests
 
         var transaction = _transactionCreateRequestFaker.Generate();
         transaction.AccountID = account.ID;
-        transaction.Date = fakeDate.AddDays(-2);
+        transaction.Date = DateOnly.FromDateTime(fakeDate.AddDays(-2));
 
         var oldBalance = balances[4].Amount;
 
@@ -166,11 +162,7 @@ public class TransactionServiceTests
         // Assert
         helper.UserDataContext.Balances.Should().HaveCount(6);
         helper.UserDataContext.Balances.ToList().ElementAt(4).Should().NotBeNull();
-        helper
-            .UserDataContext.Balances.ToList()
-            .ElementAt(4)
-            .DateTime.Should()
-            .Be(balances[4].DateTime);
+        helper.UserDataContext.Balances.ToList().ElementAt(4).Date.Should().Be(balances[4].Date);
         helper
             .UserDataContext.Balances.ToList()
             .ElementAt(4)
@@ -203,11 +195,11 @@ public class TransactionServiceTests
 
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
-        balances[0].DateTime = fakeDate.AddDays(-10);
-        balances[1].DateTime = fakeDate.AddDays(-5);
-        balances[2].DateTime = fakeDate.AddDays(-3);
-        balances[3].DateTime = fakeDate.AddDays(-1);
-        balances[4].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-10));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate.AddDays(-5));
+        balances[2].Date = DateOnly.FromDateTime(fakeDate.AddDays(-3));
+        balances[3].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[4].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
@@ -216,7 +208,7 @@ public class TransactionServiceTests
 
         var transaction = _transactionCreateRequestFaker.Generate();
         transaction.AccountID = account.ID;
-        transaction.Date = balances[2].DateTime;
+        transaction.Date = balances[2].Date;
 
         var oldBalanceOnTransactionDate = balances[2].Amount;
         var oldCurrentBalance = balances[4].Amount;
@@ -228,11 +220,7 @@ public class TransactionServiceTests
         helper.UserDataContext.Balances.Should().HaveCount(5);
 
         helper.UserDataContext.Balances.ToList().ElementAt(2).Should().NotBeNull();
-        helper
-            .UserDataContext.Balances.ToList()
-            .ElementAt(2)
-            .DateTime.Should()
-            .Be(balances[2].DateTime);
+        helper.UserDataContext.Balances.ToList().ElementAt(2).Date.Should().Be(balances[2].Date);
         helper
             .UserDataContext.Balances.ToList()
             .ElementAt(2)
@@ -240,11 +228,7 @@ public class TransactionServiceTests
             .Be(oldBalanceOnTransactionDate + transaction.Amount);
 
         helper.UserDataContext.Balances.ToList().ElementAt(4).Should().NotBeNull();
-        helper
-            .UserDataContext.Balances.ToList()
-            .ElementAt(4)
-            .DateTime.Should()
-            .Be(balances[4].DateTime);
+        helper.UserDataContext.Balances.ToList().ElementAt(4).Date.Should().Be(balances[4].Date);
         helper
             .UserDataContext.Balances.ToList()
             .ElementAt(4)
@@ -568,7 +552,7 @@ public class TransactionServiceTests
         {
             ID = transactions.First().ID,
             Amount = 100.0M,
-            Date = new Faker().Date.Past().ToUniversalTime(),
+            Date = DateOnly.FromDateTime(new Faker().Date.Past()),
             Category = "newCategory",
             Subcategory = "newSubcategory",
             MerchantName = "newMerchantName",
@@ -603,7 +587,7 @@ public class TransactionServiceTests
         {
             ID = Guid.NewGuid(),
             Amount = 100.0M,
-            Date = new Faker().Date.Past(),
+            Date = DateOnly.FromDateTime(new Faker().Date.Past()),
             Category = "newCategory",
             Subcategory = "newSubcategory",
             MerchantName = "newMerchantName",
@@ -645,18 +629,18 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
-        balances[0].DateTime = fakeDate.AddDays(-10);
-        balances[1].DateTime = fakeDate.AddDays(-5);
-        balances[2].DateTime = fakeDate.AddDays(-3);
-        balances[3].DateTime = fakeDate.AddDays(-1);
-        balances[4].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-10));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate.AddDays(-5));
+        balances[2].Date = DateOnly.FromDateTime(fakeDate.AddDays(-3));
+        balances[3].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[4].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(2);
 
-        transactions.First().Date = balances.First().DateTime;
+        transactions.First().Date = balances.First().Date;
         transactions.First().Amount = 50.0M;
 
         account.Transactions = transactions;
@@ -682,11 +666,7 @@ public class TransactionServiceTests
         // Assert
         helper.UserDataContext.Balances.Should().HaveCount(5);
         helper.UserDataContext.Balances.ToList().Last().Should().NotBeNull();
-        helper
-            .UserDataContext.Balances.ToList()
-            .Last()
-            .DateTime.Should()
-            .Be(balances.Last().DateTime);
+        helper.UserDataContext.Balances.ToList().Last().Date.Should().Be(balances.Last().Date);
         helper
             .UserDataContext.Balances.ToList()
             .Last()
@@ -781,17 +761,18 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
-        balances[0].DateTime = fakeDate.AddDays(-10);
-        balances[1].DateTime = fakeDate.AddDays(-5);
-        balances[2].DateTime = fakeDate.AddDays(-3);
-        balances[3].DateTime = fakeDate.AddDays(-1);
-        balances[4].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-10));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate.AddDays(-5));
+        balances[2].Date = DateOnly.FromDateTime(fakeDate.AddDays(-3));
+        balances[3].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[4].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(2);
-        transactions[0].Date = balances[0].DateTime;
+        transactions[0].Date = balances[0].Date;
+        transactions[0].Amount = 50.0M;
 
         account.Transactions = transactions;
 
@@ -807,11 +788,7 @@ public class TransactionServiceTests
         // Assert
         helper.UserDataContext.Balances.Should().HaveCount(5);
         helper.UserDataContext.Balances.ToList().Last().Should().NotBeNull();
-        helper
-            .UserDataContext.Balances.ToList()
-            .Last()
-            .DateTime.Should()
-            .Be(balances.Last().DateTime);
+        helper.UserDataContext.Balances.ToList().Last().Date.Should().Be(balances.Last().Date);
         helper
             .UserDataContext.Balances.ToList()
             .Last()
@@ -1160,7 +1137,7 @@ public class TransactionServiceTests
             new()
             {
                 Amount = 50M,
-                Date = DateTime.UtcNow,
+                Date = DateOnly.FromDateTime(DateTime.UtcNow),
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "Coffee Shop",
@@ -1170,7 +1147,7 @@ public class TransactionServiceTests
             new()
             {
                 Amount = 25M,
-                Date = DateTime.UtcNow,
+                Date = DateOnly.FromDateTime(DateTime.UtcNow),
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "Gas Station",
@@ -1196,7 +1173,7 @@ public class TransactionServiceTests
         {
             SyncID = string.Empty,
             Amount = 15M,
-            Date = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
             MerchantName = "Random Store",
             Source = "test",
             AccountID = account.ID,
@@ -1249,7 +1226,7 @@ public class TransactionServiceTests
             new()
             {
                 Amount = 50M,
-                Date = DateTime.UtcNow,
+                Date = DateOnly.FromDateTime(DateTime.UtcNow),
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "Coffee Shop",
@@ -1259,7 +1236,7 @@ public class TransactionServiceTests
             new()
             {
                 Amount = 55M,
-                Date = DateTime.UtcNow,
+                Date = DateOnly.FromDateTime(DateTime.UtcNow),
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "Coffee Place",
@@ -1269,7 +1246,7 @@ public class TransactionServiceTests
             new()
             {
                 Amount = 25M,
-                Date = DateTime.UtcNow,
+                Date = DateOnly.FromDateTime(DateTime.UtcNow),
                 Account = account,
                 AccountID = account.ID,
                 MerchantName = "Gas Station",
@@ -1295,7 +1272,7 @@ public class TransactionServiceTests
         {
             SyncID = string.Empty,
             Amount = 52M,
-            Date = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
             MerchantName = "Coffee Shop",
             Source = "test",
             AccountID = account.ID,
@@ -1344,7 +1321,7 @@ public class TransactionServiceTests
             {
                 ID = t.ID,
                 Amount = 99.0M,
-                Date = new Faker().Date.Past().ToUniversalTime(),
+                Date = DateOnly.FromDateTime(new Faker().Date.Past()),
                 Category = "batchCategory",
                 Subcategory = "batchSubcategory",
                 MerchantName = "batchMerchant",
@@ -1395,7 +1372,7 @@ public class TransactionServiceTests
             {
                 ID = transactions.First().ID,
                 Amount = 50.0M,
-                Date = new Faker().Date.Past().ToUniversalTime(),
+                Date = DateOnly.FromDateTime(new Faker().Date.Past()),
                 Category = "cat",
                 Subcategory = "sub",
                 MerchantName = "merchant",
@@ -1404,7 +1381,7 @@ public class TransactionServiceTests
             {
                 ID = Guid.NewGuid(), // does not exist
                 Amount = 50.0M,
-                Date = new Faker().Date.Past().ToUniversalTime(),
+                Date = DateOnly.FromDateTime(new Faker().Date.Past()),
                 Category = "cat",
                 Subcategory = "sub",
                 MerchantName = "merchant",
@@ -1453,7 +1430,7 @@ public class TransactionServiceTests
             {
                 ID = duplicateId,
                 Amount = 50.0M,
-                Date = new Faker().Date.Past().ToUniversalTime(),
+                Date = DateOnly.FromDateTime(new Faker().Date.Past()),
                 Category = "cat",
                 Subcategory = "sub",
                 MerchantName = "merchant",
@@ -1462,7 +1439,7 @@ public class TransactionServiceTests
             {
                 ID = duplicateId, // same ID as above
                 Amount = 75.0M,
-                Date = new Faker().Date.Past().ToUniversalTime(),
+                Date = DateOnly.FromDateTime(new Faker().Date.Past()),
                 Category = "cat2",
                 Subcategory = "sub2",
                 MerchantName = "merchant2",
@@ -1505,20 +1482,20 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
-        balances[0].DateTime = fakeDate.AddDays(-10);
-        balances[1].DateTime = fakeDate.AddDays(-5);
-        balances[2].DateTime = fakeDate.AddDays(-3);
-        balances[3].DateTime = fakeDate.AddDays(-1);
-        balances[4].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-10));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate.AddDays(-5));
+        balances[2].Date = DateOnly.FromDateTime(fakeDate.AddDays(-3));
+        balances[3].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[4].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(2);
 
-        transactions[0].Date = balances[0].DateTime;
+        transactions[0].Date = balances[0].Date;
         transactions[0].Amount = 50.0M;
-        transactions[1].Date = balances[1].DateTime;
+        transactions[1].Date = balances[1].Date;
         transactions[1].Amount = 30.0M;
 
         account.Transactions = transactions;
@@ -1720,20 +1697,20 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(5);
 
-        balances[0].DateTime = fakeDate.AddDays(-10);
-        balances[1].DateTime = fakeDate.AddDays(-5);
-        balances[2].DateTime = fakeDate.AddDays(-3);
-        balances[3].DateTime = fakeDate.AddDays(-1);
-        balances[4].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-10));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate.AddDays(-5));
+        balances[2].Date = DateOnly.FromDateTime(fakeDate.AddDays(-3));
+        balances[3].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[4].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(2);
 
-        transactions[0].Date = balances[0].DateTime;
+        transactions[0].Date = balances[0].Date;
         transactions[0].Amount = 50.0M;
-        transactions[1].Date = balances[1].DateTime;
+        transactions[1].Date = balances[1].Date;
         transactions[1].Amount = 30.0M;
 
         account.Transactions = transactions;
@@ -1782,14 +1759,14 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(2);
 
-        balances[0].DateTime = fakeDate.AddDays(-1); // midnight the day before
-        balances[1].DateTime = fakeDate; // midnight on the transaction day
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1)); // midnight the day before
+        balances[1].Date = DateOnly.FromDateTime(fakeDate); // midnight on the transaction day
 
         account.Balances = balances;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate(1).First();
-        transaction.Date = fakeDate.AddHours(14).AddMinutes(30); // 14:30 same day
+        transaction.Date = DateOnly.FromDateTime(fakeDate); // same day as balance
         transaction.Amount = 50.0M;
 
         account.Transactions = [transaction];
@@ -1846,14 +1823,14 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(2);
 
-        balances[0].DateTime = fakeDate.AddDays(-1);
-        balances[1].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate(1).First();
-        transaction.Date = fakeDate.AddHours(14).AddMinutes(30);
+        transaction.Date = DateOnly.FromDateTime(fakeDate);
         transaction.Amount = 50.0M;
 
         account.Transactions = [transaction];
@@ -1913,14 +1890,14 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(2);
 
-        balances[0].DateTime = fakeDate.AddDays(-1);
-        balances[1].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate(1).First();
-        transaction.Date = fakeDate.AddHours(14).AddMinutes(30);
+        transaction.Date = DateOnly.FromDateTime(fakeDate);
         transaction.Amount = 50.0M;
 
         account.Transactions = [transaction];
@@ -1967,14 +1944,14 @@ public class TransactionServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balances = balanceFaker.Generate(2);
 
-        balances[0].DateTime = fakeDate.AddDays(-1);
-        balances[1].DateTime = fakeDate;
+        balances[0].Date = DateOnly.FromDateTime(fakeDate.AddDays(-1));
+        balances[1].Date = DateOnly.FromDateTime(fakeDate);
 
         account.Balances = balances;
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transaction = transactionFaker.Generate(1).First();
-        transaction.Date = fakeDate.AddHours(14).AddMinutes(30);
+        transaction.Date = DateOnly.FromDateTime(fakeDate);
         transaction.Amount = 50.0M;
 
         account.Transactions = [transaction];

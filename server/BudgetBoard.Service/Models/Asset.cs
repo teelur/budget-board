@@ -17,9 +17,9 @@ public interface IAssetResponse
     Guid ID { get; }
     string Name { get; }
     decimal? CurrentValue { get; }
-    DateTime? PurchaseDate { get; }
+    DateOnly? PurchaseDate { get; }
     decimal? PurchasePrice { get; }
-    DateTime? SellDate { get; }
+    DateOnly? SellDate { get; }
     decimal? SellPrice { get; }
     bool Hide { get; }
     DateTime? Deleted { get; }
@@ -32,10 +32,10 @@ public class AssetResponse() : IAssetResponse
     public Guid ID { get; set; } = Guid.Empty;
     public string Name { get; set; } = string.Empty;
     public decimal? CurrentValue { get; set; } = null;
-    public DateTime? ValueDate { get; set; } = null;
-    public DateTime? PurchaseDate { get; set; } = null;
+    public DateOnly? ValueDate { get; set; } = null;
+    public DateOnly? PurchaseDate { get; set; } = null;
     public decimal? PurchasePrice { get; set; } = null;
-    public DateTime? SellDate { get; set; } = null;
+    public DateOnly? SellDate { get; set; } = null;
     public decimal? SellPrice { get; set; } = null;
     public bool Hide { get; set; } = false;
     public DateTime? Deleted { get; set; } = null;
@@ -48,15 +48,13 @@ public class AssetResponse() : IAssetResponse
         ID = asset.ID;
         Name = asset.Name;
         CurrentValue = asset
-            .Values.OrderByDescending(v => v.DateTime)
-            .Where(v => v.Deleted == null)
-            .FirstOrDefault()
+            .Values.OrderByDescending(v => v.Date)
+            .FirstOrDefault(v => v.Deleted == null)
             ?.Amount;
         ValueDate = asset
-            .Values.OrderByDescending(v => v.DateTime)
-            .Where(v => v.Deleted == null)
-            .FirstOrDefault()
-            ?.DateTime;
+            .Values.OrderByDescending(v => v.Date)
+            .FirstOrDefault(v => v.Deleted == null)
+            ?.Date;
         PurchaseDate = asset.PurchaseDate;
         PurchasePrice = asset.PurchasePrice;
         SellDate = asset.SellDate;
@@ -72,9 +70,9 @@ public interface IAssetUpdateRequest
 {
     Guid ID { get; }
     string Name { get; }
-    DateTime? PurchaseDate { get; }
+    DateOnly? PurchaseDate { get; }
     decimal? PurchasePrice { get; }
-    DateTime? SellDate { get; }
+    DateOnly? SellDate { get; }
     decimal? SellPrice { get; }
     bool Hide { get; }
 }
@@ -83,9 +81,9 @@ public class AssetUpdateRequest() : IAssetUpdateRequest
 {
     public Guid ID { get; set; } = Guid.Empty;
     public string Name { get; set; } = string.Empty;
-    public DateTime? PurchaseDate { get; set; } = null;
+    public DateOnly? PurchaseDate { get; set; } = null;
     public decimal? PurchasePrice { get; set; } = null;
-    public DateTime? SellDate { get; set; } = null;
+    public DateOnly? SellDate { get; set; } = null;
     public decimal? SellPrice { get; set; } = null;
     public bool Hide { get; set; } = false;
 }

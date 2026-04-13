@@ -413,7 +413,9 @@ const ConfigureTransactions = (
       return {
         uid: row.uid,
         date: columnsSelect.date
-          ? dayjs(row[columnsSelect.date], columnsOptions.dateFormat).toDate()
+          ? dayjs(row[columnsSelect.date], columnsOptions.dateFormat).format(
+              "YYYY-MM-DD",
+            )
           : null,
         merchantName: columnsSelect.merchantName
           ? row[columnsSelect.merchantName]

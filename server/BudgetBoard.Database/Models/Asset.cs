@@ -18,7 +18,7 @@ public class Asset
     /// <summary>
     /// Date the asset was purchased, or null if unknown.
     /// </summary>
-    public DateTime? PurchaseDate { get; set; } = null;
+    public DateOnly? PurchaseDate { get; set; } = null;
 
     /// <summary>
     /// Price paid for the asset at purchase, or null if unknown.
@@ -28,7 +28,7 @@ public class Asset
     /// <summary>
     /// Date the asset was sold, or null if not sold.
     /// </summary>
-    public DateTime? SellDate { get; set; } = null;
+    public DateOnly? SellDate { get; set; } = null;
 
     /// <summary>
     /// Price received when the asset was sold, or null if not sold.

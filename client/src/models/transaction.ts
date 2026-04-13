@@ -1,7 +1,7 @@
 import { ICategory } from "./category";
 
 export interface ITransactionImport {
-  date: Date | null;
+  date: string | null;
   merchantName: string | null;
   category: string | null;
   amount: number | null;
@@ -26,7 +26,7 @@ export interface ITransactionImportRequest {
 export interface ITransactionCreateRequest {
   syncID: string | null;
   amount: number;
-  date: Date;
+  date: string;
   category: string | null;
   subcategory: string | null;
   merchantName: string | null;
@@ -37,7 +37,7 @@ export interface ITransactionCreateRequest {
 export interface ITransactionUpdateRequest {
   id: string;
   amount: number;
-  date: Date;
+  date: string;
   category: string | null;
   subcategory: string | null;
   merchantName: string | null;
@@ -54,7 +54,7 @@ export interface ITransaction {
   id: string;
   syncID: string | null;
   amount: number;
-  date: Date;
+  date: string;
   category: string | null;
   subcategory: string | null;
   merchantName: string | null;

@@ -296,7 +296,7 @@ public class GoalServiceTests
 
         var balance0 = balanceFaker.Generate();
         balance0.Amount = balance;
-        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        balance0.Date = new DateOnly(fakeDate.Year, fakeDate.Month, 1);
 
         account.Balances = [balance0];
 
@@ -368,7 +368,7 @@ public class GoalServiceTests
 
         var balance0 = balanceFaker.Generate();
         balance0.Amount = balance;
-        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        balance0.Date = new DateOnly(fakeDate.Year, fakeDate.Month, 1);
 
         account.Balances = [balance0];
 
@@ -419,14 +419,14 @@ public class GoalServiceTests
 
         var transaction = transactionFaker.Generate();
         transaction.AccountID = account.ID;
-        transaction.Date = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        transaction.Date = new DateOnly(fakeDate.Year, fakeDate.Month, 1);
         transaction.Amount = 3000;
 
         account.Transactions.Add(transaction);
 
         var otherMonthTransaction = transactionFaker.Generate();
         otherMonthTransaction.AccountID = account.ID;
-        otherMonthTransaction.Date = new DateTime(fakeDate.Year, fakeDate.Month, 2).AddMonths(-1);
+        otherMonthTransaction.Date = new DateOnly(fakeDate.Year, fakeDate.Month, 2).AddMonths(-1);
         otherMonthTransaction.Amount = 2000;
 
         account.Transactions.Add(otherMonthTransaction);
@@ -434,7 +434,7 @@ public class GoalServiceTests
         var balanceFaker = new BalanceFaker([account.ID]);
         var balance0 = balanceFaker.Generate();
         balance0.Amount = 30000;
-        balance0.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        balance0.Date = new DateOnly(fakeDate.Year, fakeDate.Month, 1);
 
         account.Balances = [balance0];
 
@@ -889,7 +889,7 @@ public class GoalServiceTests
         var balanceFaker = new BalanceFaker([.. accounts.Select(a => a.ID)]);
         var newBalance = balanceFaker.Generate();
         newBalance.Amount = 5000;
-        newBalance.DateTime = new DateTime(fakeDate.Year, fakeDate.Month, 1);
+        newBalance.Date = new DateOnly(fakeDate.Year, fakeDate.Month, 1);
         accounts.Where(a => a.ID == newBalance.AccountID).Single().Balances.Add(newBalance);
 
         helper.UserDataContext.Accounts.AddRange(accounts);

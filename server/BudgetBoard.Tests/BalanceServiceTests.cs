@@ -17,12 +17,12 @@ public class BalanceServiceTests
     private readonly Faker<BalanceCreateRequest> _balanceCreateRequestFaker =
         new Faker<BalanceCreateRequest>()
             .RuleFor(b => b.Amount, f => f.Finance.Amount())
-            .RuleFor(b => b.DateTime, f => f.Date.Past());
+            .RuleFor(b => b.Date, f => DateOnly.FromDateTime(f.Date.Past()));
 
     private readonly Faker<BalanceUpdateRequest> _balanceUpdateRequestFaker =
         new Faker<BalanceUpdateRequest>()
             .RuleFor(b => b.Amount, f => f.Finance.Amount())
-            .RuleFor(b => b.DateTime, f => f.Date.Past());
+            .RuleFor(b => b.Date, f => DateOnly.FromDateTime(f.Date.Past()));
 
     [Fact]
     public async Task CreateBalancesAsync_WhenCalledWithValidData_ShouldCreateBalances()
@@ -105,6 +105,48 @@ public class BalanceServiceTests
     }
 
     [Fact]
+    public async Task CreateBalancesAsync_WhenBalanceExistsForSameDate_ShouldUpdateExistingBalance()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var balanceService = new BalanceService(
+            Mock.Of<ILogger<IBalanceService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var existingBalance = new BalanceFaker([account.ID]).Generate();
+        account.Balances.Add(existingBalance);
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var balanceCreateRequest = new BalanceCreateRequest
+        {
+            Amount = existingBalance.Amount + 100,
+            Date = existingBalance.Date,
+            AccountID = account.ID,
+        };
+
+        // Act
+        await balanceService.CreateBalancesAsync(helper.demoUser.Id, balanceCreateRequest);
+
+        // Assert
+        helper
+            .UserDataContext.Balances.Should()
+            .ContainSingle(b =>
+                b.AccountID == account.ID
+                && b.Date == existingBalance.Date
+                && b.Amount == balanceCreateRequest.Amount
+            );
+    }
+
+    [Fact]
     public async Task ReadBalancesAsync_WhenCalledWithValidData_ShouldReturnBalances()
     {
         // Arrange
@@ -184,7 +226,6 @@ public class BalanceServiceTests
 
         var balanceUpdateRequest = _balanceUpdateRequestFaker.Generate();
         balanceUpdateRequest.ID = balance.ID;
-        balanceUpdateRequest.AccountID = account.ID;
 
         // Act
         await balanceService.UpdateBalanceAsync(helper.demoUser.Id, balanceUpdateRequest);
@@ -216,6 +257,48 @@ public class BalanceServiceTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("BalanceUpdateNotFoundError");
+    }
+
+    [Fact]
+    public async Task UpdateBalanceAsync_WhenDuplicateDateExists_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var balanceService = new BalanceService(
+            Mock.Of<ILogger<IBalanceService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var balanceFaker = new BalanceFaker([account.ID]);
+        var balance1 = balanceFaker.Generate();
+        var balance2 = balanceFaker.Generate();
+        account.Balances.Add(balance1);
+        account.Balances.Add(balance2);
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var balanceUpdateRequest = new BalanceUpdateRequest
+        {
+            ID = balance1.ID,
+            Amount = balance1.Amount + 100,
+            Date = balance2.Date,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await balanceService.UpdateBalanceAsync(helper.demoUser.Id, balanceUpdateRequest);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("BalanceDuplicateDateError");
     }
 
     [Fact]

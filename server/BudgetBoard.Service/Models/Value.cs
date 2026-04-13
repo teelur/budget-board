@@ -5,14 +5,14 @@ namespace BudgetBoard.Service.Models;
 public interface IValueCreateRequest
 {
     decimal Amount { get; }
-    DateTime DateTime { get; }
+    DateOnly Date { get; }
     Guid AssetID { get; }
 }
 
 public class ValueCreateRequest() : IValueCreateRequest
 {
     public decimal Amount { get; set; } = 0;
-    public DateTime DateTime { get; set; } = DateTime.UtcNow;
+    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
     public Guid AssetID { get; set; } = Guid.Empty;
 }
 
@@ -20,7 +20,7 @@ public interface IValueResponse
 {
     Guid ID { get; }
     decimal Amount { get; }
-    DateTime DateTime { get; }
+    DateOnly Date { get; }
     DateTime? Deleted { get; }
     Guid AssetID { get; }
 }
@@ -29,7 +29,7 @@ public class ValueResponse() : IValueResponse
 {
     public Guid ID { get; set; } = Guid.Empty;
     public decimal Amount { get; set; } = 0;
-    public DateTime DateTime { get; set; } = DateTime.UtcNow;
+    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
     public DateTime? Deleted { get; set; } = null;
     public Guid AssetID { get; set; } = Guid.Empty;
 
@@ -38,7 +38,7 @@ public class ValueResponse() : IValueResponse
     {
         ID = value.ID;
         Amount = value.Amount;
-        DateTime = value.DateTime;
+        Date = value.Date;
         Deleted = value.Deleted;
         AssetID = value.AssetID;
     }
@@ -48,12 +48,12 @@ public interface IValueUpdateRequest
 {
     Guid ID { get; }
     decimal Amount { get; }
-    DateTime DateTime { get; }
+    DateOnly Date { get; }
 }
 
 public class ValueUpdateRequest() : IValueUpdateRequest
 {
     public Guid ID { get; set; } = Guid.Empty;
     public decimal Amount { get; set; } = 0;
-    public DateTime DateTime { get; set; } = DateTime.UtcNow;
+    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 }

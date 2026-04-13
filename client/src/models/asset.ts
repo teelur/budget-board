@@ -5,9 +5,9 @@ export interface IAssetCreateRequest {
 export interface IAssetUpdateRequest {
   id: string;
   name: string;
-  purchaseDate: Date | null;
+  purchaseDate: string | null;
   purchasePrice: number | null;
-  sellDate: Date | null;
+  sellDate: string | null;
   sellPrice: number | null;
   hide: boolean;
 }
@@ -21,10 +21,10 @@ export interface IAssetResponse {
   id: string;
   name: string;
   currentValue: number;
-  valueDate: Date;
-  purchaseDate: Date | null;
+  valueDate: string;
+  purchaseDate: string | null;
   purchasePrice: number | null;
-  sellDate: Date | null;
+  sellDate: string | null;
   sellPrice: number | null;
   hide: boolean;
   deleted: boolean;

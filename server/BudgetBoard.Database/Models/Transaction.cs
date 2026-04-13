@@ -23,7 +23,7 @@ public class Transaction
     /// <summary>
     /// The date the transaction occurred.
     /// </summary>
-    public required DateTime Date { get; set; }
+    public required DateOnly Date { get; set; }
 
     /// <summary>
     /// The category assigned to the transaction.

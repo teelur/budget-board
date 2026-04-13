@@ -83,6 +83,7 @@ const Navbar = (props: NavbarProps) => {
     })
       .then(() => {
         queryClient.removeQueries();
+        localStorage.setItem("isAuthenticated", "false");
         setIsUserAuthenticated(false);
       })
       .catch((error: AxiosError) => {

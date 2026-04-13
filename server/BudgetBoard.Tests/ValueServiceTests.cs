@@ -17,7 +17,7 @@ public class ValueServiceTests
     private readonly Faker<ValueCreateRequest> _valueCreateRequestFaker =
         new Faker<ValueCreateRequest>()
             .RuleFor(v => v.Amount, f => f.Finance.Amount(-10000, 10000))
-            .RuleFor(v => v.DateTime, f => f.Date.Past())
+            .RuleFor(v => v.Date, f => DateOnly.FromDateTime(f.Date.Past()))
             .RuleFor(v => v.AssetID, f => Guid.Empty);
 
     [Fact]
@@ -50,7 +50,7 @@ public class ValueServiceTests
             .UserDataContext.Values.Should()
             .ContainSingle(v =>
                 v.Amount == valueCreateRequest.Amount
-                && v.DateTime == valueCreateRequest.DateTime
+                && v.Date == valueCreateRequest.Date
                 && v.AssetID == valueCreateRequest.AssetID
             );
     }
@@ -104,7 +104,50 @@ public class ValueServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("ValueCreateAssetNotFoundError");
+            .WithMessage("ValueAssetNotFoundError");
+    }
+
+    [Fact]
+    public async Task CreateValueAsync_WhenValueExistsForSameDate_ShouldUpdateExistingValue()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var valueService = new ValueService(
+            Mock.Of<ILogger<IValueService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var asset = new AssetFaker(helper.demoUser.Id).Generate();
+
+        var existingValue = new ValueFaker().Generate();
+        existingValue.AssetID = asset.ID;
+        asset.Values.Add(existingValue);
+
+        helper.UserDataContext.Assets.Add(asset);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var valueCreateRequest = new ValueCreateRequest
+        {
+            Amount = existingValue.Amount + 100,
+            Date = existingValue.Date,
+            AssetID = asset.ID,
+        };
+
+        // Act
+        await valueService.CreateValueAsync(helper.demoUser.Id, valueCreateRequest);
+
+        // Assert
+        helper
+            .UserDataContext.Values.Should()
+            .ContainSingle(v =>
+                v.AssetID == asset.ID
+                && v.Date == existingValue.Date
+                && v.Amount == valueCreateRequest.Amount
+            );
     }
 
     [Fact]
@@ -197,7 +240,7 @@ public class ValueServiceTests
         {
             ID = value.ID,
             Amount = value.Amount + 100,
-            DateTime = value.DateTime.AddDays(1),
+            Date = value.Date.AddDays(1),
         };
 
         // Act
@@ -208,9 +251,7 @@ public class ValueServiceTests
             .demoUser.Assets.SelectMany(a => a.Values)
             .Should()
             .ContainSingle(v =>
-                v.ID == value.ID
-                && v.Amount == editedValue.Amount
-                && v.DateTime == editedValue.DateTime
+                v.ID == value.ID && v.Amount == editedValue.Amount && v.Date == editedValue.Date
             );
     }
 
@@ -231,7 +272,7 @@ public class ValueServiceTests
         {
             ID = Guid.NewGuid(),
             Amount = 500,
-            DateTime = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.Now),
         };
 
         // Act
@@ -242,6 +283,48 @@ public class ValueServiceTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("ValueUpdateNotFoundError");
+    }
+
+    [Fact]
+    public async Task UpdateValueAsync_WhenDuplicateDateExists_ShouldThrowException()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var valueService = new ValueService(
+            Mock.Of<ILogger<IValueService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var asset = new AssetFaker(helper.demoUser.Id).Generate();
+
+        var value1 = new ValueFaker().Generate();
+        value1.AssetID = asset.ID;
+        var value2 = new ValueFaker().Generate();
+        value2.AssetID = asset.ID;
+        asset.Values.Add(value1);
+        asset.Values.Add(value2);
+
+        helper.UserDataContext.Assets.Add(asset);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var editedValue = new ValueUpdateRequest
+        {
+            ID = value1.ID,
+            Amount = value1.Amount + 100,
+            Date = value2.Date,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await valueService.UpdateValueAsync(helper.demoUser.Id, editedValue);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("ValueDuplicateDateError");
     }
 
     [Fact]

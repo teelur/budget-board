@@ -419,7 +419,7 @@ public static class AutomaticRuleHelpers
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
-        if (!DateTime.TryParse(condition.Value, out var conditionDate))
+        if (!DateOnly.TryParse(condition.Value, out var conditionDate))
         {
             throw new BudgetBoardServiceException(
                 responseLocalizer["AutomaticRuleInvalidDateError", condition.Value]
@@ -434,7 +434,7 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return transactions.Where(t => t.Date.Date == conditionDate.Date);
+            return transactions.Where(t => t.Date == conditionDate);
         }
         // Before
         else if (
@@ -444,7 +444,7 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return transactions.Where(t => t.Date.Date < conditionDate.Date);
+            return transactions.Where(t => t.Date < conditionDate);
         }
         // After
         else if (
@@ -454,7 +454,7 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return transactions.Where(t => t.Date.Date > conditionDate.Date);
+            return transactions.Where(t => t.Date > conditionDate);
         }
 
         throw new BudgetBoardServiceException(
@@ -606,7 +606,7 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            if (!DateTime.TryParse(action.Value, out var newDate))
+            if (!DateOnly.TryParse(action.Value, out var newDate))
             {
                 throw new BudgetBoardServiceException(
                     responseLocalizer["AutomaticRuleInvalidDateError", action.Value]

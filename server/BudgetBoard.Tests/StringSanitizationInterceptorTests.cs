@@ -24,7 +24,7 @@ public class StringSanitizationInterceptorTests
         {
             SyncID = "sync\0id",
             Amount = 100.00M,
-            Date = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.Today),
             Category = "Gro\0ceries",
             Subcategory = "Food\0Store",
             MerchantName = "Mer\0chant\0Name",
@@ -120,7 +120,7 @@ public class StringSanitizationInterceptorTests
         {
             SyncID = "syn\0c\0id",
             Amount = 100.00M,
-            Date = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.Today),
             MerchantName = "Mer\0\0\0chant",
             Source = "Manual",
             AccountID = account.ID,
@@ -155,7 +155,7 @@ public class StringSanitizationInterceptorTests
         {
             SyncID = null,
             Amount = 100.00M,
-            Date = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.Today),
             Category = null,
             Subcategory = null,
             MerchantName = null,
@@ -194,7 +194,7 @@ public class StringSanitizationInterceptorTests
         {
             SyncID = "syncid",
             Amount = 100.00M,
-            Date = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.Today),
             MerchantName = "Clean Merchant",
             Source = "Manual",
             AccountID = account.ID,
@@ -233,7 +233,7 @@ public class StringSanitizationInterceptorTests
         {
             SyncID = string.Empty,
             Amount = 100.00M,
-            Date = DateTime.UtcNow,
+            Date = DateOnly.FromDateTime(DateTime.Today),
             MerchantName = string.Empty,
             Source = "Manual",
             AccountID = account.ID,

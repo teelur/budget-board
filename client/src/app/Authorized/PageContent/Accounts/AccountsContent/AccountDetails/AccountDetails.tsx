@@ -56,15 +56,15 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const sortedBalances =
     balancesQuery.data
       ?.filter((balance) => !balance.deleted)
-      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+      .sort((a, b) => dayjs(b.date).diff(dayjs(a.date))) ?? [];
 
   const sortedDeletedBalances =
     balancesQuery.data
       ?.filter((balance) => balance.deleted)
-      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+      .sort((a, b) => dayjs(b.date).diff(dayjs(a.date))) ?? [];
 
   const balancesForChart = sortedBalances.filter((balance) =>
-    dayjs(balance.dateTime).isAfter(
+    dayjs(balance.date).isAfter(
       dayjs().subtract(chartLookbackMonths, "months"),
     ),
   );

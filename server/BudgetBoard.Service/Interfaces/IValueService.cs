@@ -9,6 +9,7 @@ public interface IValueService
 {
     /// <summary>
     /// Creates a new value entry for an asset.
+    /// If a value already exists for the given date, it will be updated instead of creating a new entry.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The value creation details.</param>

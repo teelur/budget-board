@@ -54,7 +54,7 @@ const AccountsSelectHeader = (
           onChange={props.setSelectedAccountIds}
           hideHidden
           filterTypes={props.filters}
-          w={"auto"}
+          w="auto"
           miw="230px"
           maw="600px"
           elevation={1}
