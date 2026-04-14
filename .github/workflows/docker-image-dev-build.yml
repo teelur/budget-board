@@ -18,6 +18,10 @@ on:
       - "compose.override.yml"
       - "LICENSE"
 
+concurrency:
+  group: dev-build-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
