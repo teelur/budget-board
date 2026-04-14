@@ -71,9 +71,9 @@ public class AssetService(
         }
 
         asset.Name = request.Name;
-        asset.PurchaseDate = request.PurchaseDate?.ToUniversalTime();
+        asset.PurchaseDate = request.PurchaseDate;
         asset.PurchasePrice = request.PurchasePrice;
-        asset.SellDate = request.SellDate?.ToUniversalTime();
+        asset.SellDate = request.SellDate;
         asset.SellPrice = request.SellPrice;
         asset.Hide = request.Hide;
 

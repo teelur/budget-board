@@ -157,8 +157,11 @@
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
     <value>The account you are trying to access does not exist.</value>
   </data>
-  <data name="BalanceAccountUpdateNotFoundError" xml:space="preserve">
-    <value>The account you are trying to update does not exist.</value>
+  <data name="BalanceUpdateNotFoundError" xml:space="preserve">
+    <value>The balance you are trying to update does not exist.</value>
+  </data>
+  <data name="BalanceDuplicateDateError" xml:space="preserve">
+    <value>A balance already exists for this account on that date.</value>
   </data>
   <data name="BalanceAccountDeleteNotFoundError" xml:space="preserve">
     <value>The account you are trying to delete does not exist.</value>
@@ -345,6 +348,12 @@
   </data>
   <data name="ValueUpdateAssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to update does not exist.</value>
+  </data>
+  <data name="ValueUpdateNotFoundError" xml:space="preserve">
+    <value>The value you are trying to update does not exist.</value>
+  </data>
+  <data name="ValueDuplicateDateError" xml:space="preserve">
+    <value>A value for this date already exists for this asset.</value>
   </data>
   <data name="ValueDeleteNotFoundError" xml:space="preserve">
     <value>The value you are trying to delete does not exist.</value>

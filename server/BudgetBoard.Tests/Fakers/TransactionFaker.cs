@@ -14,7 +14,7 @@ public class TransactionFaker : Faker<Transaction>
         RuleFor(t => t.ID, f => Guid.NewGuid())
             .RuleFor(t => t.SyncID, f => f.Random.String(20))
             .RuleFor(t => t.Amount, f => f.Finance.Amount())
-            .RuleFor(t => t.Date, f => f.Date.Past())
+            .RuleFor(t => t.Date, f => DateOnly.FromDateTime(f.Date.Past()))
             .RuleFor(t => t.Category, f => f.Random.String(10))
             .RuleFor(t => t.Subcategory, f => f.Random.String(10))
             .RuleFor(t => t.MerchantName, f => f.Random.String(10))

@@ -24,7 +24,7 @@ public class AutomaticTransactionCategorizerTests
             new Transaction
             {
                 Amount = 1.0M,
-                Date = DateTime.Parse("2025-01-01"),
+                Date = DateOnly.Parse("2025-01-01"),
                 Source = "test",
                 Account = account,
                 AccountID = account.ID,
@@ -36,7 +36,7 @@ public class AutomaticTransactionCategorizerTests
             new Transaction
             {
                 Amount = 37.76M,
-                Date = DateTime.Parse("2025-01-02"),
+                Date = DateOnly.Parse("2025-01-02"),
                 Source = "test",
                 Account = account,
                 AccountID = account.ID,
@@ -48,7 +48,7 @@ public class AutomaticTransactionCategorizerTests
             new Transaction
             {
                 Amount = 10000.00M,
-                Date = DateTime.Parse("2025-01-03"),
+                Date = DateOnly.Parse("2025-01-03"),
                 Source = "test",
                 Account = account,
                 AccountID = account.ID,
@@ -60,7 +60,7 @@ public class AutomaticTransactionCategorizerTests
             new Transaction
             {
                 Amount = 1.05M,
-                Date = DateTime.Parse("2025-01-04"),
+                Date = DateOnly.Parse("2025-01-04"),
                 Source = "test",
                 Account = account,
                 AccountID = account.ID,
@@ -72,7 +72,7 @@ public class AutomaticTransactionCategorizerTests
             new Transaction
             {
                 Amount = 10.0M,
-                Date = DateTime.Parse("2025-01-03"),
+                Date = DateOnly.Parse("2025-01-03"),
                 Source = "test",
                 Account = account,
                 AccountID = account.ID,
@@ -84,7 +84,7 @@ public class AutomaticTransactionCategorizerTests
             new Transaction
             {
                 Amount = 1.0M,
-                Date = DateTime.Parse("2025-01-06"),
+                Date = DateOnly.Parse("2025-01-06"),
                 Source = "test",
                 Account = account,
                 AccountID = account.ID,
@@ -96,7 +96,7 @@ public class AutomaticTransactionCategorizerTests
             new Transaction
             {
                 Amount = 124.86M,
-                Date = DateTime.Parse("2025-01-02"),
+                Date = DateOnly.Parse("2025-01-02"),
                 Source = "test",
                 Account = account,
                 AccountID = account.ID,
@@ -116,7 +116,7 @@ public class AutomaticTransactionCategorizerTests
         var newTransaction1 = new Transaction
         {
             Amount = 21.49M,
-            Date = DateTime.Parse("2025-02-01"),
+            Date = DateOnly.Parse("2025-02-01"),
             Account = account,
             AccountID = account.ID,
             MerchantName = "jkl mno pqr",
@@ -127,7 +127,7 @@ public class AutomaticTransactionCategorizerTests
         var newTransaction2 = new Transaction
         {
             Amount = 129.23M,
-            Date = DateTime.Parse("2025-02-01"),
+            Date = DateOnly.Parse("2025-02-01"),
             Account = account,
             AccountID = account.ID,
             MerchantName = "jkl mno pqr",

@@ -47,14 +47,15 @@ const AssetsSelectHeader = (
           type="range"
           value={props.dateRange}
           onChange={props.setDateRange}
+          miw={200}
           elevation={1}
         />
         <AssetSelect
           selectedAssetIds={props.selectedAssetIds}
           setSelectedAssetIds={props.setSelectedAssetIds}
           hideHidden
+          flex={1}
           miw="230px"
-          maw="400px"
           elevation={1}
         />
         <Button

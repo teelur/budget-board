@@ -82,7 +82,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
         onClick={() =>
           doAddValue.mutate({
             amount: Number(amountField.getValue()),
-            dateTime: dateField.getValue(),
+            date: dayjs(dateField.getValue()).format("YYYY-MM-DD"),
             assetID: props.assetId,
           })
         }

@@ -8,7 +8,7 @@ import {
 } from "~/models/transaction";
 import { areStringsEqual } from "./utils";
 import { getIsParentCategory } from "./category";
-import { getStandardDate } from "./datetime";
+import dayjs from "~/shared/dayjs";
 import { ICategory } from "~/models/category";
 
 /**
@@ -31,10 +31,10 @@ export const sortTransactions = (
     case Sorts.Date:
       return sortDirection === SortDirection.Decending
         ? transactions.sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+            (a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf(),
           )
         : transactions.sort(
-            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+            (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
           );
     case Sorts.Merchant:
       return sortDirection === SortDirection.Decending
@@ -152,17 +152,13 @@ export const getFilteredTransactions = (
     );
   }
   if (filters.dateRange?.at(0)) {
-    filteredTransactions = filteredTransactions.filter(
-      (t) =>
-        getStandardDate(t.date).getTime() >=
-        getStandardDate(filters.dateRange.at(0)!).getTime(),
+    filteredTransactions = filteredTransactions.filter((t) =>
+      dayjs(t.date).isSameOrAfter(dayjs(filters.dateRange.at(0)!), "day"),
     );
   }
   if (filters.dateRange?.at(1)) {
-    filteredTransactions = filteredTransactions.filter(
-      (t) =>
-        getStandardDate(t.date).getTime() <=
-        getStandardDate(filters.dateRange.at(1)!).getTime(),
+    filteredTransactions = filteredTransactions.filter((t) =>
+      dayjs(t.date).isSameOrBefore(dayjs(filters.dateRange.at(1)!), "day"),
     );
   }
   return filteredTransactions;
@@ -200,7 +196,7 @@ export const buildTimeToMonthlyTotalsMap = (
   const map = new Map<number, number>();
   months.forEach((month: Date) => {
     const total = transactions
-      .filter((t) => new Date(t.date).getMonth() === month.getMonth())
+      .filter((t) => dayjs(t.date).isSame(month, "month"))
       .reduce((n, { amount }) => n + amount, 0);
     map.set(month.getTime(), total);
   });
@@ -234,10 +230,8 @@ export const getTransactionsForMonth = (
   transactionData: ITransaction[],
   date: Date,
 ): ITransaction[] =>
-  transactionData.filter(
-    (t: ITransaction) =>
-      new Date(t.date).getMonth() === new Date(date).getMonth() &&
-      new Date(t.date).getUTCFullYear() === new Date(date).getUTCFullYear(),
+  transactionData.filter((t: ITransaction) =>
+    dayjs(t.date).isSame(date, "month"),
   );
 
 export interface RollingTotalSpendingPerDay {
@@ -262,13 +256,13 @@ export const getRollingTotalSpendingForMonth = (
 
   const sortedSpending = transactionsForMonth
     .filter((t) => !areStringsEqual(t.category ?? "", "Income"))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    .sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
 
   let total = 0;
   const summedTransactionsPerMonth = sortedSpending.reduce(
     (result: RollingTotalSpendingPerDay[], transaction: ITransaction) => {
       const foundDay = result.find(
-        (t) => t.day === new Date(transaction.date).getDate(),
+        (t) => t.day === dayjs(transaction.date).date(),
       );
 
       // Transactions are negative and we want spending to be positive,
@@ -277,7 +271,7 @@ export const getRollingTotalSpendingForMonth = (
 
       if (foundDay == null) {
         const newDay: RollingTotalSpendingPerDay = {
-          day: new Date(transaction.date).getDate(),
+          day: dayjs(transaction.date).date(),
           amount: total,
         };
         result.push(newDay);
@@ -378,45 +372,4 @@ export const sumTransactionAmounts = (
   transactionData: ITransaction[],
 ): number => {
   return transactionData.reduce((n, { amount }) => n + amount, 0);
-};
-
-const escapeCsvValue = (value: string): string =>
-  `"${value.replace(/"/g, '""')}"`;
-
-export const buildTransactionsCsv = (
-  transactions: ITransaction[],
-  orderedFields: string[],
-  fieldLabels: Record<string, string>,
-  accountLookup: Record<string, string>,
-): string => {
-  const getFieldValue = (t: ITransaction, key: string): string => {
-    switch (key) {
-      case "date":
-        return new Date(t.date).toLocaleDateString();
-      case "merchantName":
-        return t.merchantName ?? "";
-      case "amount":
-        return t.amount.toString();
-      case "category":
-        return t.subcategory?.trim() ? t.subcategory : (t.category ?? "");
-      case "account":
-        return accountLookup[t.accountID] ?? "";
-      case "pending":
-        return t.pending ? "true" : "false";
-      case "source":
-        return t.source;
-      default:
-        return "";
-    }
-  };
-
-  const headers = orderedFields
-    .map((k) => escapeCsvValue(fieldLabels[k] ?? k))
-    .join(",");
-
-  const rows = transactions.map((t) =>
-    orderedFields.map((key) => escapeCsvValue(getFieldValue(t, key))).join(","),
-  );
-
-  return [headers, ...rows].join("\n");
 };

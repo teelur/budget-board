@@ -54,17 +54,10 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   });
 
   const sortedBalances =
-    balancesQuery.data
-      ?.filter((balance) => !balance.deleted)
-      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
-
-  const sortedDeletedBalances =
-    balancesQuery.data
-      ?.filter((balance) => balance.deleted)
-      .sort((a, b) => dayjs(b.dateTime).diff(dayjs(a.dateTime))) ?? [];
+    balancesQuery.data?.sort((a, b) => dayjs(b.date).diff(dayjs(a.date))) ?? [];
 
   const balancesForChart = sortedBalances.filter((balance) =>
-    dayjs(balance.dateTime).isAfter(
+    dayjs(balance.date).isAfter(
       dayjs().subtract(chartLookbackMonths, "months"),
     ),
   );
@@ -172,30 +165,6 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   ) : (
                     <BalanceItems
                       balances={sortedBalances}
-                      currency={props.currency}
-                    />
-                  )}
-                </Stack>
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
-            <MantineAccordion.Item value="deleted-balances">
-              <MantineAccordion.Control>
-                <PrimaryText>{t("deleted_balances")}</PrimaryText>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <Stack gap="0.5rem">
-                  {balancesQuery.isPending && (
-                    <Skeleton height={20} radius="lg" />
-                  )}
-                  {sortedDeletedBalances.length === 0 ? (
-                    <Group justify="center">
-                      <DimmedText size="sm">
-                        {t("no_deleted_balance_entries")}
-                      </DimmedText>
-                    </Group>
-                  ) : (
-                    <BalanceItems
-                      balances={sortedDeletedBalances}
                       currency={props.currency}
                     />
                   )}

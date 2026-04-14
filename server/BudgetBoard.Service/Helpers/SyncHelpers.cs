@@ -28,35 +28,7 @@ public static class SyncHelpers
             };
         }
 
-        // We only want to create a balance if it is newer than the latest balance we have.
-        var latestBalance = userAccount
-            .Balances.OrderByDescending(b => b.DateTime)
-            .FirstOrDefault();
-        if (newBalance.DateTime > (latestBalance?.DateTime ?? DateTime.MinValue))
-        {
-            // If the account already has a balance for this date, update it instead of creating a new one.
-            var existingBalance = userAccount.Balances.FirstOrDefault(b =>
-                b.DateTime.Date == newBalance.DateTime.Date
-            );
-            if (existingBalance != null)
-            {
-                existingBalance.Amount = newBalance.Amount;
-                await balanceService.UpdateBalanceAsync(
-                    userData.Id,
-                    new BalanceUpdateRequest
-                    {
-                        ID = existingBalance.ID,
-                        Amount = newBalance.Amount,
-                        DateTime = newBalance.DateTime,
-                        AccountID = existingBalance.AccountID,
-                    }
-                );
-                return null;
-            }
-
-            // Otherwise, create a new balance.
-            await balanceService.CreateBalancesAsync(userData.Id, newBalance);
-        }
+        await balanceService.CreateBalancesAsync(userData.Id, newBalance);
         return null;
     }
 }

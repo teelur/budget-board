@@ -392,8 +392,7 @@ public class LunchFlowService(
             // If it is unset, all transactions will be synced.
             var transactionsToSync = lunchFlowTransactionsData.Transactions.Where(t =>
                 !lunchFlowAccount.SyncStartDate.HasValue
-                || DateOnly.FromDateTime(DateTime.Parse(t.Date))
-                    >= lunchFlowAccount.SyncStartDate.Value
+                || DateOnly.Parse(t.Date) >= lunchFlowAccount.SyncStartDate.Value
             );
 
             foreach (var transaction in transactionsToSync)
@@ -410,7 +409,7 @@ public class LunchFlowService(
                         AccountID = userAccount.ID,
                         SyncID = transaction.ID,
                         Amount = transaction.Amount,
-                        Date = DateTime.Parse(transaction.Date),
+                        Date = DateOnly.Parse(transaction.Date),
                         MerchantName = transaction.Merchant,
                         Source = TransactionSource.LunchFlow.Value,
                     }
@@ -495,7 +494,7 @@ public class LunchFlowService(
                 {
                     AccountID = lunchFlowAccount.LinkedAccountId!.Value,
                     Amount = lunchFlowBalancesData.Balance.Amount,
-                    DateTime = nowProvider.UtcNow,
+                    Date = DateOnly.FromDateTime(nowProvider.Now),
                 },
                 balanceService
             );

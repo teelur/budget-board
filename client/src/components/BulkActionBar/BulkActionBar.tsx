@@ -10,8 +10,8 @@ import {
   Transition,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -25,9 +25,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
@@ -126,7 +124,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
         url: "/api/userSettings",
         method: "GET",
       });
-      if (res.status === 200) return res.data as IUserSettings;
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
       return undefined;
     },
   });
@@ -150,7 +150,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
         (oldTransactions: ITransaction[]) =>
           oldTransactions.map((t) => {
             const req = requests.find((r) => r.id === t.id);
-            if (!req) return t;
+            if (!req) {
+              return t;
+            }
             return {
               ...t,
               amount: req.amount,
@@ -241,7 +243,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
         (singleSelected.subcategory ?? "").length > 0
           ? (singleSelected.subcategory ?? "")
           : (singleSelected.category ?? "");
-      setDateValue(new Date(singleSelected.date));
+      setDateValue(dayjs(singleSelected.date).toDate());
       setMerchantValue(singleSelected.merchantName ?? "");
       setCategoryValue(categoryVal);
       setAmountValue(singleSelected.amount);
@@ -249,7 +251,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     } else {
       resetFields();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [singleSelected?.id]);
 
   const handleApply = () => {
@@ -257,7 +258,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
       (t) => ({
         id: t.id,
         amount: touched.has(FIELDS.amount) ? (amountValue as number) : t.amount,
-        date: touched.has(FIELDS.date) ? dateValue! : new Date(t.date),
+        date: touched.has(FIELDS.date)
+          ? dayjs(dateValue!).format("YYYY-MM-DD")
+          : t.date,
         merchantName: touched.has(FIELDS.merchant)
           ? merchantValue
           : t.merchantName,
@@ -404,13 +407,15 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 value={amountValue}
                 onChange={(val) => {
                   setAmountValue(val);
-                  if (typeof val === "number") touch(FIELDS.amount);
-                  else
+                  if (typeof val === "number") {
+                    touch(FIELDS.amount);
+                  } else {
                     setTouched((prev) => {
                       const next = new Set(prev);
                       next.delete(FIELDS.amount);
                       return next;
                     });
+                  }
                 }}
                 prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
                 thousandSeparator={thousandsSeparator}

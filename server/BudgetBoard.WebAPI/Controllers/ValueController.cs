@@ -118,28 +118,4 @@ public class ValueController(
             return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
         }
     }
-
-    [HttpPost]
-    [Authorize]
-    [Route("[action]")]
-    public async Task<IActionResult> Restore(Guid guid)
-    {
-        try
-        {
-            await _valueService.RestoreValueAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
-            return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
-    }
 }

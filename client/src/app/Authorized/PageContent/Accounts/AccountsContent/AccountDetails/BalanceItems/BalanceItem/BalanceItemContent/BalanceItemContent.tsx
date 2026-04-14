@@ -21,7 +21,7 @@ const BalanceItemContent = (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
         <PrimaryText size="md">
-          {dayjs(props.balance.dateTime).format(longDateFormat)}
+          {dayjs(props.balance.date).format(longDateFormat)}
         </PrimaryText>
         <ActionIcon
           variant="transparent"
