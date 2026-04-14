@@ -55,6 +55,7 @@ services:
     container_name: postgres-db
     image: postgres:16
     restart: unless-stopped
+    command: ["-c", "timezone=${TZ:-UTC}"]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-superSecretPassword}
