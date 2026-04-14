@@ -1,14 +1,11 @@
-name: Publish Docker Images
+name: Build Dev Docker Images
 
 on:
-  release:
-    types: [published]
   push:
     branches:
       - main
     # Prevent the workflow from running when only documentation, images,
-    # or other non-code assets are changed. Update these patterns to
-    # match the files you want to exclude from push-triggered runs.
+    # or other non-code assets are changed.
     paths-ignore:
       - "README.md"
       - "img/**"
@@ -21,9 +18,6 @@ on:
       - "compose.override.yml"
       - "LICENSE"
 
-# Defines two custom environment variables for the workflow.
-# These are used for the Container registry domain, and a name for the
-# Docker image that this workflow builds.
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -35,12 +29,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "9.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Install dependencies
         working-directory: ./server
@@ -73,28 +67,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
-      - name: Create .env File (release)
-        run: echo "VITE_VERSION=PLACEHOLDER" >> client/.env
-        if: github.event_name == 'release'
-
-      - name: Create .env File (non-release)
+      - name: Create .env File
         run: echo "VITE_VERSION=sha-${GITHUB_SHA::7}" >> client/.env
-        if: github.event_name != 'release'
-
-      - name: Write Version to File
-        uses: eball/write-tag-to-version-file@latest
-        with:
-          filename: "client/.env"
-          placeholder: "PLACEHOLDER"
-        if: github.event_name == 'release'
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -108,7 +90,7 @@ jobs:
 
       - name: Build and push by digest
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./client
           platforms: ${{ matrix.platform }}
@@ -147,13 +129,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -167,7 +149,7 @@ jobs:
 
       - name: Build and push by digest
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./server
           platforms: ${{ matrix.platform }}
@@ -212,10 +194,10 @@ jobs:
           merge-multiple: true
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -226,28 +208,18 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/teelur/budget-board/client
-          flavor: |
-            latest=true
           tags: |
-            type=semver,pattern={{raw}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=semver,pattern=v{{major}}
-            type=sha
-            type=raw,value=release,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'beta') }}
+            type=raw,value=dev
+            type=sha,prefix=sha-
 
       - name: Extract server metadata (tags, labels) for Docker
         id: meta-server
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/teelur/budget-board/server
-          flavor: |
-            latest=true
           tags: |
-            type=semver,pattern={{raw}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=semver,pattern=v{{major}}
-            type=sha
-            type=raw,value=release,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'beta') }}
+            type=raw,value=dev
+            type=sha,prefix=sha-
 
       - name: Create client manifest list and push
         working-directory: /tmp/digests-client
