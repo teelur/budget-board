@@ -57,14 +57,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   });
 
   const sortedValues =
-    valuesQuery.data
-      ?.filter((value) => value.deleted === null)
-      .sort((a, b) => dayjs(b.date).diff(dayjs(a.date))) ?? [];
-
-  const sortedDeletedValues =
-    valuesQuery.data
-      ?.filter((value) => value.deleted !== null)
-      .sort((a, b) => dayjs(b.date).diff(dayjs(a.date))) ?? [];
+    valuesQuery.data?.sort((a, b) => dayjs(b.date).diff(dayjs(a.date))) ?? [];
 
   const valuesForChart = sortedValues.filter((value) =>
     dayjs(value.date).isAfter(dayjs().subtract(chartLookbackMonths, "months")),
@@ -230,26 +223,6 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   ) : (
                     <ValueItems
                       values={sortedValues}
-                      userCurrency={props.userCurrency}
-                    />
-                  )}
-                </Stack>
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
-            <MantineAccordion.Item value="deleted-values">
-              <MantineAccordion.Control>
-                <PrimaryText>{t("deleted_values")}</PrimaryText>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <Stack gap="0.5rem">
-                  {valuesQuery.isPending && (
-                    <Skeleton height={20} radius="lg" />
-                  )}
-                  {sortedDeletedValues.length === 0 ? (
-                    <DimmedText size="sm">{t("no_deleted_values")}</DimmedText>
-                  ) : (
-                    <ValueItems
-                      values={sortedDeletedValues}
                       userCurrency={props.userCurrency}
                     />
                   )}

@@ -31,16 +31,9 @@ public interface IValueService
     Task UpdateValueAsync(Guid userGuid, IValueUpdateRequest request);
 
     /// <summary>
-    /// Deletes (soft deletes) a value entry.
+    /// Deletes a value entry.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="valueGuid">The unique identifier of the value to delete.</param>
     Task DeleteValueAsync(Guid userGuid, Guid valueGuid);
-
-    /// <summary>
-    /// Restores a previously deleted value entry.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="valueGuid">The unique identifier of the value to restore.</param>
-    Task RestoreValueAsync(Guid userGuid, Guid valueGuid);
 }

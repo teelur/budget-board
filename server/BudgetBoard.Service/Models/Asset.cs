@@ -47,14 +47,8 @@ public class AssetResponse() : IAssetResponse
     {
         ID = asset.ID;
         Name = asset.Name;
-        CurrentValue = asset
-            .Values.OrderByDescending(v => v.Date)
-            .FirstOrDefault(v => v.Deleted == null)
-            ?.Amount;
-        ValueDate = asset
-            .Values.OrderByDescending(v => v.Date)
-            .FirstOrDefault(v => v.Deleted == null)
-            ?.Date;
+        CurrentValue = asset.Values.OrderByDescending(v => v.Date).FirstOrDefault()?.Amount;
+        ValueDate = asset.Values.OrderByDescending(v => v.Date).FirstOrDefault()?.Date;
         PurchaseDate = asset.PurchaseDate;
         PurchasePrice = asset.PurchasePrice;
         SellDate = asset.SellDate;

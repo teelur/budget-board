@@ -372,7 +372,7 @@ public class ValueServiceTests
     }
 
     [Fact]
-    public async Task DeleteValueAsync_WhenValueExists_ShouldMarkValueAsDeleted()
+    public async Task DeleteValueAsync_WhenValueExists_ShouldDeleteValue()
     {
         // Arrange
         var helper = new TestHelper();
@@ -397,10 +397,7 @@ public class ValueServiceTests
         await valueService.DeleteValueAsync(helper.demoUser.Id, value.ID);
 
         // Assert
-        helper
-            .demoUser.Assets.SelectMany(a => a.Values)
-            .Should()
-            .ContainSingle(v => v.ID == value.ID && v.Deleted.HasValue);
+        helper.UserDataContext.Values.Should().BeEmpty();
     }
 
     [Fact]
@@ -424,61 +421,5 @@ public class ValueServiceTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("ValueDeleteNotFoundError");
-    }
-
-    [Fact]
-    public async Task RestoreValueAsync_WhenValueExists_ShouldUnmarkValueAsDeleted()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var valueService = new ValueService(
-            Mock.Of<ILogger<IValueService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var asset = new AssetFaker(helper.demoUser.Id).Generate();
-
-        var value = new ValueFaker().RuleFor(v => v.Deleted, f => f.Date.Past()).Generate();
-        value.AssetID = asset.ID;
-        asset.Values.Add(value);
-
-        helper.UserDataContext.Assets.Add(asset);
-        await helper.UserDataContext.SaveChangesAsync();
-
-        // Act
-        await valueService.RestoreValueAsync(helper.demoUser.Id, value.ID);
-
-        // Assert
-        helper
-            .demoUser.Assets.SelectMany(a => a.Values)
-            .Should()
-            .ContainSingle(v => v.ID == value.ID && !v.Deleted.HasValue);
-    }
-
-    [Fact]
-    public async Task RestoreValueAsync_WhenValueDoesNotExist_ShouldThrowException()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var valueService = new ValueService(
-            Mock.Of<ILogger<IValueService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        // Act
-        Func<Task> act = async () =>
-            await valueService.RestoreValueAsync(helper.demoUser.Id, Guid.NewGuid());
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("ValueRestoreNotFoundError");
     }
 }

@@ -120,25 +120,7 @@ public class ValueService(
             throw new BudgetBoardServiceException(_responseLocalizer["ValueDeleteNotFoundError"]);
         }
 
-        value.Deleted = _nowProvider.UtcNow;
-        await _userDataContext.SaveChangesAsync();
-    }
-
-    /// <inheritdoc />
-    public async Task RestoreValueAsync(Guid userGuid, Guid valueGuid)
-    {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var value = userData
-            .Assets.SelectMany(a => a.Values)
-            .FirstOrDefault(v => v.ID == valueGuid);
-        if (value == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueRestoreNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["ValueRestoreNotFoundError"]);
-        }
-
-        value.Deleted = null;
+        _userDataContext.Values.Remove(value);
         await _userDataContext.SaveChangesAsync();
     }
 

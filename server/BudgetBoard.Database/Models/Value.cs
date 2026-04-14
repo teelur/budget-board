@@ -21,11 +21,6 @@ public class Value
     public required DateOnly Date { get; set; }
 
     /// <summary>
-    /// The date and time when the value record was deleted; null if active.
-    /// </summary>
-    public DateTime? Deleted { get; set; } = null;
-
-    /// <summary>
     /// Identifier for the associated asset.
     /// </summary>
     public required Guid AssetID { get; set; }
