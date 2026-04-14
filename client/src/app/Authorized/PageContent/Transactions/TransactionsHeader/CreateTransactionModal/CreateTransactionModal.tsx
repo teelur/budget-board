@@ -108,7 +108,7 @@ const CreateTransactionModal = (): React.ReactNode => {
     }
 
     doCreateTransaction.mutate({
-      date: dateField.getValue()!,
+      date: dayjs(dateField.getValue()!).format("YYYY-MM-DD"),
       merchantName: merchantNameField.getValue(),
       category: getParentCategory(
         categoryField.getValue(),

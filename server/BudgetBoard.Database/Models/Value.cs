@@ -16,14 +16,9 @@ public class Value
     public required decimal Amount { get; set; }
 
     /// <summary>
-    /// The date and time the value was recorded.
+    /// The date the value was recorded.
     /// </summary>
-    public required DateTime DateTime { get; set; }
-
-    /// <summary>
-    /// The date and time when the value record was deleted; null if active.
-    /// </summary>
-    public DateTime? Deleted { get; set; } = null;
+    public required DateOnly Date { get; set; }
 
     /// <summary>
     /// Identifier for the associated asset.

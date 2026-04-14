@@ -988,7 +988,7 @@ public class LunchFlowServiceTests
             SyncID = "txn123",
             AccountID = account.ID,
             Amount = -50.25m,
-            Date = DateTime.Parse("2024-01-15"),
+            Date = DateOnly.Parse("2024-01-15"),
             MerchantName = "Test Store",
             Source = TransactionSource.LunchFlow.Value,
         };

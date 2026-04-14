@@ -30,9 +30,10 @@ export const AuthProvider = ({
 }: {
   children: React.ReactNode;
 }): React.ReactNode => {
+  const cachedAuth = localStorage.getItem("isAuthenticated") === "true";
   const [isUserAuthenticated, setIsUserAuthenticated] =
-    useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+    useState<boolean>(cachedAuth);
+  const [loading, setLoading] = useState<boolean>(true);
   const [oidcLoading, setOidcLoading] = useState<boolean>(false);
 
   const { envVariables } = getProjectEnvVariables();
@@ -54,6 +55,7 @@ export const AuthProvider = ({
           color: "var(--button-color-destructive)",
         });
 
+        localStorage.setItem("isAuthenticated", "false");
         setIsUserAuthenticated(false);
       }
 
@@ -71,13 +73,16 @@ export const AuthProvider = ({
       method: "GET",
     })
       .then((res: AxiosResponse) => {
-        setIsUserAuthenticated(res.data?.isAuthenticated ?? false);
+        const authed = res.data?.isAuthenticated ?? false;
+        localStorage.setItem("isAuthenticated", String(authed));
+        setIsUserAuthenticated(authed);
       })
       .catch(() => {
         notifications.show({
           message: "Failed to check authentication status",
           color: "var(--button-color-destructive)",
         });
+        localStorage.setItem("isAuthenticated", "false");
         setIsUserAuthenticated(false);
       })
       .finally(() => {

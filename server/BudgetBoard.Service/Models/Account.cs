@@ -86,7 +86,7 @@ public interface IAccountResponse
     public string Type { get; }
     public string Subtype { get; }
     public decimal CurrentBalance { get; }
-    public DateTime? BalanceDate { get; }
+    public DateOnly? BalanceDate { get; }
     public bool HideTransactions { get; }
     public bool HideAccount { get; }
     public DateTime? Deleted { get; }
@@ -104,7 +104,7 @@ public class AccountResponse : IAccountResponse
     public string Type { get; set; }
     public string Subtype { get; set; }
     public decimal CurrentBalance { get; set; }
-    public DateTime? BalanceDate { get; set; }
+    public DateOnly? BalanceDate { get; set; }
     public bool HideTransactions { get; set; }
     public bool HideAccount { get; set; }
     public DateTime? Deleted { get; set; }
@@ -139,15 +139,8 @@ public class AccountResponse : IAccountResponse
         Type = account.Type;
         Subtype = account.Subtype;
         CurrentBalance =
-            account
-                .Balances.OrderByDescending(b => b.DateTime)
-                .FirstOrDefault(b => b.Deleted == null)
-                ?.Amount
-            ?? 0;
-        BalanceDate = account
-            .Balances.OrderByDescending(b => b.DateTime)
-            .FirstOrDefault(b => b.Deleted == null)
-            ?.DateTime;
+            account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0;
+        BalanceDate = account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Date;
         HideTransactions = account.HideTransactions;
         HideAccount = account.HideAccount;
         Deleted = account.Deleted;

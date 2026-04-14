@@ -8,16 +8,26 @@ import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { DatesRangeValue } from "@mantine/dates";
 import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
-import {
-  buildValueChartData,
-  buildValueChartSeries,
-  filterValuesByDateRange,
-  IItem,
-  IValue,
-} from "./helpers/valueChart";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { chartColors } from "~/helpers/charts";
+import { DateString } from "~/helpers/datetime";
+import { buildValueChartData, IItem, IValue } from "./helpers/valueChart";
+
+/**
+ * Builds the series for the value chart.
+ * @param items
+ * @returns An array of objects containing the item ID, name, and color to use.
+ */
+const buildValueChartSeries = (items: IItem[]) =>
+  items.map((item: IItem) => {
+    return {
+      name: item.id,
+      label: item.name,
+      color: chartColors[items.indexOf(item) % chartColors.length] ?? "gray.6",
+    };
+  });
 
 interface ValueChartProps {
   items: IItem[];
@@ -62,6 +72,26 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
         );
   };
 
+  const sortedChartValues = React.useMemo(() => {
+    const startDate: Date = props.dateRange[0]
+      ? dayjs(props.dateRange[0]).toDate()
+      : dayjs().subtract(1, "month").toDate();
+    const endDate: Date = props.dateRange[1]
+      ? dayjs(props.dateRange[1]).toDate()
+      : dayjs().toDate();
+
+    return props.values
+      .filter((value) =>
+        dayjs(value.date).isBetween(startDate, endDate, "date", "[]"),
+      )
+      .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
+  }, [props.values, props.dateRange, dayjs]);
+
+  const dateLabelFormatter = React.useCallback(
+    (date: DateString): string => dayjs(date).format(dateFormat),
+    [dayjs, dateFormat],
+  );
+
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
   }
@@ -74,41 +104,17 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
     );
   }
 
-  const sortedChartValues = () => {
-    const startDate: Date = props.dateRange[0]
-      ? dayjs(props.dateRange[0]).toDate()
-      : dayjs().subtract(1, "month").toDate();
-    const endDate: Date = props.dateRange[1]
-      ? dayjs(props.dateRange[1]).toDate()
-      : dayjs().toDate();
-
-    const filteredValues: IValue[] = filterValuesByDateRange(
-      props.values,
-      startDate,
-      endDate,
-    );
-
-    return filteredValues.sort((a, b) =>
-      dayjs(a.dateTime).diff(dayjs(b.dateTime)),
-    );
-  };
-
-  const formatDateString = React.useCallback(
-    (date: Date): string => dayjs(date).format(dateFormat),
-    [dayjs, dateFormat],
-  );
-
   return (
     <BarChart
       h={400}
       w="100%"
       data={buildValueChartData(
-        sortedChartValues(),
-        formatDateString,
+        sortedChartValues,
+        dateLabelFormatter,
         props.invertYAxis,
       )}
       series={chartSeries}
-      dataKey="dateString"
+      dataKey="date"
       type="stacked"
       withLegend
       tooltipAnimationDuration={200}

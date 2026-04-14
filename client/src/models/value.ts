@@ -1,19 +1,18 @@
 export interface IValueCreateRequest {
   amount: number;
-  dateTime: Date;
+  date: string;
   assetID: string;
 }
 
 export interface IValueUpdateRequest {
   id: string;
   amount: number;
-  dateTime: Date;
+  date: string;
 }
 
 export interface IValueResponse {
   id: string;
   amount: number;
-  dateTime: Date;
-  deleted: Date | null;
+  date: string;
   assetID: string;
 }

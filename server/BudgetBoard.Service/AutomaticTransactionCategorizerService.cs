@@ -29,22 +29,20 @@ public class AutomaticTransactionCategorizerService(
             throw new BudgetBoardServiceException(responseLocalizer["UserSettingsNotFoundError"]);
         }
 
-        var trainingTransactions = userData.Accounts
-            .Where(a => a.Deleted is null) // Filter out deleted accounts
+        var trainingTransactions = userData
+            .Accounts.Where(a => a.Deleted is null) // Filter out deleted accounts
             .Select(a => a.Transactions)
             .SelectMany(c => c)
-            .Where(t => t.Deleted is null && t.Category is not null && !t.Category.Equals(string.Empty)); // Filter out deleted transactions or those without category
+            .Where(t =>
+                t.Deleted is null && t.Category is not null && !t.Category.Equals(string.Empty)
+            ); // Filter out deleted transactions or those without category
         if (request.StartDate is not null)
         {
-            trainingTransactions = trainingTransactions.Where(t =>
-                DateOnly.FromDateTime(t.Date) >= request.StartDate
-            );
+            trainingTransactions = trainingTransactions.Where(t => t.Date >= request.StartDate);
         }
         if (request.EndDate is not null)
         {
-            trainingTransactions = trainingTransactions.Where(t =>
-                DateOnly.FromDateTime(t.Date) <= request.EndDate
-            );
+            trainingTransactions = trainingTransactions.Where(t => t.Date <= request.EndDate);
         }
 
         if (!trainingTransactions.Any())
@@ -62,12 +60,8 @@ public class AutomaticTransactionCategorizerService(
 
         userSettings.AutoCategorizerModelOID = objectId;
         userSettings.AutoCategorizerLastTrained = DateOnly.FromDateTime(nowProvider.Now);
-        userSettings.AutoCategorizerModelStartDate = DateOnly.FromDateTime(
-            trainingTransactions.Min(t => t.Date)
-        );
-        userSettings.AutoCategorizerModelEndDate = DateOnly.FromDateTime(
-            trainingTransactions.Max(t => t.Date)
-        );
+        userSettings.AutoCategorizerModelStartDate = trainingTransactions.Min(t => t.Date);
+        userSettings.AutoCategorizerModelEndDate = trainingTransactions.Max(t => t.Date);
 
         await userDataContext.SaveChangesAsync();
     }

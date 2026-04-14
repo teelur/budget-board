@@ -3,6 +3,7 @@ using System;
 using BudgetBoard.Database.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    partial class UserDataContextModelSnapshot : ModelSnapshot
+    [Migration("20260413004606_ValueDateOnly")]
+    partial class ValueDateOnly
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,14 +187,14 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateOnly?>("PurchaseDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal?>("PurchasePrice")
                         .HasColumnType("numeric");
 
-                    b.Property<DateOnly?>("SellDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("SellDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal?>("SellPrice")
                         .HasColumnType("numeric");
@@ -236,6 +239,9 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ID");
 
@@ -646,6 +652,9 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ID");
 

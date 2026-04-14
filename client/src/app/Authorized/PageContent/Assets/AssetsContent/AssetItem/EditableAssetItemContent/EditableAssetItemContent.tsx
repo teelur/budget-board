@@ -80,12 +80,16 @@ const EditableAssetItemContent = (
       const editedAsset: IAssetUpdateRequest = {
         id: props.asset.id,
         name: assetNameField.getValue(),
-        purchaseDate: purchaseDate.getValue(),
+        purchaseDate: purchaseDate.getValue()
+          ? dayjs(purchaseDate.getValue()).format("YYYY-MM-DD")
+          : null,
         purchasePrice:
           purchasePrice.getValue() === undefined
             ? null
             : Number(purchasePrice.getValue()),
-        sellDate: sellDate.getValue(),
+        sellDate: sellDate.getValue()
+          ? dayjs(sellDate.getValue()).format("YYYY-MM-DD")
+          : null,
         sellPrice:
           sellPrice.getValue() === undefined
             ? null

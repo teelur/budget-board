@@ -32,20 +32,26 @@ public class ValueService(
         var asset = userData.Assets.FirstOrDefault(a => a.ID == request.AssetID);
         if (asset == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueCreateAssetNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["ValueCreateAssetNotFoundError"]
-            );
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueAssetNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["ValueAssetNotFoundError"]);
         }
 
-        var newValue = new Value()
+        var existingValue = asset.Values.FirstOrDefault(v => v.Date == request.Date);
+        if (existingValue != null)
         {
-            DateTime = request.DateTime,
-            Amount = request.Amount,
-            AssetID = request.AssetID,
-        };
+            existingValue.Amount = request.Amount;
+        }
+        else
+        {
+            var newValue = new Value()
+            {
+                Date = request.Date,
+                Amount = request.Amount,
+                AssetID = request.AssetID,
+            };
+            _userDataContext.Values.Add(newValue);
+        }
 
-        _userDataContext.Values.Add(newValue);
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -78,7 +84,25 @@ public class ValueService(
             throw new BudgetBoardServiceException(_responseLocalizer["ValueUpdateNotFoundError"]);
         }
 
-        _userDataContext.Entry(value).CurrentValues.SetValues(editedValue);
+        var asset = userData.Assets.FirstOrDefault(a => a.ID == value.AssetID);
+        if (asset == null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueAssetNotFoundLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["ValueAssetNotFoundError"]);
+        }
+
+        var duplicateValue = asset.Values.FirstOrDefault(v =>
+            v.Date == editedValue.Date && v.ID != editedValue.ID
+        );
+        if (duplicateValue != null)
+        {
+            _logger.LogError("{LogMessage}", _logLocalizer["ValueDuplicateDateLog"]);
+            throw new BudgetBoardServiceException(_responseLocalizer["ValueDuplicateDateError"]);
+        }
+
+        value.Amount = editedValue.Amount;
+        value.Date = editedValue.Date;
+
         await _userDataContext.SaveChangesAsync();
     }
 
@@ -96,25 +120,7 @@ public class ValueService(
             throw new BudgetBoardServiceException(_responseLocalizer["ValueDeleteNotFoundError"]);
         }
 
-        value.Deleted = _nowProvider.UtcNow;
-        await _userDataContext.SaveChangesAsync();
-    }
-
-    /// <inheritdoc />
-    public async Task RestoreValueAsync(Guid userGuid, Guid valueGuid)
-    {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var value = userData
-            .Assets.SelectMany(a => a.Values)
-            .FirstOrDefault(v => v.ID == valueGuid);
-        if (value == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueRestoreNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["ValueRestoreNotFoundError"]);
-        }
-
-        value.Deleted = null;
+        _userDataContext.Values.Remove(value);
         await _userDataContext.SaveChangesAsync();
     }
 

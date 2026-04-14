@@ -9,7 +9,7 @@ public class BalanceFaker : Faker<Balance>
     {
         RuleFor(b => b.ID, f => Guid.NewGuid())
             .RuleFor(b => b.Amount, f => f.Finance.Amount())
-            .RuleFor(b => b.DateTime, f => f.Date.Past())
+            .RuleFor(b => b.Date, f => DateOnly.FromDateTime(f.Date.Past()))
             .RuleFor(b => b.AccountID, f => f.PickRandom(accountIds));
     }
 }

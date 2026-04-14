@@ -4,7 +4,7 @@ import { useDidUpdate } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
@@ -24,8 +24,13 @@ const EditableValueItemContent = (
   props: EditableValueItemContentProps,
 ): React.ReactNode => {
   const { request } = useAuth();
-  const { dayjsLocale, longDateFormat, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const {
+    dayjs,
+    dayjsLocale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
 
   const valueAmountField = useField<string | number | undefined>({
     initialValue: props.value.amount,
@@ -38,7 +43,7 @@ const EditableValueItemContent = (
     },
   });
   const valueDateField = useField<Date>({
-    initialValue: props.value.dateTime,
+    initialValue: dayjs(props.value.date).toDate(),
   });
 
   const queryClient = useQueryClient();
@@ -50,7 +55,7 @@ const EditableValueItemContent = (
         data: {
           id: props.value.id,
           amount: Number(valueAmountField.getValue()),
-          dateTime: valueDateField.getValue(),
+          date: dayjs(valueDateField.getValue()).format("YYYY-MM-DD"),
         } as IValueUpdateRequest,
       }),
     onSuccess: async () => {
@@ -100,33 +105,6 @@ const EditableValueItemContent = (
       }),
   });
 
-  const doRestoreValue = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/value/restore`,
-        method: "POST",
-        params: { guid: props.value.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["assets"],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: ["values", props.value.assetID],
-      });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Value restored",
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
   useDidUpdate(() => {
     doUpdateValue.mutate();
   }, [valueDateField.getValue()]);
@@ -134,11 +112,7 @@ const EditableValueItemContent = (
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <LoadingOverlay
-        visible={
-          doUpdateValue.isPending ||
-          doDeleteValue.isPending ||
-          doRestoreValue.isPending
-        }
+        visible={doUpdateValue.isPending || doDeleteValue.isPending}
       />
       <Stack w="100%">
         <DateInput
@@ -172,24 +146,14 @@ const EditableValueItemContent = (
         >
           <PencilIcon size={16} />
         </ActionIcon>
-        {props.value.deleted ? (
-          <ActionIcon
-            h="100%"
-            size="sm"
-            onClick={() => doRestoreValue.mutate()}
-          >
-            <Undo2Icon size={16} />
-          </ActionIcon>
-        ) : (
-          <ActionIcon
-            h="100%"
-            size="sm"
-            bg="var(--button-color-destructive)"
-            onClick={() => doDeleteValue.mutate()}
-          >
-            <Trash2Icon size={16} />
-          </ActionIcon>
-        )}
+        <ActionIcon
+          h="100%"
+          size="sm"
+          bg="var(--button-color-destructive)"
+          onClick={() => doDeleteValue.mutate()}
+        >
+          <Trash2Icon size={16} />
+        </ActionIcon>
       </Group>
     </Group>
   );

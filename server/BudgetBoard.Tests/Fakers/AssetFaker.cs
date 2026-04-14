@@ -9,9 +9,9 @@ public class AssetFaker : Faker<Asset>
     {
         RuleFor(a => a.ID, f => Guid.NewGuid())
             .RuleFor(a => a.Name, f => f.Finance.AccountName())
-            .RuleFor(a => a.PurchaseDate, f => f.Date.Past())
+            .RuleFor(a => a.PurchaseDate, f => DateOnly.FromDateTime(f.Date.Past()))
             .RuleFor(a => a.PurchasePrice, f => f.Finance.Amount())
-            .RuleFor(a => a.SellDate, f => f.Date.Future())
+            .RuleFor(a => a.SellDate, f => DateOnly.FromDateTime(f.Date.Future()))
             .RuleFor(a => a.SellPrice, f => f.Finance.Amount())
             .RuleFor(a => a.Hide, f => false)
             .RuleFor(a => a.Deleted, f => null)

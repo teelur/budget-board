@@ -9,8 +9,7 @@ public class ValueFaker : Faker<Value>
     {
         RuleFor(a => a.ID, f => Guid.NewGuid())
             .RuleFor(a => a.Amount, f => f.Finance.Amount())
-            .RuleFor(a => a.DateTime, f => f.Date.Past())
-            .RuleFor(a => a.Deleted, f => null)
+            .RuleFor(a => a.Date, f => DateOnly.FromDateTime(f.Date.Past()))
             .RuleFor(a => a.AssetID, f => Guid.NewGuid());
     }
 }

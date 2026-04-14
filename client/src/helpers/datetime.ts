@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 
+export type DateString = string;
+
 const DATE = 1;
 const HOUR = 12;
 const MINUTES = 0;
@@ -35,7 +37,7 @@ export const getDaysSinceDate = (date: Date): string => {
  * @param {Date} date - The original date object to standardize.
  * @returns {Date} A new date object with standard time set.
  */
-export const getStandardDate = (date: Date) =>
+export const getStandardDate = (date: Date | string) =>
   dayjs(date)
     .hour(HOUR)
     .minute(MINUTES)
@@ -79,7 +81,7 @@ export const initCurrentMonth = (): Date => {
  */
 export const getDateFromMonthsAgo = (
   numberOfMonthsAgo: number,
-  date?: Date
+  date?: Date,
 ): Date => {
   const lastMonth = date ? new Date(date) : initCurrentMonth();
 
@@ -117,7 +119,10 @@ export const getDaysInMonth = (monthIndex: number, year: number): number =>
  * @param {Date} date - The date to format.
  * @returns {string} The formatted month and year string.
  */
-export const getMonthAndYearDateString = (date: Date, locale: string): string => {
+export const getMonthAndYearDateString = (
+  date: Date,
+  locale: string,
+): string => {
   return date.toLocaleString(locale, { month: "long", year: "numeric" });
 };
 
@@ -127,13 +132,12 @@ export const getMonthAndYearDateString = (date: Date, locale: string): string =>
  * The function filters the provided dates array, comparing the index of each
  * date to the first index of that date. If the indexes match, the date is unique.
  *
- * @param {Date[]} dates - Array of Date objects from which to extract unique dates.
- * @returns {Date[]} An array containing the unique dates from the provided dates.
+ * @param {DateString[]} dates - Array of DateString objects from which to extract unique dates.
+ * @returns {DateString[]} An array containing the unique dates from the provided dates.
  */
-export const getUniqueDates = (dates: Date[]): Date[] =>
+export const getUniqueDates = (dates: DateString[]): DateString[] =>
   dates.filter(
-    (date, index, array) =>
-      array.findIndex((d) => d.getTime() === date.getTime()) === index
+    (date, index, array) => array.findIndex((d) => d === date) === index,
   );
 
 /**
@@ -147,7 +151,7 @@ export const getUniqueDates = (dates: Date[]): Date[] =>
  */
 export const areDatesEqual = (
   date1: Date | null,
-  date2: Date | null
+  date2: Date | null,
 ): boolean => {
   if (!date1 || !date2) {
     return false;

@@ -30,7 +30,7 @@ public interface ITransactionCreateRequest
 {
     string? SyncID { get; }
     decimal Amount { get; }
-    DateTime Date { get; }
+    DateOnly Date { get; }
     string? Category { get; }
     string? Subcategory { get; }
     string? MerchantName { get; }
@@ -42,7 +42,7 @@ public class TransactionCreateRequest : ITransactionCreateRequest
 {
     public string? SyncID { get; set; }
     public decimal Amount { get; set; }
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
     public string? MerchantName { get; set; }
@@ -54,7 +54,7 @@ public class TransactionCreateRequest : ITransactionCreateRequest
     {
         SyncID = null;
         Amount = 0.0M;
-        Date = DateTime.MinValue;
+        Date = DateOnly.MinValue;
         Category = null;
         Subcategory = null;
         MerchantName = null;
@@ -67,7 +67,7 @@ public interface ITransactionUpdateRequest
 {
     Guid ID { get; }
     decimal Amount { get; }
-    DateTime Date { get; }
+    DateOnly Date { get; }
     string? Category { get; }
     string? Subcategory { get; }
     string? MerchantName { get; }
@@ -78,7 +78,7 @@ public class TransactionUpdateRequest : ITransactionUpdateRequest
 {
     public Guid ID { get; set; }
     public decimal Amount { get; set; }
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
     public string? MerchantName { get; set; }
@@ -89,7 +89,7 @@ public class TransactionUpdateRequest : ITransactionUpdateRequest
     {
         ID = Guid.NewGuid();
         Amount = 0.0M;
-        Date = DateTime.MinValue;
+        Date = DateOnly.MinValue;
         Category = null;
         Subcategory = null;
         MerchantName = null;
@@ -135,7 +135,7 @@ public class TransactionSplitRequest : ITransactionSplitRequest
 
 public class TransactionImport
 {
-    public DateTime? Date { get; set; }
+    public DateOnly? Date { get; set; }
     public string? MerchantName { get; set; }
     public string? Category { get; set; }
     public decimal? Amount { get; set; }
@@ -144,7 +144,7 @@ public class TransactionImport
     [JsonConstructor]
     public TransactionImport()
     {
-        Date = DateTime.MinValue;
+        Date = DateOnly.MinValue;
         MerchantName = string.Empty;
         Category = null;
         Amount = 0.0M;
@@ -189,7 +189,7 @@ public interface ITransactionResponse
     Guid ID { get; }
     string? SyncID { get; }
     decimal Amount { get; }
-    DateTime Date { get; }
+    DateOnly Date { get; }
     string? Category { get; }
     string? Subcategory { get; }
     string? MerchantName { get; }
@@ -204,7 +204,7 @@ public class TransactionResponse : ITransactionResponse
     public Guid ID { get; set; }
     public string? SyncID { get; set; }
     public decimal Amount { get; set; }
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
     public string? MerchantName { get; set; }
@@ -219,7 +219,7 @@ public class TransactionResponse : ITransactionResponse
         ID = Guid.NewGuid();
         SyncID = null;
         Amount = 0.0M;
-        Date = DateTime.MinValue;
+        Date = DateOnly.MinValue;
         Category = null;
         Subcategory = null;
         MerchantName = null;

@@ -1,5 +1,6 @@
 import { IBalanceResponse } from "~/models/balance";
 import { getStandardDate } from "./datetime";
+import dayjs from "~/shared/dayjs";
 
 /**
  * Groups balances by account ID, sorted by dateTime in ascending order.
@@ -7,15 +8,15 @@ import { getStandardDate } from "./datetime";
  * @returns Map keyed by account ID with corresponding sorted balances
  */
 export const mapAccountsToSortedBalances = (
-  balances: IBalanceResponse[]
+  balances: IBalanceResponse[],
 ): Map<string, IBalanceResponse[]> => {
-  const sortedBalances = balances.sort(
-    (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+  const sortedBalances = balances.sort((a, b) =>
+    dayjs(a.date).diff(dayjs(b.date)),
   );
 
   const accountBalanceMap = Map.groupBy(
     sortedBalances,
-    (balance: IBalanceResponse) => balance.accountID
+    (balance: IBalanceResponse) => balance.accountID,
   );
 
   return accountBalanceMap;
@@ -32,7 +33,7 @@ export const mapAccountsToSortedBalances = (
  */
 export const getInitialBalanceDate = (
   balances: IBalanceResponse[],
-  startDate: Date
+  startDate: Date,
 ): Date =>
   // If an account is missing data for the specified startDate, we should try to find the closest date before the startDate.
   // This value will be undefined if there is no balance at or before the startDate. In that case we do not have any balances
@@ -41,8 +42,8 @@ export const getInitialBalanceDate = (
     balances
       .slice()
       .reverse()
-      .find((b) => new Date(b.dateTime).getTime() <= startDate.getTime())
-      ?.dateTime ?? startDate
+      .find((b) => !dayjs(b.date).isAfter(dayjs(startDate), "day"))?.date ??
+      startDate,
   );
 
 /**
@@ -56,12 +57,10 @@ export const getInitialBalanceDate = (
 export const filterBalancesByDateRange = (
   balances: IBalanceResponse[],
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ): IBalanceResponse[] =>
   balances.filter(
     (balance) =>
-      getStandardDate(balance.dateTime).getTime() >=
-        getStandardDate(startDate).getTime() &&
-      getStandardDate(balance.dateTime).getTime() <=
-        getStandardDate(endDate).getTime()
+      dayjs(balance.date).isSameOrAfter(dayjs(startDate), "day") &&
+      dayjs(balance.date).isSameOrBefore(dayjs(endDate), "day"),
   );
