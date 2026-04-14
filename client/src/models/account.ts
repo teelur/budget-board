@@ -38,7 +38,7 @@ export interface IAccountResponse {
   type: string;
   subtype: string;
   currentBalance: number;
-  balanceDate: string;
+  balanceDate: string | null;
   hideTransactions: boolean;
   hideAccount: boolean;
   deleted: Date | null;
