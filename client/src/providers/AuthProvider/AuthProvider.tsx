@@ -33,7 +33,7 @@ export const AuthProvider = ({
   const cachedAuth = localStorage.getItem("isAuthenticated") === "true";
   const [isUserAuthenticated, setIsUserAuthenticated] =
     useState<boolean>(cachedAuth);
-  const [loading, setLoading] = useState<boolean>(!cachedAuth);
+  const [loading, setLoading] = useState<boolean>(true);
   const [oidcLoading, setOidcLoading] = useState<boolean>(false);
 
   const { envVariables } = getProjectEnvVariables();
