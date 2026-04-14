@@ -105,33 +105,6 @@ const EditableValueItemContent = (
       }),
   });
 
-  const doRestoreValue = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/value/restore`,
-        method: "POST",
-        params: { guid: props.value.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["assets"],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: ["values", props.value.assetID],
-      });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Value restored",
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
   useDidUpdate(() => {
     doUpdateValue.mutate();
   }, [valueDateField.getValue()]);
@@ -139,11 +112,7 @@ const EditableValueItemContent = (
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <LoadingOverlay
-        visible={
-          doUpdateValue.isPending ||
-          doDeleteValue.isPending ||
-          doRestoreValue.isPending
-        }
+        visible={doUpdateValue.isPending || doDeleteValue.isPending}
       />
       <Stack w="100%">
         <DateInput

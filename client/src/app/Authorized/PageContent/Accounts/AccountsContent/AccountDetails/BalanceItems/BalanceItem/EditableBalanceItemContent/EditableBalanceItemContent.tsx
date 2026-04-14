@@ -100,32 +100,6 @@ const EditableBalanceItemContent = (
       }),
   });
 
-  const doRestoreBalance = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/balance/restore`,
-        method: "POST",
-        params: { guid: props.balance.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["balances", props.balance.accountID],
-      });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("balance_restored_successfully_message"),
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
   useDidUpdate(() => {
     doUpdateBalance.mutate();
   }, [balanceDateField.getValue()]);
@@ -133,11 +107,7 @@ const EditableBalanceItemContent = (
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <LoadingOverlay
-        visible={
-          doUpdateBalance.isPending ||
-          doDeleteBalance.isPending ||
-          doRestoreBalance.isPending
-        }
+        visible={doUpdateBalance.isPending || doDeleteBalance.isPending}
       />
       <Stack w="100%" gap="0.5rem">
         <DateInput
