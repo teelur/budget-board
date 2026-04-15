@@ -475,4 +475,16 @@
   <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
     <value>Die Anfrage zur Massenlöschung enthält doppelte Transaktions-IDs.</value>
   </data>
+  <data name="BalanceUpdateNotFoundError" xml:space="preserve">
+    <value>Der Saldo, den Sie aktualisieren möchten, ist nicht vorhanden.</value>
+  </data>
+  <data name="BalanceDuplicateDateError" xml:space="preserve">
+    <value>Für dieses Konto liegt zu diesem Datum bereits ein Saldo vor.</value>
+  </data>
+  <data name="ValueUpdateNotFoundError" xml:space="preserve">
+    <value>Der Wert, den Sie aktualisieren möchten, ist nicht vorhanden.</value>
+  </data>
+  <data name="ValueDuplicateDateError" xml:space="preserve">
+    <value>Für diesen Vermögenswert liegt zu diesem Datum bereits ein Wert vor.</value>
+  </data>
 </root>
