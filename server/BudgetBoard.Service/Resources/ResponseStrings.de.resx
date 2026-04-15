@@ -479,7 +479,7 @@
     <value>Der Saldo, den Sie aktualisieren möchten, ist nicht vorhanden.</value>
   </data>
   <data name="BalanceDuplicateDateError" xml:space="preserve">
-    <value>A balance already exists for this account on that date.</value>
+    <value>Für dieses Konto liegt zu diesem Datum bereits ein Saldo vor.</value>
   </data>
   <data name="ValueUpdateNotFoundError" xml:space="preserve">
     <value>Der Wert, den Sie aktualisieren möchten, ist nicht vorhanden.</value>
