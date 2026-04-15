@@ -202,8 +202,8 @@ jobs:
           images: ghcr.io/teelur/budget-board/client
           tags: |
             type=semver,pattern={{raw}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=semver,pattern=v{{major}}
+            type=semver,pattern=v{{major}}.{{minor}},enable=${{ !github.event.release.prerelease }}
+            type=semver,pattern=v{{major}},enable=${{ !github.event.release.prerelease }}
 
       - name: Extract server metadata (tags, labels) for Docker
         id: meta-server
@@ -212,8 +212,8 @@ jobs:
           images: ghcr.io/teelur/budget-board/server
           tags: |
             type=semver,pattern={{raw}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=semver,pattern=v{{major}}
+            type=semver,pattern=v{{major}}.{{minor}},enable=${{ !github.event.release.prerelease }}
+            type=semver,pattern=v{{major}},enable=${{ !github.event.release.prerelease }}
 
       - name: Create client manifest list and push
         working-directory: /tmp/digests-client
