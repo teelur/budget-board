@@ -200,6 +200,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/teelur/budget-board/client
+          flavor: |
+            latest=false
           tags: |
             type=semver,pattern={{raw}}
             type=semver,pattern=v{{major}}.{{minor}},enable=${{ !github.event.release.prerelease }}
@@ -210,6 +212,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/teelur/budget-board/server
+          flavor: |
+            latest=false
           tags: |
             type=semver,pattern={{raw}}
             type=semver,pattern=v{{major}}.{{minor}},enable=${{ !github.event.release.prerelease }}
