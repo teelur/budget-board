@@ -66,3 +66,4 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 <img width="45%" alt="budgets" src="img/budget-board-budgets.png" />
 <img width="45%" alt="goals" src="img/budget-board-goals.png" />
 <img width="45%" alt="trends" src="img/budget-board-trends.png" />
+<img width="45%" alt="external accounts" src="img/budget-board-external-accounts.png" />
