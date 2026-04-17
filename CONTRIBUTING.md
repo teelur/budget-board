@@ -7,7 +7,7 @@ Contributing comes in many forms, whether it's reporting bugs, suggesting featur
 ## Ways to Contribute
 
 - **Bug reports** — Open an [issue](https://github.com/teelur/budget-board/issues/new?template=bug_report.md) with information about the bug, steps to reproduce it, and any relevant screenshots or logs.
-- **Feature requests** — Start a [discussion](https://github.com/teelur/budget-board/discussions/categories/feature-requests) or add to existing requests. I will typicaly prioritize features that have more community interest, so upvoting and commenting on existing discussions is a great way to help drive the direction of the project.
+- **Feature requests** — Start a [discussion](https://github.com/teelur/budget-board/discussions/categories/feature-requests) or add to existing requests. I will typically prioritize features that have more community interest, so upvoting and commenting on existing discussions is a great way to help drive the direction of the project.
 - **Documentation** — If you find any gaps or inaccuracies in the documentation, you can open a PR in the [documentation repo](https://github.com/teelur/budget-board-docs).
 - **Translations** — Help translate the app at [Weblate](https://hosted.weblate.org/engage/budget-board/). No code required.
 - **Code contributions** — See below.
@@ -50,16 +50,16 @@ You will need to install the following software to run the server locally:
 
 #### Running the Server Locally
 
-1. Clone the repository and navigate to the server directory.
-2. You will need to setup a local PostgreSQL database and get the connection string for it.
+1. Clone the repository and navigate to the `server/BudgetBoard.WebAPI` directory.
+2. You will need to set up a local PostgreSQL database and get the connection string for it.
 3. Update the .NET secrets with the connection details for your local database. See below for the required secrets.
 4. Run `dotnet run` to start the server.
 
 #### Secrets
 
-You will need to add these variables to you .NET secrets file for the BudgetBoard.WebAPI project.
+You will need to add these values to the .NET user-secrets file for the `BudgetBoard.WebAPI` project.
 
-## Required Environment Variables
+##### Required .NET User Secrets
 
 | Variable            | Description                                                  |
 | ------------------- | ------------------------------------------------------------ |
