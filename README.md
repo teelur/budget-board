@@ -46,16 +46,15 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 - **Multiple Languages**: Selectable languages include English, German, French, and Simplified Chinese, with community-contributed translations.
 - **Localized Date & Number Formats**: Dates and numbers are displayed according to the selected language and locale.
 
-### Feedback
+### Contributing
 
-- [Notice a bug?](https://github.com/teelur/budget-board/issues/new/choose)
-- [Have a feature request?](https://github.com/teelur/budget-board/discussions/categories/feature-requests)
-- [Have any feedback?](https://github.com/teelur/budget-board/discussions/categories/feedback)
-- [Have a question?](https://github.com/teelur/budget-board/discussions/categories/q-a)
+Budget Board welcomes contributions from the community. Check out the [contributing guide](CONTRIBUTING.md) for more information on how to get involved.
 
-### Translations
-
-- Help translate Budget Board into other languages at [Weblate](https://hosted.weblate.org/projects/budget-board/).
+- **Bug reports** — Open an [issue](https://github.com/teelur/budget-board/issues/new?template=bug_report.md) with information about the bug, steps to reproduce it, and any relevant screenshots or logs.
+- **Feature requests** — Start a [discussion](https://github.com/teelur/budget-board/discussions/categories/feature-requests) or add to existing requests. I will typicaly prioritize features that have more community interest, so upvoting and commenting on existing discussions is a great way to help drive the direction of the project.
+- **Documentation** — If you find any gaps or inaccuracies in the documentation, you can open a PR in the [documentation repo](https://github.com/teelur/budget-board-docs).
+- **Translations** — Help translate the app at [Weblate](https://hosted.weblate.org/engage/budget-board/). No code required.
+- **Code contributions** — See the [contributing guide](CONTRIBUTING.md) for instructions on how to contribute code changes.
 
 ### Screenshots
 
