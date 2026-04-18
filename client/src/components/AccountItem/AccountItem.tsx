@@ -63,7 +63,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
       <DimmedText size="xs">
         {t("last_updated", {
           date: props.account.balanceDate
-            ? dayjs(props.account.balanceDate).format(`${dateFormat} LT`)
+            ? dayjs(props.account.balanceDate).format(`${dateFormat}`)
             : t("never"),
         })}
       </DimmedText>

@@ -238,7 +238,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
           <DimmedText size="sm">
             {t("last_updated", {
               date: dayjs(props.account.balanceDate).isValid()
-                ? dayjs(props.account.balanceDate).format(`${dateFormat} LT`)
+                ? dayjs(props.account.balanceDate).format(`${dateFormat}`)
                 : t("never"),
             })}
           </DimmedText>
