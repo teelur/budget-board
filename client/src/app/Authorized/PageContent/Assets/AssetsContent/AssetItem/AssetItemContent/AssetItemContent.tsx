@@ -72,7 +72,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
         <DimmedText size="sm">
           {t("last_updated", {
             date: dayjs(props.asset.valueDate).isValid()
-              ? dayjs(props.asset.valueDate).format(`${dateFormat} LT`)
+              ? dayjs(props.asset.valueDate).format(`${dateFormat}`)
               : t("never"),
           })}
         </DimmedText>
