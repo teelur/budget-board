@@ -64,6 +64,7 @@ const PageContent = (): React.ReactNode => {
         height: "100%",
       }}
       type="auto"
+      pb="0.3rem"
       offsetScrollbars="present"
     >
       <Stack
