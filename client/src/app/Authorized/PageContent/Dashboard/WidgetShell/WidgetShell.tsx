@@ -1,5 +1,5 @@
 import { ActionIcon, Group } from "@mantine/core";
-import { SettingsIcon, XIcon } from "lucide-react";
+import { Maximize2Icon, SettingsIcon, XIcon } from "lucide-react";
 import React from "react";
 
 interface WidgetShellProps {
@@ -59,6 +59,20 @@ const WidgetShell = ({
             <XIcon size={14} />
           </ActionIcon>
         </Group>
+      )}
+      {isEditMode && (
+        <Maximize2Icon
+          size={14}
+          style={{
+            position: "absolute",
+            bottom: 6,
+            right: 6,
+            zIndex: 10,
+            color: "var(--mantine-color-dimmed)",
+            pointerEvents: "none",
+            transform: "rotate(90deg)",
+          }}
+        />
       )}
       {children}
     </div>

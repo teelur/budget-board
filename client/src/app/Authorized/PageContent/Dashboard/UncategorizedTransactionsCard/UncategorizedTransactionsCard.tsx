@@ -51,7 +51,9 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
         url: "/api/userSettings",
         method: "GET",
       });
-      if (res.status === 200) return res.data as IUserSettings;
+      if (res.status === 200) {
+        return res.data as IUserSettings;
+      }
       return undefined;
     },
   });
@@ -95,9 +97,10 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
     <>
       <SplitCard
         w="100%"
+        h="100%"
         border={BorderThickness.Thick}
         header={
-          <Group gap={"0.25rem"}>
+          <Group gap="0.25rem">
             <TagsIcon color="var(--base-color-text-dimmed)" />
             <PrimaryText size="xl" lh={1}>
               {t("uncategorized_transactions")}
@@ -106,16 +109,22 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
         }
         elevation={1}
       >
-        <Stack gap="0.5rem" align="center" w="100%">
+        <Stack
+          gap="0.5rem"
+          align="center"
+          w="100%"
+          style={{ flex: 1, minHeight: 0 }}
+        >
           {transactionsQuery.isPending ? (
-            <Skeleton height={350} radius="lg" />
+            <Skeleton h="100%" radius="lg" />
           ) : (
-            <ScrollArea.Autosize
+            <ScrollArea
               w="100%"
+              h="100%"
               p="0.125rem"
-              mah={350}
               type="auto"
               offsetScrollbars="present"
+              style={{ flex: 1, minHeight: 0 }}
             >
               <Stack gap="0.3rem">
                 {currentPageTransactions.map((transaction: ITransaction) => (
@@ -130,7 +139,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
                   />
                 ))}
               </Stack>
-            </ScrollArea.Autosize>
+            </ScrollArea>
           )}
           {sortedFilteredTransactions.length > itemsPerPage && (
             <Pagination

@@ -152,9 +152,10 @@ const SpendingTrendsCard = (): React.ReactNode => {
   return (
     <SplitCard
       w="100%"
+      h="100%"
       border={BorderThickness.Thick}
       header={
-        <Group gap={"0.25rem"}>
+        <Group gap="0.25rem">
           <LineChartIcon color="var(--base-color-text-dimmed)" />
           <PrimaryText size="xl" lh={1}>
             {t("spending_trends")}

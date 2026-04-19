@@ -143,7 +143,9 @@ const Dashboard = (): React.ReactNode => {
 
   const handleAddWidget = (widgetType: string) => {
     const entry = WIDGET_REGISTRY.find((r) => r.widgetType === widgetType);
-    if (!entry) return;
+    if (!entry) {
+      return;
+    }
 
     doAddWidget.mutate({
       widgetType,
@@ -158,7 +160,9 @@ const Dashboard = (): React.ReactNode => {
     layout: Layout,
     _layouts: Partial<Record<string, Layout>>,
   ) => {
-    if (!isEditMode) return;
+    if (!isEditMode) {
+      return;
+    }
 
     const updates: IWidgetSettingsBatchUpdateRequest[] = layout.map((item) => ({
       id: item.i,
@@ -246,7 +250,10 @@ const Dashboard = (): React.ReactNode => {
               margin={[12, 12]}
             >
               {widgets.map((widget) => (
-                <div key={widget.id} style={{ overflow: "hidden" }}>
+                <div
+                  key={widget.id}
+                  style={{ height: "100%", overflow: "hidden" }}
+                >
                   <WidgetShell
                     isEditMode={isEditMode}
                     onRemove={() => doRemoveWidget.mutate(widget.id)}

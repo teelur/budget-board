@@ -1,4 +1,4 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import NetWorthItem from "./NetWorthItem/NetWorthItem";
 import { filterVisibleAccounts } from "~/helpers/accounts";
@@ -194,6 +194,7 @@ const NetWorthCard = ({
   return (
     <SplitCard
       w="100%"
+      h="100%"
       border={BorderThickness.Thick}
       header={
         <Group w="100%" justify="space-between">
@@ -207,9 +208,11 @@ const NetWorthCard = ({
       }
       elevation={1}
     >
-      <Stack w="100%" gap="0.5rem">
-        {getNetWorthLines()}
-      </Stack>
+      <ScrollArea w="100%" h="100%" type="auto" offsetScrollbars="present">
+        <Stack w="100%" gap="0.5rem">
+          {getNetWorthLines()}
+        </Stack>
+      </ScrollArea>
       {settingsOpened !== undefined && onSettingsClose && (
         <NetWorthCardSettings
           widgetId={widgetId}

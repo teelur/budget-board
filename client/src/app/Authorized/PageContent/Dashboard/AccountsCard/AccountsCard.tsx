@@ -1,4 +1,4 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -72,6 +72,7 @@ const AccountsCard = (): React.ReactNode => {
   return (
     <SplitCard
       w="100%"
+      h="100%"
       border={BorderThickness.Thick}
       header={
         <Group gap={"0.25rem"}>
@@ -83,19 +84,24 @@ const AccountsCard = (): React.ReactNode => {
       }
       elevation={1}
     >
-      <Stack align="center" gap="0.5rem">
-        {institutionQuery.isPending || accountsQuery.isPending ? (
-          <Skeleton height={600} radius="lg" />
-        ) : (sortedFilteredInstitutionsForDisplay ?? []).length > 0 ? (
-          (sortedFilteredInstitutionsForDisplay ?? []).map(
-            (institution: IInstitution) => (
-              <InstitutionItem key={institution.id} institution={institution} />
-            ),
-          )
-        ) : (
-          <DimmedText size="sm">{t("no_accounts_found")}</DimmedText>
-        )}
-      </Stack>
+      <ScrollArea w="100%" h="100%" type="auto" offsetScrollbars="present">
+        <Stack align="center" gap="0.5rem">
+          {institutionQuery.isPending || accountsQuery.isPending ? (
+            <Skeleton height={200} radius="lg" />
+          ) : (sortedFilteredInstitutionsForDisplay ?? []).length > 0 ? (
+            (sortedFilteredInstitutionsForDisplay ?? []).map(
+              (institution: IInstitution) => (
+                <InstitutionItem
+                  key={institution.id}
+                  institution={institution}
+                />
+              ),
+            )
+          ) : (
+            <DimmedText size="sm">{t("no_accounts_found")}</DimmedText>
+          )}
+        </Stack>
+      </ScrollArea>
     </SplitCard>
   );
 };
