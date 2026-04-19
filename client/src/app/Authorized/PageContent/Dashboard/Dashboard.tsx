@@ -27,10 +27,10 @@ import {
   WIDGET_REGISTRY,
 } from "~/shared/dashboardGrid";
 import AccountsCard from "./AccountsCard/AccountsCard";
-import NetWorthCard from "./NetWorthCard/NetWorthCard";
+import NetWorthWidget from "~/components/widgets/NetWorthWidget/NetWorthWidget";
 import SpendingTrendsCard from "./SpendingTrendsCard/SpendingTrendsCard";
-import UncategorizedTransactionsCard from "./UncategorizedTransactionsCard/UncategorizedTransactionsCard";
-import WidgetShell from "./WidgetShell/WidgetShell";
+import UncategorizedTransactionsWidget from "~/components/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
+import WidgetShell from "~/components/widgets/WidgetShell/WidgetShell";
 import DashboardEditor from "./DashboardEditor/DashboardEditor";
 import WidgetPicker from "./WidgetPicker/WidgetPicker";
 import Footer from "./Footer/Footer";
@@ -193,7 +193,7 @@ const Dashboard = (): React.ReactNode => {
         return <AccountsCard />;
       case "NetWorth":
         return (
-          <NetWorthCard
+          <NetWorthWidget
             widgetId={widget.id}
             settingsOpened={settingsOpenId === widget.id}
             onSettingsClose={() => setSettingsOpenId(null)}
@@ -202,15 +202,15 @@ const Dashboard = (): React.ReactNode => {
       case "SpendingTrends":
         return <SpendingTrendsCard />;
       case "UncategorizedTransactions":
-        return <UncategorizedTransactionsCard />;
+        return <UncategorizedTransactionsWidget />;
       default:
         return null;
     }
   };
 
   return (
-    <Stack w="100%" maw={1400} flex="1" justify="space-between">
-      <Stack gap="xs">
+    <Stack w="100%" flex="1" justify="space-between">
+      <Stack gap={0}>
         <Group justify="flex-end">
           {isEditMode ? (
             <DashboardEditor
@@ -229,7 +229,6 @@ const Dashboard = (): React.ReactNode => {
             </Button>
           )}
         </Group>
-
         <div ref={containerRef} style={{ width: "100%" }}>
           {widgetSettingsQuery.isPending ? (
             <Stack gap="md">
@@ -271,9 +270,7 @@ const Dashboard = (): React.ReactNode => {
           )}
         </div>
       </Stack>
-
       <Footer />
-
       <WidgetPicker
         opened={pickerOpened}
         onClose={closePicker}

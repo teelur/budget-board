@@ -5,7 +5,6 @@ import {
 } from "~/helpers/transactions";
 import { Group, Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
-import { IUserSettings } from "~/models/userSettings";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -18,15 +17,18 @@ import SplitCard, {
 } from "~/components/ui/SplitCard/SplitCard";
 import { TagsIcon } from "lucide-react";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
-const UncategorizedTransactionsCard = (): React.ReactNode => {
-  const itemsPerPage = 20;
+const UncategorizedTransactionsWidget = (): React.ReactNode => {
+  const itemsPerPage = 15;
   const [activePage, setPage] = React.useState(1);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
   const { t } = useTranslation();
   const { transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
 
   const transactionsQuery = useQuery({
     queryKey: ["transactions", { getHidden: false }],
@@ -44,22 +46,6 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
     },
   });
 
-  const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-      return undefined;
-    },
-  });
-
-  const currency = userSettingsQuery.data?.currency ?? "USD";
-
   const sortedFilteredTransactions = React.useMemo(
     () =>
       getVisibleTransactions(
@@ -68,9 +54,13 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
     [transactionsQuery.data],
   );
 
-  const currentPageTransactions = sortedFilteredTransactions.slice(
-    (activePage - 1) * itemsPerPage,
-    (activePage - 1) * itemsPerPage + itemsPerPage,
+  const currentPageTransactions = React.useMemo(
+    () =>
+      sortedFilteredTransactions.slice(
+        (activePage - 1) * itemsPerPage,
+        (activePage - 1) * itemsPerPage + itemsPerPage,
+      ),
+    [sortedFilteredTransactions, activePage, itemsPerPage],
   );
 
   const onToggleSelect = (id: string) =>
@@ -89,9 +79,47 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
       return next;
     });
 
-  if (sortedFilteredTransactions.length === 0) {
-    return null;
-  }
+  const getWidgetContent = () => {
+    if (transactionsQuery.isPending) {
+      return <Skeleton h="100%" radius="lg" />;
+    }
+
+    if (sortedFilteredTransactions.length === 0) {
+      return (
+        <Group justify="center" align="center" gap="0.5rem" h="100%">
+          <TagsIcon size={24} color="var(--base-color-text-dimmed)" />
+          <DimmedText>{t("no_uncategorized_transactions")}</DimmedText>
+        </Group>
+      );
+    }
+
+    return (
+      <>
+        <ScrollArea
+          w="100%"
+          h="100%"
+          p="0.125rem"
+          type="auto"
+          offsetScrollbars="present"
+          style={{ flex: 1, minHeight: 0 }}
+        >
+          <Stack gap="0.3rem">
+            {currentPageTransactions.map((transaction: ITransaction) => (
+              <TransactionCard
+                key={transaction.id}
+                transaction={transaction}
+                categories={transactionCategories}
+                elevation={2}
+                currency={preferredCurrency}
+                isSelected={selectedIds.has(transaction.id)}
+                onToggleSelect={onToggleSelect}
+              />
+            ))}
+          </Stack>
+        </ScrollArea>
+      </>
+    );
+  };
 
   return (
     <>
@@ -115,32 +143,7 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
           w="100%"
           style={{ flex: 1, minHeight: 0 }}
         >
-          {transactionsQuery.isPending ? (
-            <Skeleton h="100%" radius="lg" />
-          ) : (
-            <ScrollArea
-              w="100%"
-              h="100%"
-              p="0.125rem"
-              type="auto"
-              offsetScrollbars="present"
-              style={{ flex: 1, minHeight: 0 }}
-            >
-              <Stack gap="0.3rem">
-                {currentPageTransactions.map((transaction: ITransaction) => (
-                  <TransactionCard
-                    key={transaction.id}
-                    transaction={transaction}
-                    categories={transactionCategories}
-                    elevation={2}
-                    currency={currency}
-                    isSelected={selectedIds.has(transaction.id)}
-                    onToggleSelect={onToggleSelect}
-                  />
-                ))}
-              </Stack>
-            </ScrollArea>
-          )}
+          {getWidgetContent()}
           {sortedFilteredTransactions.length > itemsPerPage && (
             <Pagination
               value={activePage}
@@ -163,4 +166,4 @@ const UncategorizedTransactionsCard = (): React.ReactNode => {
   );
 };
 
-export default UncategorizedTransactionsCard;
+export default UncategorizedTransactionsWidget;

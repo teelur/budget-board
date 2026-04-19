@@ -57,7 +57,7 @@ const normalizeNumber = (value: unknown): number => {
  * @returns The parsed object or undefined on failure.
  */
 const safeParseJson = (
-  configuration: string
+  configuration: string,
 ): Record<string, unknown> | undefined => {
   try {
     return JSON.parse(configuration) as Record<string, unknown>;
@@ -73,7 +73,7 @@ const safeParseJson = (
  * @returns An array of normalized widget categories.
  */
 const normalizeCategories = (
-  categories: unknown
+  categories: unknown,
 ): INetWorthWidgetCategory[] => {
   if (!Array.isArray(categories)) {
     return [];
@@ -135,7 +135,7 @@ const normalizeLines = (lines: unknown): INetWorthWidgetLine[] => {
  * @returns The normalized configuration or undefined when parsing fails.
  */
 export const parseNetWorthConfiguration = (
-  configuration?: string
+  configuration?: string,
 ): INetWorthWidgetConfiguration | undefined => {
   if (!configuration) {
     return undefined;
@@ -148,10 +148,6 @@ export const parseNetWorthConfiguration = (
 
   const groupsRaw = parsed.groups ?? parsed.Groups;
   const normalizedGroups = normalizeGroups(groupsRaw);
-
-  if (normalizedGroups.length === 0) {
-    return undefined;
-  }
 
   return {
     groups: normalizedGroups,
@@ -199,7 +195,7 @@ export const isLineCategory = (category: INetWorthWidgetCategory): boolean =>
  */
 export const getAssetValueForCategory = (
   category: INetWorthWidgetCategory,
-  assets: IAssetResponse[]
+  assets: IAssetResponse[],
 ): number => {
   if (areStringsEqual(category.subtype, "all")) {
     return sumAssetsTotalValue(assets);
@@ -220,7 +216,7 @@ export const calculateLineTotal = (
   line: INetWorthWidgetLine,
   validAccounts: IAccountResponse[],
   validAssets: IAssetResponse[],
-  lines: INetWorthWidgetLine[]
+  lines: INetWorthWidgetLine[],
 ): number => {
   const categories = line.categories ?? [];
 
@@ -260,7 +256,7 @@ export const calculateLineTotal = (
             lineMatch,
             validAccounts,
             validAssets,
-            lines
+            lines,
           );
           return total + lineTotal;
         }
@@ -268,7 +264,7 @@ export const calculateLineTotal = (
 
       return total;
     },
-    0
+    0,
   );
 };
 

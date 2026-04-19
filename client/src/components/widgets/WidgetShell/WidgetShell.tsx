@@ -36,27 +36,27 @@ const WidgetShell = ({
           {onSettingsOpen && (
             <ActionIcon
               variant="filled"
-              size="sm"
+              size="md"
               onClick={(e) => {
                 e.stopPropagation();
                 onSettingsOpen();
               }}
               aria-label="Widget settings"
             >
-              <SettingsIcon size={14} />
+              <SettingsIcon size={20} />
             </ActionIcon>
           )}
           <ActionIcon
             variant="filled"
             color="var(--button-color-destructive)"
-            size="sm"
+            size="md"
             onClick={(e) => {
               e.stopPropagation();
               onRemove();
             }}
             aria-label="Remove widget"
           >
-            <XIcon size={14} />
+            <XIcon size={20} />
           </ActionIcon>
         </Group>
       )}

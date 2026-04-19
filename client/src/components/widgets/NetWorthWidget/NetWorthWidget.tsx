@@ -8,7 +8,6 @@ import { IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
 import { filterVisibleAssets } from "~/helpers/assets";
 import { IAssetResponse } from "~/models/asset";
-import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import {
@@ -25,21 +24,23 @@ import { useTranslation } from "react-i18next";
 import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
-import { TrendingUpIcon } from "lucide-react";
+import { TrendingUpIcon, TriangleAlertIcon } from "lucide-react";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
-interface NetWorthCardProps {
+interface NetWorthWidgetProps {
   widgetId: string;
   settingsOpened?: boolean;
   onSettingsClose?: () => void;
 }
 
-const NetWorthCard = ({
+const NetWorthWidget = ({
   widgetId,
   settingsOpened,
   onSettingsClose,
-}: NetWorthCardProps): React.ReactNode => {
+}: NetWorthWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
 
   const widgetSettingsQuery = useQuery({
     queryKey: ["widgetSettings"],
@@ -87,22 +88,6 @@ const NetWorthCard = ({
     },
   });
 
-  const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
-
   const validAccounts = filterVisibleAccounts(accountsQuery.data ?? []);
   const validAssets = filterVisibleAssets(assetsQuery.data ?? []);
 
@@ -117,7 +102,10 @@ const NetWorthCard = ({
 
     if (!widgetSettingsQuery.data || widgetSettingsQuery.data.length === 0) {
       return (
-        <DimmedText size="sm">{t("no_configuration_data_found")}</DimmedText>
+        <Group justify="center" align="center" gap="0.5rem" h="100%">
+          <TriangleAlertIcon size={24} color="var(--base-color-text-dimmed)" />
+          <DimmedText size="sm">{t("no_configuration_data_found")}</DimmedText>
+        </Group>
       );
     }
 
@@ -127,7 +115,12 @@ const NetWorthCard = ({
 
     if (netWorthWidgetSettingsList.length === 0) {
       return (
-        <DimmedText size="sm">{t("error_loading_settings_message")}</DimmedText>
+        <Group justify="center" align="center" gap="0.5rem" h="100%">
+          <TriangleAlertIcon size={24} color="var(--base-color-text-dimmed)" />
+          <DimmedText size="sm">
+            {t("error_loading_settings_message")}
+          </DimmedText>
+        </Group>
       );
     }
 
@@ -137,9 +130,12 @@ const NetWorthCard = ({
 
     if (!configuration) {
       return (
-        <DimmedText size="sm">
-          {t("error_loading_configuration_message")}
-        </DimmedText>
+        <Group justify="center" align="center" gap="0.5rem" h="100%">
+          <TriangleAlertIcon size={24} color="var(--base-color-text-dimmed)" />
+          <DimmedText size="sm">
+            {t("error_loading_configuration_message")}
+          </DimmedText>
+        </Group>
       );
     }
 
@@ -147,9 +143,12 @@ const NetWorthCard = ({
 
     if (!netWorthWidgetGroups || netWorthWidgetGroups.length === 0) {
       return (
-        <DimmedText size="sm">
-          {t("widget_no_items_configured_message")}
-        </DimmedText>
+        <Group justify="center" align="center" gap="0.5rem" h="100%">
+          <TriangleAlertIcon size={24} color="var(--base-color-text-dimmed)" />
+          <DimmedText size="sm">
+            {t("widget_no_items_configured_message")}
+          </DimmedText>
+        </Group>
       );
     }
 
@@ -158,36 +157,38 @@ const NetWorthCard = ({
       .sort((a, b) => a.index - b.index);
 
     return (
-      <Stack gap="0.5rem">
-        {orderedGroups.map((group) => {
-          const sortedLines = group.lines
-            .slice()
-            .sort(
-              (a: INetWorthWidgetLine, b: INetWorthWidgetLine) =>
-                a.index - b.index,
-            );
+      <ScrollArea w="100%" h="100%" type="auto" offsetScrollbars="present">
+        <Stack gap="0.5rem">
+          {orderedGroups.map((group) => {
+            const sortedLines = group.lines
+              .slice()
+              .sort(
+                (a: INetWorthWidgetLine, b: INetWorthWidgetLine) =>
+                  a.index - b.index,
+              );
 
-          return (
-            <Card key={group.id} p="0.25rem" elevation={2}>
-              <Stack gap={0}>
-                {sortedLines.map((line: INetWorthWidgetLine) => (
-                  <NetWorthItem
-                    key={line.id}
-                    title={line.name}
-                    totalBalance={calculateLineTotal(
-                      line,
-                      validAccounts,
-                      validAssets,
-                      orderedGroups.flatMap((g) => g.lines),
-                    )}
-                    userCurrency={userSettingsQuery.data?.currency ?? "USD"}
-                  />
-                ))}
-              </Stack>
-            </Card>
-          );
-        })}
-      </Stack>
+            return (
+              <Card key={group.id} p="0.25rem" elevation={2}>
+                <Stack gap={0}>
+                  {sortedLines.map((line: INetWorthWidgetLine) => (
+                    <NetWorthItem
+                      key={line.id}
+                      title={line.name}
+                      totalBalance={calculateLineTotal(
+                        line,
+                        validAccounts,
+                        validAssets,
+                        orderedGroups.flatMap((g) => g.lines),
+                      )}
+                      userCurrency={preferredCurrency ?? "USD"}
+                    />
+                  ))}
+                </Stack>
+              </Card>
+            );
+          })}
+        </Stack>
+      </ScrollArea>
     );
   };
 
@@ -208,11 +209,7 @@ const NetWorthCard = ({
       }
       elevation={1}
     >
-      <ScrollArea w="100%" h="100%" type="auto" offsetScrollbars="present">
-        <Stack w="100%" gap="0.5rem">
-          {getNetWorthLines()}
-        </Stack>
-      </ScrollArea>
+      {getNetWorthLines()}
       {settingsOpened !== undefined && onSettingsClose && (
         <NetWorthCardSettings
           widgetId={widgetId}
@@ -224,4 +221,4 @@ const NetWorthCard = ({
   );
 };
 
-export default NetWorthCard;
+export default NetWorthWidget;
