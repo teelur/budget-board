@@ -1,14 +1,36 @@
 export interface IWidgetSettingsResponse {
   id: string;
   widgetType: string;
-  isVisible: boolean;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
   configuration: string;
   userID: string;
 }
 
+export interface IWidgetSettingsCreateRequest {
+  widgetType: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface IWidgetSettingsBatchUpdateRequest {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface IWidgetSettingsUpdateRequest<T> {
   id: string;
-  isVisible: boolean;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
   configuration: T;
 }
 

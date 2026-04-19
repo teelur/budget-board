@@ -18,7 +18,6 @@ import {
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import {
   calculateLineTotal,
-  isNetWorthWidgetType,
   parseNetWorthConfiguration,
 } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
@@ -28,7 +27,17 @@ import SplitCard, {
 } from "~/components/ui/SplitCard/SplitCard";
 import { TrendingUpIcon } from "lucide-react";
 
-const NetWorthCard = (): React.ReactNode => {
+interface NetWorthCardProps {
+  widgetId: string;
+  settingsOpened?: boolean;
+  onSettingsClose?: () => void;
+}
+
+const NetWorthCard = ({
+  widgetId,
+  settingsOpened,
+  onSettingsClose,
+}: NetWorthCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
@@ -114,7 +123,7 @@ const NetWorthCard = (): React.ReactNode => {
 
     const netWorthWidgetSettingsList = widgetSettingsQuery.data
       .slice()
-      .filter((widget) => isNetWorthWidgetType(widget.widgetType));
+      .filter((widget) => widget.id === widgetId);
 
     if (netWorthWidgetSettingsList.length === 0) {
       return (
@@ -187,21 +196,27 @@ const NetWorthCard = (): React.ReactNode => {
       w="100%"
       border={BorderThickness.Thick}
       header={
-        <Group w={"100%"} justify="space-between">
-          <Group gap={"0.25rem"}>
+        <Group w="100%" justify="space-between">
+          <Group gap="0.25rem">
             <TrendingUpIcon color="var(--base-color-text-dimmed)" />
             <PrimaryText size="xl" lh={1}>
               {t("net_worth")}
             </PrimaryText>
           </Group>
-          <NetWorthCardSettings />
         </Group>
       }
       elevation={1}
     >
-      <Stack w={"100%"} gap="0.5rem">
+      <Stack w="100%" gap="0.5rem">
         {getNetWorthLines()}
       </Stack>
+      {settingsOpened !== undefined && onSettingsClose && (
+        <NetWorthCardSettings
+          widgetId={widgetId}
+          opened={settingsOpened}
+          onClose={onSettingsClose}
+        />
+      )}
     </SplitCard>
   );
 };
