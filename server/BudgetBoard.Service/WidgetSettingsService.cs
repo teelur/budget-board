@@ -48,7 +48,7 @@ public class WidgetSettingsService(
         {
             foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
             {
-                await this.CreateWidgetSettingsAsync(
+                await CreateWidgetSettingsAsync(
                     userGuid,
                     new WidgetSettingsCreateRequest
                     {

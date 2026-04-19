@@ -13,10 +13,10 @@ public static class WidgetSettingsHelpers
     /// </summary>
     public static readonly IReadOnlyList<DefaultWidgetLayout> DefaultLayouts =
     [
-        new DefaultWidgetLayout(WidgetTypes.Accounts, X: 0, Y: 0, W: 4, H: 5),
-        new DefaultWidgetLayout(WidgetTypes.UncategorizedTransactions, X: 4, Y: 0, W: 8, H: 5),
-        new DefaultWidgetLayout(WidgetTypes.NetWorth, X: 0, Y: 5, W: 4, H: 5),
-        new DefaultWidgetLayout(WidgetTypes.SpendingTrends, X: 4, Y: 5, W: 8, H: 5),
+        new DefaultWidgetLayout(WidgetTypes.Accounts, X: 0, Y: 0, W: 4, H: 20),
+        new DefaultWidgetLayout(WidgetTypes.UncategorizedTransactions, X: 4, Y: 0, W: 8, H: 11),
+        new DefaultWidgetLayout(WidgetTypes.NetWorth, X: 0, Y: 5, W: 4, H: 10),
+        new DefaultWidgetLayout(WidgetTypes.SpendingTrends, X: 4, Y: 5, W: 8, H: 16),
     ];
 
     public static readonly NetWorthWidgetConfiguration DefaultNetWorthWidgetConfiguration = new()

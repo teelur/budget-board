@@ -1,7 +1,7 @@
 import { LayoutItem } from "react-grid-layout";
 
 export const GRID_COLS = 12;
-export const GRID_ROW_HEIGHT = 80;
+export const GRID_ROW_HEIGHT = 20;
 export const GRID_BREAKPOINT = 768;
 
 export interface WidgetRegistryEntry {
@@ -20,7 +20,7 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     descriptionKey: "accounts_widget_description",
     maxInstances: 1,
     defaultW: 4,
-    defaultH: 5,
+    defaultH: 20,
   },
   {
     widgetType: "NetWorth",
@@ -28,7 +28,7 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     descriptionKey: "net_worth_widget_description",
     maxInstances: Infinity,
     defaultW: 4,
-    defaultH: 5,
+    defaultH: 20,
   },
   {
     widgetType: "UncategorizedTransactions",
@@ -36,7 +36,7 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     descriptionKey: "uncategorized_transactions_widget_description",
     maxInstances: 1,
     defaultW: 8,
-    defaultH: 5,
+    defaultH: 20,
   },
   {
     widgetType: "SpendingTrends",
@@ -44,7 +44,7 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     descriptionKey: "spending_trends_widget_description",
     maxInstances: Infinity,
     defaultW: 8,
-    defaultH: 5,
+    defaultH: 20,
   },
 ];
 
@@ -54,7 +54,9 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
  */
 export const deriveSmLayout = (lgLayout: LayoutItem[]): LayoutItem[] => {
   const sorted = lgLayout.slice().sort((a, b) => {
-    if (a.y !== b.y) return a.y - b.y;
+    if (a.y !== b.y) {
+      return a.y - b.y;
+    }
     return a.x - b.x;
   });
 
