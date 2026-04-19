@@ -34,6 +34,10 @@ export interface IWidgetSettingsUpdateRequest<T> {
   configuration: T;
 }
 
+export interface IAccountsWidgetConfiguration {
+  accountIds: string[];
+}
+
 export interface INetWorthWidgetConfiguration {
   groups: Array<INetWorthWidgetGroup>;
 }

@@ -14,7 +14,6 @@ import {
   INetWorthWidgetLine,
   IWidgetSettingsResponse,
 } from "~/models/widgetSettings";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import {
   calculateLineTotal,
   parseNetWorthConfiguration,
@@ -24,8 +23,9 @@ import { useTranslation } from "react-i18next";
 import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
-import { TrendingUpIcon, TriangleAlertIcon } from "lucide-react";
+import { TrendingUpIcon } from "lucide-react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import WidgetErrorMessage from "../shared/WidgetErrorMessage";
 
 interface NetWorthWidgetProps {
   widgetId: string;
@@ -101,12 +101,7 @@ const NetWorthWidget = ({
     }
 
     if (!widgetSettingsQuery.data || widgetSettingsQuery.data.length === 0) {
-      return (
-        <Group justify="center" align="center" gap="0.5rem" h="100%">
-          <TriangleAlertIcon size={24} color="var(--base-color-text-dimmed)" />
-          <DimmedText size="sm">{t("no_configuration_data_found")}</DimmedText>
-        </Group>
-      );
+      return <WidgetErrorMessage messageKey="no_configuration_data_found" />;
     }
 
     const netWorthWidgetSettingsList = widgetSettingsQuery.data
@@ -114,14 +109,7 @@ const NetWorthWidget = ({
       .filter((widget) => widget.id === widgetId);
 
     if (netWorthWidgetSettingsList.length === 0) {
-      return (
-        <Group justify="center" align="center" gap="0.5rem" h="100%">
-          <TriangleAlertIcon size={24} color="var(--base-color-text-dimmed)" />
-          <DimmedText size="sm">
-            {t("error_loading_settings_message")}
-          </DimmedText>
-        </Group>
-      );
+      return <WidgetErrorMessage messageKey="error_loading_settings_message" />;
     }
 
     const configuration = parseNetWorthConfiguration(
@@ -130,12 +118,7 @@ const NetWorthWidget = ({
 
     if (!configuration) {
       return (
-        <Group justify="center" align="center" gap="0.5rem" h="100%">
-          <TriangleAlertIcon size={24} color="var(--base-color-text-dimmed)" />
-          <DimmedText size="sm">
-            {t("error_loading_configuration_message")}
-          </DimmedText>
-        </Group>
+        <WidgetErrorMessage messageKey="error_loading_configuration_message" />
       );
     }
 
@@ -143,12 +126,7 @@ const NetWorthWidget = ({
 
     if (!netWorthWidgetGroups || netWorthWidgetGroups.length === 0) {
       return (
-        <Group justify="center" align="center" gap="0.5rem" h="100%">
-          <TriangleAlertIcon size={24} color="var(--base-color-text-dimmed)" />
-          <DimmedText size="sm">
-            {t("widget_no_items_configured_message")}
-          </DimmedText>
-        </Group>
+        <WidgetErrorMessage messageKey="widget_no_items_configured_message" />
       );
     }
 

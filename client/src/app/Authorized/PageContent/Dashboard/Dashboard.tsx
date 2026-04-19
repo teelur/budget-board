@@ -26,7 +26,7 @@ import {
   GRID_ROW_HEIGHT,
   WIDGET_REGISTRY,
 } from "~/shared/dashboardGrid";
-import AccountsCard from "./AccountsCard/AccountsCard";
+import AccountsWidget from "~/components/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/widgets/NetWorthWidget/NetWorthWidget";
 import SpendingTrendsCard from "./SpendingTrendsCard/SpendingTrendsCard";
 import UncategorizedTransactionsWidget from "~/components/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
@@ -190,7 +190,13 @@ const Dashboard = (): React.ReactNode => {
   const renderWidgetContent = (widget: IWidgetSettingsResponse) => {
     switch (widget.widgetType) {
       case "Accounts":
-        return <AccountsCard />;
+        return (
+          <AccountsWidget
+            widgetId={widget.id}
+            settingsOpened={settingsOpenId === widget.id}
+            onSettingsClose={() => setSettingsOpenId(null)}
+          />
+        );
       case "NetWorth":
         return (
           <NetWorthWidget
@@ -257,7 +263,8 @@ const Dashboard = (): React.ReactNode => {
                     isEditMode={isEditMode}
                     onRemove={() => doRemoveWidget.mutate(widget.id)}
                     onSettingsOpen={
-                      widget.widgetType === "NetWorth"
+                      widget.widgetType === "NetWorth" ||
+                      widget.widgetType === "Accounts"
                         ? () => setSettingsOpenId(widget.id)
                         : undefined
                     }

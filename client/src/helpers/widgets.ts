@@ -1,5 +1,6 @@
 import { areStringsEqual } from "~/helpers/utils";
 import {
+  IAccountsWidgetConfiguration,
   INetWorthWidgetCategory,
   INetWorthWidgetConfiguration,
   INetWorthWidgetGroup,
@@ -154,15 +155,25 @@ export const parseNetWorthConfiguration = (
   };
 };
 
-/**
- * Check whether a widgetType string refers to the Net Worth widget.
- *
- * @param widgetType - Raw widget type string from the backend.
- * @returns True when the type matches the Net Worth widget.
- */
-export const isNetWorthWidgetType = (widgetType: string): boolean =>
-  areStringsEqual(widgetType, "Net Worth") ||
-  areStringsEqual(widgetType, "NetWorth");
+export const parseAccountsConfiguration = (
+  configuration?: string,
+): IAccountsWidgetConfiguration => {
+  if (!configuration) {
+    return { accountIds: [] };
+  }
+
+  const parsed = safeParseJson(configuration);
+  if (!parsed) {
+    return { accountIds: [] };
+  }
+
+  const raw = parsed.accountIds ?? parsed.AccountIds;
+  const accountIds = Array.isArray(raw)
+    ? (raw as unknown[]).filter((v): v is string => typeof v === "string")
+    : [];
+
+  return { accountIds };
+};
 
 /**
  * Check whether a given category represents an asset category.
