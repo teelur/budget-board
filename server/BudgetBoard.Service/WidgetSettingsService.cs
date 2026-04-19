@@ -18,21 +18,18 @@ public class WidgetSettingsService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : IWidgetSettingsService
 {
-    public async Task CreateWidgetSettingsAsync(
-        Guid userGuid,
-        IWidgetSettingsCreateRequest<NetWorthWidgetConfiguration> request
-    )
+    public async Task CreateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var newWidget = new WidgetSettings
         {
             WidgetType = request.WidgetType,
-            IsVisible = request.IsVisible,
-            Configuration =
-                (request.Configuration) != null
-                    ? JsonSerializer.Serialize(request.Configuration)
-                    : null,
+            X = request.X,
+            Y = request.Y,
+            W = request.W,
+            H = request.H,
+            Configuration = GetDefaultConfiguration(request.WidgetType),
             UserID = userData.Id,
         };
 
@@ -44,42 +41,37 @@ public class WidgetSettingsService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
+        // Seed all default widgets when a user has none
+        if (!userData.WidgetSettings.Any())
+        {
+            foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
+            {
+                await this.CreateWidgetSettingsAsync(
+                    userGuid,
+                    new WidgetSettingsCreateRequest
+                    {
+                        WidgetType = layout.WidgetType,
+                        X = layout.X,
+                        Y = layout.Y,
+                        W = layout.W,
+                        H = layout.H,
+                    }
+                );
+            }
+        }
+
         var widgetSettings = userData.WidgetSettings.Select(ws => new WidgetResponse
         {
             ID = ws.ID,
             WidgetType = ws.WidgetType,
-            IsVisible = ws.IsVisible,
-            Configuration = ws.Configuration ?? GetDefaultConfiguration(ws.WidgetType),
+            X = ws.X,
+            Y = ws.Y,
+            W = ws.W,
+            H = ws.H,
+            Configuration =
+                ws.Configuration ?? GetDefaultConfiguration(ws.WidgetType) ?? string.Empty,
             UserID = ws.UserID,
         });
-
-        // Until we add customizable dashboards, we will need to automatically create the widget settings.
-        if (!widgetSettings.Any())
-        {
-            await this.CreateWidgetSettingsAsync(
-                userGuid,
-                new WidgetSettingsCreateRequest<NetWorthWidgetConfiguration>
-                {
-                    WidgetType = "NetWorth",
-                    IsVisible = true,
-                    Configuration = WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration,
-                    UserID = userGuid,
-                }
-            );
-
-            widgetSettings = userData.WidgetSettings.Select(ws => new WidgetResponse
-            {
-                ID = ws.ID,
-                WidgetType = ws.WidgetType,
-                IsVisible = ws.IsVisible,
-                Configuration =
-                    ws.Configuration
-                    ?? JsonSerializer.Serialize(
-                        WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
-                    ),
-                UserID = ws.UserID,
-            });
-        }
 
         return widgetSettings;
     }
@@ -97,9 +89,39 @@ public class WidgetSettingsService(
             throw new BudgetBoardServiceException(responseLocalizer["WidgetUpdateNotFoundError"]);
         }
 
-        widget.IsVisible = request.IsVisible;
+        widget.X = request.X;
+        widget.Y = request.Y;
+        widget.W = request.W;
+        widget.H = request.H;
         widget.Configuration =
             request.Configuration != null ? JsonSerializer.Serialize(request.Configuration) : null;
+
+        await userDataContext.SaveChangesAsync();
+    }
+
+    public async Task BatchUpdateWidgetSettingsAsync(
+        Guid userGuid,
+        IEnumerable<IWidgetSettingsBatchUpdateRequest> requests
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        foreach (var req in requests)
+        {
+            var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == req.ID);
+            if (widget == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["WidgetUpdateNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["WidgetUpdateNotFoundError"]
+                );
+            }
+
+            widget.X = req.X;
+            widget.Y = req.Y;
+            widget.W = req.W;
+            widget.H = req.H;
+        }
 
         await userDataContext.SaveChangesAsync();
     }
@@ -158,14 +180,14 @@ public class WidgetSettingsService(
         return foundUser;
     }
 
-    private string GetDefaultConfiguration(string widgetType)
+    private static string? GetDefaultConfiguration(string widgetType)
     {
         return widgetType switch
         {
             WidgetTypes.NetWorth => JsonSerializer.Serialize(
                 WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
             ),
-            _ => string.Empty,
+            _ => null,
         };
     }
 }

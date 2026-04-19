@@ -2,8 +2,22 @@ using BudgetBoard.Service.Models;
 
 namespace BudgetBoard.Service.Helpers;
 
+public record DefaultWidgetLayout(string WidgetType, int X, int Y, int W, int H);
+
 public static class WidgetSettingsHelpers
 {
+    /// <summary>
+    /// Default grid positions for each widget on a 12-column grid.
+    /// Matches the original two-column dashboard layout.
+    /// </summary>
+    public static readonly IReadOnlyList<DefaultWidgetLayout> DefaultLayouts =
+    [
+        new DefaultWidgetLayout(WidgetTypes.Accounts, X: 0, Y: 0, W: 4, H: 5),
+        new DefaultWidgetLayout(WidgetTypes.UncategorizedTransactions, X: 4, Y: 0, W: 8, H: 5),
+        new DefaultWidgetLayout(WidgetTypes.NetWorth, X: 0, Y: 5, W: 4, H: 5),
+        new DefaultWidgetLayout(WidgetTypes.SpendingTrends, X: 4, Y: 5, W: 8, H: 5),
+    ];
+
     public static readonly NetWorthWidgetConfiguration DefaultNetWorthWidgetConfiguration = new()
     {
         Groups =

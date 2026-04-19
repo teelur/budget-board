@@ -2,28 +2,36 @@
 
 public static class WidgetTypes
 {
+    public const string Accounts = "Accounts";
     public const string NetWorth = "NetWorth";
+    public const string UncategorizedTransactions = "UncategorizedTransactions";
+    public const string SpendingTrends = "SpendingTrends";
 
-    public static readonly IEnumerable<string> All = [NetWorth];
+    public static readonly IEnumerable<string> All =
+    [
+        Accounts,
+        NetWorth,
+        UncategorizedTransactions,
+        SpendingTrends,
+    ];
 }
 
-public interface IWidgetSettingsCreateRequest<TConfiguration>
-    where TConfiguration : class
+public interface IWidgetSettingsCreateRequest
 {
     string WidgetType { get; }
-    bool IsVisible { get; }
-    TConfiguration Configuration { get; }
-    Guid UserID { get; }
+    int X { get; }
+    int Y { get; }
+    int W { get; }
+    int H { get; }
 }
 
-public class WidgetSettingsCreateRequest<TConfiguration>
-    : IWidgetSettingsCreateRequest<TConfiguration>
-    where TConfiguration : class
+public class WidgetSettingsCreateRequest : IWidgetSettingsCreateRequest
 {
     public string WidgetType { get; set; } = string.Empty;
-    public bool IsVisible { get; set; } = true;
-    public TConfiguration Configuration { get; set; } = null!;
-    public Guid UserID { get; set; } = Guid.Empty;
+    public int X { get; set; } = 0;
+    public int Y { get; set; } = 0;
+    public int W { get; set; } = 4;
+    public int H { get; set; } = 5;
 }
 
 public class NetWorthWidgetConfiguration
@@ -58,7 +66,10 @@ public interface IWidgetResponse
 {
     Guid ID { get; }
     string WidgetType { get; }
-    bool IsVisible { get; }
+    int X { get; }
+    int Y { get; }
+    int W { get; }
+    int H { get; }
     string Configuration { get; }
     Guid UserID { get; }
 }
@@ -67,7 +78,10 @@ public class WidgetResponse : IWidgetResponse
 {
     public Guid ID { get; set; } = Guid.NewGuid();
     public string WidgetType { get; set; } = string.Empty;
-    public bool IsVisible { get; set; } = true;
+    public int X { get; set; } = 0;
+    public int Y { get; set; } = 0;
+    public int W { get; set; } = 4;
+    public int H { get; set; } = 5;
     public string Configuration { get; set; } = string.Empty;
     public Guid UserID { get; set; } = Guid.Empty;
 }
@@ -76,8 +90,11 @@ public interface IWidgetSettingsUpdateRequest<TConfiguration>
     where TConfiguration : class
 {
     Guid ID { get; }
-    bool IsVisible { get; }
-    TConfiguration Configuration { get; }
+    int X { get; }
+    int Y { get; }
+    int W { get; }
+    int H { get; }
+    TConfiguration? Configuration { get; }
 }
 
 public class WidgetSettingsUpdateRequest<TConfiguration>
@@ -85,6 +102,27 @@ public class WidgetSettingsUpdateRequest<TConfiguration>
     where TConfiguration : class
 {
     public Guid ID { get; set; } = Guid.NewGuid();
-    public bool IsVisible { get; set; } = true;
-    public TConfiguration Configuration { get; set; } = null!;
+    public int X { get; set; } = 0;
+    public int Y { get; set; } = 0;
+    public int W { get; set; } = 4;
+    public int H { get; set; } = 5;
+    public TConfiguration? Configuration { get; set; } = null;
+}
+
+public interface IWidgetSettingsBatchUpdateRequest
+{
+    Guid ID { get; }
+    int X { get; }
+    int Y { get; }
+    int W { get; }
+    int H { get; }
+}
+
+public class WidgetSettingsBatchUpdateRequest : IWidgetSettingsBatchUpdateRequest
+{
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public int X { get; set; } = 0;
+    public int Y { get; set; } = 0;
+    public int W { get; set; } = 4;
+    public int H { get; set; } = 5;
 }

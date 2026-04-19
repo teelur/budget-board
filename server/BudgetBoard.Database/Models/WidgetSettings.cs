@@ -16,9 +16,24 @@ public class WidgetSettings
     public required string WidgetType { get; set; }
 
     /// <summary>
-    /// Indicates whether the widget is visible on the dashboard.
+    /// Column position on the grid (0-based).
     /// </summary>
-    public bool IsVisible { get; set; } = true;
+    public int X { get; set; } = 0;
+
+    /// <summary>
+    /// Row position on the grid (0-based).
+    /// </summary>
+    public int Y { get; set; } = 0;
+
+    /// <summary>
+    /// Width in grid columns.
+    /// </summary>
+    public int W { get; set; } = 4;
+
+    /// <summary>
+    /// Height in grid row units.
+    /// </summary>
+    public int H { get; set; } = 5;
 
     /// <summary>
     /// JSON string containing widget-specific configuration options.
