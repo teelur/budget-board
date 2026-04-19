@@ -30,7 +30,7 @@ import AccountsWidget from "~/components/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/widgets/NetWorthWidget/NetWorthWidget";
 import SpendingTrendsCard from "./SpendingTrendsCard/SpendingTrendsCard";
 import UncategorizedTransactionsWidget from "~/components/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
-import WidgetShell from "~/components/widgets/WidgetShell/WidgetShell";
+import WidgetShell from "~/components/widgets/shared/WidgetShell/WidgetShell";
 import DashboardEditor from "./DashboardEditor/DashboardEditor";
 import WidgetPicker from "./WidgetPicker/WidgetPicker";
 import Footer from "./Footer/Footer";

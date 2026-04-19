@@ -15,7 +15,7 @@ import { LandmarkIcon } from "lucide-react";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import AccountsWidgetSettings from "./AccountsWidgetSettings/AccountsWidgetSettings";
-import WidgetErrorMessage from "~/components/widgets/shared/WidgetErrorMessage";
+import WidgetErrorMessage from "~/components/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
 
 interface AccountsWidgetProps {
   widgetId: string;

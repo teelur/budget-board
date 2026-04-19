@@ -25,7 +25,7 @@ import SplitCard, {
 } from "~/components/ui/SplitCard/SplitCard";
 import { TrendingUpIcon } from "lucide-react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import WidgetErrorMessage from "../shared/WidgetErrorMessage";
+import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage";
 
 interface NetWorthWidgetProps {
   widgetId: string;
