@@ -1,4 +1,4 @@
-﻿using BudgetBoard.Service.Models;
+﻿using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 
 namespace BudgetBoard.Service.Interfaces;
 

@@ -34,34 +34,6 @@ public class WidgetSettingsCreateRequest : IWidgetSettingsCreateRequest
     public int H { get; set; } = 5;
 }
 
-public class NetWorthWidgetConfiguration
-{
-    public IEnumerable<NetWorthWidgetGroup> Groups { get; set; } = [];
-}
-
-public class NetWorthWidgetGroup
-{
-    public Guid ID { get; set; } = Guid.NewGuid();
-    public int Index { get; set; } = 0;
-    public IEnumerable<NetWorthWidgetLine> Lines { get; set; } = [];
-}
-
-public class NetWorthWidgetLine
-{
-    public Guid ID { get; set; } = Guid.NewGuid();
-    public string Name { get; set; } = string.Empty;
-    public List<NetWorthWidgetCategory> Categories { get; set; } = [];
-    public int Index { get; set; } = 0;
-}
-
-public class NetWorthWidgetCategory
-{
-    public Guid ID { get; set; } = Guid.NewGuid();
-    public string Value { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty;
-    public string Subtype { get; set; } = string.Empty;
-}
-
 public interface IWidgetResponse
 {
     Guid ID { get; }

@@ -4,6 +4,7 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;

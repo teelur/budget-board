@@ -5,6 +5,7 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
