@@ -4,6 +4,7 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Models.Widgets.AccountsWidget;
 using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
@@ -77,10 +78,7 @@ public class WidgetSettingsService(
         return widgetSettings;
     }
 
-    public async Task UpdateWidgetSettingsAsync(
-        Guid userGuid,
-        IWidgetSettingsUpdateRequest<NetWorthWidgetConfiguration> request
-    )
+    public async Task UpdateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == request.ID);
@@ -94,8 +92,9 @@ public class WidgetSettingsService(
         widget.Y = request.Y;
         widget.W = request.W;
         widget.H = request.H;
-        widget.Configuration =
-            request.Configuration != null ? JsonSerializer.Serialize(request.Configuration) : null;
+        widget.Configuration = request.Configuration.HasValue
+            ? ValidateAndSerializeConfiguration(widget.WidgetType, request.Configuration.Value)
+            : widget.Configuration;
 
         await userDataContext.SaveChangesAsync();
     }
@@ -179,6 +178,32 @@ public class WidgetSettingsService(
         }
 
         return foundUser;
+    }
+
+    private string ValidateAndSerializeConfiguration(string widgetType, JsonElement configuration)
+    {
+        try
+        {
+            return widgetType switch
+            {
+                WidgetTypes.NetWorth => JsonSerializer.Serialize(
+                    JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(configuration)
+                        ?? throw new JsonException()
+                ),
+                WidgetTypes.Accounts => JsonSerializer.Serialize(
+                    JsonSerializer.Deserialize<AccountsWidgetConfiguration>(configuration)
+                        ?? throw new JsonException()
+                ),
+                _ => configuration.GetRawText(),
+            };
+        }
+        catch (JsonException)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["WidgetConfigurationDeserializationLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["WidgetConfigurationDeserializationError"]
+            );
+        }
     }
 
     private static string? GetDefaultConfiguration(string widgetType)

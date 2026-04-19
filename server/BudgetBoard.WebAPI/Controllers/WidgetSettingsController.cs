@@ -1,7 +1,6 @@
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
@@ -69,9 +68,7 @@ public class WidgetSettingsController(
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update(
-        [FromBody] WidgetSettingsUpdateRequest<NetWorthWidgetConfiguration> editedWidget
-    )
+    public async Task<IActionResult> Update([FromBody] WidgetSettingsUpdateRequest editedWidget)
     {
         try
         {

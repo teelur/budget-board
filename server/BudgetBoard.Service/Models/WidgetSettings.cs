@@ -58,27 +58,24 @@ public class WidgetResponse : IWidgetResponse
     public Guid UserID { get; set; } = Guid.Empty;
 }
 
-public interface IWidgetSettingsUpdateRequest<TConfiguration>
-    where TConfiguration : class
+public interface IWidgetSettingsUpdateRequest
 {
     Guid ID { get; }
     int X { get; }
     int Y { get; }
     int W { get; }
     int H { get; }
-    TConfiguration? Configuration { get; }
+    System.Text.Json.JsonElement? Configuration { get; }
 }
 
-public class WidgetSettingsUpdateRequest<TConfiguration>
-    : IWidgetSettingsUpdateRequest<TConfiguration>
-    where TConfiguration : class
+public class WidgetSettingsUpdateRequest : IWidgetSettingsUpdateRequest
 {
     public Guid ID { get; set; } = Guid.NewGuid();
     public int X { get; set; } = 0;
     public int Y { get; set; } = 0;
     public int W { get; set; } = 4;
     public int H { get; set; } = 5;
-    public TConfiguration? Configuration { get; set; } = null;
+    public System.Text.Json.JsonElement? Configuration { get; set; } = null;
 }
 
 public interface IWidgetSettingsBatchUpdateRequest

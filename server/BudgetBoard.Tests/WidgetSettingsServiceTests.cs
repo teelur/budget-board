@@ -201,14 +201,14 @@ public class WidgetSettingsServiceTests
             ],
         };
 
-        var updateRequest = new WidgetSettingsUpdateRequest<NetWorthWidgetConfiguration>
+        var updateRequest = new WidgetSettingsUpdateRequest
         {
             ID = existingSettings.ID,
             X = 4,
             Y = 0,
             W = 8,
             H = 5,
-            Configuration = updatedConfig,
+            Configuration = JsonSerializer.SerializeToElement(updatedConfig),
         };
 
         // Act
@@ -233,14 +233,16 @@ public class WidgetSettingsServiceTests
         var helper = new TestHelper();
         var service = CreateService(helper);
 
-        var updateRequest = new WidgetSettingsUpdateRequest<NetWorthWidgetConfiguration>
+        var updateRequest = new WidgetSettingsUpdateRequest
         {
             ID = Guid.NewGuid(),
             X = 0,
             Y = 0,
             W = 4,
             H = 5,
-            Configuration = new NetWorthWidgetConfiguration { Groups = [] },
+            Configuration = JsonSerializer.SerializeToElement(
+                new NetWorthWidgetConfiguration { Groups = [] }
+            ),
         };
 
         // Act

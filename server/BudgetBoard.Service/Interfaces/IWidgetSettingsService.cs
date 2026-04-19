@@ -1,5 +1,4 @@
 ﻿using BudgetBoard.Service.Models;
-using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 
 namespace BudgetBoard.Service.Interfaces;
 
@@ -27,12 +26,9 @@ public interface IWidgetSettingsService
     /// Updates existing widget settings for a user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="request">The widget settings update request for a Net Worth Widget.</param>
+    /// <param name="request">The widget settings update request.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task UpdateWidgetSettingsAsync(
-        Guid userGuid,
-        IWidgetSettingsUpdateRequest<NetWorthWidgetConfiguration> request
-    );
+    Task UpdateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsUpdateRequest request);
 
     /// <summary>
     /// Updates grid positions for multiple widget instances in a single operation.
