@@ -9,9 +9,9 @@ import {
   ResponsiveGridLayout,
   useContainerWidth,
 } from "react-grid-layout";
-import AccountsWidget from "~/components/widgets/AccountsWidget/AccountsWidget";
-import NetWorthWidget from "~/components/widgets/NetWorthWidget/NetWorthWidget";
-import WidgetShell from "~/components/widgets/shared/WidgetShell/WidgetShell";
+import AccountsWidget from "~/components/ui/widgets/AccountsWidget/AccountsWidget";
+import NetWorthWidget from "~/components/ui/widgets/NetWorthWidget/NetWorthWidget";
+import WidgetShell from "~/components/ui/widgets/shared/WidgetShell/WidgetShell";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   IWidgetSettingsBatchUpdateRequest,
@@ -25,7 +25,7 @@ import {
   GRID_ROW_HEIGHT,
 } from "~/shared/dashboardGrid";
 import SpendingTrendsCard from "../SpendingTrendsCard/SpendingTrendsCard";
-import UncategorizedTransactionsWidget from "~/components/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
+import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
 
 const SKELETON_COUNT = 4;
 
