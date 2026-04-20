@@ -46,7 +46,7 @@ public class WidgetSettingsService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         // Seed all default widgets when a user has none
-        if (!userData.WidgetSettings.Any())
+        if (userData.WidgetSettings.Count == 0)
         {
             foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
             {
