@@ -164,6 +164,7 @@ const DashboardContent = ({ isEditMode }: DashboardContentProps) => {
           resizeConfig={{ enabled: isEditMode }}
           onLayoutChange={handleLayoutChange}
           margin={[12, 12]}
+          containerPadding={[0, 0]}
         >
           {widgets.map((widget) => (
             <div key={widget.id} style={{ height: "100%", overflow: "hidden" }}>
