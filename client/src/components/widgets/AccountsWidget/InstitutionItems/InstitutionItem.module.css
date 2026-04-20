@@ -1,0 +1,7 @@
+.title {
+  font-size: var(--mantine-font-size-md);
+
+  @container (max-width: 380px) {
+    font-size: var(--mantine-font-size-sm);
+  }
+}

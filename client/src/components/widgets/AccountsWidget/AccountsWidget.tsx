@@ -144,6 +144,9 @@ const AccountsWidget = ({
           </PrimaryText>
         </Group>
       }
+      style={{
+        containerType: "inline-size",
+      }}
       elevation={1}
     >
       {getAccountsContent()}
