@@ -27,6 +27,7 @@ const SplitCard = ({
     <Card
       w="100%"
       p={0}
+      radius="sm"
       {...props}
       style={{
         ...style,
