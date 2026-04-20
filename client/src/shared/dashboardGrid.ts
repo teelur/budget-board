@@ -9,8 +9,6 @@ export interface WidgetRegistryEntry {
   labelKey: string;
   descriptionKey: string;
   maxInstances: number;
-  defaultW: number;
-  defaultH: number;
 }
 
 export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
@@ -19,32 +17,24 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     labelKey: "accounts",
     descriptionKey: "accounts_widget_description",
     maxInstances: 1,
-    defaultW: 4,
-    defaultH: 20,
   },
   {
     widgetType: "NetWorth",
     labelKey: "net_worth",
     descriptionKey: "net_worth_widget_description",
     maxInstances: Infinity,
-    defaultW: 4,
-    defaultH: 20,
   },
   {
     widgetType: "UncategorizedTransactions",
     labelKey: "uncategorized_transactions",
     descriptionKey: "uncategorized_transactions_widget_description",
     maxInstances: 1,
-    defaultW: 8,
-    defaultH: 20,
   },
   {
     widgetType: "SpendingTrends",
     labelKey: "spending_trends",
     descriptionKey: "spending_trends_widget_description",
     maxInstances: Infinity,
-    defaultW: 8,
-    defaultH: 20,
   },
 ];
 

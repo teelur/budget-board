@@ -24,13 +24,15 @@ public class WidgetSettingsService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
+        var defaultLayout = WidgetSettingsHelpers.GetDefaultWidgetLayout(request.WidgetType);
+
         var newWidget = new WidgetSettings
         {
             WidgetType = request.WidgetType,
-            X = request.X,
-            Y = request.Y,
-            W = request.W,
-            H = request.H,
+            X = request.X ?? defaultLayout.X,
+            Y = request.Y ?? defaultLayout.Y,
+            W = request.W ?? defaultLayout.W,
+            H = request.H ?? defaultLayout.H,
             Configuration = GetDefaultConfiguration(request.WidgetType),
             UserID = userData.Id,
         };

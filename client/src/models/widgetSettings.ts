@@ -11,10 +11,10 @@ export interface IWidgetSettingsResponse {
 
 export interface IWidgetSettingsCreateRequest {
   widgetType: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  x: number | null;
+  y: number | null;
+  w: number | null;
+  h: number | null;
 }
 
 export interface IWidgetSettingsBatchUpdateRequest {

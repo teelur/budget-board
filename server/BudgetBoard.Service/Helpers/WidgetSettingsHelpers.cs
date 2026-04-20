@@ -19,6 +19,9 @@ public static class WidgetSettingsHelpers
         new DefaultWidgetLayout(WidgetTypes.SpendingTrends, X: 4, Y: 5, W: 8, H: 16),
     ];
 
+    /// <summary>
+    /// Default configuration for the NetWorth widget.
+    /// </summary>
     public static readonly NetWorthWidgetConfiguration DefaultNetWorthWidgetConfiguration = new()
     {
         Groups =
@@ -200,4 +203,8 @@ public static class WidgetSettingsHelpers
             },
         ],
     };
+
+    public static DefaultWidgetLayout GetDefaultWidgetLayout(string widgetType) =>
+        DefaultLayouts.FirstOrDefault(dl => dl.WidgetType == widgetType)
+        ?? new DefaultWidgetLayout(widgetType, 0, 0, 4, 5);
 }

@@ -16,8 +16,9 @@ const DashboardEditor = ({
   onResetToDefaults,
   isResetting,
 }: DashboardEditorProps): React.ReactNode => {
-  const { t } = useTranslation();
   const [isConfirmingReset, setIsConfirmingReset] = React.useState(false);
+
+  const { t } = useTranslation();
 
   const handleResetClick = () => {
     if (isConfirmingReset) {
@@ -33,7 +34,7 @@ const DashboardEditor = ({
   };
 
   return (
-    <Group justify="flex-end" gap="xs">
+    <Group justify="flex-end" gap="0.5rem">
       <Button
         variant="subtle"
         leftSection={<PlusIcon size={16} />}

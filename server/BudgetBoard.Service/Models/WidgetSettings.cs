@@ -19,19 +19,19 @@ public static class WidgetTypes
 public interface IWidgetSettingsCreateRequest
 {
     string WidgetType { get; }
-    int X { get; }
-    int Y { get; }
-    int W { get; }
-    int H { get; }
+    int? X { get; }
+    int? Y { get; }
+    int? W { get; }
+    int? H { get; }
 }
 
 public class WidgetSettingsCreateRequest : IWidgetSettingsCreateRequest
 {
     public string WidgetType { get; set; } = string.Empty;
-    public int X { get; set; } = 0;
-    public int Y { get; set; } = 0;
-    public int W { get; set; } = 4;
-    public int H { get; set; } = 5;
+    public int? X { get; set; } = null;
+    public int? Y { get; set; } = null;
+    public int? W { get; set; } = null;
+    public int? H { get; set; } = null;
 }
 
 public interface IWidgetResponse

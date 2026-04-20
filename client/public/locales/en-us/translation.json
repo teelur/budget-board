@@ -190,6 +190,7 @@
   "error_occurred_while_loading_message": "An error occurred while loading. Please try again later.",
   "error_parsing_csv_message": "Error parsing CSV: {{errorMessage}}",
   "error_reading_file_message": "Error reading file: {{error}}",
+  "error_widget_type_not_found": "Widget type {{widgetType}} not found.",
   "examples": "Examples",
   "expense_amount": "Expense Amount",
   "expense_trends": "Expense Trends",
