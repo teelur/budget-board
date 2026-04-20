@@ -6,7 +6,7 @@ import {
   filterHiddenTransactions,
   getRollingTotalSpendingForMonth,
 } from "~/helpers/transactions";
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Box, Group, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -164,7 +164,7 @@ const SpendingTrendsCard = (): React.ReactNode => {
       }
       elevation={1}
     >
-      <Stack gap={0} w="100%">
+      <Stack gap={0} w="100%" style={{ flex: 1, minHeight: 0 }}>
         {transactionsQueries.isPending ? (
           <Skeleton height={400} radius="md" />
         ) : (
@@ -172,13 +172,15 @@ const SpendingTrendsCard = (): React.ReactNode => {
             <DimmedText size="sm" ta="right">
               {getSpendingComparisonString()}
             </DimmedText>
-            <SpendingChart
-              months={months}
-              transactions={filterHiddenTransactions(
-                transactionsQueries.data ?? [],
-              )}
-              includeYAxis={false}
-            />
+            <Box style={{ flex: 1, minHeight: 0 }}>
+              <SpendingChart
+                months={months}
+                transactions={filterHiddenTransactions(
+                  transactionsQueries.data ?? [],
+                )}
+                includeYAxis={false}
+              />
+            </Box>
           </>
         )}
       </Stack>

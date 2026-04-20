@@ -74,6 +74,7 @@ const SpendingTab = (): React.ReactNode => {
         setSelectedMonths={setSelectedMonths}
       />
       <SpendingChart
+        h={400}
         transactions={transactionsWithoutHidden}
         months={selectedMonths}
         isPending={transactionsQuery.isPending}
