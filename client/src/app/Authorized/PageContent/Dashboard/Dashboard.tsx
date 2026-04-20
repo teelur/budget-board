@@ -9,7 +9,7 @@ const Dashboard = (): React.ReactNode => {
 
   return (
     <Stack w="100%" flex="1" justify="space-between">
-      <Stack gap={0}>
+      <Stack gap="0.25rem">
         <DashboardHeader
           isEditMode={isEditMode}
           setIsEditMode={setIsEditMode}
