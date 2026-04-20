@@ -3,7 +3,7 @@ import React from "react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
-const Footer = (): React.ReactNode => {
+const DashboardFooter = (): React.ReactNode => {
   return (
     <Group gap="0.5rem">
       <PrimaryText size="xs">{import.meta.env.VITE_VERSION}</PrimaryText>
@@ -20,4 +20,4 @@ const Footer = (): React.ReactNode => {
   );
 };
 
-export default Footer;
+export default DashboardFooter;

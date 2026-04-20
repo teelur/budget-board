@@ -1,17 +1,15 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { getDateFromMonthsAgo, getDaysInMonth } from "~/helpers/datetime";
 import {
   filterHiddenTransactions,
   getRollingTotalSpendingForMonth,
 } from "~/helpers/transactions";
 import { Box, Group, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { IUserSettings } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
@@ -20,30 +18,18 @@ import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
 import { LineChartIcon } from "lucide-react";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
-const SpendingTrendsCard = (): React.ReactNode => {
-  const months = [getDateFromMonthsAgo(0), getDateFromMonthsAgo(1)];
-
+const SpendingTrendsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
   const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
 
-  const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
-
+  const months = [
+    dayjs().startOf("month").toDate(),
+    dayjs().subtract(1, "month").startOf("month").toDate(),
+  ];
   const transactionsQueries = useQueries({
     queries: months.map((date) => ({
       queryKey: [
@@ -78,11 +64,14 @@ const SpendingTrendsCard = (): React.ReactNode => {
   const getSpendingComparison = (): number => {
     const today = dayjs().date();
 
+    const thisMonthNum = months[0]?.getMonth();
+    const lastMonthNum = months[1]?.getMonth();
+    const daysInLastMonth = dayjs(months[1]).daysInMonth();
+
     const thisMonthRollingTotal = getRollingTotalSpendingForMonth(
       filterHiddenTransactions(
         (transactionsQueries.data ?? []).filter(
-          (transaction) =>
-            dayjs(transaction.date).month() === dayjs(months[0])?.month(),
+          (transaction) => dayjs(transaction.date).month() === thisMonthNum,
         ),
       ),
       today,
@@ -90,23 +79,13 @@ const SpendingTrendsCard = (): React.ReactNode => {
     const lastMonthRollingTotal = getRollingTotalSpendingForMonth(
       filterHiddenTransactions(
         (transactionsQueries.data ?? []).filter(
-          (transaction) =>
-            dayjs(transaction.date).month() === dayjs(months[1])?.month(),
+          (transaction) => dayjs(transaction.date).month() === lastMonthNum,
         ),
       ),
-      getDaysInMonth(
-        dayjs(months[1])?.month() ?? 0,
-        dayjs(months[1])?.year() ?? 0,
-      ),
+      daysInLastMonth,
     );
 
-    if (
-      today >
-      getDaysInMonth(
-        dayjs(months[1])?.month() ?? 0,
-        dayjs(months[1])?.year() ?? 0,
-      )
-    ) {
+    if (today > daysInLastMonth) {
       // If today is greater than the last day of the last month, we need to compare to the
       // last day of the last month.
       return (
@@ -129,20 +108,14 @@ const SpendingTrendsCard = (): React.ReactNode => {
     const amount = convertNumberToCurrency(
       Math.abs(spendingComparisonNumber),
       true,
-      userSettingsQuery.data?.currency ?? "USD",
+      preferredCurrency,
       SignDisplay.Auto,
       intlLocale,
     );
 
     if (spendingComparisonNumber < 0) {
-      if (userSettingsQuery.isPending) {
-        return "";
-      }
       return t("spending_trends_less_than_last_month", { amount });
     } else if (spendingComparisonNumber > 0) {
-      if (userSettingsQuery.isPending) {
-        return "";
-      }
       return t("spending_trends_more_than_last_month", { amount });
     }
 
@@ -188,4 +161,4 @@ const SpendingTrendsCard = (): React.ReactNode => {
   );
 };
 
-export default SpendingTrendsCard;
+export default SpendingTrendsWidget;

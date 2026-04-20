@@ -24,7 +24,7 @@ import {
   GRID_COLS,
   GRID_ROW_HEIGHT,
 } from "~/shared/dashboardGrid";
-import SpendingTrendsCard from "../SpendingTrendsCard/SpendingTrendsCard";
+import SpendingTrendsWidget from "../../../../../components/ui/widgets/SpendingTrendsWidget/SpendingTrendsWidget";
 import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
 
 const SKELETON_COUNT = 4;
@@ -127,7 +127,7 @@ const DashboardContent = ({ isEditMode }: DashboardContentProps) => {
           />
         );
       case "SpendingTrends":
-        return <SpendingTrendsCard />;
+        return <SpendingTrendsWidget />;
       case "UncategorizedTransactions":
         return <UncategorizedTransactionsWidget />;
       default:
