@@ -88,9 +88,6 @@ const NetWorthWidget = ({
     },
   });
 
-  const validAccounts = filterVisibleAccounts(accountsQuery.data ?? []);
-  const validAssets = filterVisibleAssets(assetsQuery.data ?? []);
-
   const getNetWorthLines = (): React.ReactNode => {
     if (
       widgetSettingsQuery.isPending ||
@@ -133,6 +130,9 @@ const NetWorthWidget = ({
     const orderedGroups = netWorthWidgetGroups
       .slice()
       .sort((a, b) => a.index - b.index);
+
+    const validAccounts = filterVisibleAccounts(accountsQuery.data ?? []);
+    const validAssets = filterVisibleAssets(assetsQuery.data ?? []);
 
     return (
       <ScrollArea w="100%" h="100%" type="auto" offsetScrollbars="present">
