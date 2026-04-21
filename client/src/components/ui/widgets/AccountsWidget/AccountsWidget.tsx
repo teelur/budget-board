@@ -109,7 +109,7 @@ const AccountsWidget = ({
 
   const getAccountsContent = () => {
     if (institutionQuery.isPending || accountsQuery.isPending) {
-      return <Skeleton height={200} radius="lg" />;
+      return <Skeleton height="100%" radius="md" />;
     }
 
     if ((sortedFilteredInstitutionsForDisplay ?? []).length === 0) {

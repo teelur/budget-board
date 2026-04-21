@@ -94,7 +94,7 @@ const NetWorthWidget = ({
       accountsQuery.isPending ||
       assetsQuery.isPending
     ) {
-      return <Skeleton height={200} radius="lg" />;
+      return <Skeleton height="100%" radius="md" />;
     }
 
     if (!widgetSettingsQuery.data || widgetSettingsQuery.data.length === 0) {

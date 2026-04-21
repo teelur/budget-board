@@ -81,7 +81,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
 
   const getWidgetContent = () => {
     if (transactionsQuery.isPending) {
-      return <Skeleton h="100%" radius="lg" />;
+      return <Skeleton h="100%" radius="md" />;
     }
 
     if (sortedFilteredTransactions.length === 0) {
