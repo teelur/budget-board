@@ -1,3 +1,28 @@
+.title {
+  font-size: var(--mantine-font-size-md);
+
+  @container (max-width: 380px) {
+    font-size: var(--mantine-font-size-sm);
+  }
+}
+
+.amount {
+  font-size: var(--mantine-font-size-md);
+  white-space: nowrap;
+
+  @container (max-width: 380px) {
+    font-size: var(--mantine-font-size-sm);
+  }
+}
+
+.timestamp {
+  font-size: var(--mantine-font-size-sm);
+
+  @container (max-width: 380px) {
+    font-size: var(--mantine-font-size-xs);
+  }
+}
+
 .root {
   &:hover {
     outline: 2px solid var(--mantine-primary-color-filled);

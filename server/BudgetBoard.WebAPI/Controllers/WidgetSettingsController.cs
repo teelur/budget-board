@@ -22,9 +22,7 @@ public class WidgetSettingsController(
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create(
-        [FromBody] WidgetSettingsCreateRequest<NetWorthWidgetConfiguration> newWidget
-    )
+    public async Task<IActionResult> Create([FromBody] WidgetSettingsCreateRequest newWidget)
     {
         try
         {
@@ -70,15 +68,39 @@ public class WidgetSettingsController(
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update(
-        [FromBody] WidgetSettingsUpdateRequest<NetWorthWidgetConfiguration> editedWidget
-    )
+    public async Task<IActionResult> Update([FromBody] WidgetSettingsUpdateRequest editedWidget)
     {
         try
         {
             await widgetSettingsService.UpdateWidgetSettingsAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
                 editedWidget
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
+
+    [HttpPut]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> Batch(
+        [FromBody] List<WidgetSettingsBatchUpdateRequest> batchUpdate
+    )
+    {
+        try
+        {
+            await widgetSettingsService.BatchUpdateWidgetSettingsAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                batchUpdate
             );
             return Ok();
         }

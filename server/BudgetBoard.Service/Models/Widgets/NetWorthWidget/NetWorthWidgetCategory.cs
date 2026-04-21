@@ -1,4 +1,12 @@
-﻿namespace BudgetBoard.Service.Models;
+﻿namespace BudgetBoard.Service.Models.Widgets.NetWorthWidget;
+
+public class NetWorthWidgetCategory
+{
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public string Value { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string Subtype { get; set; } = string.Empty;
+}
 
 public interface INetWorthWidgetCategoryCreateRequest
 {

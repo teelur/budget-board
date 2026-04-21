@@ -47,9 +47,14 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
       onClick={props.onClick}
     >
       <Group justify="space-between" wrap="nowrap">
-        <PrimaryText>{props.account.name}</PrimaryText>
+        <PrimaryText className={classes.title}>
+          {props.account.name}
+        </PrimaryText>
         {userSettingsQuery.isPending ? null : (
-          <StatusText amount={props.account.currentBalance}>
+          <StatusText
+            className={classes.amount}
+            amount={props.account.currentBalance}
+          >
             {convertNumberToCurrency(
               props.account.currentBalance,
               true,
@@ -60,7 +65,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
           </StatusText>
         )}
       </Group>
-      <DimmedText size="xs">
+      <DimmedText className={classes.timestamp}>
         {t("last_updated", {
           date: dayjs(props.account.balanceDate).isValid()
             ? dayjs(props.account.balanceDate).format(`${dateFormat}`)

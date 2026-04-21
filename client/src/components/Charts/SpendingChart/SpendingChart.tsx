@@ -22,6 +22,7 @@ interface SpendingChartProps {
   isPending?: boolean;
   includeGrid?: boolean;
   includeYAxis?: boolean;
+  h?: number | string;
 }
 
 const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
@@ -92,8 +93,8 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
 
   return (
     <AreaChart
-      h={400}
       w="100%"
+      h={props.h ?? "100%"}
       series={chartSeries}
       data={chartData}
       dataKey="day"

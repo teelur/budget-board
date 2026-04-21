@@ -1,9 +1,27 @@
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 
 namespace BudgetBoard.Service.Helpers;
 
+public record DefaultWidgetLayout(string WidgetType, int X, int Y, int W, int H);
+
 public static class WidgetSettingsHelpers
 {
+    /// <summary>
+    /// Default grid positions for each widget on a 12-column grid.
+    /// Matches the original two-column dashboard layout.
+    /// </summary>
+    public static readonly IReadOnlyList<DefaultWidgetLayout> DefaultLayouts =
+    [
+        new DefaultWidgetLayout(WidgetTypes.Accounts, X: 0, Y: 0, W: 4, H: 20),
+        new DefaultWidgetLayout(WidgetTypes.UncategorizedTransactions, X: 4, Y: 0, W: 8, H: 11),
+        new DefaultWidgetLayout(WidgetTypes.NetWorth, X: 0, Y: 5, W: 4, H: 10),
+        new DefaultWidgetLayout(WidgetTypes.SpendingTrends, X: 4, Y: 5, W: 8, H: 16),
+    ];
+
+    /// <summary>
+    /// Default configuration for the NetWorth widget.
+    /// </summary>
     public static readonly NetWorthWidgetConfiguration DefaultNetWorthWidgetConfiguration = new()
     {
         Groups =
@@ -185,4 +203,8 @@ public static class WidgetSettingsHelpers
             },
         ],
     };
+
+    public static DefaultWidgetLayout GetDefaultWidgetLayout(string widgetType) =>
+        DefaultLayouts.FirstOrDefault(dl => dl.WidgetType == widgetType)
+        ?? new DefaultWidgetLayout(widgetType, 0, 0, 4, 5);
 }

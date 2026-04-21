@@ -17,7 +17,7 @@ namespace BudgetBoard.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -663,15 +663,24 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<string>("Configuration")
                         .HasColumnType("jsonb");
 
-                    b.Property<bool>("IsVisible")
-                        .HasColumnType("boolean");
+                    b.Property<int>("H")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("W")
+                        .HasColumnType("integer");
+
                     b.Property<string>("WidgetType")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("X")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Y")
+                        .HasColumnType("integer");
 
                     b.HasKey("ID");
 

@@ -11,12 +11,9 @@ public interface IWidgetSettingsService
     /// Creates new widget settings for a user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="request">The widget settings creation request for a Net Worth Widget.</param>
+    /// <param name="request">The widget settings creation request.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task CreateWidgetSettingsAsync(
-        Guid userGuid,
-        IWidgetSettingsCreateRequest<NetWorthWidgetConfiguration> request
-    );
+    Task CreateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsCreateRequest request);
 
     /// <summary>
     /// Retrieves all widget settings for a specific user.
@@ -29,11 +26,19 @@ public interface IWidgetSettingsService
     /// Updates existing widget settings for a user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="request">The widget settings update request for a Net Worth Widget.</param>
+    /// <param name="request">The widget settings update request.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task UpdateWidgetSettingsAsync(
+    Task UpdateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsUpdateRequest request);
+
+    /// <summary>
+    /// Updates grid positions for multiple widget instances in a single operation.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="requests">Collection of batch update requests containing new grid coordinates.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    Task BatchUpdateWidgetSettingsAsync(
         Guid userGuid,
-        IWidgetSettingsUpdateRequest<NetWorthWidgetConfiguration> request
+        IEnumerable<IWidgetSettingsBatchUpdateRequest> requests
     );
 
     /// <summary>

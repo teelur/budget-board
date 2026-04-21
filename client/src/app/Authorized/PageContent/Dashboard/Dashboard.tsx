@@ -1,27 +1,22 @@
-import classes from "./Dashboard.module.css";
-
-import { Flex, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import React from "react";
-import AccountsCard from "./AccountsCard/AccountsCard";
-import NetWorthCard from "./NetWorthCard/NetWorthCard";
-import Footer from "./Footer/Footer";
-import SpendingTrendsCard from "./SpendingTrendsCard/SpendingTrendsCard";
-import UncategorizedTransactionsCard from "./UncategorizedTransactionsCard/UncategorizedTransactionsCard";
+import DashboardFooter from "./DashboardFooter/DashboardFooter";
+import DashboardHeader from "./DashboardHeader/DashboardHeader";
+import DashboardContent from "./DashboardContent/DashboardContent";
 
 const Dashboard = (): React.ReactNode => {
+  const [isEditMode, setIsEditMode] = React.useState(false);
+
   return (
-    <Stack w="100%" maw={1400} h="100%" flex="1" justify="space-between">
-      <Flex className={classes.mainContent}>
-        <Stack className={classes.accountColumn}>
-          <AccountsCard />
-          <NetWorthCard />
-        </Stack>
-        <Stack className={classes.feedColumn}>
-          <UncategorizedTransactionsCard />
-          <SpendingTrendsCard />
-        </Stack>
-      </Flex>
-      <Footer />
+    <Stack w="100%" flex="1" justify="space-between">
+      <Stack gap="0.25rem">
+        <DashboardHeader
+          isEditMode={isEditMode}
+          setIsEditMode={setIsEditMode}
+        />
+        <DashboardContent isEditMode={isEditMode} />
+      </Stack>
+      <DashboardFooter />
     </Stack>
   );
 };
