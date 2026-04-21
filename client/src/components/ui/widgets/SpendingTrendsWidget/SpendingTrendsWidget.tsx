@@ -139,7 +139,7 @@ const SpendingTrendsWidget = (): React.ReactNode => {
     >
       <Stack gap={0} w="100%" style={{ flex: 1, minHeight: 0 }}>
         {transactionsQueries.isPending ? (
-          <Skeleton height={400} radius="md" />
+          <Skeleton height="100%" radius="md" />
         ) : (
           <>
             <DimmedText size="sm" ta="right">
