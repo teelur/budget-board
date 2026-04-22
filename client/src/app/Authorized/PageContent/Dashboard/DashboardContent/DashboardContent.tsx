@@ -31,7 +31,7 @@ const SKELETON_COUNT = 4;
 
 interface DashboardContentProps {
   isEditMode: boolean;
-  onBreakpointChange?: (breakpoint: string) => void;
+  onBreakpointChange?: (breakpoint: "sm" | "lg") => void;
 }
 
 const DashboardContent = ({

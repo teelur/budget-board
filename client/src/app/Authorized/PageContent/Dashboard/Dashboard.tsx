@@ -6,8 +6,9 @@ import DashboardContent from "./DashboardContent/DashboardContent";
 
 const Dashboard = (): React.ReactNode => {
   const [isEditMode, setIsEditMode] = React.useState(false);
-  const [currentBreakpoint, setCurrentBreakpoint] =
-    React.useState<string>("lg");
+  const [currentBreakpoint, setCurrentBreakpoint] = React.useState<"sm" | "lg">(
+    "lg",
+  );
 
   const effectiveEditMode = isEditMode && currentBreakpoint !== "sm";
 
