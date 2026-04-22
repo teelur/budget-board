@@ -8,7 +8,7 @@ const Dashboard = (): React.ReactNode => {
   const [isEditMode, setIsEditMode] = React.useState(false);
 
   return (
-    <Stack w="100%" flex="1" justify="space-between">
+    <Stack w="100%" maw={1400} flex="1" justify="space-between">
       <Stack gap="0.25rem">
         <DashboardHeader
           isEditMode={isEditMode}
