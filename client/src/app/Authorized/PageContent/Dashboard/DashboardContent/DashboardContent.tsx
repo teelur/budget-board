@@ -31,9 +31,13 @@ const SKELETON_COUNT = 4;
 
 interface DashboardContentProps {
   isEditMode: boolean;
+  onBreakpointChange?: (breakpoint: "sm" | "lg") => void;
 }
 
-const DashboardContent = ({ isEditMode }: DashboardContentProps) => {
+const DashboardContent = ({
+  isEditMode,
+  onBreakpointChange,
+}: DashboardContentProps) => {
   const [settingsOpenId, setSettingsOpenId] = React.useState<string | null>(
     null,
   );
@@ -163,6 +167,7 @@ const DashboardContent = ({ isEditMode }: DashboardContentProps) => {
           dragConfig={{ enabled: isEditMode }}
           resizeConfig={{ enabled: isEditMode }}
           onLayoutChange={handleLayoutChange}
+          onBreakpointChange={onBreakpointChange}
           margin={[12, 12]}
           containerPadding={[0, 0]}
         >
