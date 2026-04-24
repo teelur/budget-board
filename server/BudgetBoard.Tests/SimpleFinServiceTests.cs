@@ -884,6 +884,144 @@ public class SimpleFinServiceTests
     }
 
     [Fact]
+    public async Task RefreshAccountsAsync_WhenOneAccountHasBadBalance_ShouldRefreshRemainingAccounts()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        // First account has an empty balance string — decimal.Parse will throw.
+        // Second account is valid and must still be refreshed.
+        var jsonResponse =
+            @"{
+            ""errors"": [],
+            ""accounts"": [
+                {
+                    ""org"": {
+                        ""domain"": ""example.com"",
+                        ""sfin-url"": ""https://example.com/simplefin"",
+                        ""name"": ""Example Bank"",
+                        ""url"": ""https://example.com"",
+                        ""id"": ""org-123""
+                    },
+                    ""id"": ""account-bad"",
+                    ""name"": ""Bad Balance Account"",
+                    ""currency"": ""USD"",
+                    ""balance"": """",
+                    ""balance-date"": 1609459200,
+                    ""transactions"": []
+                },
+                {
+                    ""org"": {
+                        ""domain"": ""example.com"",
+                        ""sfin-url"": ""https://example.com/simplefin"",
+                        ""name"": ""Example Bank"",
+                        ""url"": ""https://example.com"",
+                        ""id"": ""org-123""
+                    },
+                    ""id"": ""account-valid"",
+                    ""name"": ""Valid Account"",
+                    ""currency"": ""USD"",
+                    ""balance"": ""1000.50"",
+                    ""balance-date"": 1609459200,
+                    ""transactions"": []
+                }
+            ]
+        }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                new HttpResponseMessage
+                {
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Content = new StringContent(jsonResponse),
+                }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var simpleFinOrganizationServiceMock = new Mock<ISimpleFinOrganizationService>();
+        simpleFinOrganizationServiceMock
+            .Setup(s =>
+                s.CreateSimpleFinOrganizationAsync(
+                    helper.demoUser.Id,
+                    It.IsAny<ISimpleFinOrganizationCreateRequest>()
+                )
+            )
+            .Callback<Guid, ISimpleFinOrganizationCreateRequest>(
+                (userId, request) =>
+                {
+                    var org = new Database.Models.SimpleFinOrganization
+                    {
+                        Domain = request.Domain,
+                        SimpleFinUrl = request.SimpleFinUrl,
+                        Name = request.Name,
+                        Url = request.Url,
+                        SyncID = request.SyncID,
+                        UserID = userId,
+                    };
+                    helper.UserDataContext.SimpleFinOrganizations.Add(org);
+                    helper.UserDataContext.SaveChanges();
+                }
+            )
+            .Returns(Task.CompletedTask);
+        var simpleFinAccountServiceMock = new Mock<ISimpleFinAccountService>();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            simpleFinOrganizationServiceMock.Object,
+            simpleFinAccountServiceMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.SimpleFinAccessToken = "https://demo:demo@test.com/simplefin";
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var errors = await simpleFinService.RefreshAccountsAsync(helper.demoUser.Id);
+
+        // Assert: the valid account was still created despite the bad-balance account throwing
+        simpleFinAccountServiceMock.Verify(
+            s =>
+                s.CreateSimpleFinAccountAsync(
+                    helper.demoUser.Id,
+                    It.Is<ISimpleFinAccountCreateRequest>(r => r.SyncID == "account-valid")
+                ),
+            Times.Once
+        );
+        simpleFinAccountServiceMock.Verify(
+            s =>
+                s.CreateSimpleFinAccountAsync(
+                    helper.demoUser.Id,
+                    It.Is<ISimpleFinAccountCreateRequest>(r => r.SyncID == "account-bad")
+                ),
+            Times.Never
+        );
+
+        // Assert: an error is reported for the bad-balance account
+        errors.Should().NotBeEmpty();
+        errors.Should().Contain(e => e.Contains("SimpleFinAccountSyncException"));
+    }
+
+    [Fact]
     public async Task RemoveAccessTokenAsync_WhenCalledWithInvalidUserId_ShouldThrowException()
     {
         // Arrange
