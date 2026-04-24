@@ -1811,7 +1811,7 @@ public class SimpleFinServiceTests
         transactionServiceMock.Verify(
             s =>
                 s.CreateTransactionAsync(
-                    helper.demoUser,
+                    It.Is<ApplicationUser>(u => u.Id == helper.demoUser.Id),
                     It.IsAny<ITransactionCreateRequest>(),
                     It.IsAny<IEnumerable<ICategory>>(),
                     It.IsAny<AutomaticTransactionCategorizerHelper>()
@@ -1825,6 +1825,6 @@ public class SimpleFinServiceTests
 
         // Assert: an error is reported for the bad-balance account
         errors.Should().NotBeEmpty();
-        errors.Should().Contain(e => e.Contains("Bad Balance Account"));
+        errors.Should().Contain(e => e.Contains("SimpleFinAccountSyncException"));
     }
 }

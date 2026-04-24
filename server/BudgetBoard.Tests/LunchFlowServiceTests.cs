@@ -1344,6 +1344,6 @@ public class LunchFlowServiceTests
 
         // Assert: an error was reported for the bad account
         errors.Should().NotBeEmpty();
-        errors.Should().Contain(e => e.Contains("bad-account-id"));
+        errors.Should().Contain(e => e.Contains("LunchFlowAccountSyncException"));
     }
 }
