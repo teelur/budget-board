@@ -1195,16 +1195,12 @@ public class LunchFlowServiceTests
     public async Task SyncTransactionHistoryAsync_WhenOneAccountThrowsDuringSync_ShouldSyncRemainingAccounts()
     {
         // Arrange
-        // Regression test: an exception for one account must not abort sync for
-        // subsequent accounts. We simulate this by giving the first account a
-        // transaction with an unparseable date, which causes DateOnly.Parse to throw.
         var helper = new TestHelper();
         helper.demoUser.LunchFlowApiKey = "valid-api-key";
 
         var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
 
-        // First account: transaction with a bad date → DateOnly.Parse throws
-        var accountBad = new Database.Models.Account
+        var accountBad = new Account
         {
             Name = "Bad Account",
             Type = "checking",
@@ -1218,8 +1214,7 @@ public class LunchFlowServiceTests
         lunchFlowAccountBad.SyncID = "bad-account-id";
         helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccountBad);
 
-        // Second account: valid transaction that should still be synced
-        var accountValid = new Database.Models.Account
+        var accountValid = new Account
         {
             Name = "Valid Account",
             Type = "checking",

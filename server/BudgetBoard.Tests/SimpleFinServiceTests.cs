@@ -1651,9 +1651,6 @@ public class SimpleFinServiceTests
     public async Task SyncTransactionHistoryAsync_WhenOneAccountThrowsDuringSync_ShouldSyncRemainingAccounts()
     {
         // Arrange
-        // Regression test for: when one account has bad data (e.g., empty balance from a
-        // bank that requires reauthentication), an unhandled exception must not abort
-        // sync for subsequent accounts in the loop.
         var helper = new TestHelper();
 
         // First account has an empty balance (causes decimal.Parse to throw).
@@ -1747,7 +1744,7 @@ public class SimpleFinServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var org = new Database.Models.SimpleFinOrganization
+        var org = new SimpleFinOrganization
         {
             Domain = "example.com",
             SimpleFinUrl = "https://example.com/simplefin",
@@ -1757,7 +1754,7 @@ public class SimpleFinServiceTests
         helper.UserDataContext.SimpleFinOrganizations.Add(org);
 
         // Bad-balance account: linked so sync is attempted and the parse throws.
-        var accountBad = new Database.Models.Account
+        var accountBad = new Account
         {
             Name = "Bad Balance",
             Type = "checking",
@@ -1766,7 +1763,7 @@ public class SimpleFinServiceTests
         };
         helper.UserDataContext.Accounts.Add(accountBad);
 
-        var simpleFinAccountBad = new Database.Models.SimpleFinAccount
+        var simpleFinAccountBad = new SimpleFinAccount
         {
             SyncID = "account-bad-balance",
             Name = "Bad Balance Account",
@@ -1781,7 +1778,7 @@ public class SimpleFinServiceTests
         helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccountBad);
 
         // Valid account: should sync even though the previous account threw.
-        var accountValid = new Database.Models.Account
+        var accountValid = new Account
         {
             Name = "Valid Checking",
             Type = "checking",
@@ -1790,7 +1787,7 @@ public class SimpleFinServiceTests
         };
         helper.UserDataContext.Accounts.Add(accountValid);
 
-        var simpleFinAccountValid = new Database.Models.SimpleFinAccount
+        var simpleFinAccountValid = new SimpleFinAccount
         {
             SyncID = "account-valid",
             Name = "Valid Account",
