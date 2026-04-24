@@ -487,4 +487,10 @@
   <data name="ValueDuplicateDateError" xml:space="preserve">
     <value>A value for this date already exists for this asset.</value>
   </data>
+  <data name="SimpleFinAccountSyncException" xml:space="preserve">
+    <value>An unexpected error occurred while syncing SimpleFIN account '{0}'.</value>
+  </data>
+  <data name="LunchFlowAccountSyncException" xml:space="preserve">
+    <value>An unexpected error occurred while syncing LunchFlow account '{0}'.</value>
+  </data>
 </root>
