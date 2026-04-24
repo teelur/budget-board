@@ -466,6 +466,9 @@
   <data name="SimpleFinAccountNotFoundForSyncLog" xml:space="preserve">
     <value>SimpleFIN account with SyncID {0} not found in cache. Skipping account sync.</value>
   </data>
+  <data name="SimpleFinAccountSyncExceptionLog" xml:space="preserve">
+    <value>An unexpected error occurred while syncing SimpleFIN account {0}: {1}. Skipping.</value>
+  </data>
   <data name="SimpleFinAccountNotLinkedLog" xml:space="preserve">
     <value>SimpleFIN account {0} is not linked to any account. Skipping transaction sync.</value>
   </data>
@@ -507,5 +510,8 @@
   </data>
   <data name="LunchFlowBalanceDataRetrievalErrorLog" xml:space="preserve">
     <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
+  </data>
+  <data name="LunchFlowAccountSyncExceptionLog" xml:space="preserve">
+    <value>An unexpected error occurred while syncing LunchFlow account {0}: {1}. Skipping.</value>
   </data>
 </root>
