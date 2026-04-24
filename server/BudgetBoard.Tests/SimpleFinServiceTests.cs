@@ -1646,4 +1646,188 @@ public class SimpleFinServiceTests
             Times.Exactly(2)
         );
     }
+
+    [Fact]
+    public async Task SyncTransactionHistoryAsync_WhenOneAccountThrowsDuringSync_ShouldSyncRemainingAccounts()
+    {
+        // Arrange
+        // Regression test for: when one account has bad data (e.g., empty balance from a
+        // bank that requires reauthentication), an unhandled exception must not abort
+        // sync for subsequent accounts in the loop.
+        var helper = new TestHelper();
+
+        // First account has an empty balance (causes decimal.Parse to throw).
+        // Second account is valid and must still be synced.
+        var jsonResponse =
+            @"{
+            ""errors"": [],
+            ""accounts"": [
+                {
+                    ""org"": {
+                        ""domain"": ""example.com"",
+                        ""sfin-url"": ""https://example.com/simplefin"",
+                        ""name"": ""Example Bank"",
+                        ""url"": ""https://example.com"",
+                        ""id"": ""org-123""
+                    },
+                    ""id"": ""account-bad-balance"",
+                    ""name"": ""Bad Balance Account"",
+                    ""currency"": ""USD"",
+                    ""balance"": """",
+                    ""balance-date"": 1609459200,
+                    ""transactions"": []
+                },
+                {
+                    ""org"": {
+                        ""domain"": ""example.com"",
+                        ""sfin-url"": ""https://example.com/simplefin"",
+                        ""name"": ""Example Bank"",
+                        ""url"": ""https://example.com"",
+                        ""id"": ""org-123""
+                    },
+                    ""id"": ""account-valid"",
+                    ""name"": ""Valid Account"",
+                    ""currency"": ""USD"",
+                    ""balance"": ""2500.00"",
+                    ""balance-date"": 1609459200,
+                    ""transactions"": [
+                        {
+                            ""id"": ""txn-1"",
+                            ""posted"": 1609372800,
+                            ""amount"": ""-25.00"",
+                            ""description"": ""Grocery Store"",
+                            ""transacted_at"": 1609372800,
+                            ""pending"": false
+                        }
+                    ]
+                }
+            ]
+        }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                new HttpResponseMessage
+                {
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Content = new StringContent(jsonResponse),
+                }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var nowProviderMock = Mock.Of<INowProvider>();
+        Mock.Get(nowProviderMock).Setup(_ => _.UtcNow).Returns(DateTime.UtcNow);
+
+        var transactionServiceMock = new Mock<ITransactionService>();
+        var balanceServiceMock = new Mock<IBalanceService>();
+
+        var simpleFinService = new SimpleFinService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ISimpleFinService>>(),
+            nowProviderMock,
+            Mock.Of<IAccountService>(),
+            transactionServiceMock.Object,
+            balanceServiceMock.Object,
+            Mock.Of<ISimpleFinOrganizationService>(),
+            Mock.Of<ISimpleFinAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var org = new Database.Models.SimpleFinOrganization
+        {
+            Domain = "example.com",
+            SimpleFinUrl = "https://example.com/simplefin",
+            Name = "Example Bank",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.SimpleFinOrganizations.Add(org);
+
+        // Bad-balance account: linked so sync is attempted and the parse throws.
+        var accountBad = new Database.Models.Account
+        {
+            Name = "Bad Balance",
+            Type = "checking",
+            Subtype = "checking",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.Accounts.Add(accountBad);
+
+        var simpleFinAccountBad = new Database.Models.SimpleFinAccount
+        {
+            SyncID = "account-bad-balance",
+            Name = "Bad Balance Account",
+            Currency = "USD",
+            Balance = 500.00m,
+            BalanceDate = (int)new DateTimeOffset(DateTime.UtcNow.AddDays(-2)).ToUnixTimeSeconds(),
+            OrganizationId = org.ID,
+            LinkedAccountId = accountBad.ID,
+            UserID = helper.demoUser.Id,
+            LastSync = DateTime.UtcNow.AddDays(-1),
+        };
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccountBad);
+
+        // Valid account: should sync even though the previous account threw.
+        var accountValid = new Database.Models.Account
+        {
+            Name = "Valid Checking",
+            Type = "checking",
+            Subtype = "checking",
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.Accounts.Add(accountValid);
+
+        var simpleFinAccountValid = new Database.Models.SimpleFinAccount
+        {
+            SyncID = "account-valid",
+            Name = "Valid Account",
+            Currency = "USD",
+            Balance = 2000.00m,
+            BalanceDate = (int)new DateTimeOffset(DateTime.UtcNow.AddDays(-2)).ToUnixTimeSeconds(),
+            OrganizationId = org.ID,
+            LinkedAccountId = accountValid.ID,
+            UserID = helper.demoUser.Id,
+            LastSync = DateTime.UtcNow.AddDays(-1),
+        };
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccountValid);
+
+        helper.demoUser.SimpleFinAccessToken = "https://demo:demo@test.com/simplefin";
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var errors = await simpleFinService.SyncTransactionHistoryAsync(helper.demoUser.Id);
+
+        // Assert: the valid account still synced despite the bad-balance account throwing
+        transactionServiceMock.Verify(
+            s =>
+                s.CreateTransactionAsync(
+                    helper.demoUser,
+                    It.IsAny<ITransactionCreateRequest>(),
+                    It.IsAny<IEnumerable<ICategory>>(),
+                    It.IsAny<AutomaticTransactionCategorizerHelper>()
+                ),
+            Times.Once
+        );
+        balanceServiceMock.Verify(
+            s => s.CreateBalancesAsync(helper.demoUser.Id, It.IsAny<IBalanceCreateRequest>()),
+            Times.Once
+        );
+
+        // Assert: an error is reported for the bad-balance account
+        errors.Should().NotBeEmpty();
+        errors.Should().Contain(e => e.Contains("Bad Balance Account"));
+    }
 }

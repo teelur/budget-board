@@ -383,36 +383,54 @@ public class LunchFlowService(
                 continue;
             }
 
-            List<Transaction> userTransactions =
-            [
-                .. userAccount.Transactions.OrderByDescending(t => t.Date),
-            ];
-
-            // SyncStartDate allows the user to specify a date from which to start syncing transactions.
-            // If it is unset, all transactions will be synced.
-            var transactionsToSync = lunchFlowTransactionsData.Transactions.Where(t =>
-                !lunchFlowAccount.SyncStartDate.HasValue
-                || DateOnly.Parse(t.Date) >= lunchFlowAccount.SyncStartDate.Value
-            );
-
-            foreach (var transaction in transactionsToSync)
+            try
             {
-                if (userTransactions.Any(t => t.SyncID != null && t.SyncID == transaction.ID))
-                {
-                    continue;
-                }
+                List<Transaction> userTransactions =
+                [
+                    .. userAccount.Transactions.OrderByDescending(t => t.Date),
+                ];
 
-                await transactionService.CreateTransactionAsync(
-                    userData.Id,
-                    new TransactionCreateRequest
+                // SyncStartDate allows the user to specify a date from which to start syncing transactions.
+                // If it is unset, all transactions will be synced.
+                var transactionsToSync = lunchFlowTransactionsData.Transactions.Where(t =>
+                    !lunchFlowAccount.SyncStartDate.HasValue
+                    || DateOnly.Parse(t.Date) >= lunchFlowAccount.SyncStartDate.Value
+                );
+
+                foreach (var transaction in transactionsToSync)
+                {
+                    if (userTransactions.Any(t => t.SyncID != null && t.SyncID == transaction.ID))
                     {
-                        AccountID = userAccount.ID,
-                        SyncID = transaction.ID,
-                        Amount = transaction.Amount,
-                        Date = DateOnly.Parse(transaction.Date),
-                        MerchantName = transaction.Merchant,
-                        Source = TransactionSource.LunchFlow.Value,
+                        continue;
                     }
+
+                    await transactionService.CreateTransactionAsync(
+                        userData.Id,
+                        new TransactionCreateRequest
+                        {
+                            AccountID = userAccount.ID,
+                            SyncID = transaction.ID,
+                            Amount = transaction.Amount,
+                            Date = DateOnly.Parse(transaction.Date),
+                            MerchantName = transaction.Merchant,
+                            Source = TransactionSource.LunchFlow.Value,
+                        }
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "{LogMessage}",
+                    logLocalizer[
+                        "LunchFlowAccountSyncExceptionLog",
+                        lunchFlowAccount.SyncID,
+                        ex.Message
+                    ]
+                );
+                errors.Add(
+                    responseLocalizer["LunchFlowAccountSyncException", lunchFlowAccount.SyncID]
                 );
             }
         }
@@ -488,19 +506,39 @@ public class LunchFlowService(
                 continue;
             }
 
-            var error = await SyncHelpers.SyncBalance(
-                userData,
-                new BalanceCreateRequest
-                {
-                    AccountID = lunchFlowAccount.LinkedAccountId!.Value,
-                    Amount = lunchFlowBalancesData.Balance.Amount,
-                    Date = DateOnly.FromDateTime(nowProvider.Now),
-                },
-                balanceService
-            );
-            if (error.HasValue)
+            try
             {
-                errors.Add(responseLocalizer[error.Value.ErrorKey, [.. error.Value.ErrorParams]]);
+                var error = await SyncHelpers.SyncBalance(
+                    userData,
+                    new BalanceCreateRequest
+                    {
+                        AccountID = lunchFlowAccount.LinkedAccountId!.Value,
+                        Amount = lunchFlowBalancesData.Balance.Amount,
+                        Date = DateOnly.FromDateTime(nowProvider.Now),
+                    },
+                    balanceService
+                );
+                if (error.HasValue)
+                {
+                    errors.Add(
+                        responseLocalizer[error.Value.ErrorKey, [.. error.Value.ErrorParams]]
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "{LogMessage}",
+                    logLocalizer[
+                        "LunchFlowAccountSyncExceptionLog",
+                        lunchFlowAccount.SyncID,
+                        ex.Message
+                    ]
+                );
+                errors.Add(
+                    responseLocalizer["LunchFlowAccountSyncException", lunchFlowAccount.SyncID]
+                );
             }
         }
 

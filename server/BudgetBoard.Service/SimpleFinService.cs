@@ -590,25 +590,37 @@ public class SimpleFinService(
                 continue;
             }
 
-            var transactionErrors = await SyncTransactionsAsync(
-                userData,
-                simpleFinAccount,
-                accountData.Transactions,
-                allCategories,
-                autoCategorizer
-            );
-            errors.AddRange(transactionErrors);
-
-            var balanceSyncErrors = await SyncBalancesAsync(
-                userData,
-                simpleFinAccount.ID,
-                accountData
-            );
-            errors.AddRange(balanceSyncErrors);
-
-            if (transactionErrors.Count == 0 && balanceSyncErrors.Count == 0)
+            try
             {
-                simpleFinAccount.LastSync = nowProvider.UtcNow;
+                var transactionErrors = await SyncTransactionsAsync(
+                    userData,
+                    simpleFinAccount,
+                    accountData.Transactions,
+                    allCategories,
+                    autoCategorizer
+                );
+                errors.AddRange(transactionErrors);
+
+                var balanceSyncErrors = await SyncBalancesAsync(
+                    userData,
+                    simpleFinAccount.ID,
+                    accountData
+                );
+                errors.AddRange(balanceSyncErrors);
+
+                if (transactionErrors.Count == 0 && balanceSyncErrors.Count == 0)
+                {
+                    simpleFinAccount.LastSync = nowProvider.UtcNow;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "{LogMessage}",
+                    logLocalizer["SimpleFinAccountSyncExceptionLog", accountData.Name, ex.Message]
+                );
+                errors.Add(responseLocalizer["SimpleFinAccountSyncException", accountData.Name]);
             }
         }
 
