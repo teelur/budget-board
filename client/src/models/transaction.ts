@@ -68,18 +68,24 @@ export interface IFilters {
   accounts: string[];
   category: string;
   dateRange: [Date | null, Date | null];
+  merchantName: string;
+  amountRange: [number | null, number | null];
 }
 
 export class Filters implements IFilters {
   accounts: string[] = [];
   category: string = "";
   dateRange: [Date | null, Date | null] = [null, null];
+  merchantName: string = "";
+  amountRange: [number | null, number | null] = [null, null];
 
   constructor(filter?: Filters) {
     if (filter) {
       this.accounts = filter.accounts;
       this.category = filter.category;
       this.dateRange = filter.dateRange;
+      this.merchantName = filter.merchantName;
+      this.amountRange = filter.amountRange;
     }
   }
 
@@ -89,7 +95,10 @@ export class Filters implements IFilters {
         JSON.stringify([...other.accounts].sort()) &&
       this.category === other.category &&
       this.dateRange[0]?.getTime() === other.dateRange[0]?.getTime() &&
-      this.dateRange[1]?.getTime() === other.dateRange[1]?.getTime()
+      this.dateRange[1]?.getTime() === other.dateRange[1]?.getTime() &&
+      this.merchantName === other.merchantName &&
+      this.amountRange[0] === other.amountRange[0] &&
+      this.amountRange[1] === other.amountRange[1]
     );
   }
 }

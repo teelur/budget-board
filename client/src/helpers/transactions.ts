@@ -161,6 +161,23 @@ export const getFilteredTransactions = (
       dayjs(t.date).isSameOrBefore(dayjs(filters.dateRange.at(1)!), "day"),
     );
   }
+  if (filters.merchantName && filters.merchantName.length > 0) {
+    filteredTransactions = filteredTransactions.filter((t) =>
+      t.merchantName
+        ?.toLowerCase()
+        .includes(filters.merchantName.toLowerCase()),
+    );
+  }
+  if (filters.amountRange[0] !== null) {
+    filteredTransactions = filteredTransactions.filter(
+      (t) => t.amount >= filters.amountRange[0]!,
+    );
+  }
+  if (filters.amountRange[1] !== null) {
+    filteredTransactions = filteredTransactions.filter(
+      (t) => t.amount <= filters.amountRange[1]!,
+    );
+  }
   return filteredTransactions;
 };
 
