@@ -113,15 +113,17 @@ export const getVisibleTransactions = (
   transactions.filter((t: ITransaction) => t.deleted === null);
 
 /**
- * Filters transactions based on accounts, categories, and date range.
+ * Filters transactions based on accounts, categories, date range, merchant name, and amount range.
  *
  * The function starts by excluding deleted transactions. It then applies:
  * - Account filters (if any are selected).
  * - Category filters (checks if the category is a parent or subcategory).
  * - Date range filters (if dates are specified).
+ * - Merchant name filter (if specified).
+ * - Amount range filters (if specified).
  *
  * @param {ITransaction[]} transactions - Array of transaction objects.
- * @param {Filters} filters - Object containing account, category, and date range filters.
+ * @param {Filters} filters - Object containing account, category, date range, merchant name, and amount range filters.
  * @param {ICategory[]} transactionCategories - Array of all categories, used to check for parent categories.
  * @returns {ITransaction[]} The filtered array of transactions.
  */
@@ -163,8 +165,8 @@ export const getFilteredTransactions = (
   }
   if (filters.merchantName && filters.merchantName.length > 0) {
     filteredTransactions = filteredTransactions.filter((t) =>
-      t.merchantName
-        ?.toLowerCase()
+      (t.merchantName ?? "")
+        .toLowerCase()
         .includes(filters.merchantName.toLowerCase()),
     );
   }
