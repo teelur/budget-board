@@ -1,6 +1,6 @@
 import classes from "./FilterCard.module.css";
 
-import { Flex, Stack, Button, Group } from "@mantine/core";
+import { Flex, Stack, Button } from "@mantine/core";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
