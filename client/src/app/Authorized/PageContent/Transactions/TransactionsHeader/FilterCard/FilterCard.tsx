@@ -13,22 +13,47 @@ import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 
 const FilterCard = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dayjsLocale, longDateFormat } = useLocale();
+  const {
+    dayjs,
+    dayjsLocale,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+    currencySymbol,
+  } = useLocale();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
   const { transactionCategories } = useTransactionCategories();
 
   return (
     <Card elevation={1}>
-      <Stack gap={0} className={classes.root}>
-        <PrimaryText size="lg">{t("filters")}</PrimaryText>
+      <Stack gap="0.25rem" className={classes.root}>
         <Flex
-          className={classes.container}
+          className={classes.header}
           justify="space-between"
+          align="center"
           wrap="nowrap"
         >
+          <PrimaryText size="lg">{t("filters")}</PrimaryText>
+          <Button
+            className={classes.clearButton}
+            w="100%"
+            size="xs"
+            variant={
+              transactionFilters.isEqual(new Filters()) ? "outline" : "primary"
+            }
+            onClick={() => {
+              setTransactionFilters(new Filters());
+            }}
+          >
+            {t("clear_filters")}
+          </Button>
+        </Flex>
+        <Flex className={classes.row} justify="space-between" wrap="nowrap">
           <DatePickerInput
             className={classes.datePickerInput}
             miw={165}
@@ -47,6 +72,8 @@ const FilterCard = (): React.ReactNode => {
               newFilters.accounts = transactionFilters.accounts;
               newFilters.category = transactionFilters.category;
               newFilters.dateRange = parsedDateRange;
+              newFilters.merchantName = transactionFilters.merchantName;
+              newFilters.amountRange = transactionFilters.amountRange;
               setTransactionFilters(newFilters);
             }}
             clearable
@@ -61,6 +88,8 @@ const FilterCard = (): React.ReactNode => {
               newFilters.accounts = newAccountIds;
               newFilters.category = transactionFilters.category;
               newFilters.dateRange = transactionFilters.dateRange;
+              newFilters.merchantName = transactionFilters.merchantName;
+              newFilters.amountRange = transactionFilters.amountRange;
               setTransactionFilters(newFilters);
             }}
             hideHidden
@@ -77,6 +106,8 @@ const FilterCard = (): React.ReactNode => {
               newFilters.accounts = transactionFilters.accounts;
               newFilters.category = val;
               newFilters.dateRange = transactionFilters.dateRange;
+              newFilters.merchantName = transactionFilters.merchantName;
+              newFilters.amountRange = transactionFilters.amountRange;
               setTransactionFilters(newFilters);
             }}
             withinPortal
@@ -84,18 +115,73 @@ const FilterCard = (): React.ReactNode => {
             label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
             elevation={1}
           />
-          <Button
-            className={classes.clearButton}
-            w="100%"
-            variant={
-              transactionFilters.isEqual(new Filters()) ? "outline" : "primary"
-            }
-            onClick={() => {
-              setTransactionFilters(new Filters());
+        </Flex>
+        <Flex className={classes.row} justify="space-between" wrap="nowrap">
+          <TextInput
+            className={classes.merchantInput}
+            miw={140}
+            label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+            placeholder={t("enter_merchant_name")}
+            value={transactionFilters.merchantName}
+            onChange={(e) => {
+              const newFilters = new Filters();
+              newFilters.accounts = transactionFilters.accounts;
+              newFilters.category = transactionFilters.category;
+              newFilters.dateRange = transactionFilters.dateRange;
+              newFilters.merchantName = e.currentTarget.value;
+              newFilters.amountRange = transactionFilters.amountRange;
+              setTransactionFilters(newFilters);
             }}
-          >
-            {t("clear_filters")}
-          </Button>
+            elevation={1}
+          />
+          <NumberInput
+            className={classes.amountInput}
+            miw={100}
+            label={<PrimaryText size="sm">{t("amount_min")}</PrimaryText>}
+            placeholder="0"
+            value={transactionFilters.amountRange[0] ?? ""}
+            onChange={(val) => {
+              const newFilters = new Filters();
+              newFilters.accounts = transactionFilters.accounts;
+              newFilters.category = transactionFilters.category;
+              newFilters.dateRange = transactionFilters.dateRange;
+              newFilters.merchantName = transactionFilters.merchantName;
+              newFilters.amountRange = [
+                val === "" ? null : Number(val),
+                transactionFilters.amountRange[1],
+              ];
+              setTransactionFilters(newFilters);
+            }}
+            prefix={currencySymbol}
+            decimalScale={2}
+            decimalSeparator={decimalSeparator}
+            thousandSeparator={thousandsSeparator}
+            elevation={1}
+          />
+          <NumberInput
+            className={classes.amountInput}
+            miw={100}
+            label={<PrimaryText size="sm">{t("amount_max")}</PrimaryText>}
+            placeholder="0"
+            value={transactionFilters.amountRange[1] ?? ""}
+            onChange={(val) => {
+              const newFilters = new Filters();
+              newFilters.accounts = transactionFilters.accounts;
+              newFilters.category = transactionFilters.category;
+              newFilters.dateRange = transactionFilters.dateRange;
+              newFilters.merchantName = transactionFilters.merchantName;
+              newFilters.amountRange = [
+                transactionFilters.amountRange[0],
+                val === "" ? null : Number(val),
+              ];
+              setTransactionFilters(newFilters);
+            }}
+            prefix={currencySymbol}
+            decimalScale={2}
+            decimalSeparator={decimalSeparator}
+            thousandSeparator={thousandsSeparator}
+            elevation={1}
+          />
         </Flex>
       </Stack>
     </Card>
