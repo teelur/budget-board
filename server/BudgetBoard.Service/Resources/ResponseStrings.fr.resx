@@ -467,7 +467,7 @@
     <value>The provided date format is invalid.</value>
   </data>
   <data name="AccountPermanentDeleteNotFoundError" xml:space="preserve">
-    <value>The account you are trying to permanently delete does not exist.</value>
+    <value>Le compte que vous essayez de supprimer définitivement n’existe pas.</value>
   </data>
   <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
     <value>The batch update request contains duplicate transaction IDs.</value>
@@ -476,15 +476,21 @@
     <value>The batch delete request contains duplicate transaction IDs.</value>
   </data>
   <data name="BalanceUpdateNotFoundError" xml:space="preserve">
-    <value>The balance you are trying to update does not exist.</value>
+    <value>La balance que vous essayez de mettre à jour n'existe pas.</value>
   </data>
   <data name="BalanceDuplicateDateError" xml:space="preserve">
-    <value>A balance already exists for this account on that date.</value>
+    <value>Une balance existe déjà pour ce compte à cette date.</value>
   </data>
   <data name="ValueUpdateNotFoundError" xml:space="preserve">
     <value>The value you are trying to update does not exist.</value>
   </data>
   <data name="ValueDuplicateDateError" xml:space="preserve">
     <value>A value for this date already exists for this asset.</value>
+  </data>
+  <data name="SimpleFinAccountSyncException" xml:space="preserve">
+    <value>An unexpected error occurred while syncing SimpleFIN account '{0}'.</value>
+  </data>
+  <data name="LunchFlowAccountSyncException" xml:space="preserve">
+    <value>An unexpected error occurred while syncing LunchFlow account '{0}'.</value>
   </data>
 </root>
