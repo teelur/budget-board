@@ -39,6 +39,8 @@
   "all_children_will_also_be_deleted": "All children will also be deleted.",
   "amount": "Amount",
   "amount_format": "Amount Format",
+  "amount_max": "Max Amount",
+  "amount_min": "Min Amount",
   "appearance_mode": "Appearance Mode",
   "apply_changes": "Apply Changes",
   "apply_existing_account_amount_to_goal": "Apply existing account balance towards goal target?",
