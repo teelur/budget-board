@@ -13,7 +13,7 @@ const TransactionsSettings = (): React.ReactNode => {
   const location = useLocation();
 
   const navItems = [
-    { path: "categories", label: t("custom_categories") },
+    { path: "categories", label: t("categories") },
     { path: "rules", label: t("automatic_rules") },
     { path: "deleted", label: t("deleted_transactions") },
     { path: "auto-categorizer", label: t("auto_categorizer") },
