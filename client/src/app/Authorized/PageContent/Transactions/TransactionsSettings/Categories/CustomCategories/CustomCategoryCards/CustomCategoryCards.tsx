@@ -1,4 +1,4 @@
-import { Box, Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
