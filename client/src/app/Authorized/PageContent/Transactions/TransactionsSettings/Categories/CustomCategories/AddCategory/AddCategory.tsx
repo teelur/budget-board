@@ -87,7 +87,7 @@ const AddCategory = (): React.ReactNode => {
               categories={parentCategories}
               {...parentField.getInputProps()}
               withinPortal
-              elevation={2}
+              elevation={1}
             />
           </Stack>
         )}
