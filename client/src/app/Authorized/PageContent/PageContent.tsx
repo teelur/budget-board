@@ -23,8 +23,7 @@ const AssetsSettingsDeleted = lazy(
   () => import("./Assets/AssetsSettings/DeletedAssets/DeletedAssets"),
 );
 const TransactionsSettingsCategories = lazy(
-  () =>
-    import("./Transactions/TransactionsSettings/CustomCategories/CustomCategories"),
+  () => import("./Transactions/TransactionsSettings/Categories/Categories"),
 );
 const TransactionsSettingsRules = lazy(
   () =>
