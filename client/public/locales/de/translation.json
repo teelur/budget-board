@@ -39,6 +39,8 @@
   "all_children_will_also_be_deleted": "Alle Unterobjekte werden ebenfalls gelöscht.",
   "amount": "Betrag",
   "amount_format": "Betrag Formatierung",
+  "amount_max": "Höchstbetrag",
+  "amount_min": "Mindestbetrag",
   "appearance_mode": "Anzeigemodus",
   "apply_changes": "Änderungen übernehmen",
   "apply_existing_account_amount_to_goal": "Den vorhandenen Kontostand auf das Ziel anrechnen?",
