@@ -532,4 +532,7 @@
   <data name="AccountTypeDeleteHasChildrenError" xml:space="preserve">
     <value>The account type you are trying to delete has child types. Please reassign or delete the child types first.</value>
   </data>
+  <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
+    <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
+  </data>
   </root>

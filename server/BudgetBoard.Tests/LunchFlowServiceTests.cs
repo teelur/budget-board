@@ -1204,7 +1204,6 @@ public class LunchFlowServiceTests
         {
             Name = "Bad Account",
             Type = "checking",
-            Subtype = "checking",
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(accountBad);
@@ -1218,7 +1217,6 @@ public class LunchFlowServiceTests
         {
             Name = "Valid Account",
             Type = "checking",
-            Subtype = "checking",
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(accountValid);

@@ -45,7 +45,6 @@ public class AccountService(
             Name = request.Name,
             InstitutionID = request.InstitutionID,
             Type = request.Type,
-            Subtype = request.Subtype,
             HideTransactions = request.HideTransactions,
             HideAccount = request.HideAccount,
             Source = request.Source ?? AccountSource.Manual,

@@ -15,15 +15,12 @@ public interface IAccountTypeService
     Task CreateAccountTypeAsync(Guid userGuid, IAccountTypeCreateRequest request);
 
     /// <summary>
-    /// Retrieves account types for the specified user.
+    /// Retrieves all account types for the specified user. This includes both built-in (if configured) and custom account types.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="accountTypeGuid">Optional. The unique identifier of a specific account type to retrieve.</param>
+    /// <param name="guid">Optional. When provided, returns only the account type with this ID.</param>
     /// <returns>A collection of account type details.</returns>
-    Task<IReadOnlyList<IAccountTypeResponse>> ReadAccountTypesAsync(
-        Guid userGuid,
-        Guid accountTypeGuid = default
-    );
+    Task<IReadOnlyList<IAccountTypeResponse>> ReadAccountTypesAsync(Guid userGuid);
 
     /// <summary>
     /// Updates an existing account type.

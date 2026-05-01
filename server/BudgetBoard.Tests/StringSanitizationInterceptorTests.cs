@@ -59,7 +59,6 @@ public class StringSanitizationInterceptorTests
         {
             Name = "Test\0Account",
             Type = "Check\0ing",
-            Subtype = "Sub\0type",
             Source = "Man\0ual",
             UserID = helper.demoUser.Id,
         };
@@ -76,7 +75,6 @@ public class StringSanitizationInterceptorTests
         savedAccount.Should().NotBeNull();
         savedAccount!.Name.Should().Be("TestAccount");
         savedAccount.Type.Should().Be("Checking");
-        savedAccount.Subtype.Should().Be("Subtype");
         savedAccount.Source.Should().Be("Manual");
     }
 

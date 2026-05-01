@@ -10,17 +10,22 @@ internal static class AccountTypeHelpers
     /// </summary>
     /// <param name="userData">The user whose account types are to be retrieved.</param>
     /// <returns>A read-only list containing all applicable account types.</returns>
-    internal static IReadOnlyList<IAccountType> GetAllAccountTypes(ApplicationUser userData)
+    internal static IReadOnlyList<IAccountTypeResponse> GetAllAccountTypes(ApplicationUser userData)
     {
-        var customAccountTypes = userData.AccountTypes.Select(at => new AccountTypeBase()
-        {
-            Value = at.Value,
-            Parent = at.Parent,
-        });
+        var allAccountTypes = new List<IAccountTypeResponse>();
+        allAccountTypes.AddRange(
+            userData.AccountTypes.Select(at => new AccountTypeResponse(at)).ToList()
+        );
 
-        var allAccountTypes = new List<IAccountType>();
-        allAccountTypes.AddRange(AccountTypeConstants.DefaultAccountTypes);
-        allAccountTypes.AddRange(customAccountTypes);
+        if (userData.UserSettings?.DisableBuiltInAccountTypes != true)
+        {
+            allAccountTypes.AddRange(
+                AccountTypeConstants
+                    .DefaultAccountTypes.Select(at => new AccountTypeResponse(at))
+                    .ToList()
+            );
+        }
+
         return allAccountTypes;
     }
 }

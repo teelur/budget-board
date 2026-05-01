@@ -264,7 +264,7 @@ public class AccountTypeServiceTests
         var result = await accountTypeService.ReadAccountTypesAsync(helper.demoUser.Id);
 
         // Assert
-        result.Should().BeEquivalentTo(accountTypes.Select(a => new AccountTypeResponse(a)));
+        result.Select(r => r.ID).Should().Contain(accountTypes.Select(a => a.ID));
     }
 
     [Fact]
@@ -362,6 +362,46 @@ public class AccountTypeServiceTests
             .UserDataContext.AccountTypes.First()
             .Value.Should()
             .Be(accountTypeUpdateRequest.Value);
+    }
+
+    [Fact]
+    public async Task UpdateAccountTypeAsync_WhenValueChanges_ShouldUpdateAccountsUsingThatType()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var accountType = accountTypeFaker.Generate();
+        accountType.Parent = AccountTypeConstants.DefaultAccountTypes.First().Value;
+
+        helper.UserDataContext.AccountTypes.Add(accountType);
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Type = accountType.Value;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var accountTypeUpdateRequest = _accountTypeUpdateRequestFaker.Generate();
+        accountTypeUpdateRequest.ID = accountType.ID;
+        accountTypeUpdateRequest.Parent = accountType.Parent;
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeUpdateRequest
+        );
+
+        // Assert
+        account.Type.Should().Be(accountTypeUpdateRequest.Value);
     }
 
     [Fact]
@@ -603,7 +643,7 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
-    public async Task DeleteAccountTypeAsync_WhenAccountTypeInUseByAccount_ShouldThrowError()
+    public async Task DeleteAccountTypeAsync_WhenAccountTypeInUseByAccount_ShouldResetAccountType()
     {
         // Arrange
         var helper = new TestHelper();
@@ -628,17 +668,15 @@ public class AccountTypeServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () =>
-            await accountTypeService.DeleteAccountTypeAsync(helper.demoUser.Id, accountType.ID);
+        await accountTypeService.DeleteAccountTypeAsync(helper.demoUser.Id, accountType.ID);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeDeleteInUseByAccountsError");
+        helper.UserDataContext.AccountTypes.Should().NotContain(accountType);
+        account.Type.Should().BeNull();
     }
 
     [Fact]
-    public async Task DeleteAccountTypeAsync_WhenAccountTypeHasChildren_ShouldThrowError()
+    public async Task DeleteAccountTypeAsync_WhenAccountTypeHasChildren_ShouldDeleteChildrenAndResetAccounts()
     {
         // Arrange
         var helper = new TestHelper();
@@ -656,18 +694,20 @@ public class AccountTypeServiceTests
         childAccountType.Parent = parentAccountType.Value;
 
         helper.UserDataContext.AccountTypes.AddRange([parentAccountType, childAccountType]);
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Type = childAccountType.Value;
+
+        helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
 
         // Act
-        Func<Task> act = async () =>
-            await accountTypeService.DeleteAccountTypeAsync(
-                helper.demoUser.Id,
-                parentAccountType.ID
-            );
+        await accountTypeService.DeleteAccountTypeAsync(helper.demoUser.Id, parentAccountType.ID);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeDeleteHasChildrenError");
+        helper.UserDataContext.AccountTypes.Should().NotContain(parentAccountType);
+        helper.UserDataContext.AccountTypes.Should().NotContain(childAccountType);
+        account.Type.Should().BeNull();
     }
 }

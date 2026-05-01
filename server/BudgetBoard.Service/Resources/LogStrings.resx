@@ -553,4 +553,7 @@
   <data name="AccountTypeDeleteHasChildrenLog" xml:space="preserve">
     <value>Attempted to delete an account type that has child types.</value>
   </data>
+  <data name="AccountTypeInvalidClassificationLog" xml:space="preserve">
+    <value>Attempted to create or update an account type with an invalid classification.</value>
+  </data>
 </root>
