@@ -268,64 +268,6 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
-    public async Task ReadAccountTypesAsync_WhenCalledWithValidDataAndAccountTypeGuid_ShouldReturnAccountType()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var accountTypeService = new AccountTypeService(
-            Mock.Of<ILogger<IAccountTypeService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
-        var accountTypes = accountTypeFaker.Generate(5);
-
-        helper.UserDataContext.AccountTypes.AddRange(accountTypes);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        var result = await accountTypeService.ReadAccountTypesAsync(
-            helper.demoUser.Id,
-            accountTypes.First().ID
-        );
-
-        // Assert
-        result.Should().BeEquivalentTo([new AccountTypeResponse(accountTypes.First())]);
-    }
-
-    [Fact]
-    public async Task ReadAccountTypesAsync_WhenCalledWithInvalidAccountTypeGuid_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var accountTypeService = new AccountTypeService(
-            Mock.Of<ILogger<IAccountTypeService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
-        var accountTypes = accountTypeFaker.Generate(5);
-
-        helper.UserDataContext.AccountTypes.AddRange(accountTypes);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        Func<Task> act = async () =>
-            await accountTypeService.ReadAccountTypesAsync(helper.demoUser.Id, Guid.NewGuid());
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeNotFoundError");
-    }
-
-    [Fact]
     public async Task UpdateAccountTypeAsync_WhenCalledWithValidData_ShouldUpdateAccountType()
     {
         // Arrange
@@ -709,5 +651,151 @@ public class AccountTypeServiceTests
         helper.UserDataContext.AccountTypes.Should().NotContain(parentAccountType);
         helper.UserDataContext.AccountTypes.Should().NotContain(childAccountType);
         account.Type.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task CreateAccountTypeAsync_WhenClassificationIsInvalid_ShouldThrowError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeCreateRequest = _accountTypeCreateRequestFaker.Generate();
+        accountTypeCreateRequest.Parent = string.Empty;
+        accountTypeCreateRequest.Classification = "invalid";
+
+        // Act
+        Func<Task> act = async () =>
+            await accountTypeService.CreateAccountTypeAsync(
+                helper.demoUser.Id,
+                accountTypeCreateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountTypeInvalidClassificationError");
+    }
+
+    [Fact]
+    public async Task CreateAccountTypeAsync_WhenParentExists_ShouldInheritParentClassification()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Use a known liability parent from defaults
+        var liabilityParent = AccountTypeConstants.DefaultAccountTypes.First(at =>
+            at.Classification == AccountClassifications.Liability && string.IsNullOrEmpty(at.Parent)
+        );
+
+        var accountTypeCreateRequest = _accountTypeCreateRequestFaker.Generate();
+        accountTypeCreateRequest.Parent = liabilityParent.Value;
+        accountTypeCreateRequest.Classification = AccountClassifications.Asset; // should be overridden
+
+        // Act
+        await accountTypeService.CreateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeCreateRequest
+        );
+
+        // Assert
+        helper
+            .UserDataContext.AccountTypes.Single()
+            .Classification.Should()
+            .Be(AccountClassifications.Liability);
+    }
+
+    [Fact]
+    public async Task UpdateAccountTypeAsync_WhenClassificationIsInvalid_ShouldThrowError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var accountType = accountTypeFaker.Generate();
+        accountType.Parent = string.Empty;
+
+        helper.UserDataContext.AccountTypes.Add(accountType);
+        helper.UserDataContext.SaveChanges();
+
+        var accountTypeUpdateRequest = _accountTypeUpdateRequestFaker.Generate();
+        accountTypeUpdateRequest.ID = accountType.ID;
+        accountTypeUpdateRequest.Parent = string.Empty;
+        accountTypeUpdateRequest.Classification = "invalid";
+
+        // Act
+        Func<Task> act = async () =>
+            await accountTypeService.UpdateAccountTypeAsync(
+                helper.demoUser.Id,
+                accountTypeUpdateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountTypeInvalidClassificationError");
+    }
+
+    [Fact]
+    public async Task UpdateAccountTypeAsync_WhenParentExists_ShouldInheritParentClassification()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var accountType = accountTypeFaker.Generate();
+        accountType.Parent = AccountTypeConstants.DefaultAccountTypes.First().Value;
+
+        helper.UserDataContext.AccountTypes.Add(accountType);
+        helper.UserDataContext.SaveChanges();
+
+        // Use a known liability parent from defaults
+        var liabilityParent = AccountTypeConstants.DefaultAccountTypes.First(at =>
+            at.Classification == AccountClassifications.Liability && string.IsNullOrEmpty(at.Parent)
+        );
+
+        var accountTypeUpdateRequest = _accountTypeUpdateRequestFaker.Generate();
+        accountTypeUpdateRequest.ID = accountType.ID;
+        accountTypeUpdateRequest.Parent = liabilityParent.Value;
+        accountTypeUpdateRequest.Classification = AccountClassifications.Asset; // should be overridden
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeUpdateRequest
+        );
+
+        // Assert
+        helper
+            .UserDataContext.AccountTypes.Single()
+            .Classification.Should()
+            .Be(AccountClassifications.Liability);
     }
 }

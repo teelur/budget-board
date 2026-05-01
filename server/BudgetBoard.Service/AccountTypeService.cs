@@ -294,9 +294,11 @@ public class AccountTypeService(
 
         void RemoveChildrenUsingType(string parentValue)
         {
-            var children = userData.AccountTypes.Where(a =>
-                a.Parent.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
-            );
+            var children = userData
+                .AccountTypes.Where(a =>
+                    a.Parent.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
+                )
+                .ToList();
             foreach (var child in children)
             {
                 UpdateAccountsUsingType(userData.Accounts, child.Value, null);
