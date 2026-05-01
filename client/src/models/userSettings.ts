@@ -5,6 +5,7 @@ export interface IUserSettings {
   budgetWarningThreshold: number;
   forceSyncLookbackMonths: number;
   disableBuiltInTransactionCategories: boolean;
+  disableBuiltInAccountTypes: boolean;
   enableAutoCategorizer: boolean;
   autoCategorizerModelOID?: number;
   autoCategorizerLastTrained?: Date;
@@ -20,6 +21,7 @@ export interface IUserSettingsUpdateRequest {
   budgetWarningThreshold?: number;
   forceSyncLookbackMonths?: number;
   disableBuiltInTransactionCategories?: boolean;
+  disableBuiltInAccountTypes?: boolean;
   enableAutoCategorizer?: boolean;
   autoCategorizerModelOID?: number;
   autoCategorizerLastTrained?: Date;
