@@ -514,4 +514,43 @@
   <data name="LunchFlowAccountSyncExceptionLog" xml:space="preserve">
     <value>An unexpected error occurred while syncing LunchFlow account {0}: {1}. Skipping.</value>
   </data>
+  <data name="AccountTypeCreateDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to create an account type with a duplicate name.</value>
+  </data>
+  <data name="AccountTypeCreateEmptyNameLog" xml:space="preserve">
+    <value>Attempted to create an account type with an empty name.</value>
+  </data>
+  <data name="AccountTypeCreateSameNameAsParentLog" xml:space="preserve">
+    <value>Attempted to create an account type with the same name as its parent.</value>
+  </data>
+  <data name="AccountTypeCreateParentNotFoundLog" xml:space="preserve">
+    <value>Attempted to create an account type with a parent that does not exist.</value>
+  </data>
+  <data name="AccountTypeNotFoundLog" xml:space="preserve">
+    <value>Attempted to access an account type that does not exist.</value>
+  </data>
+  <data name="AccountTypeUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update an account type that does not exist.</value>
+  </data>
+  <data name="AccountTypeUpdateDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to update an account type with a duplicate name.</value>
+  </data>
+  <data name="AccountTypeUpdateEmptyNameLog" xml:space="preserve">
+    <value>Attempted to update an account type with an empty name.</value>
+  </data>
+  <data name="AccountTypeUpdateSameNameAsParentLog" xml:space="preserve">
+    <value>Attempted to update an account type with the same name as its parent.</value>
+  </data>
+  <data name="AccountTypeUpdateParentNotFoundLog" xml:space="preserve">
+    <value>Attempted to update an account type with a parent that does not exist.</value>
+  </data>
+  <data name="AccountTypeDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete an account type that does not exist.</value>
+  </data>
+  <data name="AccountTypeDeleteInUseByAccountsLog" xml:space="preserve">
+    <value>Attempted to delete an account type that is in use by existing accounts.</value>
+  </data>
+  <data name="AccountTypeDeleteHasChildrenLog" xml:space="preserve">
+    <value>Attempted to delete an account type that has child types.</value>
+  </data>
 </root>
