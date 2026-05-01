@@ -17,6 +17,8 @@ public class AccountType
     /// </summary>
     public string Parent { get; set; } = string.Empty;
 
+    public string Classification { get; set; } = string.Empty;
+
     /// <summary>
     /// Identifier for the user who owns the account type.
     /// </summary>
