@@ -3,7 +3,7 @@ import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { DateString, getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
-import { IAccountResponse, liabilityAccountTypes } from "~/models/account";
+import { AccountTypeClassification, IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -17,6 +17,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { buildValueChartData } from "../ValueChart/helpers/valueChart";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 interface NetWorthChartData {
   date: DateString;
@@ -35,6 +36,7 @@ interface NetWorthChartData {
 const buildNetWorthChartData = (
   balances: IBalanceResponse[],
   accounts: IAccountResponse[],
+  liabilityAccountTypes: string[],
   formatDateString: (date: DateString) => string,
 ): NetWorthChartData[] => {
   // Use the account balance chart data to build the net worth chart data.
@@ -83,6 +85,7 @@ interface NetWorthChartProps {
 const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dateFormat, intlLocale } = useLocale();
+  const { allAccountTypes } = useAccountTypes();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -124,6 +127,12 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
         );
   };
 
+  const liabilityAccountTypes = allAccountTypes
+    .filter(
+      (type) => type.classification === AccountTypeClassification.Liability,
+    )
+    .map((type) => type.id);
+
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
   }
@@ -153,6 +162,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
             : dayjs().toDate(),
         ),
         props.accounts,
+        liabilityAccountTypes,
         (date: DateString) => dayjs(date).format(dateFormat),
       )}
       series={chartSeries}

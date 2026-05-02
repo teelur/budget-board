@@ -4,6 +4,11 @@ export enum AccountSource {
   LunchFlow = "LunchFlow",
 }
 
+export enum AccountTypeClassification {
+  Asset = "asset",
+  Liability = "liability",
+}
+
 export interface IAccountCreateRequest {
   name: string;
   institutionID?: string;

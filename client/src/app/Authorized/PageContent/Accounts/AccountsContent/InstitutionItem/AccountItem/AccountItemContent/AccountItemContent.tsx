@@ -4,8 +4,10 @@ import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { AccountSource, IAccountResponse } from "~/models/account";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface IAccountItemContentProps {
@@ -17,6 +19,7 @@ interface IAccountItemContentProps {
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { allAccountTypes } = useAccountTypes();
 
   const getAccountSourceBadgeColor = (): string => {
     switch (props.account.source) {
@@ -28,6 +31,33 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
       default:
         return "gray";
     }
+  };
+
+  const getAccountTypeDisplay = (): React.ReactNode => {
+    if (props.account.type?.length === 0) {
+      return <DimmedText size="sm">{t("no_type")}</DimmedText>;
+    }
+
+    const isParentCategory = getIsParentCategory(
+      props.account.type,
+      allAccountTypes,
+    );
+
+    const accountType = isParentCategory
+      ? props.account.type
+      : getParentCategory(props.account.type, allAccountTypes);
+
+    return (
+      <Group gap="0.25rem">
+        <DimmedText size="sm">{accountType}</DimmedText>
+        {!isParentCategory && (
+          <>
+            <ChevronRightIcon size={14} />
+            <DimmedText size="sm">{props.account.type}</DimmedText>
+          </>
+        )}
+      </Group>
+    );
   };
 
   return (
@@ -80,19 +110,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
         </StatusText>
       </Group>
       <Group justify="space-between" align="center">
-        {props.account.type ? (
-          <Group gap="0.25rem">
-            <DimmedText size="sm">{props.account.type}</DimmedText>
-            {props.account.subtype && (
-              <>
-                <ChevronRightIcon size={14} />
-                <DimmedText size="sm">{props.account.subtype}</DimmedText>
-              </>
-            )}
-          </Group>
-        ) : (
-          <DimmedText size="sm">{t("no_type")}</DimmedText>
-        )}
+        {getAccountTypeDisplay()}
         <DimmedText size="sm">
           {t("last_updated", {
             date: dayjs(props.account.balanceDate).isValid()

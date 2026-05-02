@@ -1,4 +1,5 @@
 import { IAccountResponse } from "~/models/account";
+import { IAccountType } from "~/models/accountType";
 
 /**
  * Filters out accounts that are either hidden or marked as deleted.
@@ -12,10 +13,10 @@ import { IAccountResponse } from "~/models/account";
  * @returns {IAccountResponse[]} An array containing only the visible accounts.
  */
 export const filterVisibleAccounts = (
-  accounts: IAccountResponse[]
+  accounts: IAccountResponse[],
 ): IAccountResponse[] =>
   accounts.filter(
-    (a: IAccountResponse) => !(a.hideAccount || a.deleted !== null)
+    (a: IAccountResponse) => !(a.hideAccount || a.deleted !== null),
   );
 
 /**
@@ -34,13 +35,29 @@ export const sumAccountsTotalBalance = (accounts: IAccountResponse[]) => {
 
 /**
  * Returns accounts matching any of the given types.
+ * If a given type is a parent type, accounts matching any of its subtypes will also be included.
  *
  * @param {IAccountResponse[]} accounts - List of account objects.
- * @param {string[]} types - List of types or subtypes to match.
+ * @param {string[]} typesToGet - List of types or subtypes to match.
+ * @param {IAccountType[]} allTypes - List of all account types, including parent-child relationships.
  * @returns {IAccountResponse[]} Filtered list of matching accounts.
  */
 export const getAccountsOfTypes = (
   accounts: IAccountResponse[],
-  types: string[]
-): IAccountResponse[] =>
-  accounts.filter((a) => types?.includes(a.type) || types?.includes(a.subtype));
+  typesToGet: string[],
+  allTypes: IAccountType[],
+): IAccountResponse[] => {
+  const typesToGetWithSubtypes = new Set<string>();
+
+  typesToGet.forEach((type) => {
+    typesToGetWithSubtypes.add(type);
+
+    // If the type is a parent type, also include its subtypes
+    const subtypes = allTypes
+      .filter((t) => t.parent === type)
+      .map((t) => t.value);
+    subtypes.forEach((subtype) => typesToGetWithSubtypes.add(subtype));
+  });
+
+  return accounts.filter((account) => typesToGetWithSubtypes.has(account.type));
+};

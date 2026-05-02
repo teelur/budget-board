@@ -81,9 +81,8 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
             </Stack>
             <Stack gap={0}>
               <DimmedText size="xs">{t("account_type")}</DimmedText>
-              <PrimaryText size="lg">
-                {props.account.subtype || props.account.type}
-              </PrimaryText>
+              {/* TODO: Replace with actual account type name once account types are implemented */}
+              <PrimaryText size="lg">{props.account.type}</PrimaryText>
             </Stack>
           </Group>
           <Accordion
