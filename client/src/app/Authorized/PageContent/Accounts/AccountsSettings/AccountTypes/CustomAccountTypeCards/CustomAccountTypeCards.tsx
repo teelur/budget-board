@@ -6,7 +6,10 @@ import { useTranslation } from "react-i18next";
 import React from "react";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { accountTypesQueryKey, translateAxiosError } from "~/helpers/requests";
-import { IAccountTypeResponse } from "~/models/accountType";
+import {
+  IAccountTypeResponse,
+  IAccountTypeUpdateRequest,
+} from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
@@ -24,6 +27,25 @@ const CustomAccountTypeCards = (): React.ReactNode => {
         url: "/api/accountType",
         method: "DELETE",
         params: { guid },
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    },
+    onError: (error: AxiosError) =>
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      }),
+  });
+
+  const doUpdateAccountType = useMutation({
+    mutationFn: async (req: IAccountTypeUpdateRequest) =>
+      await request({
+        url: "/api/accountType",
+        method: "PUT",
+        data: req,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
@@ -97,21 +119,25 @@ const CustomAccountTypeCards = (): React.ReactNode => {
       {groups.map((group) => (
         <Stack key={group.parent.value} align="flex-start" gap="0.5rem">
           <CustomAccountTypeCard
-            name={group.parent.value}
-            classification={group.parent.classification}
+            accountType={group.parent}
             isBuiltIn={group.isBuiltIn}
             deleteAccountType={async () => {
               await doDeleteAccountType.mutateAsync(group.parent.id);
+            }}
+            updateAccountType={async (req) => {
+              await doUpdateAccountType.mutateAsync(req);
             }}
           />
           {group.children.map((child) => (
             <CustomAccountTypeCard
               key={child.id}
-              name={child.value}
-              classification={child.classification}
+              accountType={child}
               isChildCard
               deleteAccountType={async () => {
                 await doDeleteAccountType.mutateAsync(child.id);
+              }}
+              updateAccountType={async (req) => {
+                await doUpdateAccountType.mutateAsync(req);
               }}
             />
           ))}

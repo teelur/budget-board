@@ -183,7 +183,11 @@ public class AccountTypeService(
             IEnumerable<IAccountTypeResponse> allAccountTypes
         )
         {
-            if (allAccountTypes.Any(a => a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)))
+            if (
+                allAccountTypes.Any(a =>
+                    a.ID != request.ID && a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)
+                )
+            )
             {
                 logger.LogError("{LogMessage}", logLocalizer["AccountTypeUpdateDuplicateNameLog"]);
                 throw new BudgetBoardServiceException(
