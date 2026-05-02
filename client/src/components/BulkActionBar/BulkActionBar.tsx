@@ -8,6 +8,7 @@ import {
   Text,
   ActionIcon,
   Transition,
+  Badge,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -29,6 +30,7 @@ import { IUserSettings } from "~/models/userSettings";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
+import { IAccountResponse } from "~/models/account";
 
 interface BulkActionBarProps {
   selectedIds: Set<string>;
@@ -128,6 +130,22 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
         return res.data as IUserSettings;
       }
       return undefined;
+    },
+  });
+
+  const accountsQuery = useQuery({
+    queryKey: ["accounts"],
+    queryFn: async (): Promise<IAccountResponse[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/account",
+        method: "GET",
+      });
+
+      if (res.status === 200) {
+        return res.data as IAccountResponse[];
+      }
+
+      return [];
     },
   });
 
@@ -235,6 +253,13 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   );
   const singleSelected =
     selectedTransactions.length === 1 ? selectedTransactions[0] : null;
+
+  const singleSelectedAccount = React.useMemo(() => {
+    if (!singleSelected) return null;
+    return (
+      accountsQuery.data?.find((a) => a.id === singleSelected.accountID) ?? null
+    );
+  }, [singleSelected?.accountID, accountsQuery.data]);
 
   // When a single transaction is selected, pre-populate all fields with its data
   React.useEffect(() => {
@@ -364,6 +389,11 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
               >
                 {t("clear_selection")}
               </Button>
+              {singleSelectedAccount && (
+                <Badge size="sm" variant="outline">
+                  {singleSelectedAccount.name}
+                </Badge>
+              )}
             </Group>
 
             {/* Fields + actions row */}
