@@ -131,7 +131,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
     .filter(
       (type) => type.classification === AccountTypeClassification.Liability,
     )
-    .map((type) => type.id);
+    .map((type) => type.value);
 
   if (props.isPending) {
     return <Skeleton height={425} radius="lg" />;
