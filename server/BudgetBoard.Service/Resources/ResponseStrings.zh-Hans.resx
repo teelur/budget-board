@@ -493,4 +493,46 @@
   <data name="LunchFlowAccountSyncException" xml:space="preserve">
     <value>An unexpected error occurred while syncing LunchFlow account '{0}'.</value>
   </data>
+  <data name="AccountTypeCreateDuplicateNameError" xml:space="preserve">
+    <value>An account type with this name already exists.</value>
+  </data>
+  <data name="AccountTypeCreateEmptyNameError" xml:space="preserve">
+    <value>The account type name cannot be empty.</value>
+  </data>
+  <data name="AccountTypeCreateSameNameAsParentError" xml:space="preserve">
+    <value>The account type name cannot be the same as its parent.</value>
+  </data>
+  <data name="AccountTypeCreateParentNotFoundError" xml:space="preserve">
+    <value>The parent account type does not exist.</value>
+  </data>
+  <data name="AccountTypeNotFoundError" xml:space="preserve">
+    <value>The account type you are trying to access does not exist.</value>
+  </data>
+  <data name="AccountTypeUpdateNotFoundError" xml:space="preserve">
+    <value>The account type you are trying to update does not exist.</value>
+  </data>
+  <data name="AccountTypeUpdateDuplicateNameError" xml:space="preserve">
+    <value>An account type with this name already exists.</value>
+  </data>
+  <data name="AccountTypeUpdateEmptyNameError" xml:space="preserve">
+    <value>The account type name cannot be empty.</value>
+  </data>
+  <data name="AccountTypeUpdateSameNameAsParentError" xml:space="preserve">
+    <value>The account type name cannot be the same as its parent.</value>
+  </data>
+  <data name="AccountTypeUpdateParentNotFoundError" xml:space="preserve">
+    <value>The parent account type does not exist.</value>
+  </data>
+  <data name="AccountTypeDeleteNotFoundError" xml:space="preserve">
+    <value>The account type you are trying to delete does not exist.</value>
+  </data>
+  <data name="AccountTypeDeleteInUseByAccountsError" xml:space="preserve">
+    <value>The account type you are trying to delete is in use by existing accounts.</value>
+  </data>
+  <data name="AccountTypeDeleteHasChildrenError" xml:space="preserve">
+    <value>The account type you are trying to delete has child types. Please reassign or delete the child types first.</value>
+  </data>
+  <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
+    <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
+  </data>
 </root>
