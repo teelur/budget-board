@@ -485,4 +485,110 @@ public class UserSettingsServiceTests
         // Assert
         helper.demoUser.UserSettings.DisableBuiltInAccountTypes.Should().BeFalse();
     }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_WhenCurrencySameAsCurrent_DoesNotUpdate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            Currency = "USD",
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { Currency = "USD" };
+
+        // Act — same value, should be a no-op (no error, no change)
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.Currency.Should().Be("USD");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenAlreadyDisabledAndSameValueRequested_DoesNotThrow()
+    {
+        // Arrange — built-ins already disabled; user has a conflicting custom type name, but
+        // since the requested value equals the current value, validation is skipped entirely.
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAccountTypes = true,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var conflictingType = accountTypeFaker.Generate();
+        conflictingType.Value = "Checking"; // would normally block re-enabling built-ins
+        helper.UserDataContext.AccountTypes.Add(conflictingType);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = true };
+
+        // Act — same value as current (true → true), should be a no-op
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should().NotThrowAsync();
+        helper.demoUser.UserSettings.DisableBuiltInAccountTypes.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenAlreadyEnabledAndSameValueRequested_DoesNotThrow()
+    {
+        // Arrange — built-ins enabled (default); user has an account using a built-in type, but
+        // since the requested value equals the current value, validation is skipped entirely.
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAccountTypes = false,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Type = "checking"; // would normally block disabling built-ins
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = false };
+
+        // Act — same value as current (false → false), should be a no-op
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should().NotThrowAsync();
+        helper.demoUser.UserSettings.DisableBuiltInAccountTypes.Should().BeFalse();
+    }
 }

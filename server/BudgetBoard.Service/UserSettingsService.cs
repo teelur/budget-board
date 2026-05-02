@@ -62,7 +62,13 @@ public class UserSettingsService(
 
         void HandleCurrencyChange()
         {
-            if (!string.IsNullOrEmpty(request.Currency))
+            if (
+                !string.IsNullOrEmpty(request.Currency)
+                && !request.Currency.Equals(
+                    userSettings.Currency,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
             {
                 var isValidCurrency = LocalizationHelpers.CurrencyCodes.Contains(request.Currency);
                 if (!isValidCurrency)
@@ -79,7 +85,13 @@ public class UserSettingsService(
 
         void HandleLanguageChange()
         {
-            if (!string.IsNullOrEmpty(request.Language))
+            if (
+                !string.IsNullOrEmpty(request.Language)
+                && !request.Language.Equals(
+                    userSettings.Language,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
             {
                 var isValidLanguage = SupportedLanguages.AllUserLanguageOptions.Contains(
                     request.Language.ToLower()
@@ -98,7 +110,13 @@ public class UserSettingsService(
 
         void HandleDateFormatChange()
         {
-            if (!string.IsNullOrEmpty(request.DateFormat))
+            if (
+                !string.IsNullOrEmpty(request.DateFormat)
+                && !request.DateFormat.Equals(
+                    userSettings.DateFormat,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
             {
                 var isValidDateFormat = LocalizationHelpers.IsValidDateFormat(request.DateFormat);
                 if (!isValidDateFormat)
@@ -115,7 +133,10 @@ public class UserSettingsService(
 
         void HandleBudgetWarningThresholdChange()
         {
-            if (request.BudgetWarningThreshold.HasValue)
+            if (
+                request.BudgetWarningThreshold.HasValue
+                && userSettings.BudgetWarningThreshold != request.BudgetWarningThreshold.Value
+            )
             {
                 if (
                     request.BudgetWarningThreshold.Value < 0
@@ -137,7 +158,10 @@ public class UserSettingsService(
 
         void HandleForceSyncLookbackMonthsChange()
         {
-            if (request.ForceSyncLookbackMonths.HasValue)
+            if (
+                request.ForceSyncLookbackMonths.HasValue
+                && userSettings.ForceSyncLookbackMonths != request.ForceSyncLookbackMonths.Value
+            )
             {
                 if (
                     request.ForceSyncLookbackMonths.Value < 0
@@ -158,7 +182,11 @@ public class UserSettingsService(
 
         void HandleDisableBuiltInTransactionCategoriesChange()
         {
-            if (request.DisableBuiltInTransactionCategories.HasValue)
+            if (
+                request.DisableBuiltInTransactionCategories.HasValue
+                && userSettings.DisableBuiltInTransactionCategories
+                    != request.DisableBuiltInTransactionCategories.Value
+            )
             {
                 userSettings.DisableBuiltInTransactionCategories = request
                     .DisableBuiltInTransactionCategories
@@ -168,7 +196,11 @@ public class UserSettingsService(
 
         void HandleDisableBuiltInAccountTypesChange()
         {
-            if (request.DisableBuiltInAccountTypes.HasValue)
+            if (
+                request.DisableBuiltInAccountTypes.HasValue
+                && userSettings.DisableBuiltInAccountTypes
+                    != request.DisableBuiltInAccountTypes.Value
+            )
             {
                 var builtInTypeValues = AccountTypeConstants
                     .DefaultAccountTypes.Select(at => at.Value.ToLower())
@@ -220,7 +252,10 @@ public class UserSettingsService(
 
         void HandleEnableAutoCategorizerChange()
         {
-            if (request.EnableAutoCategorizer.HasValue)
+            if (
+                request.EnableAutoCategorizer.HasValue
+                && userSettings.EnableAutoCategorizer != request.EnableAutoCategorizer.Value
+            )
             {
                 // We can only enable auto categorizer if we trained it
                 if (
@@ -239,7 +274,11 @@ public class UserSettingsService(
 
         void HandleAutoCategorizerMinimumProbabilityPercentageChange()
         {
-            if (request.AutoCategorizerMinimumProbabilityPercentage.HasValue)
+            if (
+                request.AutoCategorizerMinimumProbabilityPercentage.HasValue
+                && userSettings.AutoCategorizerMinimumProbabilityPercentage
+                    != request.AutoCategorizerMinimumProbabilityPercentage.Value
+            )
             {
                 if (
                     request.AutoCategorizerMinimumProbabilityPercentage.Value < 0
