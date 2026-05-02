@@ -798,4 +798,98 @@ public class AccountTypeServiceTests
             .Classification.Should()
             .Be(AccountClassifications.Liability);
     }
+
+    [Fact]
+    public async Task UpdateAccountTypeAsync_WhenValueChanges_ShouldUpdateDirectChildrenParent()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+
+        var parentType = accountTypeFaker.Generate();
+        parentType.Parent = string.Empty;
+        parentType.Classification = AccountClassifications.Asset;
+
+        var childType = accountTypeFaker.Generate();
+        childType.Parent = parentType.Value;
+        childType.Classification = AccountClassifications.Asset;
+
+        helper.UserDataContext.AccountTypes.AddRange(parentType, childType);
+        helper.UserDataContext.SaveChanges();
+
+        var newValue = "RenamedParent";
+        var updateRequest = new AccountTypeUpdateRequest
+        {
+            ID = parentType.ID,
+            Value = newValue,
+            Parent = string.Empty,
+            Classification = AccountClassifications.Asset,
+        };
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(helper.demoUser.Id, updateRequest);
+
+        // Assert
+        helper
+            .UserDataContext.AccountTypes.Single(a => a.ID == childType.ID)
+            .Parent.Should()
+            .Be(newValue);
+    }
+
+    [Fact]
+    public async Task UpdateAccountTypeAsync_WhenValueChanges_ShouldNotChangeGrandchildrenParent()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+
+        var grandparentType = accountTypeFaker.Generate();
+        grandparentType.Parent = string.Empty;
+        grandparentType.Classification = AccountClassifications.Asset;
+
+        var parentType = accountTypeFaker.Generate();
+        parentType.Parent = grandparentType.Value;
+        parentType.Classification = AccountClassifications.Asset;
+
+        var grandchildType = accountTypeFaker.Generate();
+        grandchildType.Parent = parentType.Value;
+        grandchildType.Classification = AccountClassifications.Asset;
+
+        helper.UserDataContext.AccountTypes.AddRange(grandparentType, parentType, grandchildType);
+        helper.UserDataContext.SaveChanges();
+
+        var originalParentValue = parentType.Value;
+        var updateRequest = new AccountTypeUpdateRequest
+        {
+            ID = grandparentType.ID,
+            Value = "RenamedGrandparent",
+            Parent = string.Empty,
+            Classification = AccountClassifications.Asset,
+        };
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(helper.demoUser.Id, updateRequest);
+
+        // Assert — grandchild's Parent still points to its direct parent, not the renamed grandparent
+        helper
+            .UserDataContext.AccountTypes.Single(a => a.ID == grandchildType.ID)
+            .Parent.Should()
+            .Be(originalParentValue);
+    }
 }

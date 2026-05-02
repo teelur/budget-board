@@ -164,6 +164,7 @@ public class AccountTypeService(
             request.Value,
             accountType.Classification
         );
+        UpdateChildrenParentValue(userData.AccountTypes, oldValue, request.Value);
 
         await userDataContext.SaveChangesAsync();
 
@@ -269,6 +270,22 @@ public class AccountTypeService(
             {
                 child.Classification = newClassification;
                 UpdateChildrenClassification(accountTypes, child.Value, newClassification);
+            }
+        }
+
+        static void UpdateChildrenParentValue(
+            ICollection<AccountType> accountTypes,
+            string oldParentValue,
+            string newParentValue
+        )
+        {
+            foreach (
+                var child in accountTypes.Where(a =>
+                    a.Parent.Equals(oldParentValue, StringComparison.OrdinalIgnoreCase)
+                )
+            )
+            {
+                child.Parent = newParentValue;
             }
         }
     }
