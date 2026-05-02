@@ -11,6 +11,7 @@ import { getAccountsOfTypes, sumAccountsTotalBalance } from "./accounts";
 import { IAccountResponse } from "~/models/account";
 import { IAssetResponse } from "~/models/asset";
 import { ComboboxItem } from "@mantine/core";
+import { IAccountType } from "~/models/accountType";
 
 /**
  * Return a string representation for the supplied value, defaulting to an empty string.
@@ -228,6 +229,7 @@ export const calculateLineTotal = (
   validAccounts: IAccountResponse[],
   validAssets: IAssetResponse[],
   lines: INetWorthWidgetLine[],
+  allTypes: IAccountType[],
 ): number => {
   const categories = line.categories ?? [];
 
@@ -253,7 +255,9 @@ export const calculateLineTotal = (
 
           return (
             total +
-            sumAccountsTotalBalance(getAccountsOfTypes(validAccounts, filters))
+            sumAccountsTotalBalance(
+              getAccountsOfTypes(validAccounts, filters, allTypes),
+            )
           );
         }
 
@@ -268,6 +272,7 @@ export const calculateLineTotal = (
             validAccounts,
             validAssets,
             lines,
+            allTypes,
           );
           return total + lineTotal;
         }

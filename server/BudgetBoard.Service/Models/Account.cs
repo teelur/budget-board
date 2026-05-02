@@ -15,7 +15,6 @@ public interface IAccountCreateRequest
     public string Name { get; }
     public Guid? InstitutionID { get; }
     public string Type { get; }
-    public string Subtype { get; }
     public bool HideTransactions { get; }
     public bool HideAccount { get; }
     public string Source { get; }
@@ -26,7 +25,6 @@ public class AccountCreateRequest() : IAccountCreateRequest
     public string Name { get; set; } = string.Empty;
     public Guid? InstitutionID { get; set; }
     public string Type { get; set; } = string.Empty;
-    public string Subtype { get; set; } = string.Empty;
     public bool HideTransactions { get; set; } = false;
     public bool HideAccount { get; set; } = false;
     public string Source { get; set; } = string.Empty;
@@ -37,7 +35,6 @@ public interface IAccountUpdateRequest
     public Guid ID { get; }
     public string Name { get; }
     public string Type { get; }
-    public string Subtype { get; }
     public bool HideTransactions { get; }
     public bool HideAccount { get; }
     public decimal? InterestRate { get; }
@@ -48,7 +45,6 @@ public class AccountUpdateRequest() : IAccountUpdateRequest
     public Guid ID { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
-    public string Subtype { get; set; } = string.Empty;
     public bool HideTransactions { get; set; } = false;
     public bool HideAccount { get; set; } = false;
     public decimal? InterestRate { get; set; } = null;
@@ -58,8 +54,7 @@ public class AccountUpdateRequest() : IAccountUpdateRequest
     {
         ID = account.ID;
         Name = account.Name;
-        Type = account.Type;
-        Subtype = account.Subtype;
+        Type = account.Type ?? string.Empty;
         HideTransactions = account.HideTransactions;
         HideAccount = account.HideAccount;
         InterestRate = account.InterestRate;
@@ -84,7 +79,6 @@ public interface IAccountResponse
     public string Name { get; }
     public Guid? InstitutionID { get; }
     public string Type { get; }
-    public string Subtype { get; }
     public decimal CurrentBalance { get; }
     public DateOnly? BalanceDate { get; }
     public bool HideTransactions { get; }
@@ -102,7 +96,6 @@ public class AccountResponse : IAccountResponse
     public string Name { get; set; }
     public Guid? InstitutionID { get; set; }
     public string Type { get; set; }
-    public string Subtype { get; set; }
     public decimal CurrentBalance { get; set; }
     public DateOnly? BalanceDate { get; set; }
     public bool HideTransactions { get; set; }
@@ -120,7 +113,6 @@ public class AccountResponse : IAccountResponse
         Name = string.Empty;
         InstitutionID = null;
         Type = string.Empty;
-        Subtype = string.Empty;
         CurrentBalance = 0.0M;
         BalanceDate = null;
         HideTransactions = false;
@@ -136,8 +128,7 @@ public class AccountResponse : IAccountResponse
         ID = account.ID;
         Name = account.Name;
         InstitutionID = account.InstitutionID;
-        Type = account.Type;
-        Subtype = account.Subtype;
+        Type = account.Type ?? string.Empty;
         CurrentBalance =
             account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0;
         BalanceDate = account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Date;

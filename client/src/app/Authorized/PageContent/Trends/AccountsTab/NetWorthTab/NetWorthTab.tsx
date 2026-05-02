@@ -13,6 +13,8 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const NetWorthTab = (): React.ReactNode => {
   const { dayjs } = useLocale();
+  const { request } = useAuth();
+
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
     [],
   );
@@ -21,7 +23,6 @@ const NetWorthTab = (): React.ReactNode => {
     dayjs().format(mantineDateFormat),
   ]);
 
-  const { request } = useAuth();
   const balancesQuery = useQueries({
     queries: selectedAccountIds.map((accountId: string) => ({
       queryKey: ["balances", accountId],

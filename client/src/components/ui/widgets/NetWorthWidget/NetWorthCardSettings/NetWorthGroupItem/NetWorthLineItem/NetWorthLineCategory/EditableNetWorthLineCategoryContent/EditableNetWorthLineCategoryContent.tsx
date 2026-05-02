@@ -12,12 +12,12 @@ import Select from "~/components/core/Select/Select/Select";
 import { translateAxiosError } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { getSubtypeOptions, NET_WORTH_CATEGORY_TYPES } from "~/helpers/widgets";
-import { accountCategories } from "~/models/account";
 import { INetWorthWidgetCategoryUpdateRequest } from "~/models/netWorthWidgetConfiguration";
 import {
   INetWorthWidgetCategory,
   INetWorthWidgetLine,
 } from "~/models/widgetSettings";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface EditableNetWorthLineCategoryContentProps {
@@ -44,8 +44,8 @@ const EditableNetWorthLineCategoryContent = (
   });
 
   const { t } = useTranslation();
-
   const { request } = useAuth();
+  const { allAccountTypes } = useAccountTypes();
 
   const queryClient = useQueryClient();
   const doUpdateCategory = useMutation({
@@ -207,7 +207,7 @@ const EditableNetWorthLineCategoryContent = (
         return (
           <CategorySelect
             size="xs"
-            categories={accountCategories}
+            categories={allAccountTypes}
             {...valueField.getInputProps()}
             withinPortal
             elevation={2}

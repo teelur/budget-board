@@ -7,14 +7,16 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
-import { IAccountResponse } from "~/models/account";
+import { AccountTypeClassification, IAccountResponse } from "~/models/account";
 import { DatesRangeValue } from "@mantine/dates";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 const AssetsTab = (): React.ReactNode => {
   const { request } = useAuth();
   const { dayjs } = useLocale();
+  const { allAccountTypes } = useAccountTypes();
 
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
     [],
@@ -65,6 +67,10 @@ const AssetsTab = (): React.ReactNode => {
     },
   });
 
+  const assetAccountTypes = allAccountTypes
+    .filter((type) => type.classification === AccountTypeClassification.Asset)
+    .map((type) => type.value);
+
   return (
     <Stack p="0.5rem">
       <AccountsSelectHeader
@@ -72,7 +78,7 @@ const AssetsTab = (): React.ReactNode => {
         setSelectedAccountIds={setSelectedAccountIds}
         dateRange={dateRange}
         setDateRange={setDateRange}
-        filters={["Checking", "Savings", "Investment", "Cash"]}
+        filters={assetAccountTypes}
       />
       <ValueChart
         values={(balancesQuery.data ?? []).map((balance) => ({

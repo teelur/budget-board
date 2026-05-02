@@ -28,12 +28,7 @@ public class Account
     /// <summary>
     /// Type of the account (e.g., checking, savings).
     /// </summary>
-    public string Type { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Subtype of the account (e.g., brokerage, retirement).
-    /// </summary>
-    public string Subtype { get; set; } = string.Empty;
+    public string? Type { get; set; } = null;
 
     /// <summary>
     /// Indicates whether transactions for this account are hidden from views.

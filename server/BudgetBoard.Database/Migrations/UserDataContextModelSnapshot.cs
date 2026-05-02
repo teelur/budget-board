@@ -69,12 +69,7 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Subtype")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("UserID")
@@ -87,6 +82,34 @@ namespace BudgetBoard.Database.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Account", (string)null);
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.AccountType", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Classification")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Parent")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("AccountType", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.ApplicationUser", b =>
@@ -608,6 +631,9 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("DisableBuiltInAccountTypes")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("DisableBuiltInTransactionCategories")
                         .HasColumnType("boolean");
 
@@ -865,6 +891,17 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Institution");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.AccountType", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("AccountTypes")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -1127,6 +1164,8 @@ namespace BudgetBoard.Database.Migrations
 
             modelBuilder.Entity("BudgetBoard.Database.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("AccountTypes");
+
                     b.Navigation("Accounts");
 
                     b.Navigation("Assets");

@@ -40,9 +40,11 @@ const AccountMultiSelectInputBase = ({
   });
 
   const getFilteredAccounts = (): IAccountResponse[] => {
-    let filteredAccounts = (accountsQuery.data ?? []).filter(
-      (a) => a.deleted === null
+    const sortedAccounts = (accountsQuery.data ?? []).sort((a, b) =>
+      a.name.localeCompare(b.name),
     );
+
+    let filteredAccounts = sortedAccounts.filter((a) => a.deleted === null);
 
     if (hideHidden) {
       filteredAccounts = filteredAccounts.filter((a) => !a.hideAccount);
@@ -50,13 +52,13 @@ const AccountMultiSelectInputBase = ({
 
     if (filterTypes.length > 0) {
       filteredAccounts = filteredAccounts.filter((a) =>
-        filterTypes?.includes(a.type)
+        filterTypes?.includes(a.type),
       );
     }
 
     if (manualOnly) {
       filteredAccounts = filteredAccounts.filter(
-        (a) => a.source === AccountSource.Manual
+        (a) => a.source === AccountSource.Manual,
       );
     }
 
