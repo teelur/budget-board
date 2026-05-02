@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IAccountTypeResponse } from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
+import { accountTypesQueryKey } from "~/helpers/requests";
 
 interface AccountTypeContextType {
   allAccountTypes: IAccountTypeResponse[];
@@ -23,7 +24,7 @@ export const AccountTypeProvider = (props: AccountTypeProviderProps) => {
   const { request } = useAuth();
 
   const accountTypesQuery = useQuery({
-    queryKey: ["accountTypes"],
+    queryKey: [accountTypesQueryKey],
     queryFn: async (): Promise<IAccountTypeResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/accountType",

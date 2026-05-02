@@ -308,4 +308,181 @@ public class UserSettingsServiceTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidDateFormatError");
     }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenAccountUsesBuiltInType_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Type = "checking"; // matches a built-in type value (stored lowercase in HashSet)
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = true };
+
+        // Act
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("DisableBuiltInAccountTypesInUseError");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenCustomTypeHasBuiltInParent_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var customAccountType = accountTypeFaker.Generate();
+        customAccountType.Parent = "depository"; // matches a built-in type value (stored lowercase in HashSet)
+        helper.UserDataContext.AccountTypes.Add(customAccountType);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = true };
+
+        // Act
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("DisableBuiltInAccountTypesInUseError");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenNoBuiltInTypesInUse_Succeeds()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Type = "CustomNonBuiltInType";
+        helper.UserDataContext.Accounts.Add(account);
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var customAccountType = accountTypeFaker.Generate();
+        customAccountType.Parent = "CustomNonBuiltInParent";
+        helper.UserDataContext.AccountTypes.Add(customAccountType);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = true };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.DisableBuiltInAccountTypes.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_EnableBuiltInAccountTypes_WhenConflictingCustomType_ThrowsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAccountTypes = true,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var customAccountType = accountTypeFaker.Generate();
+        customAccountType.Value = "Checking"; // conflicts with a built-in type (case-insensitive check)
+        helper.UserDataContext.AccountTypes.Add(customAccountType);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = false };
+
+        // Act
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("EnableBuiltInAccountTypesConflictError");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_EnableBuiltInAccountTypes_WhenNoConflict_Succeeds()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAccountTypes = true,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var customAccountType = accountTypeFaker.Generate();
+        customAccountType.Value = "MyUniqueCustomType"; // no conflict with built-in types
+        helper.UserDataContext.AccountTypes.Add(customAccountType);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = false };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.DisableBuiltInAccountTypes.Should().BeFalse();
+    }
 }

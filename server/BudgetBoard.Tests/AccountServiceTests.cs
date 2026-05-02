@@ -366,7 +366,9 @@ public class AccountServiceTests()
         await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
 
         // Assert
-        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().Be(fakeDate);
+        var deletedAccount = helper.demoUser.Accounts.Single(a => a.ID == account.ID);
+        deletedAccount.Deleted.Should().Be(fakeDate);
+        deletedAccount.Source.Should().Be(AccountSource.Manual);
     }
 
     [Fact]
@@ -846,7 +848,7 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task PermanentlyDeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldClearLink()
+    public async Task PermanentlyDeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldRemoveAccount()
     {
         // Arrange
         var helper = new TestHelper();
@@ -874,14 +876,10 @@ public class AccountServiceTests()
 
         // Assert
         helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
-        helper
-            .UserDataContext.LunchFlowAccounts.Single(a => a.ID == lunchFlowAccount.ID)
-            .LinkedAccountId.Should()
-            .BeNull();
     }
 
     [Fact]
-    public async Task PermanentlyDeleteAccountAsync_WithLinkedSimpleFinAccount_ShouldClearLink()
+    public async Task PermanentlyDeleteAccountAsync_WithLinkedSimpleFinAccount_ShouldRemoveAccount()
     {
         // Arrange
         var helper = new TestHelper();
@@ -913,9 +911,87 @@ public class AccountServiceTests()
 
         // Assert
         helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
+    }
+
+    [Fact]
+    public async Task DeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldClearLink()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
+        var lunchFlowAccount = lunchFlowAccountFaker.Generate();
+        lunchFlowAccount.LinkedAccountId = account.ID;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().NotBeNull();
+        helper
+            .UserDataContext.LunchFlowAccounts.Single(a => a.ID == lunchFlowAccount.ID)
+            .LinkedAccountId.Should()
+            .BeNull();
+        helper
+            .UserDataContext.LunchFlowAccounts.Single(a => a.ID == lunchFlowAccount.ID)
+            .LastSync.Should()
+            .BeNull();
+    }
+
+    [Fact]
+    public async Task DeleteAccountAsync_WithLinkedSimpleFinAccount_ShouldClearLink()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var orgFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
+        var org = orgFaker.Generate();
+
+        var simpleFinAccountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, org.ID);
+        var simpleFinAccount = simpleFinAccountFaker.Generate();
+        simpleFinAccount.LinkedAccountId = account.ID;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SimpleFinOrganizations.Add(org);
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().NotBeNull();
         helper
             .UserDataContext.SimpleFinAccounts.Single(a => a.ID == simpleFinAccount.ID)
             .LinkedAccountId.Should()
+            .BeNull();
+        helper
+            .UserDataContext.SimpleFinAccounts.Single(a => a.ID == simpleFinAccount.ID)
+            .LastSync.Should()
             .BeNull();
     }
 }
