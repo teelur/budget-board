@@ -72,6 +72,11 @@ public class UserSettings
     public bool DisableBuiltInTransactionCategories { get; set; } = false;
 
     /// <summary>
+    /// Indicates whether built-in account types are disabled.
+    /// </summary>
+    public bool DisableBuiltInAccountTypes { get; set; } = false;
+
+    /// <summary>
     /// Indicates whether the auto-categorizer is enabled.
     /// </summary>
     public bool EnableAutoCategorizer { get; set; } = false;

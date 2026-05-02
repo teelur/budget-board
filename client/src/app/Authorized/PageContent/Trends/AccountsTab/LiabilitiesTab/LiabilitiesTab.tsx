@@ -8,13 +8,15 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
-import { IAccountResponse } from "~/models/account";
+import { AccountTypeClassification, IAccountResponse } from "~/models/account";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 const LiabilitiesTab = (): React.ReactNode => {
   const { request } = useAuth();
   const { dayjs } = useLocale();
+  const { allAccountTypes } = useAccountTypes();
 
   const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
     [],
@@ -65,6 +67,12 @@ const LiabilitiesTab = (): React.ReactNode => {
     },
   });
 
+  const liabilityAccountTypes = allAccountTypes
+    .filter(
+      (type) => type.classification === AccountTypeClassification.Liability,
+    )
+    .map((type) => type.value);
+
   return (
     <Stack p="0.5rem">
       <AccountsSelectHeader
@@ -72,7 +80,7 @@ const LiabilitiesTab = (): React.ReactNode => {
         setSelectedAccountIds={setSelectedAccountIds}
         dateRange={dateRange}
         setDateRange={setDateRange}
-        filters={["Loan", "Credit Card", "Mortgage"]}
+        filters={liabilityAccountTypes}
       />
       <ValueChart
         values={(balancesQuery.data ?? []).map((balance) => ({

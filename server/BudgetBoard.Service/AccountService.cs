@@ -45,7 +45,6 @@ public class AccountService(
             Name = request.Name,
             InstitutionID = request.InstitutionID,
             Type = request.Type,
-            Subtype = request.Subtype,
             HideTransactions = request.HideTransactions,
             HideAccount = request.HideAccount,
             Source = request.Source ?? AccountSource.Manual,
@@ -120,6 +119,8 @@ public class AccountService(
         var now = _nowProvider.UtcNow;
         account.Deleted = now;
 
+        account.Type = null;
+
         if (deleteTransactions)
         {
             foreach (var transaction in account.Transactions)
@@ -133,6 +134,25 @@ public class AccountService(
             account.Institution.Deleted = now;
             account.Institution.Index = 0;
         }
+
+        var lunchFlowAccount = await _userDataContext.LunchFlowAccounts.FirstOrDefaultAsync(a =>
+            a.LinkedAccountId == accountGuid
+        );
+        if (lunchFlowAccount != null)
+        {
+            lunchFlowAccount.LinkedAccountId = null;
+            lunchFlowAccount.LastSync = null;
+        }
+
+        var simpleFinAccount = await _userDataContext.SimpleFinAccounts.FirstOrDefaultAsync(a =>
+            a.LinkedAccountId == accountGuid
+        );
+        if (simpleFinAccount != null)
+        {
+            simpleFinAccount.LinkedAccountId = null;
+            simpleFinAccount.LastSync = null;
+        }
+        account.Source = AccountSource.Manual;
 
         await _userDataContext.SaveChangesAsync();
     }
@@ -231,24 +251,6 @@ public class AccountService(
             );
         }
 
-        var lunchFlowAccount = await _userDataContext.LunchFlowAccounts.FirstOrDefaultAsync(a =>
-            a.LinkedAccountId == accountGuid
-        );
-        if (lunchFlowAccount != null)
-        {
-            lunchFlowAccount.LinkedAccountId = null;
-            lunchFlowAccount.LastSync = null;
-        }
-
-        var simpleFinAccount = await _userDataContext.SimpleFinAccounts.FirstOrDefaultAsync(a =>
-            a.LinkedAccountId == accountGuid
-        );
-        if (simpleFinAccount != null)
-        {
-            simpleFinAccount.LinkedAccountId = null;
-            simpleFinAccount.LastSync = null;
-        }
-
         _userDataContext.Transactions.RemoveRange(account.Transactions);
         _userDataContext.Balances.RemoveRange(account.Balances);
         _userDataContext.Accounts.Remove(account);
@@ -268,6 +270,8 @@ public class AccountService(
                 .Include(u => u.Accounts)
                 .ThenInclude(a => a.Institution)
                 .Include(u => u.Institutions)
+                .Include(u => u.LunchFlowAccounts)
+                .Include(u => u.SimpleFinAccounts)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }

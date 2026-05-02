@@ -26,6 +26,7 @@ import SplitCard, {
 import { TrendingUpIcon } from "lucide-react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 interface NetWorthWidgetProps {
   widgetId: string;
@@ -41,6 +42,7 @@ const NetWorthWidget = ({
   const { t } = useTranslation();
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
+  const { allAccountTypes } = useAccountTypes();
 
   const widgetSettingsQuery = useQuery({
     queryKey: ["widgetSettings"],
@@ -157,6 +159,7 @@ const NetWorthWidget = ({
                         validAccounts,
                         validAssets,
                         orderedGroups.flatMap((g) => g.lines),
+                        allAccountTypes,
                       )}
                       userCurrency={preferredCurrency ?? "USD"}
                     />

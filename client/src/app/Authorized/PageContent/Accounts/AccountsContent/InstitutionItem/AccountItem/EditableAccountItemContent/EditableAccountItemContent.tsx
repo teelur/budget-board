@@ -13,14 +13,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { PencilIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { translateAxiosError } from "~/helpers/requests";
-import {
-  accountCategories,
-  IAccountResponse,
-  IAccountUpdateRequest,
-} from "~/models/account";
+import { IAccountResponse, IAccountUpdateRequest } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
@@ -30,6 +25,7 @@ import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -59,10 +55,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     initialValue: props.account.type,
   });
 
-  const accountSubTypeField = useField<string>({
-    initialValue: props.account.subtype ?? "",
-  });
-
   const hideAccountField = useField<boolean>({
     initialValue: props.account.hideAccount ?? false,
   });
@@ -79,6 +71,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { allAccountTypes } = useAccountTypes();
   const { request } = useAuth();
 
   const queryClient = useQueryClient();
@@ -88,7 +81,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
         id: props.account.id,
         name: accountNameField.getValue(),
         type: accountTypeField.getValue(),
-        subtype: accountSubTypeField.getValue(),
         hideTransactions: hideTransactionsField.getValue(),
         hideAccount: hideAccountField.getValue(),
         interestRate: ((interestRateField.getValue() ?? 0) as number) / 100,
@@ -119,7 +111,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
           : undefined,
       );
       accountTypeField.setValue(props.account.type);
-      accountSubTypeField.setValue(props.account.subtype ?? "");
       hideAccountField.setValue(props.account.hideAccount ?? false);
       hideTransactionsField.setValue(props.account.hideTransactions ?? false);
     },
@@ -129,7 +120,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     () => doUpdateAccount.mutate(),
     [
       accountTypeField.getValue(),
-      accountSubTypeField.getValue(),
       hideAccountField.getValue(),
       hideTransactionsField.getValue(),
     ],
@@ -219,18 +209,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
         <Group justify="space-between" align="center">
           <CategorySelect
             w={220}
-            categories={accountCategories}
-            value={
-              accountSubTypeField.getValue().length > 0
-                ? accountSubTypeField.getValue()
-                : accountTypeField.getValue()
-            }
+            categories={allAccountTypes}
+            value={accountTypeField.getValue()}
             onChange={(val: string) => {
-              const parent = getParentCategory(val, accountCategories);
-              accountTypeField.setValue(parent);
-              getIsParentCategory(val, accountCategories)
-                ? accountSubTypeField.setValue("")
-                : accountSubTypeField.setValue(val);
+              accountTypeField.setValue(val);
             }}
             withinPortal
             elevation={2}

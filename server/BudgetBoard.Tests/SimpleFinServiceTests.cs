@@ -1225,7 +1225,6 @@ public class SimpleFinServiceTests
             Name = "My Checking",
             InstitutionID = null,
             Type = "checking",
-            Subtype = "checking",
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(account);
@@ -1399,7 +1398,6 @@ public class SimpleFinServiceTests
             Name = "Deleted Checking",
             InstitutionID = null,
             Type = "checking",
-            Subtype = "checking",
             UserID = helper.demoUser.Id,
             Deleted = DateTime.UtcNow.AddDays(-1),
         };
@@ -1723,7 +1721,6 @@ public class SimpleFinServiceTests
         {
             Name = "My Checking",
             Type = "checking",
-            Subtype = "checking",
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(account1);
@@ -1732,7 +1729,6 @@ public class SimpleFinServiceTests
         {
             Name = "My Savings",
             Type = "savings",
-            Subtype = "savings",
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(account2);
@@ -1896,7 +1892,6 @@ public class SimpleFinServiceTests
         {
             Name = "Bad Balance",
             Type = "checking",
-            Subtype = "checking",
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(accountBad);
@@ -1920,7 +1915,6 @@ public class SimpleFinServiceTests
         {
             Name = "Valid Checking",
             Type = "checking",
-            Subtype = "checking",
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(accountValid);

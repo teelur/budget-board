@@ -19,6 +19,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
 
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<AccountType> AccountTypes { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Budget> Budgets { get; set; }
     public DbSet<Goal> Goals { get; set; }
@@ -90,6 +91,8 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
                 a.ToTable("Account");
             }
         );
+
+        modelBuilder.Entity<AccountType>().ToTable("AccountType");
 
         modelBuilder.Entity<Transaction>().ToTable("Transaction");
 

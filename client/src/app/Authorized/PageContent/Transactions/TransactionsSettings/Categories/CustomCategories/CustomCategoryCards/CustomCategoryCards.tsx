@@ -66,7 +66,6 @@ const CustomCategoryCards = () => {
     const customParents = customCategories.filter((c) => c.parent === "");
     const customChildren = customCategories.filter((c) => c.parent !== "");
 
-    // Map parent value (lowercase) → children
     const childrenByParent = new Map<string, ICategoryResponse[]>();
     for (const child of customChildren) {
       const key = child.parent.toLowerCase();
@@ -74,7 +73,6 @@ const CustomCategoryCards = () => {
       childrenByParent.get(key)!.push(child);
     }
 
-    // Find built-in parents that are parents of custom children
     const customParentKeys = new Set(
       customParents.map((c) => c.value.toLowerCase()),
     );

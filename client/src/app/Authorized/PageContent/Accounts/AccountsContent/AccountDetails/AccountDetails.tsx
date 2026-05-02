@@ -20,6 +20,11 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import {
+  getIsParentAccountType,
+  getParentAccountType,
+} from "~/helpers/accountType";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -33,6 +38,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
+  const { allAccountTypes } = useAccountTypes();
   const { request } = useAuth();
 
   const balancesQuery = useQuery({
@@ -82,8 +88,13 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
             <Stack gap={0}>
               <DimmedText size="xs">{t("account_type")}</DimmedText>
               <PrimaryText size="lg">
-                {props.account.subtype || props.account.type}
+                {props.account.type ? props.account.type : t("no_type")}
               </PrimaryText>
+              {!getIsParentAccountType(props.account.type, allAccountTypes) && (
+                <DimmedText size="xs">
+                  {getParentAccountType(props.account.type, allAccountTypes)}
+                </DimmedText>
+              )}
             </Stack>
           </Group>
           <Accordion

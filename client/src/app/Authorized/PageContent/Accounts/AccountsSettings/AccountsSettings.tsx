@@ -12,7 +12,10 @@ const AccountsSettings = (): React.ReactNode => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navItems = [{ path: "deleted", label: t("deleted_accounts") }];
+  const navItems = [
+    { path: "account-types", label: t("account_types") },
+    { path: "deleted", label: t("deleted_accounts") },
+  ];
 
   const activeItem = navItems.find((item) =>
     location.pathname.endsWith(item.path),
