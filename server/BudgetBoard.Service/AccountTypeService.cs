@@ -122,10 +122,7 @@ public class AccountTypeService(
     public async Task<IReadOnlyList<IAccountTypeResponse>> ReadAccountTypesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        return userData
-            .AccountTypes.Select(at => new AccountTypeResponse(at))
-            .ToList()
-            .AsReadOnly();
+        return AccountTypeHelpers.GetAllAccountTypes(userData);
     }
 
     /// <inheritdoc />
