@@ -17,7 +17,10 @@ internal static class TransactionCategoriesHelpers
     /// <returns>
     /// The name of the parent category if found; otherwise, an empty string.
     /// </returns>
-    internal static string GetParentCategory(string category, IEnumerable<ICategory> categories)
+    internal static string GetParentCategory(
+        string category,
+        IEnumerable<ITransactionCategory> categories
+    )
     {
         var foundCategory = categories.FirstOrDefault(c =>
             c.Value.Equals(category, StringComparison.CurrentCultureIgnoreCase)
@@ -42,7 +45,10 @@ internal static class TransactionCategoriesHelpers
     /// <returns>
     /// True if the specified category is a parent category; otherwise, false.
     /// </returns>
-    internal static bool GetIsParentCategory(string category, IEnumerable<ICategory> categories)
+    internal static bool GetIsParentCategory(
+        string category,
+        IEnumerable<ITransactionCategory> categories
+    )
     {
         if (string.IsNullOrEmpty(category))
         {
@@ -74,7 +80,10 @@ internal static class TransactionCategoriesHelpers
     /// <returns>
     /// A tuple with the parent and child categories. Child may be empty.
     /// </returns>
-    internal static (string parent, string child) GetFullCategory(string category, IEnumerable<ICategory> categories)
+    internal static (string parent, string child) GetFullCategory(
+        string category,
+        IEnumerable<ITransactionCategory> categories
+    )
     {
         var parentCategory = GetParentCategory(category, categories);
         var childCategory = GetIsParentCategory(category, categories) ? string.Empty : category;
@@ -93,23 +102,23 @@ internal static class TransactionCategoriesHelpers
     /// <returns>
     /// A read-only list containing all applicable categories.
     /// </returns>
-    internal static IReadOnlyList<ICategory> GetAllTransactionCategories(ApplicationUser userData)
+    internal static IReadOnlyList<ITransactionCategoryResponse> GetAllTransactionCategories(
+        ApplicationUser userData
+    )
     {
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase()
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
+        var allTransactionCategories = new List<ITransactionCategoryResponse>();
+        allTransactionCategories.AddRange(
+            userData.TransactionCategories.Select(tc => new CategoryResponse(tc)).ToList()
+        );
 
-        var disableBuiltInTransactionCategories =
-            userData.UserSettings?.DisableBuiltInTransactionCategories ?? false;
-
-        var allCategories = new List<ICategory>();
-        if (!disableBuiltInTransactionCategories)
+        if (userData.UserSettings?.DisableBuiltInTransactionCategories != true)
         {
-            allCategories.AddRange(TransactionCategoriesConstants.DefaultTransactionCategories);
+            allTransactionCategories.AddRange(
+                TransactionCategoriesConstants
+                    .DefaultTransactionCategories.Select(tc => new CategoryResponse(tc))
+                    .ToList()
+            );
         }
-        allCategories.AddRange(customCategories);
-        return allCategories;
+        return allTransactionCategories;
     }
 }

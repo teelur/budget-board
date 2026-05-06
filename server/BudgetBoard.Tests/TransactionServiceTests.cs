@@ -1160,10 +1160,10 @@ public class TransactionServiceTests
 
         var mlModel = AutomaticTransactionCategorizerHelper.Train(trainingTransactions);
 
-        var allCategories = new List<ICategory>
+        var allCategories = new List<ITransactionCategory>
         {
-            new CategoryBase { Value = "Dining", Parent = string.Empty },
-            new CategoryBase { Value = "Transportation", Parent = string.Empty },
+            new TransactionCategoryBase { Value = "Dining", Parent = string.Empty },
+            new TransactionCategoryBase { Value = "Transportation", Parent = string.Empty },
         };
 
         var autoCategorizer = new AutomaticTransactionCategorizerHelper(mlModel);
@@ -1259,10 +1259,10 @@ public class TransactionServiceTests
 
         var mlModel = AutomaticTransactionCategorizerHelper.Train(trainingTransactions);
 
-        var allCategories = new List<ICategory>
+        var allCategories = new List<ITransactionCategory>
         {
-            new CategoryBase { Value = "Dining", Parent = string.Empty },
-            new CategoryBase { Value = "Transportation", Parent = string.Empty },
+            new TransactionCategoryBase { Value = "Dining", Parent = string.Empty },
+            new TransactionCategoryBase { Value = "Transportation", Parent = string.Empty },
         };
 
         var autoCategorizer = new AutomaticTransactionCategorizerHelper(mlModel);

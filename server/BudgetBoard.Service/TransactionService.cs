@@ -22,7 +22,7 @@ public class TransactionService(
     public async Task CreateTransactionAsync(
         ApplicationUser userData,
         ITransactionCreateRequest request,
-        IEnumerable<ICategory>? allCategories = null,
+        IEnumerable<ITransactionCategory>? allCategories = null,
         AutomaticTransactionCategorizerHelper? autoCategorizer = null
     )
     {
@@ -109,7 +109,7 @@ public class TransactionService(
     public async Task CreateTransactionAsync(
         Guid userGuid,
         ITransactionCreateRequest request,
-        IEnumerable<ICategory>? allCategories = null,
+        IEnumerable<ITransactionCategory>? allCategories = null,
         AutomaticTransactionCategorizerHelper? autoCategorizer = null
     )
     {

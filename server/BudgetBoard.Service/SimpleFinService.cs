@@ -649,7 +649,7 @@ public class SimpleFinService(
         ApplicationUser userData,
         SimpleFinAccount simpleFinAccount,
         IEnumerable<ISimpleFinTransactionData> transactionsData,
-        IEnumerable<ICategory> allCategories,
+        IEnumerable<ITransactionCategory> allCategories,
         AutomaticTransactionCategorizerHelper? autoCategorizer
     )
     {

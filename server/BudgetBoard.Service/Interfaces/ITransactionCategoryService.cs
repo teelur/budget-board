@@ -12,25 +12,21 @@ public interface ITransactionCategoryService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The category creation details.</param>
-    Task CreateTransactionCategoryAsync(Guid userGuid, ICategoryCreateRequest request);
+    Task CreateTransactionCategoryAsync(Guid userGuid, ITransactionCategoryCreateRequest request);
 
     /// <summary>
     /// Retrieves transaction categories for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="categoryGuid">Optional. The unique identifier of a specific category to retrieve.</param>
     /// <returns>A collection of category details.</returns>
-    Task<IReadOnlyList<ICategoryResponse>> ReadTransactionCategoriesAsync(
-        Guid userGuid,
-        Guid categoryGuid = default
-    );
+    Task<IReadOnlyList<ITransactionCategoryResponse>> ReadTransactionCategoriesAsync(Guid userGuid);
 
     /// <summary>
     /// Updates an existing transaction category.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The category update details.</param>
-    Task UpdateTransactionCategoryAsync(Guid userGuid, ICategoryUpdateRequest request);
+    Task UpdateTransactionCategoryAsync(Guid userGuid, ITransactionCategoryUpdateRequest request);
 
     /// <summary>
     /// Deletes a transaction category.
