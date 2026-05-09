@@ -27,7 +27,7 @@ const FilterCard = (): React.ReactNode => {
     currencySymbol,
   } = useLocale();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
 
   return (
     <Card elevation={1}>

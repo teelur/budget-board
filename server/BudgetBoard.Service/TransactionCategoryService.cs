@@ -128,7 +128,7 @@ public class TransactionCategoryService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        return userData.TransactionCategories.Select(c => new CategoryResponse(c)).ToList();
+        return TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
     }
 
     /// <inheritdoc />

@@ -1,9 +1,12 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
-import { Button, LoadingOverlay, Switch, Stack, Group } from "@mantine/core";
+import {
+  transactionCategoriesQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
+import { Button, LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { ICategoryCreateRequest } from "~/models/category";
+import { CategoryTypes, ICategoryCreateRequest } from "~/models/category";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
@@ -11,7 +14,6 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import Card from "~/components/core/Card/Card";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 
@@ -19,7 +21,7 @@ const AddCategory = (): React.ReactNode => {
   const [isChildCategory, setIsChildCategory] = React.useState(false);
 
   const { t } = useTranslation();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories } = useTransactionCategories();
 
   const nameField = useField<string>({
     initialValue: "",
@@ -27,6 +29,9 @@ const AddCategory = (): React.ReactNode => {
   });
   const parentField = useField<string>({
     initialValue: "",
+  });
+  const categoryTypeField = useField<string>({
+    initialValue: CategoryTypes.Expense,
   });
 
   const { request } = useAuth();
@@ -40,7 +45,13 @@ const AddCategory = (): React.ReactNode => {
         data: category,
       }),
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ["transactionCategories"] });
+      await queryClient.invalidateQueries({
+        queryKey: [transactionCategoriesQueryKey],
+      });
+      nameField.reset();
+      parentField.reset();
+      categoryTypeField.setValue(CategoryTypes.Expense);
+      setIsChildCategory(false);
     },
     onError: (error: AxiosError) =>
       notifications.show({
@@ -49,9 +60,19 @@ const AddCategory = (): React.ReactNode => {
       }),
   });
 
-  const parentCategories = transactionCategories.filter(
+  const parentCategories = allTransactionCategories.filter(
     (category) => category.parent?.length === 0,
   );
+
+  const getCategoryTypeForSubmit = (): string => {
+    if (isChildCategory) {
+      const parent = allTransactionCategories.find(
+        (c) => c.value.toLowerCase() === parentField.getValue().toLowerCase(),
+      );
+      return parent?.categoryType ?? categoryTypeField.getValue();
+    }
+    return categoryTypeField.getValue();
+  };
 
   return (
     <Card elevation={1}>
@@ -62,32 +83,49 @@ const AddCategory = (): React.ReactNode => {
           label={<PrimaryText size="sm">{t("category_name")}</PrimaryText>}
           elevation={1}
         />
-        <Stack gap="0.5rem" justify="center">
+        <Stack gap="0.25rem" justify="center">
           <PrimaryText size="sm">{t("category_type")}</PrimaryText>
-          <Group gap="0.5rem">
-            <DimmedText size="sm">{t("parent")}</DimmedText>
-            <Switch
-              checked={isChildCategory}
-              onChange={(event) => {
-                setIsChildCategory(event.currentTarget.checked);
-                if (!event.currentTarget.checked) {
-                  parentField.setValue("");
-                }
-              }}
-              size="md"
-            />
-            <DimmedText size="sm">{t("child")}</DimmedText>
-          </Group>
+          <SegmentedControl
+            color="var(--mantine-primary-color-filled)"
+            radius="md"
+            value={isChildCategory ? "child" : "parent"}
+            onChange={(val) => {
+              const child = val === "child";
+              setIsChildCategory(child);
+              if (!child) {
+                parentField.reset();
+              }
+            }}
+            data={[
+              { label: t("parent"), value: "parent" },
+              { label: t("child"), value: "child" },
+            ]}
+          />
         </Stack>
-        {isChildCategory && (
+        {isChildCategory ? (
           <Stack gap="0.25rem">
             <PrimaryText size="sm">{t("parent_category")}</PrimaryText>
             <CategorySelect
               w="100%"
               categories={parentCategories}
-              {...parentField.getInputProps()}
+              value={parentField.getValue()}
+              onChange={(val: string) => parentField.setValue(val)}
               withinPortal
               elevation={1}
+            />
+          </Stack>
+        ) : (
+          <Stack gap="0.25rem">
+            <PrimaryText size="sm">{t("classification")}</PrimaryText>
+            <SegmentedControl
+              color="var(--mantine-primary-color-filled)"
+              radius="md"
+              value={categoryTypeField.getValue()}
+              onChange={(val) => categoryTypeField.setValue(val)}
+              data={[
+                { label: t("expense"), value: CategoryTypes.Expense },
+                { label: t("income"), value: CategoryTypes.Income },
+              ]}
             />
           </Stack>
         )}
@@ -97,6 +135,7 @@ const AddCategory = (): React.ReactNode => {
             doAddCategory.mutate({
               value: nameField.getValue(),
               parent: parentField.getValue(),
+              categoryType: getCategoryTypeForSubmit(),
             })
           }
         >

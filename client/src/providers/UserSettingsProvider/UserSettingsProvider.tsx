@@ -8,12 +8,16 @@ import { useTranslation } from "react-i18next";
 export interface UserSettingsContextValue {
   preferredCurrency: string;
   preferredLanguage: string;
+  disableBuiltInAccountTypes: boolean;
+  disableBuiltInTransactionCategories: boolean;
 }
 
 export const UserSettingsContext =
   React.createContext<UserSettingsContextValue>({
     preferredCurrency: "USD",
     preferredLanguage: "default",
+    disableBuiltInAccountTypes: false,
+    disableBuiltInTransactionCategories: false,
   });
 
 export const UserSettingsProvider = ({
@@ -56,6 +60,10 @@ export const UserSettingsProvider = ({
   const userSettingsValue: UserSettingsContextValue = {
     preferredCurrency: userSettingsQuery.data?.currency ?? "USD",
     preferredLanguage: userSettingsQuery.data?.language ?? "default",
+    disableBuiltInAccountTypes:
+      userSettingsQuery.data?.disableBuiltInAccountTypes ?? false,
+    disableBuiltInTransactionCategories:
+      userSettingsQuery.data?.disableBuiltInTransactionCategories ?? false,
   };
 
   return (

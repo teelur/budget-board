@@ -20,7 +20,7 @@ const Transactions = (): React.ReactNode => {
     ITransaction[]
   >([]);
 
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
 
   const onToggleSelect = (id: string) => {
     setSelectedIds((prev) => {

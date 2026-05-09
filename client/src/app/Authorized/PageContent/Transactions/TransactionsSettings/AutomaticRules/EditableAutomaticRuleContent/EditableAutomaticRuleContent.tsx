@@ -29,7 +29,7 @@ const EditableAutomaticRuleContent = (
     TransactionFields.find((field) => field.value === "merchant")?.value ?? "";
 
   const { t } = useTranslation();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
 
   const addNewCondition = () => {
     props.setConditionItems((prev) => [

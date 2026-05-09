@@ -35,7 +35,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({

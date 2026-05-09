@@ -32,7 +32,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({
