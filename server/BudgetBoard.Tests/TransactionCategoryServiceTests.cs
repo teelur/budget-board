@@ -277,7 +277,7 @@ public class TransactionCategoryServiceTests
     }
 
     [Fact]
-    public async Task ReadTransactionCategoriesAsync_WhenCalledWithValidData_ShouldReturnCategories()
+    public async Task ReadTransactionCategoriesAsync_WhenCalledWithValidData_ShouldReturnCustomAndDefaultCategories()
     {
         // Arrange
         var helper = new TestHelper();
@@ -301,7 +301,60 @@ public class TransactionCategoryServiceTests
         );
 
         // Assert
-        result.Should().BeEquivalentTo(transactionCategories.Select(t => new CategoryResponse(t)));
+        var expectedCustomCategories = transactionCategories.Select(t => new CategoryResponse(t));
+        var expectedDefaultCategories =
+            TransactionCategoriesConstants.DefaultTransactionCategories.Select(
+                tc => new CategoryResponse(tc)
+            );
+        var expectedAll = expectedCustomCategories.Concat(expectedDefaultCategories);
+
+        result.Should().BeEquivalentTo(expectedAll);
+    }
+
+    [Fact]
+    public async Task ReadTransactionCategoriesAsync_WhenDefaultsDisabled_ShouldReturnOnlyCustomCategories()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        // Disable built-in categories
+        var userSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInTransactionCategories = true,
+        };
+        helper.UserDataContext.UserSettings.Add(userSettings);
+        helper.demoUser.UserSettings = userSettings;
+        helper.UserDataContext.SaveChanges();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
+        var transactionCategories = transactionCategoryFaker.Generate(5);
+
+        helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var result = await transactionCategoryService.ReadTransactionCategoriesAsync(
+            helper.demoUser.Id
+        );
+
+        // Assert
+        var expectedCustomCategories = transactionCategories.Select(t => new CategoryResponse(t));
+        result.Should().BeEquivalentTo(expectedCustomCategories);
+        result
+            .Should()
+            .NotContainEquivalentOf(
+                new CategoryResponse(
+                    TransactionCategoriesConstants.DefaultTransactionCategories.First()
+                )
+            );
     }
 
     [Fact]
