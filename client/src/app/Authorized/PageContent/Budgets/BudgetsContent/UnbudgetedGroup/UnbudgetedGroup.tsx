@@ -1,7 +1,12 @@
 import { Accordion as MantineAccordion, Group, Stack } from "@mantine/core";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
-import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
+import {
+  CategoryNode,
+  CategoryTypes,
+  ICategory,
+  ICategoryNode,
+} from "~/models/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +24,7 @@ interface UnbudgetedGroupProps {
   categories: ICategory[];
   selectedDate: Date | null;
   openDetails: (category: string, month: Date | null) => void;
+  showUncategorized?: boolean;
 }
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
@@ -48,12 +54,18 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
         category.value.toLocaleLowerCase(),
       );
       return acc + (categoryTotal ? categoryTotal : 0);
-    }, 0) + (props.categoryToTransactionsTotalMap.get("") ?? 0);
+    }, 0) +
+    (props.showUncategorized
+      ? (props.categoryToTransactionsTotalMap.get("") ?? 0)
+      : 0);
 
   const getUnbudgetedCards = (): React.ReactNode[] => {
     const cards: React.ReactNode[] = [];
 
-    if (props.categoryToTransactionsTotalMap.has("")) {
+    if (
+      props.showUncategorized &&
+      props.categoryToTransactionsTotalMap.has("")
+    ) {
       cards.push(
         <UnbudgetedCard
           key="uncategorized"
@@ -61,6 +73,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
             new CategoryNode({
               value: "",
               parent: "",
+              categoryType: CategoryTypes.Expense,
             })
           }
           categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}

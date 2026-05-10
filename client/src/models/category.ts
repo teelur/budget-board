@@ -34,7 +34,7 @@ export class CategoryNode implements ICategoryNode {
   parent: string;
   categoryType: string;
 
-  constructor(category?: ITransactionCategory) {
+  constructor(category?: ICategory & { categoryType?: string }) {
     this.value = category?.value ?? "";
     this.parent = category?.parent ?? "";
     this.categoryType = category?.categoryType ?? CategoryTypes.Expense;

@@ -8,7 +8,7 @@ import { uncategorizedTransactionCategory } from "~/models/transaction";
  * @returns An array of CategoryNode which each contain an array of its children.
  */
 export const buildCategoriesTree = (
-  categories: ICategory[]
+  categories: ICategory[],
 ): CategoryNode[] => {
   const roots: CategoryNode[] = [];
 
@@ -24,7 +24,7 @@ export const buildCategoriesTree = (
     .filter((c) => c.parent.length !== 0)
     .forEach((category) => {
       const parent: CategoryNode | undefined = roots.find((c) =>
-        areStringsEqual(c.value, category.parent)
+        areStringsEqual(c.value, category.parent),
       );
 
       if (parent) {
@@ -33,7 +33,7 @@ export const buildCategoriesTree = (
     });
 
   roots.sort((a, b) =>
-    a.value.toLocaleLowerCase().localeCompare(b.value.toLocaleLowerCase())
+    a.value.toLocaleLowerCase().localeCompare(b.value.toLocaleLowerCase()),
   );
 
   return roots;
@@ -51,10 +51,10 @@ export const buildCategoriesTree = (
  */
 export const getFormattedCategoryValue = (
   categoryString: string,
-  categories: ICategory[]
+  categories: ICategory[],
 ): string => {
   const foundCategory = categories.find((c) =>
-    areStringsEqual(c.value, categoryString)
+    areStringsEqual(c.value, categoryString),
   );
 
   return foundCategory?.value ?? uncategorizedTransactionCategory;
@@ -73,7 +73,7 @@ export const getFormattedCategoryValue = (
  */
 export const getIsParentCategory = (
   categoryValue: string,
-  categories: ICategory[]
+  categories: ICategory[],
 ): boolean => {
   // Handle the special case for "Uncategorized"
   if (areStringsEqual(categoryValue, uncategorizedTransactionCategory)) {
@@ -96,7 +96,7 @@ export const getIsParentCategory = (
  */
 export const getParentCategory = (
   categoryValue: string,
-  categories: ICategory[]
+  categories: ICategory[],
 ): string => {
   // Handle the special case for "Uncategorized"
   if (areStringsEqual(categoryValue, uncategorizedTransactionCategory)) {
@@ -104,7 +104,7 @@ export const getParentCategory = (
   }
 
   const category = categories.find((c) =>
-    areStringsEqual(c.value, categoryValue)
+    areStringsEqual(c.value, categoryValue),
   );
 
   if (category == null) {
@@ -125,6 +125,6 @@ export const getParentCategory = (
  */
 export const getSubCategories = (
   categoryValue: string,
-  categories: ICategory[]
+  categories: ICategory[],
 ): ICategory[] =>
   categories.filter((c) => areStringsEqual(c.parent, categoryValue));

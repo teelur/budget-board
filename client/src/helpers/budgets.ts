@@ -1,5 +1,10 @@
 import { CashFlowValue, IBudget } from "~/models/budget";
-import { CategoryNode, ICategory, ICategoryNode } from "~/models/category";
+import {
+  CategoryNode,
+  ICategory,
+  ICategoryNode,
+  ITransactionCategory,
+} from "~/models/category";
 import { areStringsEqual } from "./utils";
 import {
   getFormattedCategoryValue,
@@ -26,7 +31,7 @@ export enum BudgetGroup {
  */
 export const getCashFlowValue = (
   timeToMonthlyTotalsMap: Map<number, number>,
-  date: Date
+  date: Date,
 ): CashFlowValue => {
   const cashFlow = timeToMonthlyTotalsMap.get(date.getTime()) ?? 0;
   if (cashFlow > 0) {
@@ -64,11 +69,11 @@ export const getBudgetGroupForCategory = (category: string): BudgetGroup => {
  */
 export const getSignForBudget = (
   category: string,
-  transactionCategories: ICategory[]
+  transactionCategories: ICategory[],
 ): number => {
   switch (
     getBudgetGroupForCategory(
-      getParentCategory(category, transactionCategories)
+      getParentCategory(category, transactionCategories),
     )
   ) {
     case BudgetGroup.Spending:
@@ -90,7 +95,7 @@ export const getSignForBudget = (
 export const getBudgetsForGroup = (
   budgetData: IBudget[] | undefined,
   budgetGroup: BudgetGroup,
-  transactionCategories: ICategory[]
+  transactionCategories: ICategory[],
 ): IBudget[] => {
   if (budgetData == null) {
     return [];
@@ -101,8 +106,8 @@ export const getBudgetsForGroup = (
       budgetData.filter((b) =>
         areStringsEqual(
           getParentCategory(b.category, transactionCategories),
-          "income"
-        )
+          "income",
+        ),
       ) ?? []
     );
   } else if (budgetGroup === BudgetGroup.Spending) {
@@ -111,8 +116,8 @@ export const getBudgetsForGroup = (
         (b) =>
           !areStringsEqual(
             getParentCategory(b.category, transactionCategories),
-            "income"
-          )
+            "income",
+          ),
       ) ?? []
     );
   }
@@ -140,7 +145,7 @@ export const getStatusColor = (
   amount: number,
   total: number,
   type: StatusColorType,
-  warningThreshold: number
+  warningThreshold: number,
 ): string => {
   if (type === StatusColorType.Income) {
     if (amount < total) {
@@ -195,7 +200,7 @@ export const getStatusColor = (
 export const getBudgetAmount = (
   budgetCategory: string,
   categoryToTransactionsTotalMap: Map<string, number>,
-  categories: ICategory[]
+  categories: ICategory[],
 ): number => {
   if (getIsParentCategory(budgetCategory, categories)) {
     const children = getSubCategories(budgetCategory, categories);
@@ -204,9 +209,9 @@ export const getBudgetAmount = (
       (acc, category) =>
         acc +
         (categoryToTransactionsTotalMap.get(
-          category.value.toLocaleLowerCase()
+          category.value.toLocaleLowerCase(),
         ) ?? 0),
-      0
+      0,
     );
 
     return (
@@ -228,7 +233,7 @@ export const getBudgetAmount = (
  * @returns {Map<string, IBudget[]>} - A map from category to list of budgets.
  */
 export const buildCategoryToBudgetsMap = (
-  budgets: IBudget[]
+  budgets: IBudget[],
 ): Map<string, IBudget[]> =>
   budgets
     .sort((a: IBudget, b: IBudget) => {
@@ -245,7 +250,7 @@ export const buildCategoryToBudgetsMap = (
           ...(budgetMap.get(item.category.toLocaleLowerCase()) || []),
           item,
         ]),
-      new Map()
+      new Map(),
     );
 
 /**
@@ -260,7 +265,7 @@ export const buildCategoryToBudgetsMap = (
  */
 export const buildBudgetCategoryTree = (
   budgets: IBudget[],
-  categories: ICategory[]
+  categories: ITransactionCategory[],
 ): ICategoryNode[] => {
   const categoryTree: ICategoryNode[] = [];
 
@@ -269,20 +274,23 @@ export const buildBudgetCategoryTree = (
 
     if (
       !categoryTree.some((category) =>
-        areStringsEqual(category.value, parentCategory)
+        areStringsEqual(category.value, parentCategory),
       )
     ) {
       categoryTree.push(
         new CategoryNode({
           value: getFormattedCategoryValue(parentCategory, categories),
           parent: "",
-        })
+          categoryType:
+            categories.find((c) => areStringsEqual(c.value, parentCategory))
+              ?.categoryType ?? "expense",
+        }),
       );
     }
 
     if (!getIsParentCategory(budget.category, categories)) {
       const parent = categoryTree.find((category) =>
-        areStringsEqual(category.value, parentCategory)
+        areStringsEqual(category.value, parentCategory),
       );
 
       if (parent) {
@@ -290,7 +298,10 @@ export const buildBudgetCategoryTree = (
           new CategoryNode({
             value: getFormattedCategoryValue(budget.category, categories),
             parent: parentCategory,
-          })
+            categoryType:
+              categories.find((c) => areStringsEqual(c.value, budget.category))
+                ?.categoryType ?? "expense",
+          }),
         );
       }
     }
@@ -301,7 +312,7 @@ export const buildBudgetCategoryTree = (
 
 export const getTotalLimitForCategory = (
   budgets: IBudget[],
-  category: ICategoryNode
+  category: ICategoryNode,
 ): number => {
   if (budgets.some((b) => areStringsEqual(b.category, category.value))) {
     return budgets.reduce((total, budget) => {
@@ -316,7 +327,7 @@ export const getTotalLimitForCategory = (
   return budgets.reduce((total, budget) => {
     if (
       category.subCategories.some((subCategory) =>
-        areStringsEqual(subCategory.value, budget.category)
+        areStringsEqual(subCategory.value, budget.category),
       )
     ) {
       return total + budget.limit;
@@ -328,7 +339,7 @@ export const getTotalLimitForCategory = (
 
 export const buildCategoryToLimitsMap = (
   budgets: IBudget[],
-  categories: ICategoryNode[]
+  categories: ICategoryNode[],
 ): Map<string, number> => {
   const categoryToLimitsMap = new Map<string, number>();
 
@@ -337,12 +348,12 @@ export const buildCategoryToLimitsMap = (
       categoryToLimitsMap.set(
         budget.category.toLocaleLowerCase(),
         categoryToLimitsMap.get(budget.category.toLocaleLowerCase())! +
-          budget.limit
+          budget.limit,
       );
     } else {
       categoryToLimitsMap.set(
         budget.category.toLocaleLowerCase(),
-        budget.limit
+        budget.limit,
       );
     }
 
@@ -365,12 +376,12 @@ export const buildCategoryToLimitsMap = (
         categoryToLimitsMap.set(
           parentCategory.toLocaleLowerCase(),
           categoryToLimitsMap.get(parentCategory.toLocaleLowerCase())! +
-            budget.limit
+            budget.limit,
         );
       } else {
         categoryToLimitsMap.set(
           parentCategory.toLocaleLowerCase(),
-          budget.limit
+          budget.limit,
         );
       }
     }
