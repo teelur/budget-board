@@ -110,7 +110,7 @@ const CustomCategoryCard = (
               elevation={1}
             />
             <Stack gap="0.25rem" justify="center">
-              <PrimaryText size="sm">{t("category_type")}</PrimaryText>
+              <PrimaryText size="sm">{t("category_level")}</PrimaryText>
               <SegmentedControl
                 color="var(--mantine-primary-color-filled)"
                 radius="md"
@@ -181,13 +181,11 @@ const CustomCategoryCard = (
               <PrimaryText size="sm">{props.category.value}</PrimaryText>
             )}
             {props.isBuiltIn && <Badge size="xs">{t("built_in")}</Badge>}
-            {!props.isChildCard && (
-              <Badge size="xs" variant="outline">
-                {props.category.categoryType === CategoryTypes.Income
-                  ? t("income")
-                  : t("expense")}
-              </Badge>
-            )}
+            <Badge size="xs" variant="outline">
+              {props.category.categoryType === CategoryTypes.Income
+                ? t("income")
+                : t("expense")}
+            </Badge>
           </Group>
           <Flex justify="flex-end" flex="1 1 auto" gap="0.25rem">
             {!props.isBuiltIn && (

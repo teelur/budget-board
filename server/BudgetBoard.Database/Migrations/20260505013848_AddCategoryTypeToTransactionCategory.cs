@@ -21,6 +21,11 @@ namespace BudgetBoard.Database.Migrations
                 "UPDATE \"TransactionCategory\" SET \"CategoryType\" = 'expense' WHERE \"CategoryType\" IS NULL;"
             );
 
+            // Clean up deleted transactions by setting category and subcategory to null
+            migrationBuilder.Sql(
+                "UPDATE \"Transaction\" SET \"Category\" = NULL, \"Subcategory\" = NULL WHERE \"Deleted\" IS NOT NULL;"
+            );
+
             migrationBuilder.AlterColumn<string>(
                 name: "CategoryType",
                 table: "TransactionCategory",

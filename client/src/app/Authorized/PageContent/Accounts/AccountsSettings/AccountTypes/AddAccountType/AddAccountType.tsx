@@ -81,7 +81,7 @@ const AddAccountType = (): React.ReactNode => {
           elevation={1}
         />
         <Stack gap="0.25rem" justify="center">
-          <PrimaryText size="sm">{t("category_type")}</PrimaryText>
+          <PrimaryText size="sm">{t("category_level")}</PrimaryText>
           <SegmentedControl
             color="var(--mantine-primary-color-filled)"
             radius="md"

@@ -55,7 +55,7 @@ const CategorySelectBase = ({
 
   const categoriesTree = React.useMemo(
     () => buildCategoriesTree(categories),
-    [categories]
+    [categories],
   );
 
   const buildCategoriesOptions = (categoriesTree: ICategoryNode[]) => {
@@ -83,7 +83,7 @@ const CategorySelectBase = ({
                 {category.value}
               </CategoryOptionText>
             </Group>
-          </Combobox.Option>
+          </Combobox.Option>,
         );
       }
       if (category?.subCategories.length > 0) {
@@ -92,9 +92,9 @@ const CategorySelectBase = ({
             category.subCategories.sort((a, b) =>
               a.value
                 .toLocaleLowerCase()
-                .localeCompare(b.value.toLocaleLowerCase())
-            )
-          )
+                .localeCompare(b.value.toLocaleLowerCase()),
+            ),
+          ),
         );
       }
     });
@@ -130,7 +130,7 @@ const CategorySelectBase = ({
               {uncategorizedTransactionCategory}
             </CategoryOptionText>
           </Group>
-        </Combobox.Option>
+        </Combobox.Option>,
       );
     }
     return options;
