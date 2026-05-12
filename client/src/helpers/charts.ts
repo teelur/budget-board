@@ -104,7 +104,6 @@ export const buildSpendingCategoryChartData = (
 ) => {
   const filteredTransactions = transactions.filter(
     (transaction) =>
-      !areStringsEqual(transaction.category ?? "", "Income") &&
       !areStringsEqual(transaction.category ?? "", hiddenTransactionCategory),
   );
 
@@ -141,7 +140,6 @@ export const buildSpendingSubcategoryChartData = (
 ): any[] => {
   const filteredTransactions = transactions.filter(
     (transaction) =>
-      !areStringsEqual(transaction.category ?? "", "Income") &&
       !areStringsEqual(transaction.category ?? "", hiddenTransactionCategory),
   );
 

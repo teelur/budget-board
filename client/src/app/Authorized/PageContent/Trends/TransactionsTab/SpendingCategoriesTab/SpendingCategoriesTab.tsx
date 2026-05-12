@@ -14,6 +14,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTranslation } from "react-i18next";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { CategoryTypes } from "~/models/category";
 
 const SpendingCategoriesTab = (): React.ReactNode => {
   const { request } = useAuth();
@@ -71,6 +72,21 @@ const SpendingCategoriesTab = (): React.ReactNode => {
         })
       : transactionsWithoutHidden;
 
+  const expenseCategoryValues = new Set(
+    transactionCategories
+      .filter(
+        (c) => c.parent === "" && c.categoryType === CategoryTypes.Expense,
+      )
+      .map((c) => c.value.toLowerCase()),
+  );
+
+  const expenseTransactions = transactionsForSelectedMonths.filter(
+    (tx) =>
+      tx.category == null ||
+      tx.category === "" ||
+      expenseCategoryValues.has(tx.category.toLowerCase()),
+  );
+
   return (
     <Stack p="0.5rem" gap="1rem">
       <MonthToolcards
@@ -123,7 +139,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
       </Group>
       <Flex justify="center">
         <SpendingCategoriesChart
-          transactions={transactionsForSelectedMonths}
+          transactions={expenseTransactions}
           categories={transactionCategories}
           showSubcategories={showSubcategories}
           isPending={transactionsQuery.isPending}
