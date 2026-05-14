@@ -19,11 +19,6 @@ public class TransactionCategoryServiceTests
             .RuleFor(c => c.Value, f => f.Random.String(20))
             .RuleFor(c => c.Parent, f => f.Random.String(20));
 
-    private readonly Faker<TransactionCategoryUpdateRequest> _categoryUpdateRequestFaker =
-        new Faker<TransactionCategoryUpdateRequest>()
-            .RuleFor(c => c.Value, f => f.Random.String(20))
-            .RuleFor(c => c.Parent, f => f.Random.String(20));
-
     [Fact]
     public async Task CreateTransactionCategoryAsync_WhenCalledWithValidData_ShouldCreateCategory()
     {
@@ -258,8 +253,7 @@ public class TransactionCategoryServiceTests
 
         var categoryCreateRequest = _categoryCreateRequestFaker.Generate();
         categoryCreateRequest.Parent = TransactionCategoriesConstants
-            .DefaultTransactionCategories.Where(tc => tc.Parent.Length == 0)
-            .First()
+            .DefaultTransactionCategories.First(tc => tc.Parent.Length == 0)
             .Value;
 
         // Act
@@ -317,7 +311,6 @@ public class TransactionCategoryServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        // Disable built-in categories
         var userSettings = new UserSettings
         {
             UserID = helper.demoUser.Id,
@@ -379,9 +372,13 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = transactionCategories.First().ID;
-        categoryUpdateRequest.Parent = transactionCategories.First().Parent;
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            ID = transactionCategories.First().ID,
+            Value = "NewValue",
+            Parent = transactionCategories.Last().Parent,
+            CategoryType = transactionCategories.First().CategoryType,
+        };
 
         // Act
         await transactionCategoryService.UpdateTransactionCategoryAsync(
@@ -415,8 +412,7 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = Guid.NewGuid();
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest { ID = Guid.NewGuid() };
 
         // Act
         Func<Task> act = async () =>
@@ -450,9 +446,13 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = transactionCategories.First().ID;
-        categoryUpdateRequest.Value = transactionCategories.Last().Value;
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            ID = transactionCategories.First().ID,
+            Value = transactionCategories.Last().Value,
+            Parent = transactionCategories.First().Parent,
+            CategoryType = transactionCategories.First().CategoryType,
+        };
 
         // Act
         Func<Task> act = async () =>
@@ -465,6 +465,45 @@ public class TransactionCategoryServiceTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("TransactionCategoryUpdateDuplicateNameError");
+    }
+
+    [Fact]
+    public async Task UpdateTransactionCategoryAsync_WhenUpdatedWithSameName_ShouldNotThrowDuplicate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
+        var category = transactionCategoryFaker.Generate();
+        category.Parent = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value;
+
+        helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.SaveChanges();
+
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            CategoryType = category.CategoryType,
+            ID = category.ID,
+            Value = category.Value,
+            Parent = category.Parent,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionCategoryService.UpdateTransactionCategoryAsync(
+                helper.demoUser.Id,
+                categoryUpdateRequest
+            );
+
+        // Assert
+        await act.Should().NotThrowAsync();
     }
 
     [Fact]
@@ -486,9 +525,13 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = transactionCategories.First().ID;
-        categoryUpdateRequest.Value = string.Empty;
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            ID = transactionCategories.First().ID,
+            Parent = transactionCategories.First().Parent,
+            Value = string.Empty,
+            CategoryType = transactionCategories.First().CategoryType,
+        };
 
         // Act
         Func<Task> act = async () =>
@@ -522,9 +565,13 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = transactionCategories.First().ID;
-        categoryUpdateRequest.Parent = categoryUpdateRequest.Value;
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            ID = transactionCategories.First().ID,
+            Parent = transactionCategories.First().Parent,
+            Value = transactionCategories.First().Parent,
+            CategoryType = transactionCategories.First().CategoryType,
+        };
 
         // Act
         Func<Task> act = async () =>
@@ -558,9 +605,12 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = transactionCategories.First().ID;
-        categoryUpdateRequest.Parent = "NonExistentParent";
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            ID = transactionCategories.First().ID,
+            Value = transactionCategories.First().Value,
+            Parent = "NonExistentParent",
+        };
 
         // Act
         Func<Task> act = async () =>
@@ -576,7 +626,7 @@ public class TransactionCategoryServiceTests
     }
 
     [Fact]
-    public async Task DeleteTransactionCategoryAsync_WhenCalledWithValidData_ShouldDeleteCategory()
+    public async Task UpdateTransactionCategoryAsync_WhenCalledWithInvalidCategoryType_ShouldThrowError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -590,24 +640,34 @@ public class TransactionCategoryServiceTests
 
         var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
         var transactionCategories = transactionCategoryFaker.Generate(5);
-        for (var i = 1; i < transactionCategories.Count; i++)
-        {
-            transactionCategories[i].Parent = transactionCategories.First().Value;
-        }
+        transactionCategories.ForEach(tc =>
+            tc.Parent = TransactionCategoriesConstants
+                .DefaultTransactionCategories.First(dtc => string.IsNullOrEmpty(dtc.Parent))
+                .Value
+        );
 
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
 
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            ID = transactionCategories.First().ID,
+            Value = transactionCategories.First().Value,
+            Parent = transactionCategories.First().Parent,
+            CategoryType = "InvalidCategoryType",
+        };
+
         // Act
-        await transactionCategoryService.DeleteTransactionCategoryAsync(
-            helper.demoUser.Id,
-            transactionCategories.Last().ID
-        );
+        Func<Task> act = async () =>
+            await transactionCategoryService.UpdateTransactionCategoryAsync(
+                helper.demoUser.Id,
+                categoryUpdateRequest
+            );
 
         // Assert
-        helper
-            .UserDataContext.TransactionCategories.Should()
-            .NotContainEquivalentOf(transactionCategories.Last());
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionCategoryInvalidTypeError");
     }
 
     [Fact]
@@ -640,9 +700,13 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = category.ID;
-        categoryUpdateRequest.Parent = category.Parent;
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            ID = category.ID,
+            Value = "NewCategoryValue",
+            Parent = category.Parent,
+            CategoryType = category.CategoryType,
+        };
 
         // Act
         await transactionCategoryService.UpdateTransactionCategoryAsync(
@@ -685,9 +749,13 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.Budgets.AddRange(budgets);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = category.ID;
-        categoryUpdateRequest.Parent = category.Parent;
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            Value = "NewCategoryValue",
+            Parent = category.Parent,
+            CategoryType = category.CategoryType,
+            ID = category.ID,
+        };
 
         // Act
         await transactionCategoryService.UpdateTransactionCategoryAsync(
@@ -727,9 +795,13 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.AutomaticRules.Add(rule);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = category.ID;
-        categoryUpdateRequest.Parent = category.Parent;
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            Value = "NewCategoryValue",
+            Parent = category.Parent,
+            CategoryType = category.CategoryType,
+            ID = category.ID,
+        };
 
         // Act
         await transactionCategoryService.UpdateTransactionCategoryAsync(
@@ -742,6 +814,59 @@ public class TransactionCategoryServiceTests
             .UserDataContext.RuleActions.First(a => a.ID == categoryAction.ID)
             .Value.Should()
             .Be(categoryUpdateRequest.Value);
+    }
+
+    [Fact]
+    public async Task UpdateTransactionCategoryAsync_WhenRenamedAndReparented_ShouldUpdateChildrenCategoryType()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
+        var parentCategory = transactionCategoryFaker.Generate();
+
+        // Top-level category (no parent) so ResolveCategoryType uses the supplied CategoryType directly
+        parentCategory.Parent = string.Empty;
+        parentCategory.CategoryType = TransactionCategoryTypes.Expense;
+
+        var children = transactionCategoryFaker.Generate(3);
+        children.ForEach(c =>
+        {
+            c.Parent = parentCategory.Value;
+            c.CategoryType = TransactionCategoryTypes.Expense;
+        });
+
+        helper.UserDataContext.TransactionCategories.Add(parentCategory);
+        helper.UserDataContext.TransactionCategories.AddRange(children);
+        helper.UserDataContext.SaveChanges();
+
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            Value = "NewParentValue",
+            Parent = string.Empty,
+            CategoryType = TransactionCategoryTypes.Income,
+            ID = parentCategory.ID,
+        };
+
+        // Act
+        await transactionCategoryService.UpdateTransactionCategoryAsync(
+            helper.demoUser.Id,
+            categoryUpdateRequest
+        );
+
+        // Assert
+        var childIds = children.Select(c => c.ID).ToHashSet();
+        helper
+            .UserDataContext.TransactionCategories.Where(c => childIds.Contains(c.ID))
+            .Should()
+            .AllSatisfy(c => c.CategoryType.Should().Be(TransactionCategoryTypes.Income));
     }
 
     [Fact]
@@ -768,9 +893,13 @@ public class TransactionCategoryServiceTests
         helper.UserDataContext.TransactionCategories.AddRange(children);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = parent.ID;
-        categoryUpdateRequest.Parent = parent.Parent;
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            Value = "NewParentValue",
+            CategoryType = parent.CategoryType,
+            ID = parent.ID,
+            Parent = parent.Parent,
+        };
 
         // Act
         await transactionCategoryService.UpdateTransactionCategoryAsync(
@@ -786,7 +915,7 @@ public class TransactionCategoryServiceTests
     }
 
     [Fact]
-    public async Task UpdateTransactionCategoryAsync_WhenUpdatedWithSameName_ShouldNotThrowDuplicate()
+    public async Task DeleteTransactionCategoryAsync_WhenCalledWithValidData_ShouldDeleteCategory()
     {
         // Arrange
         var helper = new TestHelper();
@@ -799,26 +928,25 @@ public class TransactionCategoryServiceTests
         );
 
         var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
-        var category = transactionCategoryFaker.Generate();
-        category.Parent = TransactionCategoriesConstants.DefaultTransactionCategories.First().Value;
+        var transactionCategories = transactionCategoryFaker.Generate(5);
+        for (var i = 1; i < transactionCategories.Count; i++)
+        {
+            transactionCategories[i].Parent = transactionCategories.First().Value;
+        }
 
-        helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);
         helper.UserDataContext.SaveChanges();
 
-        var categoryUpdateRequest = _categoryUpdateRequestFaker.Generate();
-        categoryUpdateRequest.ID = category.ID;
-        categoryUpdateRequest.Value = category.Value;
-        categoryUpdateRequest.Parent = category.Parent;
-
         // Act
-        Func<Task> act = async () =>
-            await transactionCategoryService.UpdateTransactionCategoryAsync(
-                helper.demoUser.Id,
-                categoryUpdateRequest
-            );
+        await transactionCategoryService.DeleteTransactionCategoryAsync(
+            helper.demoUser.Id,
+            transactionCategories.Last().ID
+        );
 
         // Assert
-        await act.Should().NotThrowAsync();
+        helper
+            .UserDataContext.TransactionCategories.Should()
+            .NotContainEquivalentOf(transactionCategories.Last());
     }
 
     [Fact]
@@ -909,15 +1037,23 @@ public class TransactionCategoryServiceTests
         var category = transactionCategoryFaker.Generate();
         category.Parent = string.Empty;
 
+        var subcategory = transactionCategoryFaker.Generate();
+        subcategory.Parent = category.Value;
+
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(5);
-        transactions.ForEach(t => t.Subcategory = category.Value);
+        transactions.ForEach(t => t.Subcategory = subcategory.Value);
+        transactions.ForEach(t => t.Category = subcategory.Parent);
+
+        var parentTransactions = transactionFaker.Generate(5);
+        parentTransactions.ForEach(t => t.Category = category.Value);
 
         helper.UserDataContext.TransactionCategories.Add(category);
         helper.UserDataContext.Transactions.AddRange(transactions);
+        helper.UserDataContext.Transactions.AddRange(parentTransactions);
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
 
@@ -931,6 +1067,7 @@ public class TransactionCategoryServiceTests
         helper
             .UserDataContext.Transactions.Should()
             .AllSatisfy(t => t.Subcategory.Should().BeNull());
+        helper.UserDataContext.Transactions.Should().AllSatisfy(t => t.Category.Should().BeNull());
     }
 
     [Fact]
@@ -950,11 +1087,17 @@ public class TransactionCategoryServiceTests
         var category = transactionCategoryFaker.Generate();
         category.Parent = string.Empty;
 
+        var subcategory = transactionCategoryFaker.Generate();
+        subcategory.Parent = category.Value;
+
         var budgetFaker = new BudgetFaker(helper.demoUser.Id);
         var budgets = budgetFaker.Generate(5);
         budgets.ForEach(b => b.Category = category.Value);
+        budgets.First().Category = subcategory.Value;
+        budgets.Last().Category = subcategory.Value;
 
         helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.TransactionCategories.Add(subcategory);
         helper.UserDataContext.Budgets.AddRange(budgets);
         helper.UserDataContext.SaveChanges();
 

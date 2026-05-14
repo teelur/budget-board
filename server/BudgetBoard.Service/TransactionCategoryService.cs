@@ -185,7 +185,7 @@ public class TransactionCategoryService(
 
         UpdateChildrenCategoryType(
             userData.TransactionCategories,
-            request.Value,
+            oldValue,
             transactionCategory.CategoryType
         );
         UpdateChildrenParentValue(userData.TransactionCategories, oldValue, request.Value);
@@ -314,33 +314,21 @@ public class TransactionCategoryService(
             ICollection<Category> categories,
             string parentValue,
             string newCategoryType
-        )
-        {
-            foreach (
-                var child in categories.Where(c =>
-                    c.Parent.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                child.CategoryType = newCategoryType;
-            }
-        }
+        ) =>
+            categories
+                .Where(c => c.Parent.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
+                .ToList()
+                .ForEach(c => c.CategoryType = newCategoryType);
 
         static void UpdateChildrenParentValue(
             ICollection<Category> categories,
             string oldParentValue,
             string newParentValue
-        )
-        {
-            foreach (
-                var child in categories.Where(c =>
-                    c.Parent.Equals(oldParentValue, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                child.Parent = newParentValue;
-            }
-        }
+        ) =>
+            categories
+                .Where(c => c.Parent.Equals(oldParentValue, StringComparison.OrdinalIgnoreCase))
+                .ToList()
+                .ForEach(c => c.Parent = newParentValue);
     }
 
     /// <inheritdoc />
@@ -357,12 +345,20 @@ public class TransactionCategoryService(
             );
         }
 
+        var allTransactionCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            userData
+        );
+
         RemoveChildrenUsingCategory(transactionCategory.Value);
         NullOutTransactionsUsingCategory(
             transactionCategory.Value,
             userData.Accounts.SelectMany(a => a.Transactions)
         );
-        RemoveBudgetsUsingCategory(transactionCategory.Value, userData.Budgets);
+        RemoveBudgetsUsingCategory(
+            transactionCategory.Value,
+            userData.Budgets,
+            allTransactionCategories
+        );
         UpdateRuleActionsUsingCategory(
             transactionCategory.Value,
             null,
@@ -385,7 +381,7 @@ public class TransactionCategoryService(
                     child.Value,
                     userData.Accounts.SelectMany(a => a.Transactions)
                 );
-                RemoveBudgetsUsingCategory(child.Value, userData.Budgets);
+                RemoveBudgetsUsingCategory(child.Value, userData.Budgets, allTransactionCategories);
                 UpdateRuleActionsUsingCategory(
                     child.Value,
                     null,
@@ -407,20 +403,23 @@ public class TransactionCategoryService(
                         value,
                         StringComparison.OrdinalIgnoreCase
                     )
-                )
-                    transaction.Category = null;
-
-                if (
-                    (transaction.Subcategory ?? string.Empty).Equals(
+                    || (transaction.Subcategory ?? string.Empty).Equals(
                         value,
                         StringComparison.OrdinalIgnoreCase
                     )
                 )
+                {
+                    transaction.Category = null;
                     transaction.Subcategory = null;
+                }
             }
         }
 
-        static void RemoveBudgetsUsingCategory(string value, ICollection<Budget> budgets)
+        static void RemoveBudgetsUsingCategory(
+            string value,
+            ICollection<Budget> budgets,
+            IEnumerable<ITransactionCategory> allCategories
+        )
         {
             var toRemove = budgets
                 .Where(b => b.Category.Equals(value, StringComparison.OrdinalIgnoreCase))
