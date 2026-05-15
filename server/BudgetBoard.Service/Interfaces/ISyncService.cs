@@ -1,4 +1,6 @@
-﻿namespace BudgetBoard.Service.Interfaces;
+﻿using BudgetBoard.Service.Models;
+
+namespace BudgetBoard.Service.Interfaces;
 
 /// <summary>
 /// Service interface for synchronizing financial data.
@@ -12,7 +14,7 @@ public interface ISyncService
     /// The unique identifier of the user.
     /// </param>
     /// <returns>
-    /// A collection of messages or status updates regarding the sync process.
+    /// A collection of errors encountered during the sync process.
     /// </returns>
-    Task<IReadOnlyList<string>> SyncAsync(Guid userGuid);
+    Task<IReadOnlyList<SyncError>> SyncAsync(Guid userGuid);
 }

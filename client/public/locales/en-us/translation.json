@@ -466,6 +466,7 @@
   "step_3": "Step 3",
   "submit": "Submit",
   "sync": "Sync",
+  "syncErrorFromSource": "{{source}} Error",
   "sync_start_date_input": "Sync Start Date:",
   "sync_start_date_styled": "<0>Sync Start Date:</0><1>{{startDate}}</1>",
   "system_default": "System Default",

@@ -11,6 +11,7 @@ import {
   translateAxiosError,
 } from "~/helpers/requests";
 import { useTranslation } from "react-i18next";
+import { SyncError } from "~/models/sync";
 
 const SyncButton = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -37,10 +38,11 @@ const SyncButton = (): React.ReactNode => {
       });
       if ((data.data?.length ?? 0) > 0) {
         {
-          data.data.map((error: string) =>
+          data.data.map((error: SyncError) =>
             notifications.show({
               color: "var(--button-color-destructive)",
-              message: error,
+              title: t("syncErrorFromSource", { source: error.source }),
+              message: error.message,
             }),
           );
         }

@@ -107,6 +107,14 @@ public class SimpleFinAccountService(
             );
         }
 
+        if (accountToDelete.LinkedAccountId != null)
+        {
+            var linkedAccount = userData.Accounts.FirstOrDefault(a =>
+                a.ID == accountToDelete.LinkedAccountId
+            );
+            linkedAccount?.Source = AccountSource.Manual;
+        }
+
         userDataContext.SimpleFinAccounts.Remove(accountToDelete);
         await userDataContext.SaveChangesAsync();
     }
