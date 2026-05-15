@@ -151,7 +151,6 @@
   "delimiter_required_message": "Ein Trennzeichen wird benötigt.",
   "disable": "Deaktivieren",
   "disable_built_in_transaction_categories_description": "Sie können die im 'Budget Board' voreingestellten Transaktionskategorien deaktivieren. Dadurch werden sie aus allen Dropdown-Menüs zur Kategorieauswahl ausgeblendet und Sie können ausschließlich Ihre benutzerdefinierten Kategorien verwenden.",
-  "disable_built_in_transaction_categories_warning": "Hinweis: Dies kann zu Problemen mit bestehenden Transaktionen/Budgets führen, die diese Kategorien verwenden.",
   "disabled": "Deaktiviert",
   "disconnect_oidc_provider": "OIDC-Anbieter trennen",
   "does_not_contain": "Enthält nicht",

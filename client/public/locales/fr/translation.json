@@ -153,7 +153,6 @@
   "delimiter_required_message": "Un délimiteur est requis.",
   "disable": "Désactivé",
   "disable_built_in_transaction_categories_description": "Vous pouvez désactiver les catégories de transaction intégré a Budget Board. Cela les cachera dans la sélection des menus déroulant de toutes les catégories et vous permettra d'utiliser seulement vos catégories personnalisées.",
-  "disable_built_in_transaction_categories_warning": "Information : Cela peut créer des problèmes avec les transactions/budgets existants qui utilisent ces catégories.",
   "disabled": "Désactivé",
   "disconnect_oidc_provider": "Déconnecter le fournisseur OIDC",
   "does_not_contain": "Ne contient pas",
