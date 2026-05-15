@@ -1,7 +1,7 @@
 namespace BudgetBoard.Service.Models;
 
-public class SyncError
+public record SyncError(string Source, string Message)
 {
-    public string Source { get; set; } = string.Empty;
-    public string Message { get; set; } = string.Empty;
+    public SyncError()
+        : this(string.Empty, string.Empty) { }
 }
