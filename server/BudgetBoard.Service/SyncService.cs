@@ -37,13 +37,13 @@ public class SyncService(
             errors.AddRange(
                 (await simpleFinService.RefreshAccountsAsync(userGuid)).Select(e => new SyncError
                 {
-                    Source = "SimpleFin",
+                    Source = responseLocalizer["SimpleFin"],
                     Message = e,
                 })
             );
             errors.AddRange(
                 (await simpleFinService.SyncTransactionHistoryAsync(userGuid)).Select(
-                    e => new SyncError { Source = "SimpleFin", Message = e }
+                    e => new SyncError { Source = responseLocalizer["SimpleFin"], Message = e }
                 )
             );
         }
@@ -57,13 +57,13 @@ public class SyncService(
             errors.AddRange(
                 (await lunchFlowService.RefreshAccountsAsync(userGuid)).Select(e => new SyncError
                 {
-                    Source = "LunchFlow",
+                    Source = responseLocalizer["LunchFlow"],
                     Message = e,
                 })
             );
             errors.AddRange(
                 (await lunchFlowService.SyncTransactionHistoryAsync(userGuid)).Select(
-                    e => new SyncError { Source = "LunchFlow", Message = e }
+                    e => new SyncError { Source = responseLocalizer["LunchFlow"], Message = e }
                 )
             );
         }
