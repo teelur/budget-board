@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Models;
 
 namespace BudgetBoard.IntegrationTests.Fakers;
 
@@ -10,6 +11,7 @@ class TransactionCategoryFaker : Faker<Category>
         RuleFor(c => c.ID, f => f.Random.Guid())
             .RuleFor(c => c.Value, f => f.Random.String(20))
             .RuleFor(c => c.Parent, f => f.Random.String(20))
+            .RuleFor(c => c.CategoryType, f => f.PickRandom(TransactionCategoryTypes.AllTypes))
             .RuleFor(c => c.UserID, f => userID);
     }
 }

@@ -1,6 +1,6 @@
-export interface IAccountType {
-  value: string;
-  parent: string;
+import { ICategory } from "./category";
+
+export interface IAccountType extends ICategory {
   classification: string;
 }
 

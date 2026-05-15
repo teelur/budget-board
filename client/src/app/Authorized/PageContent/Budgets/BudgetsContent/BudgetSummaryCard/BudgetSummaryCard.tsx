@@ -14,7 +14,8 @@ interface BudgetSummaryCardProps {
   expenseCategories: ICategory[];
   budgets: IBudget[];
   categoryToTransactionsTotalMap: Map<string, number>;
-  unbudgetedCategoryTree: ICategory[];
+  unbudgetedIncomeCategoryTree: ICategory[];
+  unbudgetedExpenseCategoryTree: ICategory[];
   isPending: boolean;
 }
 
@@ -27,33 +28,36 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
   const incomeTransactionsTotal = props.incomeCategories.reduce(
     (acc, category) => {
       const transactionsTotal = props.categoryToTransactionsTotalMap.get(
-        category.value.toLocaleLowerCase()
+        category.value.toLocaleLowerCase(),
       );
       return acc + (transactionsTotal ?? 0);
     },
-    0
+    0,
   );
 
   const expenseBudgetsTotal = props.budgets
     .filter((b) =>
-      props.expenseCategories.some((c) => areStringsEqual(b.category, c.value))
+      props.expenseCategories.some((c) => areStringsEqual(b.category, c.value)),
     )
     .reduce((acc, b) => acc + b.limit, 0);
   const expenseTransactionsTotal = props.expenseCategories.reduce(
     (acc, category) => {
       const transactionsTotal = props.categoryToTransactionsTotalMap.get(
-        category.value.toLocaleLowerCase()
+        category.value.toLocaleLowerCase(),
       );
       return acc + (transactionsTotal ?? 0);
     },
-    0
+    0,
   );
 
   const unbudgetedTransactionsTotal =
-    props.unbudgetedCategoryTree
+    [
+      ...props.unbudgetedIncomeCategoryTree,
+      ...props.unbudgetedExpenseCategoryTree,
+    ]
       .map((category) => {
         const transactionsTotal = props.categoryToTransactionsTotalMap.get(
-          category.value.toLocaleLowerCase()
+          category.value.toLocaleLowerCase(),
         );
         return transactionsTotal ?? 0;
       })

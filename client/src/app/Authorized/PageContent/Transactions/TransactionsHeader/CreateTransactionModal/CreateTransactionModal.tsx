@@ -35,7 +35,7 @@ const CreateTransactionModal = (): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
   const dateField = useField<Date | null>({

@@ -20,21 +20,14 @@ public class TransactionCategoryController(
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
-    private readonly ILogger<TransactionCategoryController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly ITransactionCategoryService _transactionCategoryService =
-        transactionCategoryService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] CategoryCreateRequest category)
+    public async Task<IActionResult> Create([FromBody] TransactionCategoryCreateRequest category)
     {
         try
         {
-            await _transactionCategoryService.CreateTransactionCategoryAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await transactionCategoryService.CreateTransactionCategoryAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 category
             );
             return Ok();
@@ -45,8 +38,8 @@ public class TransactionCategoryController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -57,8 +50,8 @@ public class TransactionCategoryController(
         try
         {
             return Ok(
-                await _transactionCategoryService.ReadTransactionCategoriesAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
+                await transactionCategoryService.ReadTransactionCategoriesAsync(
+                    new Guid(userManager.GetUserId(User) ?? string.Empty)
                 )
             );
         }
@@ -68,19 +61,19 @@ public class TransactionCategoryController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] CategoryUpdateRequest category)
+    public async Task<IActionResult> Update([FromBody] TransactionCategoryUpdateRequest category)
     {
         try
         {
-            await _transactionCategoryService.UpdateTransactionCategoryAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await transactionCategoryService.UpdateTransactionCategoryAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 category
             );
             return Ok();
@@ -91,8 +84,8 @@ public class TransactionCategoryController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 
@@ -102,8 +95,8 @@ public class TransactionCategoryController(
     {
         try
         {
-            await _transactionCategoryService.DeleteTransactionCategoryAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await transactionCategoryService.DeleteTransactionCategoryAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 guid
             );
             return Ok();
@@ -114,8 +107,8 @@ public class TransactionCategoryController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
 }

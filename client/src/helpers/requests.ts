@@ -1,6 +1,8 @@
 import { AxiosError } from "axios";
 
 export const accountTypesQueryKey: string = "accountTypes";
+export const transactionsQueryKey: string = "transactions";
+export const transactionCategoriesQueryKey: string = "transactionCategories";
 export const simpleFinOrganizationQueryKey: string = "simpleFinOrganizations";
 export const simpleFinAccountQueryKey: string = "simpleFinAccounts";
 export const lunchFlowAccountQueryKey: string = "lunchFlowAccounts";

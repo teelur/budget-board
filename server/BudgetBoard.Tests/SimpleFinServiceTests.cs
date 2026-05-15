@@ -1256,7 +1256,7 @@ public class SimpleFinServiceTests
                 s.CreateTransactionAsync(
                     helper.demoUser,
                     It.IsAny<ITransactionCreateRequest>(),
-                    It.IsAny<IEnumerable<ICategory>>(),
+                    It.IsAny<IEnumerable<ITransactionCategory>>(),
                     null
                 ),
             Times.Once
@@ -1770,7 +1770,7 @@ public class SimpleFinServiceTests
                 s.CreateTransactionAsync(
                     It.Is<ApplicationUser>(u => u.Id == helper.demoUser.Id),
                     It.IsAny<ITransactionCreateRequest>(),
-                    It.IsAny<IEnumerable<ICategory>>(),
+                    It.IsAny<IEnumerable<ITransactionCategory>>(),
                     It.IsAny<AutomaticTransactionCategorizerHelper>()
                 ),
             Times.Exactly(2)
@@ -1945,7 +1945,7 @@ public class SimpleFinServiceTests
                 s.CreateTransactionAsync(
                     It.Is<ApplicationUser>(u => u.Id == helper.demoUser.Id),
                     It.IsAny<ITransactionCreateRequest>(),
-                    It.IsAny<IEnumerable<ICategory>>(),
+                    It.IsAny<IEnumerable<ITransactionCategory>>(),
                     It.IsAny<AutomaticTransactionCategorizerHelper>()
                 ),
             Times.Once

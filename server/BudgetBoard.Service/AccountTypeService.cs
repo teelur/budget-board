@@ -168,17 +168,6 @@ public class AccountTypeService(
 
         await userDataContext.SaveChangesAsync();
 
-        string ResolveClassification(
-            string parent,
-            string classification,
-            IEnumerable<IAccountTypeResponse> allAccountTypes
-        ) =>
-            string.IsNullOrEmpty(parent)
-                ? classification
-                : allAccountTypes
-                    .First(a => a.Value.Equals(parent, StringComparison.OrdinalIgnoreCase))
-                    .Classification;
-
         void ThrowIfValueAlreadyExists(
             string value,
             IEnumerable<IAccountTypeResponse> allAccountTypes
@@ -238,6 +227,17 @@ public class AccountTypeService(
             }
         }
 
+        string ResolveClassification(
+            string parent,
+            string classification,
+            IEnumerable<IAccountTypeResponse> allAccountTypes
+        ) =>
+            string.IsNullOrEmpty(parent)
+                ? classification
+                : allAccountTypes
+                    .First(a => a.Value.Equals(parent, StringComparison.OrdinalIgnoreCase))
+                    .Classification;
+
         static void UpdateAccountsUsingType(
             ICollection<Account> accounts,
             string oldType,
@@ -269,7 +269,6 @@ public class AccountTypeService(
             )
             {
                 child.Classification = newClassification;
-                UpdateChildrenClassification(accountTypes, child.Value, newClassification);
             }
         }
 

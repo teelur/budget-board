@@ -22,7 +22,7 @@ public class TransactionService(
     public async Task CreateTransactionAsync(
         ApplicationUser userData,
         ITransactionCreateRequest request,
-        IEnumerable<ICategory>? allCategories = null,
+        IEnumerable<ITransactionCategory>? allCategories = null,
         AutomaticTransactionCategorizerHelper? autoCategorizer = null
     )
     {
@@ -109,7 +109,7 @@ public class TransactionService(
     public async Task CreateTransactionAsync(
         Guid userGuid,
         ITransactionCreateRequest request,
-        IEnumerable<ICategory>? allCategories = null,
+        IEnumerable<ITransactionCategory>? allCategories = null,
         AutomaticTransactionCategorizerHelper? autoCategorizer = null
     )
     {
@@ -286,21 +286,7 @@ public class TransactionService(
             );
         }
 
-        transaction.Deleted = nowProvider.UtcNow;
-
-        Account account = transaction.Account!;
-        // Manual accounts need to manually update the balance
-        if (account.Source == AccountSource.Manual)
-        {
-            // Update all following balances to not include the deleted transaction.
-            var balancesAfterDeleted = account
-                .Balances.Where(b => b.Date >= transaction.Date)
-                .ToList();
-            foreach (var balance in balancesAfterDeleted)
-            {
-                balance.Amount -= transaction.Amount;
-            }
-        }
+        MarkTransactionAsDeleted(transaction);
 
         await userDataContext.SaveChangesAsync();
     }
@@ -336,19 +322,7 @@ public class TransactionService(
                 );
             }
 
-            transaction.Deleted = nowProvider.UtcNow;
-
-            Account account = transaction.Account!;
-            if (account.Source == AccountSource.Manual)
-            {
-                var balancesAfterDeleted = account
-                    .Balances.Where(b => b.Date >= transaction.Date)
-                    .ToList();
-                foreach (var balance in balancesAfterDeleted)
-                {
-                    balance.Amount -= transaction.Amount;
-                }
-            }
+            MarkTransactionAsDeleted(transaction);
         }
 
         await userDataContext.SaveChangesAsync();
@@ -542,6 +516,26 @@ public class TransactionService(
         foreach (var balance in balancesAfterNew)
         {
             balance.Amount += transaction.Amount;
+        }
+    }
+
+    private void MarkTransactionAsDeleted(Transaction transaction)
+    {
+        transaction.Deleted = nowProvider.UtcNow;
+        transaction.Category = null;
+        transaction.Subcategory = null;
+
+        Account account = transaction.Account!;
+
+        if (account.Source == AccountSource.Manual)
+        {
+            var balancesAfterDeleted = account
+                .Balances.Where(b => b.Date >= transaction.Date)
+                .ToList();
+            foreach (var balance in balancesAfterDeleted)
+            {
+                balance.Amount -= transaction.Amount;
+            }
         }
     }
 }

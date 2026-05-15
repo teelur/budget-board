@@ -231,11 +231,9 @@ public class BudgetService(
 
         _userDataContext.Budgets.Remove(budget);
 
-        var customCategories = userData.TransactionCategories.Select(tc => new CategoryBase
-        {
-            Value = tc.Value,
-            Parent = tc.Parent,
-        });
+        var customCategories = userData.TransactionCategories.Select(
+            tc => new TransactionCategoryBase { Value = tc.Value, Parent = tc.Parent }
+        );
 
         var allCategories =
             userData.UserSettings?.DisableBuiltInTransactionCategories == true
@@ -374,7 +372,7 @@ public class BudgetService(
         ApplicationUser userData,
         IBudgetCreateRequest childRequest,
         Budget childBudget,
-        IEnumerable<ICategory> allCategories
+        IEnumerable<ITransactionCategory> allCategories
     )
     {
         var parentCategory = TransactionCategoriesHelpers.GetParentCategory(

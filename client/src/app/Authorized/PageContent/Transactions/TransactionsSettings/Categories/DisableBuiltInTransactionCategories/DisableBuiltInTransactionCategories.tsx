@@ -1,35 +1,43 @@
 import { Button, Skeleton, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
 import {
-  IUserSettings,
-  IUserSettingsUpdateRequest,
-} from "~/models/userSettings";
+  transactionCategoriesQueryKey,
+  transactionsQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
+import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { defaultGuid } from "~/models/applicationUser";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { ITransaction } from "~/models/transaction";
+import { AxiosResponse } from "axios";
 
 const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
+  const { allTransactionCategories, customTransactionCategories } =
+    useTransactionCategories();
+  const { disableBuiltInTransactionCategories } = useUserSettings();
 
-  const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
+  const transactionsQuery = useQuery({
+    queryKey: [transactionsQueryKey, { getHidden: false }],
+    queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
-        url: "/api/userSettings",
+        url: "/api/transaction",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data as IUserSettings;
+        return res.data as ITransaction[];
       }
 
-      return undefined;
+      return [];
     },
   });
 
@@ -43,6 +51,9 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      await queryClient.invalidateQueries({
+        queryKey: [transactionCategoriesQueryKey],
+      });
     },
     onError: (error: any) => {
       notifications.show({
@@ -52,8 +63,46 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
     },
   });
 
-  if (userSettingsQuery.isPending) {
+  if (transactionsQuery.isPending) {
     return <Skeleton height={75} radius="md" />;
+  }
+
+  const builtInCategoryValues = new Set(
+    allTransactionCategories
+      .filter((c) => c.id === defaultGuid)
+      .map((c) => c.value.toLowerCase()),
+  );
+
+  const transactionsUsingBuiltIn = (transactionsQuery.data ?? []).filter(
+    (tx) =>
+      (tx.category != null &&
+        builtInCategoryValues.has(tx.category.toLowerCase())) ||
+      (tx.subcategory != null &&
+        builtInCategoryValues.has(tx.subcategory.toLowerCase())),
+  );
+
+  const customCategoriesWithBuiltInParent = customTransactionCategories.filter(
+    (c) => c.parent !== "" && builtInCategoryValues.has(c.parent.toLowerCase()),
+  );
+
+  const canDisable =
+    transactionsUsingBuiltIn.length === 0 &&
+    customCategoriesWithBuiltInParent.length === 0;
+
+  const blockingReasons: string[] = [];
+  if (transactionsUsingBuiltIn.length > 0) {
+    blockingReasons.push(
+      t("disable_built_in_transaction_categories_blocked_transactions", {
+        count: transactionsUsingBuiltIn.length,
+      }),
+    );
+  }
+  if (customCategoriesWithBuiltInParent.length > 0) {
+    blockingReasons.push(
+      t("disable_built_in_transaction_categories_blocked_custom_categories", {
+        count: customCategoriesWithBuiltInParent.length,
+      }),
+    );
   }
 
   return (
@@ -64,28 +113,30 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
       <DimmedText size="xs">
         {t("disable_built_in_transaction_categories_description")}
       </DimmedText>
-      <DimmedText size="xs">
-        {t("disable_built_in_transaction_categories_warning")}
-      </DimmedText>
+      {!canDisable &&
+        blockingReasons.map((reason, i) => (
+          <PrimaryText key={i} size="xs">
+            {reason}
+          </PrimaryText>
+        ))}
       <Button
         bg={
-          userSettingsQuery.data?.disableBuiltInTransactionCategories
+          disableBuiltInTransactionCategories
             ? "var(--button-color-destructive)"
             : ""
         }
         variant="primary"
         size="xs"
+        disabled={!disableBuiltInTransactionCategories && !canDisable}
         loading={doUpdateUserSettings.isPending}
         onClick={() => {
           doUpdateUserSettings.mutate({
             disableBuiltInTransactionCategories:
-              !userSettingsQuery.data?.disableBuiltInTransactionCategories,
+              !disableBuiltInTransactionCategories,
           } as IUserSettingsUpdateRequest);
         }}
       >
-        {userSettingsQuery.data?.disableBuiltInTransactionCategories
-          ? t("disabled")
-          : t("enabled")}
+        {disableBuiltInTransactionCategories ? t("disabled") : t("enabled")}
       </Button>
     </Stack>
   );
