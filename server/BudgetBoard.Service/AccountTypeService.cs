@@ -159,11 +159,7 @@ public class AccountTypeService(
 
         UpdateAccountsUsingType(userData.Accounts, oldValue, request.Value);
 
-        UpdateChildrenClassification(
-            userData.AccountTypes,
-            request.Value,
-            accountType.Classification
-        );
+        UpdateChildrenClassification(userData.AccountTypes, oldValue, accountType.Classification);
         UpdateChildrenParentValue(userData.AccountTypes, oldValue, request.Value);
 
         await userDataContext.SaveChangesAsync();
