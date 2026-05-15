@@ -306,6 +306,41 @@ public class LunchFlowAccountServiceTests()
     }
 
     [Fact]
+    public async Task DeleteLunchFlowAccountAsync_WhenLinkedAccountExists_ShouldResetLinkedAccountSourceToManual()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var lunchFlowAccountService = new LunchFlowAccountService(
+            Mock.Of<ILogger<ILunchFlowAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var linkedAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        linkedAccount.Source = AccountSource.LunchFlow;
+
+        var lunchFlowAccount = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccount.LinkedAccountId = linkedAccount.ID;
+
+        helper.UserDataContext.Accounts.Add(linkedAccount);
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await lunchFlowAccountService.DeleteLunchFlowAccountAsync(
+            helper.demoUser.Id,
+            lunchFlowAccount.ID
+        );
+
+        // Assert
+        var updatedLinkedAccount = helper.UserDataContext.Accounts.First(a =>
+            a.ID == linkedAccount.ID
+        );
+        updatedLinkedAccount.Source.Should().Be(AccountSource.Manual);
+    }
+
+    [Fact]
     public async Task DeleteLunchFlowAccountAsync_WhenAccountNotFound_ShouldThrowException()
     {
         // Arrange
