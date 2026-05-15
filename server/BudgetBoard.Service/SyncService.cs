@@ -24,9 +24,9 @@ public class SyncService(
 ) : ISyncService
 {
     /// <inheritdoc />
-    public async Task<IReadOnlyList<string>> SyncAsync(Guid userGuid)
+    public async Task<IReadOnlyList<SyncError>> SyncAsync(Guid userGuid)
     {
-        var errors = new List<string>();
+        var errors = new List<SyncError>();
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         // The external sync provider update changed how the Source is determined. Need to reconcile existing accounts.
@@ -34,8 +34,18 @@ public class SyncService(
 
         if (!string.IsNullOrEmpty(userData.SimpleFinAccessToken))
         {
-            errors.AddRange(await simpleFinService.RefreshAccountsAsync(userGuid));
-            errors.AddRange(await simpleFinService.SyncTransactionHistoryAsync(userGuid));
+            errors.AddRange(
+                (await simpleFinService.RefreshAccountsAsync(userGuid)).Select(e => new SyncError
+                {
+                    Source = "SimpleFin",
+                    Message = e,
+                })
+            );
+            errors.AddRange(
+                (await simpleFinService.SyncTransactionHistoryAsync(userGuid)).Select(
+                    e => new SyncError { Source = "SimpleFin", Message = e }
+                )
+            );
         }
         else
         {
@@ -44,8 +54,18 @@ public class SyncService(
 
         if (!string.IsNullOrEmpty(userData.LunchFlowApiKey))
         {
-            errors.AddRange(await lunchFlowService.RefreshAccountsAsync(userGuid));
-            errors.AddRange(await lunchFlowService.SyncTransactionHistoryAsync(userGuid));
+            errors.AddRange(
+                (await lunchFlowService.RefreshAccountsAsync(userGuid)).Select(e => new SyncError
+                {
+                    Source = "LunchFlow",
+                    Message = e,
+                })
+            );
+            errors.AddRange(
+                (await lunchFlowService.SyncTransactionHistoryAsync(userGuid)).Select(
+                    e => new SyncError { Source = "LunchFlow", Message = e }
+                )
+            );
         }
         else
         {
