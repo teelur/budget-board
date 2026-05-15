@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
@@ -135,6 +135,25 @@ const LunchFlowAccountCard = (
       });
     },
   });
+  const doDeleteLunchFlowAccount = useMutation({
+    mutationFn: async (lunchFlowAccountGuid: string) =>
+      await request({
+        url: "/api/lunchFlowAccount",
+        method: "DELETE",
+        params: { lunchFlowAccountGuid },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
+      queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error),
+      });
+    },
+  });
 
   const getAccountNameForId = (accountId: string): string => {
     const account = accountsQuery.data?.find(
@@ -236,143 +255,163 @@ const LunchFlowAccountCard = (
     <Card elevation={2}>
       <LoadingOverlay
         visible={
-          doUpdateLinkedAccount.isPending || doUpdateSyncStartDate.isPending
+          doUpdateLinkedAccount.isPending ||
+          doUpdateSyncStartDate.isPending ||
+          doDeleteLunchFlowAccount.isPending
         }
       />
-      <Stack gap={0}>
-        <Group justify="space-between" align="center">
-          <Group gap="0.5rem">
-            <PrimaryText size="sm">{props.lunchFlowAccount.name}</PrimaryText>
-            <ActionIcon
-              variant={isEditable ? "outline" : "transparent"}
-              size="md"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggle();
-              }}
-            >
-              <PencilIcon size={16} />
-            </ActionIcon>
+      <Group w={"100%"} gap={"0.5rem"}>
+        <Stack gap={0} flex={1}>
+          <Group justify="space-between" align="center">
+            <Group gap="0.5rem">
+              <PrimaryText size="sm">{props.lunchFlowAccount.name}</PrimaryText>
+              <ActionIcon
+                variant={isEditable ? "outline" : "transparent"}
+                size="md"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggle();
+                }}
+              >
+                <PencilIcon size={16} />
+              </ActionIcon>
+            </Group>
+            <StatusText size="sm" amount={props.lunchFlowAccount.balance}>
+              {convertNumberToCurrency(
+                props.lunchFlowAccount.balance,
+                true,
+                accountCurrency,
+                SignDisplay.Auto,
+                intlLocale,
+              )}
+            </StatusText>
           </Group>
-          <StatusText size="sm" amount={props.lunchFlowAccount.balance}>
-            {convertNumberToCurrency(
-              props.lunchFlowAccount.balance,
-              true,
-              accountCurrency,
-              SignDisplay.Auto,
-              intlLocale,
-            )}
-          </StatusText>
-        </Group>
-        <Group justify="space-between" align="center">
-          <Group gap="0.5rem">
-            {isEditable ? (
-              <Group gap="0.5rem">
-                <PrimaryText size="xs">{t("linked_account_input")}</PrimaryText>
-                <Select
-                  size="xs"
-                  placeholder={t("select_an_account")}
-                  data={selectableAccounts}
-                  value={props.lunchFlowAccount.linkedAccountId}
-                  onChange={(value) => {
-                    doUpdateLinkedAccount.mutate({
-                      lunchFlowAccountGuid: props.lunchFlowAccount.id,
-                      linkedAccountGuid: value,
-                    });
-                  }}
-                  nothingFoundMessage={t("no_valid_accounts_found")}
-                  elevation={2}
-                />
-              </Group>
-            ) : (
-              <Group gap="0.25rem">
-                <Trans
-                  i18nKey="linked_account_styled"
-                  values={{
-                    accountName: props.lunchFlowAccount.linkedAccountId
-                      ? getAccountNameForId(
-                          props.lunchFlowAccount.linkedAccountId,
-                        )
-                      : t("none"),
-                  }}
-                  components={[
-                    <DimmedText size="xs" key="label" />,
-                    getBadgeForAccountName(),
-                  ]}
-                />
-                {isLinkedAccountDeleted && (
-                  <Badge size="sm" color="var(--button-color-destructive)">
-                    {t("deleted")}
-                  </Badge>
-                )}
-              </Group>
-            )}
-            {isEditable ? (
-              <Group gap="0.5rem">
-                <PrimaryText size="xs">
-                  {t("sync_start_date_input")}
-                </PrimaryText>
-                <DateInput
-                  size="xs"
-                  w="8rem"
-                  {...syncStartDateField.getInputProps()}
-                  onChange={(value) => {
-                    syncStartDateField.setValue(value);
-                    doUpdateSyncStartDate.mutate({
-                      lunchFlowAccountGuid: props.lunchFlowAccount.id,
-                      syncStartDate: dayjs(value).isValid()
-                        ? dayjs(value).toDate()
-                        : null,
-                    });
-                  }}
-                  clearable
-                  placeholder={t("auto")}
-                  valueFormat={dateFormat}
-                  locale={dayjsLocale}
-                  elevation={2}
-                />
-              </Group>
-            ) : (
-              <Group gap="0.25rem">
-                <Trans
-                  i18nKey="sync_start_date_styled"
-                  values={{
-                    startDate: dayjs(
-                      props.lunchFlowAccount.syncStartDate,
-                    ).isValid()
-                      ? dayjs(props.lunchFlowAccount.syncStartDate).format(
-                          `${dateFormat}`,
-                        )
-                      : t("auto"),
-                  }}
-                  components={[
-                    <DimmedText size="xs" key="label" />,
-                    getBadgeForSyncStartDate(),
-                  ]}
-                />
-              </Group>
-            )}
+          <Group justify="space-between" align="center">
+            <Group gap="0.5rem">
+              {isEditable ? (
+                <Group gap="0.5rem">
+                  <PrimaryText size="xs">
+                    {t("linked_account_input")}
+                  </PrimaryText>
+                  <Select
+                    size="xs"
+                    placeholder={t("select_an_account")}
+                    data={selectableAccounts}
+                    value={props.lunchFlowAccount.linkedAccountId}
+                    onChange={(value) => {
+                      doUpdateLinkedAccount.mutate({
+                        lunchFlowAccountGuid: props.lunchFlowAccount.id,
+                        linkedAccountGuid: value,
+                      });
+                    }}
+                    nothingFoundMessage={t("no_valid_accounts_found")}
+                    elevation={2}
+                  />
+                </Group>
+              ) : (
+                <Group gap="0.25rem">
+                  <Trans
+                    i18nKey="linked_account_styled"
+                    values={{
+                      accountName: props.lunchFlowAccount.linkedAccountId
+                        ? getAccountNameForId(
+                            props.lunchFlowAccount.linkedAccountId,
+                          )
+                        : t("none"),
+                    }}
+                    components={[
+                      <DimmedText size="xs" key="label" />,
+                      getBadgeForAccountName(),
+                    ]}
+                  />
+                  {isLinkedAccountDeleted && (
+                    <Badge size="sm" color="var(--button-color-destructive)">
+                      {t("deleted")}
+                    </Badge>
+                  )}
+                </Group>
+              )}
+              {isEditable ? (
+                <Group gap="0.5rem">
+                  <PrimaryText size="xs">
+                    {t("sync_start_date_input")}
+                  </PrimaryText>
+                  <DateInput
+                    size="xs"
+                    w="8rem"
+                    {...syncStartDateField.getInputProps()}
+                    onChange={(value) => {
+                      syncStartDateField.setValue(value);
+                      doUpdateSyncStartDate.mutate({
+                        lunchFlowAccountGuid: props.lunchFlowAccount.id,
+                        syncStartDate: dayjs(value).isValid()
+                          ? dayjs(value).toDate()
+                          : null,
+                      });
+                    }}
+                    clearable
+                    placeholder={t("auto")}
+                    valueFormat={dateFormat}
+                    locale={dayjsLocale}
+                    elevation={2}
+                  />
+                </Group>
+              ) : (
+                <Group gap="0.25rem">
+                  <Trans
+                    i18nKey="sync_start_date_styled"
+                    values={{
+                      startDate: dayjs(
+                        props.lunchFlowAccount.syncStartDate,
+                      ).isValid()
+                        ? dayjs(props.lunchFlowAccount.syncStartDate).format(
+                            `${dateFormat}`,
+                          )
+                        : t("auto"),
+                    }}
+                    components={[
+                      <DimmedText size="xs" key="label" />,
+                      getBadgeForSyncStartDate(),
+                    ]}
+                  />
+                </Group>
+              )}
+              <DimmedText size="xs">
+                {t("last_sync", {
+                  date: dayjs(props.lunchFlowAccount.lastSync).isValid()
+                    ? dayjs(props.lunchFlowAccount.lastSync).format(
+                        `${dateFormat} LT`,
+                      )
+                    : t("never"),
+                })}
+              </DimmedText>
+            </Group>
             <DimmedText size="xs">
-              {t("last_sync", {
-                date: dayjs(props.lunchFlowAccount.lastSync).isValid()
-                  ? dayjs(props.lunchFlowAccount.lastSync).format(
+              {t("last_updated", {
+                date: dayjs(props.lunchFlowAccount.balanceDate).isValid()
+                  ? dayjs(props.lunchFlowAccount.balanceDate).format(
                       `${dateFormat} LT`,
                     )
                   : t("never"),
               })}
             </DimmedText>
           </Group>
-          <DimmedText size="xs">
-            {t("last_updated", {
-              date: dayjs(props.lunchFlowAccount.balanceDate).isValid()
-                ? dayjs(props.lunchFlowAccount.balanceDate).format(
-                    `${dateFormat} LT`,
-                  )
-                : t("never"),
-            })}
-          </DimmedText>
-        </Group>
-      </Stack>
+        </Stack>
+        {isEditable && (
+          <Group style={{ alignSelf: "stretch" }}>
+            <ActionIcon
+              h="100%"
+              size="sm"
+              color="var(--button-color-destructive)"
+              onClick={() =>
+                doDeleteLunchFlowAccount.mutate(props.lunchFlowAccount.id)
+              }
+            >
+              <Trash2Icon size={16} />
+            </ActionIcon>
+          </Group>
+        )}
+      </Group>
     </Card>
   );
 };

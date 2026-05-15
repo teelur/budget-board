@@ -104,4 +104,27 @@ public class SimpleFinAccountController(
             return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
+
+    [HttpDelete]
+    [Authorize]
+    public async Task<IActionResult> Delete(Guid simpleFinAccountGuid)
+    {
+        try
+        {
+            await simpleFinAccountService.DeleteSimpleFinAccountAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                simpleFinAccountGuid
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
 }

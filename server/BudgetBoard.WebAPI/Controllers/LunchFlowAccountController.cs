@@ -104,4 +104,27 @@ public class LunchFlowAccountController(
             return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
         }
     }
+
+    [HttpDelete]
+    [Authorize]
+    public async Task<IActionResult> Delete(Guid lunchFlowAccountGuid)
+    {
+        try
+        {
+            await lunchFlowAccountService.DeleteLunchFlowAccountAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                lunchFlowAccountGuid
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+        }
+    }
 }

@@ -248,6 +248,43 @@ public class SimpleFinAccountServiceTests()
     }
 
     [Fact]
+    public async Task DeleteAccountAsync_WhenLinkedAccountExists_ShouldResetLinkedAccountSourceToManual()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organizationFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
+        var organization = organizationFaker.Generate();
+
+        var linkedAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        linkedAccount.Source = AccountSource.SimpleFIN;
+
+        var accountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
+        var account = accountFaker.Generate();
+        account.LinkedAccountId = linkedAccount.ID;
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.Accounts.Add(linkedAccount);
+        helper.UserDataContext.SimpleFinAccounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await simpleFinAccountService.DeleteSimpleFinAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        var updatedLinkedAccount = helper.UserDataContext.Accounts.First(a =>
+            a.ID == linkedAccount.ID
+        );
+        updatedLinkedAccount.Source.Should().Be(AccountSource.Manual);
+    }
+
+    [Fact]
     public async Task DeleteAccountAsync_WhenAccountNotFound_ShouldThrowException()
     {
         // Arrange

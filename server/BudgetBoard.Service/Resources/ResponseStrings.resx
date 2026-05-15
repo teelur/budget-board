@@ -361,6 +361,12 @@
   <data name="ValueRestoreNotFoundError" xml:space="preserve">
     <value>The value you are trying to restore does not exist.</value>
   </data>
+  <data name="SimpleFin" xml:space="preserve">
+    <value>SimpleFIN</value>
+  </data>
+  <data name="LunchFlow" xml:space="preserve">
+    <value>LunchFlow</value>
+  </data>
   <data name="SimpleFinDataNotFoundError" xml:space="preserve">
     <value>SimpleFIN data not found.</value>
   </data>

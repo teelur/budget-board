@@ -108,6 +108,14 @@ public class LunchFlowAccountService(
             );
         }
 
+        if (lunchFlowAccount.LinkedAccountId != null)
+        {
+            var linkedAccount = userData.Accounts.FirstOrDefault(a =>
+                a.ID == lunchFlowAccount.LinkedAccountId
+            );
+            linkedAccount?.Source = AccountSource.Manual;
+        }
+
         userData.LunchFlowAccounts.Remove(lunchFlowAccount);
         await userDataContext.SaveChangesAsync();
     }

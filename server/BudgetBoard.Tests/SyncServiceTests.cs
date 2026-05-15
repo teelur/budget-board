@@ -216,7 +216,11 @@ public class SyncServiceTests
         var errors = await syncService.SyncAsync(helper.demoUser.Id);
 
         // Assert
-        errors.Should().BeEquivalentTo(expectedErrors);
+        errors
+            .Should()
+            .BeEquivalentTo(
+                expectedErrors.Select(e => new SyncError { Source = "SimpleFin", Message = e })
+            );
     }
 
     [Fact]
@@ -251,7 +255,11 @@ public class SyncServiceTests
         var errors = await syncService.SyncAsync(helper.demoUser.Id);
 
         // Assert
-        errors.Should().BeEquivalentTo(expectedErrors);
+        errors
+            .Should()
+            .BeEquivalentTo(
+                expectedErrors.Select(e => new SyncError { Source = "SimpleFin", Message = e })
+            );
     }
 
     [Fact]
@@ -290,8 +298,16 @@ public class SyncServiceTests
 
         // Assert
         errors.Should().HaveCount(3);
-        errors.Should().Contain(accountErrors);
-        errors.Should().Contain(transactionErrors);
+        errors
+            .Should()
+            .Contain(
+                accountErrors.Select(e => new SyncError { Source = "SimpleFin", Message = e })
+            );
+        errors
+            .Should()
+            .Contain(
+                transactionErrors.Select(e => new SyncError { Source = "SimpleFin", Message = e })
+            );
     }
 
     [Fact]
@@ -677,8 +693,12 @@ public class SyncServiceTests
 
         // Assert
         errors.Should().HaveCount(2);
-        errors.Should().Contain("LunchFlow Error 1");
-        errors.Should().Contain("LunchFlow Error 2");
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "LunchFlow", Message = "LunchFlow Error 1" });
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "LunchFlow", Message = "LunchFlow Error 2" });
     }
 
     [Fact]
@@ -726,9 +746,15 @@ public class SyncServiceTests
 
         // Assert
         errors.Should().HaveCount(3);
-        errors.Should().Contain("Transaction Error 1");
-        errors.Should().Contain("Transaction Error 2");
-        errors.Should().Contain("Transaction Error 3");
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "LunchFlow", Message = "Transaction Error 1" });
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "LunchFlow", Message = "Transaction Error 2" });
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "LunchFlow", Message = "Transaction Error 3" });
     }
 
     [Fact]
@@ -771,8 +797,8 @@ public class SyncServiceTests
 
         // Assert
         errors.Should().HaveCount(2);
-        errors.Should().Contain("Refresh Error");
-        errors.Should().Contain("Sync Error");
+        errors.Should().Contain(new SyncError { Source = "LunchFlow", Message = "Refresh Error" });
+        errors.Should().Contain(new SyncError { Source = "LunchFlow", Message = "Sync Error" });
     }
 
     [Fact]
@@ -876,10 +902,18 @@ public class SyncServiceTests
 
         // Assert
         errors.Should().HaveCount(4);
-        errors.Should().Contain("SimpleFin Error 1");
-        errors.Should().Contain("SimpleFin Error 2");
-        errors.Should().Contain("LunchFlow Error 1");
-        errors.Should().Contain("LunchFlow Error 2");
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "SimpleFin", Message = "SimpleFin Error 1" });
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "SimpleFin", Message = "SimpleFin Error 2" });
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "LunchFlow", Message = "LunchFlow Error 1" });
+        errors
+            .Should()
+            .Contain(new SyncError { Source = "LunchFlow", Message = "LunchFlow Error 2" });
     }
 
     [Fact]
