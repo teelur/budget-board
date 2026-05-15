@@ -156,6 +156,8 @@ const SimpleFinAccountCard = (
       queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });
+      queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
     },
     onError: (error: any) => {
       notifications.show({
