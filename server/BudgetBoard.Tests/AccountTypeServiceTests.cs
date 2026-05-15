@@ -630,6 +630,50 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
+    public async Task UpdateAccountTypeAsync_WhenParentIsDifferentClassification_ShouldResolveClassification()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var accountType = accountTypeFaker.Generate();
+        accountType.Parent = string.Empty;
+        accountType.Classification = AccountClassifications.Liability;
+
+        helper.UserDataContext.AccountTypes.Add(accountType);
+        helper.UserDataContext.SaveChanges();
+
+        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
+        {
+            ID = accountType.ID,
+            Parent = AccountTypeConstants
+                .DefaultAccountTypes.First(at => at.Classification == AccountClassifications.Asset)
+                .Value,
+            Value = accountType.Value,
+            Classification = AccountClassifications.Liability,
+        };
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeUpdateRequest
+        );
+
+        // Assert
+        helper
+            .UserDataContext.AccountTypes.Single(at => at.ID == accountType.ID)
+            .Classification.Should()
+            .Be(AccountClassifications.Asset);
+    }
+
+    [Fact]
     public async Task UpdateAccountTypeAsync_WhenValueChanges_ShouldUpdateAccountsUsingThatType()
     {
         // Arrange
@@ -659,7 +703,7 @@ public class AccountTypeServiceTests
         {
             ID = accountType.ID,
             Parent = accountType.Parent,
-            Value = accountType.Value,
+            Value = "UpdatedAccountTypeValue",
         };
 
         // Act
