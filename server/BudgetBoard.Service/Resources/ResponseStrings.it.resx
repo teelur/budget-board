@@ -535,4 +535,10 @@
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
     <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
   </data>
+  <data name="SimpleFin" xml:space="preserve">
+    <value>SimpleFIN</value>
+  </data>
+  <data name="LunchFlow" xml:space="preserve">
+    <value>LunchFlow</value>
+  </data>
 </root>
