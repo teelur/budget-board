@@ -15,7 +15,7 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const Budgets = (): React.ReactNode => {
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
   const { dayjs } = useLocale();
   const { request } = useAuth();
 

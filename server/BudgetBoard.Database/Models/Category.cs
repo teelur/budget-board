@@ -21,6 +21,11 @@ public class Category
     public required string Parent { get; set; }
 
     /// <summary>
+    /// The category type.
+    /// </summary>
+    public string CategoryType { get; set; } = string.Empty;
+
+    /// <summary>
     /// Identifier for the user who owns the category.
     /// </summary>
     public required Guid UserID { get; set; }

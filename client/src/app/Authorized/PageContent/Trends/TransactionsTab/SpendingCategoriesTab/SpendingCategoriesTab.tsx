@@ -5,23 +5,23 @@ import {
   filterHiddenTransactions,
 } from "~/helpers/transactions";
 import { Button, Flex, Group, Stack } from "@mantine/core";
-import {
-  defaultTransactionCategories,
-  ITransaction,
-} from "~/models/transaction";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { ITransaction } from "~/models/transaction";
+import { useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import SpendingCategoriesChart from "~/components/Charts/SpendingCategoriesChart/SpendingCategoriesChart";
-import { ICategoryResponse } from "~/models/category";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTranslation } from "react-i18next";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { CategoryTypes } from "~/models/category";
 
 const SpendingCategoriesTab = (): React.ReactNode => {
   const { request } = useAuth();
   const { t } = useTranslation();
   const { dayjs } = useLocale();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
     dayjs().startOf("month").toDate(),
@@ -72,24 +72,19 @@ const SpendingCategoriesTab = (): React.ReactNode => {
         })
       : transactionsWithoutHidden;
 
-  const transactionCategoriesQuery = useQuery({
-    queryKey: ["transactionCategories"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
+  const expenseCategoryValues = new Set(
+    transactionCategories
+      .filter(
+        (c) => c.parent === "" && c.categoryType === CategoryTypes.Expense,
+      )
+      .map((c) => c.value.toLowerCase()),
+  );
 
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return undefined;
-    },
-  });
-
-  const transactionCategoriesWithCustom = defaultTransactionCategories.concat(
-    transactionCategoriesQuery.data ?? [],
+  const expenseTransactions = transactionsForSelectedMonths.filter(
+    (tx) =>
+      tx.category == null ||
+      tx.category === "" ||
+      expenseCategoryValues.has(tx.category.toLowerCase()),
   );
 
   return (
@@ -144,12 +139,10 @@ const SpendingCategoriesTab = (): React.ReactNode => {
       </Group>
       <Flex justify="center">
         <SpendingCategoriesChart
-          transactions={transactionsForSelectedMonths}
-          categories={transactionCategoriesWithCustom}
+          transactions={expenseTransactions}
+          categories={transactionCategories}
           showSubcategories={showSubcategories}
-          isPending={
-            transactionsQuery.isPending || transactionCategoriesQuery.isPending
-          }
+          isPending={transactionsQuery.isPending}
         />
       </Flex>
     </Stack>

@@ -259,7 +259,7 @@ public class AutomaticRuleService(
     private async Task<int> RunAutomaticRule(
         ApplicationUser userData,
         IAutomaticRuleCreateRequest rule,
-        IEnumerable<ICategory> allCategories
+        IEnumerable<ITransactionCategory> allCategories
     )
     {
         var matchedTransactions = GetMatchingTransactions(
@@ -285,7 +285,7 @@ public class AutomaticRuleService(
     private List<Transaction> GetMatchingTransactions(
         IEnumerable<IRuleParameterRequest> conditions,
         IEnumerable<Transaction> transactions,
-        IEnumerable<ICategory> allCategories
+        IEnumerable<ITransactionCategory> allCategories
     )
     {
         var matchedTransactions = transactions.Where(t =>
@@ -322,7 +322,7 @@ public class AutomaticRuleService(
     private async Task<int> ApplyActionsToTransactions(
         IEnumerable<IRuleParameterRequest> actions,
         IEnumerable<Transaction> transactions,
-        IEnumerable<ICategory> allCategories,
+        IEnumerable<ITransactionCategory> allCategories,
         Guid userId
     )
     {

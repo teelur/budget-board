@@ -1,7 +1,7 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
 import { IBudget } from "~/models/budget";
 import { buildCategoriesTree, getParentCategory } from "~/helpers/category";
-import { ICategory } from "~/models/category";
+import { CategoryTypes, ITransactionCategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import { buildCategoryToTransactionsTotalMap } from "~/helpers/transactions";
 import { BudgetGroup, getBudgetGroupForCategory } from "~/helpers/budgets";
@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
-  categories: ICategory[];
+  categories: ITransactionCategory[];
   transactions: ITransaction[];
   selectedDate: Date | null;
   isPending?: boolean;
@@ -27,7 +27,7 @@ interface BudgetsContentProps {
 const BudgetsContent = (props: BudgetsContentProps) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
-    null
+    null,
   );
   const [selectedMonth, setSelectedMonth] = React.useState<Date | null>(null);
 
@@ -42,25 +42,25 @@ const BudgetsContent = (props: BudgetsContentProps) => {
     (budget) =>
       BudgetGroup.Income ===
       getBudgetGroupForCategory(
-        getParentCategory(budget.category, props.categories)
-      )
+        getParentCategory(budget.category, props.categories),
+      ),
   );
   const incomeCategoryTree = categoryTree.filter((category) =>
-    areStringsEqual(category.value, "income")
+    areStringsEqual(category.value, "income"),
   );
   const expenseBudgets = props.budgets.filter(
     (budget) =>
       BudgetGroup.Spending ===
       getBudgetGroupForCategory(
-        getParentCategory(budget.category, props.categories)
-      )
+        getParentCategory(budget.category, props.categories),
+      ),
   );
   const expenseCategoryTree = categoryTree.filter(
     (category) =>
       !areStringsEqual(category.value, "income") &&
       props.budgets.some((budget) =>
-        areStringsEqual(budget.category, category.value)
-      )
+        areStringsEqual(budget.category, category.value),
+      ),
   );
 
   const unbudgetedCategoryTree = categoryTree.filter(
@@ -68,10 +68,17 @@ const BudgetsContent = (props: BudgetsContentProps) => {
       !props.budgets.some((budget) =>
         areStringsEqual(
           getParentCategory(budget.category, props.categories),
-          getParentCategory(category.value, props.categories)
-        )
+          getParentCategory(category.value, props.categories),
+        ),
       ) &&
-      categoryToTransactionsTotalMap.has(category.value.toLocaleLowerCase())
+      categoryToTransactionsTotalMap.has(category.value.toLocaleLowerCase()),
+  );
+
+  const unbudgetedIncomeCategoryTree = unbudgetedCategoryTree.filter(
+    (c) => c.categoryType === CategoryTypes.Income,
+  );
+  const unbudgetedExpenseCategoryTree = unbudgetedCategoryTree.filter(
+    (c) => c.categoryType !== CategoryTypes.Income,
   );
 
   const openBudgetDetails = (category: string, month: Date | null) => {
@@ -103,6 +110,17 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               openDetails={openBudgetDetails}
             />
           )}
+          {props.isPending ? (
+            <Skeleton h={65} radius="md" />
+          ) : (
+            <UnbudgetedGroup
+              categoryTree={unbudgetedIncomeCategoryTree}
+              categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+              categories={props.categories}
+              selectedDate={props.selectedDate}
+              openDetails={openBudgetDetails}
+            />
+          )}
         </Stack>
         <Stack gap="0.5rem">
           <BudgetsGroupHeader groupName={t("expenses")} />
@@ -118,18 +136,19 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               openDetails={openBudgetDetails}
             />
           )}
+          {props.isPending ? (
+            <Skeleton h={65} radius="md" />
+          ) : (
+            <UnbudgetedGroup
+              categoryTree={unbudgetedExpenseCategoryTree}
+              categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+              categories={props.categories}
+              selectedDate={props.selectedDate}
+              openDetails={openBudgetDetails}
+              showUncategorized
+            />
+          )}
         </Stack>
-        {props.isPending ? (
-          <Skeleton h={65} radius="md" />
-        ) : (
-          <UnbudgetedGroup
-            categoryTree={unbudgetedCategoryTree}
-            categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
-            categories={props.categories}
-            selectedDate={props.selectedDate}
-            openDetails={openBudgetDetails}
-          />
-        )}
       </Stack>
       <Stack
         style={{ flexGrow: 1 }}
@@ -141,7 +160,8 @@ const BudgetsContent = (props: BudgetsContentProps) => {
           expenseCategories={expenseCategoryTree}
           budgets={props.budgets}
           categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
-          unbudgetedCategoryTree={unbudgetedCategoryTree}
+          unbudgetedIncomeCategoryTree={unbudgetedIncomeCategoryTree}
+          unbudgetedExpenseCategoryTree={unbudgetedExpenseCategoryTree}
           isPending={props.isPending ?? false}
         />
         <FixParentBudgetButton

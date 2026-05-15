@@ -11,7 +11,7 @@ public static class AutomaticRuleHelpers
     public static IEnumerable<Transaction> FilterOnCondition(
         IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions,
-        IEnumerable<ICategory> allCategories,
+        IEnumerable<ITransactionCategory> allCategories,
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
@@ -65,7 +65,7 @@ public static class AutomaticRuleHelpers
     public static async Task<int> ApplyActionToTransactions(
         IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
-        IEnumerable<ICategory> allCategories,
+        IEnumerable<ITransactionCategory> allCategories,
         ITransactionService transactionService,
         Guid userGuid,
         IStringLocalizer<ResponseStrings> responseLocalizer
@@ -287,7 +287,7 @@ public static class AutomaticRuleHelpers
     private static IEnumerable<Transaction> FilterOnCategoryCondition(
         IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions,
-        IEnumerable<ICategory> allCategories,
+        IEnumerable<ITransactionCategory> allCategories,
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
@@ -498,7 +498,7 @@ public static class AutomaticRuleHelpers
     private static async Task<int> ApplyActionForCategory(
         IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
-        IEnumerable<ICategory> allCategories,
+        IEnumerable<ITransactionCategory> allCategories,
         ITransactionService transactionService,
         Guid userGuid,
         IStringLocalizer<ResponseStrings> responseLocalizer

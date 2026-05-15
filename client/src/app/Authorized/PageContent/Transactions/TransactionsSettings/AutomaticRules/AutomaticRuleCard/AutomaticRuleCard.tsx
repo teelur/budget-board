@@ -35,7 +35,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   );
 
   const { t } = useTranslation();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({

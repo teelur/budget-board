@@ -5,37 +5,20 @@ import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { accountTypesQueryKey, translateAxiosError } from "~/helpers/requests";
-import {
-  IUserSettings,
-  IUserSettingsUpdateRequest,
-} from "~/models/userSettings";
+import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { IAccountResponse } from "~/models/account";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { defaultGuid } from "~/models/applicationUser";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 const DisableBuiltInAccountTypes = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
   const { allAccountTypes, customAccountTypes } = useAccountTypes();
-
-  const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { disableBuiltInAccountTypes } = useUserSettings();
 
   const accountsQuery = useQuery({
     queryKey: ["accounts"],
@@ -73,7 +56,7 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
     },
   });
 
-  if (userSettingsQuery.isPending || accountsQuery.isPending) {
+  if (accountsQuery.isPending) {
     return <Skeleton height={75} radius="md" />;
   }
 
@@ -124,27 +107,18 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
           </PrimaryText>
         ))}
       <Button
-        bg={
-          userSettingsQuery.data?.disableBuiltInAccountTypes
-            ? "var(--button-color-destructive)"
-            : ""
-        }
+        bg={disableBuiltInAccountTypes ? "var(--button-color-destructive)" : ""}
         variant="primary"
         size="xs"
-        disabled={
-          !userSettingsQuery.data?.disableBuiltInAccountTypes && !canDisable
-        }
+        disabled={!disableBuiltInAccountTypes && !canDisable}
         loading={doUpdateUserSettings.isPending}
         onClick={() => {
           doUpdateUserSettings.mutate({
-            disableBuiltInAccountTypes:
-              !userSettingsQuery.data?.disableBuiltInAccountTypes,
+            disableBuiltInAccountTypes: !disableBuiltInAccountTypes,
           } as IUserSettingsUpdateRequest);
         }}
       >
-        {userSettingsQuery.data?.disableBuiltInAccountTypes
-          ? t("disabled")
-          : t("enabled")}
+        {disableBuiltInAccountTypes ? t("disabled") : t("enabled")}
       </Button>
     </Stack>
   );

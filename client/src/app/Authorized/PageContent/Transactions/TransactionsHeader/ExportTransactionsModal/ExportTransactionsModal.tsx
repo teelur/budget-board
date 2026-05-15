@@ -85,7 +85,7 @@ const ExportTransactionsModal = (): React.ReactNode => {
 
   const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
   const isMobile = useIsMobile();
 

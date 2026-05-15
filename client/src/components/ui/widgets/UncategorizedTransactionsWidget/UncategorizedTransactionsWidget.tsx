@@ -26,7 +26,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
   const { t } = useTranslation();
-  const { transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
 
