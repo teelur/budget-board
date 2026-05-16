@@ -56,6 +56,15 @@ public static class AutomaticRuleHelpers
         {
             return FilterOnDateCondition(condition, transactions, responseLocalizer);
         }
+        else if (
+            condition.Field.Equals(
+                AutomaticRuleConstants.TransactionFields.Account,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return FilterOnAccountCondition(condition, transactions, responseLocalizer);
+        }
 
         throw new BudgetBoardServiceException(
             responseLocalizer["AutomaticRuleUnsupportedFieldError", condition.Field]
@@ -459,6 +468,45 @@ public static class AutomaticRuleHelpers
 
         throw new BudgetBoardServiceException(
             responseLocalizer["AutomaticRuleUnsupportedOperatorForDateError", condition.Operator]
+        );
+    }
+
+    private static IEnumerable<Transaction> FilterOnAccountCondition(
+        IRuleParameterRequest condition,
+        IEnumerable<Transaction> transactions,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
+    {
+        if (!Guid.TryParse(condition.Value, out var accountId))
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer["AutomaticRuleInvalidAccountIdError", condition.Value]
+            );
+        }
+
+        // Is
+        if (
+            condition.Operator.Equals(
+                AutomaticRuleConstants.ConditionalOperators.Is,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return transactions.Where(t => t.AccountID == accountId);
+        }
+        // Is not
+        else if (
+            condition.Operator.Equals(
+                AutomaticRuleConstants.ConditionalOperators.IsNot,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return transactions.Where(t => t.AccountID != accountId);
+        }
+
+        throw new BudgetBoardServiceException(
+            responseLocalizer["AutomaticRuleUnsupportedOperatorForAccountError", condition.Operator]
         );
     }
 

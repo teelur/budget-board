@@ -7,9 +7,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
+  ActionTransactionFields,
   ActionOperators,
   IRuleParameterEdit,
-  TransactionFields,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
@@ -132,17 +132,17 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
       return (
         <>
           <Select
-            data={TransactionFields.map((i) => ({
+            data={ActionTransactionFields.map((i) => ({
               ...i,
               label: t(i.label),
             }))}
             value={
-              TransactionFields.find(
+              ActionTransactionFields.find(
                 (field) => field.value === props.ruleParameter.field,
               )?.value
             }
             onChange={(value) => {
-              const foundValue = TransactionFields.find(
+              const foundValue = ActionTransactionFields.find(
                 (field) => field.value === value,
               );
 

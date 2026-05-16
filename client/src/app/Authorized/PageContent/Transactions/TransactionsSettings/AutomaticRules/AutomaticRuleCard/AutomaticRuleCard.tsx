@@ -13,12 +13,14 @@ import ConditionItem from "./ConditionItem/ConditionItem";
 import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { IAccountResponse } from "~/models/account";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -35,22 +37,24 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   );
 
   const { t } = useTranslation();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
 
-  const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/userSettings",
+  const accountsQuery = useQuery({
+    queryKey: ["accounts"],
+    queryFn: async (): Promise<IAccountResponse[]> => {
+      const res: AxiosResponse = await request({
+        url: "/api/account",
         method: "GET",
       });
 
       if (res.status === 200) {
-        return res.data;
+        return res.data as IAccountResponse[];
       }
 
-      return undefined;
+      return [];
     },
   });
 
@@ -186,7 +190,8 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
                 key={condition.id}
                 condition={condition}
                 categories={transactionCategories}
-                currency={userSettingsQuery.data?.currency ?? ""}
+                currency={preferredCurrency}
+                accounts={accountsQuery.data ?? []}
               />
             ))}
           </Group>
@@ -199,7 +204,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
                 key={action.id}
                 action={action}
                 categories={transactionCategories}
-                currency={userSettingsQuery.data?.currency ?? ""}
+                currency={preferredCurrency}
               />
             ))}
           </Group>

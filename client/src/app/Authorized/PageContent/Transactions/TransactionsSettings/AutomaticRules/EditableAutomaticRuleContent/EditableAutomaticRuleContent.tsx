@@ -2,12 +2,13 @@ import { ActionIcon, Group, Stack } from "@mantine/core";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import {
+  ActionTransactionFields,
   ActionOperators,
+  ConditionTransactionFields,
   FieldToOperatorType,
   IRuleParameterEdit,
   Operators,
   OperatorTypes,
-  TransactionFields,
 } from "~/models/automaticRule";
 import ActionItem from "./ActionItem/ActionItem";
 import ConditionItem from "./ConditionItem/ConditionItem";
@@ -23,13 +24,15 @@ interface EditableAutomaticRuleContentProps {
 }
 
 const EditableAutomaticRuleContent = (
-  props: EditableAutomaticRuleContentProps
+  props: EditableAutomaticRuleContentProps,
 ): React.ReactNode => {
   const defaultField =
-    TransactionFields.find((field) => field.value === "merchant")?.value ?? "";
+    ConditionTransactionFields.find((field) => field.value === "merchant")
+      ?.value ?? "";
 
   const { t } = useTranslation();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
 
   const addNewCondition = () => {
     props.setConditionItems((prev) => [
@@ -39,8 +42,8 @@ const EditableAutomaticRuleContent = (
         operator:
           Operators.filter((op) =>
             op.type.includes(
-              FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING
-            )
+              FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING,
+            ),
           )
             .map((op) => op.value)
             .at(0) ?? "",
@@ -58,7 +61,7 @@ const EditableAutomaticRuleContent = (
     props.setActionItems((prev) => [
       ...prev,
       {
-        field: TransactionFields.at(0)!.value,
+        field: ActionTransactionFields.at(0)!.value,
         operator: ActionOperators.at(0)!.value,
         value: "",
         type: "",
@@ -86,7 +89,7 @@ const EditableAutomaticRuleContent = (
             setRuleParameter={(newParameter) =>
               props.setConditionItems(
                 (prev: IRuleParameterEdit[]): IRuleParameterEdit[] =>
-                  prev.map((param, i) => (i === index ? newParameter : param))
+                  prev.map((param, i) => (i === index ? newParameter : param)),
               )
             }
             allowDelete={props.conditionItems.length > 1}
@@ -110,7 +113,7 @@ const EditableAutomaticRuleContent = (
             setRuleParameter={(newParameter) =>
               props.setActionItems(
                 (prev: IRuleParameterEdit[]): IRuleParameterEdit[] =>
-                  prev.map((param, i) => (i === index ? newParameter : param))
+                  prev.map((param, i) => (i === index ? newParameter : param)),
               )
             }
             allowDelete={props.actionItems.length > 1}
