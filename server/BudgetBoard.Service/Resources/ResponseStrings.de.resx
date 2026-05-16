@@ -488,10 +488,10 @@
     <value>Für diesen Vermögenswert liegt zu diesem Datum bereits ein Wert vor.</value>
   </data>
   <data name="SimpleFinAccountSyncException" xml:space="preserve">
-    <value>An unexpected error occurred while syncing SimpleFIN account '{0}'.</value>
+    <value>Bei der Synchronisierung des SimpleFIN-Kontos „{0}“ ist ein unerwarteter Fehler aufgetreten.</value>
   </data>
   <data name="LunchFlowAccountSyncException" xml:space="preserve">
-    <value>An unexpected error occurred while syncing LunchFlow account '{0}'.</value>
+    <value>Bei der Synchronisierung des LunchFlow-Kontos „{0}“ ist ein unerwarteter Fehler aufgetreten.</value>
   </data>
   <data name="AccountTypeCreateDuplicateNameError" xml:space="preserve">
     <value>An account type with this name already exists.</value>
