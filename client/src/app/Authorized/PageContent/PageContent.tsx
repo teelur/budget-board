@@ -59,26 +59,26 @@ const SettingsAdvanced = lazy(
 );
 
 const PageContent = (): React.ReactNode => {
+  const suspenseFallback = (
+    <Stack
+      h={"calc(100dvh - var(--app-shell-header-offset, 60px))"}
+      justify="center"
+      align="center"
+    >
+      <LoadingScreen fullScreen={false} />
+    </Stack>
+  );
+
   return (
     <ScrollArea
-      style={{
-        width: "100%",
-        height: "100%",
-      }}
-      type="auto"
+      w="100%"
+      h="100%"
+      type="hover"
       pb="0.3rem"
       offsetScrollbars="present"
     >
-      <Stack
-        align="center"
-        justify="flex-start"
-        w="100%"
-        h="100%"
-        flex="1 1 auto"
-        p="0.5rem"
-        pb="var(--bulk-bar-height, 0)"
-      >
-        <Suspense fallback={<LoadingScreen />}>
+      <Stack w="100%" p="0.5rem" pb="var(--bulk-bar-height, 0)" align="center">
+        <Suspense fallback={suspenseFallback}>
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/accounts">
