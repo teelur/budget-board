@@ -541,4 +541,10 @@
   <data name="LunchFlow" xml:space="preserve">
     <value>LunchFlow</value>
   </data>
+  <data name="AutomaticRuleInvalidAccountIdError" xml:space="preserve">
+    <value>The account ID '{0}' is not a valid GUID.</value>
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
+    <value>Unsupported operator '{0}' for Account field.</value>
+  </data>
 </root>
