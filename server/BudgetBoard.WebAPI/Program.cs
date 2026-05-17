@@ -224,7 +224,7 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 // Used to abstract datetime
 builder.Services.AddSingleton<INowProvider>(_ =>
 {
-    var tzId = Environment.GetEnvironmentVariable("TZ");
+    var tzId = builder.Configuration.GetValue<string>("TZ");
     var timeZone = string.IsNullOrWhiteSpace(tzId)
         ? TimeZoneInfo.Local
         : TimeZoneInfo.FindSystemTimeZoneById(tzId);
