@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -58,4 +58,73 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="UnexpectedServerError" xml:space="preserve">
+    <value>An unexpected error occurred.</value>
+  </data>
+  <data name="AuthCodeRequired" xml:space="preserve">
+    <value>The authorization code is required.</value>
+  </data>
+  <data name="AuthFailed" xml:space="preserve">
+    <value>Authentication failed.</value>
+  </data>
+  <data name="LoginFailed" xml:space="preserve">
+    <value>Unable to complete login.</value>
+  </data>
+  <data name="UserNotAuthenticated" xml:space="preserve">
+    <value>The user is not authenticated.</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>The user was not found.</value>
+  </data>
+  <data name="NoOidcLoginFound" xml:space="preserve">
+    <value>No OIDC login was found for this user.</value>
+  </data>
+  <data name="RemoveOidcNoPassword" xml:space="preserve">
+    <value>Cannot remove OIDC login. The user must have a local password set first to maintain account access.</value>
+  </data>
+  <data name="RemoveOidcFailed" xml:space="preserve">
+    <value>Failed to remove OIDC login.</value>
+  </data>
+  <data name="RemoveOidcSuccess" xml:space="preserve">
+    <value>OIDC login disconnected successfully.</value>
+  </data>
+  <data name="UserIdNotFound" xml:space="preserve">
+    <value>The user ID was not found.</value>
+  </data>
+  <data name="InvalidJsonType" xml:space="preserve">
+    <value>The provided JSON token type is invalid.</value>
+  </data>
+  <data name="LocalAccountProviderName" xml:space="preserve">
+    <value>Local Account</value>
+  </data>
+  <data name="RegistrationDisabledError" xml:space="preserve">
+    <value>Registration is disabled.</value>
+  </data>
+  <data name="NoEmailConfirmationEndpointError" xml:space="preserve">
+    <value>No email confirmation endpoint was registered!</value>
+  </data>
+  <data name="UserEmailRequiredError" xml:space="preserve">
+    <value>The user must have an email address.</value>
+  </data>
+  <data name="EndpointNotFoundError" xml:space="preserve">
+    <value>Could not find the endpoint named '{0}'.</value>
+  </data>
+  <data name="InvalidLanguageError" xml:space="preserve">
+    <value>The specified language '{0}' is not supported.</value>
+  </data>
+  <data name="EmailSenderConfigMissing" xml:space="preserve">
+    <value>Email sender configuration is missing. Please set EMAIL_SENDER.</value>
+  </data>
+  <data name="SmtpHostConfigMissing" xml:space="preserve">
+    <value>SMTP host configuration is missing. Please set EMAIL_SMTP_HOST.</value>
+  </data>
+  <data name="AccountLockedOutEmailSubject" xml:space="preserve">
+    <value>Account Locked Due to Multiple Failed Login Attempts</value>
+  </data>
+  <data name="AccountLockedOutEmailBody" xml:space="preserve">
+    <value>&lt;h2&gt;Your Account Has Been Locked&lt;/h2&gt;
+&lt;p&gt;We've detected multiple failed login attempts on your account. For your security, your account has been temporarily locked.&lt;/p&gt;
+&lt;p&gt;Your account will be automatically unlocked after the lockout period expires.&lt;/p&gt;
+&lt;p&gt;If this was you, please try again later or use the 'Forgot Password' option to reset your credentials.&lt;/p&gt;</value>
+  </data>
 </root>
