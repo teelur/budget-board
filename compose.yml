@@ -26,6 +26,7 @@ services:
       AUTO_UPDATE_DB: ${AUTO_UPDATE_DB:-true}
       DISABLE_AUTO_SYNC: ${DISABLE_AUTO_SYNC:-false}
       SYNC_INTERVAL_HOURS: ${SYNC_INTERVAL_HOURS:-8}
+      TZ: ${TZ:-UTC}
     networks:
       - budget-board-network
     depends_on:
