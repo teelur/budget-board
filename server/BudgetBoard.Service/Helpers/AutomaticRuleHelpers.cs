@@ -56,6 +56,15 @@ public static class AutomaticRuleHelpers
         {
             return FilterOnDateCondition(condition, transactions, responseLocalizer);
         }
+        else if (
+            condition.Field.Equals(
+                AutomaticRuleConstants.TransactionFields.Account,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return FilterOnAccountCondition(condition, transactions, responseLocalizer);
+        }
 
         throw new BudgetBoardServiceException(
             responseLocalizer["AutomaticRuleUnsupportedFieldError", condition.Field]
@@ -459,6 +468,55 @@ public static class AutomaticRuleHelpers
 
         throw new BudgetBoardServiceException(
             responseLocalizer["AutomaticRuleUnsupportedOperatorForDateError", condition.Operator]
+        );
+    }
+
+    private static IEnumerable<Transaction> FilterOnAccountCondition(
+        IRuleParameterRequest condition,
+        IEnumerable<Transaction> transactions,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
+    {
+        var accountIds = new HashSet<Guid>();
+        foreach (
+            var part in condition.Value.Split(
+                ',',
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+            )
+        )
+        {
+            if (!Guid.TryParse(part, out var parsed))
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AutomaticRuleInvalidAccountIdError", part]
+                );
+            }
+            accountIds.Add(parsed);
+        }
+
+        // Is
+        if (
+            condition.Operator.Equals(
+                AutomaticRuleConstants.ConditionalOperators.Is,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return transactions.Where(t => accountIds.Contains(t.AccountID));
+        }
+        // Is not
+        else if (
+            condition.Operator.Equals(
+                AutomaticRuleConstants.ConditionalOperators.IsNot,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return transactions.Where(t => !accountIds.Contains(t.AccountID));
+        }
+
+        throw new BudgetBoardServiceException(
+            responseLocalizer["AutomaticRuleUnsupportedOperatorForAccountError", condition.Operator]
         );
     }
 

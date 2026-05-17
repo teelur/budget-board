@@ -151,6 +151,12 @@
   <data name="AutomaticRuleUnsupportedOperatorForDateError" xml:space="preserve">
     <value>Unsupported operator '{0}' for Date field.</value>
   </data>
+  <data name="AutomaticRuleInvalidAccountIdError" xml:space="preserve">
+    <value>The account ID '{0}' is not a valid GUID.</value>
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
+    <value>Unsupported operator '{0}' for Account field.</value>
+  </data>
   <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
     <value>The account you are trying to add a balance to does not exist.</value>
   </data>
