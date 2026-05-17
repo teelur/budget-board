@@ -477,11 +477,21 @@ public static class AutomaticRuleHelpers
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
-        if (!Guid.TryParse(condition.Value, out var accountId))
+        var accountIds = new HashSet<Guid>();
+        foreach (
+            var part in condition.Value.Split(
+                ',',
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+            )
+        )
         {
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AutomaticRuleInvalidAccountIdError", condition.Value]
-            );
+            if (!Guid.TryParse(part, out var parsed))
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AutomaticRuleInvalidAccountIdError", part]
+                );
+            }
+            accountIds.Add(parsed);
         }
 
         // Is
@@ -492,7 +502,7 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return transactions.Where(t => t.AccountID == accountId);
+            return transactions.Where(t => accountIds.Contains(t.AccountID));
         }
         // Is not
         else if (
@@ -502,7 +512,7 @@ public static class AutomaticRuleHelpers
             )
         )
         {
-            return transactions.Where(t => t.AccountID != accountId);
+            return transactions.Where(t => !accountIds.Contains(t.AccountID));
         }
 
         throw new BudgetBoardServiceException(

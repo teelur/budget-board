@@ -43,11 +43,12 @@ export const getFormattedValue = (
       return formatDate(value);
     case "category":
       return getFormattedCategoryValue(value, categories);
-    case "account":
+    case "account": {
       const accountNames = accounts
         .filter((account) => value.split(",").includes(account.id))
         .map((account) => account.name);
       return accountNames.join(", ");
+    }
     default:
       return value;
   }
