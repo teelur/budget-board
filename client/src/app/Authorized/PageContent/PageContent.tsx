@@ -59,85 +59,83 @@ const SettingsAdvanced = lazy(
 );
 
 const PageContent = (): React.ReactNode => {
+  const suspenseFallback = (
+    <Stack
+      h={"calc(100dvh - var(--app-shell-header-offset, 60px))"}
+      justify="center"
+      align="center"
+    >
+      <LoadingScreen fullScreen={false} />
+    </Stack>
+  );
+
   return (
     <ScrollArea
-      style={{
-        width: "100%",
-        height: "100%",
-      }}
-      type="auto"
+      w="100%"
+      h="100%"
+      type="hover"
       pb="0.3rem"
       offsetScrollbars="present"
     >
-      <Stack
-        align="center"
-        justify="flex-start"
-        w="100%"
-        h="100%"
-        flex="1 1 auto"
-        p="0.5rem"
-        pb="var(--bulk-bar-height, 0)"
-      >
-        <Box w="100%" h="100%" flex="1 1 auto">
-          <Suspense fallback={<LoadingScreen fullScreen={false} />}>
-            <Routes>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/accounts">
-                <Route index element={<Accounts />} />
-                <Route path="settings" element={<AccountsSettings />}>
-                  <Route
-                    index
-                    element={<Navigate to="account-types" replace />}
-                  />
-                  <Route
-                    path="account-types"
-                    element={<AccountsSettingsAccountTypes />}
-                  />
-                  <Route path="deleted" element={<AccountsSettingsDeleted />} />
-                </Route>
+      <Stack w="100%" p="0.5rem" pb="var(--bulk-bar-height, 0)" align="center">
+        <Suspense fallback={suspenseFallback}>
+          <Routes>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/accounts">
+              <Route index element={<Accounts />} />
+              <Route path="settings" element={<AccountsSettings />}>
+                <Route
+                  index
+                  element={<Navigate to="account-types" replace />}
+                />
+                <Route
+                  path="account-types"
+                  element={<AccountsSettingsAccountTypes />}
+                />
+                <Route path="deleted" element={<AccountsSettingsDeleted />} />
               </Route>
-              <Route path="/assets">
-                <Route index element={<Assets />} />
-                <Route path="settings" element={<AssetsSettings />}>
-                  <Route index element={<Navigate to="deleted" replace />} />
-                  <Route path="deleted" element={<AssetsSettingsDeleted />} />
-                </Route>
+            </Route>
+            <Route path="/assets">
+              <Route index element={<Assets />} />
+              <Route path="settings" element={<AssetsSettings />}>
+                <Route index element={<Navigate to="deleted" replace />} />
+                <Route path="deleted" element={<AssetsSettingsDeleted />} />
               </Route>
-              <Route path="/transactions">
-                <Route index element={<Transactions />} />
-                <Route path="settings" element={<TransactionsSettings />}>
-                  <Route index element={<Navigate to="categories" replace />} />
-                  <Route
-                    path="categories"
-                    element={<TransactionsSettingsCategories />}
-                  />
-                  <Route path="rules" element={<TransactionsSettingsRules />} />
-                  <Route
-                    path="deleted"
-                    element={<TransactionsSettingsDeleted />}
-                  />
-                  <Route
-                    path="auto-categorizer"
-                    element={<TransactionsSettingsAutoCategorizer />}
-                  />
-                </Route>
+            </Route>
+            <Route path="/transactions">
+              <Route index element={<Transactions />} />
+              <Route path="settings" element={<TransactionsSettings />}>
+                <Route index element={<Navigate to="categories" replace />} />
+                <Route
+                  path="categories"
+                  element={<TransactionsSettingsCategories />}
+                />
+                <Route path="rules" element={<TransactionsSettingsRules />} />
+                <Route
+                  path="deleted"
+                  element={<TransactionsSettingsDeleted />}
+                />
+                <Route
+                  path="auto-categorizer"
+                  element={<TransactionsSettingsAutoCategorizer />}
+                />
               </Route>
-              <Route path="/budgets">
-                <Route index element={<Budgets />} />
-                <Route path="settings" element={<BudgetsSettings />} />
-              </Route>
-              <Route path="/goals" element={<Goals />} />
-              <Route path="/trends" element={<Trends />} />
-              <Route path="/external-accounts" element={<ExternalAccounts />} />
-              <Route path="/settings" element={<Settings />}>
-                <Route index element={<Navigate to="user" replace />} />
-                <Route path="user" element={<SettingsUser />} />
-                <Route path="security" element={<SettingsSecurity />} />
-                <Route path="advanced" element={<SettingsAdvanced />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </Box>
+            </Route>
+            <Route path="/budgets">
+              <Route index element={<Budgets />} />
+              <Route path="settings" element={<BudgetsSettings />} />
+            </Route>
+            <Route path="/goals" element={<Goals />} />
+            <Route path="/trends" element={<Trends />} />
+            <Route path="/external-accounts" element={<ExternalAccounts />} />
+            <Route path="/settings" element={<Settings />}>
+              <Route index element={<Navigate to="user" replace />} />
+              <Route path="user" element={<SettingsUser />} />
+              <Route path="security" element={<SettingsSecurity />} />
+              <Route path="advanced" element={<SettingsAdvanced />} />
+            </Route>
+          </Routes>
+        </Suspense>
       </Stack>
     </ScrollArea>
   );

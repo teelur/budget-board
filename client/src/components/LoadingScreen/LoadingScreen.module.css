@@ -2,17 +2,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #fffffe;
 }
 
 .loadingContainerContained {
-  width: 100%;
-  height: calc(100dvh - var(--app-shell-header-height, 60px));
 }
 
 .loadingContainerFullscreen {
   position: fixed;
   inset: 0;
+  background-color: #fffffe;
 }
 
 .loadingSpinner {
@@ -35,7 +33,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .loadingContainer {
+  .loadingContainerFullscreen {
     background-color: #121212;
   }
 
