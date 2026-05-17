@@ -222,7 +222,14 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 }
 
 // Used to abstract datetime
-builder.Services.AddSingleton<INowProvider, NowProvider>();
+builder.Services.AddSingleton<INowProvider>(_ =>
+{
+    var tzId = Environment.GetEnvironmentVariable("TZ");
+    var timeZone = string.IsNullOrWhiteSpace(tzId)
+        ? TimeZoneInfo.Local
+        : TimeZoneInfo.FindSystemTimeZoneById(tzId);
+    return new NowProvider(timeZone);
+});
 
 // Add the services
 builder.Services.AddScoped<IAccountService, AccountService>();

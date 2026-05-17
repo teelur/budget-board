@@ -6,10 +6,15 @@ public interface INowProvider
     DateTime UtcNow { get; }
 }
 
-public class NowProvider : INowProvider
+public class NowProvider(TimeZoneInfo timeZone) : INowProvider
 {
-    private static readonly Lazy<NowProvider> _instance = new(() => new NowProvider());
+    private static readonly Lazy<NowProvider> _instance = new(() =>
+        new NowProvider(TimeZoneInfo.Local)
+    );
     public static NowProvider Instance => _instance.Value;
-    public DateTime Now => DateTime.Now;
+
+    private readonly TimeZoneInfo _timeZone = timeZone;
+
+    public DateTime Now => TimeZoneInfo.ConvertTime(DateTime.UtcNow, _timeZone);
     public DateTime UtcNow => DateTime.UtcNow;
 }
