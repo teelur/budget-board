@@ -1,4 +1,4 @@
-import { ScrollArea, Stack } from "@mantine/core";
+import { Box, ScrollArea, Stack } from "@mantine/core";
 import { Navigate, Route, Routes } from "react-router";
 import { Suspense, lazy } from "react";
 import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
@@ -78,64 +78,66 @@ const PageContent = (): React.ReactNode => {
         p="0.5rem"
         pb="var(--bulk-bar-height, 0)"
       >
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/accounts">
-              <Route index element={<Accounts />} />
-              <Route path="settings" element={<AccountsSettings />}>
-                <Route
-                  index
-                  element={<Navigate to="account-types" replace />}
-                />
-                <Route
-                  path="account-types"
-                  element={<AccountsSettingsAccountTypes />}
-                />
-                <Route path="deleted" element={<AccountsSettingsDeleted />} />
+        <Box w="100%" h="100%" flex="1 1 auto">
+          <Suspense fallback={<LoadingScreen fullScreen={false} />}>
+            <Routes>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/accounts">
+                <Route index element={<Accounts />} />
+                <Route path="settings" element={<AccountsSettings />}>
+                  <Route
+                    index
+                    element={<Navigate to="account-types" replace />}
+                  />
+                  <Route
+                    path="account-types"
+                    element={<AccountsSettingsAccountTypes />}
+                  />
+                  <Route path="deleted" element={<AccountsSettingsDeleted />} />
+                </Route>
               </Route>
-            </Route>
-            <Route path="/assets">
-              <Route index element={<Assets />} />
-              <Route path="settings" element={<AssetsSettings />}>
-                <Route index element={<Navigate to="deleted" replace />} />
-                <Route path="deleted" element={<AssetsSettingsDeleted />} />
+              <Route path="/assets">
+                <Route index element={<Assets />} />
+                <Route path="settings" element={<AssetsSettings />}>
+                  <Route index element={<Navigate to="deleted" replace />} />
+                  <Route path="deleted" element={<AssetsSettingsDeleted />} />
+                </Route>
               </Route>
-            </Route>
-            <Route path="/transactions">
-              <Route index element={<Transactions />} />
-              <Route path="settings" element={<TransactionsSettings />}>
-                <Route index element={<Navigate to="categories" replace />} />
-                <Route
-                  path="categories"
-                  element={<TransactionsSettingsCategories />}
-                />
-                <Route path="rules" element={<TransactionsSettingsRules />} />
-                <Route
-                  path="deleted"
-                  element={<TransactionsSettingsDeleted />}
-                />
-                <Route
-                  path="auto-categorizer"
-                  element={<TransactionsSettingsAutoCategorizer />}
-                />
+              <Route path="/transactions">
+                <Route index element={<Transactions />} />
+                <Route path="settings" element={<TransactionsSettings />}>
+                  <Route index element={<Navigate to="categories" replace />} />
+                  <Route
+                    path="categories"
+                    element={<TransactionsSettingsCategories />}
+                  />
+                  <Route path="rules" element={<TransactionsSettingsRules />} />
+                  <Route
+                    path="deleted"
+                    element={<TransactionsSettingsDeleted />}
+                  />
+                  <Route
+                    path="auto-categorizer"
+                    element={<TransactionsSettingsAutoCategorizer />}
+                  />
+                </Route>
               </Route>
-            </Route>
-            <Route path="/budgets">
-              <Route index element={<Budgets />} />
-              <Route path="settings" element={<BudgetsSettings />} />
-            </Route>
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/trends" element={<Trends />} />
-            <Route path="/external-accounts" element={<ExternalAccounts />} />
-            <Route path="/settings" element={<Settings />}>
-              <Route index element={<Navigate to="user" replace />} />
-              <Route path="user" element={<SettingsUser />} />
-              <Route path="security" element={<SettingsSecurity />} />
-              <Route path="advanced" element={<SettingsAdvanced />} />
-            </Route>
-          </Routes>
-        </Suspense>
+              <Route path="/budgets">
+                <Route index element={<Budgets />} />
+                <Route path="settings" element={<BudgetsSettings />} />
+              </Route>
+              <Route path="/goals" element={<Goals />} />
+              <Route path="/trends" element={<Trends />} />
+              <Route path="/external-accounts" element={<ExternalAccounts />} />
+              <Route path="/settings" element={<Settings />}>
+                <Route index element={<Navigate to="user" replace />} />
+                <Route path="user" element={<SettingsUser />} />
+                <Route path="security" element={<SettingsSecurity />} />
+                <Route path="advanced" element={<SettingsAdvanced />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </Box>
       </Stack>
     </ScrollArea>
   );
