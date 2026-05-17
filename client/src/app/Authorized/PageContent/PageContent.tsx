@@ -1,4 +1,4 @@
-import { Box, ScrollArea, Stack } from "@mantine/core";
+import { ScrollArea, Stack } from "@mantine/core";
 import { Navigate, Route, Routes } from "react-router";
 import { Suspense, lazy } from "react";
 import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
