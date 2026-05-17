@@ -7,11 +7,11 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
+  ConditionTransactionFields,
   FieldToOperatorType,
   IRuleParameterEdit,
   Operators,
   OperatorTypes,
-  TransactionFields,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { IUserSettings } from "~/models/userSettings";
@@ -23,6 +23,7 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 
 export interface ConditionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -123,6 +124,23 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           elevation={1}
         />
       );
+    } else if (props.ruleParameter.field === "account") {
+      return (
+        <AccountMultiSelect
+          value={
+            props.ruleParameter.value
+              ? props.ruleParameter.value.split(",").map((id) => id.trim())
+              : []
+          }
+          onChange={(selectedIds) =>
+            props.setRuleParameter({
+              ...props.ruleParameter,
+              value: Array.isArray(selectedIds) ? selectedIds.join(",") : "",
+            })
+          }
+          elevation={1}
+        />
+      );
     }
 
     return null;
@@ -132,17 +150,17 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
     <Card elevation={1}>
       <Group gap="0.5rem">
         <Select
-          data={TransactionFields.map((i) => ({
+          data={ConditionTransactionFields.map((i) => ({
             ...i,
             label: t(i.label),
           }))}
           value={
-            TransactionFields.find(
+            ConditionTransactionFields.find(
               (field) => field.value === props.ruleParameter.field,
             )?.value
           }
           onChange={(value) => {
-            const foundField = TransactionFields.find(
+            const foundField = ConditionTransactionFields.find(
               (field) => field.value === value,
             );
 

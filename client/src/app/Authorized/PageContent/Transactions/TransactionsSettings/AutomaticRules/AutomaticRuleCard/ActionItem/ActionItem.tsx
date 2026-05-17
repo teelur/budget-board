@@ -4,9 +4,9 @@ import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getFormattedValue } from "~/helpers/automaticRules";
 import {
+  ActionTransactionFields,
   ActionOperators,
   IRuleParameterResponse,
-  TransactionFields,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -29,9 +29,11 @@ const ActionItem = (props: ActionItemProps) => {
       return (
         <>
           <Badge bg="var(--accent-color-purple)" size="sm">
-            {TransactionFields.find(
-              (field) => field.value === props.action.field,
-            )?.label ?? props.action.field}
+            {t(
+              ActionTransactionFields.find(
+                (field) => field.value === props.action.field,
+              )?.label ?? props.action.field,
+            )}
           </Badge>
           <PrimaryText size="sm">{t("to")}</PrimaryText>
           <Badge size="sm">

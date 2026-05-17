@@ -3,10 +3,11 @@ import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getFormattedValue } from "~/helpers/automaticRules";
+import { IAccountResponse } from "~/models/account";
 import {
+  ConditionTransactionFields,
   IRuleParameterResponse,
   Operators,
-  TransactionFields,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -14,6 +15,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 interface ConditionItemProps {
   condition: IRuleParameterResponse;
   categories: ICategory[];
+  accounts: IAccountResponse[];
   currency: string;
 }
 
@@ -21,7 +23,7 @@ const ConditionItem = (props: ConditionItemProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
 
-  const fieldLabelKey = TransactionFields.find(
+  const fieldLabelKey = ConditionTransactionFields.find(
     (field) => field.value === props.condition.field,
   )?.label;
 
@@ -49,6 +51,7 @@ const ConditionItem = (props: ConditionItemProps) => {
             props.categories,
             formatDate,
             intlLocale,
+            props.accounts,
           )}
         </Badge>
       </Group>

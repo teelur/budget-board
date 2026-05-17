@@ -49,20 +49,58 @@ export interface IAutomaticRuleUpdateRequest {
 export interface TransactionField {
   label: string;
   value: string;
+  appliesTo: TransactionFieldScope;
 }
 
-export const TransactionFields: ComboboxItem[] = [
-  { label: "merchant_name", value: "merchant" },
-  { label: "date", value: "date" },
-  { label: "amount", value: "amount" },
-  { label: "category", value: "category" },
+export enum TransactionFieldScope {
+  CONDITION = "condition",
+  ACTION = "action",
+  BOTH = "both",
+}
+
+export const TransactionFields: TransactionField[] = [
+  {
+    label: "merchant_name",
+    value: "merchant",
+    appliesTo: TransactionFieldScope.BOTH,
+  },
+  { label: "date", value: "date", appliesTo: TransactionFieldScope.BOTH },
+  {
+    label: "amount",
+    value: "amount",
+    appliesTo: TransactionFieldScope.BOTH,
+  },
+  {
+    label: "category",
+    value: "category",
+    appliesTo: TransactionFieldScope.BOTH,
+  },
+  {
+    label: "account",
+    value: "account",
+    appliesTo: TransactionFieldScope.CONDITION,
+  },
 ];
+
+export const ConditionTransactionFields: ComboboxItem[] =
+  TransactionFields.filter(
+    (field) =>
+      field.appliesTo === TransactionFieldScope.CONDITION ||
+      field.appliesTo === TransactionFieldScope.BOTH,
+  ).map(({ label, value }) => ({ label, value }));
+
+export const ActionTransactionFields: ComboboxItem[] = TransactionFields.filter(
+  (field) =>
+    field.appliesTo === TransactionFieldScope.ACTION ||
+    field.appliesTo === TransactionFieldScope.BOTH,
+).map(({ label, value }) => ({ label, value }));
 
 export enum OperatorTypes {
   STRING = "string",
   NUMBER = "number",
   DATE = "date",
   CATEGORY = "category",
+  STRING_ARRAY = "string_array",
 }
 
 export const FieldToOperatorType = new Map<string, OperatorTypes>([
@@ -70,6 +108,7 @@ export const FieldToOperatorType = new Map<string, OperatorTypes>([
   ["date", OperatorTypes.DATE],
   ["amount", OperatorTypes.NUMBER],
   ["category", OperatorTypes.CATEGORY],
+  ["account", OperatorTypes.STRING_ARRAY],
 ]);
 
 export const ActionOperators: Operator[] = [
@@ -112,6 +151,14 @@ export const Operators: Operator[] = [
   { label: "on", value: "on", type: [OperatorTypes.DATE] },
   { label: "before", value: "before", type: [OperatorTypes.DATE] },
   { label: "after", value: "after", type: [OperatorTypes.DATE] },
-  { label: "is", value: "is", type: [OperatorTypes.CATEGORY] },
-  { label: "is_not", value: "isNot", type: [OperatorTypes.CATEGORY] },
+  {
+    label: "is",
+    value: "is",
+    type: [OperatorTypes.CATEGORY, OperatorTypes.STRING_ARRAY],
+  },
+  {
+    label: "is_not",
+    value: "isNot",
+    type: [OperatorTypes.CATEGORY, OperatorTypes.STRING_ARRAY],
+  },
 ];
