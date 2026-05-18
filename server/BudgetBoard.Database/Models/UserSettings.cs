@@ -77,6 +77,11 @@ public class UserSettings
     public bool DisableBuiltInAccountTypes { get; set; } = false;
 
     /// <summary>
+    /// Indicates whether built-in asset types are disabled.
+    /// </summary>
+    public bool DisableBuiltInAssetTypes { get; set; } = false;
+
+    /// <summary>
     /// Indicates whether the auto-categorizer is enabled.
     /// </summary>
     public bool EnableAutoCategorizer { get; set; } = false;

@@ -556,4 +556,34 @@
   <data name="AccountTypeInvalidClassificationLog" xml:space="preserve">
     <value>Attempted to create or update an account type with an invalid classification.</value>
   </data>
+  <data name="AssetTypeCreateDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to create an asset type with a duplicate name.</value>
+  </data>
+  <data name="AssetTypeCreateEmptyNameLog" xml:space="preserve">
+    <value>Attempted to create an asset type with an empty name.</value>
+  </data>
+  <data name="AssetTypeCreateSameNameAsParentLog" xml:space="preserve">
+    <value>Attempted to create an asset type with the same name as its parent.</value>
+  </data>
+  <data name="AssetTypeCreateParentNotFoundLog" xml:space="preserve">
+    <value>Attempted to create an asset type with a parent that does not exist.</value>
+  </data>
+  <data name="AssetTypeUpdateNotFoundLog" xml:space="preserve">
+    <value>Attempted to update an asset type that does not exist.</value>
+  </data>
+  <data name="AssetTypeUpdateDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to update an asset type with a duplicate name.</value>
+  </data>
+  <data name="AssetTypeUpdateEmptyNameLog" xml:space="preserve">
+    <value>Attempted to update an asset type with an empty name.</value>
+  </data>
+  <data name="AssetTypeUpdateSameNameAsParentLog" xml:space="preserve">
+    <value>Attempted to update an asset type with the same name as its parent.</value>
+  </data>
+  <data name="AssetTypeUpdateParentNotFoundLog" xml:space="preserve">
+    <value>Attempted to update an asset type with a parent that does not exist.</value>
+  </data>
+  <data name="AssetTypeDeleteNotFoundLog" xml:space="preserve">
+    <value>Attempted to delete an asset type that does not exist.</value>
+  </data>
 </root>
