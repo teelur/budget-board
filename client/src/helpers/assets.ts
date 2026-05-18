@@ -1,4 +1,38 @@
 import { IAssetResponse } from "~/models/asset";
+import { IAssetType } from "~/models/assetType";
+import { areStringsEqual } from "./utils";
+
+export const getIsParentAssetType = (
+  assetTypeValue: string,
+  assetTypes: IAssetType[],
+): boolean => {
+  if (assetTypeValue.length === 0) {
+    return true;
+  }
+
+  return (
+    (
+      assetTypes.find((t) => areStringsEqual(t.value, assetTypeValue))
+        ?.parent ?? ""
+    ).length === 0
+  );
+};
+
+export const getParentAssetType = (
+  assetTypeValue: string,
+  assetTypes: IAssetType[],
+): string => {
+  if (assetTypeValue.length === 0) {
+    return "";
+  }
+
+  const type = assetTypes.find((t) => areStringsEqual(t.value, assetTypeValue));
+  if (type == null) {
+    return "";
+  }
+
+  return type.parent === "" ? type.value : type.parent;
+};
 
 /**
  * Filters out assets that are either hidden or marked as deleted.
@@ -6,7 +40,7 @@ import { IAssetResponse } from "~/models/asset";
  * @returns A filtered array of visible asset objects.
  */
 export const filterVisibleAssets = (
-  assets: IAssetResponse[]
+  assets: IAssetResponse[],
 ): IAssetResponse[] =>
   assets.filter((a: IAssetResponse) => !(a.hide || a.deleted !== null));
 

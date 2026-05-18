@@ -29,6 +29,8 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
+import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -50,9 +52,13 @@ const EditableAssetItemContent = (
     decimalSeparator,
   } = useLocale();
   const { request } = useAuth();
+  const { allAssetTypes } = useAssetTypes();
 
   const assetNameField = useField<string>({
     initialValue: props.asset.name,
+  });
+  const typeField = useField<string>({
+    initialValue: props.asset.type ?? "",
   });
   const purchaseDate = useField<Date | null>({
     initialValue: props.asset.purchaseDate
@@ -80,6 +86,7 @@ const EditableAssetItemContent = (
       const editedAsset: IAssetUpdateRequest = {
         id: props.asset.id,
         name: assetNameField.getValue(),
+        type: typeField.getValue(),
         purchaseDate: purchaseDate.getValue()
           ? dayjs(purchaseDate.getValue()).format("YYYY-MM-DD")
           : null,
@@ -114,6 +121,7 @@ const EditableAssetItemContent = (
 
       // Reset fields to original values on error
       assetNameField.setValue(props.asset.name);
+      typeField.setValue(props.asset.type ?? "");
     },
   });
 
@@ -175,6 +183,16 @@ const EditableAssetItemContent = (
             <TextInput
               {...assetNameField.getInputProps()}
               onBlur={() => doUpdateAsset.mutate()}
+              elevation={1}
+            />
+            <CategorySelect
+              categories={allAssetTypes}
+              value={typeField.getValue()}
+              onChange={(val: string) => {
+                typeField.setValue(val);
+                doUpdateAsset.mutate();
+              }}
+              withinPortal
               elevation={1}
             />
             <Flex style={{ alignSelf: "stretch" }}>
