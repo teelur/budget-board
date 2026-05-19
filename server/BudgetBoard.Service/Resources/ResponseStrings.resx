@@ -577,4 +577,10 @@
   <data name="AssetTypeDeleteNotFoundError" xml:space="preserve">
     <value>The asset type you are trying to delete does not exist.</value>
   </data>
-  </root>
+  <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
+    <value>Built-in asset types cannot be re-enabled because one or more custom asset types share a name with a built-in type. Please rename or remove the conflicting custom types first.</value>
+  </data>
+  <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
+    <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
+  </data>
+</root>

@@ -55,6 +55,7 @@ public class UserSettingsService(
         HandleForceSyncLookbackMonthsChange();
         HandleDisableBuiltInTransactionCategoriesChange();
         HandleDisableBuiltInAccountTypesChange();
+        HandleDisableBuiltInAssetTypesChange();
         HandleEnableAutoCategorizerChange();
         HandleAutoCategorizerMinimumProbabilityPercentageChange();
 
@@ -250,6 +251,61 @@ public class UserSettingsService(
             }
         }
 
+        void HandleDisableBuiltInAssetTypesChange()
+        {
+            if (
+                request.DisableBuiltInAssetTypes.HasValue
+                && userSettings.DisableBuiltInAssetTypes != request.DisableBuiltInAssetTypes.Value
+            )
+            {
+                var builtInTypeValues = AssetTypeConstants
+                    .DefaultAssetTypes.Select(at => at.Value.ToLower())
+                    .ToHashSet();
+                if (userSettings.DisableBuiltInAssetTypes)
+                {
+                    // Built-in types cannot be re-enabled if the user has custom asset types that conflict with the built-in types.
+                    var hasConflictingCustomAssetTypes = userData.AssetTypes.Any(at =>
+                        builtInTypeValues.Contains(at.Value.ToLower())
+                    );
+                    if (hasConflictingCustomAssetTypes)
+                    {
+                        logger.LogError(
+                            "{LogMessage}",
+                            logLocalizer["EnableBuiltInAssetTypesConflictLog"]
+                        );
+                        throw new BudgetBoardServiceException(
+                            responseLocalizer["EnableBuiltInAssetTypesConflictError"]
+                        );
+                    }
+                }
+                else
+                {
+                    // Built-in types cannot be disabled if the user has any assets that use built-in types
+                    // or custom asset types that are children of built-in types
+                    var hasBuiltInAssetTypesInUse =
+                        userData.Assets.Any(a =>
+                            a.Type != null && builtInTypeValues.Contains(a.Type.ToLower())
+                        )
+                        || userData.AssetTypes.Any(at =>
+                            !string.IsNullOrEmpty(at.Parent)
+                            && builtInTypeValues.Contains(at.Parent.ToLower())
+                        );
+                    if (hasBuiltInAssetTypesInUse)
+                    {
+                        logger.LogError(
+                            "{LogMessage}",
+                            logLocalizer["DisableBuiltInAssetTypesInUseLog"]
+                        );
+                        throw new BudgetBoardServiceException(
+                            responseLocalizer["DisableBuiltInAssetTypesInUseError"]
+                        );
+                    }
+                }
+
+                userSettings.DisableBuiltInAssetTypes = request.DisableBuiltInAssetTypes.Value;
+            }
+        }
+
         void HandleEnableAutoCategorizerChange()
         {
             if (
@@ -309,6 +365,8 @@ public class UserSettingsService(
                 .ApplicationUsers.Include(u => u.UserSettings)
                 .Include(u => u.Accounts)
                 .Include(u => u.AccountTypes)
+                .Include(u => u.Assets)
+                .Include(u => u.AssetTypes)
                 .FirstOrDefaultAsync(u => u.Id == new Guid(id));
         }
         catch (Exception ex)

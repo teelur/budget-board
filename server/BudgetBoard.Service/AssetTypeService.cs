@@ -23,8 +23,8 @@ public class AssetTypeService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var allAssetTypes = AssetTypeHelpers.GetAllAssetTypes(userData);
 
-        ThrowIfValueAlreadyExists(request.Value, allAssetTypes);
         ThrowIfValueIsNullOrEmpty(request.Value);
+        ThrowIfValueAlreadyExists(request.Value, allAssetTypes);
         ThrowIfValueSameNameAsParent(request.Value, request.Parent, allAssetTypes);
         ThrowIfParentNotFound(request.Parent, allAssetTypes);
 
@@ -118,8 +118,8 @@ public class AssetTypeService(
 
         var allAssetTypes = AssetTypeHelpers.GetAllAssetTypes(userData);
 
-        ThrowIfValueAlreadyExists(request.Value, allAssetTypes);
         ThrowIfValueIsNullOrEmpty(request.Value);
+        ThrowIfValueAlreadyExists(request.Value, allAssetTypes);
         ThrowIfValueSameNameAsParent(request.Value, request.Parent);
         ThrowIfParentNotFound(request.Parent, allAssetTypes);
 

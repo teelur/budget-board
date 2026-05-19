@@ -18,7 +18,6 @@ public interface IAssetTypeService
     /// Retrieves all asset types for the specified user. This includes both built-in (if configured) and custom asset types.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="guid">Optional. When provided, returns only the asset type with this ID.</param>
     /// <returns>A collection of asset type details.</returns>
     Task<IReadOnlyList<IAssetTypeResponse>> ReadAssetTypesAsync(Guid userGuid);
 

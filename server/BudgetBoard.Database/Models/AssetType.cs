@@ -3,22 +3,22 @@ namespace BudgetBoard.Database.Models;
 public class AssetType
 {
     /// <summary>
-    /// Unique identifier for the account type.
+    /// Unique identifier for the asset type.
     /// </summary>
     public Guid ID { get; set; } = Guid.NewGuid();
 
     /// <summary>
-    /// The account type name.
+    /// The asset type name.
     /// </summary>
     public required string Value { get; set; }
 
     /// <summary>
-    /// The parent account type name.
+    /// The parent asset type name.
     /// </summary>
     public string Parent { get; set; } = string.Empty;
 
     /// <summary>
-    /// Identifier for the user who owns the account type.
+    /// Identifier for the user who owns the asset type.
     /// </summary>
     public required Guid UserID { get; set; }
 

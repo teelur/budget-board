@@ -263,8 +263,6 @@ export const calculateLineTotal = (
             return total;
           }
 
-          console.log(getAssetsOfTypes(validAssets, filters, allAssetTypes));
-
           return (
             total +
             sumAssetsTotalValue(

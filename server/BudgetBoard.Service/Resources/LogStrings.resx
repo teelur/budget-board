@@ -586,4 +586,10 @@
   <data name="AssetTypeDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete an asset type that does not exist.</value>
   </data>
+  <data name="EnableBuiltInAssetTypesConflictLog" xml:space="preserve">
+    <value>Attempted to re-enable built-in asset types but custom asset types conflict with built-in type names.</value>
+  </data>
+  <data name="DisableBuiltInAssetTypesInUseLog" xml:space="preserve">
+    <value>Attempted to disable built-in asset types but they are currently in use.</value>
+  </data>
 </root>
