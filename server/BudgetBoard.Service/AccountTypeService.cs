@@ -23,8 +23,8 @@ public class AccountTypeService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var allAccountTypes = AccountTypeHelpers.GetAllAccountTypes(userData);
 
-        ThrowIfValueAlreadyExists(request.Value, allAccountTypes);
         ThrowIfValueIsNullOrEmpty(request.Value);
+        ThrowIfValueAlreadyExists(request.Value, allAccountTypes);
         ThrowIfValueSameNameAsParent(request.Value, request.Parent, allAccountTypes);
         ThrowIfParentNotFound(request.Parent, allAccountTypes);
         ThrowIfInvalidClassification(request.Classification);
@@ -141,8 +141,8 @@ public class AccountTypeService(
 
         var allAccountTypes = AccountTypeHelpers.GetAllAccountTypes(userData);
 
-        ThrowIfValueAlreadyExists(request.Value, allAccountTypes);
         ThrowIfValueIsNullOrEmpty(request.Value);
+        ThrowIfValueAlreadyExists(request.Value, allAccountTypes);
         ThrowIfValueSameNameAsParent(request.Value, request.Parent);
         ThrowIfParentNotFound(request.Parent);
         ThrowIfInvalidClassification(request.Classification);

@@ -51,6 +51,11 @@ public class Asset
     public int Index { get; set; } = 0;
 
     /// <summary>
+    /// The type of the asset.
+    /// </summary>
+    public string? Type { get; set; } = null;
+
+    /// <summary>
     /// Historical or current values associated with the asset.
     /// </summary>
     public ICollection<Value> Values { get; set; } = [];

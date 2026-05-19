@@ -12,6 +12,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { TransactionFiltersProvider } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { TransactionCategoryProvider } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { AccountTypeProvider } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { AssetTypeProvider } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 
 const Authorized = (): React.ReactNode => {
   const [isNavbarOpen, { toggle }] = useDisclosure();
@@ -49,11 +50,13 @@ const Authorized = (): React.ReactNode => {
         flex={{ direction: "column" }}
       >
         <AccountTypeProvider>
-          <TransactionCategoryProvider>
-            <TransactionFiltersProvider>
-              <PageContent />
-            </TransactionFiltersProvider>
-          </TransactionCategoryProvider>
+          <AssetTypeProvider>
+            <TransactionCategoryProvider>
+              <TransactionFiltersProvider>
+                <PageContent />
+              </TransactionFiltersProvider>
+            </TransactionCategoryProvider>
+          </AssetTypeProvider>
         </AccountTypeProvider>
       </AppShellMain>
     </AppShell>

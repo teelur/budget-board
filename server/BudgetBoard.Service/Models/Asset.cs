@@ -23,6 +23,7 @@ public interface IAssetResponse
     decimal? SellPrice { get; }
     bool Hide { get; }
     DateTime? Deleted { get; }
+    string? Type { get; }
     int Index { get; }
     Guid UserID { get; }
 }
@@ -39,6 +40,7 @@ public class AssetResponse() : IAssetResponse
     public decimal? SellPrice { get; set; } = null;
     public bool Hide { get; set; } = false;
     public DateTime? Deleted { get; set; } = null;
+    public string? Type { get; set; } = null;
     public int Index { get; set; } = 0;
     public Guid UserID { get; set; } = Guid.Empty;
 
@@ -55,6 +57,7 @@ public class AssetResponse() : IAssetResponse
         SellPrice = asset.SellPrice;
         Hide = asset.Hide;
         Deleted = asset.Deleted;
+        Type = asset.Type;
         Index = asset.Index;
         UserID = asset.UserID;
     }
@@ -69,6 +72,7 @@ public interface IAssetUpdateRequest
     DateOnly? SellDate { get; }
     decimal? SellPrice { get; }
     bool Hide { get; }
+    string? Type { get; }
 }
 
 public class AssetUpdateRequest() : IAssetUpdateRequest
@@ -80,6 +84,7 @@ public class AssetUpdateRequest() : IAssetUpdateRequest
     public DateOnly? SellDate { get; set; } = null;
     public decimal? SellPrice { get; set; } = null;
     public bool Hide { get; set; } = false;
+    public string? Type { get; set; } = null;
 }
 
 public interface IAssetIndexRequest

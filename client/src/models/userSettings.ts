@@ -6,6 +6,7 @@ export interface IUserSettings {
   forceSyncLookbackMonths: number;
   disableBuiltInTransactionCategories: boolean;
   disableBuiltInAccountTypes: boolean;
+  disableBuiltInAssetTypes: boolean;
   enableAutoCategorizer: boolean;
   autoCategorizerModelOID?: number;
   autoCategorizerLastTrained?: Date;
@@ -22,6 +23,7 @@ export interface IUserSettingsUpdateRequest {
   forceSyncLookbackMonths?: number;
   disableBuiltInTransactionCategories?: boolean;
   disableBuiltInAccountTypes?: boolean;
+  disableBuiltInAssetTypes?: boolean;
   enableAutoCategorizer?: boolean;
   autoCategorizerModelOID?: number;
   autoCategorizerLastTrained?: Date;
