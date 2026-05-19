@@ -547,4 +547,40 @@
   <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
     <value>Unsupported operator '{0}' for Account field.</value>
   </data>
+  <data name="AssetTypeCreateDuplicateNameError" xml:space="preserve">
+    <value>An asset type with that name already exists.</value>
+  </data>
+  <data name="AssetTypeCreateEmptyNameError" xml:space="preserve">
+    <value>The asset type name cannot be empty.</value>
+  </data>
+  <data name="AssetTypeCreateSameNameAsParentError" xml:space="preserve">
+    <value>The asset type name cannot be the same as its parent.</value>
+  </data>
+  <data name="AssetTypeCreateParentNotFoundError" xml:space="preserve">
+    <value>The parent asset type does not exist.</value>
+  </data>
+  <data name="AssetTypeUpdateNotFoundError" xml:space="preserve">
+    <value>The asset type you are trying to update does not exist.</value>
+  </data>
+  <data name="AssetTypeUpdateDuplicateNameError" xml:space="preserve">
+    <value>An asset type with that name already exists.</value>
+  </data>
+  <data name="AssetTypeUpdateEmptyNameError" xml:space="preserve">
+    <value>The asset type name cannot be empty.</value>
+  </data>
+  <data name="AssetTypeUpdateSameNameAsParentError" xml:space="preserve">
+    <value>The asset type name cannot be the same as its parent.</value>
+  </data>
+  <data name="AssetTypeUpdateParentNotFoundError" xml:space="preserve">
+    <value>The parent asset type does not exist.</value>
+  </data>
+  <data name="AssetTypeDeleteNotFoundError" xml:space="preserve">
+    <value>The asset type you are trying to delete does not exist.</value>
+  </data>
+  <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
+    <value>Built-in asset types cannot be re-enabled because one or more custom asset types share a name with a built-in type. Please rename or remove the conflicting custom types first.</value>
+  </data>
+  <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
+    <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
+  </data>
 </root>
