@@ -9,6 +9,7 @@ export interface UserSettingsContextValue {
   preferredCurrency: string;
   preferredLanguage: string;
   disableBuiltInAccountTypes: boolean;
+  disableBuiltInAssetTypes: boolean;
   disableBuiltInTransactionCategories: boolean;
 }
 
@@ -17,6 +18,7 @@ export const UserSettingsContext =
     preferredCurrency: "USD",
     preferredLanguage: "default",
     disableBuiltInAccountTypes: false,
+    disableBuiltInAssetTypes: false,
     disableBuiltInTransactionCategories: false,
   });
 
@@ -62,6 +64,8 @@ export const UserSettingsProvider = ({
     preferredLanguage: userSettingsQuery.data?.language ?? "default",
     disableBuiltInAccountTypes:
       userSettingsQuery.data?.disableBuiltInAccountTypes ?? false,
+    disableBuiltInAssetTypes:
+      userSettingsQuery.data?.disableBuiltInAssetTypes ?? false,
     disableBuiltInTransactionCategories:
       userSettingsQuery.data?.disableBuiltInTransactionCategories ?? false,
   };

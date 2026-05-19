@@ -240,6 +240,7 @@ builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
+builder.Services.AddScoped<IAssetTypeService, AssetTypeService>();
 builder.Services.AddScoped<IValueService, ValueService>();
 builder.Services.AddScoped<IWidgetSettingsService, WidgetSettingsService>();
 builder.Services.AddScoped<INetWorthWidgetLineService, NetWorthWidgetLineService>();

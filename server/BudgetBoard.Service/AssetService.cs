@@ -76,6 +76,7 @@ public class AssetService(
         asset.SellDate = request.SellDate;
         asset.SellPrice = request.SellPrice;
         asset.Hide = request.Hide;
+        asset.Type = request.Type;
 
         await _userDataContext.SaveChangesAsync();
     }
@@ -92,6 +93,7 @@ public class AssetService(
             throw new BudgetBoardServiceException(_responseLocalizer["AssetDeleteNotFoundError"]);
         }
 
+        asset.Type = null;
         asset.Deleted = _nowProvider.UtcNow;
         await _userDataContext.SaveChangesAsync();
     }

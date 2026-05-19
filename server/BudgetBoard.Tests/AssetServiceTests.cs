@@ -165,6 +165,7 @@ public class AssetServiceTests
             SellDate = existingAsset.SellDate,
             SellPrice = existingAsset.SellPrice,
             Hide = existingAsset.Hide,
+            Type = "Automobile",
         };
 
         // Act
@@ -173,6 +174,7 @@ public class AssetServiceTests
         // Assert
         var assetInDb = helper.UserDataContext.Assets.Single(a => a.ID == existingAsset.ID);
         assetInDb.Name.Should().Be("Updated Asset Name");
+        assetInDb.Type.Should().Be("Automobile");
     }
 
     [Fact]

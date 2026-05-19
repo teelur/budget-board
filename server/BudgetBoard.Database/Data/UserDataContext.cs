@@ -32,6 +32,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<RuleCondition> RuleConditions { get; set; }
     public DbSet<RuleAction> RuleActions { get; set; }
     public DbSet<Asset> Assets { get; set; }
+    public DbSet<AssetType> AssetTypes { get; set; }
     public DbSet<Value> Values { get; set; }
     public DbSet<WidgetSettings> WidgetSettings { get; set; }
     public DbSet<SimpleFinOrganization> SimpleFinOrganizations { get; set; }
@@ -159,6 +160,8 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
 
             a.ToTable("Asset");
         });
+
+        modelBuilder.Entity<AssetType>().ToTable("AssetType");
 
         modelBuilder.Entity<Value>().ToTable("Value");
 

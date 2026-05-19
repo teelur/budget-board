@@ -12,7 +12,10 @@ const AssetsSettings = (): React.ReactNode => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navItems = [{ path: "deleted", label: t("deleted_assets") }];
+  const navItems = [
+    { path: "asset-types", label: t("asset_types") },
+    { path: "deleted", label: t("deleted_assets") },
+  ];
 
   const activeItem = navItems.find((item) =>
     location.pathname.endsWith(item.path),
