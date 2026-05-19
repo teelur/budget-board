@@ -53,6 +53,33 @@ namespace BudgetBoard.Database.Migrations
                 table: "AssetType",
                 column: "UserID"
             );
+
+            // Null out Type for all soft-deleted assets
+            migrationBuilder.Sql(
+                """
+                UPDATE "Asset"
+                SET "Type" = NULL
+                WHERE "Deleted" IS NOT NULL;
+                """
+            );
+
+            // Null out Type for all soft-deleted accounts
+            migrationBuilder.Sql(
+                """
+                UPDATE "Account"
+                SET "Type" = NULL
+                WHERE "Deleted" IS NOT NULL;
+                """
+            );
+
+            // Null out Category and Subcategory for all soft-deleted transactions
+            migrationBuilder.Sql(
+                """
+                UPDATE "Transaction"
+                SET "Category" = NULL, "Subcategory" = NULL
+                WHERE "Deleted" IS NOT NULL;
+                """
+            );
         }
 
         /// <inheritdoc />

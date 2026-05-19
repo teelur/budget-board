@@ -16,6 +16,7 @@ public class AssetFaker : Faker<Asset>
             .RuleFor(a => a.Hide, f => false)
             .RuleFor(a => a.Deleted, f => null)
             .RuleFor(a => a.Index, f => f.Random.Int(0, 100))
+            .RuleFor(a => a.Type, f => f.Random.Word())
             .RuleFor(a => a.UserID, f => userID);
     }
 }

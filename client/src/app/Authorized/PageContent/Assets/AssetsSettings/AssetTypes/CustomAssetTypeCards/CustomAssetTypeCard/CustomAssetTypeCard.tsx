@@ -159,15 +159,14 @@ const CustomAssetTypeCard = (
                   variant="subtle"
                   onClick={() => setIsEditing(true)}
                 >
-                  <PencilIcon size={14} />
+                  <PencilIcon size="1rem" />
                 </ActionIcon>
                 <ActionIcon
                   size="sm"
-                  variant="subtle"
-                  color="var(--button-color-destructive)"
                   onClick={() => props.deleteAssetType()}
+                  bg="var(--button-color-destructive)"
                 >
-                  <TrashIcon size={14} />
+                  <TrashIcon size="1rem" />
                 </ActionIcon>
               </>
             )}

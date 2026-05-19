@@ -185,16 +185,6 @@ const EditableAssetItemContent = (
               onBlur={() => doUpdateAsset.mutate()}
               elevation={1}
             />
-            <CategorySelect
-              categories={allAssetTypes}
-              value={typeField.getValue()}
-              onChange={(val: string) => {
-                typeField.setValue(val);
-                doUpdateAsset.mutate();
-              }}
-              withinPortal
-              elevation={1}
-            />
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon
                 variant="outline"
@@ -233,7 +223,18 @@ const EditableAssetItemContent = (
           </StatusText>
         </Group>
         <Group justify="space-between" align="flex-end">
-          <Group gap="1rem">
+          <Group gap="1rem" align="flex-end">
+            <CategorySelect
+              w={220}
+              categories={allAssetTypes}
+              value={typeField.getValue()}
+              onChange={(val: string) => {
+                typeField.setValue(val);
+                doUpdateAsset.mutate();
+              }}
+              withinPortal
+              elevation={1}
+            />
             <Group gap="0.5rem">
               <DateInput
                 {...purchaseDate.getInputProps()}
