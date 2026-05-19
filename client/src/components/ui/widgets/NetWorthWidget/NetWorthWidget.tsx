@@ -27,6 +27,7 @@ import { TrendingUpIcon } from "lucide-react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 
 interface NetWorthWidgetProps {
   widgetId: string;
@@ -43,6 +44,7 @@ const NetWorthWidget = ({
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
+  const { allAssetTypes } = useAssetTypes();
 
   const widgetSettingsQuery = useQuery({
     queryKey: ["widgetSettings"],
@@ -160,6 +162,7 @@ const NetWorthWidget = ({
                         validAssets,
                         orderedGroups.flatMap((g) => g.lines),
                         allAccountTypes,
+                        allAssetTypes,
                       )}
                       userCurrency={preferredCurrency ?? "USD"}
                     />

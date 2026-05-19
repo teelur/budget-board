@@ -18,6 +18,7 @@ import {
   INetWorthWidgetLine,
 } from "~/models/widgetSettings";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface EditableNetWorthLineCategoryContentProps {
@@ -46,6 +47,7 @@ const EditableNetWorthLineCategoryContent = (
   const { t } = useTranslation();
   const { request } = useAuth();
   const { allAccountTypes } = useAccountTypes();
+  const { allAssetTypes } = useAssetTypes();
 
   const queryClient = useQueryClient();
   const doUpdateCategory = useMutation({
@@ -106,7 +108,7 @@ const EditableNetWorthLineCategoryContent = (
     } else if (areStringsEqual(type, "asset")) {
       if (areStringsEqual(subtype, "all")) {
         return true;
-      } else if (areStringsEqual(subtype, "specific")) {
+      } else if (areStringsEqual(subtype, "category")) {
         return !!value;
       }
     } else if (areStringsEqual(type, "line")) {
@@ -217,6 +219,16 @@ const EditableNetWorthLineCategoryContent = (
     } else if (areStringsEqual(type, "asset")) {
       if (areStringsEqual(subtype, "all")) {
         return null;
+      } else if (areStringsEqual(subtype, "category")) {
+        return (
+          <CategorySelect
+            size="xs"
+            categories={allAssetTypes}
+            {...valueField.getInputProps()}
+            withinPortal
+            elevation={2}
+          />
+        );
       }
     } else if (areStringsEqual(type, "line")) {
       if (areStringsEqual(subtype, "name")) {

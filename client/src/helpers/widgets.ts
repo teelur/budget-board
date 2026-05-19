@@ -6,12 +6,13 @@ import {
   INetWorthWidgetGroup,
   INetWorthWidgetLine,
 } from "~/models/widgetSettings";
-import { sumAssetsTotalValue } from "./assets";
+import { getAssetsOfTypes, sumAssetsTotalValue } from "./assets";
 import { getAccountsOfTypes, sumAccountsTotalBalance } from "./accounts";
 import { IAccountResponse } from "~/models/account";
 import { IAssetResponse } from "~/models/asset";
 import { ComboboxItem } from "@mantine/core";
 import { IAccountType } from "~/models/accountType";
+import { IAssetType } from "~/models/assetType";
 
 /**
  * Return a string representation for the supplied value, defaulting to an empty string.
@@ -212,8 +213,20 @@ export const getAssetValueForCategory = (
   if (areStringsEqual(category.subtype, "all")) {
     return sumAssetsTotalValue(assets);
   }
+  if (areStringsEqual(category.subtype, "category")) {
+    const filters = [category.value]
+      .filter(Boolean)
+      .map((value) => value as string);
 
-  // Currently, we only support "all" as a subtype for assets.
+    if (filters.length === 0) {
+      return 0;
+    }
+
+    return sumAssetsTotalValue(
+      assets.filter((asset) => filters.includes(asset.type)),
+    );
+  }
+
   return 0;
 };
 
@@ -229,7 +242,8 @@ export const calculateLineTotal = (
   validAccounts: IAccountResponse[],
   validAssets: IAssetResponse[],
   lines: INetWorthWidgetLine[],
-  allTypes: IAccountType[],
+  allAccountTypes: IAccountType[],
+  allAssetTypes: IAssetType[],
 ): number => {
   const categories = line.categories ?? [];
 
@@ -240,7 +254,26 @@ export const calculateLineTotal = (
   return categories.reduce(
     (total: number, category: INetWorthWidgetCategory) => {
       if (isAssetCategory(category)) {
-        return total + getAssetValueForCategory(category, validAssets);
+        if (areStringsEqual(category.subtype, "category")) {
+          const filters = [category.value]
+            .filter(Boolean)
+            .map((value) => value as string);
+
+          if (filters.length === 0) {
+            return total;
+          }
+
+          console.log(getAssetsOfTypes(validAssets, filters, allAssetTypes));
+
+          return (
+            total +
+            sumAssetsTotalValue(
+              getAssetsOfTypes(validAssets, filters, allAssetTypes),
+            )
+          );
+        } else if (areStringsEqual(category.subtype, "all")) {
+          return total + getAssetValueForCategory(category, validAssets);
+        }
       }
 
       if (isAccountCategory(category)) {
@@ -256,7 +289,7 @@ export const calculateLineTotal = (
           return (
             total +
             sumAccountsTotalBalance(
-              getAccountsOfTypes(validAccounts, filters, allTypes),
+              getAccountsOfTypes(validAccounts, filters, allAccountTypes),
             )
           );
         }
@@ -272,7 +305,8 @@ export const calculateLineTotal = (
             validAccounts,
             validAssets,
             lines,
-            allTypes,
+            allAccountTypes,
+            allAssetTypes,
           );
           return total + lineTotal;
         }
@@ -296,6 +330,7 @@ export const NET_WORTH_CATEGORY_ACCOUNT_SUBTYPES: ComboboxItem[] = [
 
 export const NET_WORTH_CATEGORY_ASSET_SUBTYPES: ComboboxItem[] = [
   { value: "all", label: "all" },
+  { value: "category", label: "category" },
 ];
 
 export const NET_WORTH_CATEGORY_LINE_SUBTYPES: ComboboxItem[] = [
