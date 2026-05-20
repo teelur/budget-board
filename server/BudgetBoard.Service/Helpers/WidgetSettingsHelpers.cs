@@ -3,7 +3,15 @@ using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 
 namespace BudgetBoard.Service.Helpers;
 
-public record DefaultWidgetLayout(string WidgetType, int X, int Y, int W, int H);
+public record DefaultWidgetLayout(
+    string WidgetType,
+    int LgX,
+    int LgY,
+    int LgW,
+    int LgH,
+    int SmY,
+    int SmH
+);
 
 public static class WidgetSettingsHelpers
 {
@@ -13,10 +21,42 @@ public static class WidgetSettingsHelpers
     /// </summary>
     public static readonly IReadOnlyList<DefaultWidgetLayout> DefaultLayouts =
     [
-        new DefaultWidgetLayout(WidgetTypes.Accounts, X: 0, Y: 0, W: 4, H: 20),
-        new DefaultWidgetLayout(WidgetTypes.UncategorizedTransactions, X: 4, Y: 0, W: 8, H: 11),
-        new DefaultWidgetLayout(WidgetTypes.NetWorth, X: 0, Y: 5, W: 4, H: 10),
-        new DefaultWidgetLayout(WidgetTypes.SpendingTrends, X: 4, Y: 5, W: 8, H: 16),
+        new DefaultWidgetLayout(
+            WidgetTypes.Accounts,
+            LgX: 0,
+            LgY: 0,
+            LgW: 4,
+            LgH: 20,
+            SmY: 0,
+            SmH: 20
+        ),
+        new DefaultWidgetLayout(
+            WidgetTypes.UncategorizedTransactions,
+            LgX: 4,
+            LgY: 0,
+            LgW: 8,
+            LgH: 11,
+            SmY: 0,
+            SmH: 11
+        ),
+        new DefaultWidgetLayout(
+            WidgetTypes.NetWorth,
+            LgX: 0,
+            LgY: 5,
+            LgW: 4,
+            LgH: 10,
+            SmY: 0,
+            SmH: 10
+        ),
+        new DefaultWidgetLayout(
+            WidgetTypes.SpendingTrends,
+            LgX: 4,
+            LgY: 5,
+            LgW: 8,
+            LgH: 16,
+            SmY: 0,
+            SmH: 16
+        ),
     ];
 
     /// <summary>
@@ -206,5 +246,5 @@ public static class WidgetSettingsHelpers
 
     public static DefaultWidgetLayout GetDefaultWidgetLayout(string widgetType) =>
         DefaultLayouts.FirstOrDefault(dl => dl.WidgetType == widgetType)
-        ?? new DefaultWidgetLayout(widgetType, 0, 0, 4, 5);
+        ?? new DefaultWidgetLayout(widgetType, 0, 0, 4, 5, 0, 5);
 }

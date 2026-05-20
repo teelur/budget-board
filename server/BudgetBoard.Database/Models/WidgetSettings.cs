@@ -16,24 +16,34 @@ public class WidgetSettings
     public required string WidgetType { get; set; }
 
     /// <summary>
-    /// Column position on the grid (0-based).
+    /// Column position on the grid for large screens (0-based).
     /// </summary>
-    public int X { get; set; } = 0;
+    public int LgX { get; set; } = 0;
 
     /// <summary>
-    /// Row position on the grid (0-based).
+    /// Row position on the grid for large screens (0-based).
     /// </summary>
-    public int Y { get; set; } = 0;
+    public int LgY { get; set; } = 0;
 
     /// <summary>
-    /// Width in grid columns.
+    /// Width in grid columns for large screens.
     /// </summary>
-    public int W { get; set; } = 4;
+    public int LgW { get; set; } = 4;
 
     /// <summary>
-    /// Height in grid row units.
+    /// Height in grid row units for large screens.
     /// </summary>
-    public int H { get; set; } = 5;
+    public int LgH { get; set; } = 5;
+
+    /// <summary>
+    /// Row position on the grid for small screens (0-based).
+    /// </summary>
+    public int SmY { get; set; } = 0;
+
+    /// <summary>
+    /// Height in grid row units for small screens.
+    /// </summary>
+    public int SmH { get; set; } = 5;
 
     /// <summary>
     /// JSON string containing widget-specific configuration options.
