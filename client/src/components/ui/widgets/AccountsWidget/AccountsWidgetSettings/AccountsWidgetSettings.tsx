@@ -144,10 +144,12 @@ const AccountsWidgetSettings = ({
         method: "PUT",
         data: {
           id: widget.id,
-          x: widget.x,
-          y: widget.y,
-          w: widget.w,
-          h: widget.h,
+          lgX: widget.lgX,
+          lgY: widget.lgY,
+          lgW: widget.lgW,
+          lgH: widget.lgH,
+          smY: widget.smY,
+          smH: widget.smH,
           configuration: { accountIds },
         },
       });

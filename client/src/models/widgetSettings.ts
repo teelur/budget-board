@@ -1,36 +1,44 @@
 export interface IWidgetSettingsResponse {
   id: string;
   widgetType: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  lgX: number;
+  lgY: number;
+  lgW: number;
+  lgH: number;
+  smY: number;
+  smH: number;
   configuration: string;
   userID: string;
 }
 
 export interface IWidgetSettingsCreateRequest {
   widgetType: string;
-  x: number | null;
-  y: number | null;
-  w: number | null;
-  h: number | null;
+  lgX: number | null;
+  lgY: number | null;
+  lgW: number | null;
+  lgH: number | null;
+  smY: number | null;
+  smH: number | null;
 }
 
 export interface IWidgetSettingsBatchUpdateRequest {
   id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  lgX?: number | null;
+  lgY?: number | null;
+  lgW?: number | null;
+  lgH?: number | null;
+  smY?: number | null;
+  smH?: number | null;
 }
 
 export interface IWidgetSettingsUpdateRequest<T> {
   id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  lgX: number;
+  lgY: number;
+  lgW: number;
+  lgH: number;
+  smY: number;
+  smH: number;
   configuration: T;
 }
 

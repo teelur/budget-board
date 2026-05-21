@@ -5,7 +5,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const DashboardFooter = (): React.ReactNode => {
   return (
-    <Group gap="0.5rem">
+    <Group w="100%" gap="0.5rem" justify="left">
       <PrimaryText size="xs">{import.meta.env.VITE_VERSION}</PrimaryText>
       <ActionIcon
         component="a"

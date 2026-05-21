@@ -96,12 +96,12 @@ public class WidgetSettingsService(
             throw new BudgetBoardServiceException(responseLocalizer["WidgetUpdateNotFoundError"]);
         }
 
-        widget.LgX = request.LgX;
-        widget.LgY = request.LgY;
-        widget.LgW = request.LgW;
-        widget.LgH = request.LgH;
-        widget.SmY = request.SmY;
-        widget.SmH = request.SmH;
+        widget.LgX = request.LgX ?? widget.LgX;
+        widget.LgY = request.LgY ?? widget.LgY;
+        widget.LgW = request.LgW ?? widget.LgW;
+        widget.LgH = request.LgH ?? widget.LgH;
+        widget.SmY = request.SmY ?? widget.SmY;
+        widget.SmH = request.SmH ?? widget.SmH;
         widget.Configuration = request.Configuration.HasValue
             ? ValidateAndSerializeConfiguration(widget.WidgetType, request.Configuration.Value)
             : widget.Configuration;
@@ -127,12 +127,12 @@ public class WidgetSettingsService(
                 );
             }
 
-            widget.LgX = req.LgX;
-            widget.LgY = req.LgY;
-            widget.LgW = req.LgW;
-            widget.LgH = req.LgH;
-            widget.SmY = req.SmY;
-            widget.SmH = req.SmH;
+            widget.LgX = req.LgX ?? widget.LgX;
+            widget.LgY = req.LgY ?? widget.LgY;
+            widget.LgW = req.LgW ?? widget.LgW;
+            widget.LgH = req.LgH ?? widget.LgH;
+            widget.SmY = req.SmY ?? widget.SmY;
+            widget.SmH = req.SmH ?? widget.SmH;
         }
 
         await userDataContext.SaveChangesAsync();
@@ -165,6 +165,25 @@ public class WidgetSettingsService(
         }
 
         widget.Configuration = GetDefaultConfiguration(widget.WidgetType);
+        await userDataContext.SaveChangesAsync();
+    }
+
+    public async Task ResetSmallScreenToLargeScreenLayout(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var widgetsGroupedByY = userData.WidgetSettings.GroupBy(ws => ws.LgY).OrderBy(g => g.Key);
+
+        var iterator = 0;
+        foreach (var widgetGroup in widgetsGroupedByY)
+        {
+            foreach (var widget in widgetGroup)
+            {
+                widget.SmY = iterator++;
+                widget.SmH = widget.LgH;
+            }
+        }
+
         await userDataContext.SaveChangesAsync();
     }
 

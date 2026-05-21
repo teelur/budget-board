@@ -409,4 +409,134 @@ public class WidgetSettingsServiceTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("WidgetDeleteNotFoundError");
     }
+
+    [Fact]
+    public async Task ResetSmallScreenToLargeScreenLayout_WhenWidgetsExist_ShouldAssignSmPositionsInLgYOrder()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        // Three widgets at different LgY rows
+        var widget1 = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Accounts,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 3,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+        var widget2 = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.NetWorth,
+            LgX = 4,
+            LgY = 5,
+            LgW = 4,
+            LgH = 6,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+        var widget3 = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.UncategorizedTransactions,
+            LgX = 0,
+            LgY = 11,
+            LgW = 4,
+            LgH = 4,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.AddRange(widget1, widget2, widget3);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.ResetSmallScreenToLargeScreenLayout(helper.demoUser.Id);
+
+        // Assert — SmY should be 0, 1, 2 in ascending LgY order; SmH should mirror LgH
+        var result1 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget1.ID);
+        var result2 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget2.ID);
+        var result3 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget3.ID);
+
+        result1.SmY.Should().Be(0);
+        result1.SmH.Should().Be(widget1.LgH);
+
+        result2.SmY.Should().Be(1);
+        result2.SmH.Should().Be(widget2.LgH);
+
+        result3.SmY.Should().Be(2);
+        result3.SmH.Should().Be(widget3.LgH);
+    }
+
+    [Fact]
+    public async Task ResetSmallScreenToLargeScreenLayout_WhenMultipleWidgetsShareSameLgY_ShouldAssignSequentialSmYWithinGroup()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        // Two widgets sharing LgY = 0, one widget at LgY = 5
+        var widgetA = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Accounts,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+        var widgetB = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.NetWorth,
+            LgX = 4,
+            LgY = 0,
+            LgW = 4,
+            LgH = 4,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+        var widgetC = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.SpendingTrends,
+            LgX = 0,
+            LgY = 5,
+            LgW = 8,
+            LgH = 3,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.AddRange(widgetA, widgetB, widgetC);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.ResetSmallScreenToLargeScreenLayout(helper.demoUser.Id);
+
+        // Assert — the two LgY=0 widgets get SmY 0 and 1; the LgY=5 widget gets SmY 2
+        var resultA = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetA.ID);
+        var resultB = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetB.ID);
+        var resultC = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetC.ID);
+
+        new[] { resultA.SmY, resultB.SmY }.Should().BeEquivalentTo([0, 1]);
+        resultA.SmH.Should().Be(widgetA.LgH);
+        resultB.SmH.Should().Be(widgetB.LgH);
+
+        resultC.SmY.Should().Be(2);
+        resultC.SmH.Should().Be(widgetC.LgH);
+    }
 }
