@@ -2,11 +2,10 @@ import { Badge, Button, Group } from "@mantine/core";
 import { LayoutIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface DashboardMobileHeaderProps {
