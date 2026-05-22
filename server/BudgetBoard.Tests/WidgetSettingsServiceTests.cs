@@ -461,7 +461,7 @@ public class WidgetSettingsServiceTests
         // Act
         await service.ResetSmallScreenToLargeScreenLayout(helper.demoUser.Id);
 
-        // Assert — SmY should be 0, 1, 2 in ascending LgY order; SmH should mirror LgH
+        // Assert — SmY should stack by cumulative SmH in ascending (LgY, LgX) order; SmH mirrors LgH
         var result1 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget1.ID);
         var result2 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget2.ID);
         var result3 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget3.ID);
@@ -469,15 +469,15 @@ public class WidgetSettingsServiceTests
         result1.SmY.Should().Be(0);
         result1.SmH.Should().Be(widget1.LgH);
 
-        result2.SmY.Should().Be(1);
+        result2.SmY.Should().Be(result1.SmY + result1.SmH);
         result2.SmH.Should().Be(widget2.LgH);
 
-        result3.SmY.Should().Be(2);
+        result3.SmY.Should().Be(result2.SmY + result2.SmH);
         result3.SmH.Should().Be(widget3.LgH);
     }
 
     [Fact]
-    public async Task ResetSmallScreenToLargeScreenLayout_WhenMultipleWidgetsShareSameLgY_ShouldAssignSequentialSmYWithinGroup()
+    public async Task ResetSmallScreenToLargeScreenLayout_WhenMultipleWidgetsShareSameLgY_ShouldOrderByLgXAndStackByHeight()
     {
         // Arrange
         var helper = new TestHelper();
@@ -527,16 +527,18 @@ public class WidgetSettingsServiceTests
         // Act
         await service.ResetSmallScreenToLargeScreenLayout(helper.demoUser.Id);
 
-        // Assert — the two LgY=0 widgets get SmY 0 and 1; the LgY=5 widget gets SmY 2
+        // Assert — widgets are ordered by (LgY, LgX) and stacked by cumulative SmH
         var resultA = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetA.ID);
         var resultB = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetB.ID);
         var resultC = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetC.ID);
 
-        new[] { resultA.SmY, resultB.SmY }.Should().BeEquivalentTo([0, 1]);
+        resultA.SmY.Should().Be(0);
         resultA.SmH.Should().Be(widgetA.LgH);
+
+        resultB.SmY.Should().Be(resultA.SmY + resultA.SmH);
         resultB.SmH.Should().Be(widgetB.LgH);
 
-        resultC.SmY.Should().Be(2);
+        resultC.SmY.Should().Be(resultB.SmY + resultB.SmH);
         resultC.SmH.Should().Be(widgetC.LgH);
     }
 }

@@ -31,7 +31,7 @@ namespace BudgetBoard.Database.Migrations
                 table: "WidgetSettings",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0
+                defaultValue: 5
             );
 
             // Initialise small-screen positions from large-screen values for any existing rows.

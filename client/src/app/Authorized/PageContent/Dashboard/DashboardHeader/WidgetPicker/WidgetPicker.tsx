@@ -74,13 +74,19 @@ const WidgetPicker = ({
       return;
     }
 
+    const existing = widgetSettingsQuery.data ?? [];
+    const nextSmY = existing.reduce(
+      (max, w) => Math.max(max, w.smY + w.smH),
+      0,
+    );
+
     doAddWidget.mutate({
       widgetType,
       lgX: 0,
       lgY: 9999,
       lgW: null,
       lgH: null,
-      smY: null,
+      smY: nextSmY,
       smH: null,
     });
 

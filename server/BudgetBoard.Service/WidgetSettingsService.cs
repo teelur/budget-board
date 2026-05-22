@@ -172,16 +172,16 @@ public class WidgetSettingsService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        var widgetsGroupedByY = userData.WidgetSettings.GroupBy(ws => ws.LgY).OrderBy(g => g.Key);
+        var widgetsInSmallScreenOrder = userData
+            .WidgetSettings.OrderBy(ws => ws.LgY)
+            .ThenBy(ws => ws.LgX);
 
-        var iterator = 0;
-        foreach (var widgetGroup in widgetsGroupedByY)
+        var currentY = 0;
+        foreach (var widget in widgetsInSmallScreenOrder)
         {
-            foreach (var widget in widgetGroup)
-            {
-                widget.SmY = iterator++;
-                widget.SmH = widget.LgH;
-            }
+            widget.SmY = currentY;
+            widget.SmH = widget.LgH;
+            currentY += widget.SmH;
         }
 
         await userDataContext.SaveChangesAsync();

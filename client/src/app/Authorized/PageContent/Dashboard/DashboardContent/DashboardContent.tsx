@@ -20,7 +20,6 @@ import {
 } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
-  deriveSmLayout,
   GRID_BREAKPOINT,
   GRID_COLS,
   GRID_ROW_HEIGHT,
@@ -160,16 +159,14 @@ const DashboardContent = ({
   );
   const smLayout = React.useMemo<LayoutItem[]>(
     () =>
-      widgets.every((w) => w.smY !== null)
-        ? widgets.map((w) => ({
-            i: w.id,
-            x: 0, // x is ignored for sm since cols=1
-            y: w.smY!,
-            w: 1, // w is ignored for sm since cols=1
-            h: w.smH!,
-          }))
-        : deriveSmLayout(lgLayout),
-    [widgets, lgLayout],
+      widgets.map((w) => ({
+        i: w.id,
+        x: 0, // x is ignored for sm since cols=1
+        y: w.smY,
+        w: 1, // w is ignored for sm since cols=1
+        h: w.smH,
+      })),
+    [widgets],
   );
 
   const isDesktopViewport =

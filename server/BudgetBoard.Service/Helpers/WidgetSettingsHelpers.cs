@@ -36,7 +36,7 @@ public static class WidgetSettingsHelpers
             LgY: 0,
             LgW: 8,
             LgH: 11,
-            SmY: 0,
+            SmY: 30,
             SmH: 11
         ),
         new DefaultWidgetLayout(
@@ -45,7 +45,7 @@ public static class WidgetSettingsHelpers
             LgY: 5,
             LgW: 4,
             LgH: 10,
-            SmY: 0,
+            SmY: 20,
             SmH: 10
         ),
         new DefaultWidgetLayout(
@@ -54,7 +54,7 @@ public static class WidgetSettingsHelpers
             LgY: 5,
             LgW: 8,
             LgH: 16,
-            SmY: 0,
+            SmY: 41,
             SmH: 16
         ),
     ];
