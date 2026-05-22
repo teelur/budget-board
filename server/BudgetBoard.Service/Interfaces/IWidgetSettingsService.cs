@@ -55,4 +55,11 @@ public interface IWidgetSettingsService
     /// <param name="widgetGuid">The unique identifier of the widget whose settings configuration will be reset.</param>
     /// <returns>A task that represents the asynchronous reset operation.</returns>
     Task ResetWidgetSettingsConfiguration(Guid userGuid, Guid widgetGuid);
+
+    /// <summary>
+    /// Resets the grid layout for small screens to match the large screen layout for all widgets of a given user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user whose small screen layout will be reset.</param>
+    /// <returns>A task that represents the asynchronous reset operation.</returns>
+    Task ResetSmallScreenToLargeScreenLayout(Guid userGuid);
 }

@@ -76,7 +76,7 @@ const PageContent = (): React.ReactNode => {
     <ScrollArea
       w="100%"
       h="100%"
-      type="hover"
+      type="auto"
       pb="0.3rem"
       offsetScrollbars="present"
     >

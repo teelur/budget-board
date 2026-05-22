@@ -36,10 +36,12 @@ public class WidgetSettingsServiceTests
         var request = new WidgetSettingsCreateRequest
         {
             WidgetType = WidgetTypes.NetWorth,
-            X = 0,
-            Y = 5,
-            W = 4,
-            H = 5,
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
         };
 
         // Act
@@ -51,10 +53,12 @@ public class WidgetSettingsServiceTests
         );
         settings.Should().NotBeNull();
         settings!.WidgetType.Should().Be(WidgetTypes.NetWorth);
-        settings.X.Should().Be(0);
-        settings.Y.Should().Be(5);
-        settings.W.Should().Be(4);
-        settings.H.Should().Be(5);
+        settings.LgX.Should().Be(0);
+        settings.LgY.Should().Be(5);
+        settings.LgW.Should().Be(4);
+        settings.LgH.Should().Be(5);
+        settings.SmY.Should().Be(5);
+        settings.SmH.Should().Be(5);
     }
 
     [Fact]
@@ -67,10 +71,12 @@ public class WidgetSettingsServiceTests
         var existingSettings = new WidgetSettings
         {
             WidgetType = WidgetTypes.NetWorth,
-            X = 0,
-            Y = 5,
-            W = 4,
-            H = 5,
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
             Configuration = JsonSerializer.Serialize(
                 new NetWorthWidgetConfiguration
                 {
@@ -115,10 +121,12 @@ public class WidgetSettingsServiceTests
         var setting = settings.First();
         setting.ID.Should().Be(existingSettings.ID);
         setting.WidgetType.Should().Be(WidgetTypes.NetWorth);
-        setting.X.Should().Be(0);
-        setting.Y.Should().Be(5);
-        setting.W.Should().Be(4);
-        setting.H.Should().Be(5);
+        setting.LgX.Should().Be(0);
+        setting.LgY.Should().Be(5);
+        setting.LgW.Should().Be(4);
+        setting.LgH.Should().Be(5);
+        setting.SmY.Should().Be(5);
+        setting.SmH.Should().Be(5);
         setting.Configuration.Should().Be(existingSettings.Configuration);
         setting.UserID.Should().Be(helper.demoUser.Id);
     }
@@ -141,10 +149,12 @@ public class WidgetSettingsServiceTests
         {
             var match = settings.FirstOrDefault(s => s.WidgetType == layout.WidgetType);
             match.Should().NotBeNull($"default widget '{layout.WidgetType}' should be seeded");
-            match!.X.Should().Be(layout.X);
-            match.Y.Should().Be(layout.Y);
-            match.W.Should().Be(layout.W);
-            match.H.Should().Be(layout.H);
+            match!.LgX.Should().Be(layout.LgX);
+            match.LgY.Should().Be(layout.LgY);
+            match.LgW.Should().Be(layout.LgW);
+            match.LgH.Should().Be(layout.LgH);
+            match.SmY.Should().Be(layout.SmY);
+            match.SmH.Should().Be(layout.SmH);
             match.UserID.Should().Be(helper.demoUser.Id);
         }
     }
@@ -160,10 +170,12 @@ public class WidgetSettingsServiceTests
         {
             ID = Guid.NewGuid(),
             WidgetType = WidgetTypes.NetWorth,
-            X = 0,
-            Y = 5,
-            W = 4,
-            H = 5,
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
             Configuration = JsonSerializer.Serialize(
                 WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
             ),
@@ -204,10 +216,12 @@ public class WidgetSettingsServiceTests
         var updateRequest = new WidgetSettingsUpdateRequest
         {
             ID = existingSettings.ID,
-            X = 4,
-            Y = 0,
-            W = 8,
-            H = 5,
+            LgX = 4,
+            LgY = 0,
+            LgW = 8,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
             Configuration = JsonSerializer.SerializeToElement(updatedConfig),
         };
 
@@ -219,10 +233,12 @@ public class WidgetSettingsServiceTests
             ws.ID == existingSettings.ID && ws.UserID == helper.demoUser.Id
         );
         updated.Should().NotBeNull();
-        updated!.X.Should().Be(4);
-        updated.Y.Should().Be(0);
-        updated.W.Should().Be(8);
-        updated.H.Should().Be(5);
+        updated!.LgX.Should().Be(4);
+        updated.LgY.Should().Be(0);
+        updated.LgW.Should().Be(8);
+        updated.LgH.Should().Be(5);
+        updated.SmY.Should().Be(0);
+        updated.SmH.Should().Be(5);
         updated.Configuration.Should().Be(JsonSerializer.Serialize(updatedConfig));
     }
 
@@ -236,10 +252,12 @@ public class WidgetSettingsServiceTests
         var updateRequest = new WidgetSettingsUpdateRequest
         {
             ID = Guid.NewGuid(),
-            X = 0,
-            Y = 0,
-            W = 4,
-            H = 5,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
             Configuration = JsonSerializer.SerializeToElement(
                 new NetWorthWidgetConfiguration { Groups = [] }
             ),
@@ -267,20 +285,24 @@ public class WidgetSettingsServiceTests
         {
             ID = Guid.NewGuid(),
             WidgetType = WidgetTypes.Accounts,
-            X = 0,
-            Y = 0,
-            W = 4,
-            H = 5,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
             UserID = helper.demoUser.Id,
         };
         var widget2 = new WidgetSettings
         {
             ID = Guid.NewGuid(),
             WidgetType = WidgetTypes.NetWorth,
-            X = 0,
-            Y = 5,
-            W = 4,
-            H = 5,
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
             UserID = helper.demoUser.Id,
         };
 
@@ -292,18 +314,22 @@ public class WidgetSettingsServiceTests
             new()
             {
                 ID = widget1.ID,
-                X = 8,
-                Y = 0,
-                W = 4,
-                H = 3,
+                LgX = 8,
+                LgY = 0,
+                LgW = 4,
+                LgH = 3,
+                SmY = 0,
+                SmH = 3,
             },
             new()
             {
                 ID = widget2.ID,
-                X = 0,
-                Y = 3,
-                W = 8,
-                H = 6,
+                LgX = 0,
+                LgY = 3,
+                LgW = 8,
+                LgH = 6,
+                SmY = 3,
+                SmH = 6,
             },
         };
 
@@ -312,16 +338,20 @@ public class WidgetSettingsServiceTests
 
         // Assert
         var updated1 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget1.ID);
-        updated1.X.Should().Be(8);
-        updated1.Y.Should().Be(0);
-        updated1.W.Should().Be(4);
-        updated1.H.Should().Be(3);
+        updated1.LgX.Should().Be(8);
+        updated1.LgY.Should().Be(0);
+        updated1.LgW.Should().Be(4);
+        updated1.LgH.Should().Be(3);
+        updated1.SmY.Should().Be(0);
+        updated1.SmH.Should().Be(3);
 
         var updated2 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget2.ID);
-        updated2.X.Should().Be(0);
-        updated2.Y.Should().Be(3);
-        updated2.W.Should().Be(8);
-        updated2.H.Should().Be(6);
+        updated2.LgX.Should().Be(0);
+        updated2.LgY.Should().Be(3);
+        updated2.LgW.Should().Be(8);
+        updated2.LgH.Should().Be(6);
+        updated2.SmY.Should().Be(3);
+        updated2.SmH.Should().Be(6);
     }
 
     [Fact]
@@ -335,10 +365,12 @@ public class WidgetSettingsServiceTests
         {
             ID = Guid.NewGuid(),
             WidgetType = WidgetTypes.NetWorth,
-            X = 0,
-            Y = 5,
-            W = 4,
-            H = 5,
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
             Configuration = JsonSerializer.Serialize(
                 WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
             ),
@@ -376,5 +408,137 @@ public class WidgetSettingsServiceTests
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("WidgetDeleteNotFoundError");
+    }
+
+    [Fact]
+    public async Task ResetSmallScreenToLargeScreenLayout_WhenWidgetsExist_ShouldAssignSmPositionsInLgYOrder()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        // Three widgets at different LgY rows
+        var widget1 = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Accounts,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 3,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+        var widget2 = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.NetWorth,
+            LgX = 4,
+            LgY = 5,
+            LgW = 4,
+            LgH = 6,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+        var widget3 = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.UncategorizedTransactions,
+            LgX = 0,
+            LgY = 11,
+            LgW = 4,
+            LgH = 4,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.AddRange(widget1, widget2, widget3);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.ResetSmallScreenToLargeScreenLayout(helper.demoUser.Id);
+
+        // Assert — SmY should stack by cumulative SmH in ascending (LgY, LgX) order; SmH mirrors LgH
+        var result1 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget1.ID);
+        var result2 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget2.ID);
+        var result3 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget3.ID);
+
+        result1.SmY.Should().Be(0);
+        result1.SmH.Should().Be(widget1.LgH);
+
+        result2.SmY.Should().Be(result1.SmY + result1.SmH);
+        result2.SmH.Should().Be(widget2.LgH);
+
+        result3.SmY.Should().Be(result2.SmY + result2.SmH);
+        result3.SmH.Should().Be(widget3.LgH);
+    }
+
+    [Fact]
+    public async Task ResetSmallScreenToLargeScreenLayout_WhenMultipleWidgetsShareSameLgY_ShouldOrderByLgXAndStackByHeight()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        // Two widgets sharing LgY = 0, one widget at LgY = 5
+        var widgetA = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Accounts,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+        var widgetB = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.NetWorth,
+            LgX = 4,
+            LgY = 0,
+            LgW = 4,
+            LgH = 4,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+        var widgetC = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.SpendingTrends,
+            LgX = 0,
+            LgY = 5,
+            LgW = 8,
+            LgH = 3,
+            SmY = 99,
+            SmH = 99,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.AddRange(widgetA, widgetB, widgetC);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.ResetSmallScreenToLargeScreenLayout(helper.demoUser.Id);
+
+        // Assert — widgets are ordered by (LgY, LgX) and stacked by cumulative SmH
+        var resultA = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetA.ID);
+        var resultB = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetB.ID);
+        var resultC = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetC.ID);
+
+        resultA.SmY.Should().Be(0);
+        resultA.SmH.Should().Be(widgetA.LgH);
+
+        resultB.SmY.Should().Be(resultA.SmY + resultA.SmH);
+        resultB.SmH.Should().Be(widgetB.LgH);
+
+        resultC.SmY.Should().Be(resultB.SmY + resultB.SmH);
+        resultC.SmH.Should().Be(widgetC.LgH);
     }
 }
