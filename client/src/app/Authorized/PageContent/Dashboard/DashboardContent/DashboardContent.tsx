@@ -1,4 +1,5 @@
-import { Skeleton, Stack } from "@mantine/core";
+import { Box, Flex, Skeleton, Stack } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
@@ -19,7 +20,6 @@ import {
 } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
-  deriveSmLayout,
   GRID_BREAKPOINT,
   GRID_COLS,
   GRID_ROW_HEIGHT,
@@ -28,15 +28,16 @@ import SpendingTrendsWidget from "../../../../../components/ui/widgets/SpendingT
 import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
 
 const SKELETON_COUNT = 4;
+const SM_PREVIEW_WIDTH = 500;
 
 interface DashboardContentProps {
   isEditMode: boolean;
-  onBreakpointChange?: (breakpoint: "sm" | "lg") => void;
+  editTarget: "lg" | "sm";
 }
 
 const DashboardContent = ({
   isEditMode,
-  onBreakpointChange,
+  editTarget,
 }: DashboardContentProps) => {
   const [settingsOpenId, setSettingsOpenId] = React.useState<string | null>(
     null,
@@ -93,24 +94,29 @@ const DashboardContent = ({
     },
   });
 
-  const handleLayoutChange = (
-    layout: Layout,
-    _layouts: Partial<Record<string, Layout>>,
-  ) => {
-    if (!isEditMode) {
-      return;
-    }
+  const handleSave = React.useCallback(
+    (layout: Layout) => {
+      if (!isEditMode) return;
 
-    const updates: IWidgetSettingsBatchUpdateRequest[] = layout.map((item) => ({
-      id: item.i,
-      x: item.x,
-      y: item.y,
-      w: item.w,
-      h: item.h,
-    }));
+      const updates: IWidgetSettingsBatchUpdateRequest[] =
+        editTarget === "lg"
+          ? layout.map((item) => ({
+              id: item.i,
+              lgX: item.x,
+              lgY: item.y,
+              lgW: item.w,
+              lgH: item.h,
+            }))
+          : layout.map((item) => ({
+              id: item.i,
+              smY: item.y,
+              smH: item.h,
+            }));
 
-    doBatchUpdate.mutate(updates);
-  };
+      doBatchUpdate.mutate(updates);
+    },
+    [isEditMode, editTarget, doBatchUpdate.mutate],
+  );
 
   const renderWidgetContent = (widget: IWidgetSettingsResponse) => {
     switch (widget.widgetType) {
@@ -140,17 +146,36 @@ const DashboardContent = ({
   };
 
   const widgets = widgetSettingsQuery.data ?? [];
-  const lgLayout: LayoutItem[] = widgets.map((w) => ({
-    i: w.id,
-    x: w.x,
-    y: w.y,
-    w: w.w,
-    h: w.h,
-  }));
-  const smLayout = deriveSmLayout(lgLayout);
+  const lgLayout = React.useMemo<LayoutItem[]>(
+    () =>
+      widgets.map((w) => ({
+        i: w.id,
+        x: w.lgX,
+        y: w.lgY,
+        w: w.lgW,
+        h: w.lgH,
+      })),
+    [widgets],
+  );
+  const smLayout = React.useMemo<LayoutItem[]>(
+    () =>
+      widgets.map((w) => ({
+        i: w.id,
+        x: 0, // x is ignored for sm since cols=1
+        y: w.smY,
+        w: 1, // w is ignored for sm since cols=1
+        h: w.smH,
+      })),
+    [widgets],
+  );
+
+  const isDesktopViewport =
+    useMediaQuery(`(min-width: ${GRID_BREAKPOINT}px)`) ?? false;
+  const isEditingSmOnDesktop =
+    isEditMode && editTarget === "sm" && isDesktopViewport;
 
   return (
-    <div ref={containerRef} style={{ width: "100%" }}>
+    <Flex ref={containerRef} w={"100%"} flex="1" justify="center">
       {widgetSettingsQuery.isPending ? (
         <Stack gap="md">
           {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
@@ -158,38 +183,50 @@ const DashboardContent = ({
           ))}
         </Stack>
       ) : (
-        <ResponsiveGridLayout
-          width={width}
-          layouts={{ lg: lgLayout, sm: smLayout }}
-          breakpoints={{ lg: GRID_BREAKPOINT, sm: 0 }}
-          cols={{ lg: GRID_COLS, sm: 1 }}
-          rowHeight={GRID_ROW_HEIGHT}
-          dragConfig={{ enabled: isEditMode }}
-          resizeConfig={{ enabled: isEditMode }}
-          onLayoutChange={handleLayoutChange}
-          onBreakpointChange={onBreakpointChange}
-          margin={[12, 12]}
-          containerPadding={[0, 0]}
-        >
-          {widgets.map((widget) => (
-            <div key={widget.id} style={{ height: "100%", overflow: "hidden" }}>
-              <WidgetShell
-                isEditMode={isEditMode}
-                onRemove={() => doRemoveWidget.mutate(widget.id)}
-                onSettingsOpen={
-                  widget.widgetType === "NetWorth" ||
-                  widget.widgetType === "Accounts"
-                    ? () => setSettingsOpenId(widget.id)
-                    : undefined
-                }
+        <Box w={isEditingSmOnDesktop ? SM_PREVIEW_WIDTH : "100%"}>
+          <ResponsiveGridLayout
+            key={isEditingSmOnDesktop ? "sm-preview" : "lg"}
+            width={isEditingSmOnDesktop ? SM_PREVIEW_WIDTH : width}
+            layouts={
+              isEditingSmOnDesktop
+                ? { lg: smLayout, sm: smLayout }
+                : { lg: lgLayout, sm: smLayout }
+            }
+            breakpoints={{ lg: GRID_BREAKPOINT, sm: 0 }}
+            cols={
+              isEditingSmOnDesktop ? { lg: 1, sm: 1 } : { lg: GRID_COLS, sm: 1 }
+            }
+            rowHeight={GRID_ROW_HEIGHT}
+            dragConfig={{ enabled: isEditMode }}
+            resizeConfig={{ enabled: isEditMode }}
+            onDragStop={(layout) => handleSave(layout)}
+            onResizeStop={(layout) => handleSave(layout)}
+            margin={[12, 12]}
+            containerPadding={[0, 0]}
+          >
+            {widgets.map((widget) => (
+              <div
+                key={widget.id}
+                style={{ height: "100%", overflow: "hidden" }}
               >
-                {renderWidgetContent(widget)}
-              </WidgetShell>
-            </div>
-          ))}
-        </ResponsiveGridLayout>
+                <WidgetShell
+                  isEditMode={isEditMode}
+                  onRemove={() => doRemoveWidget.mutate(widget.id)}
+                  onSettingsOpen={
+                    widget.widgetType === "NetWorth" ||
+                    widget.widgetType === "Accounts"
+                      ? () => setSettingsOpenId(widget.id)
+                      : undefined
+                  }
+                >
+                  {renderWidgetContent(widget)}
+                </WidgetShell>
+              </div>
+            ))}
+          </ResponsiveGridLayout>
+        </Box>
       )}
-    </div>
+    </Flex>
   );
 };
 

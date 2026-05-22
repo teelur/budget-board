@@ -29,10 +29,12 @@ public class WidgetSettingsService(
         var newWidget = new WidgetSettings
         {
             WidgetType = request.WidgetType,
-            X = request.X ?? defaultLayout.X,
-            Y = request.Y ?? defaultLayout.Y,
-            W = request.W ?? defaultLayout.W,
-            H = request.H ?? defaultLayout.H,
+            LgX = request.LgX ?? defaultLayout.LgX,
+            LgY = request.LgY ?? defaultLayout.LgY,
+            LgW = request.LgW ?? defaultLayout.LgW,
+            LgH = request.LgH ?? defaultLayout.LgH,
+            SmY = request.SmY ?? defaultLayout.SmY,
+            SmH = request.SmH ?? defaultLayout.SmH,
             Configuration = GetDefaultConfiguration(request.WidgetType),
             UserID = userData.Id,
         };
@@ -55,10 +57,12 @@ public class WidgetSettingsService(
                     new WidgetSettingsCreateRequest
                     {
                         WidgetType = layout.WidgetType,
-                        X = layout.X,
-                        Y = layout.Y,
-                        W = layout.W,
-                        H = layout.H,
+                        LgX = layout.LgX,
+                        LgY = layout.LgY,
+                        LgW = layout.LgW,
+                        LgH = layout.LgH,
+                        SmY = layout.SmY,
+                        SmH = layout.SmH,
                     }
                 );
             }
@@ -68,10 +72,12 @@ public class WidgetSettingsService(
         {
             ID = ws.ID,
             WidgetType = ws.WidgetType,
-            X = ws.X,
-            Y = ws.Y,
-            W = ws.W,
-            H = ws.H,
+            LgX = ws.LgX,
+            LgY = ws.LgY,
+            LgW = ws.LgW,
+            LgH = ws.LgH,
+            SmY = ws.SmY,
+            SmH = ws.SmH,
             Configuration =
                 ws.Configuration ?? GetDefaultConfiguration(ws.WidgetType) ?? string.Empty,
             UserID = ws.UserID,
@@ -90,10 +96,12 @@ public class WidgetSettingsService(
             throw new BudgetBoardServiceException(responseLocalizer["WidgetUpdateNotFoundError"]);
         }
 
-        widget.X = request.X;
-        widget.Y = request.Y;
-        widget.W = request.W;
-        widget.H = request.H;
+        widget.LgX = request.LgX ?? widget.LgX;
+        widget.LgY = request.LgY ?? widget.LgY;
+        widget.LgW = request.LgW ?? widget.LgW;
+        widget.LgH = request.LgH ?? widget.LgH;
+        widget.SmY = request.SmY ?? widget.SmY;
+        widget.SmH = request.SmH ?? widget.SmH;
         widget.Configuration = request.Configuration.HasValue
             ? ValidateAndSerializeConfiguration(widget.WidgetType, request.Configuration.Value)
             : widget.Configuration;
@@ -119,10 +127,12 @@ public class WidgetSettingsService(
                 );
             }
 
-            widget.X = req.X;
-            widget.Y = req.Y;
-            widget.W = req.W;
-            widget.H = req.H;
+            widget.LgX = req.LgX ?? widget.LgX;
+            widget.LgY = req.LgY ?? widget.LgY;
+            widget.LgW = req.LgW ?? widget.LgW;
+            widget.LgH = req.LgH ?? widget.LgH;
+            widget.SmY = req.SmY ?? widget.SmY;
+            widget.SmH = req.SmH ?? widget.SmH;
         }
 
         await userDataContext.SaveChangesAsync();
@@ -155,6 +165,25 @@ public class WidgetSettingsService(
         }
 
         widget.Configuration = GetDefaultConfiguration(widget.WidgetType);
+        await userDataContext.SaveChangesAsync();
+    }
+
+    public async Task ResetSmallScreenToLargeScreenLayout(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var widgetsInSmallScreenOrder = userData
+            .WidgetSettings.OrderBy(ws => ws.LgY)
+            .ThenBy(ws => ws.LgX);
+
+        var currentY = 0;
+        foreach (var widget in widgetsInSmallScreenOrder)
+        {
+            widget.SmY = currentY;
+            widget.SmH = widget.LgH;
+            currentY += widget.SmH;
+        }
+
         await userDataContext.SaveChangesAsync();
     }
 
