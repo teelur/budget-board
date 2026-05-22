@@ -12,6 +12,9 @@ const localeMap: Record<string, string> = {
   de: "de",
   fr: "fr",
   "zh-hans": "zh-cn",
+  id: "id",
+  it: "it",
+  ru: "ru",
 };
 
 export interface LocaleContextValue {

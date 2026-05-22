@@ -43,6 +43,9 @@ export const Languages: LanguageItem[] = [
   { value: "de", label: "german" },
   { value: "fr", label: "french" },
   { value: "zh-hans", label: "chinese_simplified" },
+  { value: "id", label: "indonesian" },
+  { value: "it", label: "italian" },
+  { value: "ru", label: "russian" },
 ];
 
 export class DateFormatItem {
