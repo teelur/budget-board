@@ -26,9 +26,12 @@ public static class SupportedLanguages
     public const string German = "de";
     public const string French = "fr";
     public const string ChineseSimplified = "zh-hans";
+    public const string Indonesian = "id";
+    public const string Italian = "it";
+    public const string Russian = "ru";
 
     public static List<string> SupportedCultureNames { get; } =
-    [EnglishUnitedStates, German, French, ChineseSimplified];
+    [EnglishUnitedStates, German, French, ChineseSimplified, Indonesian, Italian, Russian];
 
     public static List<string> AllUserLanguageOptions { get; } =
     [SystemDefault, .. SupportedCultureNames];
