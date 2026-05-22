@@ -1,5 +1,3 @@
-import { LayoutItem } from "react-grid-layout";
-
 export const GRID_COLS = 12;
 export const GRID_ROW_HEIGHT = 20;
 export const GRID_BREAKPOINT = 768;
