@@ -27,7 +27,7 @@ const InstitutionItem = (props: InstitutionItemProps): React.ReactNode => {
           {props.institution.name}
         </SecondaryHeading>
       </Stack>
-      <Stack px="0.5rem" py="0.25rem" gap="0.25rem">
+      <Stack px="0.5rem" py="0.25rem" gap="0.5rem">
         {sortedFilteredAccounts.map((account: IAccountResponse) => (
           <AccountItem
             key={account.id}
