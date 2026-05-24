@@ -1,12 +1,11 @@
-import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Box, Flex, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
-import InstitutionItem from "./InstitutionItems/InstitutionItem";
+import InstitutionItem from "./InstitutionItem/InstitutionItem";
 import { IAccountResponse } from "~/models/account";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import SplitCard, {
   BorderThickness,
@@ -16,6 +15,8 @@ import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import AccountsWidgetSettings from "./AccountsWidgetSettings/AccountsWidgetSettings";
 import WidgetErrorMessage from "~/components/ui/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
+import Divider from "~/components/core/Divider/Divider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface AccountsWidgetProps {
   widgetId: string;
@@ -109,7 +110,11 @@ const AccountsWidget = ({
 
   const getAccountsContent = () => {
     if (institutionQuery.isPending || accountsQuery.isPending) {
-      return <Skeleton height="100%" radius="md" />;
+      return (
+        <Flex h="100%" w="100%" p="0.5rem">
+          <Skeleton flex={1} radius="md" />
+        </Flex>
+      );
     }
 
     if ((sortedFilteredInstitutionsForDisplay ?? []).length === 0) {
@@ -119,15 +124,18 @@ const AccountsWidget = ({
     }
 
     return (
-      <ScrollArea w="100%" h="100%" type="auto" offsetScrollbars="present">
-        <Stack align="center" gap="0.5rem">
-          {(sortedFilteredInstitutionsForDisplay ?? []).map(
-            (institution: IInstitution) => (
-              <InstitutionItem key={institution.id} institution={institution} />
-            ),
-          )}
-        </Stack>
-      </ScrollArea>
+      <Stack h="100%" w="100%" justify="space-around" gap={0}>
+        {(sortedFilteredInstitutionsForDisplay ?? []).map(
+          (institution: IInstitution, index: number) => (
+            <React.Fragment key={institution.id}>
+              <InstitutionItem institution={institution} />
+              {index < sortedFilteredInstitutionsForDisplay.length - 1 && (
+                <Divider size="xs" elevation={1} />
+              )}
+            </React.Fragment>
+          ),
+        )}
+      </Stack>
     );
   };
 
@@ -139,9 +147,9 @@ const AccountsWidget = ({
       header={
         <Group gap="0.25rem">
           <LandmarkIcon color="var(--base-color-text-dimmed)" />
-          <PrimaryText size="xl" lh={1}>
+          <PrimaryHeading order={3} lh={1}>
             {t("accounts")}
-          </PrimaryText>
+          </PrimaryHeading>
         </Group>
       }
       style={{

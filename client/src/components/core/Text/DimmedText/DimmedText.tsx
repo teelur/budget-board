@@ -9,7 +9,7 @@ const DimmedText = ({
   children,
   ...props
 }: DimmedTextProps): React.ReactNode => (
-  <Text c="var(--base-color-text-dimmed)" fw={600} {...props}>
+  <Text c="var(--base-color-text-dimmed)" fw={500} {...props}>
     {children}
   </Text>
 );

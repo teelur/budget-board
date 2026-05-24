@@ -9,7 +9,7 @@ const PrimaryText = ({
   children,
   ...props
 }: PrimaryTextProps): React.ReactNode => (
-  <Text c="var(--base-color-text-primary)" fw={600} {...props}>
+  <Text c="var(--base-color-text-primary)" fw={500} {...props}>
     {children}
   </Text>
 );
