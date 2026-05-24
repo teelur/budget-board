@@ -1,4 +1,4 @@
-import { Box, Flex, Group, Skeleton, Stack } from "@mantine/core";
+import { Flex, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
