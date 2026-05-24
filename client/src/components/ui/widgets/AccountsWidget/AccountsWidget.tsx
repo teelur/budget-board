@@ -124,13 +124,13 @@ const AccountsWidget = ({
     }
 
     return (
-      <Stack h="100%" w="100%" justify="space-around" gap={0}>
+      <Stack h="100%" w="100%" my="0.5rem" justify="space-around" gap={0}>
         {(sortedFilteredInstitutionsForDisplay ?? []).map(
           (institution: IInstitution, index: number) => (
             <React.Fragment key={institution.id}>
               <InstitutionItem institution={institution} />
               {index < sortedFilteredInstitutionsForDisplay.length - 1 && (
-                <Divider size="xs" elevation={1} />
+                <Divider my={"0.5rem"} size="xs" elevation={1} />
               )}
             </React.Fragment>
           ),
