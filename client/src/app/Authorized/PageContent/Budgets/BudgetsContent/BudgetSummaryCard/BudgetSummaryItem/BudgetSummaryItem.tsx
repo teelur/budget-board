@@ -96,21 +96,10 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
 
   return (
     <Stack gap={0}>
-      <Group
-        gap="0.25rem"
-        justify={props.showDivider ? "center" : "space-between"}
-      >
+      <Group gap="0.25rem" justify="space-between">
         <Flex>
           <PrimaryText size="md">{props.label}</PrimaryText>
         </Flex>
-        {props.showDivider ? (
-          <Divider
-            color="var(--elevated-color-border)"
-            my="sm"
-            variant="dashed"
-            flex="1 0 auto"
-          />
-        ) : null}
         <Flex gap="0.25rem" align="baseline">
           <Trans
             i18nKey={i18nKey}
