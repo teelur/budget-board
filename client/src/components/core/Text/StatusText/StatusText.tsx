@@ -27,7 +27,7 @@ const StatusText = ({
         amount,
         total ?? 0,
         type ?? StatusColorType.Total,
-        warningThreshold ?? 110
+        warningThreshold ?? 110,
       )}
       fw={props.fw ?? 600}
       {...props}

@@ -8,6 +8,8 @@ import { getFormattedCategoryValue } from "~/helpers/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;
@@ -21,32 +23,6 @@ const TransactionCardContent = (
 ): React.ReactNode => {
   const { dayjs, longDateFormat, intlLocale } = useLocale();
 
-  const getPrimaryTextColor = (): string => {
-    switch (props.elevation) {
-      case 0:
-        return "var(--base-color-text-primary)";
-      case 1:
-        return "var(--surface-color-text-primary)";
-      case 2:
-        return "var(--elevated-color-text-primary)";
-      default:
-        return "var(--base-color-text-primary)";
-    }
-  };
-
-  const getDimmedTextColor = (): string => {
-    switch (props.elevation) {
-      case 0:
-        return "var(--base-color-text-dimmed)";
-      case 1:
-        return "var(--surface-color-text-dimmed)";
-      case 2:
-        return "var(--elevated-color-text-dimmed)";
-      default:
-        return "var(--base-color-text-dimmed)";
-    }
-  };
-
   const categoryValue =
     (props.transaction.subcategory ?? "").length > 0
       ? (props.transaction.subcategory ?? "")
@@ -54,23 +30,21 @@ const TransactionCardContent = (
 
   return (
     <Flex className={classes.content} w="100%" gap="0.5rem" align="center">
-      <Text
+      <DimmedText
         className={classes.dateText}
         flex="1 0 auto"
-        c={getDimmedTextColor()}
         size="sm"
-        fw={600}
+        elevation={props.elevation}
       >
         {dayjs(props.transaction.date).format(`${longDateFormat}`)}
-      </Text>
-      <Text
+      </DimmedText>
+      <PrimaryText
         className={classes.merchantNameText}
-        c={getPrimaryTextColor()}
         w="100%"
-        fw={600}
+        elevation={props.elevation}
       >
         {props.transaction.merchantName}
-      </Text>
+      </PrimaryText>
       <Flex
         className={classes.contentSubcontainer}
         gap="0.5rem"
