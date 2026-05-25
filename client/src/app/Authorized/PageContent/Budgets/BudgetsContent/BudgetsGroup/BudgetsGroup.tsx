@@ -25,17 +25,17 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
   const categoryToBudgetsMap = buildCategoryToBudgetsMap(props.budgets);
   const categoryToLimitsMap = buildCategoryToLimitsMap(
     props.budgets,
-    props.categoryTree
+    props.categoryTree,
   );
 
   return (
-    <Stack gap="0.5rem" align="center">
+    <Stack gap="0.75rem" align="center">
       {props.budgets.length > 0 ? (
         props.categoryTree.map((category) => {
           if (
             categoryToBudgetsMap.has(category.value.toLocaleLowerCase()) ||
             category.subCategories.some((subCategory) =>
-              categoryToBudgetsMap.has(subCategory.value.toLocaleLowerCase())
+              categoryToBudgetsMap.has(subCategory.value.toLocaleLowerCase()),
             )
           ) {
             return (

@@ -238,96 +238,51 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { budgetChildCards, unbudgetChildCards } = buildChildren();
 
   return (
-    <Card p="0.25rem" w="100%" elevation={1}>
-      <Stack gap="0.25rem">
-        <Card
-          p="0.25rem 0.5rem"
-          onClick={() => {
-            if (id.length > 0) {
-              props.openDetails(props.categoryTree.value, props.selectedDate);
-            }
-          }}
-          hoverEffect
-          elevation={2}
-        >
-          <LoadingOverlay
-            visible={doEditBudget.isPending || doDeleteBudget.isPending}
-          />
-          <Group gap="0.75rem" align="flex-start" wrap="nowrap">
-            <Stack gap={0} w="100%">
-              <Group
-                justify="space-between"
-                align="center"
-                style={{ containerType: "inline-size" }}
-                gap={0}
-              >
-                <Group gap="0.25rem" align="center">
-                  <PrimaryText className={classes.title}>
-                    {props.categoryTree.value}
-                  </PrimaryText>
-                  <ActionIcon
-                    variant={isSelected ? "outline" : "transparent"}
-                    size="md"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (id.length > 0) {
-                        newLimitField.setValue(limit);
-                        toggle();
-                      }
-                    }}
-                  >
-                    <PencilIcon size={16} />
-                  </ActionIcon>
-                </Group>
-                <Group gap="0.5rem" justify="flex-end" align="center">
-                  {isSelected ? (
-                    <>
-                      <Trans
-                        i18nKey="budget_amount_fraction_editable_total_styled"
-                        values={{
-                          amount: convertNumberToCurrency(
-                            amount * (isIncome ? 1 : -1),
-                            false,
-                            userSettingsQuery.data?.currency ?? "USD",
-                            SignDisplay.Auto,
-                            intlLocale,
-                          ),
-                        }}
-                        components={[
-                          <PrimaryText className={classes.text} key="amount" />,
-                          <DimmedText size="sm" key="of" />,
-                        ]}
-                      />
-                      <Flex onClick={(e) => e.stopPropagation()}>
-                        <NumberInput
-                          {...newLimitField.getInputProps()}
-                          onBlur={() => handleEdit(newLimitField.getValue())}
-                          thousandSeparator={thousandsSeparator}
-                          decimalSeparator={decimalSeparator}
-                          min={childLimitsTotal}
-                          max={999999}
-                          step={1}
-                          prefix={getCurrencySymbol(
-                            userSettingsQuery.data?.currency,
-                          )}
-                          placeholder={t("enter_limit")}
-                          size="xs"
-                          styles={{
-                            root: {
-                              maxWidth: "100px",
-                            },
-                            input: {
-                              padding: "0 10px",
-                              fontSize: "16px",
-                            },
-                          }}
-                          elevation={2}
-                        />
-                      </Flex>
-                    </>
-                  ) : (
+    <Stack w="100%" gap="0.25rem">
+      <Card
+        p="0.25rem 0.5rem"
+        onClick={() => {
+          if (id.length > 0) {
+            props.openDetails(props.categoryTree.value, props.selectedDate);
+          }
+        }}
+        hoverEffect
+        elevation={1}
+      >
+        <LoadingOverlay
+          visible={doEditBudget.isPending || doDeleteBudget.isPending}
+        />
+        <Group gap="0.75rem" align="flex-start" wrap="nowrap">
+          <Stack gap={0} w="100%">
+            <Group
+              justify="space-between"
+              align="center"
+              style={{ containerType: "inline-size" }}
+              gap={0}
+            >
+              <Group gap="0.25rem" align="center">
+                <PrimaryText className={classes.title} elevation={1}>
+                  {props.categoryTree.value}
+                </PrimaryText>
+                <ActionIcon
+                  variant={isSelected ? "outline" : "transparent"}
+                  size="md"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (id.length > 0) {
+                      newLimitField.setValue(limit);
+                      toggle();
+                    }
+                  }}
+                >
+                  <PencilIcon size={16} />
+                </ActionIcon>
+              </Group>
+              <Group gap="0.5rem" justify="flex-end" align="center">
+                {isSelected ? (
+                  <>
                     <Trans
-                      i18nKey="budget_amount_fraction_styled"
+                      i18nKey="budget_amount_fraction_editable_total_styled"
                       values={{
                         amount: convertNumberToCurrency(
                           amount * (isIncome ? 1 : -1),
@@ -336,121 +291,173 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                           SignDisplay.Auto,
                           intlLocale,
                         ),
-                        total: convertNumberToCurrency(
-                          limit,
-                          false,
-                          userSettingsQuery.data?.currency ?? "USD",
-                          SignDisplay.Auto,
-                          intlLocale,
-                        ),
                       }}
                       components={[
-                        <PrimaryText className={classes.text} key="amount" />,
-                        <DimmedText size="sm" key="of" />,
-                        <PrimaryText className={classes.text} key="total" />,
+                        <PrimaryText
+                          className={classes.text}
+                          key="amount"
+                          elevation={1}
+                        />,
+                        <DimmedText size="sm" key="of" elevation={1} />,
                       ]}
                     />
-                  )}
-                </Group>
+                    <Flex onClick={(e) => e.stopPropagation()}>
+                      <NumberInput
+                        {...newLimitField.getInputProps()}
+                        onBlur={() => handleEdit(newLimitField.getValue())}
+                        thousandSeparator={thousandsSeparator}
+                        decimalSeparator={decimalSeparator}
+                        min={childLimitsTotal}
+                        max={999999}
+                        step={1}
+                        prefix={getCurrencySymbol(
+                          userSettingsQuery.data?.currency,
+                        )}
+                        placeholder={t("enter_limit")}
+                        size="xs"
+                        styles={{
+                          root: {
+                            maxWidth: "100px",
+                          },
+                          input: {
+                            padding: "0 10px",
+                            fontSize: "16px",
+                          },
+                        }}
+                        elevation={1}
+                      />
+                    </Flex>
+                  </>
+                ) : (
+                  <Trans
+                    i18nKey="budget_amount_fraction_styled"
+                    values={{
+                      amount: convertNumberToCurrency(
+                        amount * (isIncome ? 1 : -1),
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD",
+                        SignDisplay.Auto,
+                        intlLocale,
+                      ),
+                      total: convertNumberToCurrency(
+                        limit,
+                        false,
+                        userSettingsQuery.data?.currency ?? "USD",
+                        SignDisplay.Auto,
+                        intlLocale,
+                      ),
+                    }}
+                    components={[
+                      <PrimaryText
+                        className={classes.text}
+                        key="amount"
+                        elevation={1}
+                      />,
+                      <DimmedText size="sm" key="of" elevation={1} />,
+                      <PrimaryText
+                        className={classes.text}
+                        key="total"
+                        elevation={1}
+                      />,
+                    ]}
+                  />
+                )}
               </Group>
-              <Group
-                gap="0.25rem"
-                justify="flex-end"
-                align="baseline"
-                style={{ containerType: "inline-size" }}
-              >
-                <Flex style={{ flex: "1 1 auto" }}>
-                  <Progress
-                    size={16}
-                    percentComplete={percentComplete}
-                    amount={amount}
-                    limit={limit}
-                    type={isIncome ? ProgressType.Income : ProgressType.Expense}
+            </Group>
+            <Group
+              gap="0.25rem"
+              justify="flex-end"
+              align="baseline"
+              style={{ containerType: "inline-size" }}
+            >
+              <Flex style={{ flex: "1 1 auto" }}>
+                <Progress
+                  size={16}
+                  percentComplete={percentComplete}
+                  amount={amount}
+                  limit={limit}
+                  type={isIncome ? ProgressType.Income : ProgressType.Expense}
+                  warningThreshold={
+                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
+                  }
+                  elevation={1}
+                />
+              </Flex>
+              <Trans
+                i18nKey="budget_left_styled"
+                values={{
+                  amount: convertNumberToCurrency(
+                    roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
+                    false,
+                    userSettingsQuery.data?.currency ?? "USD",
+                    SignDisplay.Auto,
+                    intlLocale,
+                  ),
+                }}
+                components={[
+                  <StatusText
+                    amount={roundAwayFromZero(amount)}
+                    total={limit}
+                    type={
+                      isIncome
+                        ? StatusColorType.Income
+                        : StatusColorType.Expense
+                    }
                     warningThreshold={
                       userSettingsQuery.data?.budgetWarningThreshold ?? 80
                     }
-                    elevation={2}
-                  />
-                </Flex>
-                <Trans
-                  i18nKey="budget_left_styled"
-                  values={{
-                    amount: convertNumberToCurrency(
-                      roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
-                      false,
-                      userSettingsQuery.data?.currency ?? "USD",
-                      SignDisplay.Auto,
-                      intlLocale,
-                    ),
-                  }}
-                  components={[
-                    <StatusText
-                      amount={roundAwayFromZero(amount)}
-                      total={limit}
-                      type={
-                        isIncome
-                          ? StatusColorType.Income
-                          : StatusColorType.Expense
-                      }
-                      warningThreshold={
-                        userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                      }
-                      size="md"
-                      key="amount"
-                    />,
-                    <DimmedText size="md" key="amount" />,
-                  ]}
-                />
-              </Group>
-            </Stack>
-            {isSelected && (
-              <Flex
-                style={{ alignSelf: "stretch" }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Popover>
-                  <MantinePopover.Target>
-                    <ActionIcon
+                    size="md"
+                    key="amount"
+                  />,
+                  <DimmedText size="md" key="amount" elevation={1} />,
+                ]}
+              />
+            </Group>
+          </Stack>
+          {isSelected && (
+            <Flex
+              style={{ alignSelf: "stretch" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Popover>
+                <MantinePopover.Target>
+                  <ActionIcon color="var(--button-color-destructive)" h="100%">
+                    <TrashIcon size="1rem" />
+                  </ActionIcon>
+                </MantinePopover.Target>
+                <MantinePopover.Dropdown p="0.5rem" maw={200}>
+                  <Stack gap={5}>
+                    <PrimaryText size="sm" elevation={1}>
+                      {t("confirm_delete_budget_message")}
+                    </PrimaryText>
+                    <DimmedText size="xs" elevation={1}>
+                      {t("all_children_will_also_be_deleted")}
+                    </DimmedText>
+                    <Button
                       color="var(--button-color-destructive)"
-                      h="100%"
+                      size="compact-xs"
+                      onClick={() => {
+                        doDeleteBudget.mutate(id);
+                        close();
+                      }}
                     >
-                      <TrashIcon size="1rem" />
-                    </ActionIcon>
-                  </MantinePopover.Target>
-                  <MantinePopover.Dropdown p="0.5rem" maw={200}>
-                    <Stack gap={5}>
-                      <PrimaryText size="sm">
-                        {t("confirm_delete_budget_message")}
-                      </PrimaryText>
-                      <DimmedText size="xs">
-                        {t("all_children_will_also_be_deleted")}
-                      </DimmedText>
-                      <Button
-                        color="var(--button-color-destructive)"
-                        size="compact-xs"
-                        onClick={() => {
-                          doDeleteBudget.mutate(id);
-                          close();
-                        }}
-                      >
-                        {t("delete")}
-                      </Button>
-                    </Stack>
-                  </MantinePopover.Dropdown>
-                </Popover>
-              </Flex>
-            )}
-          </Group>
-        </Card>
-        {props.categoryTree.subCategories.length > 0 &&
-          (budgetChildCards.length > 0 || unbudgetChildCards.length > 0) && (
-            <Stack gap="0.25rem">
-              {budgetChildCards.length > 0 && budgetChildCards}
-              {unbudgetChildCards.length > 0 && unbudgetChildCards}
-            </Stack>
+                      {t("delete")}
+                    </Button>
+                  </Stack>
+                </MantinePopover.Dropdown>
+              </Popover>
+            </Flex>
           )}
-      </Stack>
-    </Card>
+        </Group>
+      </Card>
+      {props.categoryTree.subCategories.length > 0 &&
+        (budgetChildCards.length > 0 || unbudgetChildCards.length > 0) && (
+          <Stack gap="0.25rem">
+            {budgetChildCards.length > 0 && budgetChildCards}
+            {unbudgetChildCards.length > 0 && unbudgetChildCards}
+          </Stack>
+        )}
+    </Stack>
   );
 };
 
