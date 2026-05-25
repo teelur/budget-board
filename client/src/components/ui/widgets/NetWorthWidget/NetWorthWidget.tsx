@@ -1,6 +1,5 @@
-import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Flex, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
-import NetWorthItem from "./NetWorthItem/NetWorthItem";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
@@ -8,26 +7,18 @@ import { IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
 import { filterVisibleAssets } from "~/helpers/assets";
 import { IAssetResponse } from "~/models/asset";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import {
-  INetWorthWidgetLine,
-  IWidgetSettingsResponse,
-} from "~/models/widgetSettings";
-import {
-  calculateLineTotal,
-  parseNetWorthConfiguration,
-} from "~/helpers/widgets";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
+import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
 import { useTranslation } from "react-i18next";
 import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
 import { TrendingUpIcon } from "lucide-react";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage";
-import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
-import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import NetWorthGroup from "./NetWorthGroup/NetWorthGroup";
+import Divider from "~/components/core/Divider/Divider";
 
 interface NetWorthWidgetProps {
   widgetId: string;
@@ -42,9 +33,6 @@ const NetWorthWidget = ({
 }: NetWorthWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
-  const { preferredCurrency } = useUserSettings();
-  const { allAccountTypes } = useAccountTypes();
-  const { allAssetTypes } = useAssetTypes();
 
   const widgetSettingsQuery = useQuery({
     queryKey: ["widgetSettings"],
@@ -92,13 +80,17 @@ const NetWorthWidget = ({
     },
   });
 
-  const getNetWorthLines = (): React.ReactNode => {
+  const getNetWorthGroups = (): React.ReactNode => {
     if (
       widgetSettingsQuery.isPending ||
       accountsQuery.isPending ||
       assetsQuery.isPending
     ) {
-      return <Skeleton height="100%" radius="md" />;
+      return (
+        <Flex p="0.5rem" h="100%" w="100%">
+          <Skeleton height="100%" radius="md" />
+        </Flex>
+      );
     }
 
     if (!widgetSettingsQuery.data || widgetSettingsQuery.data.length === 0) {
@@ -139,40 +131,21 @@ const NetWorthWidget = ({
     const validAssets = filterVisibleAssets(assetsQuery.data ?? []);
 
     return (
-      <ScrollArea w="100%" h="100%" type="auto" offsetScrollbars="present">
-        <Stack gap="0.5rem">
-          {orderedGroups.map((group) => {
-            const sortedLines = group.lines
-              .slice()
-              .sort(
-                (a: INetWorthWidgetLine, b: INetWorthWidgetLine) =>
-                  a.index - b.index,
-              );
-
-            return (
-              <Card key={group.id} p="0.25rem" elevation={2}>
-                <Stack gap={0}>
-                  {sortedLines.map((line: INetWorthWidgetLine) => (
-                    <NetWorthItem
-                      key={line.id}
-                      title={line.name}
-                      totalBalance={calculateLineTotal(
-                        line,
-                        validAccounts,
-                        validAssets,
-                        orderedGroups.flatMap((g) => g.lines),
-                        allAccountTypes,
-                        allAssetTypes,
-                      )}
-                      userCurrency={preferredCurrency ?? "USD"}
-                    />
-                  ))}
-                </Stack>
-              </Card>
-            );
-          })}
-        </Stack>
-      </ScrollArea>
+      <Stack h="100%" w="100%" my="0.5rem" justify="space-around" gap={0}>
+        {orderedGroups.map((group, index) => (
+          <React.Fragment key={group.id}>
+            <NetWorthGroup
+              netWorthWidgetGroup={group}
+              validAccounts={validAccounts}
+              validAssets={validAssets}
+              orderedGroups={orderedGroups}
+            />
+            {index < orderedGroups.length - 1 && (
+              <Divider my={"0.5rem"} size="xs" elevation={1} />
+            )}
+          </React.Fragment>
+        ))}
+      </Stack>
     );
   };
 
@@ -185,15 +158,15 @@ const NetWorthWidget = ({
         <Group w="100%" justify="space-between">
           <Group gap="0.25rem">
             <TrendingUpIcon color="var(--base-color-text-dimmed)" />
-            <PrimaryText size="xl" lh={1}>
+            <PrimaryHeading order={3} lh={1}>
               {t("net_worth")}
-            </PrimaryText>
+            </PrimaryHeading>
           </Group>
         </Group>
       }
       elevation={1}
     >
-      {getNetWorthLines()}
+      {getNetWorthGroups()}
       {settingsOpened !== undefined && onSettingsClose && (
         <NetWorthCardSettings
           widgetId={widgetId}
