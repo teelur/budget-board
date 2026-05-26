@@ -14,6 +14,7 @@ import {
 } from "~/models/widgetSettings";
 import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface WidgetPickerProps {
   opened: boolean;
@@ -97,7 +98,7 @@ const WidgetPicker = ({
     <Drawer
       opened={opened}
       onClose={onClose}
-      title={<PrimaryText size="lg">{t("add_widget")}</PrimaryText>}
+      title={<PrimaryHeading order={4}>{t("add_widget")}</PrimaryHeading>}
       position="right"
       size="sm"
     >
