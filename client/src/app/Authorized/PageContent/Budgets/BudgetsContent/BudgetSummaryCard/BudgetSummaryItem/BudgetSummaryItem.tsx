@@ -120,7 +120,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
               : ProgressType.Expense
           }
           warningThreshold={warningThreshold}
-          elevation={2}
+          elevation={1}
         />
       )}
     </Stack>
