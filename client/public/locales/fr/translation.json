@@ -137,7 +137,6 @@
   "csv_file_is_empty_message": "Le fichier CSV est vide.",
   "csv_file_missing_header_row_message": "Le fichier CSV ne contient pas de ligne d’en-tête.",
   "current_password": "Mot de passe actuel",
-  "custom_account_types": "",
   "custom_account_types_description": "Créez des types de compte personnalisés pour organiser vos comptes.",
   "custom_asset_types": "Types d'actif personnalisés",
   "custom_asset_types_description": "Créez des types d'actif personnalisés pour organiser vos actifs.",
