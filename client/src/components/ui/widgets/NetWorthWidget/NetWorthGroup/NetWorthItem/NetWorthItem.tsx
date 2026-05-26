@@ -1,4 +1,4 @@
-import { Divider, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -36,15 +36,14 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
   });
 
   return (
-    <Group p={0} align="center" wrap="nowrap" gap="0.25rem">
+    <Group
+      p={0}
+      justify="space-between"
+      align="center"
+      wrap="nowrap"
+      gap="0.25rem"
+    >
       <PrimaryText fw={600}>{props.title}</PrimaryText>
-      <Divider
-        color="var(--elevated-color-border)"
-        my="sm"
-        size="xs"
-        variant="dashed"
-        flex="1 0 auto"
-      />
       {userSettingsQuery.isPending ? null : (
         <StatusText amount={props.totalBalance}>
           {convertNumberToCurrency(

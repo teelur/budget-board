@@ -1,11 +1,11 @@
 import { ActionIcon, Box, Group, Stack } from "@mantine/core";
 import React from "react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import SettingsNavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
+import NavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 const TransactionsSettings = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -29,14 +29,14 @@ const TransactionsSettings = (): React.ReactNode => {
         <ActionIcon variant="subtle" onClick={() => navigate("/transactions")}>
           <ChevronLeftIcon />
         </ActionIcon>
-        <PrimaryText size="lg">{t("transactions_settings")}</PrimaryText>
+        <PrimaryHeading order={5}>{t("transactions_settings")}</PrimaryHeading>
         {activeItem && (
           <>
             <ChevronRightIcon
               size="1rem"
               color="var(--base-color-text-dimmed)"
             />
-            <DimmedText size="lg">{activeItem.label}</DimmedText>
+            <SecondaryHeading order={5}>{activeItem.label}</SecondaryHeading>
           </>
         )}
       </Group>
@@ -47,7 +47,7 @@ const TransactionsSettings = (): React.ReactNode => {
           gap={4}
         >
           {navItems.map((item) => (
-            <SettingsNavLink
+            <NavLink
               key={item.path}
               label={item.label}
               active={location.pathname.endsWith(item.path)}

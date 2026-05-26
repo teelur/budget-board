@@ -141,7 +141,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
           }
         }}
         hoverEffect={!isSelected}
-        elevation={2}
+        elevation={1}
       >
         <LoadingOverlay
           visible={doEditBudget.isPending || doDeleteBudget.isPending}
@@ -154,7 +154,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               style={{ containerType: "inline-size" }}
             >
               <Group gap="0.25rem" align="center">
-                <PrimaryText className={classes.title}>
+                <PrimaryText className={classes.title} elevation={1}>
                   {props.categoryValue}
                 </PrimaryText>
                 <ActionIcon
@@ -193,8 +193,12 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                         ),
                       }}
                       components={[
-                        <PrimaryText className={classes.text} key="amount" />,
-                        <DimmedText size="sm" key="of" />,
+                        <PrimaryText
+                          className={classes.text}
+                          key="amount"
+                          elevation={1}
+                        />,
+                        <DimmedText size="sm" key="of" elevation={1} />,
                       ]}
                     />
                     <Flex onClick={(e) => e.stopPropagation()}>
@@ -221,7 +225,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                           },
                         }}
                         key="total-edit"
-                        elevation={2}
+                        elevation={1}
                       />
                     </Flex>
                   </>
@@ -245,9 +249,17 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       ),
                     }}
                     components={[
-                      <PrimaryText className={classes.text} key="amount" />,
-                      <DimmedText size="sm" key="of" />,
-                      <PrimaryText className={classes.text} key="total" />,
+                      <PrimaryText
+                        className={classes.text}
+                        key="amount"
+                        elevation={1}
+                      />,
+                      <DimmedText size="sm" key="of" elevation={1} />,
+                      <PrimaryText
+                        className={classes.text}
+                        key="total"
+                        elevation={1}
+                      />,
                     ]}
                   />
                 )}
@@ -271,7 +283,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   warningThreshold={
                     userSettingsQuery.data?.budgetWarningThreshold ?? 80
                   }
-                  elevation={2}
+                  elevation={1}
                 />
               </Flex>
               <Trans
@@ -302,7 +314,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                     size="md"
                     key="amount"
                   />,
-                  <DimmedText size="md" key="amount" />,
+                  <DimmedText size="md" key="amount" elevation={1} />,
                 ]}
               />
             </Group>

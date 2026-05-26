@@ -3,10 +3,10 @@ import { Stack } from "@mantine/core";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import ColumnOrderItem from "./ColumnOrderItem/ColumnOrderItem";
 import { EXPORT_FIELDS } from "../ExportTransactionsModal";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface ColumnOrderCardProps {
   orderedFields: string[];
@@ -27,7 +27,7 @@ const ColumnOrderCard = (props: ColumnOrderCardProps): React.ReactNode => {
   return (
     <Card w="100%" elevation={1}>
       <Stack gap="0.5rem">
-        <PrimaryText size="lg">{t("column_order")}</PrimaryText>
+        <PrimaryHeading order={5}>{t("column_order")}</PrimaryHeading>
         <DragDropProvider
           onDragEnd={(event) => {
             props.onChange(move(props.orderedFields, event));

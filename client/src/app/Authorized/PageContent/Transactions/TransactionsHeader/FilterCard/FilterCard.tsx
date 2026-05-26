@@ -15,6 +15,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const FilterCard = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -27,7 +28,8 @@ const FilterCard = (): React.ReactNode => {
     currencySymbol,
   } = useLocale();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
 
   return (
     <Card elevation={1}>
@@ -38,7 +40,7 @@ const FilterCard = (): React.ReactNode => {
           align="center"
           wrap="nowrap"
         >
-          <PrimaryText size="lg">{t("filters")}</PrimaryText>
+          <PrimaryHeading order={5}>{t("filters")}</PrimaryHeading>
           <Button
             className={classes.clearButton}
             w="100%"

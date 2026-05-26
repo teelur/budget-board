@@ -1,7 +1,7 @@
 import classes from "./AccountItem.module.css";
 
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { Group, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { IAccountResponse } from "~/models/account";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -41,16 +41,29 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
   });
 
   return (
-    <Stack
-      gap={0.5}
+    <Group
+      h="100%"
+      justify="space-between"
+      wrap="nowrap"
       className={props.onClick ? classes.root : undefined}
       onClick={props.onClick}
     >
-      <Group justify="space-between" wrap="nowrap">
+      <Stack h="100%" gap={0}>
         <PrimaryText className={classes.title}>
           {props.account.name}
         </PrimaryText>
-        {userSettingsQuery.isPending ? null : (
+        <DimmedText className={classes.timestamp} size="xs">
+          {t("last_updated", {
+            date: dayjs(props.account.balanceDate).isValid()
+              ? dayjs(props.account.balanceDate).format(`${dateFormat}`)
+              : t("never"),
+          })}
+        </DimmedText>
+      </Stack>
+      <Stack h="100%" justify="flex-start">
+        {userSettingsQuery.isPending ? (
+          <Skeleton height={25} width={100} radius="md" />
+        ) : (
           <StatusText
             className={classes.amount}
             amount={props.account.currentBalance}
@@ -64,15 +77,8 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
             )}
           </StatusText>
         )}
-      </Group>
-      <DimmedText className={classes.timestamp}>
-        {t("last_updated", {
-          date: dayjs(props.account.balanceDate).isValid()
-            ? dayjs(props.account.balanceDate).format(`${dateFormat}`)
-            : t("never"),
-        })}
-      </DimmedText>
-    </Stack>
+      </Stack>
+    </Group>
   );
 };
 

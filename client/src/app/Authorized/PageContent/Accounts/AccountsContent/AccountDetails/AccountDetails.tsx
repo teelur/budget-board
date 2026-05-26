@@ -25,6 +25,7 @@ import {
   getParentAccountType,
 } from "~/helpers/accountType";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -74,7 +75,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryText size="lg">{t("account_details")}</PrimaryText>}
+      title={<PrimaryHeading order={4}>{t("account_details")}</PrimaryHeading>}
     >
       {!props.account ? (
         <Skeleton height={425} radius="lg" />
@@ -103,7 +104,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
           >
             <MantineAccordion.Item value="add-balance">
               <MantineAccordion.Control>
-                <PrimaryText>{t("add_balance")}</PrimaryText>
+                <PrimaryHeading order={5}>{t("add_balance")}</PrimaryHeading>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <AddBalance
@@ -114,7 +115,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="chart">
               <MantineAccordion.Control>
-                <PrimaryText>{t("account_trends")}</PrimaryText>
+                <PrimaryHeading order={5}>{t("account_trends")}</PrimaryHeading>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Group>
@@ -160,7 +161,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="balances">
               <MantineAccordion.Control>
-                <PrimaryText>{t("recent_balances")}</PrimaryText>
+                <PrimaryHeading order={5}>
+                  {t("recent_balances")}
+                </PrimaryHeading>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Stack gap="0.5rem">

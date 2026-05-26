@@ -9,7 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import { useTranslation } from "react-i18next";
 import SplitCard, {
@@ -19,6 +18,7 @@ import { TagsIcon } from "lucide-react";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const itemsPerPage = 15;
@@ -26,7 +26,8 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
   const { t } = useTranslation();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
 
@@ -94,30 +95,28 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
     }
 
     return (
-      <>
-        <ScrollArea
-          w="100%"
-          h="100%"
-          p="0.125rem"
-          type="auto"
-          offsetScrollbars="present"
-          style={{ flex: 1, minHeight: 0 }}
-        >
-          <Stack gap="0.3rem">
-            {currentPageTransactions.map((transaction: ITransaction) => (
-              <TransactionCard
-                key={transaction.id}
-                transaction={transaction}
-                categories={transactionCategories}
-                elevation={2}
-                currency={preferredCurrency}
-                isSelected={selectedIds.has(transaction.id)}
-                onToggleSelect={onToggleSelect}
-              />
-            ))}
-          </Stack>
-        </ScrollArea>
-      </>
+      <ScrollArea
+        w="100%"
+        h="100%"
+        p="0.125rem"
+        type="auto"
+        offsetScrollbars="present"
+        style={{ flex: 1, minHeight: 0 }}
+      >
+        <Stack gap="0.3rem">
+          {currentPageTransactions.map((transaction: ITransaction) => (
+            <TransactionCard
+              key={transaction.id}
+              transaction={transaction}
+              categories={transactionCategories}
+              elevation={2}
+              currency={preferredCurrency}
+              isSelected={selectedIds.has(transaction.id)}
+              onToggleSelect={onToggleSelect}
+            />
+          ))}
+        </Stack>
+      </ScrollArea>
     );
   };
 
@@ -130,14 +129,15 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
         header={
           <Group gap="0.25rem">
             <TagsIcon color="var(--base-color-text-dimmed)" />
-            <PrimaryText size="xl" lh={1}>
+            <PrimaryHeading order={3} lh={1}>
               {t("uncategorized_transactions")}
-            </PrimaryText>
+            </PrimaryHeading>
           </Group>
         }
         elevation={1}
       >
         <Stack
+          p="0.5rem"
           gap="0.5rem"
           align="center"
           w="100%"

@@ -2,7 +2,6 @@ import { Badge, Button, Group, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";
@@ -13,6 +12,7 @@ import {
 } from "~/helpers/requests";
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
 import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const LunchFlowAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -61,7 +61,7 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
     <Stack p={0} gap="0.5rem">
       <Group justify="space-between">
         <Group>
-          <PrimaryText size="lg">{t("lunchflow")}</PrimaryText>
+          <PrimaryHeading order={4}>{t("lunchflow")}</PrimaryHeading>
           {userQuery.data?.lunchFlowApiKey && (
             <Badge color="var(--button-color-confirm)">{t("connected")}</Badge>
           )}

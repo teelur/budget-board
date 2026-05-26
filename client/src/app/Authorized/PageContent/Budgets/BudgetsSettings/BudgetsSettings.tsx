@@ -16,6 +16,7 @@ import {
   IUserSettings,
   IUserSettingsUpdateRequest,
 } from "~/models/userSettings";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const BudgetsSettings = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -79,7 +80,7 @@ const BudgetsSettings = (): React.ReactNode => {
         <ActionIcon variant="subtle" onClick={() => navigate("/budgets")}>
           <ChevronLeftIcon />
         </ActionIcon>
-        <PrimaryText size="lg">{t("budget_settings")}</PrimaryText>
+        <PrimaryHeading order={4}>{t("budget_settings")}</PrimaryHeading>
       </Group>
       <Box maw={800} mx="auto" w="100%">
         <Group gap="0.5rem" wrap="nowrap">

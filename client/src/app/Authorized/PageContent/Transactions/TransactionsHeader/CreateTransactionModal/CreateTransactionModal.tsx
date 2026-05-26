@@ -23,6 +23,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -35,7 +36,8 @@ const CreateTransactionModal = (): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { request } = useAuth();
 
   const dateField = useField<Date | null>({
@@ -136,7 +138,9 @@ const CreateTransactionModal = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryText>{t("create_transaction")}</PrimaryText>}
+        title={
+          <PrimaryHeading order={4}>{t("create_transaction")}</PrimaryHeading>
+        }
       >
         <Stack gap="0.25rem">
           <DateInput
