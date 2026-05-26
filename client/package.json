@@ -77,7 +77,8 @@
   },
   "resolutions": {
     "react-is": "^19.0.0",
-    "glob/minimatch": "^9.0.6"
+    "glob/minimatch": "^9.0.6",
+    "ip-address": "^10.2.0"
   },
   "packageManager": "yarn@4.14.1"
 }
