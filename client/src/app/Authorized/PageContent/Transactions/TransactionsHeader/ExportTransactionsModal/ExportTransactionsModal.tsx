@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import FilterCard from "../FilterCard/FilterCard";
 import FieldSelectionCard from "./FieldSelectionCard/FieldSelectionCard";
 import ColumnOrderCard from "./ColumnOrderCard/ColumnOrderCard";

@@ -2,7 +2,6 @@ import { Stack } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Drawer from "~/components/core/Drawer/Drawer";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { WIDGET_REGISTRY } from "~/shared/dashboardGrid";
 import WidgetPickerItem from "./WidgetPickerItem/WidgetPickerItem";
 import { notifications } from "@mantine/notifications";

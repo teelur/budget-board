@@ -1,6 +1,6 @@
 import classes from "./TransactionCardContent.module.css";
 
-import { Badge, Flex, Text } from "@mantine/core";
+import { Badge, Flex } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";

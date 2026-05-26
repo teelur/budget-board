@@ -3,7 +3,6 @@ import { Stack } from "@mantine/core";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import ColumnOrderItem from "./ColumnOrderItem/ColumnOrderItem";
 import { EXPORT_FIELDS } from "../ExportTransactionsModal";

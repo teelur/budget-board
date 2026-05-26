@@ -1,6 +1,6 @@
 import { StatusColorType } from "~/helpers/budgets";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { Divider, Flex, Group, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";

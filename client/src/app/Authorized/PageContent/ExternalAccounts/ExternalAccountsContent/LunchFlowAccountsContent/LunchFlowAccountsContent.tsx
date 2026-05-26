@@ -2,7 +2,6 @@ import { Badge, Button, Group, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";

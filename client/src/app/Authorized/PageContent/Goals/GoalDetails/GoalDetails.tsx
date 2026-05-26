@@ -16,7 +16,6 @@ import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import Drawer from "~/components/core/Drawer/Drawer";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Card from "~/components/core/Card/Card";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
