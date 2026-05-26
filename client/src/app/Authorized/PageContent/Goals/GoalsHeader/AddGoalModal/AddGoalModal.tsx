@@ -16,6 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { notifications } from "@mantine/notifications";
 import { translateAxiosError } from "~/helpers/requests";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const AddGoalModal = (): React.ReactNode => {
   const [selectedGoalType, setSelectedGoalType] = React.useState<string | null>(
@@ -98,7 +99,7 @@ const AddGoalModal = (): React.ReactNode => {
         opened={isOpen}
         onClose={close}
         size="600px"
-        title={<PrimaryText size="md">{t("add_goal")}</PrimaryText>}
+        title={<PrimaryHeading order={4}>{t("add_goal")}</PrimaryHeading>}
       >
         <Stepper
           active={activeStep}

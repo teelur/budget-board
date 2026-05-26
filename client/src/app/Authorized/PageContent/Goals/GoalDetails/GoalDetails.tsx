@@ -21,6 +21,7 @@ import Card from "~/components/core/Card/Card";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;
@@ -71,7 +72,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       onClose={props.doClose}
       position="right"
       size="md"
-      title={<PrimaryText size="lg">{t("goal_details")}</PrimaryText>}
+      title={<PrimaryHeading order={4}>{t("goal_details")}</PrimaryHeading>}
     >
       {props.goal === null ? (
         <Skeleton height={425} radius="lg" />
@@ -79,7 +80,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
         <Accordion defaultValue={["accounts", "chart"]} elevation={1}>
           <MantineAccordion.Item value="accounts">
             <MantineAccordion.Control>
-              <PrimaryText size="md">{t("accounts")}</PrimaryText>
+              <PrimaryHeading order={5}>{t("accounts")}</PrimaryHeading>
             </MantineAccordion.Control>
             <MantineAccordion.Panel>
               <Stack gap="0.5rem">
@@ -93,7 +94,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
           </MantineAccordion.Item>
           <MantineAccordion.Item value="chart">
             <MantineAccordion.Control>
-              <PrimaryText size="md">{t("goal_trends")}</PrimaryText>
+              <PrimaryHeading order={5}>{t("goal_trends")}</PrimaryHeading>
             </MantineAccordion.Control>
             <MantineAccordion.Panel>
               <Stack>
