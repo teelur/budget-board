@@ -5,7 +5,6 @@ import {
   Group,
   Portal,
   Stack,
-  Text,
   ActionIcon,
   Transition,
   Badge,
