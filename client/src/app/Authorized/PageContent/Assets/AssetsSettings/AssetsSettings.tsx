@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import SettingsNavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 const AssetsSettings = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -27,14 +29,14 @@ const AssetsSettings = (): React.ReactNode => {
         <ActionIcon variant="subtle" onClick={() => navigate("/assets")}>
           <ChevronLeftIcon />
         </ActionIcon>
-        <PrimaryText size="lg">{t("assets_settings")}</PrimaryText>
+        <PrimaryHeading order={5}>{t("assets_settings")}</PrimaryHeading>
         {activeItem && (
           <>
             <ChevronRightIcon
               size="1rem"
               color="var(--base-color-text-dimmed)"
             />
-            <DimmedText size="lg">{activeItem.label}</DimmedText>
+            <SecondaryHeading order={5}>{activeItem.label}</SecondaryHeading>
           </>
         )}
       </Group>
