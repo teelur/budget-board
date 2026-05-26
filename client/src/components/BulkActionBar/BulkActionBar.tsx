@@ -31,6 +31,8 @@ import SplitTransaction from "~/components/core/Card/TransactionCard/Transaction
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
 import { IAccountResponse } from "~/models/account";
+import DimmedText from "../core/Text/DimmedText/DimmedText";
+import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 
 interface BulkActionBarProps {
   selectedIds: Set<string>;
@@ -365,9 +367,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
           >
             {/* Selection controls row */}
             <Group gap="0.5rem" wrap="wrap">
-              <Text size="sm" fw={600}>
+              <DimmedText size="sm">
                 {t("n_selected", { count: props.selectedIds.size })}
-              </Text>
+              </DimmedText>
               <Button
                 size="compact-xs"
                 variant="subtle"
@@ -399,7 +401,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
             {/* Fields + actions row */}
             <Flex gap="0.5rem" wrap="wrap" align="flex-end">
               <DateInput
-                label={<Text size="xs">{t("date")}</Text>}
+                label={<PrimaryText size="xs">{t("date")}</PrimaryText>}
                 value={dateValue}
                 valueFormat={longDateFormat}
                 locale={dayjsLocale}
@@ -409,7 +411,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 elevation={1}
               />
               <TextInput
-                label={<Text size="xs">{t("merchant_name")}</Text>}
+                label={
+                  <PrimaryText size="xs">{t("merchant_name")}</PrimaryText>
+                }
                 value={merchantValue}
                 onChange={(e) => {
                   setMerchantValue(e.currentTarget.value);
@@ -421,7 +425,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 elevation={1}
               />
               <CategorySelect
-                label={<Text size="xs">{t("category")}</Text>}
+                label={<PrimaryText size="xs">{t("category")}</PrimaryText>}
                 categories={props.categories}
                 value={categoryValue || null}
                 onChange={(val) => {
@@ -433,7 +437,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 elevation={1}
               />
               <NumberInput
-                label={<Text size="xs">{t("amount")}</Text>}
+                label={<PrimaryText size="xs">{t("amount")}</PrimaryText>}
                 value={amountValue}
                 onChange={(val) => {
                   setAmountValue(val);
@@ -501,11 +505,11 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
             {/* Inline delete confirmation */}
             <Collapse expanded={showDeleteConfirm}>
               <Group gap="0.5rem" align="center">
-                <Text size="sm">
+                <PrimaryText size="sm">
                   {t("confirm_delete_transactions_message", {
                     count: props.selectedIds.size,
                   })}
-                </Text>
+                </PrimaryText>
                 <Button
                   size="compact-sm"
                   color="var(--button-color-destructive)"
