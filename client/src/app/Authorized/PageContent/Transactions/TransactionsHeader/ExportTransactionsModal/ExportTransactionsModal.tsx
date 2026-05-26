@@ -19,6 +19,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { ITransaction, Filters } from "~/models/transaction";
 import { IInstitution } from "~/models/institution";
 import { getFilteredTransactions } from "~/helpers/transactions";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const escapeCsvValue = (value: string): string =>
   `"${value.replace(/"/g, '""')}"`;
@@ -85,7 +86,8 @@ const ExportTransactionsModal = (): React.ReactNode => {
 
   const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { request } = useAuth();
   const isMobile = useIsMobile();
 
@@ -190,7 +192,9 @@ const ExportTransactionsModal = (): React.ReactNode => {
         onClose={close}
         fullScreen={isMobile}
         size="80rem"
-        title={<PrimaryText>{t("export_transactions")}</PrimaryText>}
+        title={
+          <PrimaryHeading order={4}>{t("export_transactions")}</PrimaryHeading>
+        }
       >
         <Stack className={classes.container} gap="0.5rem">
           <FilterCard />

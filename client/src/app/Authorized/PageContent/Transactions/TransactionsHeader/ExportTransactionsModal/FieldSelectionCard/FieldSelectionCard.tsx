@@ -5,6 +5,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { EXPORT_FIELDS } from "../ExportTransactionsModal";
 import { useElementSize } from "@mantine/hooks";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface FieldSelectionCardProps {
   selectedFields: string[];
@@ -20,7 +21,7 @@ const FieldSelectionCard = (
   return (
     <Card ref={ref} w="100%" elevation={1}>
       <Stack gap="0.5rem">
-        <PrimaryText size="lg">{t("fields")}</PrimaryText>
+        <PrimaryHeading order={5}>{t("fields")}</PrimaryHeading>
         <Checkbox.Group value={props.selectedFields} onChange={props.onChange}>
           <SimpleGrid cols={width < 300 ? 1 : 2}>
             {EXPORT_FIELDS.map((field) => (
