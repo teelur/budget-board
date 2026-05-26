@@ -1,5 +1,7 @@
 import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
+import "@fontsource-variable/ibm-plex-sans/index.css";
+import "@fontsource-variable/plus-jakarta-sans/index.css";
 import "./index.css";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";

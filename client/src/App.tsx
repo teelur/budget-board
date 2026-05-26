@@ -38,8 +38,11 @@ import { LocaleProvider } from "./providers/LocaleProvider/LocaleProvider";
 
 // Your theme configuration is merged with default theme
 const theme = createTheme({
-  fontFamily: "IBM Plex Sans, sans-serif",
-  headings: { fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: "600" },
+  fontFamily: "IBM Plex Sans Variable, sans-serif",
+  headings: {
+    fontFamily: "Plus Jakarta Sans Variable, sans-serif",
+    fontWeight: "600",
+  },
   cursorType: "pointer",
   defaultRadius: "xs",
   primaryColor: "indigo",

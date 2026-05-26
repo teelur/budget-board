@@ -805,6 +805,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource-variable/ibm-plex-sans@npm:^5.2.8":
+  version: 5.2.8
+  resolution: "@fontsource-variable/ibm-plex-sans@npm:5.2.8"
+  checksum: 10c0/e1c073d347da65e1b6e8a1269dc2f6ebea4ff1a9abe84d70194d5b6c868871cd2ae704fd78612495c8dd2a3a0541c97d75959f5edd21c4bc3582fdaf2dfbe029
+  languageName: node
+  linkType: hard
+
+"@fontsource-variable/plus-jakarta-sans@npm:^5.2.8":
+  version: 5.2.8
+  resolution: "@fontsource-variable/plus-jakarta-sans@npm:5.2.8"
+  checksum: 10c0/33fcffdf8ca3f2822f9b495c7f172bfd0b6fe69832082e033924ad88cddcefb54b22d9114c641a6603782094e578a83e7d10b25086c5c2f586be51b407dbc246
+  languageName: node
+  linkType: hard
+
 "@formatjs/ecma402-abstract@npm:2.3.6":
   version: 2.3.6
   resolution: "@formatjs/ecma402-abstract@npm:2.3.6"
@@ -2450,6 +2464,8 @@ __metadata:
     "@dnd-kit/helpers": "npm:^0.4.0"
     "@dnd-kit/react": "npm:^0.4.0"
     "@eslint/js": "npm:^10.0.1"
+    "@fontsource-variable/ibm-plex-sans": "npm:^5.2.8"
+    "@fontsource-variable/plus-jakarta-sans": "npm:^5.2.8"
     "@icons-pack/react-simple-icons": "npm:^13.13.0"
     "@mantine/carousel": "npm:^9.2.1"
     "@mantine/charts": "npm:^9.2.1"

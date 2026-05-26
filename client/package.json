@@ -12,6 +12,8 @@
   "dependencies": {
     "@dnd-kit/helpers": "^0.4.0",
     "@dnd-kit/react": "^0.4.0",
+    "@fontsource-variable/ibm-plex-sans": "^5.2.8",
+    "@fontsource-variable/plus-jakarta-sans": "^5.2.8",
     "@icons-pack/react-simple-icons": "^13.13.0",
     "@mantine/carousel": "^9.2.1",
     "@mantine/charts": "^9.2.1",
