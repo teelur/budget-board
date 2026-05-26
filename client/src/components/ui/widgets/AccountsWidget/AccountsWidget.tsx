@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
-import { IAccountResponse } from "~/models/account";
 import { useTranslation } from "react-i18next";
 import SplitCard, {
   BorderThickness,
@@ -42,22 +41,6 @@ const AccountsWidget = ({
 
       if (res.status === 200) {
         return res.data as IInstitution[];
-      }
-
-      return [];
-    },
-  });
-
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
       }
 
       return [];
@@ -109,7 +92,7 @@ const AccountsWidget = ({
   );
 
   const getAccountsContent = () => {
-    if (institutionQuery.isPending || accountsQuery.isPending) {
+    if (institutionQuery.isPending || widgetSettingsQuery.isPending) {
       return (
         <Flex h="100%" w="100%" p="0.5rem">
           <Skeleton flex={1} radius="md" />
