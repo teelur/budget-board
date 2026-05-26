@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import SettingsNavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
+import NavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
@@ -47,7 +47,7 @@ const TransactionsSettings = (): React.ReactNode => {
           gap={4}
         >
           {navItems.map((item) => (
-            <SettingsNavLink
+            <NavLink
               key={item.path}
               label={item.label}
               active={location.pathname.endsWith(item.path)}

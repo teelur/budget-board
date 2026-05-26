@@ -2,13 +2,13 @@ import classes from "./SettingsNavLink.module.css";
 import { UnstyledButton } from "@mantine/core";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
-interface SettingsNavLinkProps {
+interface NavLinkProps {
   label: string;
   active?: boolean;
   onClick?: () => void;
 }
 
-const SettingsNavLink = (props: SettingsNavLinkProps): React.ReactNode => {
+const NavLink = (props: NavLinkProps): React.ReactNode => {
   return (
     <UnstyledButton
       className={classes.link}
@@ -25,4 +25,4 @@ const SettingsNavLink = (props: SettingsNavLinkProps): React.ReactNode => {
   );
 };
 
-export default SettingsNavLink;
+export default NavLink;
