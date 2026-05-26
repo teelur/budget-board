@@ -6,6 +6,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { ChevronRightIcon } from "lucide-react";
 import SettingsNavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 const Settings = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -25,14 +27,14 @@ const Settings = (): React.ReactNode => {
   return (
     <Stack w="100%" p="0.5rem">
       <Group gap="xs">
-        <PrimaryText size="lg">{t("settings")}</PrimaryText>
+        <PrimaryHeading order={5}>{t("settings")}</PrimaryHeading>
         {activeItem && (
           <>
             <ChevronRightIcon
               size="1rem"
               color="var(--base-color-text-dimmed)"
             />
-            <DimmedText size="lg">{activeItem.label}</DimmedText>
+            <SecondaryHeading order={5}>{activeItem.label}</SecondaryHeading>
           </>
         )}
       </Group>
