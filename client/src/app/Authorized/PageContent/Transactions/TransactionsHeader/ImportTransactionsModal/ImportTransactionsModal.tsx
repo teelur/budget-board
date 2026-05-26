@@ -18,8 +18,8 @@ import ConfigureTransactions from "./ConfigureTransactions/ConfigureTransactions
 import { useDisclosure } from "@mantine/hooks";
 import ImportCompleted from "./ImportCompleted/ImportCompleted";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -167,7 +167,9 @@ const ImportTransactionsModal = () => {
         opened={opened}
         onClose={close}
         size="auto"
-        title={<PrimaryText>{t("import_transactions")}</PrimaryText>}
+        title={
+          <PrimaryHeading order={4}>{t("import_transactions")}</PrimaryHeading>
+        }
       >
         <Stepper
           active={activeStep}

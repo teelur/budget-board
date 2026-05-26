@@ -15,6 +15,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const CreateAccount = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -105,7 +106,7 @@ const CreateAccount = () => {
     }
 
     let institutionForAccount = institutionQuery.data?.find((i) =>
-      areStringsEqual(i.name, institutionField.getValue())
+      areStringsEqual(i.name, institutionField.getValue()),
     );
 
     if (institutionForAccount === undefined) {
@@ -116,7 +117,7 @@ const CreateAccount = () => {
       const institutionQueryResult = await institutionQuery.refetch();
 
       institutionForAccount = institutionQueryResult.data?.find((i) =>
-        areStringsEqual(i.name, institutionField.getValue())
+        areStringsEqual(i.name, institutionField.getValue()),
       );
 
       if (institutionForAccount === undefined) {
@@ -147,7 +148,7 @@ const CreateAccount = () => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryText size="md">{t("create_account")}</PrimaryText>}
+        title={<PrimaryHeading order={4}>{t("create_account")}</PrimaryHeading>}
       >
         <Stack gap="0.5rem">
           <TextInput

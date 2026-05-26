@@ -2,10 +2,10 @@ import { Box, Group, Stack } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { ChevronRightIcon } from "lucide-react";
-import SettingsNavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
+import NavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 const Settings = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -25,14 +25,14 @@ const Settings = (): React.ReactNode => {
   return (
     <Stack w="100%" p="0.5rem">
       <Group gap="xs">
-        <PrimaryText size="lg">{t("settings")}</PrimaryText>
+        <PrimaryHeading order={5}>{t("settings")}</PrimaryHeading>
         {activeItem && (
           <>
             <ChevronRightIcon
               size="1rem"
               color="var(--base-color-text-dimmed)"
             />
-            <DimmedText size="lg">{activeItem.label}</DimmedText>
+            <SecondaryHeading order={5}>{activeItem.label}</SecondaryHeading>
           </>
         )}
       </Group>
@@ -43,7 +43,7 @@ const Settings = (): React.ReactNode => {
           gap={4}
         >
           {navItems.map((item) => (
-            <SettingsNavLink
+            <NavLink
               key={item.path}
               label={item.label}
               active={location.pathname.endsWith(item.path)}

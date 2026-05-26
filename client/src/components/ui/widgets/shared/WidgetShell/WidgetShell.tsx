@@ -35,7 +35,8 @@ const WidgetShell = ({
         >
           {onSettingsOpen && (
             <ActionIcon
-              variant="filled"
+              color="var(--base-color-text-secondary)"
+              variant="subtle"
               size="md"
               onClick={(e) => {
                 e.stopPropagation();

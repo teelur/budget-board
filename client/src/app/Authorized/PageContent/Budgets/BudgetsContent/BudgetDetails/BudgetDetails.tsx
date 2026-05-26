@@ -22,6 +22,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -35,7 +36,8 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({
@@ -102,7 +104,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryText size="lg">{t("budget_details")}</PrimaryText>}
+      title={<PrimaryHeading order={4}>{t("budget_details")}</PrimaryHeading>}
     >
       {transactionsQuery.isPending ||
       props.month === null ||
@@ -127,9 +129,9 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
           <Accordion defaultValue={["chart", "transactions"]} elevation={1}>
             <MantineAccordion.Item value="chart">
               <MantineAccordion.Control>
-                <PrimaryText size="md">
+                <PrimaryHeading order={5} size="md">
                   {isExpenseCategory ? t("expense_trends") : t("income_trends")}
-                </PrimaryText>
+                </PrimaryHeading>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <MonthlySpendingChart
@@ -142,7 +144,9 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="transactions">
               <MantineAccordion.Control>
-                <PrimaryText size="md">{t("recent_transactions")}</PrimaryText>
+                <PrimaryHeading order={5} size="md">
+                  {t("recent_transactions")}
+                </PrimaryHeading>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <TransactionCards

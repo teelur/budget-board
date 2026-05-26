@@ -46,7 +46,7 @@ const SplitCard = ({
         />
         <Flex
           w="100%"
-          p="0.5rem"
+          p={0}
           direction="column"
           align="stretch"
           style={{ flex: 1, minHeight: 0, overflowY: "auto" }}

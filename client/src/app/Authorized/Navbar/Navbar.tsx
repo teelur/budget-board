@@ -25,6 +25,7 @@ import { useNavigate, useLocation } from "react-router";
 interface NavbarProps {
   isNavbarOpen: boolean;
   toggleNavbar: () => void;
+  closeNavbar: () => void;
 }
 
 const Navbar = (props: NavbarProps) => {
@@ -101,7 +102,7 @@ const Navbar = (props: NavbarProps) => {
       active={location.pathname.startsWith(link.path)}
       onClick={() => {
         navigate(link.path);
-        props.toggleNavbar();
+        props.closeNavbar();
       }}
     />
   ));
@@ -129,7 +130,7 @@ const Navbar = (props: NavbarProps) => {
             active={location.pathname.startsWith("/external-accounts")}
             onClick={() => {
               navigate("/external-accounts");
-              props.toggleNavbar();
+              props.closeNavbar();
             }}
           />
           <NavbarLink
@@ -138,7 +139,7 @@ const Navbar = (props: NavbarProps) => {
             active={location.pathname.startsWith("/settings")}
             onClick={() => {
               navigate("/settings");
-              props.toggleNavbar();
+              props.closeNavbar();
             }}
           />
           <NavbarLink

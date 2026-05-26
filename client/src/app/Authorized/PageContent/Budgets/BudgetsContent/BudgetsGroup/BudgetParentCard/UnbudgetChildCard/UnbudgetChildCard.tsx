@@ -79,7 +79,7 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
           }
         }}
         hoverEffect
-        elevation={2}
+        elevation={1}
       >
         <LoadingOverlay visible={doAddBudget.isPending} />
         <Group
@@ -87,10 +87,12 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
           w="100%"
           style={{ containerType: "inline-size" }}
         >
-          <PrimaryText className={classes.text}>{props.category}</PrimaryText>
+          <PrimaryText className={classes.text} elevation={1}>
+            {props.category}
+          </PrimaryText>
           <Group gap="0.5rem">
             {userSettingsQuery.isPending ? null : (
-              <PrimaryText className={classes.text}>
+              <PrimaryText className={classes.text} elevation={1}>
                 {convertNumberToCurrency(
                   props.amount * (props.isIncome ? 1 : -1),
                   false,

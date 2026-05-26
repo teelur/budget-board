@@ -23,6 +23,7 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryText size="lg">{t("asset_details")}</PrimaryText>}
+      title={<PrimaryHeading order={4}>{t("asset_details")}</PrimaryHeading>}
     >
       {!props.asset ? (
         <Skeleton height={425} radius="lg" />
@@ -152,7 +153,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
           >
             <MantineAccordion.Item value="add-value">
               <MantineAccordion.Control>
-                <PrimaryText>{t("add_value")}</PrimaryText>
+                <PrimaryHeading order={5}>{t("add_value")}</PrimaryHeading>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <AddValue
@@ -163,7 +164,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="chart">
               <MantineAccordion.Control>
-                <PrimaryText>{t("value_trends")}</PrimaryText>
+                <PrimaryHeading order={5}>{t("value_trends")}</PrimaryHeading>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Group>
@@ -209,7 +210,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </MantineAccordion.Item>
             <MantineAccordion.Item value="values">
               <MantineAccordion.Control>
-                <PrimaryText>{t("value_history")}</PrimaryText>
+                <PrimaryHeading order={5}>{t("value_history")}</PrimaryHeading>
               </MantineAccordion.Control>
               <MantineAccordion.Panel>
                 <Stack gap="0.5rem">

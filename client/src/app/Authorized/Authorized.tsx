@@ -15,7 +15,7 @@ import { AccountTypeProvider } from "~/providers/AccountTypeProvider/AccountType
 import { AssetTypeProvider } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 
 const Authorized = (): React.ReactNode => {
-  const [isNavbarOpen, { toggle }] = useDisclosure();
+  const [isNavbarOpen, { toggle, close }] = useDisclosure();
 
   return (
     <AppShell
@@ -42,7 +42,11 @@ const Authorized = (): React.ReactNode => {
         bg="var(--background-color-sidebar)"
         style={{ borderWidth: "2px" }}
       >
-        <Navbar isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
+        <Navbar
+          isNavbarOpen={isNavbarOpen}
+          toggleNavbar={toggle}
+          closeNavbar={close}
+        />
       </AppShellNavbar>
       <AppShellMain
         bg="var(--background-color-base)"

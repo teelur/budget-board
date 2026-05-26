@@ -13,6 +13,7 @@ import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const CreateAsset = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -55,7 +56,7 @@ const CreateAsset = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryText>{t("create_asset")}</PrimaryText>}
+        title={<PrimaryHeading order={4}>{t("create_asset")}</PrimaryHeading>}
       >
         <Stack gap="0.5rem">
           <TextInput

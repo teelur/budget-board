@@ -10,7 +10,6 @@ import { ITransaction } from "~/models/transaction";
 import { useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -19,6 +18,7 @@ import SplitCard, {
 } from "~/components/ui/SplitCard/SplitCard";
 import { LineChartIcon } from "lucide-react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const SpendingTrendsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -130,14 +130,14 @@ const SpendingTrendsWidget = (): React.ReactNode => {
       header={
         <Group gap="0.25rem">
           <LineChartIcon color="var(--base-color-text-dimmed)" />
-          <PrimaryText size="xl" lh={1}>
+          <PrimaryHeading order={3} lh={1}>
             {t("spending_trends")}
-          </PrimaryText>
+          </PrimaryHeading>
         </Group>
       }
       elevation={1}
     >
-      <Stack gap={0} w="100%" style={{ flex: 1, minHeight: 0 }}>
+      <Stack gap={0} w="100%" p={"0.5rem"} style={{ flex: 1, minHeight: 0 }}>
         {transactionsQueries.isPending ? (
           <Skeleton height="100%" radius="md" />
         ) : (
