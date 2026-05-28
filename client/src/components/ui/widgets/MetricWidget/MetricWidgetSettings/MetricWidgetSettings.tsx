@@ -21,6 +21,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { translateAxiosError } from "~/helpers/requests";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense){currency}
 @budgets.percent_used(this_month, category=Groceries){percent}
@@ -176,29 +177,25 @@ const MetricWidgetSettings = ({
               placeholder={t("metric_widget_title_placeholder")}
               {...titleField.getInputProps()}
             />
-            <TextInput
+            <FormulaTextInput
               label={
                 <PrimaryText size="sm">
                   {t("metric_widget_value_label")}
                 </PrimaryText>
               }
               placeholder={t("metric_widget_value_placeholder")}
-              styles={{
-                input: { fontFamily: "monospace", fontSize: "0.85rem" },
-              }}
-              {...valueField.getInputProps()}
+              value={valueField.getValue()}
+              onChange={valueField.setValue}
             />
-            <TextInput
+            <FormulaTextInput
               label={
                 <PrimaryText size="sm">
                   {t("metric_widget_label_label")}
                 </PrimaryText>
               }
               placeholder={t("metric_widget_label_placeholder")}
-              styles={{
-                input: { fontFamily: "monospace", fontSize: "0.85rem" },
-              }}
-              {...labelField.getInputProps()}
+              value={labelField.getValue()}
+              onChange={labelField.setValue}
             />
           </Stack>
         )}
