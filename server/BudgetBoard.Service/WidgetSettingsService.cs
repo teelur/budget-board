@@ -244,6 +244,12 @@ public class WidgetSettingsService(
             WidgetTypes.NetWorth => JsonSerializer.Serialize(
                 WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
             ),
+            WidgetTypes.Metric => JsonSerializer.Serialize(
+                new
+                {
+                    markup = "title: This Month's Spending\nvalue: @transactions.sum(this_month, type=expense){currency}\nlabel: total expenses",
+                }
+            ),
             _ => null,
         };
     }

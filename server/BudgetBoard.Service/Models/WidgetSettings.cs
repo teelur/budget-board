@@ -6,6 +6,7 @@ public static class WidgetTypes
     public const string NetWorth = "NetWorth";
     public const string UncategorizedTransactions = "UncategorizedTransactions";
     public const string SpendingTrends = "SpendingTrends";
+    public const string Metric = "Metric";
 
     public static readonly IEnumerable<string> All =
     [
@@ -13,6 +14,7 @@ public static class WidgetTypes
         NetWorth,
         UncategorizedTransactions,
         SpendingTrends,
+        Metric,
     ];
 }
 
