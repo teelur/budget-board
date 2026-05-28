@@ -1,7 +1,3 @@
-export interface IMetricWidgetConfiguration {
-  markup: string;
-}
-
 export interface LiteralToken {
   type: "literal";
   text: string;
@@ -18,12 +14,6 @@ export interface ExpressionToken {
 }
 
 export type MetricToken = LiteralToken | ExpressionToken;
-
-export interface ParsedMetricMarkup {
-  title?: MetricToken[];
-  value?: MetricToken[];
-  label?: MetricToken[];
-}
 
 export interface MetricDataRequirements {
   needsTransactions: boolean;

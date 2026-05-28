@@ -1,4 +1,4 @@
-import { Flex, Skeleton, Text } from "@mantine/core";
+import { Flex, Skeleton, Stack, Text } from "@mantine/core";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -11,7 +11,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import {
   buildDataRequirements,
-  parseMetricMarkup,
+  parseTemplate,
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
@@ -43,8 +43,6 @@ const MetricWidget = ({
   const { preferredCurrency } = useUserSettings();
   const { intlLocale } = useLocale();
 
-  // ── Widget settings (to read the markup) ──────────────────────────────────
-
   const widgetSettingsQuery = useQuery({
     queryKey: ["widgetSettings"],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
@@ -57,27 +55,49 @@ const MetricWidget = ({
     },
   });
 
-  const { configTitle, markup } = React.useMemo(() => {
+  // The widget configuration is stored as a JSON string in the database.
+  const { configTitle, configValue, configLabel } = React.useMemo(() => {
     const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
-    if (!widget?.configuration) return { configTitle: undefined, markup: "" };
+    if (!widget?.configuration)
+      return {
+        configTitle: undefined,
+        configValue: undefined,
+        configLabel: undefined,
+      };
+
     try {
       const parsed = JSON.parse(widget.configuration) as {
-        markup?: string;
         title?: string;
+        value?: string;
+        label?: string;
       };
-      return { configTitle: parsed.title, markup: parsed.markup ?? "" };
+      return {
+        configTitle: parsed.title,
+        configValue: parsed.value,
+        configLabel: parsed.label,
+      };
     } catch {
-      return { configTitle: undefined, markup: "" };
+      return {
+        configTitle: undefined,
+        configValue: undefined,
+        configLabel: undefined,
+      };
     }
   }, [widgetSettingsQuery.data, widgetId]);
 
-  const parsedMarkup = React.useMemo(() => parseMetricMarkup(markup), [markup]);
-  const requirements = React.useMemo(
-    () => buildDataRequirements(parsedMarkup),
-    [parsedMarkup],
+  const parsedValueTokens = React.useMemo(
+    () => parseTemplate(configValue ?? ""),
+    [configValue],
+  );
+  const parsedLabelTokens = React.useMemo(
+    () => parseTemplate(configLabel ?? ""),
+    [configLabel],
   );
 
-  // ── Conditional data fetching ──────────────────────────────────────────────
+  const requirements = React.useMemo(
+    () => buildDataRequirements(parsedValueTokens, parsedLabelTokens),
+    [parsedValueTokens, parsedLabelTokens],
+  );
 
   const transactionMonthQueries = useQueries({
     queries:
@@ -182,8 +202,6 @@ const MetricWidget = ({
     enabled: requirements.needsAccounts,
   });
 
-  // ── Loading state ──────────────────────────────────────────────────────────
-
   const isPending =
     widgetSettingsQuery.isPending ||
     (requirements.needsTransactions &&
@@ -195,9 +213,7 @@ const MetricWidget = ({
     (requirements.needsAccounts &&
       (accountsQuery.isPending || accountTypesQuery.isPending));
 
-  // ── Build data context for expression evaluation ──────────────────────────
-
-  const ctx: MetricDataContext = React.useMemo(
+  const metricDataContext: MetricDataContext = React.useMemo(
     () => ({
       transactions: requirements.needsAllTimeTransactions
         ? (allTimeTransactionsQuery.data ?? [])
@@ -222,31 +238,23 @@ const MetricWidget = ({
     ],
   );
 
-  // ── Resolved display values ────────────────────────────────────────────────
-
   const titleText = React.useMemo(() => {
-    if (configTitle !== undefined) return configTitle || t("metric");
-    if (parsedMarkup.title && !isPending) {
-      return resolveTemplate(parsedMarkup.title, ctx);
-    }
-    return t("metric");
-  }, [configTitle, parsedMarkup.title, isPending, ctx, t]);
+    return configTitle || t("metric");
+  }, [configTitle, t]);
 
   const valueText = React.useMemo(() => {
-    if (parsedMarkup.value && !isPending) {
-      return resolveTemplate(parsedMarkup.value, ctx);
+    if (configValue && !isPending) {
+      return resolveTemplate(parsedValueTokens, metricDataContext);
     }
     return null;
-  }, [parsedMarkup.value, isPending, ctx]);
+  }, [configValue, isPending, parsedValueTokens, metricDataContext]);
 
   const labelText = React.useMemo(() => {
-    if (parsedMarkup.label && !isPending) {
-      return resolveTemplate(parsedMarkup.label, ctx);
+    if (configLabel && !isPending) {
+      return resolveTemplate(parsedLabelTokens, metricDataContext);
     }
     return null;
-  }, [parsedMarkup.label, isPending, ctx]);
-
-  // ── Render ─────────────────────────────────────────────────────────────────
+  }, [configLabel, isPending, parsedLabelTokens, metricDataContext]);
 
   const renderContent = () => {
     if (isPending) {
@@ -257,17 +265,16 @@ const MetricWidget = ({
       );
     }
 
-    if (!parsedMarkup.value) {
+    if (!configValue) {
       return (
         <WidgetErrorMessage messageKey="metric_widget_no_value_expression" />
       );
     }
 
     return (
-      <Flex
+      <Stack
         h="100%"
         w="100%"
-        direction="column"
         align="center"
         justify="center"
         p="1rem"
@@ -281,7 +288,7 @@ const MetricWidget = ({
             {labelText}
           </DimmedText>
         )}
-      </Flex>
+      </Stack>
     );
   };
 
@@ -289,9 +296,10 @@ const MetricWidget = ({
     <SplitCard
       w="100%"
       h="100%"
+      style={{ containerType: "inline-size" }}
       border={BorderThickness.Thick}
       header={
-        <PrimaryHeading order={3} lh={1}>
+        <PrimaryHeading order={4} className={classes.title}>
           {titleText}
         </PrimaryHeading>
       }

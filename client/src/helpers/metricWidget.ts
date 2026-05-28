@@ -6,7 +6,6 @@ import { IAccountResponse } from "~/models/account";
 import { IAccountType } from "~/models/accountType";
 import {
   ExpressionToken,
-  ParsedMetricMarkup,
   MetricDataRequirements,
   MetricToken,
 } from "~/models/metricWidget";
@@ -57,7 +56,7 @@ function parseArgs(argsStr: string): {
   return { period, params };
 }
 
-function parseTemplate(template: string): MetricToken[] {
+export function parseTemplate(template: string): MetricToken[] {
   const tokens: MetricToken[] = [];
   let lastIndex = 0;
   const regex = new RegExp(EXPRESSION_REGEX.source, "g");
@@ -94,26 +93,6 @@ function parseTemplate(template: string): MetricToken[] {
 
   return tokens;
 }
-
-export function parseMetricMarkup(markup: string): ParsedMetricMarkup {
-  const result: ParsedMetricMarkup = {};
-  const lines = markup.split("\n");
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith("title:")) {
-      result.title = parseTemplate(trimmed.slice("title:".length).trim());
-    } else if (trimmed.startsWith("value:")) {
-      result.value = parseTemplate(trimmed.slice("value:".length).trim());
-    } else if (trimmed.startsWith("label:")) {
-      result.label = parseTemplate(trimmed.slice("label:".length).trim());
-    }
-  }
-
-  return result;
-}
-
-// ─── Period helpers ───────────────────────────────────────────────────────────
 
 export function getMonthsForPeriod(period: string): Date[] {
   const now = dayjs();
@@ -184,8 +163,6 @@ function isInPeriod(dateStr: string, period: string): boolean {
   }
 }
 
-// ─── Data context ─────────────────────────────────────────────────────────────
-
 export interface MetricDataContext {
   transactions: ITransaction[];
   budgets: IBudget[];
@@ -195,8 +172,6 @@ export interface MetricDataContext {
   preferredCurrency: string;
   intlLocale: string;
 }
-
-// ─── Formatting ───────────────────────────────────────────────────────────────
 
 function formatValue(
   value: number,
@@ -232,8 +207,6 @@ function formatValue(
       return String(value);
   }
 }
-
-// ─── Expression resolvers ─────────────────────────────────────────────────────
 
 function resolveTransactions(
   metric: string,
@@ -424,20 +397,18 @@ export function resolveTemplate(
     .join("");
 }
 
-// ─── Data requirements ────────────────────────────────────────────────────────
-
-function getAllExpressionTokens(markup: ParsedMetricMarkup): ExpressionToken[] {
-  return [
-    ...(markup.title ?? []),
-    ...(markup.value ?? []),
-    ...(markup.label ?? []),
-  ].filter((t): t is ExpressionToken => t.type === "expression");
+function getAllExpressionTokens(
+  ...tokenGroups: MetricToken[][]
+): ExpressionToken[] {
+  return tokenGroups
+    .flat()
+    .filter((t): t is ExpressionToken => t.type === "expression");
 }
 
 export function buildDataRequirements(
-  markup: ParsedMetricMarkup,
+  ...tokenGroups: MetricToken[][]
 ): MetricDataRequirements {
-  const expressions = getAllExpressionTokens(markup);
+  const expressions = getAllExpressionTokens(...tokenGroups);
 
   const needsTransactions = expressions.some(
     (e) => e.source === "transactions" || e.source === "budgets",
