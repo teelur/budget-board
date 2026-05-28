@@ -206,8 +206,8 @@ const DashboardContent = ({
               isEditingSmOnDesktop ? { lg: 1, sm: 1 } : { lg: GRID_COLS, sm: 1 }
             }
             rowHeight={GRID_ROW_HEIGHT}
-            dragConfig={{ enabled: isEditMode }}
-            resizeConfig={{ enabled: isEditMode }}
+            dragConfig={{ enabled: isEditMode && settingsOpenId === null }}
+            resizeConfig={{ enabled: isEditMode && settingsOpenId === null }}
             onDragStop={(layout) => handleSave(layout)}
             onResizeStop={(layout) => handleSave(layout)}
             margin={[12, 12]}
