@@ -157,7 +157,9 @@ const MetricWidgetSettings = ({
       opened={opened}
       onClose={onClose}
       title={
-        <PrimaryHeading order={4}>{t("metric_widget_settings")}</PrimaryHeading>
+        <PrimaryHeading component="span" order={4}>
+          {t("metric_widget_settings")}
+        </PrimaryHeading>
       }
       size="lg"
     >

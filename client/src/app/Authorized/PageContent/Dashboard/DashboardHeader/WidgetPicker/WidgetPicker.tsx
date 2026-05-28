@@ -97,7 +97,11 @@ const WidgetPicker = ({
     <Drawer
       opened={opened}
       onClose={onClose}
-      title={<PrimaryHeading order={4}>{t("add_widget")}</PrimaryHeading>}
+      title={
+        <PrimaryHeading component="span" order={4}>
+          {t("add_widget")}
+        </PrimaryHeading>
+      }
       position="right"
       size="sm"
     >

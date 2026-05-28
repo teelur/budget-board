@@ -168,7 +168,9 @@ const ImportTransactionsModal = () => {
         onClose={close}
         size="auto"
         title={
-          <PrimaryHeading order={4}>{t("import_transactions")}</PrimaryHeading>
+          <PrimaryHeading component="span" order={4}>
+            {t("import_transactions")}
+          </PrimaryHeading>
         }
       >
         <Stepper

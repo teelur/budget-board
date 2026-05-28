@@ -70,7 +70,11 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryHeading order={4}>{t("asset_details")}</PrimaryHeading>}
+      title={
+        <PrimaryHeading component="span" order={4}>
+          {t("asset_details")}
+        </PrimaryHeading>
+      }
     >
       {!props.asset ? (
         <Skeleton height={425} radius="lg" />

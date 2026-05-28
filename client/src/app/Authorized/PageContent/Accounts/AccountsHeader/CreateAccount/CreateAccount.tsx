@@ -148,7 +148,11 @@ const CreateAccount = () => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryHeading order={4}>{t("create_account")}</PrimaryHeading>}
+        title={
+          <PrimaryHeading component="span" order={4}>
+            {t("create_account")}
+          </PrimaryHeading>
+        }
       >
         <Stack gap="0.5rem">
           <TextInput
