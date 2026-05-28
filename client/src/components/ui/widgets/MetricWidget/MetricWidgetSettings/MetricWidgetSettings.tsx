@@ -6,6 +6,7 @@ import {
   ScrollArea,
   Skeleton,
   Stack,
+  TextInput,
   Textarea,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
@@ -21,25 +22,21 @@ import { translateAxiosError } from "~/helpers/requests";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-const SYNTAX_EXAMPLES = `title: Spending This Month
-value: @transactions.sum(this_month, type=expense){currency}
+const SYNTAX_EXAMPLES = `value: @transactions.sum(this_month, type=expense){currency}
 label: total expenses
 
 ---
 
-title: Grocery Budget
 value: @budgets.percent_used(this_month, category=Groceries){percent}
 label: @budgets.spent(this_month, category=Groceries){currency} of @budgets.total(this_month, category=Groceries){currency}
 
 ---
 
-title: Emergency Fund
 value: @goals.percent_complete(name=Emergency Fund){percent}
 label: @goals.current_amount(name=Emergency Fund){currency} of @goals.target(name=Emergency Fund){currency}
 
 ---
 
-title: Checking Balance
 value: @accounts.balance(type=Checking){currency}`;
 
 interface MetricWidgetSettingsProps {
@@ -57,6 +54,7 @@ const MetricWidgetSettings = ({
   const { request } = useAuth();
   const queryClient = useQueryClient();
 
+  const titleField = useField({ initialValue: "" });
   const markupField = useField({ initialValue: "" });
   const [initialized, setInitialized] = React.useState(false);
 
@@ -75,6 +73,7 @@ const MetricWidgetSettings = ({
   React.useEffect(() => {
     if (!opened) {
       setInitialized(false);
+      titleField.reset();
       markupField.reset();
       return;
     }
@@ -85,17 +84,48 @@ const MetricWidgetSettings = ({
       try {
         const parsed = JSON.parse(widget.configuration) as {
           markup?: string;
+          title?: string;
         };
-        markupField.setValue(parsed.markup ?? "");
+        if (parsed.title !== undefined) {
+          titleField.setValue(parsed.title);
+          markupField.setValue(parsed.markup ?? "");
+        } else {
+          // Migrate old format: extract title: line from markup
+          const rawMarkup = parsed.markup ?? "";
+          const lines = rawMarkup.split("\n");
+          const titleLine = lines.find((l) => l.trim().startsWith("title:"));
+          titleField.setValue(
+            titleLine ? titleLine.trim().slice("title:".length).trim() : "",
+          );
+          markupField.setValue(
+            lines
+              .filter((l) => !l.trim().startsWith("title:"))
+              .join("\n")
+              .trimStart(),
+          );
+        }
       } catch {
+        titleField.setValue("");
         markupField.setValue("");
       }
     }
     setInitialized(true);
-  }, [opened, initialized, widgetSettingsQuery.isPending, widgetSettingsQuery.data, widgetId]);
+  }, [
+    opened,
+    initialized,
+    widgetSettingsQuery.isPending,
+    widgetSettingsQuery.data,
+    widgetId,
+  ]);
 
   const doSave = useMutation({
-    mutationFn: async (markup: string) => {
+    mutationFn: async ({
+      title,
+      markup,
+    }: {
+      title: string;
+      markup: string;
+    }) => {
       const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
       if (!widget) throw new Error("Widget not found");
 
@@ -110,7 +140,7 @@ const MetricWidgetSettings = ({
           lgH: widget.lgH,
           smY: widget.smY,
           smH: widget.smH,
-          configuration: { markup },
+          configuration: { title, markup },
         },
       });
     },
@@ -127,7 +157,10 @@ const MetricWidgetSettings = ({
   });
 
   const handleSave = () => {
-    doSave.mutate(markupField.getValue());
+    doSave.mutate({
+      title: titleField.getValue(),
+      markup: markupField.getValue(),
+    });
   };
 
   return (
@@ -143,21 +176,32 @@ const MetricWidgetSettings = ({
         {widgetSettingsQuery.isPending ? (
           <Skeleton height={200} radius="md" />
         ) : (
-          <Textarea
-            label={t("metric_widget_markup_label")}
-            placeholder={t("metric_widget_markup_placeholder")}
-            autosize
-            minRows={5}
-            maxRows={12}
-            styles={{ input: { fontFamily: "monospace", fontSize: "0.85rem" } }}
-            {...markupField.getInputProps()}
-          />
+          <Stack gap="0.75rem">
+            <TextInput
+              label={t("metric_widget_title_label")}
+              placeholder={t("metric_widget_title_placeholder")}
+              {...titleField.getInputProps()}
+            />
+            <Textarea
+              label={t("metric_widget_markup_label")}
+              placeholder={t("metric_widget_markup_placeholder")}
+              autosize
+              minRows={5}
+              maxRows={12}
+              styles={{
+                input: { fontFamily: "monospace", fontSize: "0.85rem" },
+              }}
+              {...markupField.getInputProps()}
+            />
+          </Stack>
         )}
 
         <Accordion variant="contained">
           <Accordion.Item value="reference">
             <Accordion.Control>
-              <DimmedText size="sm">{t("metric_widget_syntax_reference")}</DimmedText>
+              <DimmedText size="sm">
+                {t("metric_widget_syntax_reference")}
+              </DimmedText>
             </Accordion.Control>
             <Accordion.Panel>
               <ScrollArea.Autosize mah={320} type="auto">
@@ -183,7 +227,10 @@ const MetricWidgetSettings = ({
                   <DimmedText size="xs" fw={600} mt="0.25rem">
                     {t("metric_widget_syntax_examples")}:
                   </DimmedText>
-                  <Code block style={{ fontSize: "0.75rem", whiteSpace: "pre" }}>
+                  <Code
+                    block
+                    style={{ fontSize: "0.75rem", whiteSpace: "pre" }}
+                  >
                     {SYNTAX_EXAMPLES}
                   </Code>
                 </Stack>

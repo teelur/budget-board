@@ -16,8 +16,6 @@ import { filterVisibleAccounts, getAccountsOfTypes } from "~/helpers/accounts";
 import { getVisibleTransactions } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-
 export const PERIOD_KEYWORDS = [
   "this_month",
   "last_month",
@@ -31,8 +29,6 @@ export const PERIOD_KEYWORDS = [
 export type PeriodKeyword = (typeof PERIOD_KEYWORDS)[number];
 
 const EXPRESSION_REGEX = /@(\w+)\.(\w+)\(([^)]*)\)\{([^}]+)\}/g;
-
-// ─── Parsing ──────────────────────────────────────────────────────────────────
 
 function parseArgs(argsStr: string): {
   period?: string;
@@ -77,7 +73,7 @@ function parseTemplate(template: string): MetricToken[] {
 
     const [raw, source, metric, argsStr, format] = match as RegExpExecArray &
       string[];
-    const { period, params } = parseArgs(argsStr);
+    const { period, params } = parseArgs(argsStr ?? "");
 
     tokens.push({
       type: "expression",

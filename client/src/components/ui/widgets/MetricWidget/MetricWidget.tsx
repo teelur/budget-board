@@ -57,14 +57,17 @@ const MetricWidget = ({
     },
   });
 
-  const markup = React.useMemo(() => {
+  const { configTitle, markup } = React.useMemo(() => {
     const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
-    if (!widget?.configuration) return "";
+    if (!widget?.configuration) return { configTitle: undefined, markup: "" };
     try {
-      const parsed = JSON.parse(widget.configuration) as { markup?: string };
-      return parsed.markup ?? "";
+      const parsed = JSON.parse(widget.configuration) as {
+        markup?: string;
+        title?: string;
+      };
+      return { configTitle: parsed.title, markup: parsed.markup ?? "" };
     } catch {
-      return "";
+      return { configTitle: undefined, markup: "" };
     }
   }, [widgetSettingsQuery.data, widgetId]);
 
@@ -222,11 +225,12 @@ const MetricWidget = ({
   // ── Resolved display values ────────────────────────────────────────────────
 
   const titleText = React.useMemo(() => {
+    if (configTitle !== undefined) return configTitle || t("metric");
     if (parsedMarkup.title && !isPending) {
       return resolveTemplate(parsedMarkup.title, ctx);
     }
     return t("metric");
-  }, [parsedMarkup.title, isPending, ctx, t]);
+  }, [configTitle, parsedMarkup.title, isPending, ctx, t]);
 
   const valueText = React.useMemo(() => {
     if (parsedMarkup.value && !isPending) {
