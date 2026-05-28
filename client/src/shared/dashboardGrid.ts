@@ -34,4 +34,10 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     descriptionKey: "spending_trends_widget_description",
     maxInstances: Infinity,
   },
+  {
+    widgetType: "Metric",
+    labelKey: "metric",
+    descriptionKey: "metric_widget_description",
+    maxInstances: Infinity,
+  },
 ];

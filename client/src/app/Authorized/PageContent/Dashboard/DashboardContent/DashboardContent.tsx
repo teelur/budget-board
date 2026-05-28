@@ -26,6 +26,7 @@ import {
 } from "~/shared/dashboardGrid";
 import SpendingTrendsWidget from "../../../../../components/ui/widgets/SpendingTrendsWidget/SpendingTrendsWidget";
 import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
+import MetricWidget from "~/components/ui/widgets/MetricWidget/MetricWidget";
 
 const SKELETON_COUNT = 4;
 const SM_PREVIEW_WIDTH = 500;
@@ -140,6 +141,14 @@ const DashboardContent = ({
         return <SpendingTrendsWidget />;
       case "UncategorizedTransactions":
         return <UncategorizedTransactionsWidget />;
+      case "Metric":
+        return (
+          <MetricWidget
+            widgetId={widget.id}
+            settingsOpened={settingsOpenId === widget.id}
+            onSettingsClose={() => setSettingsOpenId(null)}
+          />
+        );
       default:
         return null;
     }
@@ -214,7 +223,8 @@ const DashboardContent = ({
                   onRemove={() => doRemoveWidget.mutate(widget.id)}
                   onSettingsOpen={
                     widget.widgetType === "NetWorth" ||
-                    widget.widgetType === "Accounts"
+                    widget.widgetType === "Accounts" ||
+                    widget.widgetType === "Metric"
                       ? () => setSettingsOpenId(widget.id)
                       : undefined
                   }
