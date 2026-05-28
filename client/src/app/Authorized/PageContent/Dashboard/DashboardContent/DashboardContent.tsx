@@ -61,6 +61,29 @@ const DashboardContent = ({
       return [];
     },
   });
+  const widgets = widgetSettingsQuery.data ?? [];
+  const lgLayout = React.useMemo<LayoutItem[]>(
+    () =>
+      widgets.map((w) => ({
+        i: w.id,
+        x: w.lgX,
+        y: w.lgY,
+        w: w.lgW,
+        h: w.lgH,
+      })),
+    [widgets],
+  );
+  const smLayout = React.useMemo<LayoutItem[]>(
+    () =>
+      widgets.map((w) => ({
+        i: w.id,
+        x: 0, // x is ignored for sm since cols=1
+        y: w.smY,
+        w: 1, // w is ignored for sm since cols=1
+        h: w.smH,
+      })),
+    [widgets],
+  );
 
   const doBatchUpdate = useMutation({
     mutationFn: async (updates: IWidgetSettingsBatchUpdateRequest[]) =>
@@ -99,6 +122,20 @@ const DashboardContent = ({
     (layout: Layout) => {
       if (!isEditMode) return;
 
+      const currentLayout = editTarget === "lg" ? lgLayout : smLayout;
+      const hasChanged = layout.some((item) => {
+        const current = currentLayout.find((c) => c.i === item.i);
+        if (!current) return true;
+        return editTarget === "lg"
+          ? current.x !== item.x ||
+              current.y !== item.y ||
+              current.w !== item.w ||
+              current.h !== item.h
+          : current.y !== item.y || current.h !== item.h;
+      });
+
+      if (!hasChanged) return;
+
       const updates: IWidgetSettingsBatchUpdateRequest[] =
         editTarget === "lg"
           ? layout.map((item) => ({
@@ -116,7 +153,7 @@ const DashboardContent = ({
 
       doBatchUpdate.mutate(updates);
     },
-    [isEditMode, editTarget, doBatchUpdate.mutate],
+    [isEditMode, editTarget, lgLayout, smLayout, doBatchUpdate.mutate],
   );
 
   const renderWidgetContent = (widget: IWidgetSettingsResponse) => {
@@ -153,30 +190,6 @@ const DashboardContent = ({
         return null;
     }
   };
-
-  const widgets = widgetSettingsQuery.data ?? [];
-  const lgLayout = React.useMemo<LayoutItem[]>(
-    () =>
-      widgets.map((w) => ({
-        i: w.id,
-        x: w.lgX,
-        y: w.lgY,
-        w: w.lgW,
-        h: w.lgH,
-      })),
-    [widgets],
-  );
-  const smLayout = React.useMemo<LayoutItem[]>(
-    () =>
-      widgets.map((w) => ({
-        i: w.id,
-        x: 0, // x is ignored for sm since cols=1
-        y: w.smY,
-        w: 1, // w is ignored for sm since cols=1
-        h: w.smH,
-      })),
-    [widgets],
-  );
 
   const isDesktopViewport =
     useMediaQuery(`(min-width: ${GRID_BREAKPOINT}px)`) ?? false;

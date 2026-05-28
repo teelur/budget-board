@@ -555,5 +555,6 @@
   "welcome_to": "Welcome to",
   "widget_already_added": "Already added",
   "widget_no_items_configured_message": "No items are configured for this widget.",
+  "widget_not_found": "Widget not found!",
   "yyyy_mm_dd": "YYYY{{separator}}MM{{separator}}DD"
 }

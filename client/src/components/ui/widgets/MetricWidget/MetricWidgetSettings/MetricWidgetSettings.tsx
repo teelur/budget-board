@@ -14,6 +14,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import Modal from "~/components/core/Modal/Modal";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -107,7 +108,13 @@ const MetricWidgetSettings = ({
       label: string;
     }) => {
       const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
-      if (!widget) throw new Error("Widget not found");
+      if (!widget) {
+        notifications.show({
+          color: "var(--button-color-destructive)",
+          message: t("widget_not_found"),
+        });
+        return;
+      }
 
       return await request({
         url: "/api/widgetSettings",
@@ -148,7 +155,9 @@ const MetricWidgetSettings = ({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={<PrimaryText size="md">{t("metric_widget_settings")}</PrimaryText>}
+      title={
+        <PrimaryHeading order={4}>{t("metric_widget_settings")}</PrimaryHeading>
+      }
       size="lg"
     >
       <Stack gap="0.75rem">
@@ -159,12 +168,20 @@ const MetricWidgetSettings = ({
         ) : (
           <Stack gap="0.75rem">
             <TextInput
-              label={t("metric_widget_title_label")}
+              label={
+                <PrimaryText size="sm">
+                  {t("metric_widget_title_label")}
+                </PrimaryText>
+              }
               placeholder={t("metric_widget_title_placeholder")}
               {...titleField.getInputProps()}
             />
             <TextInput
-              label={t("metric_widget_value_label")}
+              label={
+                <PrimaryText size="sm">
+                  {t("metric_widget_value_label")}
+                </PrimaryText>
+              }
               placeholder={t("metric_widget_value_placeholder")}
               styles={{
                 input: { fontFamily: "monospace", fontSize: "0.85rem" },
@@ -172,7 +189,11 @@ const MetricWidgetSettings = ({
               {...valueField.getInputProps()}
             />
             <TextInput
-              label={t("metric_widget_label_label")}
+              label={
+                <PrimaryText size="sm">
+                  {t("metric_widget_label_label")}
+                </PrimaryText>
+              }
               placeholder={t("metric_widget_label_placeholder")}
               styles={{
                 input: { fontFamily: "monospace", fontSize: "0.85rem" },
