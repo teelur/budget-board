@@ -247,7 +247,9 @@ public class WidgetSettingsService(
             WidgetTypes.Metric => JsonSerializer.Serialize(
                 new
                 {
-                    markup = "title: This Month's Spending\nvalue: @transactions.sum(this_month, type=expense){currency}\nlabel: total expenses",
+                    title = "This Month's Spending",
+                    value = "@transactions.sum(this_month, type=expense){currency}",
+                    label = "total expenses",
                 }
             ),
             _ => null,
