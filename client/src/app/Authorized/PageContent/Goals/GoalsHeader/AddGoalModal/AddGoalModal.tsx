@@ -99,7 +99,11 @@ const AddGoalModal = (): React.ReactNode => {
         opened={isOpen}
         onClose={close}
         size="600px"
-        title={<PrimaryHeading order={4}>{t("add_goal")}</PrimaryHeading>}
+        title={
+          <PrimaryHeading component="span" order={4}>
+            {t("add_goal")}
+          </PrimaryHeading>
+        }
       >
         <Stepper
           active={activeStep}

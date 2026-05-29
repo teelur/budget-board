@@ -56,7 +56,11 @@ const CreateAsset = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryHeading order={4}>{t("create_asset")}</PrimaryHeading>}
+        title={
+          <PrimaryHeading component="span" order={4}>
+            {t("create_asset")}
+          </PrimaryHeading>
+        }
       >
         <Stack gap="0.5rem">
           <TextInput

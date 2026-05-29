@@ -38,6 +38,7 @@ const WidgetShell = ({
               color="var(--base-color-text-secondary)"
               variant="subtle"
               size="md"
+              onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
                 onSettingsOpen();
@@ -51,6 +52,7 @@ const WidgetShell = ({
             variant="filled"
             color="var(--button-color-destructive)"
             size="md"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               onRemove();

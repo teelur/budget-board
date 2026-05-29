@@ -104,7 +104,11 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryHeading order={4}>{t("budget_details")}</PrimaryHeading>}
+      title={
+        <PrimaryHeading component="span" order={4}>
+          {t("budget_details")}
+        </PrimaryHeading>
+      }
     >
       {transactionsQuery.isPending ||
       props.month === null ||
