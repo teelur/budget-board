@@ -110,11 +110,7 @@ const MetricWidgetSettings = ({
     }) => {
       const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
       if (!widget) {
-        notifications.show({
-          color: "var(--button-color-destructive)",
-          message: t("widget_not_found"),
-        });
-        return;
+        throw new Error(t("widget_not_found"));
       }
 
       return await request({
@@ -136,10 +132,14 @@ const MetricWidgetSettings = ({
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
       onClose();
     },
-    onError: (error: AxiosError) => {
+    onError: (error: AxiosError | Error) => {
+      const message =
+        error instanceof AxiosError
+          ? translateAxiosError(error)
+          : error.message;
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
+        message,
       });
     },
   });

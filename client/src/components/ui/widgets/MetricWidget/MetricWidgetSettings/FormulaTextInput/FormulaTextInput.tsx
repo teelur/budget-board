@@ -368,7 +368,6 @@ const FormulaTextInput = ({
       }}
       onOptionSubmit={handleOptionSubmit}
       store={combobox}
-      withinPortal={false}
     >
       <Combobox.Target>
         <TextInput
