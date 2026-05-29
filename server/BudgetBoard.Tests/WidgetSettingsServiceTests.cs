@@ -17,6 +17,14 @@ namespace BudgetBoard.IntegrationTests;
 public class WidgetSettingsServiceTests
 {
     private static readonly string[] items = ["Checking", "Savings", "Credit Card", "Loan"];
+    private static readonly string expectedMetricConfiguration = JsonSerializer.Serialize(
+        new
+        {
+            title = "This Month's Spending",
+            value = "@transactions.sum(this_month, type=expense){currency}",
+            label = "total expenses",
+        }
+    );
 
     private static WidgetSettingsService CreateService(TestHelper helper) =>
         new(
@@ -59,6 +67,34 @@ public class WidgetSettingsServiceTests
         settings.LgH.Should().Be(5);
         settings.SmY.Should().Be(5);
         settings.SmH.Should().Be(5);
+    }
+
+    [Fact]
+    public async Task CreateWidgetSettingsAsync_WhenMetricTypeAndNoLayoutProvided_ShouldUseMetricDefaults()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        var request = new WidgetSettingsCreateRequest { WidgetType = WidgetTypes.Metric };
+
+        // Act
+        await service.CreateWidgetSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        var settings = helper.UserDataContext.WidgetSettings.SingleOrDefault(ws =>
+            ws.UserID == helper.demoUser.Id
+        );
+
+        settings.Should().NotBeNull();
+        settings!.WidgetType.Should().Be(WidgetTypes.Metric);
+        settings.LgX.Should().Be(9);
+        settings.LgY.Should().Be(0);
+        settings.LgW.Should().Be(3);
+        settings.LgH.Should().Be(8);
+        settings.SmY.Should().Be(0);
+        settings.SmH.Should().Be(6);
+        settings.Configuration.Should().Be(expectedMetricConfiguration);
     }
 
     [Fact]
@@ -408,6 +444,38 @@ public class WidgetSettingsServiceTests
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("WidgetDeleteNotFoundError");
+    }
+
+    [Fact]
+    public async Task ResetWidgetSettingsConfiguration_WhenMetricWidget_ShouldRestoreMetricDefaultMarkup()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        var metricWidget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Metric,
+            LgX = 9,
+            LgY = 0,
+            LgW = 3,
+            LgH = 8,
+            SmY = 0,
+            SmH = 6,
+            Configuration = JsonSerializer.Serialize(new { markup = "custom metric markup" }),
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(metricWidget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.ResetWidgetSettingsConfiguration(helper.demoUser.Id, metricWidget.ID);
+
+        // Assert
+        var updated = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == metricWidget.ID);
+        updated.Configuration.Should().Be(expectedMetricConfiguration);
     }
 
     [Fact]

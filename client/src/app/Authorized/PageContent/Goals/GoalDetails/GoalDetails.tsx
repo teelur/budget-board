@@ -71,7 +71,11 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       onClose={props.doClose}
       position="right"
       size="md"
-      title={<PrimaryHeading order={4}>{t("goal_details")}</PrimaryHeading>}
+      title={
+        <PrimaryHeading component="span" order={4}>
+          {t("goal_details")}
+        </PrimaryHeading>
+      }
     >
       {props.goal === null ? (
         <Skeleton height={425} radius="lg" />

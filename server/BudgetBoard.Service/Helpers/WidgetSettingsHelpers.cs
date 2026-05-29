@@ -57,6 +57,7 @@ public static class WidgetSettingsHelpers
             SmY: 41,
             SmH: 16
         ),
+        new DefaultWidgetLayout(WidgetTypes.Metric, LgX: 9, LgY: 0, LgW: 3, LgH: 8, SmY: 0, SmH: 6),
     ];
 
     /// <summary>

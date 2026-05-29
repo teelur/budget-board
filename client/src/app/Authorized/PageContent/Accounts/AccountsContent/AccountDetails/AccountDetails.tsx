@@ -75,7 +75,11 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<PrimaryHeading order={4}>{t("account_details")}</PrimaryHeading>}
+      title={
+        <PrimaryHeading component="span" order={4}>
+          {t("account_details")}
+        </PrimaryHeading>
+      }
     >
       {!props.account ? (
         <Skeleton height={425} radius="lg" />

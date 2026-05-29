@@ -3,6 +3,7 @@ import { Title, TitleProps } from "@mantine/core";
 
 interface PrimaryHeadingProps extends TitleProps {
   children?: React.ReactNode;
+  component?: React.ElementType;
 }
 
 const PrimaryHeading = ({
