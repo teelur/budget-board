@@ -439,6 +439,7 @@ public class DemoSeedService(
             ("Entertainment", 100m),
             ("Bills & Utilities", 250m),
             ("Health & Fitness", 150m),
+            ("Income", 5000m),
         };
 
         foreach (var (category, limit) in budgets)
