@@ -167,6 +167,7 @@
   "delimiter_must_be_single_character_message": "Delimiter must be a single character.",
   "delimiter_required_message": "Delimiter is required.",
   "demo_mode": "Demo Mode",
+  "demo_mode_banner": "Budget Board is currently running in demo mode. Some functionality may be disabled.",
   "demo_mode_login_hint": "This is a demo instance. Login credentials have been pre-filled.",
   "desktop": "Desktop",
   "disable": "Disable",

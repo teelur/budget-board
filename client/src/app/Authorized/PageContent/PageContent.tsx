@@ -1,7 +1,10 @@
-import { ScrollArea, Stack } from "@mantine/core";
+import { Alert, ScrollArea, Stack } from "@mantine/core";
 import { Navigate, Route, Routes } from "react-router";
 import { Suspense, lazy } from "react";
 import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
+import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
+import { useTranslation } from "react-i18next";
+import { TriangleAlert } from "lucide-react";
 
 const Dashboard = lazy(() => import("./Dashboard/Dashboard"));
 const Accounts = lazy(() => import("./Accounts/Accounts"));
@@ -62,6 +65,10 @@ const SettingsAdvanced = lazy(
 );
 
 const PageContent = (): React.ReactNode => {
+  const { t } = useTranslation();
+  const { envVariables } = getProjectEnvVariables();
+  const isDemoMode = envVariables.VITE_DEMO_MODE?.toLowerCase() === "true";
+
   const suspenseFallback = (
     <Stack
       h={"calc(100dvh - var(--app-shell-header-offset, 60px))"}
@@ -81,6 +88,18 @@ const PageContent = (): React.ReactNode => {
       offsetScrollbars="present"
     >
       <Stack w="100%" p="0.5rem" pb="var(--bulk-bar-height, 0)" align="center">
+        {isDemoMode && (
+          <Alert
+            icon={<TriangleAlert size={16} />}
+            color="yellow"
+            radius="md"
+            w="100%"
+            p="0.5rem"
+            styles={{ message: { fontSize: "var(--mantine-font-size-sm)" } }}
+          >
+            {t("demo_mode_banner")}
+          </Alert>
+        )}
         <Suspense fallback={suspenseFallback}>
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
