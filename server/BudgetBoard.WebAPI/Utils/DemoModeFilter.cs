@@ -37,8 +37,6 @@ public class DemoModeFilter(
         if (
             path.StartsWith("/api/simplefin")
             || path.StartsWith("/api/lunchflow")
-            || path.StartsWith("/api/simplefinaccount")
-            || path.StartsWith("/api/lunchflowaccount")
             || path.StartsWith("/api/oidc")
         )
         {
