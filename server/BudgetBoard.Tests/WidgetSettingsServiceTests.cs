@@ -88,11 +88,11 @@ public class WidgetSettingsServiceTests
 
         settings.Should().NotBeNull();
         settings!.WidgetType.Should().Be(WidgetTypes.Metric);
-        settings.LgX.Should().Be(9);
+        settings.LgX.Should().Be(4);
         settings.LgY.Should().Be(0);
-        settings.LgW.Should().Be(3);
-        settings.LgH.Should().Be(8);
-        settings.SmY.Should().Be(0);
+        settings.LgW.Should().Be(2);
+        settings.LgH.Should().Be(6);
+        settings.SmY.Should().Be(30);
         settings.SmH.Should().Be(6);
         settings.Configuration.Should().Be(expectedMetricConfiguration);
     }
