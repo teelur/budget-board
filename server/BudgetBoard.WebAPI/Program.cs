@@ -257,6 +257,8 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<ILunchFlowAccountService, LunchFlowAccountService>();
 builder.Services.AddScoped<IDemoSeedService, DemoSeedService>();
 
+// Enabling demo mode will clear the database and seed demo data on startup.
+// THIS SHOULD NOT BE ENABLED IN TYPICAL DEPLOYMENTS!
 if (demoModeEnabled)
 {
     builder.Services.AddQuartz(options =>
@@ -379,7 +381,8 @@ else
     System.Diagnostics.Debug.WriteLine("Automatic Db updates not enabled.");
 }
 
-// Need to make sure this runs after migrations are performed.
+// Enabling demo mode will clear the database and seed demo data on startup.
+// THIS SHOULD NOT BE ENABLED IN TYPICAL DEPLOYMENTS!
 if (demoModeEnabled)
 {
     logger.LogInformation("Demo mode enabled: seeding initial demo data on startup…");
