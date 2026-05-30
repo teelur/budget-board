@@ -166,6 +166,8 @@
   "deleted_values": "Deleted Values",
   "delimiter_must_be_single_character_message": "Delimiter must be a single character.",
   "delimiter_required_message": "Delimiter is required.",
+  "demo_mode": "Demo Mode",
+  "demo_mode_login_hint": "This is a demo instance. Login credentials have been pre-filled.",
   "desktop": "Desktop",
   "disable": "Disable",
   "disable_built_in_account_types_blocked_accounts": "{{count}} account(s) are currently using built-in account types. Reassign them first.",
