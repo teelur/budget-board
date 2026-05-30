@@ -38,25 +38,28 @@ public class DemoSeedService(
     )[] TransactionPool =
     [
         ("Income", "Paycheck", "Employer Direct Deposit", 2400m, 3200m, false),
-        ("Food & Drink", "Groceries", "Whole Foods Market", 40m, 180m, true),
-        ("Food & Drink", "Groceries", "Trader Joe's", 25m, 110m, true),
-        ("Food & Drink", "Coffee", "Starbucks", 4m, 12m, true),
-        ("Food & Drink", "Restaurants", "Chipotle", 8m, 22m, true),
-        ("Food & Drink", "Restaurants", "Local Bistro", 18m, 65m, true),
-        ("Transportation", "Gas", "Shell", 30m, 80m, true),
-        ("Transportation", "Rideshare", "Uber", 8m, 35m, true),
-        ("Transportation", "Parking", "ParkMobile", 5m, 25m, true),
-        ("Shopping", "Online", "Amazon", 12m, 240m, true),
+        ("Food & Dining", "Groceries", "Whole Foods Market", 40m, 180m, true),
+        ("Food & Dining", "Groceries", "Trader Joe's", 25m, 110m, true),
+        ("Food & Dining", "Coffee Shops", "Starbucks", 4m, 12m, true),
+        ("", "", "Square *Unknown Vendor", 10m, 60m, true),
+        ("Food & Dining", "Restaurants", "Chipotle", 8m, 22m, true),
+        ("Food & Dining", "Restaurants", "Local Bistro", 18m, 65m, true),
+        ("Auto & Transport", "Gas & Fuel", "Shell", 30m, 80m, true),
+        ("Auto & Transport", "Ride Share", "Uber", 8m, 35m, true),
+        ("Auto & Transport", "Parking", "ParkMobile", 5m, 25m, true),
+        ("Shopping", "Household", "Amazon", 12m, 240m, true),
+        ("", "", "ACH Debit 4837291", 20m, 150m, true),
         ("Shopping", "Clothing", "Target", 15m, 120m, true),
-        ("Shopping", "Electronics", "Best Buy", 25m, 600m, true),
-        ("Entertainment", "Streaming", "Netflix", 15m, 20m, true),
-        ("Entertainment", "Streaming", "Spotify", 9m, 11m, true),
+        ("Shopping", "Electronics & Software", "Best Buy", 25m, 600m, true),
+        ("Entertainment", "Movies", "Netflix", 15m, 20m, true),
+        ("Entertainment", "Music", "Spotify", 9m, 11m, true),
         ("Entertainment", "Movies", "AMC Theatres", 10m, 28m, true),
-        ("Bills", "Electricity", "City Electric Co.", 60m, 160m, true),
-        ("Bills", "Internet", "Comcast", 55m, 80m, true),
-        ("Bills", "Phone", "Verizon", 45m, 90m, true),
-        ("Health", "Pharmacy", "CVS Pharmacy", 8m, 75m, true),
-        ("Health", "Gym", "LA Fitness", 25m, 45m, true),
+        ("Bills & Utilities", "Utilities", "City Electric Co.", 60m, 160m, true),
+        ("Bills & Utilities", "Internet", "Comcast", 55m, 80m, true),
+        ("", "", "Online Purchase 9921", 5m, 80m, true),
+        ("Bills & Utilities", "Mobile Phone", "Verizon", 45m, 90m, true),
+        ("Health & Fitness", "Pharmacy", "CVS Pharmacy", 8m, 75m, true),
+        ("Health & Fitness", "Gym", "LA Fitness", 25m, 45m, true),
     ];
 
     /// <inheritdoc />
@@ -130,6 +133,15 @@ public class DemoSeedService(
         await SeedUserDataAsync(user);
     }
 
+    /// <summary>
+    /// Seeds institutions, accounts, transactions, budgets, and widget settings for the provided user.
+    /// </summary>
+    /// <param name="user">
+    /// The user for whom to seed institutions, accounts, transactions, budgets, and widget settings.
+    /// </param>
+    /// <returns>
+    /// A task that represents the asynchronous operation.
+    /// </returns>
     private async Task SeedUserDataAsync(ApplicationUser user)
     {
         var rng = new Random();
@@ -343,7 +355,7 @@ public class DemoSeedService(
                             Amount = savingsTransferAmount,
                             Date = transferDate,
                             Category = "Transfer",
-                            Subcategory = "Savings",
+                            Subcategory = "",
                             MerchantName = "Transfer from Checking",
                             Source = "Manual",
                             AccountID = accountId,
@@ -366,7 +378,7 @@ public class DemoSeedService(
                             Amount = growthAmount,
                             Date = growthDate,
                             Category = "Income",
-                            Subcategory = "Dividends",
+                            Subcategory = "Interest Income",
                             MerchantName = "Market Returns",
                             Source = "Manual",
                             AccountID = accountId,
@@ -421,12 +433,12 @@ public class DemoSeedService(
         var budgetMonth = new DateTime(today.Year, today.Month, 1, 0, 0, 0, DateTimeKind.Utc);
         var budgets = new (string Category, decimal Limit)[]
         {
-            ("Food & Drink", 500m),
+            ("Food & Dining", 500m),
             ("Shopping", 300m),
-            ("Transportation", 200m),
+            ("Auto & Transport", 200m),
             ("Entertainment", 100m),
-            ("Bills", 250m),
-            ("Health", 150m),
+            ("Bills & Utilities", 250m),
+            ("Health & Fitness", 150m),
         };
 
         foreach (var (category, limit) in budgets)
