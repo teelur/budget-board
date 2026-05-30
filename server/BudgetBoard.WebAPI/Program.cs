@@ -81,6 +81,7 @@ builder.Services.AddLocalization();
 
 var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 var disableLocalAuth = builder.Configuration.GetValue<bool>("DISABLE_LOCAL_AUTH");
+var demoModeEnabled = builder.Configuration.GetValue<bool>("DEMO_MODE");
 
 // Validate configuration: if local auth is disabled, OIDC must be enabled
 if (disableLocalAuth && !oidcEnabled)
@@ -159,7 +160,8 @@ if (!string.IsNullOrEmpty(emailSender) && !disableLocalAuth)
 }
 
 builder.Services.ConfigureOptions<ConfigureJsonOptions>();
-builder.Services.AddControllers();
+builder.Services.AddScoped<DemoModeFilter>();
+builder.Services.AddControllers(options => options.Filters.Add<DemoModeFilter>());
 
 //Add support to logging with SERILOG
 builder.Host.UseSerilog(
@@ -282,6 +284,11 @@ else
     logger.LogInformation("New user creation enabled");
 }
 
+if (demoModeEnabled)
+{
+    logger.LogInformation("Demo mode enabled - all write operations are disabled");
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -298,7 +305,9 @@ app.MyMapIdentityApi<ApplicationUser>(
     new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
     {
         ExcludeRegisterPost =
-            builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS") || disableLocalAuth,
+            builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS")
+            || disableLocalAuth
+            || demoModeEnabled,
         ExcludeLoginPost = disableLocalAuth,
         ExcludeLogoutPost = false, // Keep logout available even with OIDC
         ExcludeForgotPasswordPost = disableLocalAuth,
