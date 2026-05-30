@@ -15,18 +15,11 @@ public class DemoSeedService(
     ILogger<DemoSeedService> logger,
     UserDataContext userDataContext,
     UserManager<ApplicationUser> userManager,
-    IConfiguration configuration,
     IStringLocalizer<LogStrings> logLocalizer,
     ITransactionService transactionService
 ) : IDemoSeedService
 {
     private const int MonthsOfData = 6;
-    private readonly ILogger<DemoSeedService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IConfiguration _configuration = configuration;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-    private readonly ITransactionService _transactionService = transactionService;
 
     private static readonly (
         string Category,
@@ -65,13 +58,13 @@ public class DemoSeedService(
     /// <inheritdoc />
     public async Task ResetAndSeedAsync()
     {
-        _logger.LogInformation("{LogMessage}", _logLocalizer["DemoResetDeletingUsersLog"].Value);
+        logger.LogInformation("{LogMessage}", logLocalizer["DemoResetDeletingUsersLog"].Value);
         await DeleteAllUsersAsync();
 
-        _logger.LogInformation("{LogMessage}", _logLocalizer["DemoResetSeedingLog"].Value);
+        logger.LogInformation("{LogMessage}", logLocalizer["DemoResetSeedingLog"].Value);
         await SeedDemoUserAsync();
 
-        _logger.LogInformation("{LogMessage}", _logLocalizer["DemoResetCompleteLog"].Value);
+        logger.LogInformation("{LogMessage}", logLocalizer["DemoResetCompleteLog"].Value);
     }
 
     /// <summary>
@@ -85,15 +78,15 @@ public class DemoSeedService(
     /// </returns>
     private async Task DeleteAllUsersAsync()
     {
-        var users = _userManager.Users.ToList();
+        var users = userManager.Users.ToList();
         foreach (var user in users)
         {
-            var result = await _userManager.DeleteAsync(user);
+            var result = await userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                _logger.LogError(
-                    _logLocalizer["DemoResetDeleteUserFailedLog"].Value,
+                logger.LogError(
+                    logLocalizer["DemoResetDeleteUserFailedLog"].Value,
                     user.Email,
                     errors
                 );
@@ -122,11 +115,11 @@ public class DemoSeedService(
             EmailConfirmed = true,
         };
 
-        var createResult = await _userManager.CreateAsync(user, demoPassword);
+        var createResult = await userManager.CreateAsync(user, demoPassword);
         if (!createResult.Succeeded)
         {
             var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
-            _logger.LogError(_logLocalizer["DemoResetCreateUserFailedLog"].Value, errors);
+            logger.LogError(logLocalizer["DemoResetCreateUserFailedLog"].Value, errors);
             return;
         }
 
@@ -146,12 +139,12 @@ public class DemoSeedService(
     {
         var rng = new Random();
 
-        _userDataContext.UserSettings.Add(new UserSettings { UserID = user.Id });
+        userDataContext.UserSettings.Add(new UserSettings { UserID = user.Id });
 
         SeedUserAccounts(user);
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
 
-        var checking = _userDataContext.Accounts.First(a =>
+        var checking = userDataContext.Accounts.First(a =>
             a.UserID == user.Id && a.Name == "Checking"
         );
         await SeedAccountDataAsync(
@@ -163,7 +156,7 @@ public class DemoSeedService(
             expenseFrequencyPerMonth: 18
         );
 
-        var savings = _userDataContext.Accounts.First(a =>
+        var savings = userDataContext.Accounts.First(a =>
             a.UserID == user.Id && a.Name == "Savings"
         );
         await SeedAccountDataAsync(
@@ -176,7 +169,7 @@ public class DemoSeedService(
             savingsTransferAmount: 400m
         );
 
-        var creditCard = _userDataContext.Accounts.First(a =>
+        var creditCard = userDataContext.Accounts.First(a =>
             a.UserID == user.Id && a.Name == "Visa Rewards"
         );
         await SeedAccountDataAsync(
@@ -188,7 +181,7 @@ public class DemoSeedService(
             expenseFrequencyPerMonth: 14
         );
 
-        var investment = _userDataContext.Accounts.First(a =>
+        var investment = userDataContext.Accounts.First(a =>
             a.UserID == user.Id && a.Name == "Brokerage"
         );
         await SeedAccountDataAsync(
@@ -204,12 +197,12 @@ public class DemoSeedService(
         SeedAssetData(user);
         SeedGoalData(
             user,
-            _userDataContext.Accounts.First(a => a.UserID == user.Id && a.Name == "Savings").ID
+            userDataContext.Accounts.First(a => a.UserID == user.Id && a.Name == "Savings").ID
         );
         SeedBudgetData(user);
         SeedWidgetSettingsData(user);
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <summary>
@@ -233,7 +226,7 @@ public class DemoSeedService(
             UserID = user.Id,
         };
 
-        _userDataContext.Institutions.AddRange(greenfieldBank, summitCredit);
+        userDataContext.Institutions.AddRange(greenfieldBank, summitCredit);
 
         var checking = new Account
         {
@@ -272,7 +265,7 @@ public class DemoSeedService(
             UserID = user.Id,
         };
 
-        _userDataContext.Accounts.AddRange(checking, savings, creditCard, investment);
+        userDataContext.Accounts.AddRange(checking, savings, creditCard, investment);
     }
 
     /// <summary>
@@ -294,7 +287,7 @@ public class DemoSeedService(
         // Seed an initial balance so the transaction service can build on it.
         var firstMonth = today.AddMonths(-(MonthsOfData - 1));
         var initialBalanceDate = new DateOnly(firstMonth.Year, firstMonth.Month, 1).AddDays(-1);
-        _userDataContext.Balances.Add(
+        userDataContext.Balances.Add(
             new Balance
             {
                 Amount = initialBalance,
@@ -302,7 +295,7 @@ public class DemoSeedService(
                 AccountID = accountId,
             }
         );
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
 
         // Used only to compute monthly investment growth; the service tracks the real balance.
         decimal growthBase = initialBalance;
@@ -331,7 +324,7 @@ public class DemoSeedService(
                     var income = TransactionPool.First(t => t.Category == "Income");
                     var amount = GenerateRandomDecimal(rng, income.Min, income.Max);
 
-                    await _transactionService.CreateTransactionAsync(
+                    await transactionService.CreateTransactionAsync(
                         userId,
                         new TransactionCreateRequest
                         {
@@ -353,7 +346,7 @@ public class DemoSeedService(
                 var transferDate = firstDay.AddDays(2);
                 if (transferDate <= endDay)
                 {
-                    await _transactionService.CreateTransactionAsync(
+                    await transactionService.CreateTransactionAsync(
                         userId,
                         new TransactionCreateRequest
                         {
@@ -376,7 +369,7 @@ public class DemoSeedService(
                 var growthDate = firstDay.AddDays(rng.Next(1, 5));
                 if (growthDate <= endDay)
                 {
-                    await _transactionService.CreateTransactionAsync(
+                    await transactionService.CreateTransactionAsync(
                         userId,
                         new TransactionCreateRequest
                         {
@@ -408,7 +401,7 @@ public class DemoSeedService(
                     var template = expensePool[rng.Next(expensePool.Length)];
                     var amount = -GenerateRandomDecimal(rng, template.Min, template.Max);
 
-                    await _transactionService.CreateTransactionAsync(
+                    await transactionService.CreateTransactionAsync(
                         userId,
                         new TransactionCreateRequest
                         {
@@ -459,7 +452,7 @@ public class DemoSeedService(
             );
         }
 
-        _userDataContext.Assets.Add(home);
+        userDataContext.Assets.Add(home);
     }
 
     /// <summary>
@@ -467,9 +460,9 @@ public class DemoSeedService(
     /// </summary>
     private void SeedGoalData(ApplicationUser user, Guid savingsAccountId)
     {
-        var savingsAccount = _userDataContext.Accounts.First(a => a.ID == savingsAccountId);
+        var savingsAccount = userDataContext.Accounts.First(a => a.ID == savingsAccountId);
 
-        _userDataContext.Goals.Add(
+        userDataContext.Goals.Add(
             new Goal
             {
                 Name = "Emergency Fund",
@@ -514,7 +507,7 @@ public class DemoSeedService(
 
         foreach (var (category, limit) in budgets)
         {
-            _userDataContext.Budgets.Add(
+            userDataContext.Budgets.Add(
                 new Budget
                 {
                     Date = budgetMonth,
@@ -536,7 +529,7 @@ public class DemoSeedService(
     {
         foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
         {
-            _userDataContext.WidgetSettings.Add(
+            userDataContext.WidgetSettings.Add(
                 new WidgetSettings
                 {
                     WidgetType = layout.WidgetType,
