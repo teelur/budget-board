@@ -26,23 +26,23 @@ public static class WidgetSettingsHelpers
             LgX: 0,
             LgY: 0,
             LgW: 4,
-            LgH: 20,
+            LgH: 11,
             SmY: 0,
             SmH: 20
         ),
         new DefaultWidgetLayout(
             WidgetTypes.UncategorizedTransactions,
             LgX: 4,
-            LgY: 0,
+            LgY: 6,
             LgW: 8,
             LgH: 11,
-            SmY: 30,
+            SmY: 36,
             SmH: 11
         ),
         new DefaultWidgetLayout(
             WidgetTypes.NetWorth,
             LgX: 0,
-            LgY: 5,
+            LgY: 11,
             LgW: 4,
             LgH: 10,
             SmY: 20,
@@ -51,13 +51,21 @@ public static class WidgetSettingsHelpers
         new DefaultWidgetLayout(
             WidgetTypes.SpendingTrends,
             LgX: 4,
-            LgY: 5,
+            LgY: 17,
             LgW: 8,
             LgH: 16,
-            SmY: 41,
+            SmY: 47,
             SmH: 16
         ),
-        new DefaultWidgetLayout(WidgetTypes.Metric, LgX: 9, LgY: 0, LgW: 3, LgH: 8, SmY: 0, SmH: 6),
+        new DefaultWidgetLayout(
+            WidgetTypes.Metric,
+            LgX: 4,
+            LgY: 0,
+            LgW: 2,
+            LgH: 6,
+            SmY: 30,
+            SmH: 6
+        ),
     ];
 
     /// <summary>

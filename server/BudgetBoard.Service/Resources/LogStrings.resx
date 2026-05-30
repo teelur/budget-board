@@ -592,4 +592,19 @@
   <data name="DisableBuiltInAssetTypesInUseLog" xml:space="preserve">
     <value>Attempted to disable built-in asset types but they are currently in use.</value>
   </data>
+  <data name="DemoResetDeletingUsersLog" xml:space="preserve">
+    <value>Demo reset: deleting all existing users…</value>
+  </data>
+  <data name="DemoResetSeedingLog" xml:space="preserve">
+    <value>Demo reset: seeding fresh demo data…</value>
+  </data>
+  <data name="DemoResetCompleteLog" xml:space="preserve">
+    <value>Demo reset: complete.</value>
+  </data>
+  <data name="DemoResetDeleteUserFailedLog" xml:space="preserve">
+    <value>Failed to delete user {0}: {1}</value>
+  </data>
+  <data name="DemoResetCreateUserFailedLog" xml:space="preserve">
+    <value>Demo reset: failed to create demo user: {0}</value>
+  </data>
 </root>

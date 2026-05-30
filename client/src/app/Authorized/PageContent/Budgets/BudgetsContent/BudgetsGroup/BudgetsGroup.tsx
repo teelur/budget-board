@@ -1,4 +1,4 @@
-import { Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { IBudget } from "~/models/budget";
 import React from "react";
 import { ICategory, ICategoryNode } from "~/models/category";
@@ -9,6 +9,7 @@ import {
 import BudgetParentCard from "./BudgetParentCard/BudgetParentCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { InfoIcon } from "lucide-react";
 
 interface BudgetsGroupProps {
   budgets: IBudget[];
@@ -55,7 +56,10 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
           return null;
         })
       ) : (
-        <DimmedText size="sm">{t("no_budgets")}</DimmedText>
+        <Group justify="center" align="center" gap="0.5rem">
+          <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
+          <DimmedText size="sm">{t("no_budgets")}</DimmedText>
+        </Group>
       )}
     </Stack>
   );

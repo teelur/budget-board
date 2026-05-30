@@ -1,4 +1,12 @@
-import { Button, LoadingOverlay, Stack, Divider, Group } from "@mantine/core";
+import {
+  Alert,
+  Button,
+  LoadingOverlay,
+  Stack,
+  Divider,
+  Group,
+} from "@mantine/core";
+import { Info } from "lucide-react";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -32,14 +40,16 @@ const Login = (props: LoginProps): React.ReactNode => {
 
   const { envVariables } = getProjectEnvVariables();
 
+  const isDemoMode = envVariables.VITE_DEMO_MODE?.toLowerCase() === "true";
+
   const emailField = useField<string>({
-    initialValue: "",
+    initialValue: isDemoMode ? "demo@example.com" : "",
     validate: isEmail(t("invalid_email_message")),
   });
 
   const passwordMinLength = 3;
   const passwordField = useField<string>({
-    initialValue: "",
+    initialValue: isDemoMode ? "demo" : "",
     validate: hasLength(
       { min: passwordMinLength },
       t("password_min_length_message", {
@@ -186,6 +196,18 @@ const Login = (props: LoginProps): React.ReactNode => {
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
+      {envVariables.VITE_DEMO_MODE?.toLowerCase() === "true" && (
+        <Alert
+          icon={<Info size={16} />}
+          color="blue"
+          title={t("demo_mode")}
+          w="100%"
+          p="1rem"
+          radius={0}
+        >
+          {t("demo_mode_login_hint")}
+        </Alert>
+      )}
       {envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
         <Stack w="100%" align="center" gap="0.75rem" pb={"0.5rem"} p={"1rem"}>
           <TextInput

@@ -176,13 +176,9 @@ export const getStatusColor = (
   }
 
   if (type === StatusColorType.Target) {
-    if (amount < total * (warningThreshold / 100)) {
-      return "var(--text-color-status-bad)";
-    }
-    if (amount <= total) {
-      return "var(--text-color-status-warning)";
-    }
-    return "var(--text-color-status-good)";
+    return amount < total
+      ? "var(--text-color-status-bad)"
+      : "var(--text-color-status-good)";
   }
 
   return "var(--base-color-text-primary)";

@@ -7,6 +7,7 @@ type ProjectEnvVariablesType = Pick<
   | "VITE_OIDC_CLIENT_ID"
   | "VITE_DISABLE_LOCAL_AUTH"
   | "VITE_DISABLE_NEW_USERS"
+  | "VITE_DEMO_MODE"
 >;
 
 // Environment Variable Template to Be Replaced at Runtime
@@ -17,6 +18,7 @@ const projectEnvVariables: ProjectEnvVariablesType = {
   VITE_OIDC_CLIENT_ID: "${VITE_OIDC_CLIENT_ID}",
   VITE_DISABLE_LOCAL_AUTH: "${VITE_DISABLE_LOCAL_AUTH}",
   VITE_DISABLE_NEW_USERS: "${VITE_DISABLE_NEW_USERS}",
+  VITE_DEMO_MODE: "${VITE_DEMO_MODE}",
 };
 
 // Returning the variable value from runtime or obtained as a result of the build
@@ -30,17 +32,17 @@ export const getProjectEnvVariables = (): {
           ? projectEnvVariables.VITE_BUDGET_BOARD_DOMAIN
           : import.meta.env.VITE_BUDGET_BOARD_DOMAIN,
       VITE_OIDC_ENABLED: !projectEnvVariables.VITE_OIDC_ENABLED?.includes(
-        "VITE_"
+        "VITE_",
       )
         ? projectEnvVariables.VITE_OIDC_ENABLED
         : import.meta.env.VITE_OIDC_ENABLED,
       VITE_OIDC_PROVIDER: !projectEnvVariables.VITE_OIDC_PROVIDER?.includes(
-        "VITE_"
+        "VITE_",
       )
         ? projectEnvVariables.VITE_OIDC_PROVIDER
         : import.meta.env.VITE_OIDC_PROVIDER,
       VITE_OIDC_CLIENT_ID: !projectEnvVariables.VITE_OIDC_CLIENT_ID?.includes(
-        "VITE_"
+        "VITE_",
       )
         ? projectEnvVariables.VITE_OIDC_CLIENT_ID
         : import.meta.env.VITE_OIDC_CLIENT_ID,
@@ -52,6 +54,9 @@ export const getProjectEnvVariables = (): {
         !projectEnvVariables.VITE_DISABLE_NEW_USERS?.includes("VITE_")
           ? projectEnvVariables.VITE_DISABLE_NEW_USERS
           : import.meta.env.VITE_DISABLE_NEW_USERS,
+      VITE_DEMO_MODE: !projectEnvVariables.VITE_DEMO_MODE?.includes("VITE_")
+        ? projectEnvVariables.VITE_DEMO_MODE
+        : import.meta.env.VITE_DEMO_MODE,
     },
   };
 };
