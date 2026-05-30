@@ -127,4 +127,7 @@
   <data name="UserEmailRequiredError" xml:space="preserve">
     <value>The user must have an email address.</value>
   </data>
+  <data name="DemoModeNotAllowed" xml:space="preserve">
+    <value>This action is not allowed in demo mode.</value>
+  </data>
 </root>
