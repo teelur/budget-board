@@ -255,6 +255,31 @@ builder.Services.AddScoped<
     AutomaticTransactionCategorizerService
 >();
 builder.Services.AddScoped<ILunchFlowAccountService, LunchFlowAccountService>();
+builder.Services.AddScoped<IDemoSeedService, DemoSeedService>();
+
+if (demoModeEnabled)
+{
+    builder.Services.AddQuartz(options =>
+    {
+        var jobKey = new JobKey("DemoResetJob");
+        options.AddJob<DemoResetJob>(opts => opts.WithIdentity(jobKey));
+
+        options.AddTrigger(trigger =>
+            trigger
+                .ForJob(jobKey)
+                // Allow a minute for everything to settle after boot before starting the job
+                .StartAt(DateBuilder.FutureDate(1, IntervalUnit.Minute))
+                .WithSimpleSchedule(schedule => schedule.WithIntervalInHours(4).RepeatForever())
+        );
+    });
+
+    // NOTE: AddQuartzHostedService may already be registered by the sync job block above.
+    // Quartz deduplicates the hosted service registration internally, so this is safe.
+    builder.Services.AddQuartzHostedService(options =>
+    {
+        options.WaitForJobsToComplete = true;
+    });
+}
 
 var app = builder.Build();
 
@@ -352,6 +377,15 @@ if (autoUpdateDb)
 else
 {
     System.Diagnostics.Debug.WriteLine("Automatic Db updates not enabled.");
+}
+
+// Need to make sure this runs after migrations are performed.
+if (demoModeEnabled)
+{
+    logger.LogInformation("Demo mode enabled: seeding initial demo data on startup…");
+    using var seedScope = app.Services.CreateScope();
+    var demoSeedService = seedScope.ServiceProvider.GetRequiredService<IDemoSeedService>();
+    await demoSeedService.ResetAndSeedAsync();
 }
 
 app.Run();
