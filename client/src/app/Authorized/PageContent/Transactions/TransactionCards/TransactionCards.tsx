@@ -12,10 +12,11 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import { IUserSettings } from "~/models/userSettings";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { InfoIcon } from "lucide-react";
 
 interface TransactionCardsProps {
   sort: Sorts;
@@ -32,7 +33,8 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { transactionFilters } = useTransactionFilters();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({
@@ -117,7 +119,10 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
               />
             ))
           ) : (
-            <PrimaryText>{t("no_transactions")}</PrimaryText>
+            <Group justify="center" align="center" gap="0.5rem">
+              <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
+              <DimmedText size="sm">{t("no_transactions")}</DimmedText>
+            </Group>
           )}
         </Stack>
       )}

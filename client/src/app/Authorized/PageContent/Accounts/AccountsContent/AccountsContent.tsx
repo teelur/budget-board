@@ -1,4 +1,4 @@
-import { LoadingOverlay, Stack } from "@mantine/core";
+import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -12,6 +12,9 @@ import { notifications } from "@mantine/notifications";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AccountDetails from "./AccountDetails/AccountDetails";
 import { IAccountResponse } from "~/models/account";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
+import { InfoIcon } from "lucide-react";
 
 interface AccountsContentProps {
   isSortable: boolean;
@@ -23,6 +26,8 @@ const AccountsContent = (props: AccountsContentProps) => {
   const [selectedAccount, setSelectedAccount] = React.useState<
     IAccountResponse | undefined
   >(undefined);
+
+  const { t } = useTranslation();
 
   const [sortedInstitutions, setSortedInstitutions] = React.useState<
     IInstitution[]
@@ -73,7 +78,7 @@ const AccountsContent = (props: AccountsContentProps) => {
           .map((inst, index) => ({
             ...inst,
             index,
-          }))
+          })),
       );
     }
   }, [institutionQuery.data]);
@@ -116,32 +121,47 @@ const AccountsContent = (props: AccountsContentProps) => {
         account={selectedAccount}
         currency={userSettingsQuery.data?.currency || "USD"}
       />
-      <DragDropProvider
-        onDragEnd={(event) => {
-          const updatedList = move(sortedInstitutions, event).map(
-            (inst, index) => ({
-              ...inst,
-              index,
-            })
-          );
+      {institutionQuery.isPending ? (
+        <>
+          <Skeleton height={60} radius="md" />
+          <Skeleton height={60} radius="md" />
+          <Skeleton height={60} radius="md" />
+        </>
+      ) : sortedInstitutions.length === 0 ? (
+        <Group justify="center" align="center" gap="0.5rem">
+          <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
+          <DimmedText size="sm">{t("no_institutions")}</DimmedText>
+        </Group>
+      ) : (
+        <DragDropProvider
+          onDragEnd={(event) => {
+            const updatedList = move(sortedInstitutions, event).map(
+              (inst, index) => ({
+                ...inst,
+                index,
+              }),
+            );
 
-          setSortedInstitutions(updatedList);
-        }}
-      >
-        {sortedInstitutions.map((institution) => (
-          <InstitutionItem
-            key={institution.id}
-            institution={institution}
-            userCurrency={userSettingsQuery.data?.currency || "USD"}
-            isSortable={props.isSortable}
-            container={document.getElementById("institutions-stack") as Element}
-            openDetails={(account: IAccountResponse | undefined) => {
-              setSelectedAccount(account);
-              openDetails();
-            }}
-          />
-        ))}
-      </DragDropProvider>
+            setSortedInstitutions(updatedList);
+          }}
+        >
+          {sortedInstitutions.map((institution) => (
+            <InstitutionItem
+              key={institution.id}
+              institution={institution}
+              userCurrency={userSettingsQuery.data?.currency || "USD"}
+              isSortable={props.isSortable}
+              container={
+                document.getElementById("institutions-stack") as Element
+              }
+              openDetails={(account: IAccountResponse | undefined) => {
+                setSelectedAccount(account);
+                openDetails();
+              }}
+            />
+          ))}
+        </DragDropProvider>
+      )}
     </Stack>
   );
 };
