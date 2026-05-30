@@ -311,7 +311,7 @@ else
 
 if (demoModeEnabled)
 {
-    logger.LogInformation("Demo mode enabled - all write operations are disabled");
+    logger.LogInformation("Demo mode enabled - certain operations are disabled");
 }
 
 if (app.Environment.IsDevelopment())
