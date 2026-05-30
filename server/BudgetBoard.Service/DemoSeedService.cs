@@ -201,6 +201,11 @@ public class DemoSeedService(
             monthlyGrowthRate: 0.007m
         );
 
+        SeedAssetData(user);
+        SeedGoalData(
+            user,
+            _userDataContext.Accounts.First(a => a.UserID == user.Id && a.Name == "Savings").ID
+        );
         SeedBudgetData(user);
         SeedWidgetSettingsData(user);
 
@@ -419,6 +424,71 @@ public class DemoSeedService(
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Seeds a home asset with 6 months of value history for the provided user.
+    /// </summary>
+    private void SeedAssetData(ApplicationUser user)
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var purchaseDate = today.AddYears(-2);
+
+        var home = new Asset
+        {
+            Name = "Primary Residence",
+            Type = "Real Estate",
+            PurchaseDate = purchaseDate,
+            PurchasePrice = 295_000m,
+            Index = 0,
+            UserID = user.Id,
+        };
+
+        // Seed 6 monthly value records showing modest appreciation.
+        var baseValue = 308_000m;
+        for (int i = MonthsOfData - 1; i >= 0; i--)
+        {
+            var month = today.AddMonths(-i);
+            home.Values.Add(
+                new Value
+                {
+                    Amount = baseValue + (MonthsOfData - 1 - i) * 2_000m,
+                    Date = new DateOnly(month.Year, month.Month, 1),
+                    AssetID = home.ID,
+                }
+            );
+        }
+
+        _userDataContext.Assets.Add(home);
+    }
+
+    /// <summary>
+    /// Seeds an emergency fund goal linked to the provided account.
+    /// </summary>
+    private void SeedGoalData(ApplicationUser user, Guid savingsAccountId)
+    {
+        var savingsAccount = _userDataContext.Accounts.First(a => a.ID == savingsAccountId);
+
+        _userDataContext.Goals.Add(
+            new Goal
+            {
+                Name = "Emergency Fund",
+                Amount = 20_000m,
+                InitialAmount = 12_500m,
+                MonthlyContribution = 400m,
+                CompleteDate = new DateTime(
+                    DateTime.UtcNow.Year + 2,
+                    DateTime.UtcNow.Month,
+                    1,
+                    0,
+                    0,
+                    0,
+                    DateTimeKind.Utc
+                ),
+                Accounts = [savingsAccount],
+                UserID = user.Id,
+            }
+        );
     }
 
     /// <summary>
