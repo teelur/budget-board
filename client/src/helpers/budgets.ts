@@ -176,10 +176,9 @@ export const getStatusColor = (
   }
 
   if (type === StatusColorType.Target) {
-    if (amount < total) {
-      return "var(--text-color-status-bad)";
-    }
-    return "var(--text-color-status-good)";
+    return amount < total
+      ? "var(--text-color-status-bad)"
+      : "var(--text-color-status-good)";
   }
 
   return "var(--base-color-text-primary)";
