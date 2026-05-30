@@ -36,6 +36,8 @@
   "all_children_will_also_be_deleted": "所有子项也将被删除。",
   "amount": "金额",
   "amount_format": "金额格式",
+  "amount_max": "最大金额",
+  "amount_min": "最小金额",
   "appearance_mode": "显示模式",
   "apply_changes": "应用变更",
   "apply_existing_account_amount_to_goal": "将现有账户余额计入目标金额？",
