@@ -7,7 +7,7 @@ on:
     # Prevent the workflow from running when only documentation, images,
     # or other non-code assets are changed.
     paths-ignore:
-      - "README.md"
+      - "**/*.md"
       - "img/**"
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
