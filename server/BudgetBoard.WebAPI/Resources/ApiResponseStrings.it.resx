@@ -127,4 +127,7 @@
 &lt;p&gt;Your account will be automatically unlocked after the lockout period expires.&lt;/p&gt;
 &lt;p&gt;If this was you, please try again later or use the 'Forgot Password' option to reset your credentials.&lt;/p&gt;</value>
   </data>
+  <data name="DemoModeNotAllowed" xml:space="preserve">
+    <value>This action is not allowed in demo mode.</value>
+  </data>
 </root>
