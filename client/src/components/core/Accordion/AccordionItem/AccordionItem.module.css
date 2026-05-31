@@ -6,7 +6,7 @@
   transition: border-color 0.2s;
 }
 
-.item:hover {
+.item:has(> .control:hover) {
   border-color: var(--mantine-primary-color-filled);
 }
 
