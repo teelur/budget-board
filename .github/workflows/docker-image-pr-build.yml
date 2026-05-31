@@ -4,6 +4,15 @@ permissions:
 
 on:
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "img/**"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".gitignore"
+      - ".gitattributes"
+      - ".dockerignore"
+      - "LICENSE"
 
 jobs:
   test:
