@@ -23,6 +23,11 @@
   gap: 0.5rem;
 }
 
+.controlSlim {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
 .chevron {
   flex-shrink: 0;
   color: var(--accordion-border);
@@ -59,4 +64,9 @@
 .panelContentOpen {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+}
+
+.panelContentOpenSlim {
+  padding-top: 0.25rem;
+  padding-bottom: 0.5rem;
 }

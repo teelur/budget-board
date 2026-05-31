@@ -6,12 +6,14 @@ import { ChevronDown } from "lucide-react";
 interface AccordionItemProps {
   title: React.ReactNode;
   defaultOpen?: boolean;
+  slim?: boolean;
   children: React.ReactNode;
 }
 
 const AccordionItem = ({
   title,
   defaultOpen = true,
+  slim = false,
   children,
 }: AccordionItemProps): React.ReactNode => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
@@ -20,7 +22,7 @@ const AccordionItem = ({
     <div className={classes.item}>
       <button
         type="button"
-        className={classes.control}
+        className={`${classes.control} ${slim ? classes.controlSlim : ""}`}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <span style={{ flex: 1 }}>{title}</span>
@@ -32,7 +34,7 @@ const AccordionItem = ({
       <div className={`${classes.panel} ${isOpen ? classes.panelOpen : ""}`}>
         <div className={classes.panelInner}>
           <div
-            className={`${classes.panelContent} ${isOpen ? classes.panelContentOpen : ""}`}
+            className={`${classes.panelContent} ${isOpen ? (slim ? classes.panelContentOpenSlim : classes.panelContentOpen) : ""}`}
           >
             {children}
           </div>

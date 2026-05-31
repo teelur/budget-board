@@ -101,9 +101,10 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const unbudgetedCards = getUnbudgetedCards();
 
   return (
-    <Accordion elevation={1}>
+    <Accordion p="0.5rem" elevation={1}>
       <Accordion.Item
         defaultOpen={false}
+        slim
         title={
           <Group justify="space-between" align="center" w="100%" pr="0.25rem">
             <PrimaryText size="lg">{t("unbudgeted")}</PrimaryText>
