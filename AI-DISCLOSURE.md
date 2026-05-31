@@ -26,7 +26,7 @@ AI tool usage differs across the different areas of the codebase, so I have prov
 
 A lot of the server code is what I would consider "high-stakes" code, in that bugs or security issues in this code could result in both data loss and data compromise.
 
-For this reason, it is important that code in this component is deliberate, reviewed, and tested. This naturally limits the use of AI tools, but there are still some small task where they can be helpful.
+For this reason, it is important that code in this component is deliberate, reviewed, and tested. This naturally limits the use of AI tools, but there are still some small tasks where they can be helpful.
 
 | AI Used For                       | AI Not Used For                                                                                                    |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
@@ -51,12 +51,12 @@ While there are some aspects of the client code that are high-stakes, such as th
 
 ### Build Infrastructure
 
-The build infrastructure (CI/CD pipelines, Dockerfiles, etc.) were largely set up before AI tools were widely available, and as such are mostly human-authored.
+The build infrastructure (CI/CD pipelines, Dockerfiles, etc.) was largely set up before AI tools were widely available, and as such are mostly human-authored.
 
 | AI Used For                                                                 | AI Not Used For                     |
 | --------------------------------------------------------------------------- | ----------------------------------- |
 | Debugging build issues                                                      | Setting up the build infrastructure |
-| Finding appropriate documentation for build tools and configuration options | Creating dockerfiles                |
+| Finding appropriate documentation for build tools and configuration options | Creating Dockerfiles                |
 | PR feedback                                                                 |                                     |
 
 ---
@@ -68,7 +68,7 @@ While I have experimented with using AI tools to generate documentation, I have 
 | AI Used For                                    | AI Not Used For           |
 | ---------------------------------------------- | ------------------------- |
 | Some of the styling and formatting in the wiki | All documentation content |
-| Debugging docusaurus build issues              |                           |
+| Debugging Docusaurus build issues              |                           |
 
 ---
 
