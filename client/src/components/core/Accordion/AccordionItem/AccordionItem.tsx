@@ -17,12 +17,15 @@ const AccordionItem = ({
   children,
 }: AccordionItemProps): React.ReactNode => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
+  const panelId = React.useId();
 
   return (
     <div className={classes.item}>
       <button
         type="button"
         className={`${classes.control} ${slim ? classes.controlSlim : ""}`}
+        aria-expanded={isOpen}
+        aria-controls={panelId}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <span style={{ flex: 1 }}>{title}</span>
@@ -31,7 +34,13 @@ const AccordionItem = ({
           className={`${classes.chevron} ${isOpen ? classes.chevronOpen : ""}`}
         />
       </button>
-      <div className={`${classes.panel} ${isOpen ? classes.panelOpen : ""}`}>
+      <div
+        id={panelId}
+        role="region"
+        className={`${classes.panel} ${isOpen ? classes.panelOpen : ""}`}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        {...(!isOpen ? ({ inert: "" } as any) : {})}
+      >
         <div className={classes.panelInner}>
           <div
             className={`${classes.panelContent} ${isOpen ? (slim ? classes.panelContentOpenSlim : classes.panelContentOpen) : ""}`}

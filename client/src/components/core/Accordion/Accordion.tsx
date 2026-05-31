@@ -19,19 +19,23 @@ interface AccordionProps extends Omit<StackProps, "children"> {
   children: React.ReactNode;
 }
 
-const Accordion = ({
+const Accordion: ((props: AccordionProps) => React.ReactNode) & {
+  Item: typeof AccordionItem;
+} = ({
   elevation = 0,
   children,
+  style,
   ...props
 }: AccordionProps): React.ReactNode => {
   return (
     <Stack
       gap={props.gap ?? "0.5rem"}
+      {...props}
       style={{
         "--accordion-bg": BG_VARS[elevation],
         "--accordion-border": BORDER_VARS[elevation],
+        ...style,
       }}
-      {...props}
     >
       {children}
     </Stack>
