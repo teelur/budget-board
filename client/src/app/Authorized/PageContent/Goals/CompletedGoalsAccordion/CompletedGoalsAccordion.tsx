@@ -1,4 +1,4 @@
-import { Accordion as MantineAccordion, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import React from "react";
 import { IGoalResponse } from "~/models/goal";
 import CompletedGoalCard from "./CompletedGoalCard/CompletedGoalCard";
@@ -11,23 +11,18 @@ interface CompletedGoalsAccordionProps {
 }
 
 const CompletedGoalsAccordion = (
-  props: CompletedGoalsAccordionProps
+  props: CompletedGoalsAccordionProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
   return (
     <Accordion elevation={1}>
-      <MantineAccordion.Item value="completed-goals">
-        <MantineAccordion.Control>
-          <PrimaryText>{t("completed_goals")}</PrimaryText>
-        </MantineAccordion.Control>
-        <MantineAccordion.Panel>
-          <Stack gap="0.5rem">
-            {props.compeltedGoals.map((completedGoal) => (
-              <CompletedGoalCard key={completedGoal.id} goal={completedGoal} />
-            ))}
-          </Stack>
-        </MantineAccordion.Panel>
-      </MantineAccordion.Item>
+      <Accordion.Item title={<PrimaryText>{t("completed_goals")}</PrimaryText>}>
+        <Stack gap="0.5rem">
+          {props.compeltedGoals.map((completedGoal) => (
+            <CompletedGoalCard key={completedGoal.id} goal={completedGoal} />
+          ))}
+        </Stack>
+      </Accordion.Item>
     </Accordion>
   );
 };

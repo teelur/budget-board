@@ -1,10 +1,4 @@
-import {
-  Accordion as MantineAccordion,
-  Button,
-  Group,
-  Skeleton,
-  Stack,
-} from "@mantine/core";
+import { Button, Group, Skeleton, Stack } from "@mantine/core";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
@@ -80,64 +74,60 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       {props.goal === null ? (
         <Skeleton height={425} radius="lg" />
       ) : (
-        <Accordion defaultValue={["accounts", "chart"]} elevation={1}>
-          <MantineAccordion.Item value="accounts">
-            <MantineAccordion.Control>
-              <PrimaryHeading order={5}>{t("accounts")}</PrimaryHeading>
-            </MantineAccordion.Control>
-            <MantineAccordion.Panel>
-              <Stack gap="0.5rem">
-                {props.goal.accounts.map((account: IAccountResponse) => (
-                  <Card key={account.id} elevation={2}>
-                    <AccountItem account={account} />
-                  </Card>
-                ))}
-              </Stack>
-            </MantineAccordion.Panel>
-          </MantineAccordion.Item>
-          <MantineAccordion.Item value="chart">
-            <MantineAccordion.Control>
+        <Accordion elevation={1}>
+          <Accordion.Item
+            title={<PrimaryHeading order={5}>{t("accounts")}</PrimaryHeading>}
+          >
+            <Stack gap="0.5rem">
+              {props.goal.accounts.map((account: IAccountResponse) => (
+                <Card key={account.id} elevation={2}>
+                  <AccountItem account={account} />
+                </Card>
+              ))}
+            </Stack>
+          </Accordion.Item>
+          <Accordion.Item
+            title={
               <PrimaryHeading order={5}>{t("goal_trends")}</PrimaryHeading>
-            </MantineAccordion.Control>
-            <MantineAccordion.Panel>
-              <Stack>
-                <Group>
-                  <Button
-                    variant={chartLookbackMonths === 3 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(3)}
-                  >
-                    {t("3_months")}
-                  </Button>
-                  <Button
-                    variant={chartLookbackMonths === 6 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(6)}
-                  >
-                    {t("6_months")}
-                  </Button>
-                  <Button
-                    variant={chartLookbackMonths === 12 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(12)}
-                  >
-                    {t("12_months")}
-                  </Button>
-                </Group>
-                <ValueChart
-                  items={props.goal.accounts}
-                  values={
-                    balancesQuery.data?.map((balance: IBalanceResponse) => ({
-                      ...balance,
-                      parentId: balance.accountID || "",
-                    })) ?? []
-                  }
-                  dateRange={dateRange}
-                  invertYAxis={props.goal.amount === 0}
-                />
-              </Stack>
-            </MantineAccordion.Panel>
-          </MantineAccordion.Item>
+            }
+          >
+            <Stack>
+              <Group>
+                <Button
+                  variant={chartLookbackMonths === 3 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(3)}
+                >
+                  {t("3_months")}
+                </Button>
+                <Button
+                  variant={chartLookbackMonths === 6 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(6)}
+                >
+                  {t("6_months")}
+                </Button>
+                <Button
+                  variant={chartLookbackMonths === 12 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(12)}
+                >
+                  {t("12_months")}
+                </Button>
+              </Group>
+              <ValueChart
+                items={props.goal.accounts}
+                values={
+                  balancesQuery.data?.map((balance: IBalanceResponse) => ({
+                    ...balance,
+                    parentId: balance.accountID || "",
+                  })) ?? []
+                }
+                dateRange={dateRange}
+                invertYAxis={props.goal.amount === 0}
+              />
+            </Stack>
+          </Accordion.Item>
         </Accordion>
       )}
     </Drawer>
