@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_OIDC_CLIENT_ID: string;
   readonly VITE_DISABLE_LOCAL_AUTH: string;
   readonly VITE_DISABLE_NEW_USERS: string;
+  readonly VITE_DEMO_MODE: string;
 }
 
 interface ImportMeta {
