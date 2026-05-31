@@ -16,7 +16,7 @@ const BaseCard = ({ children, hoverEffect, ...props }: BaseCardProps) => {
       ref={props.ref}
       className={baseClasses.root}
       style={{
-        transition: "background 0.2s",
+        transition: "background 0.2s, border-color 0.2s",
       }}
       onMouseEnter={(e) => {
         if (hoverEffect ?? false) {

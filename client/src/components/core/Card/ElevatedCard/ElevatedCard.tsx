@@ -19,6 +19,9 @@ const ElevatedCard = ({
     <Card
       ref={props.ref}
       className={elevatedClasses.root}
+      style={{
+        transition: "background 0.2s, border-color 0.2s",
+      }}
       onMouseEnter={(e) => {
         if (hoverEffect ?? false) {
           e.currentTarget.style.borderColor =
