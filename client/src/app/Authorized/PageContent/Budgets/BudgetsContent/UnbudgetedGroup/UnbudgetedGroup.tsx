@@ -1,4 +1,4 @@
-import { Accordion as MantineAccordion, Group, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import {
@@ -101,10 +101,12 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const unbudgetedCards = getUnbudgetedCards();
 
   return (
-    <Accordion defaultValue={[]} elevation={1}>
-      <MantineAccordion.Item value="unbudgeted">
-        <MantineAccordion.Control>
-          <Group justify="space-between" align="center" w="100%" pr="1rem">
+    <Accordion p="0.5rem" elevation={1}>
+      <Accordion.Item
+        defaultOpen={false}
+        slim
+        title={
+          <Group justify="space-between" align="center" w="100%" pr="0.25rem">
             <PrimaryText size="lg">{t("unbudgeted")}</PrimaryText>
             {userSettingsQuery.isPending ? null : (
               <PrimaryText size="lg">
@@ -118,17 +120,16 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
               </PrimaryText>
             )}
           </Group>
-        </MantineAccordion.Control>
-        <MantineAccordion.Panel>
-          <Stack gap="0.5rem">
-            {unbudgetedCards.length > 0 ? (
-              unbudgetedCards
-            ) : (
-              <DimmedText size="sm">{t("no_unbudgeted_categories")}</DimmedText>
-            )}
-          </Stack>
-        </MantineAccordion.Panel>
-      </MantineAccordion.Item>
+        }
+      >
+        <Stack gap="0.5rem">
+          {unbudgetedCards.length > 0 ? (
+            unbudgetedCards
+          ) : (
+            <DimmedText size="sm">{t("no_unbudgeted_categories")}</DimmedText>
+          )}
+        </Stack>
+      </Accordion.Item>
     </Accordion>
   );
 };

@@ -1,9 +1,4 @@
-import {
-  Accordion as MantineAccordion,
-  Group,
-  Skeleton,
-  Stack,
-} from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -130,35 +125,33 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
               </PrimaryText>
             </Stack>
           </Group>
-          <Accordion defaultValue={["chart", "transactions"]} elevation={1}>
-            <MantineAccordion.Item value="chart">
-              <MantineAccordion.Control>
+          <Accordion elevation={1}>
+            <Accordion.Item
+              title={
                 <PrimaryHeading order={5} size="md">
                   {isExpenseCategory ? t("expense_trends") : t("income_trends")}
                 </PrimaryHeading>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <MonthlySpendingChart
-                  transactions={transactionsForCategory ?? []}
-                  months={chartMonths}
-                  includeYAxis={false}
-                  invertData={isExpenseCategory}
-                />
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
-            <MantineAccordion.Item value="transactions">
-              <MantineAccordion.Control>
+              }
+            >
+              <MonthlySpendingChart
+                transactions={transactionsForCategory ?? []}
+                months={chartMonths}
+                includeYAxis={false}
+                invertData={isExpenseCategory}
+              />
+            </Accordion.Item>
+            <Accordion.Item
+              title={
                 <PrimaryHeading order={5} size="md">
                   {t("recent_transactions")}
                 </PrimaryHeading>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <TransactionCards
-                  transactions={transactionsForCategoryForCurrentMonth ?? []}
-                  categories={transactionCategories}
-                />
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
+              }
+            >
+              <TransactionCards
+                transactions={transactionsForCategoryForCurrentMonth ?? []}
+                categories={transactionCategories}
+              />
+            </Accordion.Item>
           </Accordion>
         </Stack>
       )}
