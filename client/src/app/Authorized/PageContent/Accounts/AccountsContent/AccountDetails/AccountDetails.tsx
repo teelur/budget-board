@@ -1,10 +1,4 @@
-import {
-  Accordion as MantineAccordion,
-  Button,
-  Group,
-  Skeleton,
-  Stack,
-} from "@mantine/core";
+import { Button, Group, Skeleton, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
@@ -102,93 +96,85 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
               )}
             </Stack>
           </Group>
-          <Accordion
-            defaultValue={["add-balance", "chart", "balances"]}
-            elevation={1}
-          >
-            <MantineAccordion.Item value="add-balance">
-              <MantineAccordion.Control>
+          <Accordion elevation={1}>
+            <Accordion.Item
+              title={
                 <PrimaryHeading order={5}>{t("add_balance")}</PrimaryHeading>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <AddBalance
-                  accountId={props.account.id}
-                  currency={props.currency}
-                />
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
-            <MantineAccordion.Item value="chart">
-              <MantineAccordion.Control>
+              }
+            >
+              <AddBalance
+                accountId={props.account.id}
+                currency={props.currency}
+              />
+            </Accordion.Item>
+            <Accordion.Item
+              title={
                 <PrimaryHeading order={5}>{t("account_trends")}</PrimaryHeading>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <Group>
-                  <Button
-                    variant={chartLookbackMonths === 3 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(3)}
-                  >
-                    {t("3_months")}
-                  </Button>
-                  <Button
-                    variant={chartLookbackMonths === 6 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(6)}
-                  >
-                    {t("6_months")}
-                  </Button>
-                  <Button
-                    variant={chartLookbackMonths === 12 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(12)}
-                  >
-                    {t("12_months")}
-                  </Button>
-                </Group>
-                <ValueChart
-                  items={[
-                    {
-                      id: props.account.id,
-                      name: props.account.name,
-                    },
-                  ]}
-                  values={balancesForChart.map((balance) => ({
-                    ...balance,
-                    parentId: balance.accountID || "",
-                  }))}
-                  dateRange={[
-                    dayjs().subtract(chartLookbackMonths, "months").toString(),
-                    dayjs().toString(),
-                  ]}
-                />
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
-            <MantineAccordion.Item value="balances">
-              <MantineAccordion.Control>
+              }
+            >
+              <Group>
+                <Button
+                  variant={chartLookbackMonths === 3 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(3)}
+                >
+                  {t("3_months")}
+                </Button>
+                <Button
+                  variant={chartLookbackMonths === 6 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(6)}
+                >
+                  {t("6_months")}
+                </Button>
+                <Button
+                  variant={chartLookbackMonths === 12 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(12)}
+                >
+                  {t("12_months")}
+                </Button>
+              </Group>
+              <ValueChart
+                items={[
+                  {
+                    id: props.account.id,
+                    name: props.account.name,
+                  },
+                ]}
+                values={balancesForChart.map((balance) => ({
+                  ...balance,
+                  parentId: balance.accountID || "",
+                }))}
+                dateRange={[
+                  dayjs().subtract(chartLookbackMonths, "months").toString(),
+                  dayjs().toString(),
+                ]}
+              />
+            </Accordion.Item>
+            <Accordion.Item
+              title={
                 <PrimaryHeading order={5}>
                   {t("recent_balances")}
                 </PrimaryHeading>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <Stack gap="0.5rem">
-                  {balancesQuery.isPending && (
-                    <Skeleton height={20} radius="lg" />
-                  )}
-                  {sortedBalances.length === 0 ? (
-                    <Group justify="center">
-                      <DimmedText size="sm">
-                        {t("no_balance_entries")}
-                      </DimmedText>
-                    </Group>
-                  ) : (
-                    <BalanceItems
-                      balances={sortedBalances}
-                      currency={props.currency}
-                    />
-                  )}
-                </Stack>
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
+              }
+            >
+              <Stack gap="0.5rem">
+                {balancesQuery.isPending && (
+                  <Skeleton height={20} radius="lg" />
+                )}
+                {sortedBalances.length === 0 ? (
+                  <Group justify="center">
+                    <DimmedText size="sm">{t("no_balance_entries")}</DimmedText>
+                  </Group>
+                ) : (
+                  <BalanceItems
+                    balances={sortedBalances}
+                    currency={props.currency}
+                  />
+                )}
+              </Stack>
+            </Accordion.Item>
           </Accordion>
         </Stack>
       )}

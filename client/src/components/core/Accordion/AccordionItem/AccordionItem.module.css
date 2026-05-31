@@ -1,0 +1,62 @@
+.item {
+  border: 1px solid var(--accordion-border);
+  border-radius: 8px;
+  background-color: var(--accordion-bg);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.item:hover {
+  border-color: var(--mantine-primary-color-filled);
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--accordion-border);
+  transition: transform 250ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 250ms ease;
+}
+
+.panelOpen {
+  grid-template-rows: 1fr;
+}
+
+.panelInner {
+  overflow: hidden;
+}
+
+.panelContent {
+  padding: 0 1rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  transition:
+    padding-top 250ms ease,
+    padding-bottom 250ms ease;
+}
+
+.panelContentOpen {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}

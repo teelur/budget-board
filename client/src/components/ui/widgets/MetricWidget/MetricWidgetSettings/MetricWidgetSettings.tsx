@@ -1,5 +1,4 @@
 import {
-  Accordion,
   Button,
   Code,
   Group,
@@ -8,6 +7,7 @@ import {
   Stack,
   TextInput,
 } from "@mantine/core";
+import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -202,49 +202,45 @@ const MetricWidgetSettings = ({
           </Stack>
         )}
 
-        <Accordion variant="contained">
-          <Accordion.Item value="reference">
-            <Accordion.Control>
+        <Accordion elevation={0}>
+          <Accordion.Item
+            defaultOpen={false}
+            title={
               <DimmedText size="sm">
                 {t("metric_widget_syntax_reference")}
               </DimmedText>
-            </Accordion.Control>
-            <Accordion.Panel>
-              <ScrollArea.Autosize mah={320} type="auto">
-                <Stack gap="0.5rem">
-                  <Code block style={{ fontSize: "0.75rem" }}>
-                    {t("metric_widget_syntax_schema")}
-                  </Code>
-                  <DimmedText size="xs">
-                    {t("metric_widget_syntax_sources")}:{"  "}
-                    <Code>transactions</Code>, <Code>budgets</Code>,{" "}
-                    <Code>goals</Code>, <Code>accounts</Code>
-                  </DimmedText>
-                  <DimmedText size="xs">
-                    {t("metric_widget_syntax_periods")}:{"  "}
-                    <Code>this_month</Code> <Code>last_month</Code>{" "}
-                    <Code>this_year</Code> <Code>last_3_months</Code>{" "}
-                    <Code>last_6_months</Code> <Code>last_12_months</Code>{" "}
-                    <Code>all_time</Code>
-                  </DimmedText>
-                  <DimmedText size="xs">
-                    {t("metric_widget_syntax_formats")}:{"  "}
-                    <Code>currency</Code> <Code>percent</Code>{" "}
-                    <Code>integer</Code> <Code>decimal</Code>{" "}
-                    <Code>number</Code>
-                  </DimmedText>
-                  <DimmedText size="xs" fw={600} mt="0.25rem">
-                    {t("metric_widget_syntax_examples")}:
-                  </DimmedText>
-                  <Code
-                    block
-                    style={{ fontSize: "0.75rem", whiteSpace: "pre" }}
-                  >
-                    {SYNTAX_EXAMPLES}
-                  </Code>
-                </Stack>
-              </ScrollArea.Autosize>
-            </Accordion.Panel>
+            }
+          >
+            <ScrollArea.Autosize mah={320} type="auto">
+              <Stack gap="0.5rem">
+                <Code block style={{ fontSize: "0.75rem" }}>
+                  {t("metric_widget_syntax_schema")}
+                </Code>
+                <DimmedText size="xs">
+                  {t("metric_widget_syntax_sources")}:{"  "}
+                  <Code>transactions</Code>, <Code>budgets</Code>,{" "}
+                  <Code>goals</Code>, <Code>accounts</Code>
+                </DimmedText>
+                <DimmedText size="xs">
+                  {t("metric_widget_syntax_periods")}:{"  "}
+                  <Code>this_month</Code> <Code>last_month</Code>{" "}
+                  <Code>this_year</Code> <Code>last_3_months</Code>{" "}
+                  <Code>last_6_months</Code> <Code>last_12_months</Code>{" "}
+                  <Code>all_time</Code>
+                </DimmedText>
+                <DimmedText size="xs">
+                  {t("metric_widget_syntax_formats")}:{"  "}
+                  <Code>currency</Code> <Code>percent</Code>{" "}
+                  <Code>integer</Code> <Code>decimal</Code> <Code>number</Code>
+                </DimmedText>
+                <DimmedText size="xs" fw={600} mt="0.25rem">
+                  {t("metric_widget_syntax_examples")}:
+                </DimmedText>
+                <Code block style={{ fontSize: "0.75rem", whiteSpace: "pre" }}>
+                  {SYNTAX_EXAMPLES}
+                </Code>
+              </Stack>
+            </ScrollArea.Autosize>
           </Accordion.Item>
         </Accordion>
 

@@ -1,10 +1,4 @@
-import {
-  Accordion as MantineAccordion,
-  Button,
-  Group,
-  Skeleton,
-  Stack,
-} from "@mantine/core";
+import { Button, Group, Skeleton, Stack } from "@mantine/core";
 import { MoveRightIcon } from "lucide-react";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
@@ -151,89 +145,81 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 </Stack>
               )}
           </Group>
-          <Accordion
-            defaultValue={["add-value", "chart", "values"]}
-            elevation={1}
-          >
-            <MantineAccordion.Item value="add-value">
-              <MantineAccordion.Control>
+          <Accordion elevation={1}>
+            <Accordion.Item
+              title={
                 <PrimaryHeading order={5}>{t("add_value")}</PrimaryHeading>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <AddValue
-                  assetId={props.asset.id}
-                  currency={props.userCurrency}
-                />
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
-            <MantineAccordion.Item value="chart">
-              <MantineAccordion.Control>
+              }
+            >
+              <AddValue
+                assetId={props.asset.id}
+                currency={props.userCurrency}
+              />
+            </Accordion.Item>
+            <Accordion.Item
+              title={
                 <PrimaryHeading order={5}>{t("value_trends")}</PrimaryHeading>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <Group>
-                  <Button
-                    variant={chartLookbackMonths === 3 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(3)}
-                  >
-                    {t("3_months")}
-                  </Button>
-                  <Button
-                    variant={chartLookbackMonths === 6 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(6)}
-                  >
-                    {t("6_months")}
-                  </Button>
-                  <Button
-                    variant={chartLookbackMonths === 12 ? "filled" : "outline"}
-                    size="xs"
-                    onClick={() => setChartLookbackMonths(12)}
-                  >
-                    {t("12_months")}
-                  </Button>
-                </Group>
-                <ValueChart
-                  items={[
-                    {
-                      id: props.asset.id,
-                      name: props.asset.name,
-                    },
-                  ]}
-                  values={valuesForChart.map((value) => ({
-                    ...value,
-                    parentId: value.assetID || "",
-                  }))}
-                  dateRange={[
-                    dayjs().subtract(chartLookbackMonths, "months").toString(),
-                    dayjs().toString(),
-                  ]}
-                />
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
-            <MantineAccordion.Item value="values">
-              <MantineAccordion.Control>
+              }
+            >
+              <Group>
+                <Button
+                  variant={chartLookbackMonths === 3 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(3)}
+                >
+                  {t("3_months")}
+                </Button>
+                <Button
+                  variant={chartLookbackMonths === 6 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(6)}
+                >
+                  {t("6_months")}
+                </Button>
+                <Button
+                  variant={chartLookbackMonths === 12 ? "filled" : "outline"}
+                  size="xs"
+                  onClick={() => setChartLookbackMonths(12)}
+                >
+                  {t("12_months")}
+                </Button>
+              </Group>
+              <ValueChart
+                items={[
+                  {
+                    id: props.asset.id,
+                    name: props.asset.name,
+                  },
+                ]}
+                values={valuesForChart.map((value) => ({
+                  ...value,
+                  parentId: value.assetID || "",
+                }))}
+                dateRange={[
+                  dayjs().subtract(chartLookbackMonths, "months").toString(),
+                  dayjs().toString(),
+                ]}
+              />
+            </Accordion.Item>
+            <Accordion.Item
+              title={
                 <PrimaryHeading order={5}>{t("value_history")}</PrimaryHeading>
-              </MantineAccordion.Control>
-              <MantineAccordion.Panel>
-                <Stack gap="0.5rem">
-                  {valuesQuery.isPending && (
-                    <Skeleton height={20} radius="lg" />
-                  )}
-                  {sortedValues.length === 0 ? (
-                    <Group justify="center">
-                      <DimmedText size="sm">{t("no_value_entries")}</DimmedText>
-                    </Group>
-                  ) : (
-                    <ValueItems
-                      values={sortedValues}
-                      userCurrency={props.userCurrency}
-                    />
-                  )}
-                </Stack>
-              </MantineAccordion.Panel>
-            </MantineAccordion.Item>
+              }
+            >
+              <Stack gap="0.5rem">
+                {valuesQuery.isPending && <Skeleton height={20} radius="lg" />}
+                {sortedValues.length === 0 ? (
+                  <Group justify="center">
+                    <DimmedText size="sm">{t("no_value_entries")}</DimmedText>
+                  </Group>
+                ) : (
+                  <ValueItems
+                    values={sortedValues}
+                    userCurrency={props.userCurrency}
+                  />
+                )}
+              </Stack>
+            </Accordion.Item>
           </Accordion>
         </Stack>
       )}
