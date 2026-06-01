@@ -4,19 +4,36 @@ permissions:
 
 on:
   pull_request:
-    paths-ignore:
-      - "**/*.md"
-      - "img/**"
-      - "docs/**"
-      - ".github/ISSUE_TEMPLATE/**"
-      - ".gitignore"
-      - ".gitattributes"
-      - ".dockerignore"
-      - "LICENSE"
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      skip_workflow: ${{ steps.changes.outputs.skip_workflow }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Determine if this PR should skip build/test jobs
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          predicate-quantifier: every
+          filters: |
+            skip_workflow:
+              - '**/*.md'
+              - 'img/**'
+              - 'docs/**'
+              - '.github/ISSUE_TEMPLATE/**'
+              - '.gitignore'
+              - '.gitattributes'
+              - '.dockerignore'
+              - 'LICENSE'
+
   test:
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.skip_workflow != 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
