@@ -1,10 +1,12 @@
-import { Button, Group } from "@mantine/core";
+import { Button, Group, Stack, Popover as MantinePopover } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon, RotateCcwIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import Popover from "~/components/core/Popover/Popover";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { translateAxiosError } from "~/helpers/requests";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -20,7 +22,7 @@ const DashboardEditor = ({
   onAddWidget,
   editTarget,
 }: DashboardEditorProps): React.ReactNode => {
-  const [isConfirmingReset, setIsConfirmingReset] = React.useState(false);
+  const [isResetPopoverOpen, setIsResetPopoverOpen] = React.useState(false);
   const [isResetting, setIsResetting] = React.useState(false);
 
   const { t } = useTranslation();
@@ -81,17 +83,9 @@ const DashboardEditor = ({
     }
   };
 
-  const handleResetClick = () => {
-    if (isConfirmingReset) {
-      handleResetToDefaults();
-      setIsConfirmingReset(false);
-    } else {
-      setIsConfirmingReset(true);
-    }
-  };
-
-  const handleCancelReset = () => {
-    setIsConfirmingReset(false);
+  const handleConfirmReset = async () => {
+    setIsResetPopoverOpen(false);
+    await handleResetToDefaults();
   };
 
   return (
@@ -114,32 +108,46 @@ const DashboardEditor = ({
       >
         {t("add_widget")}
       </Button>
-      {isConfirmingReset ? (
-        <Group gap="xs">
+      <Popover
+        opened={isResetPopoverOpen}
+        onChange={setIsResetPopoverOpen}
+        position="bottom-end"
+        withArrow
+      >
+        <MantinePopover.Target>
           <Button
             size="xs"
-            variant="outline"
-            color="var(--button-color-destructive)"
+            variant="subtle"
+            leftSection={<RotateCcwIcon size={16} />}
+            onClick={() => setIsResetPopoverOpen((opened) => !opened)}
             loading={isResetting}
-            onClick={handleResetClick}
           >
-            {t("confirm_reset_to_defaults")}
+            {t("reset_to_defaults")}
           </Button>
-          <Button size="xs" variant="subtle" onClick={handleCancelReset}>
-            {t("cancel")}
-          </Button>
-        </Group>
-      ) : (
-        <Button
-          size="xs"
-          variant="subtle"
-          leftSection={<RotateCcwIcon size={16} />}
-          onClick={handleResetClick}
-          loading={isResetting}
-        >
-          {t("reset_to_defaults")}
-        </Button>
-      )}
+        </MantinePopover.Target>
+        <MantinePopover.Dropdown maw={350}>
+          <Stack gap={10}>
+            <PrimaryText size="xs">{t("reset_dashboard_warning")}</PrimaryText>
+            <Group gap="xs" justify="flex-end">
+              <Button
+                size="xs"
+                variant="subtle"
+                onClick={() => setIsResetPopoverOpen(false)}
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                size="xs"
+                color="var(--button-color-destructive)"
+                loading={isResetting}
+                onClick={handleConfirmReset}
+              >
+                {t("confirm_reset_to_defaults")}
+              </Button>
+            </Group>
+          </Stack>
+        </MantinePopover.Dropdown>
+      </Popover>
       <Button size="xs" onClick={onDone}>
         {t("done_editing")}
       </Button>
