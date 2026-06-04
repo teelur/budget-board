@@ -410,7 +410,6 @@
   "reset_password_request_message": "Wenn ein Konto mit dieser E-Mail-Adresse existiert, wurde ein Link zum Zurücksetzen des Passworts gesendet.",
   "reset_password_success_message": "Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich nun mit Ihrem neuen Passwort anmelden.",
   "reset_to_default": "Auf Standard zurücksetzen",
-  "reset_to_defaults": "Auf Standardwerte zurücksetzen",
   "return_to_login": "Zurück zur Anmeldung",
   "rule_executed": "Regel ausgeführt",
   "rule_run_successfully": "Regel erfolgreich ausgeführt",
