@@ -122,7 +122,7 @@ const DashboardEditor = ({
             onClick={() => setIsResetPopoverOpen((opened) => !opened)}
             loading={isResetting}
           >
-            {t("reset_to_defaults")}
+            {t("reset_dashboard")}
           </Button>
         </MantinePopover.Target>
         <MantinePopover.Dropdown maw={350}>
@@ -140,6 +140,7 @@ const DashboardEditor = ({
                 size="xs"
                 color="var(--button-color-destructive)"
                 loading={isResetting}
+                disabled={widgetSettingsQuery.isPending}
                 onClick={handleConfirmReset}
               >
                 {t("confirm_reset_to_defaults")}

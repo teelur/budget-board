@@ -419,7 +419,6 @@
   "reset_password_request_message": "Si un compte existe avec cette adresse e-mail, un lien de réinitialisation du mot de passe a été envoyé.",
   "reset_password_success_message": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
   "reset_to_default": "Réinitialiser par défaut",
-  "reset_to_defaults": "Réinitialiser les paramètres par défaut",
   "reset_to_desktop_order": "Réinitialiser selon l'ordre du bureau",
   "return_to_login": "Retourner à la connexion",
   "rule_executed": "Règle exécutée",
