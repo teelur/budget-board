@@ -6,7 +6,11 @@ using System.Diagnostics;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using BudgetBoard.Database.Models;
 using BudgetBoard.Overrides;
+using BudgetBoard.Service.Helpers;
+using BudgetBoard.Service.Interfaces;
+using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Overrides;
 using BudgetBoard.WebAPI.Resources;
@@ -55,6 +59,9 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         var localizer = endpoints.ServiceProvider.GetRequiredService<
             IStringLocalizer<ApiResponseStrings>
         >();
+        var logLocalizer = endpoints.ServiceProvider.GetRequiredService<
+            IStringLocalizer<ApiLogStrings>
+        >();
 
         // We'll figure out a unique endpoint name based on the final route pattern during endpoint generation.
         string? confirmEmailEndpointName = null;
@@ -101,6 +108,58 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                     if (!result.Succeeded)
                     {
                         return CreateValidationProblem(result);
+                    }
+
+                    // New users get the default dashboard widget layout.
+                    if (user is ApplicationUser appUser)
+                    {
+                        var widgetSettingsService = sp.GetRequiredService<IWidgetSettingsService>();
+                        var logger = sp.GetRequiredService<ILoggerFactory>()
+                            .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
+
+                        try
+                        {
+                            foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
+                            {
+                                await widgetSettingsService.CreateWidgetSettingsAsync(
+                                    appUser.Id,
+                                    new WidgetSettingsCreateRequest
+                                    {
+                                        WidgetType = layout.WidgetType,
+                                        LgX = layout.LgX,
+                                        LgY = layout.LgY,
+                                        LgW = layout.LgW,
+                                        LgH = layout.LgH,
+                                        SmY = layout.SmY,
+                                        SmH = layout.SmH,
+                                    }
+                                );
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(
+                                "{LogMessage}",
+                                logLocalizer[
+                                    "LocalRegistrationDefaultWidgetSeedingFailedLog",
+                                    appUser.Id,
+                                    ex.Message
+                                ]
+                            );
+
+                            // Best-effort rollback to avoid partially initialized accounts.
+                            await userManager.DeleteAsync(user);
+
+                            return CreateValidationProblem(
+                                IdentityResult.Failed(
+                                    new IdentityError
+                                    {
+                                        Code = "DefaultWidgetSeedingFailed",
+                                        Description = localizer["DefaultWidgetSeedingFailedError"],
+                                    }
+                                )
+                            );
+                        }
                     }
 
                     // Add local login provider

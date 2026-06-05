@@ -1,5 +1,8 @@
 ﻿using System.Security.Claims;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
+using BudgetBoard.Service.Interfaces;
+using BudgetBoard.Service.Models;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +13,7 @@ namespace BudgetBoard.Utils
     public class ExternalUserProvisioningService(
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
+        IWidgetSettingsService widgetSettingsService,
         ILogger<ExternalUserProvisioningService> logger,
         IStringLocalizer<ApiLogStrings> logLocalizer
     ) : IExternalUserProvisioningService
@@ -18,6 +22,8 @@ namespace BudgetBoard.Utils
             userManager ?? throw new ArgumentNullException(nameof(userManager));
         private readonly IConfiguration _configuration =
             configuration ?? throw new ArgumentNullException(nameof(configuration));
+        private readonly IWidgetSettingsService _widgetSettingsService =
+            widgetSettingsService ?? throw new ArgumentNullException(nameof(widgetSettingsService));
         private readonly ILogger<ExternalUserProvisioningService> _logger =
             logger ?? throw new ArgumentNullException(nameof(logger));
         private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
@@ -77,6 +83,34 @@ namespace BudgetBoard.Utils
                             "UserCreationErrorLog",
                             string.Join(", ", createResult.Errors.Select(e => e.Description))
                         ]
+                    );
+                    return false;
+                }
+
+                try
+                {
+                    foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
+                    {
+                        await _widgetSettingsService.CreateWidgetSettingsAsync(
+                            user.Id,
+                            new WidgetSettingsCreateRequest
+                            {
+                                WidgetType = layout.WidgetType,
+                                LgX = layout.LgX,
+                                LgY = layout.LgY,
+                                LgW = layout.LgW,
+                                LgH = layout.LgH,
+                                SmY = layout.SmY,
+                                SmH = layout.SmH,
+                            }
+                        );
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        "{LogMessage}",
+                        _logLocalizer["DefaultWidgetSeedingFailedLog", user.Id, ex.Message]
                     );
                     return false;
                 }
