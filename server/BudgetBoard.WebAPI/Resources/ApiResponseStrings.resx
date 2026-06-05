@@ -121,6 +121,9 @@
   <data name="DemoModeNotAllowed" xml:space="preserve">
     <value>This action is not allowed in demo mode.</value>
   </data>
+  <data name="DefaultWidgetSeedingFailedError" xml:space="preserve">
+    <value>Unable to initialize default dashboard widgets.</value>
+  </data>
   <data name="AccountLockedOutEmailSubject" xml:space="preserve">
     <value>Account Locked Due to Multiple Failed Login Attempts</value>
   </data>

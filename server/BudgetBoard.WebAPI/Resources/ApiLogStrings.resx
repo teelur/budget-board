@@ -199,6 +199,15 @@
   <data name="AddingLoginErrorLog" xml:space="preserve">
     <value>Failed to add an external login to user {0}: {1}</value>
   </data>
+  <data name="DefaultWidgetSeedingFailedLog" xml:space="preserve">
+    <value>Failed to seed default widget settings for newly provisioned user {0}. Error: {1}</value>
+  </data>
+  <data name="LocalRegistrationDefaultWidgetSeedingFailedLog" xml:space="preserve">
+    <value>Failed to seed default widget settings for locally registered user {0}. Error: {1}</value>
+  </data>
+  <data name="LocalRegistrationUserRollbackFailedLog" xml:space="preserve">
+    <value>Failed to rollback newly registered local user {0} after widget seeding failure: {1}</value>
+  </data>
   <data name="SettingCurrentLocaleLog" xml:space="preserve">
     <value>Setting current locale to '{0}'</value>
   </data>
