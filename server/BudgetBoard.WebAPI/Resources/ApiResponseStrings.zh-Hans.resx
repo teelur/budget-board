@@ -130,4 +130,7 @@
   <data name="DemoModeNotAllowed" xml:space="preserve">
     <value>This action is not allowed in demo mode.</value>
   </data>
+  <data name="DefaultWidgetSeedingFailedError" xml:space="preserve">
+    <value>Unable to initialize default dashboard widgets.</value>
+  </data>
 </root>
