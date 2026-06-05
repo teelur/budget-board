@@ -139,6 +139,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         catch (Exception ex)
                         {
                             logger.LogError(
+                                ex,
                                 "{LogMessage}",
                                 logLocalizer[
                                     "LocalRegistrationDefaultWidgetSeedingFailedLog",
@@ -148,7 +149,21 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             );
 
                             // Best-effort rollback to avoid partially initialized accounts.
-                            await userManager.DeleteAsync(user);
+                            var deleteResult = await userManager.DeleteAsync(user);
+                            if (!deleteResult.Succeeded)
+                            {
+                                logger.LogError(
+                                    "{LogMessage}",
+                                    logLocalizer[
+                                        "LocalRegistrationUserRollbackFailedLog",
+                                        appUser.Id,
+                                        string.Join(
+                                            ", ",
+                                            deleteResult.Errors.Select(e => e.Description)
+                                        )
+                                    ]
+                                );
+                            }
 
                             return CreateValidationProblem(
                                 IdentityResult.Failed(
