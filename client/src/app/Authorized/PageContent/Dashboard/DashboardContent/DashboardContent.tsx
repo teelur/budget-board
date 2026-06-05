@@ -195,6 +195,7 @@ const DashboardContent = ({
     useMediaQuery(`(min-width: ${GRID_BREAKPOINT}px)`) ?? false;
   const isEditingSmOnDesktop =
     isEditMode && editTarget === "sm" && isDesktopViewport;
+  const isMobileEditMode = isEditMode && !isDesktopViewport;
 
   return (
     <Flex ref={containerRef} w={"100%"} flex="1" justify="center">
@@ -224,7 +225,7 @@ const DashboardContent = ({
             onDragStop={(layout) => handleSave(layout)}
             onResizeStop={(layout) => handleSave(layout)}
             margin={[12, 12]}
-            containerPadding={[0, 0]}
+            containerPadding={isMobileEditMode ? [20, 0] : [0, 0]}
           >
             {widgets.map((widget) => (
               <div
