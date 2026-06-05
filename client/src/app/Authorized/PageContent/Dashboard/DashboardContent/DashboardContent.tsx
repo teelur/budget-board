@@ -1,8 +1,9 @@
-import { Box, Flex, Skeleton, Stack } from "@mantine/core";
+import { Box, Flex, Group, Skeleton, Stack } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
+import { InfoIcon } from "lucide-react";
 import React from "react";
 import {
   Layout,
@@ -10,6 +11,7 @@ import {
   ResponsiveGridLayout,
   useContainerWidth,
 } from "react-grid-layout";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import AccountsWidget from "~/components/ui/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/ui/widgets/NetWorthWidget/NetWorthWidget";
 import WidgetShell from "~/components/ui/widgets/shared/WidgetShell/WidgetShell";
@@ -27,6 +29,7 @@ import {
 import SpendingTrendsWidget from "../../../../../components/ui/widgets/SpendingTrendsWidget/SpendingTrendsWidget";
 import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
 import MetricWidget from "~/components/ui/widgets/MetricWidget/MetricWidget";
+import { useTranslation } from "react-i18next";
 
 const SKELETON_COUNT = 4;
 const SM_PREVIEW_WIDTH = 500;
@@ -40,6 +43,7 @@ const DashboardContent = ({
   isEditMode,
   editTarget,
 }: DashboardContentProps) => {
+  const { t } = useTranslation();
   const [settingsOpenId, setSettingsOpenId] = React.useState<string | null>(
     null,
   );
@@ -196,6 +200,7 @@ const DashboardContent = ({
   const isEditingSmOnDesktop =
     isEditMode && editTarget === "sm" && isDesktopViewport;
   const isMobileEditMode = isEditMode && !isDesktopViewport;
+  const showEmptyMessage = !isEditMode && widgets.length === 0;
 
   return (
     <Flex ref={containerRef} w={"100%"} flex="1" justify="center">
@@ -205,6 +210,11 @@ const DashboardContent = ({
             <Skeleton key={i} height={GRID_ROW_HEIGHT * 5} radius="md" />
           ))}
         </Stack>
+      ) : showEmptyMessage ? (
+        <Group justify="center" align="center" gap="0.5rem" w="100%">
+          <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
+          <DimmedText size="sm">{t("no_widgets")}</DimmedText>
+        </Group>
       ) : (
         <Box w={isEditingSmOnDesktop ? SM_PREVIEW_WIDTH : "100%"}>
           <ResponsiveGridLayout
