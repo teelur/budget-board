@@ -112,7 +112,6 @@ namespace BudgetBoard.Utils
                         "{LogMessage}",
                         _logLocalizer["DefaultWidgetSeedingFailedLog", user.Id, ex.Message]
                     );
-                    return false;
                 }
 
                 _logger.LogInformation("{LogMessage}", _logLocalizer["UserProvisionedLog"]);
