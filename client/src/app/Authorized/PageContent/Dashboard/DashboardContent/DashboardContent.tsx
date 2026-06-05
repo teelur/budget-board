@@ -200,7 +200,8 @@ const DashboardContent = ({
   const isEditingSmOnDesktop =
     isEditMode && editTarget === "sm" && isDesktopViewport;
   const isMobileEditMode = isEditMode && !isDesktopViewport;
-  const showEmptyMessage = !isEditMode && widgets.length === 0;
+  const showEmptyMessage =
+    widgetSettingsQuery.isSuccess && !isEditMode && widgets.length === 0;
 
   return (
     <Flex ref={containerRef} w={"100%"} flex="1" justify="center">
