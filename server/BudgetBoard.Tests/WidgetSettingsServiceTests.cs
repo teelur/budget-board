@@ -168,7 +168,7 @@ public class WidgetSettingsServiceTests
     }
 
     [Fact]
-    public async Task ReadWidgetSettingsAsync_WhenNoSettingsExist_ShouldCreateDefaultSettings()
+    public async Task ReadWidgetSettingsAsync_WhenNoSettingsExist_ShouldReturnEmptyCollection()
     {
         // Arrange
         var helper = new TestHelper();
@@ -179,20 +179,7 @@ public class WidgetSettingsServiceTests
 
         // Assert
         settings.Should().NotBeNull();
-        settings.Count().Should().Be(WidgetSettingsHelpers.DefaultLayouts.Count);
-
-        foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
-        {
-            var match = settings.FirstOrDefault(s => s.WidgetType == layout.WidgetType);
-            match.Should().NotBeNull($"default widget '{layout.WidgetType}' should be seeded");
-            match!.LgX.Should().Be(layout.LgX);
-            match.LgY.Should().Be(layout.LgY);
-            match.LgW.Should().Be(layout.LgW);
-            match.LgH.Should().Be(layout.LgH);
-            match.SmY.Should().Be(layout.SmY);
-            match.SmH.Should().Be(layout.SmH);
-            match.UserID.Should().Be(helper.demoUser.Id);
-        }
+        settings.Should().BeEmpty();
     }
 
     [Fact]

@@ -47,27 +47,6 @@ public class WidgetSettingsService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        // Seed all default widgets when a user has none
-        if (userData.WidgetSettings.Count == 0)
-        {
-            foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
-            {
-                await CreateWidgetSettingsAsync(
-                    userGuid,
-                    new WidgetSettingsCreateRequest
-                    {
-                        WidgetType = layout.WidgetType,
-                        LgX = layout.LgX,
-                        LgY = layout.LgY,
-                        LgW = layout.LgW,
-                        LgH = layout.LgH,
-                        SmY = layout.SmY,
-                        SmH = layout.SmH,
-                    }
-                );
-            }
-        }
-
         var widgetSettings = userData.WidgetSettings.Select(ws => new WidgetResponse
         {
             ID = ws.ID,

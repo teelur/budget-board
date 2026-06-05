@@ -392,6 +392,7 @@
   "no_uncategorized_transactions": "No uncategorized transactions",
   "no_valid_accounts_found": "No valid accounts found.",
   "no_value_entries": "No value entries.",
+  "no_widgets": "No widgets found. Add a widget to get started.",
   "none": "None",
   "oidc_authentication_failed_message": "OIDC authentication failed. Please try logging in again.",
   "oidc_provider_disconnected_successfully": "OIDC provider disconnected successfully.",
