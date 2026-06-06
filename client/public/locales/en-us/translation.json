@@ -338,7 +338,7 @@
   "metric_widget_title_label": "Title",
   "metric_widget_title_placeholder": "My Widget",
   "metric_widget_value_label": "Value",
-  "metric_widget_value_placeholder": "@transactions.sum(this_month, type=expense){currency}",
+  "metric_widget_value_placeholder": "@transactions.sum(this_month, type=expense)",
   "missing_information": "Missing information",
   "mm_dd_yyyy": "MM{{separator}}DD{{separator}}YYYY",
   "mobile": "Mobile",

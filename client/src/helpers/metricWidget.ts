@@ -27,7 +27,24 @@ export const PERIOD_KEYWORDS = [
 
 export type PeriodKeyword = (typeof PERIOD_KEYWORDS)[number];
 
-const EXPRESSION_REGEX = /@(\w+)\.(\w+)\(([^)]*)\)\{([^}]+)\}/g;
+const EXPRESSION_REGEX = /@(\w+)\.(\w+)\(([^)]*)\)(?:\{([^}]+)\})?/g;
+
+type MetricFormat = "currency" | "percent" | "integer" | "decimal" | "number";
+
+const DEFAULT_METRIC_FORMATS: Record<string, MetricFormat> = {
+  "transactions.sum": "currency",
+  "transactions.count": "integer",
+  "transactions.avg": "currency",
+  "budgets.total": "currency",
+  "budgets.spent": "currency",
+  "budgets.remaining": "currency",
+  "budgets.percent_used": "percent",
+  "goals.percent_complete": "percent",
+  "goals.current_amount": "currency",
+  "goals.target": "currency",
+  "goals.monthly_contribution": "currency",
+  "accounts.balance": "currency",
+};
 
 function parseArgs(argsStr: string): {
   period?: string;
@@ -70,8 +87,7 @@ export function parseTemplate(template: string): MetricToken[] {
       });
     }
 
-    const [raw, source, metric, argsStr, format] = match as RegExpExecArray &
-      string[];
+    const [raw, source, metric, argsStr] = match as RegExpExecArray & string[];
     const { period, params } = parseArgs(argsStr ?? "");
 
     tokens.push({
@@ -80,7 +96,6 @@ export function parseTemplate(template: string): MetricToken[] {
       metric,
       period,
       params,
-      format,
       raw,
     } as ExpressionToken);
 
@@ -175,7 +190,7 @@ export interface MetricDataContext {
 
 function formatValue(
   value: number,
-  format: string,
+  format: MetricFormat,
   currency: string,
   locale: string,
 ): string {
@@ -206,6 +221,10 @@ function formatValue(
     default:
       return String(value);
   }
+}
+
+function getMetricFormat(token: ExpressionToken): MetricFormat {
+  return DEFAULT_METRIC_FORMATS[`${token.source}.${token.metric}`] ?? "number";
 }
 
 function resolveTransactions(
@@ -376,7 +395,7 @@ function resolveExpression(
 
     return formatValue(
       value,
-      token.format,
+      getMetricFormat(token),
       ctx.preferredCurrency,
       ctx.intlLocale,
     );
