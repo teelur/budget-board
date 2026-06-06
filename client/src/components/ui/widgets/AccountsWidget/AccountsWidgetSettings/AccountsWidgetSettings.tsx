@@ -12,7 +12,6 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
-import { IAccountResponse } from "~/models/account";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import { translateAxiosError } from "~/helpers/requests";
@@ -65,20 +64,6 @@ const AccountsWidgetSettings = ({
       });
       if (res.status === 200) {
         return res.data as IInstitution[];
-      }
-      return [];
-    },
-  });
-
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
       }
       return [];
     },
@@ -156,7 +141,6 @@ const AccountsWidgetSettings = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-      onClose();
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -182,10 +166,7 @@ const AccountsWidgetSettings = ({
     doSave.mutate(showAll ? [] : Array.from(selectedIds));
   };
 
-  const isPending =
-    widgetSettingsQuery.isPending ||
-    institutionQuery.isPending ||
-    accountsQuery.isPending;
+  const isPending = widgetSettingsQuery.isPending || institutionQuery.isPending;
 
   const getAccountsWidgetSettingsContent = () => {
     if (isPending) {

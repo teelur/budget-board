@@ -130,7 +130,6 @@ const MetricWidgetSettings = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-      onClose();
     },
     onError: (error: AxiosError | Error) => {
       const message =
