@@ -31,8 +31,8 @@ A lot of the server code is high-stakes, since it handles data persistence, user
 | AI Used For                        | AI Not Used For                                                                                                  |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Scaffolding unit tests             | User authorization and authentication logic                                                                      |
-| Misc high-effort, repetitive tasks | Constructive and destructive operations (e.g. database writes, API calls)                                         |
-|                                    | New features without clear prior art or patterns to scaffold from (e.g. new algorithms, complex data processing)  |
+| Misc high-effort, repetitive tasks | Constructive and destructive operations (e.g. database writes, API calls)                                        |
+|                                    | New features without clear prior art or patterns to scaffold from (e.g. new algorithms, complex data processing) |
 |                                    | Database schema                                                                                                  |
 
 ---
