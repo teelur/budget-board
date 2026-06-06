@@ -38,8 +38,7 @@ const AccordionItem = ({
         id={panelId}
         role="region"
         className={`${classes.panel} ${isOpen ? classes.panelOpen : ""}`}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        {...(!isOpen ? ({ inert: "" } as any) : {})}
+        inert={!isOpen || undefined}
       >
         <div className={classes.panelInner}>
           <div
