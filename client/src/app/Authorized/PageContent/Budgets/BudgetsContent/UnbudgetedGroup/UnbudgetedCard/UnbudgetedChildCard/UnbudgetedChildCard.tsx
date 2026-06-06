@@ -26,7 +26,7 @@ interface UnbudgetedChildCardProps {
 const UnbudgetedChildCard = (
   props: UnbudgetedChildCardProps,
 ): React.ReactNode => {
-  const { intlLocale } = useLocale();
+  const { intlLocale, dayjs } = useLocale();
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
@@ -104,7 +104,7 @@ const UnbudgetedChildCard = (
                   e.stopPropagation();
                   doAddBudget.mutate([
                     {
-                      date: props.selectedDate!,
+                      month: dayjs(props.selectedDate!).format("YYYY-MM-DD"),
                       category: props.category,
                       limit: Math.round(Math.abs(props.amount)),
                     },

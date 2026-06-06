@@ -261,7 +261,7 @@ function resolveBudgets(
   const category = params["category"];
 
   let budgets = ctx.budgets.filter((b) =>
-    isInPeriod(new Date(b.date).toISOString(), period),
+    isInPeriod(dayjs(b.month).format("YYYY-MM-DD"), period),
   );
 
   if (category) {

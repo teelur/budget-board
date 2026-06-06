@@ -15,7 +15,8 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const Budgets = (): React.ReactNode => {
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { dayjs } = useLocale();
   const { request } = useAuth();
 
@@ -25,12 +26,12 @@ const Budgets = (): React.ReactNode => {
 
   const budgetsQuery = useQueries({
     queries: selectedDates.map((date: Date) => ({
-      queryKey: ["budgets", date],
+      queryKey: ["budgets", dayjs(date).format("YYYY-MM")],
       queryFn: async (): Promise<IBudget[]> => {
         const res: AxiosResponse = await request({
           url: "/api/budget",
           method: "GET",
-          params: { date },
+          params: { month: dayjs(date).format("YYYY-MM-DD") },
         });
 
         if (res.status === 200) {

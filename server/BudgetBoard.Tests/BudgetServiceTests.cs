@@ -15,7 +15,14 @@ public class BudgetServiceTests
 {
     private readonly Faker<BudgetCreateRequest> _budgetCreateRequestFaker =
         new Faker<BudgetCreateRequest>()
-            .RuleFor(b => b.Date, f => f.Date.Past())
+            .RuleFor(
+                b => b.Month,
+                f =>
+                {
+                    var randomDate = f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now);
+                    return new DateOnly(randomDate.Year, randomDate.Month, 1);
+                }
+            )
             .RuleFor(
                 b => b.Category,
                 (f, b) =>
@@ -44,19 +51,19 @@ public class BudgetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var today = DateTime.Today;
+        var today = DateOnly.FromDateTime(DateTime.Today);
         var budgets = new List<BudgetCreateRequest>();
         var newBudget1 = _budgetCreateRequestFaker.Generate();
         newBudget1.Category = "Paycheck";
-        newBudget1.Date = today;
+        newBudget1.Month = today;
         budgets.Add(newBudget1);
         var newBudget2 = _budgetCreateRequestFaker.Generate();
         newBudget2.Category = "Bonus";
-        newBudget2.Date = today;
+        newBudget2.Month = today;
         budgets.Add(newBudget2);
         var newBudget3 = _budgetCreateRequestFaker.Generate();
         newBudget3.Category = "Service & Parts";
-        newBudget3.Date = today;
+        newBudget3.Month = today;
         budgets.Add(newBudget3);
 
         // Act
@@ -81,22 +88,22 @@ public class BudgetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var today = DateTime.Today;
+        var today = DateOnly.FromDateTime(DateTime.Today);
 
         var child1 = _budgetCreateRequestFaker.Generate();
         child1.Category = "Paycheck";
         child1.Limit = 1000;
-        child1.Date = today;
+        child1.Month = today;
 
         var child2 = _budgetCreateRequestFaker.Generate();
         child2.Category = "Bonus";
         child2.Limit = 500;
-        child2.Date = today;
+        child2.Month = today;
 
         var child3 = _budgetCreateRequestFaker.Generate();
         child3.Category = "Interest Income";
         child3.Limit = 300;
-        child3.Date = today;
+        child3.Month = today;
 
         // Act
         await budgetService.CreateBudgetsWithParentsAsync(
@@ -168,17 +175,17 @@ public class BudgetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var today = DateTime.Today;
+        var today = DateOnly.FromDateTime(DateTime.Today);
         var category = "Food & Dining";
 
         var budget1 = _budgetCreateRequestFaker.Generate();
         budget1.Category = category;
-        budget1.Date = today;
+        budget1.Month = today;
         await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget1]);
 
         var budget2 = _budgetCreateRequestFaker.Generate();
         budget2.Category = category;
-        budget2.Date = today;
+        budget2.Month = today;
 
         // Act
         Func<Task> act = async () =>
@@ -206,21 +213,21 @@ public class BudgetServiceTests
         var child1Budget = budgetFaker.Generate();
         child1Budget.Category = "Bonus";
         child1Budget.Limit = 1000;
-        child1Budget.Date = DateTime.Today;
+        child1Budget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(child1Budget);
 
         var child2Budget = budgetFaker.Generate();
         child2Budget.Category = "Service & Parts";
         child2Budget.Limit = 200;
-        child2Budget.Date = DateTime.Today;
+        child2Budget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(child2Budget);
 
         var child3Budget = budgetFaker.Generate();
         child3Budget.Category = "Paycheck";
         child3Budget.Limit = 300;
-        child3Budget.Date = DateTime.Today.AddMonths(-1);
+        child3Budget.Month = DateOnly.FromDateTime(DateTime.Today.AddMonths(-1));
 
         helper.UserDataContext.Budgets.Add(child3Budget);
 
@@ -229,7 +236,7 @@ public class BudgetServiceTests
         var budget = _budgetCreateRequestFaker.Generate();
         budget.Category = "Paycheck";
         budget.Limit = 200;
-        budget.Date = DateTime.Today;
+        budget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         // Act
         await budgetService.CreateBudgetsWithParentsAsync(helper.demoUser.Id, [budget]);
@@ -258,7 +265,7 @@ public class BudgetServiceTests
         var parentBudget = budgetFaker.Generate();
         parentBudget.Category = "Income";
         parentBudget.Limit = 1000;
-        parentBudget.Date = DateTime.Today;
+        parentBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(parentBudget);
         helper.UserDataContext.SaveChanges();
@@ -266,7 +273,7 @@ public class BudgetServiceTests
         var budget = _budgetCreateRequestFaker.Generate();
         budget.Category = "Paycheck";
         budget.Limit = 200;
-        budget.Date = DateTime.Today;
+        budget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         var oldLimit = parentBudget.Limit;
 
@@ -295,7 +302,7 @@ public class BudgetServiceTests
         var parentBudget = budgetFaker.Generate();
         parentBudget.Category = "Income";
         parentBudget.Limit = 1000;
-        parentBudget.Date = DateTime.Today;
+        parentBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(parentBudget);
         helper.UserDataContext.SaveChanges();
@@ -303,7 +310,7 @@ public class BudgetServiceTests
         var budget = _budgetCreateRequestFaker.Generate();
         budget.Category = "Paycheck";
         budget.Limit = 200;
-        budget.Date = DateTime.Today;
+        budget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         // Act
         await budgetService.CreateBudgetsWithParentsAsync(helper.demoUser.Id, [budget]);
@@ -330,7 +337,7 @@ public class BudgetServiceTests
         var budget = _budgetCreateRequestFaker.Generate();
         budget.Category = "Paycheck";
         budget.Limit = 200;
-        budget.Date = DateTime.Today;
+        budget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         // Act
         await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget]);
@@ -403,14 +410,14 @@ public class BudgetServiceTests
         );
 
         var validBudget1 = _budgetCreateRequestFaker.Generate();
-        validBudget1.Date = DateTime.Today;
+        validBudget1.Month = DateOnly.FromDateTime(DateTime.Today);
 
         var invalidBudget = _budgetCreateRequestFaker.Generate();
         invalidBudget.Category = null!;
-        invalidBudget.Date = DateTime.Today;
+        invalidBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         var validBudget2 = _budgetCreateRequestFaker.Generate();
-        validBudget2.Date = DateTime.Today;
+        validBudget2.Month = DateOnly.FromDateTime(DateTime.Today);
 
         // Act
         Func<Task> act = async () =>
@@ -491,7 +498,10 @@ public class BudgetServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        var result = await budgetService.ReadBudgetsAsync(helper.demoUser.Id, DateTime.Now);
+        var result = await budgetService.ReadBudgetsAsync(
+            helper.demoUser.Id,
+            DateOnly.FromDateTime(DateTime.Now)
+        );
 
         // Assert
         result
@@ -499,7 +509,7 @@ public class BudgetServiceTests
             .HaveCount(
                 budgets
                     .Where(b =>
-                        b.Date.Month == DateTime.Now.Month && b.Date.Year == DateTime.Now.Year
+                        b.Month.Month == DateTime.Now.Month && b.Month.Year == DateTime.Now.Year
                     )
                     .Count()
             );
@@ -507,7 +517,7 @@ public class BudgetServiceTests
             .Should()
             .BeEquivalentTo(
                 budgets
-                    .Where(b => b.Date.Month == DateTime.Now.Month)
+                    .Where(b => b.Month.Month == DateTime.Now.Month)
                     .Select(b => new BudgetResponse(b))
             );
     }
@@ -526,7 +536,10 @@ public class BudgetServiceTests
 
         // Act
         Func<Task> act = async () =>
-            await budgetService.ReadBudgetsAsync(Guid.NewGuid(), DateTime.Now);
+            await budgetService.ReadBudgetsAsync(
+                Guid.NewGuid(),
+                DateOnly.FromDateTime(DateTime.Now)
+            );
 
         // Assert
         await act.Should()
@@ -547,7 +560,10 @@ public class BudgetServiceTests
         );
 
         // Act
-        var result = await budgetService.ReadBudgetsAsync(helper.demoUser.Id, DateTime.Now);
+        var result = await budgetService.ReadBudgetsAsync(
+            helper.demoUser.Id,
+            DateOnly.FromDateTime(DateTime.Now)
+        );
 
         // Assert
         result.Should().BeEmpty();
@@ -568,15 +584,15 @@ public class BudgetServiceTests
         var budgetFaker = new BudgetFaker(helper.demoUser.Id);
 
         var januaryBudget = budgetFaker.Generate();
-        januaryBudget.Date = new DateTime(2026, 1, 15);
+        januaryBudget.Month = new DateOnly(2026, 1, 1);
         januaryBudget.Category = "January Budget";
 
         var februaryBudget = budgetFaker.Generate();
-        februaryBudget.Date = new DateTime(2026, 2, 15);
+        februaryBudget.Month = new DateOnly(2026, 2, 1);
         februaryBudget.Category = "February Budget";
 
         var marchBudget = budgetFaker.Generate();
-        marchBudget.Date = new DateTime(2026, 3, 15);
+        marchBudget.Month = new DateOnly(2026, 3, 1);
         marchBudget.Category = "March Budget";
 
         helper.UserDataContext.Budgets.AddRange([januaryBudget, februaryBudget, marchBudget]);
@@ -585,7 +601,7 @@ public class BudgetServiceTests
         // Act
         var result = await budgetService.ReadBudgetsAsync(
             helper.demoUser.Id,
-            new DateTime(2026, 2, 1)
+            new DateOnly(2026, 2, 1)
         );
 
         // Assert
@@ -670,14 +686,14 @@ public class BudgetServiceTests
         var parentBudget = budgetFaker.Generate();
         parentBudget.Category = "Income";
         parentBudget.Limit = parentLimit;
-        parentBudget.Date = DateTime.Today;
+        parentBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(parentBudget);
 
         var childBudget = budgetFaker.Generate();
         childBudget.Category = "Paycheck";
         childBudget.Limit = 200;
-        childBudget.Date = DateTime.Today;
+        childBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget);
 
@@ -686,7 +702,7 @@ public class BudgetServiceTests
         var otherChildBudget = budgetFaker.Generate();
         otherChildBudget.Category = "Bonus";
         otherChildBudget.Limit = otherChildBudgetLimit;
-        otherChildBudget.Date = DateTime.Today;
+        otherChildBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(otherChildBudget);
         helper.UserDataContext.SaveChanges();
@@ -725,14 +741,14 @@ public class BudgetServiceTests
         var parentBudget = budgetFaker.Generate();
         parentBudget.Category = "Income";
         parentBudget.Limit = parentLimit;
-        parentBudget.Date = DateTime.Today;
+        parentBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(parentBudget);
 
         var childBudget = budgetFaker.Generate();
         childBudget.Category = "Paycheck";
         childBudget.Limit = 200;
-        childBudget.Date = DateTime.Today;
+        childBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget);
         helper.UserDataContext.SaveChanges();
@@ -768,7 +784,7 @@ public class BudgetServiceTests
         var childBudget = budgetFaker.Generate();
         childBudget.Category = "Paycheck";
         childBudget.Limit = 200;
-        childBudget.Date = DateTime.Today;
+        childBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget);
         helper.UserDataContext.SaveChanges();
@@ -806,7 +822,7 @@ public class BudgetServiceTests
         var parentBudget = budgetFaker.Generate();
         parentBudget.Category = "Income";
         parentBudget.Limit = 1000;
-        parentBudget.Date = DateTime.Today;
+        parentBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(parentBudget);
         var childBudget = budgetFaker.Generate();
@@ -814,7 +830,7 @@ public class BudgetServiceTests
         childBudget.UserID = helper.demoUser.Id;
         childBudget.Category = "Paycheck";
         childBudget.Limit = 200;
-        childBudget.Date = DateTime.Today;
+        childBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget);
         helper.UserDataContext.SaveChanges();
@@ -873,21 +889,21 @@ public class BudgetServiceTests
         var parentBudget = budgetFaker.Generate();
         parentBudget.Category = "Income";
         parentBudget.Limit = 1500;
-        parentBudget.Date = DateTime.Today;
+        parentBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(parentBudget);
 
         var childBudget1 = budgetFaker.Generate();
         childBudget1.Category = "Paycheck";
         childBudget1.Limit = 1000;
-        childBudget1.Date = DateTime.Today;
+        childBudget1.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget1);
 
         var childBudget2 = budgetFaker.Generate();
         childBudget2.Category = "Bonus";
         childBudget2.Limit = 500;
-        childBudget2.Date = DateTime.Today;
+        childBudget2.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget2);
         helper.UserDataContext.SaveChanges();
@@ -1005,20 +1021,20 @@ public class BudgetServiceTests
         var parentBudget = budgetFaker.Generate();
         parentBudget.Category = "Income";
         parentBudget.Limit = 1000;
-        parentBudget.Date = DateTime.Today;
+        parentBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(parentBudget);
         var childBudget = budgetFaker.Generate();
         childBudget.Category = "Paycheck";
         childBudget.Limit = 200;
-        childBudget.Date = DateTime.Today;
+        childBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget);
 
         var childBudget2 = budgetFaker.Generate();
         childBudget2.Category = "Paycheck";
         childBudget2.Limit = 200;
-        childBudget2.Date = DateTime.Today.AddMonths(-1);
+        childBudget2.Month = DateOnly.FromDateTime(DateTime.Today.AddMonths(-1));
 
         helper.UserDataContext.Budgets.Add(childBudget2);
         helper.UserDataContext.SaveChanges();
@@ -1046,21 +1062,21 @@ public class BudgetServiceTests
         var parentBudget = budgetFaker.Generate();
         parentBudget.Category = "Income";
         parentBudget.Limit = 1500;
-        parentBudget.Date = DateTime.Today;
+        parentBudget.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(parentBudget);
 
         var childBudget1 = budgetFaker.Generate();
         childBudget1.Category = "Paycheck";
         childBudget1.Limit = 1000;
-        childBudget1.Date = DateTime.Today;
+        childBudget1.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget1);
 
         var childBudget2 = budgetFaker.Generate();
         childBudget2.Category = "Bonus";
         childBudget2.Limit = 500;
-        childBudget2.Date = DateTime.Today;
+        childBudget2.Month = DateOnly.FromDateTime(DateTime.Today);
 
         helper.UserDataContext.Budgets.Add(childBudget2);
         helper.UserDataContext.SaveChanges();

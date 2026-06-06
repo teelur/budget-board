@@ -126,13 +126,13 @@ public class BudgetService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<IBudgetResponse>> ReadBudgetsAsync(
         Guid userGuid,
-        DateTime monthDate
+        DateOnly month
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var budgets = userData.Budgets.Where(b =>
-            b.Date.Month == monthDate.Month && b.Date.Year == monthDate.Year
+            b.Month.Month == month.Month && b.Month.Year == month.Year
         );
 
         return budgets.Select(b => new BudgetResponse(b)).ToList();
@@ -158,7 +158,7 @@ public class BudgetService(
         {
             var childBudgetsLimitTotal = GetBudgetChildrenLimit(
                 budget.Category,
-                budget.Date,
+                budget.Month,
                 userData
             );
 
@@ -181,13 +181,13 @@ public class BudgetService(
             {
                 var parentBudget = userData.Budgets.SingleOrDefault(b =>
                     b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
-                    && b.Date.Month == budget.Date.Month
-                    && b.Date.Year == budget.Date.Year
+                    && b.Month.Month == budget.Month.Month
+                    && b.Month.Year == budget.Month.Year
                 );
 
                 var childBudgetsLimitTotal = GetBudgetChildrenLimit(
                     parentCategory,
-                    budget.Date,
+                    budget.Month,
                     userData
                 );
 
@@ -204,7 +204,7 @@ public class BudgetService(
                     // we should create a parent budget if it doesn't exist
                     var newParentBudget = new Budget
                     {
-                        Date = budget.Date,
+                        Month = budget.Month,
                         Category = parentCategory,
                         Limit = childBudgetsLimitTotal,
                         UserID = userData.Id,
@@ -247,7 +247,7 @@ public class BudgetService(
             var childBudgetsForMonth = GetChildBudgetsForMonth(
                 userData,
                 budget.Category,
-                budget.Date
+                budget.Month
             );
 
             foreach (var childBudget in childBudgetsForMonth)
@@ -262,7 +262,7 @@ public class BudgetService(
     private static List<Budget> GetChildBudgetsForMonth(
         ApplicationUser userData,
         string parentCategory,
-        DateTime monthDate
+        DateOnly monthDate
     )
     {
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
@@ -275,7 +275,7 @@ public class BudgetService(
         );
 
         var childBudgetsForMonth = childBudgets
-            .Where(b => b.Date.Month == monthDate.Month && b.Date.Year == monthDate.Year)
+            .Where(b => b.Month.Month == monthDate.Month && b.Month.Year == monthDate.Year)
             .ToList();
 
         return childBudgetsForMonth ?? [];
@@ -283,7 +283,7 @@ public class BudgetService(
 
     private static decimal GetBudgetChildrenLimit(
         string parentCategory,
-        DateTime date,
+        DateOnly date,
         ApplicationUser userData
     ) => GetChildBudgetsForMonth(userData, parentCategory, date).Sum(b => b.Limit);
 
@@ -332,8 +332,8 @@ public class BudgetService(
         }
 
         var budgetForCategoryAlreadyExists = userData.Budgets.Any(b =>
-            b.Date.Month == request.Date.Month
-            && b.Date.Year == request.Date.Year
+            b.Month.Month == request.Month.Month
+            && b.Month.Year == request.Month.Year
             && b.Category.Equals(request.Category, StringComparison.CurrentCultureIgnoreCase)
         );
 
@@ -344,7 +344,7 @@ public class BudgetService(
                 _logLocalizer[
                     "BudgetCreateDuplicateLog",
                     request.Category,
-                    request.Date.ToString("yyyy-MM")
+                    request.Month.ToString("yyyy-MM")
                 ]
             );
 
@@ -352,13 +352,13 @@ public class BudgetService(
             return _responseLocalizer[
                 "BudgetCreateDuplicateError",
                 request.Category,
-                request.Date.ToString("yyyy-MM")
+                request.Month.ToString("yyyy-MM")
             ];
         }
 
         newBudget = new Budget
         {
-            Date = request.Date,
+            Month = request.Month,
             Category = request.Category,
             Limit = request.Limit,
             UserID = userData.Id,
@@ -394,9 +394,9 @@ public class BudgetService(
 
         var parentBudgetRequest = new BudgetCreateRequest
         {
-            Date = childRequest.Date,
+            Month = childRequest.Month,
             Category = parentCategory,
-            Limit = GetBudgetChildrenLimit(parentCategory, childRequest.Date, userData),
+            Limit = GetBudgetChildrenLimit(parentCategory, childRequest.Month, userData),
         };
 
         if (TryAddBudget(userData, parentBudgetRequest, out var newParentBudget) != null)
@@ -417,8 +417,8 @@ public class BudgetService(
     {
         var parentBudget = userData.Budgets.SingleOrDefault(b =>
             b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
-            && b.Date.Month == childBudget.Date.Month
-            && b.Date.Year == childBudget.Date.Year
+            && b.Month.Month == childBudget.Month.Month
+            && b.Month.Year == childBudget.Month.Year
         );
 
         if (parentBudget == null)

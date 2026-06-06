@@ -5,21 +5,21 @@ namespace BudgetBoard.Service.Models;
 
 public interface IBudgetCreateRequest
 {
-    DateTime Date { get; }
+    DateOnly Month { get; }
     string Category { get; }
     decimal Limit { get; }
 }
 
 public class BudgetCreateRequest : IBudgetCreateRequest
 {
-    public DateTime Date { get; set; }
+    public DateOnly Month { get; set; }
     public string Category { get; set; }
     public decimal Limit { get; set; }
 
     [JsonConstructor]
     public BudgetCreateRequest()
     {
-        Date = DateTime.MinValue;
+        Month = DateOnly.MinValue;
         Category = string.Empty;
         Limit = 0;
     }
@@ -47,7 +47,7 @@ public class BudgetUpdateRequest : IBudgetUpdateRequest
 public interface IBudgetResponse
 {
     Guid ID { get; }
-    DateTime Date { get; }
+    DateOnly Month { get; }
     string Category { get; }
     decimal Limit { get; }
     Guid UserID { get; }
@@ -56,7 +56,7 @@ public interface IBudgetResponse
 public class BudgetResponse : IBudgetResponse
 {
     public Guid ID { get; set; }
-    public DateTime Date { get; set; }
+    public DateOnly Month { get; set; }
     public string Category { get; set; }
     public decimal Limit { get; set; }
     public Guid UserID { get; set; }
@@ -65,7 +65,7 @@ public class BudgetResponse : IBudgetResponse
     public BudgetResponse()
     {
         ID = Guid.NewGuid();
-        Date = DateTime.MinValue;
+        Month = DateOnly.MinValue;
         Category = string.Empty;
         Limit = 0;
         UserID = Guid.NewGuid();
@@ -74,7 +74,7 @@ public class BudgetResponse : IBudgetResponse
     public BudgetResponse(Budget budget)
     {
         ID = budget.ID;
-        Date = budget.Date;
+        Month = budget.Month;
         Category = budget.Category;
         Limit = budget.Limit;
         UserID = budget.UserID;

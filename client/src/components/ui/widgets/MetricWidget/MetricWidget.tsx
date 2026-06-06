@@ -41,7 +41,7 @@ const MetricWidget = ({
   const { t } = useTranslation();
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
-  const { intlLocale } = useLocale();
+  const { intlLocale, dayjs } = useLocale();
 
   const widgetSettingsQuery = useQuery({
     queryKey: ["widgetSettings"],
@@ -143,13 +143,13 @@ const MetricWidget = ({
 
   const budgetQueries = useQueries({
     queries: requirements.needsBudgets
-      ? requirements.budgetMonths.map((date) => ({
-          queryKey: ["budgets", date],
+      ? requirements.budgetMonths.map((date: Date) => ({
+          queryKey: ["budgets", dayjs(date).format("YYYY-MM")],
           queryFn: async (): Promise<IBudget[]> => {
             const res: AxiosResponse = await request({
               url: "/api/budget",
               method: "GET",
-              params: { date },
+              params: { month: dayjs(date).format("YYYY-MM-DD") },
             });
             if (res.status === 200) return res.data as IBudget[];
             return [];

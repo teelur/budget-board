@@ -493,7 +493,7 @@ public class DemoSeedService(
     private void SeedBudgetData(ApplicationUser user)
     {
         var today = DateTime.UtcNow;
-        var budgetMonth = new DateTime(today.Year, today.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var budgetMonth = new DateOnly(today.Year, today.Month, 1);
         var budgets = new (string Category, decimal Limit)[]
         {
             ("Food & Dining", 500m),
@@ -510,7 +510,7 @@ public class DemoSeedService(
             userDataContext.Budgets.Add(
                 new Budget
                 {
-                    Date = budgetMonth,
+                    Month = budgetMonth,
                     Category = category,
                     Limit = limit,
                     UserID = user.Id,
