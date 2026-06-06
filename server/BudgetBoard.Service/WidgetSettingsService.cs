@@ -228,7 +228,7 @@ public class WidgetSettingsService(
                 new
                 {
                     title = "This Month's Spending",
-                    value = "@transactions.sum(this_month, type=expense){currency}",
+                    value = "@transactions.sum(this_month, type=expense)",
                     label = "total expenses",
                 }
             ),
