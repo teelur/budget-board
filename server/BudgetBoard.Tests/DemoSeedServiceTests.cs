@@ -251,10 +251,25 @@ public class DemoSeedServiceTests
             .Select(ws => ws.WidgetType)
             .Should()
             .BeEquivalentTo(WidgetSettingsHelpers.DefaultLayouts.Select(dl => dl.WidgetType));
-        widgetSettings.Should().OnlyContain(ws => !string.IsNullOrWhiteSpace(ws.Configuration));
+
+        // Widgets with configurations: Accounts, NetWorth, Metric
+        widgetSettings
+            .Where(ws =>
+                ws.WidgetType is WidgetTypes.Accounts or WidgetTypes.NetWorth or WidgetTypes.Metric
+            )
+            .Should()
+            .OnlyContain(ws => !string.IsNullOrWhiteSpace(ws.Configuration));
+
+        // Widgets without configurations: UncategorizedTransactions, SpendingTrends
+        widgetSettings
+            .Where(ws =>
+                ws.WidgetType is WidgetTypes.UncategorizedTransactions or WidgetTypes.SpendingTrends
+            )
+            .Should()
+            .OnlyContain(ws => ws.Configuration == null);
 
         var accountsWidget = widgetSettings.First(ws => ws.WidgetType == WidgetTypes.Accounts);
-        accountsWidget.Configuration.Should().Be("{}");
+        accountsWidget.Configuration.Should().Be("{\"accountIds\":[]}");
     }
 
     [Fact]
