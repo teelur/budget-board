@@ -30,7 +30,7 @@ interface AddBudgetProps {
 
 const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { thousandsSeparator, decimalSeparator } = useLocale();
+  const { thousandsSeparator, decimalSeparator, dayjs } = useLocale();
 
   const categoryField = useField<string>({
     initialValue: "",
@@ -117,7 +117,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
               onClick={() =>
                 doCreateBudget.mutate([
                   {
-                    date: props.date,
+                    month: dayjs(props.date).format("YYYY-MM-DD"),
                     category: categoryField.getValue(),
                     limit:
                       limitField.getValue() === ""

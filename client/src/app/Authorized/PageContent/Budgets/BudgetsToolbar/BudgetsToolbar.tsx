@@ -14,6 +14,7 @@ import { translateAxiosError } from "~/helpers/requests";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { SettingsIcon } from "lucide-react";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface BudgetsToolbarProps {
   categories: ICategory[];
@@ -30,6 +31,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { request } = useAuth();
+  const { dayjs } = useLocale();
 
   const queryClient = useQueryClient();
   const doCopyBudget = useMutation({
@@ -42,7 +44,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
       }),
     onSuccess: async (_, variables: IBudgetCreateRequest[]) =>
       await queryClient.invalidateQueries({
-        queryKey: ["budgets", variables[0]?.date],
+        queryKey: ["budgets", dayjs(variables[0]?.month).format("YYYY-MM")],
       }),
     onError: (error: AxiosError) =>
       notifications.show({
@@ -58,14 +60,14 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
     request({
       url: "/api/budget",
       method: "GET",
-      params: { date: lastMonth },
+      params: { month: dayjs(lastMonth).format("YYYY-MM-DD") },
     })
       .then((res: AxiosResponse<any, any>) => {
         const budgets: IBudget[] = res.data;
         if (budgets.length !== 0) {
           const newBudgets: IBudgetCreateRequest[] = budgets.map((budget) => {
             return {
-              date: props.selectedDates[0],
+              month: dayjs(props.selectedDates[0]!).format("YYYY-MM-DD"),
               category: budget.category,
               limit: budget.limit,
             } as IBudgetCreateRequest;
