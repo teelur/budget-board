@@ -4,7 +4,7 @@
 
 ---
 
-[![Build and Publish](https://github.com/teelur/budget-board/actions/workflows/docker-image-ci-build.yml/badge.svg)](https://github.com/teelur/budget-board/actions/workflows/docker-image-ci-build.yml)
+[![Build and Publish](https://github.com/teelur/budget-board/actions/workflows/docker-image-dev-build.yml/badge.svg)](https://github.com/teelur/budget-board/actions/workflows/docker-image-dev-build.yml)
 ![GitHub Release](https://img.shields.io/github/v/release/teelur/budget-board)
 
 A simple app for tracking monthly spending and working towards financial goals.
