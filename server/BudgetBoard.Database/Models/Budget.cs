@@ -1,7 +1,7 @@
 ﻿namespace BudgetBoard.Database.Models;
 
 /// <summary>
-/// Represents a budget for a specific category and date.
+/// Represents a budget for a specific category and month.
 /// </summary>
 public class Budget
 {
@@ -11,9 +11,9 @@ public class Budget
     public Guid ID { get; set; } = Guid.NewGuid();
 
     /// <summary>
-    /// The date the budget applies to.
+    /// The month the budget applies to.
     /// </summary>
-    public required DateTime Date { get; set; }
+    public required DateOnly Month { get; set; }
 
     /// <summary>
     /// The category for which the budget is set.

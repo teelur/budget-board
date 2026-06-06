@@ -65,7 +65,7 @@ public class BudgetController(
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> Read(DateTime date)
+    public async Task<IActionResult> Read(DateOnly date)
     {
         try
         {

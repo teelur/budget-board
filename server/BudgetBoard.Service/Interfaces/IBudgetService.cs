@@ -34,7 +34,7 @@ public interface IBudgetService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="monthDate">The date indicating the month to retrieve budgets for.</param>
     /// <returns>A collection of budget details.</returns>
-    Task<IReadOnlyList<IBudgetResponse>> ReadBudgetsAsync(Guid userGuid, DateTime monthDate);
+    Task<IReadOnlyList<IBudgetResponse>> ReadBudgetsAsync(Guid userGuid, DateOnly month);
 
     /// <summary>
     /// Updates an existing budget entry.
