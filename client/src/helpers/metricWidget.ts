@@ -285,32 +285,22 @@ function resolveBudgets(
   ctx: MetricDataContext,
 ): number {
   const category = params["category"];
+  if (!category) return 0;
 
-  let budgets = ctx.budgets.filter((b) =>
-    isInPeriod(dayjs(b.month).format("YYYY-MM-DD"), period),
-  );
-
-  if (category) {
-    budgets = budgets.filter((b) => areStringsEqual(b.category, category));
-  } else {
-    budgets = budgets.filter((b) => !areStringsEqual(b.category, "Income"));
-  }
+  let budgets = ctx.budgets
+    .filter((b) => isInPeriod(dayjs(b.month).format("YYYY-MM-DD"), period))
+    .filter((b) => areStringsEqual(b.category, category));
 
   const total = budgets.reduce((n, b) => n + b.limit, 0);
-
   if (metric === "total") return total;
 
   let txs = getVisibleTransactions(ctx.transactions)
     .filter((t) => isInPeriod(t.date, period))
-    .filter((t) => !areStringsEqual(t.category ?? "", "Income"));
-
-  if (category) {
-    txs = txs.filter(
+    .filter(
       (t) =>
         areStringsEqual(t.category ?? "", category) ||
         areStringsEqual(t.subcategory ?? "", category),
     );
-  }
 
   const spent = Math.abs(txs.reduce((n, t) => n + t.amount, 0));
 
