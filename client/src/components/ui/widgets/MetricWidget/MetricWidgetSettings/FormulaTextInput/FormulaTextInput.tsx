@@ -39,7 +39,32 @@ const SOURCE_PARAM_VALUES: Record<string, Record<string, string[]>> = {
   },
 };
 
-const FORMATS = ["currency", "percent", "integer", "decimal", "number"];
+interface FormulaSuggestionData {
+  transactionCategories: string[];
+  budgetCategories: string[];
+  goalNames: string[];
+  accountNames: string[];
+}
+
+function getSourceParamValues(
+  suggestionData: FormulaSuggestionData,
+): Record<string, Record<string, string[]>> {
+  return {
+    transactions: {
+      ...SOURCE_PARAM_VALUES.transactions,
+      category: suggestionData.transactionCategories,
+    },
+    budgets: {
+      category: suggestionData.budgetCategories,
+    },
+    goals: {
+      name: suggestionData.goalNames,
+    },
+    accounts: {
+      name: suggestionData.accountNames,
+    },
+  };
+}
 
 type FormulaStage =
   | { kind: "source"; query: string }
@@ -59,8 +84,7 @@ type FormulaStage =
       argsPrefix: string;
       key: string;
       query: string;
-    }
-  | { kind: "format"; expressionPrefix: string; query: string };
+    };
 
 interface FormulaSuggestion {
   label: string;
@@ -120,19 +144,12 @@ function parseFormulaStage(partial: string): FormulaStage | null {
     };
   }
 
-  const closingParenIdx = afterDot.indexOf(")");
-  const argsStr = afterDot.slice(parenIdx + 1, closingParenIdx);
-  const expressionPrefix = `@${source}.${metric}(${argsStr})`;
-  const afterClosingParen = afterDot.slice(closingParenIdx + 1);
-  const formatQuery = afterClosingParen.startsWith("{")
-    ? afterClosingParen.slice(1)
-    : "";
-
-  return { kind: "format", expressionPrefix, query: formatQuery };
+  return null;
 }
 
 function getFormulaSuggestions(
   stage: FormulaStage | null,
+  sourceParamValues: Record<string, Record<string, string[]>>,
 ): FormulaSuggestion[] {
   if (!stage) return [];
 
@@ -156,7 +173,7 @@ function getFormulaSuggestions(
         if (exactMatch) {
           const base = `@${stage.source}.${stage.metric}(${stage.query}`;
           return [
-            { label: "){format}", insert: `${base})` },
+            { label: ")", insert: `${base})` },
             ...(SOURCE_PARAM_KEYS[stage.source] ?? []).map((k) => ({
               label: `${k}=…`,
               insert: `${base}, ${k}=`,
@@ -182,20 +199,20 @@ function getFormulaSuggestions(
       }
       const key = stage.query.slice(0, eqIdx);
       const valueQuery = stage.query.slice(eqIdx + 1);
-      const values = SOURCE_PARAM_VALUES[stage.source]?.[key] ?? [];
+      const values = sourceParamValues[stage.source]?.[key] ?? [];
       const exactValueMatch = values.find(
-        (v) => v === valueQuery.toLowerCase(),
+        (v) => v.toLowerCase() === valueQuery.toLowerCase(),
       );
       if (exactValueMatch) {
         return [
           {
-            label: "){format}",
+            label: ")",
             insert: `@${stage.source}.${stage.metric}(${key}=${exactValueMatch})`,
           },
         ];
       }
       return values
-        .filter((v) => v.startsWith(valueQuery.toLowerCase()))
+        .filter((v) => v.toLowerCase().startsWith(valueQuery.toLowerCase()))
         .map((v) => ({
           label: v,
           insert: `@${stage.source}.${stage.metric}(${key}=${v}`,
@@ -210,7 +227,7 @@ function getFormulaSuggestions(
       const base = `@${stage.source}.${stage.metric}(${stage.argsPrefix}`;
       const suggestions: FormulaSuggestion[] = [];
       if (stage.query === "") {
-        suggestions.push({ label: "){format}", insert: `${base})` });
+        suggestions.push({ label: ")", insert: `${base})` });
       }
       suggestions.push(
         ...(SOURCE_PARAM_KEYS[stage.source] ?? [])
@@ -222,7 +239,7 @@ function getFormulaSuggestions(
     }
 
     case "param_value": {
-      const values = SOURCE_PARAM_VALUES[stage.source]?.[stage.key] ?? [];
+      const values = sourceParamValues[stage.source]?.[stage.key] ?? [];
       const usedKeys = stage.argsPrefix
         .split(",")
         .map((p) => (p.trim().split("=")[0] ?? "").trim())
@@ -230,14 +247,16 @@ function getFormulaSuggestions(
       const argsSoFar = stage.argsPrefix
         ? `${stage.argsPrefix}, ${stage.key}=`
         : `${stage.key}=`;
-      const exactMatch = values.find((v) => v === stage.query.toLowerCase());
+      const exactMatch = values.find(
+        (v) => v.toLowerCase() === stage.query.toLowerCase(),
+      );
       if (exactMatch) {
         const base = `@${stage.source}.${stage.metric}(${argsSoFar}${exactMatch}`;
         const remainingKeys = (SOURCE_PARAM_KEYS[stage.source] ?? []).filter(
           (k) => !usedKeys.includes(k) && k !== stage.key,
         );
         return [
-          { label: "){format}", insert: `${base})` },
+          { label: ")", insert: `${base})` },
           ...remainingKeys.map((k) => ({
             label: `${k}=…`,
             insert: `${base}, ${k}=`,
@@ -245,17 +264,12 @@ function getFormulaSuggestions(
         ];
       }
       return values
-        .filter((v) => v.startsWith(stage.query.toLowerCase()))
+        .filter((v) => v.toLowerCase().startsWith(stage.query.toLowerCase()))
         .map((v) => ({
           label: v,
           insert: `@${stage.source}.${stage.metric}(${argsSoFar}${v}`,
         }));
     }
-
-    case "format":
-      return FORMATS.filter((f) => f.startsWith(stage.query.toLowerCase())).map(
-        (f) => ({ label: f, insert: `${stage.expressionPrefix}{${f}}` }),
-      );
   }
 }
 
@@ -285,6 +299,10 @@ export interface FormulaTextInputProps {
   placeholder: string;
   value: string;
   onChange: (value: string) => void;
+  transactionCategories?: string[];
+  budgetCategories?: string[];
+  goalNames?: string[];
+  accountNames?: string[];
 }
 
 const FormulaTextInput = ({
@@ -292,6 +310,10 @@ const FormulaTextInput = ({
   placeholder,
   value,
   onChange,
+  transactionCategories = [],
+  budgetCategories = [],
+  goalNames = [],
+  accountNames = [],
 }: FormulaTextInputProps): React.ReactNode => {
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -302,11 +324,22 @@ const FormulaTextInput = ({
   const [activeFormula, setActiveFormula] =
     React.useState<ActiveFormulaMatch | null>(null);
 
+  const sourceParamValues = React.useMemo(
+    () =>
+      getSourceParamValues({
+        transactionCategories,
+        budgetCategories,
+        goalNames,
+        accountNames,
+      }),
+    [transactionCategories, budgetCategories, goalNames, accountNames],
+  );
+
   const filteredSuggestions = React.useMemo((): FormulaSuggestion[] => {
     if (!activeFormula) return [];
     const stage = parseFormulaStage(activeFormula.query);
-    return getFormulaSuggestions(stage);
-  }, [activeFormula]);
+    return getFormulaSuggestions(stage, sourceParamValues);
+  }, [activeFormula, sourceParamValues]);
 
   const syncActiveFormula = React.useCallback(
     (nextValue: string) => {
@@ -318,7 +351,7 @@ const FormulaTextInput = ({
 
       if (match) {
         const stage = parseFormulaStage(match.query);
-        if (getFormulaSuggestions(stage).length > 0) {
+        if (getFormulaSuggestions(stage, sourceParamValues).length > 0) {
           combobox.openDropdown();
           combobox.updateSelectedOptionIndex();
           return;
@@ -327,7 +360,7 @@ const FormulaTextInput = ({
 
       combobox.closeDropdown();
     },
-    [combobox],
+    [combobox, sourceParamValues],
   );
 
   React.useEffect(() => {

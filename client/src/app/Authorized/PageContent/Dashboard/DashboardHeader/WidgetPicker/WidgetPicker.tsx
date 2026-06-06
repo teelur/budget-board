@@ -42,10 +42,6 @@ const WidgetPicker = ({
     },
   });
 
-  const existingWidgetTypes = (widgetSettingsQuery.data ?? []).map(
-    (w) => w.widgetType,
-  );
-
   const doAddWidget = useMutation({
     mutationFn: async (newWidget: IWidgetSettingsCreateRequest) =>
       await request({
@@ -92,6 +88,10 @@ const WidgetPicker = ({
 
     onClose();
   };
+
+  const existingWidgetTypes = React.useMemo(() => {
+    return (widgetSettingsQuery.data ?? []).map((w) => w.widgetType);
+  }, [widgetSettingsQuery.data]);
 
   return (
     <Drawer

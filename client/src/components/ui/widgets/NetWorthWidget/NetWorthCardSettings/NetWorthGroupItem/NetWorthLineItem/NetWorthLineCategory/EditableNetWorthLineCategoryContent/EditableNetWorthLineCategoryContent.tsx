@@ -81,11 +81,6 @@ const EditableNetWorthLineCategoryContent = (
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("net_worth_setting_deleted_successfully_message"),
-      });
     },
     onError: (error: AxiosError) => {
       notifications.show({

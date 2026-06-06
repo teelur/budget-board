@@ -27,7 +27,28 @@ export const PERIOD_KEYWORDS = [
 
 export type PeriodKeyword = (typeof PERIOD_KEYWORDS)[number];
 
-const EXPRESSION_REGEX = /@(\w+)\.(\w+)\(([^)]*)\)\{([^}]+)\}/g;
+const EXPRESSION_REGEX = /@(\w+)\.(\w+)\(([^)]*)\)/g;
+
+type MetricFormat = "currency" | "percent" | "integer" | "decimal" | "number";
+
+/**
+ * Default metric format inference based on the source and metric name.
+ * Formats are always inferred and cannot be overridden.
+ */
+const DEFAULT_METRIC_FORMATS: Record<string, MetricFormat> = {
+  "transactions.sum": "currency",
+  "transactions.count": "integer",
+  "transactions.avg": "currency",
+  "budgets.total": "currency",
+  "budgets.spent": "currency",
+  "budgets.remaining": "currency",
+  "budgets.percent_used": "percent",
+  "goals.percent_complete": "percent",
+  "goals.current_amount": "currency",
+  "goals.target": "currency",
+  "goals.monthly_contribution": "currency",
+  "accounts.balance": "currency",
+};
 
 function parseArgs(argsStr: string): {
   period?: string;
@@ -70,8 +91,7 @@ export function parseTemplate(template: string): MetricToken[] {
       });
     }
 
-    const [raw, source, metric, argsStr, format] = match as RegExpExecArray &
-      string[];
+    const [raw, source, metric, argsStr] = match as RegExpExecArray & string[];
     const { period, params } = parseArgs(argsStr ?? "");
 
     tokens.push({
@@ -80,7 +100,6 @@ export function parseTemplate(template: string): MetricToken[] {
       metric,
       period,
       params,
-      format,
       raw,
     } as ExpressionToken);
 
@@ -127,8 +146,15 @@ export function getMonthsForPeriod(period: string): Date[] {
   }
 }
 
-function isInPeriod(dateStr: string, period: string): boolean {
-  const d = dayjs(dateStr);
+function isInPeriod(isoDateStr: string, period: string): boolean {
+  // Compare using date-only values to avoid timezone-driven month boundary shifts.
+  const normalizedDateStr = isoDateStr.includes("T")
+    ? isoDateStr.slice(0, 10)
+    : isoDateStr;
+
+  const d = dayjs(normalizedDateStr);
+  if (!d.isValid()) return false;
+
   const now = dayjs();
 
   switch (period) {
@@ -175,7 +201,7 @@ export interface MetricDataContext {
 
 function formatValue(
   value: number,
-  format: string,
+  format: MetricFormat,
   currency: string,
   locale: string,
 ): string {
@@ -206,6 +232,11 @@ function formatValue(
     default:
       return String(value);
   }
+}
+
+function getMetricFormat(token: ExpressionToken): MetricFormat {
+  // Format is always inferred from source.metric; user-specified format overrides are not supported.
+  return DEFAULT_METRIC_FORMATS[`${token.source}.${token.metric}`] ?? "number";
 }
 
 function resolveTransactions(
@@ -259,32 +290,22 @@ function resolveBudgets(
   ctx: MetricDataContext,
 ): number {
   const category = params["category"];
+  if (!category) return 0;
 
-  let budgets = ctx.budgets.filter((b) =>
-    isInPeriod(dayjs(b.month).format("YYYY-MM-DD"), period),
-  );
-
-  if (category) {
-    budgets = budgets.filter((b) => areStringsEqual(b.category, category));
-  } else {
-    budgets = budgets.filter((b) => !areStringsEqual(b.category, "Income"));
-  }
+  let budgets = ctx.budgets
+    .filter((b) => isInPeriod(dayjs(b.month).format("YYYY-MM-DD"), period))
+    .filter((b) => areStringsEqual(b.category, category));
 
   const total = budgets.reduce((n, b) => n + b.limit, 0);
-
   if (metric === "total") return total;
 
   let txs = getVisibleTransactions(ctx.transactions)
     .filter((t) => isInPeriod(t.date, period))
-    .filter((t) => !areStringsEqual(t.category ?? "", "Income"));
-
-  if (category) {
-    txs = txs.filter(
+    .filter(
       (t) =>
         areStringsEqual(t.category ?? "", category) ||
         areStringsEqual(t.subcategory ?? "", category),
     );
-  }
 
   const spent = Math.abs(txs.reduce((n, t) => n + t.amount, 0));
 
@@ -317,7 +338,10 @@ function resolveGoals(
     case "target":
       return getGoalTargetAmount(goal.amount, goal.initialAmount);
     case "current_amount":
-      return goal.accounts.reduce((n, a) => n + a.currentBalance, 0);
+      return (
+        goal.accounts.reduce((n, a) => n + a.currentBalance, 0) -
+        goal.initialAmount
+      );
     case "monthly_contribution":
       return goal.monthlyContribution;
     default:
@@ -376,7 +400,7 @@ function resolveExpression(
 
     return formatValue(
       value,
-      token.format,
+      getMetricFormat(token),
       ctx.preferredCurrency,
       ctx.intlLocale,
     );

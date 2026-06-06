@@ -16,7 +16,8 @@ public class DemoSeedService(
     UserDataContext userDataContext,
     UserManager<ApplicationUser> userManager,
     IStringLocalizer<LogStrings> logLocalizer,
-    ITransactionService transactionService
+    ITransactionService transactionService,
+    IWidgetSettingsService widgetSettingsService
 ) : IDemoSeedService
 {
     private const int MonthsOfData = 6;
@@ -200,7 +201,7 @@ public class DemoSeedService(
             userDataContext.Accounts.First(a => a.UserID == user.Id && a.Name == "Savings").ID
         );
         SeedBudgetData(user);
-        SeedWidgetSettingsData(user);
+        await SeedWidgetSettingsDataAsync(user);
 
         await userDataContext.SaveChangesAsync();
     }
@@ -485,7 +486,7 @@ public class DemoSeedService(
     }
 
     /// <summary>
-    /// Seeds budget limits for the provided user for the current month.
+    /// Seeds budget limits for the provided user for the past 3 months.
     /// </summary>
     /// <param name="user">
     /// The user for whom to seed budget data.
@@ -493,7 +494,6 @@ public class DemoSeedService(
     private void SeedBudgetData(ApplicationUser user)
     {
         var today = DateTime.UtcNow;
-        var budgetMonth = new DateOnly(today.Year, today.Month, 1);
         var budgets = new (string Category, decimal Limit)[]
         {
             ("Food & Dining", 500m),
@@ -505,17 +505,23 @@ public class DemoSeedService(
             ("Income", 5000m),
         };
 
-        foreach (var (category, limit) in budgets)
+        // Seed budgets for the past 3 months
+        for (int monthOffset = 0; monthOffset < 3; monthOffset++)
         {
-            userDataContext.Budgets.Add(
-                new Budget
-                {
-                    Month = budgetMonth,
-                    Category = category,
-                    Limit = limit,
-                    UserID = user.Id,
-                }
-            );
+            var budgetMonth = new DateOnly(today.Year, today.Month, 1).AddMonths(-monthOffset);
+
+            foreach (var (category, limit) in budgets)
+            {
+                userDataContext.Budgets.Add(
+                    new Budget
+                    {
+                        Month = budgetMonth,
+                        Category = category,
+                        Limit = limit,
+                        UserID = user.Id,
+                    }
+                );
+            }
         }
     }
 
@@ -525,12 +531,13 @@ public class DemoSeedService(
     /// <param name="user">
     /// The user for whom to seed widget settings.
     /// </param>
-    private void SeedWidgetSettingsData(ApplicationUser user)
+    private async Task SeedWidgetSettingsDataAsync(ApplicationUser user)
     {
         foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
         {
-            userDataContext.WidgetSettings.Add(
-                new WidgetSettings
+            await widgetSettingsService.CreateWidgetSettingsAsync(
+                user.Id,
+                new WidgetSettingsCreateRequest
                 {
                     WidgetType = layout.WidgetType,
                     LgX = layout.LgX,
@@ -539,7 +546,6 @@ public class DemoSeedService(
                     LgH = layout.LgH,
                     SmY = layout.SmY,
                     SmH = layout.SmH,
-                    UserID = user.Id,
                 }
             );
         }

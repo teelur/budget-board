@@ -9,7 +9,6 @@ export interface ExpressionToken {
   metric: string;
   period?: string;
   params: Record<string, string>;
-  format: string;
   raw: string;
 }
 

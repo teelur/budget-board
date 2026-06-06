@@ -74,12 +74,20 @@ public class DemoSeedServiceTests
             )
             .Returns(Task.CompletedTask);
 
+        var widgetSettingsService = new WidgetSettingsService(
+            Mock.Of<ILogger<IWidgetSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
         return new DemoSeedService(
             Mock.Of<ILogger<DemoSeedService>>(),
             helper.UserDataContext,
             mockUserManager.Object,
             TestHelper.CreateMockLocalizer<LogStrings>(),
-            mockTransactionService.Object
+            mockTransactionService.Object,
+            widgetSettingsService
         );
     }
 
@@ -243,6 +251,25 @@ public class DemoSeedServiceTests
             .Select(ws => ws.WidgetType)
             .Should()
             .BeEquivalentTo(WidgetSettingsHelpers.DefaultLayouts.Select(dl => dl.WidgetType));
+
+        // Widgets with configurations: Accounts, NetWorth, Metric
+        widgetSettings
+            .Where(ws =>
+                ws.WidgetType is WidgetTypes.Accounts or WidgetTypes.NetWorth or WidgetTypes.Metric
+            )
+            .Should()
+            .OnlyContain(ws => !string.IsNullOrWhiteSpace(ws.Configuration));
+
+        // Widgets without configurations: UncategorizedTransactions, SpendingTrends
+        widgetSettings
+            .Where(ws =>
+                ws.WidgetType is WidgetTypes.UncategorizedTransactions or WidgetTypes.SpendingTrends
+            )
+            .Should()
+            .OnlyContain(ws => ws.Configuration == null);
+
+        var accountsWidget = widgetSettings.First(ws => ws.WidgetType == WidgetTypes.Accounts);
+        accountsWidget.Configuration.Should().Be("{\"accountIds\":[]}");
     }
 
     [Fact]
