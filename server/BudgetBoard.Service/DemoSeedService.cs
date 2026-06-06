@@ -486,7 +486,7 @@ public class DemoSeedService(
     }
 
     /// <summary>
-    /// Seeds budget limits for the provided user for the current month.
+    /// Seeds budget limits for the provided user for the past 3 months.
     /// </summary>
     /// <param name="user">
     /// The user for whom to seed budget data.
@@ -494,7 +494,6 @@ public class DemoSeedService(
     private void SeedBudgetData(ApplicationUser user)
     {
         var today = DateTime.UtcNow;
-        var budgetMonth = new DateOnly(today.Year, today.Month, 1);
         var budgets = new (string Category, decimal Limit)[]
         {
             ("Food & Dining", 500m),
@@ -506,17 +505,23 @@ public class DemoSeedService(
             ("Income", 5000m),
         };
 
-        foreach (var (category, limit) in budgets)
+        // Seed budgets for the past 3 months
+        for (int monthOffset = 0; monthOffset < 3; monthOffset++)
         {
-            userDataContext.Budgets.Add(
-                new Budget
-                {
-                    Month = budgetMonth,
-                    Category = category,
-                    Limit = limit,
-                    UserID = user.Id,
-                }
-            );
+            var budgetMonth = new DateOnly(today.Year, today.Month, 1).AddMonths(-monthOffset);
+
+            foreach (var (category, limit) in budgets)
+            {
+                userDataContext.Budgets.Add(
+                    new Budget
+                    {
+                        Month = budgetMonth,
+                        Category = category,
+                        Limit = limit,
+                        UserID = user.Id,
+                    }
+                );
+            }
         }
     }
 
