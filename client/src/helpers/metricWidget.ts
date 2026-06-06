@@ -27,10 +27,14 @@ export const PERIOD_KEYWORDS = [
 
 export type PeriodKeyword = (typeof PERIOD_KEYWORDS)[number];
 
-const EXPRESSION_REGEX = /@(\w+)\.(\w+)\(([^)]*)\)(?:\{([^}]+)\})?/g;
+const EXPRESSION_REGEX = /@(\w+)\.(\w+)\(([^)]*)\)/g;
 
 type MetricFormat = "currency" | "percent" | "integer" | "decimal" | "number";
 
+/**
+ * Default metric format inference based on the source and metric name.
+ * Formats are always inferred and cannot be overridden.
+ */
 const DEFAULT_METRIC_FORMATS: Record<string, MetricFormat> = {
   "transactions.sum": "currency",
   "transactions.count": "integer",
@@ -231,6 +235,7 @@ function formatValue(
 }
 
 function getMetricFormat(token: ExpressionToken): MetricFormat {
+  // Format is always inferred from source.metric; user-specified format overrides are not supported.
   return DEFAULT_METRIC_FORMATS[`${token.source}.${token.metric}`] ?? "number";
 }
 

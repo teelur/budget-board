@@ -340,11 +340,6 @@ const MetricWidgetSettings = ({
                   <Code>last_6_months</Code> <Code>last_12_months</Code>{" "}
                   <Code>all_time</Code>
                 </DimmedText>
-                <DimmedText size="xs">
-                  {t("metric_widget_syntax_formats")}:{"  "}
-                  <Code>currency</Code> <Code>percent</Code>{" "}
-                  <Code>integer</Code> <Code>decimal</Code> <Code>number</Code>
-                </DimmedText>
                 <DimmedText size="xs" fw={600} mt="0.25rem">
                   {t("metric_widget_syntax_examples")}:
                 </DimmedText>
