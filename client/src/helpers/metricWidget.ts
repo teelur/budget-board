@@ -333,7 +333,10 @@ function resolveGoals(
     case "target":
       return getGoalTargetAmount(goal.amount, goal.initialAmount);
     case "current_amount":
-      return goal.accounts.reduce((n, a) => n + a.currentBalance, 0);
+      return (
+        goal.accounts.reduce((n, a) => n + a.currentBalance, 0) -
+        goal.initialAmount
+      );
     case "monthly_contribution":
       return goal.monthlyContribution;
     default:
