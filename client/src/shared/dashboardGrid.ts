@@ -14,7 +14,7 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     widgetType: "Accounts",
     labelKey: "accounts",
     descriptionKey: "accounts_widget_description",
-    maxInstances: 1,
+    maxInstances: Infinity,
   },
   {
     widgetType: "NetWorth",
@@ -32,7 +32,7 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     widgetType: "SpendingTrends",
     labelKey: "spending_trends",
     descriptionKey: "spending_trends_widget_description",
-    maxInstances: Infinity,
+    maxInstances: 1,
   },
   {
     widgetType: "Metric",
