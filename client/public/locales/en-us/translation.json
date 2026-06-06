@@ -168,7 +168,7 @@
   "delimiter_required_message": "Delimiter is required.",
   "demo_mode": "Demo Mode",
   "demo_mode_banner": "Budget Board is currently running in demo mode. Some functionality may be disabled. Demo data has been provided, and will be reset periodically.",
-  "demo_mode_login_hint": "This is a demo instance. Login credentials have been pre-filled.",
+  "demo_mode_login_hint": "This is a demo instance. Use the pre-filled credentials to log in, or create a new account.",
   "desktop": "Desktop",
   "disable": "Disable",
   "disable_built_in_account_types_blocked_accounts": "{{count}} account(s) are currently using built-in account types. Reassign them first.",
