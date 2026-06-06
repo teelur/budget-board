@@ -65,7 +65,11 @@ const DashboardContent = ({
       return [];
     },
   });
-  const widgets = widgetSettingsQuery.data ?? [];
+  const widgets = React.useMemo(
+    () => widgetSettingsQuery.data ?? [],
+    [widgetSettingsQuery.data],
+  );
+
   const lgLayout = React.useMemo<LayoutItem[]>(
     () =>
       widgets.map((w) => ({
