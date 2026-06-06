@@ -1,5 +1,5 @@
 export interface IBudgetCreateRequest {
-  date: Date;
+  month: string;
   category: string;
   limit: number;
 }
@@ -11,7 +11,7 @@ export interface IBudgetUpdateRequest {
 
 export interface IBudget {
   id: string;
-  date: Date;
+  month: string;
   category: string;
   limit: number;
   userId: string;

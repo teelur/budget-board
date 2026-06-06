@@ -65,14 +65,14 @@ public class BudgetController(
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> Read(DateTime date)
+    public async Task<IActionResult> Read(DateOnly month)
     {
         try
         {
             return Ok(
                 await _budgetService.ReadBudgetsAsync(
                     new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    date
+                    month
                 )
             );
         }
