@@ -142,8 +142,15 @@ export function getMonthsForPeriod(period: string): Date[] {
   }
 }
 
-function isInPeriod(dateStr: string, period: string): boolean {
-  const d = dayjs(dateStr);
+function isInPeriod(isoDateStr: string, period: string): boolean {
+  // Compare using date-only values to avoid timezone-driven month boundary shifts.
+  const normalizedDateStr = isoDateStr.includes("T")
+    ? isoDateStr.slice(0, 10)
+    : isoDateStr;
+
+  const d = dayjs(normalizedDateStr);
+  if (!d.isValid()) return false;
+
   const now = dayjs();
 
   switch (period) {
@@ -280,7 +287,7 @@ function resolveBudgets(
   const category = params["category"];
 
   let budgets = ctx.budgets.filter((b) =>
-    isInPeriod(new Date(b.date).toISOString(), period),
+    isInPeriod(dayjs(b.date).format("YYYY-MM-DD"), period),
   );
 
   if (category) {
