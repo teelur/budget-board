@@ -74,12 +74,20 @@ public class DemoSeedServiceTests
             )
             .Returns(Task.CompletedTask);
 
+        var widgetSettingsService = new WidgetSettingsService(
+            Mock.Of<ILogger<IWidgetSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
         return new DemoSeedService(
             Mock.Of<ILogger<DemoSeedService>>(),
             helper.UserDataContext,
             mockUserManager.Object,
             TestHelper.CreateMockLocalizer<LogStrings>(),
-            mockTransactionService.Object
+            mockTransactionService.Object,
+            widgetSettingsService
         );
     }
 
@@ -243,6 +251,10 @@ public class DemoSeedServiceTests
             .Select(ws => ws.WidgetType)
             .Should()
             .BeEquivalentTo(WidgetSettingsHelpers.DefaultLayouts.Select(dl => dl.WidgetType));
+        widgetSettings.Should().OnlyContain(ws => !string.IsNullOrWhiteSpace(ws.Configuration));
+
+        var accountsWidget = widgetSettings.First(ws => ws.WidgetType == WidgetTypes.Accounts);
+        accountsWidget.Configuration.Should().Be("{}");
     }
 
     [Fact]

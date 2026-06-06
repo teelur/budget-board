@@ -220,6 +220,7 @@ public class WidgetSettingsService(
     {
         return widgetType switch
         {
+            WidgetTypes.Accounts => JsonSerializer.Serialize(new { accountIds = new List<Guid>() }),
             WidgetTypes.NetWorth => JsonSerializer.Serialize(
                 WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
             ),

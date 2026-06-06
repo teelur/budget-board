@@ -16,7 +16,8 @@ public class DemoSeedService(
     UserDataContext userDataContext,
     UserManager<ApplicationUser> userManager,
     IStringLocalizer<LogStrings> logLocalizer,
-    ITransactionService transactionService
+    ITransactionService transactionService,
+    IWidgetSettingsService widgetSettingsService
 ) : IDemoSeedService
 {
     private const int MonthsOfData = 6;
@@ -200,7 +201,7 @@ public class DemoSeedService(
             userDataContext.Accounts.First(a => a.UserID == user.Id && a.Name == "Savings").ID
         );
         SeedBudgetData(user);
-        SeedWidgetSettingsData(user);
+        await SeedWidgetSettingsDataAsync(user);
 
         await userDataContext.SaveChangesAsync();
     }
@@ -525,12 +526,13 @@ public class DemoSeedService(
     /// <param name="user">
     /// The user for whom to seed widget settings.
     /// </param>
-    private void SeedWidgetSettingsData(ApplicationUser user)
+    private async Task SeedWidgetSettingsDataAsync(ApplicationUser user)
     {
         foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
         {
-            userDataContext.WidgetSettings.Add(
-                new WidgetSettings
+            await widgetSettingsService.CreateWidgetSettingsAsync(
+                user.Id,
+                new WidgetSettingsCreateRequest
                 {
                     WidgetType = layout.WidgetType,
                     LgX = layout.LgX,
@@ -539,7 +541,6 @@ public class DemoSeedService(
                     LgH = layout.LgH,
                     SmY = layout.SmY,
                     SmH = layout.SmH,
-                    UserID = user.Id,
                 }
             );
         }
