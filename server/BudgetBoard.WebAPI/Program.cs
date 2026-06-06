@@ -332,9 +332,7 @@ app.MyMapIdentityApi<ApplicationUser>(
     new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
     {
         ExcludeRegisterPost =
-            builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS")
-            || disableLocalAuth
-            || demoModeEnabled,
+            builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS") || disableLocalAuth,
         ExcludeLoginPost = disableLocalAuth,
         ExcludeLogoutPost = false, // Keep logout available even with OIDC
         ExcludeForgotPasswordPost = disableLocalAuth,
