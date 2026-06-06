@@ -17,11 +17,11 @@ public class BudgetServiceTests
         new Faker<BudgetCreateRequest>()
             .RuleFor(
                 b => b.Month,
-                f => new DateOnly(
-                    f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now).Year,
-                    f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now).Month,
-                    1
-                )
+                f =>
+                {
+                    var randomDate = f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now);
+                    return new DateOnly(randomDate.Year, randomDate.Month, 1);
+                }
             )
             .RuleFor(
                 b => b.Category,
@@ -584,15 +584,15 @@ public class BudgetServiceTests
         var budgetFaker = new BudgetFaker(helper.demoUser.Id);
 
         var januaryBudget = budgetFaker.Generate();
-        januaryBudget.Month = new DateOnly(2026, 1, 15);
+        januaryBudget.Month = new DateOnly(2026, 1, 1);
         januaryBudget.Category = "January Budget";
 
         var februaryBudget = budgetFaker.Generate();
-        februaryBudget.Month = new DateOnly(2026, 2, 15);
+        februaryBudget.Month = new DateOnly(2026, 2, 1);
         februaryBudget.Category = "February Budget";
 
         var marchBudget = budgetFaker.Generate();
-        marchBudget.Month = new DateOnly(2026, 3, 15);
+        marchBudget.Month = new DateOnly(2026, 3, 1);
         marchBudget.Category = "March Budget";
 
         helper.UserDataContext.Budgets.AddRange([januaryBudget, februaryBudget, marchBudget]);
