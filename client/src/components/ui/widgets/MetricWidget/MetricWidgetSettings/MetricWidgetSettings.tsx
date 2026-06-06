@@ -26,6 +26,7 @@ import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
@@ -49,6 +50,7 @@ const MetricWidgetSettings = ({
   const { request } = useAuth();
   const { allTransactionCategories } = useTransactionCategories();
   const queryClient = useQueryClient();
+  const { dayjs } = useLocale();
 
   const titleField = useField({ initialValue: "" });
   const valueField = useField({ initialValue: "" });
@@ -103,17 +105,17 @@ const MetricWidgetSettings = ({
   });
 
   const currentMonth = React.useMemo(() => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), 1);
-  }, []);
+    const now = dayjs();
+    return now.startOf("month").toDate();
+  }, [dayjs]);
 
   const budgetsQuery = useQuery({
-    queryKey: ["budgets", currentMonth],
+    queryKey: ["budgets", dayjs(currentMonth).format("YYYY-MM")],
     queryFn: async (): Promise<IBudget[]> => {
       const res: AxiosResponse = await request({
         url: "/api/budget",
         method: "GET",
-        params: { date: currentMonth },
+        params: { month: dayjs(currentMonth).format("YYYY-MM-DD") },
       });
 
       if (res.status === 200) {
