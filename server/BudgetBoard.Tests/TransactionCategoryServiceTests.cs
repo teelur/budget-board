@@ -271,7 +271,7 @@ public class TransactionCategoryServiceTests
     }
 
     [Fact]
-    public async Task ReadTransactionCategoriesAsync_WhenCalledWithValidData_ShouldReturnCustomAndDefaultCategories()
+    public async Task ReadTransactionCategoriesAsync_WhenCalledWithValidData_ShouldReturnCustomSpecialAndDefaultCategories()
     {
         // Arrange
         var helper = new TestHelper();
@@ -296,17 +296,23 @@ public class TransactionCategoryServiceTests
 
         // Assert
         var expectedCustomCategories = transactionCategories.Select(t => new CategoryResponse(t));
+        var expectedSpecialCategories =
+            TransactionCategoriesConstants.SpecialTransactionCategories.Select(
+                tc => new CategoryResponse(tc)
+            );
         var expectedDefaultCategories =
             TransactionCategoriesConstants.DefaultTransactionCategories.Select(
                 tc => new CategoryResponse(tc)
             );
-        var expectedAll = expectedCustomCategories.Concat(expectedDefaultCategories);
+        var expectedAll = expectedCustomCategories
+            .Concat(expectedSpecialCategories)
+            .Concat(expectedDefaultCategories);
 
         result.Should().BeEquivalentTo(expectedAll);
     }
 
     [Fact]
-    public async Task ReadTransactionCategoriesAsync_WhenDefaultsDisabled_ShouldReturnOnlyCustomCategories()
+    public async Task ReadTransactionCategoriesAsync_WhenDefaultsDisabled_ShouldReturnSpecialAndCustomCategories()
     {
         // Arrange
         var helper = new TestHelper();
@@ -340,7 +346,13 @@ public class TransactionCategoryServiceTests
 
         // Assert
         var expectedCustomCategories = transactionCategories.Select(t => new CategoryResponse(t));
-        result.Should().BeEquivalentTo(expectedCustomCategories);
+        var expectedSpecialCategories =
+            TransactionCategoriesConstants.SpecialTransactionCategories.Select(
+                tc => new CategoryResponse(tc)
+            );
+        var expectedAll = expectedCustomCategories.Concat(expectedSpecialCategories);
+
+        result.Should().BeEquivalentTo(expectedAll);
         result
             .Should()
             .NotContainEquivalentOf(

@@ -2,7 +2,18 @@
 
 public static class TransactionCategoriesConstants
 {
-    public static readonly IEnumerable<ITransactionCategory> DefaultTransactionCategories =
+    public static readonly IReadOnlyCollection<ITransactionCategory> SpecialTransactionCategories =
+        new List<ITransactionCategory>(
+            [
+                new TransactionCategoryBase
+                {
+                    Value = "Hide from Budgets",
+                    Parent = "",
+                    CategoryType = TransactionCategoryTypes.Expense,
+                },
+            ]
+        );
+    public static readonly IReadOnlyCollection<ITransactionCategory> DefaultTransactionCategories =
         new List<ITransactionCategory>(
             [
                 new TransactionCategoryBase
@@ -315,12 +326,6 @@ public static class TransactionCategoriesConstants
                 {
                     Value = "Sports",
                     Parent = "Health & Fitness",
-                    CategoryType = TransactionCategoryTypes.Expense,
-                },
-                new TransactionCategoryBase
-                {
-                    Value = "Hide from Budgets",
-                    Parent = "",
                     CategoryType = TransactionCategoryTypes.Expense,
                 },
                 new TransactionCategoryBase
