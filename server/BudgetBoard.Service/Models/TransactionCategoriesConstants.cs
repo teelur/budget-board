@@ -2,7 +2,7 @@
 
 public static class TransactionCategoriesConstants
 {
-    public static readonly IEnumerable<ITransactionCategory> SpecialTransactionCategories =
+    public static readonly IReadOnlyCollection<ITransactionCategory> SpecialTransactionCategories =
         new List<ITransactionCategory>(
             [
                 new TransactionCategoryBase
@@ -13,7 +13,7 @@ public static class TransactionCategoriesConstants
                 },
             ]
         );
-    public static readonly IEnumerable<ITransactionCategory> DefaultTransactionCategories =
+    public static readonly IReadOnlyCollection<ITransactionCategory> DefaultTransactionCategories =
         new List<ITransactionCategory>(
             [
                 new TransactionCategoryBase
