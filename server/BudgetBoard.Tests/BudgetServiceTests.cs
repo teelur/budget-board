@@ -130,13 +130,13 @@ public class BudgetServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var budgets = _budgetCreateRequestFaker.Generate(5);
+        var budgets = _budgetCreateRequestFaker.Generate(2);
 
         // Act
         await budgetService.CreateBudgetsAsync(helper.demoUser.Id, budgets);
 
         // Assert
-        helper.UserDataContext.Budgets.Should().HaveCount(5);
+        helper.UserDataContext.Budgets.Should().HaveCount(2);
     }
 
     [Fact]

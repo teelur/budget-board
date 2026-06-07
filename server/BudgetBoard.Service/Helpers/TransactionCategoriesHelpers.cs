@@ -111,6 +111,13 @@ internal static class TransactionCategoriesHelpers
             userData.TransactionCategories.Select(tc => new CategoryResponse(tc)).ToList()
         );
 
+        // Special categories are always included, regardless of user settings.
+        allTransactionCategories.AddRange(
+            TransactionCategoriesConstants
+                .SpecialTransactionCategories.Select(tc => new CategoryResponse(tc))
+                .ToList()
+        );
+
         if (userData.UserSettings?.DisableBuiltInTransactionCategories != true)
         {
             allTransactionCategories.AddRange(
