@@ -235,13 +235,7 @@ public class BudgetService(
             tc => new TransactionCategoryBase { Value = tc.Value, Parent = tc.Parent }
         );
 
-        var allCategories =
-            userData.UserSettings?.DisableBuiltInTransactionCategories == true
-                ? customCategories
-                : TransactionCategoriesConstants.DefaultTransactionCategories.Concat(
-                    customCategories
-                );
-
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
         if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
         {
             var childBudgetsForMonth = GetChildBudgetsForMonth(
