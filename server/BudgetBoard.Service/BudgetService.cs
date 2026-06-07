@@ -153,7 +153,6 @@ public class BudgetService(
         budget.Limit = request.Limit;
 
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
-
         if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
         {
             var childBudgetsLimitTotal = GetBudgetChildrenLimit(
@@ -231,10 +230,6 @@ public class BudgetService(
 
         _userDataContext.Budgets.Remove(budget);
 
-        var customCategories = userData.TransactionCategories.Select(
-            tc => new TransactionCategoryBase { Value = tc.Value, Parent = tc.Parent }
-        );
-
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
         if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
         {
@@ -260,7 +255,6 @@ public class BudgetService(
     )
     {
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
-
         var childBudgets = userData.Budgets.Where(b =>
             !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)
             && TransactionCategoriesHelpers
