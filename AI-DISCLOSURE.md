@@ -6,70 +6,58 @@ While this project is human-designed, developed, reviewed, and tested, I do use 
 
 ## General Philosophy
 
-This project predates the widespread availability of LLM-based AI tools, and thus a majority of the core architecture of the project was created without any AI assistance. Since early 2025, I have used AI tools as part of my workflow, mostly due to some of the benefits I have found in my professional work.
+This project predates the widespread availability of LLM-based AI tools, and thus a majority of the core architecture of the project was created without any AI assistance. Since early 2025, I have used AI tools as part of my workflow, mostly due to some of the benefits I have found in my professional work as a developer.
 
-AI tools can be incredibly helpful for certain tasks, but they cannot replace human judgment. I generally will lean on AI tools for tasks like:
-
-- Debugging unexpected behavior
-- Brainstorming high-level concepts
-- PR review feedback
-- Scaffolding code with established patterns
-- Other high-effort, low-complexity tasks
-
-My general philosophy is to treat AI tools as an overly eager intern/junior developer. They can provide interesting suggestions and can be helpful with some hand-holding, but should not be trusted with high-stakes features.
+My general philosophy is to treat AI tools as an overly eager intern/junior developer. They can provide interesting suggestions and can be helpful with some hand-holding, but should not be trusted with high-stakes features. I've found it to be pretty helpful with smaller, well-defined tasks, but larger, more complex tasks tend to require too much iteration to be worth it.
 
 ---
 
-## Usage Breakdown By Area
+## Usage Breakdown
 
-The usage of AI tools varies across the different areas of the project. I've broken down each area in the sections below. This list isn't comprehensive, but should give a general idea of what my workflow looks like.
+There are a few areas where I do and explicitly do not use AI tools.
 
-### Server (`server/`)
+### Where AI is Helpful
 
-A lot of the server code is high-stakes, since it handles data persistence, user authentication and authorization, and other critical paths. For this reason, I don't typically use AI tools much for the server side.
+#### Brainstorming
 
-| AI Used For                        | AI Not Used For                                                                                                  |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Scaffolding unit tests             | User authorization and authentication logic                                                                      |
-| Misc high-effort, repetitive tasks | Constructive and destructive operations (e.g. database writes, API calls)                                        |
-|                                    | New features without clear prior art or patterns to scaffold from (e.g. new algorithms, complex data processing) |
-|                                    | Database schema                                                                                                  |
+Typically at the start of a more complex feature, I will use AI tools to generate markdown documents that list out my thoughts on how to approach the implementation. It's super helpful to be able to gather my thoughts in a conversational format and then take that conversation and boil it down into a concise design doc that I can refer back to as I implement the feature.
 
----
+#### UI Prototyping
 
-### Client (`client/`)
+When I'm designing a new UI component, I like to be able to quickly put together a basic prototype to get a feel for how the interaction with the component will work. AI tools are helpful for throwing together some basic code to get something to show up with some garbage data, which I can then use to build out the backend logic.
 
-While there are some aspects of the client code that are high-stakes, such as the authentication flows, most of the client code is visual, so I tend to lean on AI tools more here.
+#### UI Styling
 
-| AI Used For                             | AI Not Used For                            |
-| --------------------------------------- | ------------------------------------------ |
-| Prototyping UI components               | User authentication and authorization code |
-| Debugging React build issues            | Constructive and destructive operations    |
-| Brainstorming high-level UI/UX concepts | New features without clear prior art       |
-| UI styling and CSS                      |                                            |
+I work on .NET enterprise software professionally, so UI design isn't my strong suit. I generally have an idea in mind of what I want things to look like, but struggle to make the CSS do what I want. AI tools are very helpful in figuring out the right CSS to get it done.
 
----
+#### PR Reviews
 
-### Build Infrastructure
+Adding the Copilot reviewer to GitHub PRs has been pretty helpful in getting another set of "eyes" on changelists. I will always do self-review of the code, but as a solo maintainer, it's nice to have some additional feedback on the code.
 
-The build infrastructure (CI/CD pipelines, Dockerfiles, etc.) was largely set up before AI tools were widely available, so it is mostly human-authored.
+#### Unit Test Scaffolding
 
-| AI Used For                                                                 | AI Not Used For                     |
-| --------------------------------------------------------------------------- | ----------------------------------- |
-| Debugging build issues                                                      | Setting up the build infrastructure |
-| Finding appropriate documentation for build tools and configuration options | Creating Dockerfiles                |
+Unit tests are like 80% boilerplate and 20% actual brain power. AI is very helpful in scaffolding up a bunch of tests, and then going back through and cleaning them up.
 
----
+#### Other Misc Repetitive or Low-Complexity Tasks
 
-### Documentation
+There are a lot of other small, repetitive tasks that come up in development that start to make this feel like a job rather than something I work on for fun. Adding features with prior art, updating similar changes across several components, and other low-risk, high-effort things. AI tools can be helpful in minimizing the time spent on those tasks.
 
-While I have experimented with using AI tools to generate documentation, I have found that it is more work to get the generated documentation to not be overly-verbose slop than it is to just write it myself.
+### Where AI is Not Helpful
 
-| AI Used For                                    | AI Not Used For           |
-| ---------------------------------------------- | ------------------------- |
-| Some of the styling and formatting in the wiki | All documentation content |
-| Debugging Docusaurus build issues              |                           |
+#### High-Stakes Code
 
----
+I avoid leaning on AI tools for things like authentication and authorization logic, database schema design, and other critical paths. There are a couple of reasons:
 
-_Last updated: 2026-05-31_
+- The cost of mistakes here is very high, so I want to ensure that it is done right the first time.
+- It's important to have a good understanding of what the underlying logic looks like, so that debugging issues later is easier.
+- There typically isn't a lot of prior art to scaffold from, so I need to be sure it is designed in a way that is effective and maintainable.
+
+I will typically still use AI to ask questions and get ideas, but I won't rely on it to generate the actual code for these areas.
+
+#### Documentation Content
+
+I have tried to use AI tools to generate documentation content in the past, mostly because I don't particularly enjoy writing it. I've found that it doesn't really make the process any easier, just different. The generated content is often overly verbose and requires a lot of editing to get it to not be slop, and at that point, it is just as easy to write it myself.
+
+It is helpful for grammar and spelling checks, but I don't let it mess with phrasing.
+
+_Last updated: 2026-06-08_
