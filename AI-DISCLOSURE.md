@@ -14,7 +14,7 @@ My general philosophy is to treat AI tools as an overly eager intern/junior deve
 
 ## Usage Breakdown
 
-There are a few areas where I do and explicitly do not use AI tools.
+There are a few areas where I do use AI tools and where I explicitly do not.
 
 ### Where AI is Helpful
 
