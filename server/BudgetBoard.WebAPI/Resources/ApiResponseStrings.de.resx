@@ -128,9 +128,9 @@
     <value>Die Konfiguration des SMTP-Hosts fehlt. Bitte einen Wert für EMAIL_SMTP_HOST setzen.</value>
   </data>
   <data name="DemoModeNotAllowed" xml:space="preserve">
-    <value>This action is not allowed in demo mode.</value>
+    <value>Diese Aktion ist im Demo-Modus nicht zulässig.</value>
   </data>
   <data name="DefaultWidgetSeedingFailedError" xml:space="preserve">
-    <value>Unable to initialize default dashboard widgets.</value>
+    <value>Die Standard-Dashboard-Widgets können nicht initialisiert werden.</value>
   </data>
 </root>
