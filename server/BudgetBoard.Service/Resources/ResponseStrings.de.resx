@@ -494,46 +494,46 @@
     <value>Bei der Synchronisierung des LunchFlow-Kontos „{0}“ ist ein unerwarteter Fehler aufgetreten.</value>
   </data>
   <data name="AccountTypeCreateDuplicateNameError" xml:space="preserve">
-    <value>An account type with this name already exists.</value>
+    <value>Ein Kontotyp mit diesem Namen existiert bereits.</value>
   </data>
   <data name="AccountTypeCreateEmptyNameError" xml:space="preserve">
-    <value>The account type name cannot be empty.</value>
+    <value>Der Name des Kontotyps darf nicht leer sein.</value>
   </data>
   <data name="AccountTypeCreateSameNameAsParentError" xml:space="preserve">
-    <value>The account type name cannot be the same as its parent.</value>
+    <value>Der Name des Kontotyps darf nicht mit dem seines übergeordneten Kontotyps übereinstimmen.</value>
   </data>
   <data name="AccountTypeCreateParentNotFoundError" xml:space="preserve">
-    <value>The parent account type does not exist.</value>
+    <value>Der übergeordnete Kontotyp existiert nicht.</value>
   </data>
   <data name="AccountTypeNotFoundError" xml:space="preserve">
-    <value>The account type you are trying to access does not exist.</value>
+    <value>Der Kontotyp, auf den Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="AccountTypeUpdateNotFoundError" xml:space="preserve">
-    <value>The account type you are trying to update does not exist.</value>
+    <value>Der Kontotyp, den Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="AccountTypeUpdateDuplicateNameError" xml:space="preserve">
-    <value>An account type with this name already exists.</value>
+    <value>Ein Kontotyp mit diesem Namen existiert bereits.</value>
   </data>
   <data name="AccountTypeUpdateEmptyNameError" xml:space="preserve">
-    <value>The account type name cannot be empty.</value>
+    <value>Der Name des Kontotyps darf nicht leer sein.</value>
   </data>
   <data name="AccountTypeUpdateSameNameAsParentError" xml:space="preserve">
-    <value>The account type name cannot be the same as its parent.</value>
+    <value>Der Name des Kontotyps darf nicht mit dem seines übergeordneten Kontotyps übereinstimmen.</value>
   </data>
   <data name="AccountTypeUpdateParentNotFoundError" xml:space="preserve">
-    <value>The parent account type does not exist.</value>
+    <value>Der übergeordnete Kontotyp existiert nicht.</value>
   </data>
   <data name="AccountTypeDeleteNotFoundError" xml:space="preserve">
-    <value>The account type you are trying to delete does not exist.</value>
+    <value>Der Kontotyp, den Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="AccountTypeDeleteInUseByAccountsError" xml:space="preserve">
-    <value>The account type you are trying to delete is in use by existing accounts.</value>
+    <value>Der Kontotyp, den Sie löschen möchten, wird bereits von anderen Konten verwendet.</value>
   </data>
   <data name="AccountTypeDeleteHasChildrenError" xml:space="preserve">
-    <value>The account type you are trying to delete has child types. Please reassign or delete the child types first.</value>
+    <value>Der Kontotyp, den Sie löschen möchten, hat untergeordnete Typen. Bitte ordnen Sie die untergeordneten Typen zunächst neu zu oder löschen Sie sie.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
-    <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
+    <value>Die angegebene Kontotyp-Klassifizierung ist ungültig. Gültige Werte sind "Vermögenswert" und "Verbindlichkeit".</value>
   </data>
   <data name="SimpleFin" xml:space="preserve">
     <value>SimpleFIN</value>
@@ -542,45 +542,45 @@
     <value>LunchFlow</value>
   </data>
   <data name="AutomaticRuleInvalidAccountIdError" xml:space="preserve">
-    <value>The account ID '{0}' is not a valid GUID.</value>
+    <value>Die Konto-ID '{0}' ist keine gültige GUID.</value>
   </data>
   <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
-    <value>Unsupported operator '{0}' for Account field.</value>
+    <value>Der Operator '{0}' wird für das Feld "Konto" nicht unterstützt.</value>
   </data>
   <data name="AssetTypeCreateDuplicateNameError" xml:space="preserve">
-    <value>An asset type with that name already exists.</value>
+    <value>Es gibt bereits eine Vermögensart mit diesem Namen.</value>
   </data>
   <data name="AssetTypeCreateEmptyNameError" xml:space="preserve">
-    <value>The asset type name cannot be empty.</value>
+    <value>Der Name der Vermögensart darf nicht leer sein.</value>
   </data>
   <data name="AssetTypeCreateSameNameAsParentError" xml:space="preserve">
-    <value>The asset type name cannot be the same as its parent.</value>
+    <value>Der Name der Vermögensart darf nicht mit dem der übergeordneten Vermögensart übereinstimmen.</value>
   </data>
   <data name="AssetTypeCreateParentNotFoundError" xml:space="preserve">
-    <value>The parent asset type does not exist.</value>
+    <value>Die übergeordnete Vermögensart existiert nicht.</value>
   </data>
   <data name="AssetTypeUpdateNotFoundError" xml:space="preserve">
-    <value>The asset type you are trying to update does not exist.</value>
+    <value>Die Vermögensart, die Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="AssetTypeUpdateDuplicateNameError" xml:space="preserve">
-    <value>An asset type with that name already exists.</value>
+    <value>Es gibt bereits eine Vermögensart mit diesem Namen.</value>
   </data>
   <data name="AssetTypeUpdateEmptyNameError" xml:space="preserve">
-    <value>The asset type name cannot be empty.</value>
+    <value>Der Name der Vermögensart darf nicht leer sein.</value>
   </data>
   <data name="AssetTypeUpdateSameNameAsParentError" xml:space="preserve">
-    <value>The asset type name cannot be the same as its parent.</value>
+    <value>Der Name der Vermögensart darf nicht mit dem der übergeordneten Vermögensart übereinstimmen.</value>
   </data>
   <data name="AssetTypeUpdateParentNotFoundError" xml:space="preserve">
-    <value>The parent asset type does not exist.</value>
+    <value>Die übergeordnete Vermögensart existiert nicht.</value>
   </data>
   <data name="AssetTypeDeleteNotFoundError" xml:space="preserve">
-    <value>The asset type you are trying to delete does not exist.</value>
+    <value>Die Vermögensart, die Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
-    <value>Built-in asset types cannot be re-enabled because one or more custom asset types share a name with a built-in type. Please rename or remove the conflicting custom types first.</value>
+    <value>Vordefinierte Vermögensarten können nicht wieder aktiviert werden, da ein oder mehrere benutzerdefinierte Vermögensarten denselben Namen wie ein vordefinierter Typ haben. Bitte benennen Sie die in Konflikt stehenden benutzerdefinierten Typen zunächst um oder entfernen Sie sie.</value>
   </data>
   <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
-    <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
+    <value>Vordefinierte Vermögensarten können nicht deaktiviert werden, da sie derzeit von bestehenden Vermögenswerten oder benutzerdefinierten Vermögensarten verwendet werden.</value>
   </data>
 </root>
