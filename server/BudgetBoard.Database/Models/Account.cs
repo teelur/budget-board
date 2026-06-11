@@ -13,12 +13,12 @@ public class Account
     /// <summary>
     /// Name of the account.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Identifier for the associated financial institution, if any.
     /// </summary>
-    public Guid? InstitutionID { get; set; } = null;
+    public required Guid InstitutionID { get; set; }
 
     /// <summary>
     /// Reference to the associated financial institution.
@@ -28,7 +28,7 @@ public class Account
     /// <summary>
     /// Type of the account.
     /// </summary>
-    public string? Type { get; set; } = null;
+    public string Type { get; set; } = string.Empty;
 
     /// <summary>
     /// Indicates whether transactions for this account are hidden from views.
@@ -53,12 +53,12 @@ public class Account
     /// <summary>
     /// Interest rate for the account.
     /// </summary>
-    public decimal? InterestRate { get; set; } = null;
+    public decimal InterestRate { get; set; } = 0.0M;
 
     /// <summary>
     /// Source of the account data.
     /// </summary>
-    public string Source { get; set; } = string.Empty;
+    public string Source { get; set; } = AccountSource.Manual;
 
     /// <summary>
     /// Collection of transactions associated with the account.
