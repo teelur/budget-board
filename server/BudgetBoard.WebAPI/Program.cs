@@ -1,4 +1,5 @@
 using BudgetBoard.Database.Data;
+using BudgetBoard.Database.Helpers;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;

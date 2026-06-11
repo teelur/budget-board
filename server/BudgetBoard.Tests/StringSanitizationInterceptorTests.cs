@@ -1,4 +1,3 @@
-using Bogus;
 using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using FluentAssertions;
