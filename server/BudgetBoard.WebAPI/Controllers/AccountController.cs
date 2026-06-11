@@ -72,30 +72,6 @@ public class AccountController(
         }
     }
 
-    [HttpGet("{guid}")]
-    [Authorize]
-    public async Task<IActionResult> Read(Guid guid)
-    {
-        try
-        {
-            return Ok(
-                await _accountService.ReadAccountsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    guid
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
-    }
-
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> Update([FromBody] AccountUpdateRequest editedAccount)

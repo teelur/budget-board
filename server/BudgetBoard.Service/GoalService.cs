@@ -493,7 +493,7 @@ public class GoalService(
             if (balance == null || balance.Amount == 0)
                 continue;
 
-            var interestRate = account.InterestRate ?? 0;
+            var interestRate = account.InterestRate;
             var weightedInterestRate = interestRate * balance.Amount;
 
             if (weightedInterestRate == 0)
