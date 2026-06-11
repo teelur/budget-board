@@ -234,7 +234,7 @@ public class DemoSeedService(
             Name = "Checking",
             Type = "Checking",
             InstitutionID = greenfieldBank.ID,
-            Source = "Manual",
+            Source = AccountSource.Manual,
             Index = 0,
             UserID = user.Id,
         };
@@ -243,7 +243,7 @@ public class DemoSeedService(
             Name = "Savings",
             Type = "Savings",
             InstitutionID = greenfieldBank.ID,
-            Source = "Manual",
+            Source = AccountSource.Manual,
             Index = 1,
             UserID = user.Id,
         };
@@ -252,7 +252,7 @@ public class DemoSeedService(
             Name = "Visa Rewards",
             Type = "Credit Card",
             InstitutionID = summitCredit.ID,
-            Source = "Manual",
+            Source = AccountSource.Manual,
             Index = 2,
             UserID = user.Id,
         };
@@ -261,7 +261,7 @@ public class DemoSeedService(
             Name = "Brokerage",
             Type = "Investment",
             InstitutionID = summitCredit.ID,
-            Source = "Manual",
+            Source = AccountSource.Manual,
             Index = 3,
             UserID = user.Id,
         };
