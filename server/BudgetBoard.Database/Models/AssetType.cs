@@ -1,5 +1,8 @@
 namespace BudgetBoard.Database.Models;
 
+/// <summary>
+/// Represents a type of asset.
+/// </summary>
 public class AssetType
 {
     /// <summary>

@@ -26,7 +26,7 @@ public class Account
     public Institution? Institution { get; set; } = null;
 
     /// <summary>
-    /// Type of the account (e.g., checking, savings).
+    /// Type of the account.
     /// </summary>
     public string? Type { get; set; } = null;
 
@@ -46,17 +46,17 @@ public class Account
     public DateTime? Deleted { get; set; } = null;
 
     /// <summary>
-    /// Optional ordering index for the account.
+    /// Ordering index for the account.
     /// </summary>
     public int Index { get; set; } = 0;
 
     /// <summary>
-    /// Interest rate for the account, if applicable.
+    /// Interest rate for the account.
     /// </summary>
     public decimal? InterestRate { get; set; } = null;
 
     /// <summary>
-    /// Source of the account data (e.g., manual, simplefin).
+    /// Source of the account data.
     /// </summary>
     public string Source { get; set; } = string.Empty;
 
