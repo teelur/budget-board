@@ -39,5 +39,6 @@
   "advanced_settings": "Расширенные настройки",
   "after": "После",
   "all": "Всё",
-  "all_children_will_also_be_deleted": "Все дети также будут удалены."
+  "all_children_will_also_be_deleted": "Все дети также будут удалены.",
+  "apply_changes": "Применить изменения"
 }
