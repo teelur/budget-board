@@ -7,6 +7,8 @@
 [![Build and Publish](https://github.com/teelur/budget-board/actions/workflows/docker-image-dev-build.yml/badge.svg)](https://github.com/teelur/budget-board/actions/workflows/docker-image-dev-build.yml)
 ![GitHub Release](https://img.shields.io/github/v/release/teelur/budget-board)
 
+<a href="https://trendshift.io/repositories/14793" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14793" alt="teelur%2Fbudget-board | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+
 A simple app for tracking monthly spending and working towards financial goals.
 
 ## Getting Started
