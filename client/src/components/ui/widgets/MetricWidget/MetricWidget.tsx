@@ -17,7 +17,6 @@ import {
 } from "~/helpers/metricWidget";
 import { IBudget } from "~/models/budget";
 import { IGoalResponse } from "~/models/goal";
-import { IAccountResponse } from "~/models/account";
 import { IAccountType } from "~/models/accountType";
 import { ITransaction } from "~/models/transaction";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -26,8 +25,14 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
-import { accountTypesQueryKey, accountsQueryKey, budgetsQueryKey, goalsQueryKey, transactionsQueryKey, widgetSettingsQueryKey } from "~/helpers/requests";
-
+import {
+  accountTypesQueryKey,
+  budgetsQueryKey,
+  goalsQueryKey,
+  transactionsQueryKey,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 interface MetricWidgetProps {
   widgetId: string;
@@ -178,18 +183,8 @@ const MetricWidget = ({
     enabled: requirements.needsGoals,
   });
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as IAccountResponse[];
-      return [];
-    },
-    enabled: requirements.needsAccounts,
-  });
+  // TODO: Figure out how important the enabled flag is.
+  const accountsQuery = useAccountsQuery();
 
   const accountTypesQuery = useQuery({
     queryKey: [accountTypesQueryKey],

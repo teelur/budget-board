@@ -13,10 +13,9 @@ import ConditionItem from "./ConditionItem/ConditionItem";
 import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { notifications } from "@mantine/notifications";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import {
   translateAxiosError,
-  accountsQueryKey,
   transactionsQueryKey,
   automaticRulesQueryKey,
 } from "~/helpers/requests";
@@ -24,8 +23,8 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { IAccountResponse } from "~/models/account";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -47,21 +46,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const queryClient = useQueryClient();
   const doDeleteAutomaticRule = useMutation({

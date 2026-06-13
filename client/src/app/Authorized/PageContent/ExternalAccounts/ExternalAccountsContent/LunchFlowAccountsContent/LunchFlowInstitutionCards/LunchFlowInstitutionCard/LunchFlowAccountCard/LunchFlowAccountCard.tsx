@@ -21,7 +21,8 @@ import {
   lunchFlowAccountQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
-import { AccountSource, IAccountResponse } from "~/models/account";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { AccountSource } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -50,21 +51,7 @@ const LunchFlowAccountCard = (
   const { dayjs, dateFormat, intlLocale, dayjsLocale } = useLocale();
   const { request } = useAuth();
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const lunchFlowAccountsQuery = useQuery({
     queryKey: [lunchFlowAccountQueryKey],

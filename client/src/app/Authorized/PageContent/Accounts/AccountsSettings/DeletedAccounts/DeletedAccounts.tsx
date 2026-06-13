@@ -4,11 +4,10 @@ import { AxiosResponse } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { IAccountResponse } from "~/models/account";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedAccountCard from "./DeletedAccountCard";
-import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
-
+import { institutionsQueryKey } from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 const DeletedAccounts = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -30,21 +29,7 @@ const DeletedAccounts = (): React.ReactNode => {
     },
   });
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const getDeletedAccountsContent = (): React.ReactNode => {
     if (accountsQuery.isPending) {

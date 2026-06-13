@@ -18,14 +18,13 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
-import { IAccountResponse } from "~/models/account";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { accountsQueryKey, transactionsQueryKey } from "~/helpers/requests";
-
+import { transactionsQueryKey } from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -43,7 +42,8 @@ const ConfigureTransactions = (
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { request } = useAuth();
 
   // The raw CSV data imported from the user's file.
@@ -119,21 +119,7 @@ const ConfigureTransactions = (
     },
   });
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const disableNextButton = () => {
     // Cannot proceed if there are no imported transactions.

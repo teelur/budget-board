@@ -4,16 +4,16 @@ import { mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
-import { AccountTypeClassification, IAccountResponse } from "~/models/account";
+import { AccountTypeClassification } from "~/models/account";
 import { DatesRangeValue } from "@mantine/dates";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
-import { accountsQueryKey, balancesQueryKey } from "~/helpers/requests";
-
+import { balancesQueryKey } from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 const AssetsTab = (): React.ReactNode => {
   const { request } = useAuth();
@@ -53,21 +53,7 @@ const AssetsTab = (): React.ReactNode => {
     },
   });
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const assetAccountTypes = allAccountTypes
     .filter((type) => type.classification === AccountTypeClassification.Asset)
