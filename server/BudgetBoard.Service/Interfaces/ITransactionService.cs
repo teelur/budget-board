@@ -83,7 +83,12 @@ public interface ITransactionService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="transactionIDs">The collection of unique identifiers of the transactions to delete.</param>
-    Task DeleteTransactionBatchAsync(Guid userGuid, IEnumerable<Guid> transactionIDs);
+    /// <param name="deferSave">If true, defers saving changes to the database.</param>
+    Task DeleteTransactionBatchAsync(
+        Guid userGuid,
+        IEnumerable<Guid> transactionIDs,
+        bool deferSave = false
+    );
 
     /// <summary>
     /// Restores a previously deleted transaction.
@@ -91,6 +96,19 @@ public interface ITransactionService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="transactionID">The unique identifier of the transaction to restore.</param>
     Task RestoreTransactionAsync(Guid userGuid, Guid transactionID);
+
+    /// <summary>
+    /// Restores multiple previously deleted transactions in a single operation.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="transactionIDs">The collection of unique identifiers of the transactions to restore.</param>
+    /// <param name="deferSave">If true, defers saving changes to the database.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task RestoreTransactionBatchAsync(
+        Guid userGuid,
+        IEnumerable<Guid> transactionIDs,
+        bool deferSave = false
+    );
 
     /// <summary>
     /// Splits a transaction into two parts.

@@ -33,6 +33,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -69,6 +70,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -104,6 +106,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -133,6 +136,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -158,7 +162,6 @@ public class AccountServiceTests()
         helper.demoUser.Accounts.Should().HaveCount(1);
         helper.demoUser.Institutions.Single(i => i.ID == institution.ID).Deleted.Should().BeNull();
     }
-
     #endregion
 
     #region ReadAccountsAsync
@@ -170,6 +173,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -193,7 +197,6 @@ public class AccountServiceTests()
         result[0].Should().BeEquivalentTo(new AccountResponse(firstAccount));
         result[1].Should().BeEquivalentTo(new AccountResponse(secondAccount));
     }
-
     #endregion
 
     #region UpdateAccountAsync
@@ -205,6 +208,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -234,6 +238,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -267,6 +272,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -333,6 +339,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -359,6 +366,7 @@ public class AccountServiceTests()
 
     #endregion
 
+    #region DeleteAccountAsync
     [Fact]
     public async Task DeleteAccountAsync_ExistingAccount_ShouldDeleteAccount()
     {
@@ -372,6 +380,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -390,6 +399,7 @@ public class AccountServiceTests()
         var deletedAccount = helper.demoUser.Accounts.Single(a => a.ID == account.ID);
         deletedAccount.Deleted.Should().Be(fakeDate);
         deletedAccount.Source.Should().Be(AccountSource.Manual);
+        deletedAccount.Type.Should().Be(string.Empty);
     }
 
     [Fact]
@@ -400,6 +410,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -431,10 +442,13 @@ public class AccountServiceTests()
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.Now).Returns(fakeDate);
 
+        var transactionServiceMock = new Mock<ITransactionService>();
+
         var helper = new TestHelper();
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            transactionServiceMock.Object,
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -456,11 +470,14 @@ public class AccountServiceTests()
 
         // Assert
         helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().Be(fakeDate);
-        helper
+        var deletedTransaction = helper
             .demoUser.Accounts.Single(a => a.ID == account.ID)
-            .Transactions.Single(t => t.ID == transaction.ID)
-            .Deleted.Should()
-            .Be(fakeDate);
+            .Transactions.Single(t => t.ID == transaction.ID);
+        transactionServiceMock.Verify(
+            ts =>
+                ts.DeleteTransactionBatchAsync(helper.demoUser.Id, new[] { transaction.ID }, true),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -476,6 +493,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -510,6 +528,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -538,6 +557,92 @@ public class AccountServiceTests()
     }
 
     [Fact]
+    public async Task DeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldClearLink()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
+        var lunchFlowAccount = lunchFlowAccountFaker.Generate();
+        lunchFlowAccount.LinkedAccountId = account.ID;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().NotBeNull();
+        helper
+            .UserDataContext.LunchFlowAccounts.Single(a => a.ID == lunchFlowAccount.ID)
+            .LinkedAccountId.Should()
+            .BeNull();
+        helper
+            .UserDataContext.LunchFlowAccounts.Single(a => a.ID == lunchFlowAccount.ID)
+            .LastSync.Should()
+            .BeNull();
+    }
+
+    [Fact]
+    public async Task DeleteAccountAsync_WithLinkedSimpleFinAccount_ShouldClearLink()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        var orgFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
+        var org = orgFaker.Generate();
+
+        var simpleFinAccountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, org.ID);
+        var simpleFinAccount = simpleFinAccountFaker.Generate();
+        simpleFinAccount.LinkedAccountId = account.ID;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SimpleFinOrganizations.Add(org);
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().NotBeNull();
+        helper
+            .UserDataContext.SimpleFinAccounts.Single(a => a.ID == simpleFinAccount.ID)
+            .LinkedAccountId.Should()
+            .BeNull();
+        helper
+            .UserDataContext.SimpleFinAccounts.Single(a => a.ID == simpleFinAccount.ID)
+            .LastSync.Should()
+            .BeNull();
+    }
+    #endregion
+
+    #region RestoreAccountAsync
+    [Fact]
     public async Task RestoreAccountAsync_ExistingAccount_ShouldRestoreAccount()
     {
         // Arrange
@@ -550,6 +655,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -582,6 +688,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -616,10 +723,13 @@ public class AccountServiceTests()
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
+        var transactionServiceMock = new Mock<ITransactionService>();
+
         var helper = new TestHelper();
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            transactionServiceMock.Object,
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -643,11 +753,11 @@ public class AccountServiceTests()
 
         // Assert
         helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().BeNull();
-        helper
-            .demoUser.Accounts.Single(a => a.ID == account.ID)
-            .Transactions.Single(t => t.ID == transaction.ID)
-            .Deleted.Should()
-            .BeNull();
+        transactionServiceMock.Verify(
+            ts =>
+                ts.RestoreTransactionBatchAsync(helper.demoUser.Id, new[] { transaction.ID }, true),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -663,6 +773,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -686,7 +797,9 @@ public class AccountServiceTests()
         // Assert
         helper.demoUser.Institutions.Single(i => i.ID == institution.ID).Deleted.Should().BeNull();
     }
+    #endregion
 
+    #region OrderAccountsAsync
     [Fact]
     public async Task OrderAccountsAsync_WhenExistingAccounts_ShouldOrderAccounts()
     {
@@ -695,6 +808,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -740,6 +854,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -772,7 +887,9 @@ public class AccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("AccountOrderNotFoundError");
     }
+    #endregion
 
+    #region PermanentlyDeleteAccountAsync
     [Fact]
     public async Task PermanentlyDeleteAccountAsync_ExistingAccount_ShouldRemoveAccount()
     {
@@ -781,6 +898,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -807,6 +925,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -836,6 +955,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -876,6 +996,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -907,6 +1028,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
@@ -933,86 +1055,5 @@ public class AccountServiceTests()
         // Assert
         helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
     }
-
-    [Fact]
-    public async Task DeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldClearLink()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(
-            Mock.Of<ILogger<IAccountService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountFaker = new AccountFaker(helper.demoUser.Id);
-        var account = accountFaker.Generate();
-
-        var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
-        var lunchFlowAccount = lunchFlowAccountFaker.Generate();
-        lunchFlowAccount.LinkedAccountId = account.ID;
-
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
-
-        // Assert
-        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().NotBeNull();
-        helper
-            .UserDataContext.LunchFlowAccounts.Single(a => a.ID == lunchFlowAccount.ID)
-            .LinkedAccountId.Should()
-            .BeNull();
-        helper
-            .UserDataContext.LunchFlowAccounts.Single(a => a.ID == lunchFlowAccount.ID)
-            .LastSync.Should()
-            .BeNull();
-    }
-
-    [Fact]
-    public async Task DeleteAccountAsync_WithLinkedSimpleFinAccount_ShouldClearLink()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(
-            Mock.Of<ILogger<IAccountService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountFaker = new AccountFaker(helper.demoUser.Id);
-        var account = accountFaker.Generate();
-
-        var orgFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
-        var org = orgFaker.Generate();
-
-        var simpleFinAccountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, org.ID);
-        var simpleFinAccount = simpleFinAccountFaker.Generate();
-        simpleFinAccount.LinkedAccountId = account.ID;
-
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.SimpleFinOrganizations.Add(org);
-        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
-
-        // Assert
-        helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().NotBeNull();
-        helper
-            .UserDataContext.SimpleFinAccounts.Single(a => a.ID == simpleFinAccount.ID)
-            .LinkedAccountId.Should()
-            .BeNull();
-        helper
-            .UserDataContext.SimpleFinAccounts.Single(a => a.ID == simpleFinAccount.ID)
-            .LastSync.Should()
-            .BeNull();
-    }
+    #endregion
 }
