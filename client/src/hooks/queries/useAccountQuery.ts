@@ -6,7 +6,9 @@ import { accountsQueryKey } from "~/helpers/requests";
 import { IAccountResponse } from "~/models/account";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-export const useAccountsQuery = () => {
+export const useAccountsQuery = ({
+  enabled = true,
+}: { enabled?: boolean } = {}) => {
   const { request } = useAuth();
   const { t } = useTranslation();
 
@@ -29,5 +31,6 @@ export const useAccountsQuery = () => {
 
       return [];
     },
+    enabled,
   });
 };

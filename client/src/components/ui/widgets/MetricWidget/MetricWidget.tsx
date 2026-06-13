@@ -183,8 +183,9 @@ const MetricWidget = ({
     enabled: requirements.needsGoals,
   });
 
-  // TODO: Figure out how important the enabled flag is.
-  const accountsQuery = useAccountsQuery();
+  const accountsQuery = useAccountsQuery({
+    enabled: requirements.needsAccounts,
+  });
 
   const accountTypesQuery = useQuery({
     queryKey: [accountTypesQueryKey],

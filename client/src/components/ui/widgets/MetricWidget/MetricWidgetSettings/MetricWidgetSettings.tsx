@@ -92,8 +92,7 @@ const MetricWidgetSettings = ({
     enabled: opened,
   });
 
-  // TODO: Figure out how important the enabled flag is.
-  const accountsQuery = useAccountsQuery();
+  const accountsQuery = useAccountsQuery({ enabled: opened });
 
   const currentMonth = React.useMemo(() => {
     const now = dayjs();
