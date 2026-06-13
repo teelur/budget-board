@@ -9,19 +9,19 @@ import { notifications } from "@mantine/notifications";
 import {
   lunchFlowAccountQueryKey,
   translateAxiosError,
+  userQueryKey,
 } from "~/helpers/requests";
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
 import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
 
-
 const LunchFlowAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
   const userQuery = useQuery({
-    queryKey: ["user"],
+    queryKey: [userQueryKey],
     queryFn: async (): Promise<IApplicationUser | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/applicationUser",
@@ -44,7 +44,7 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
         method: "POST",
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [lunchFlowAccountQueryKey],
       });

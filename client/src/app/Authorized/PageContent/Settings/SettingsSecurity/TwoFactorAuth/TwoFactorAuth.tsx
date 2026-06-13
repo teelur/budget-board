@@ -11,7 +11,11 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError, ValidationError } from "~/helpers/requests";
+import {
+  translateAxiosError,
+  userQueryKey,
+  ValidationError,
+} from "~/helpers/requests";
 import { AxiosError, AxiosResponse } from "axios";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
@@ -82,7 +86,7 @@ const TwoFactorAuth = (): React.ReactNode => {
         data: { ...twoFactorAuthData },
       }),
     onSuccess: async (res: AxiosResponse) => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
       await queryClient.invalidateQueries({ queryKey: ["twoFactorAuth"] });
 
       const data = res.data as TwoFactorAuthResponse;

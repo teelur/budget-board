@@ -4,7 +4,11 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError, ValidationError } from "~/helpers/requests";
+import {
+  translateAxiosError,
+  userQueryKey,
+  ValidationError,
+} from "~/helpers/requests";
 import { AxiosError } from "axios";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -18,14 +22,14 @@ const ResetPassword = (): React.ReactNode => {
     initialValue: "",
     validate: hasLength(
       { min: 3 },
-      t("password_min_length_message", { minLength: 3 })
+      t("password_min_length_message", { minLength: 3 }),
     ),
   });
   const newPasswordField = useField<string>({
     initialValue: "",
     validate: hasLength(
       { min: 3 },
-      t("password_min_length_message", { minLength: 3 })
+      t("password_min_length_message", { minLength: 3 }),
     ),
   });
   const confirmNewPasswordField = useField<string>({
@@ -55,7 +59,7 @@ const ResetPassword = (): React.ReactNode => {
         },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
 
       oldPasswordField.reset();
       newPasswordField.reset();
