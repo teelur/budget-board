@@ -21,7 +21,14 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { translateAxiosError , accountsQueryKey, balancesQueryKey, institutionsQueryKey, transactionsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import {
+  translateAxiosError,
+  accountsQueryKey,
+  balancesQueryKey,
+  institutionsQueryKey,
+  transactionsQueryKey,
+  userSettingsQueryKey,
+} from "~/helpers/requests";
 import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -29,9 +36,9 @@ import { IUserSettings } from "~/models/userSettings";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
-import { IAccountResponse } from "~/models/account";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 interface BulkActionBarProps {
   selectedIds: Set<string>;
@@ -134,21 +141,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     },
   });
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const queryClient = useQueryClient();
 
@@ -163,7 +156,10 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     onMutate: async (requests: ITransactionUpdateRequest[]) => {
       await queryClient.cancelQueries({ queryKey: [transactionsQueryKey] });
       const previousTransactions: ITransaction[] =
-        queryClient.getQueryData([transactionsQueryKey, { getHidden: false }]) ?? [];
+        queryClient.getQueryData([
+          transactionsQueryKey,
+          { getHidden: false },
+        ]) ?? [];
       queryClient.setQueryData(
         [transactionsQueryKey, { getHidden: false }],
         (oldTransactions: ITransaction[]) =>
@@ -217,7 +213,10 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     onMutate: async (ids: string[]) => {
       await queryClient.cancelQueries({ queryKey: [transactionsQueryKey] });
       const previousTransactions: ITransaction[] =
-        queryClient.getQueryData([transactionsQueryKey, { getHidden: false }]) ?? [];
+        queryClient.getQueryData([
+          transactionsQueryKey,
+          { getHidden: false },
+        ]) ?? [];
       queryClient.setQueryData(
         [transactionsQueryKey, { getHidden: false }],
         (oldTransactions: ITransaction[]) =>
@@ -248,7 +247,8 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   });
 
   const allTransactions: ITransaction[] =
-    queryClient.getQueryData([transactionsQueryKey, { getHidden: false }]) ?? [];
+    queryClient.getQueryData([transactionsQueryKey, { getHidden: false }]) ??
+    [];
   const selectedTransactions = allTransactions.filter((t) =>
     props.selectedIds.has(t.id),
   );

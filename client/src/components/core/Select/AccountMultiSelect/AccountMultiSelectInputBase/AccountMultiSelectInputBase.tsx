@@ -1,12 +1,8 @@
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
 import { AccountSource, IAccountResponse } from "~/models/account";
-import { AxiosResponse } from "axios";
 import { useTranslation } from "react-i18next";
-import { accountsQueryKey } from "~/helpers/requests";
-
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 export interface AccountMultiSelectInputBaseProps extends MultiSelectProps {
   hideHidden?: boolean;
@@ -23,23 +19,8 @@ const AccountMultiSelectInputBase = ({
   ...props
 }: AccountMultiSelectInputBaseProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const getFilteredAccounts = (): IAccountResponse[] => {
     const sortedAccounts = (accountsQuery.data ?? []).sort((a, b) =>

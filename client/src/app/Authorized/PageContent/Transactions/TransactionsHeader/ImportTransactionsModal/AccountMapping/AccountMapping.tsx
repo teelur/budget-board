@@ -1,17 +1,12 @@
 import { Stack, Divider, Group, Button } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { filterVisibleAccounts } from "~/helpers/accounts";
-import { IAccountResponse } from "~/models/account";
 import AccountMappingItem from "./AccountMappingItem/AccountMappingItem";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { MoveLeftIcon } from "lucide-react";
 import { areStringsEqual } from "~/helpers/utils";
 import { useTranslation } from "react-i18next";
-import { accountsQueryKey } from "~/helpers/requests";
-
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 export interface IAccountItem {
   value: string;
@@ -31,26 +26,11 @@ interface AccountMappingProps {
 
 const AccountMapping = (props: AccountMappingProps) => {
   const { t } = useTranslation();
-  const { request } = useAuth();
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const filteredAccounts: IAccountItem[] = filterVisibleAccounts(
-    accountsQuery.data ?? []
+    accountsQuery.data ?? [],
   )
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((account) => ({
@@ -62,12 +42,12 @@ const AccountMapping = (props: AccountMappingProps) => {
     (t) =>
       !areStringsEqual(
         props.accountNameToAccountIdMap.get(t.account ?? "") ?? "",
-        "exclude"
+        "exclude",
       ) &&
       !areStringsEqual(
         props.accountNameToAccountIdMap.get(t.account ?? "") ?? "",
-        ""
-      )
+        "",
+      ),
   );
 
   return (
@@ -88,7 +68,7 @@ const AccountMapping = (props: AccountMappingProps) => {
               })
             }
           />
-        )
+        ),
       )}
       <Group w="100%">
         <Button

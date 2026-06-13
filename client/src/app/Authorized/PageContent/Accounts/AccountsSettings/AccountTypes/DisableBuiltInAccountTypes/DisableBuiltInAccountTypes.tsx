@@ -1,18 +1,21 @@
 import { Button, Skeleton, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { accountTypesQueryKey, translateAxiosError , accountsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import {
+  accountTypesQueryKey,
+  translateAxiosError,
+  userSettingsQueryKey,
+} from "~/helpers/requests";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { IAccountResponse } from "~/models/account";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { defaultGuid } from "~/models/applicationUser";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 const DisableBuiltInAccountTypes = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -20,21 +23,7 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
   const { allAccountTypes, customAccountTypes } = useAccountTypes();
   const { disableBuiltInAccountTypes } = useUserSettings();
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const queryClient = useQueryClient();
   const doUpdateUserSettings = useMutation({
