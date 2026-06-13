@@ -14,7 +14,7 @@ const PermaDeleteAccountPopover = (
 ): React.ReactNode => {
   const { t } = useTranslation();
 
-  const permenantDeleteAccountMutation = usePermanentDeleteAccountMutation();
+  const permanentDeleteAccountMutation = usePermanentDeleteAccountMutation();
   return (
     <Popover>
       <Popover.Target>
@@ -30,9 +30,9 @@ const PermaDeleteAccountPopover = (
           <Button
             size="xs"
             color="var(--button-color-destructive)"
-            loading={permenantDeleteAccountMutation.isPending}
+            loading={permanentDeleteAccountMutation.isPending}
             onClick={() =>
-              permenantDeleteAccountMutation.mutate(props.accountId)
+              permanentDeleteAccountMutation.mutate(props.accountId)
             }
           >
             {t("permanently_delete_account")}
