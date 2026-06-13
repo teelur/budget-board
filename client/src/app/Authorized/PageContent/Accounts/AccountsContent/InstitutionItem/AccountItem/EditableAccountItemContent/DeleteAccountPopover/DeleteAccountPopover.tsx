@@ -1,48 +1,24 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , accountsQueryKey, institutionsQueryKey} from "~/helpers/requests";
 import { ActionIcon, Button, Checkbox, Popover, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useDeleteAccountMutation } from "~/hooks/mutations/accounts/useDeleteAccountMutation";
 
 interface DeleteAccountPopoverProps {
   accountId: string;
 }
 
 const DeleteAccountPopover = (
-  props: DeleteAccountPopoverProps
+  props: DeleteAccountPopoverProps,
 ): React.ReactNode => {
   const [deleteTransactions, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { request } = useAuth();
 
-  const queryClient = useQueryClient();
+  const deleteAccountMutation = useDeleteAccountMutation();
 
-  const doDeleteAccount = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/account",
-        method: "DELETE",
-        params: { guid: props.accountId, deleteTransactions },
-      }),
-    onSuccess: async () => {
-      // Refetch the accounts and institutions queries immediatly after the account is deleted
-      await queryClient.refetchQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.refetchQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
   return (
     <Popover>
       <Popover.Target>
@@ -61,8 +37,13 @@ const DeleteAccountPopover = (
           />
           <Button
             color="var(--button-color-destructive)"
-            loading={doDeleteAccount.isPending}
-            onClick={() => doDeleteAccount.mutate()}
+            loading={deleteAccountMutation.isPending}
+            onClick={() =>
+              deleteAccountMutation.mutate({
+                accountId: props.accountId,
+                deleteTransactions,
+              })
+            }
           >
             {t("delete_account")}
           </Button>

@@ -1,16 +1,12 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
 import { DatesRangeValue } from "@mantine/dates";
 import { IAccountResponse } from "~/models/account";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
 import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "../core/Select/AccountMultiSelect/AccountMultiSelect";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
-import { accountsQueryKey } from "~/helpers/requests";
-
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 interface AccountsSelectHeaderProps {
   selectedAccountIds: string[];
@@ -24,23 +20,8 @@ const AccountsSelectHeader = (
   props: AccountsSelectHeaderProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   return (
     <Group>

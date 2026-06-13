@@ -12,7 +12,6 @@ import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { IAccountResponse } from "~/models/account";
 import {
   ITransaction,
   ITransactionImportTableData,
@@ -20,8 +19,8 @@ import {
 import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { accountsQueryKey, userSettingsQueryKey } from "~/helpers/requests";
-
+import { userSettingsQueryKey } from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -62,21 +61,7 @@ const DuplicateTransactionTable = (
     },
   });
 
-  const accountsQuery = useQuery({
-    queryKey: [accountsQueryKey],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const accountIDToNameMap = React.useMemo(() => {
     const map = new Map<string, string>();

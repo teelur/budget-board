@@ -2,11 +2,11 @@ import { ActionIcon, Button, Stack } from "@mantine/core";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , accountsQueryKey, institutionsQueryKey} from "~/helpers/requests";
+import { translateAxiosError, institutionsQueryKey } from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import { IInstitution, IInstitutionCreateRequest } from "~/models/institution";
@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useCreateAccountMutation } from "~/hooks/mutations/accounts/useCreateAccountMutation";
 
 const CreateAccount = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -50,7 +51,6 @@ const CreateAccount = () => {
     },
   });
 
-  const queryClient = useQueryClient();
   const doCreateInstitution = useMutation({
     mutationFn: async (newInstitution: IInstitutionCreateRequest) =>
       await request({
@@ -67,32 +67,7 @@ const CreateAccount = () => {
     },
   });
 
-  const doCreateAccount = useMutation({
-    mutationFn: async (newAccount: IAccountCreateRequest) =>
-      await request({
-        url: "/api/account",
-        method: "POST",
-        data: newAccount,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-
-      notifications.show({
-        message: t("account_created_successfully_message"),
-        color: "var(--button-color-confirm)",
-      });
-
-      accountNameField.reset();
-      institutionField.reset();
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
-  });
+  const createAccountMutation = useCreateAccountMutation();
 
   const onCreateAccount = async () => {
     await accountNameField.validate();
@@ -129,11 +104,19 @@ const CreateAccount = () => {
       }
     }
 
-    doCreateAccount.mutate({
-      name: accountNameField.getValue(),
-      institutionID: institutionForAccount.id,
-      source: AccountSource.Manual,
-    } as IAccountCreateRequest);
+    createAccountMutation.mutate(
+      {
+        name: accountNameField.getValue(),
+        institutionID: institutionForAccount.id,
+        source: AccountSource.Manual,
+      } as IAccountCreateRequest,
+      {
+        onSuccess: () => {
+          accountNameField.reset();
+          institutionField.reset();
+        },
+      },
+    );
   };
 
   if (institutionQuery.isPending) {
@@ -172,7 +155,9 @@ const CreateAccount = () => {
             elevation={0}
           />
           <Button
-            loading={doCreateAccount.isPending || doCreateInstitution.isPending}
+            loading={
+              createAccountMutation.isPending || doCreateInstitution.isPending
+            }
             onClick={onCreateAccount}
           >
             {t("submit")}

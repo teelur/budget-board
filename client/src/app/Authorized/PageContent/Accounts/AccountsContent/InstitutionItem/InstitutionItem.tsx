@@ -11,14 +11,10 @@ import { move } from "@dnd-kit/helpers";
 import { IAccountIndexRequest, IAccountResponse } from "~/models/account";
 import React from "react";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { AxiosError } from "axios";
-import { translateAxiosError , accountsQueryKey} from "~/helpers/requests";
-import { notifications } from "@mantine/notifications";
 import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
 import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
 import Card from "~/components/core/Card/Card";
+import { useOrderAccountsMutation } from "~/hooks/mutations/accounts/useOrderAccountsMutation";
 
 interface IInstitutionItemProps {
   institution: IInstitution;
@@ -43,7 +39,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
       .map((a, index) => ({
         ...a,
         index,
-      }))
+      })),
   );
 
   React.useEffect(() => {
@@ -55,7 +51,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
         .map((a, index) => ({
           ...a,
           index,
-        }))
+        })),
     );
   }, [props.institution.accounts]);
 
@@ -69,24 +65,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
     collisionDetector: closestCorners,
   });
 
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
-  const doIndexAccounts = useMutation({
-    mutationFn: async (accounts: IAccountIndexRequest[]) =>
-      await request({
-        url: "/api/account/order",
-        method: "PUT",
-        data: accounts,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
+  const orderAccountsMutation = useOrderAccountsMutation();
 
   const totalBalance = props.institution.accounts
     .filter((a) => a.deleted === null)
@@ -101,7 +80,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
         .map((a, index) => ({
           ...a,
           index,
-        }))
+        })),
     );
   }, [props.institution.accounts]);
 
@@ -111,15 +90,15 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
         (acc, index) => ({
           id: acc.id,
           index,
-        })
+        }),
       );
-      doIndexAccounts.mutate(indexedAccounts);
+      orderAccountsMutation.mutate(indexedAccounts);
     }
   }, [props.isSortable]);
 
   return (
     <Card ref={props.isSortable ? ref : undefined} elevation={1}>
-      <LoadingOverlay visible={doIndexAccounts.isPending} />
+      <LoadingOverlay visible={orderAccountsMutation.isPending} />
       <Group w="100%" wrap="nowrap" gap="0.5rem" align="flex-start">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
@@ -152,7 +131,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
                   (acc, index) => ({
                     ...acc,
                     index,
-                  })
+                  }),
                 );
 
                 setSortedAccounts(updatedList);
