@@ -11,7 +11,12 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError, ValidationError } from "~/helpers/requests";
+import {
+  translateAxiosError,
+  twoFactorAuthQueryKey,
+  userQueryKey,
+  ValidationError,
+} from "~/helpers/requests";
 import { AxiosError, AxiosResponse } from "axios";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
@@ -58,7 +63,7 @@ const TwoFactorAuth = (): React.ReactNode => {
   const { request } = useAuth();
 
   const twoFactorAuthQuery = useQuery({
-    queryKey: ["twoFactorAuth"],
+    queryKey: [twoFactorAuthQueryKey],
     queryFn: async (): Promise<TwoFactorAuthResponse | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/manage/2fa",
@@ -82,8 +87,10 @@ const TwoFactorAuth = (): React.ReactNode => {
         data: { ...twoFactorAuthData },
       }),
     onSuccess: async (res: AxiosResponse) => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
-      await queryClient.invalidateQueries({ queryKey: ["twoFactorAuth"] });
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [twoFactorAuthQueryKey],
+      });
 
       const data = res.data as TwoFactorAuthResponse;
       if (!data) {

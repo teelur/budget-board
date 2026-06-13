@@ -6,7 +6,7 @@ import { AxiosError } from "axios";
 import { PencilIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , institutionsQueryKey} from "~/helpers/requests";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
@@ -44,7 +44,7 @@ const EditableInstitutionItemContent = (
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

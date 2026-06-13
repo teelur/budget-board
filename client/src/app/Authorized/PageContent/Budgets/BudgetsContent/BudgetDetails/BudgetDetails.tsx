@@ -18,6 +18,8 @@ import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { transactionsQueryKey } from "~/helpers/requests";
+
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -36,7 +38,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({
-    queryKey: ["transactions", { getHidden: false }],
+    queryKey: [transactionsQueryKey, { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",

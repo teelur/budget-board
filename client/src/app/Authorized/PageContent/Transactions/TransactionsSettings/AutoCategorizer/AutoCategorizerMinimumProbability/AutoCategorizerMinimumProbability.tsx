@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , userSettingsQueryKey} from "~/helpers/requests";
 import {
   IUserSettings,
   IUserSettingsUpdateRequest,
@@ -24,7 +24,7 @@ const AutoCategorizerMinimumProbability = (): React.ReactNode => {
   });
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -56,7 +56,7 @@ const AutoCategorizerMinimumProbability = (): React.ReactNode => {
         data: updatedUserSettings,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({

@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , assetsQueryKey} from "~/helpers/requests";
 import { IAssetResponse } from "~/models/asset";
 import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -26,7 +26,7 @@ const DeletedAssetCard = (props: DeletedAssetCardProps): React.ReactNode => {
         params: { guid: props.asset.id },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

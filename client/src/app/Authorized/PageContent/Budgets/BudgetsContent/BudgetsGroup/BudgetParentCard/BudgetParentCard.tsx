@@ -28,7 +28,7 @@ import { notifications } from "@mantine/notifications";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , budgetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -88,7 +88,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -112,12 +112,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
         data: newBudget,
       }),
     onMutate: async (variables: IBudgetUpdateRequest) => {
-      await queryClient.cancelQueries({ queryKey: ["budgets"] });
+      await queryClient.cancelQueries({ queryKey: [budgetsQueryKey] });
 
       const previousBudgets: IBudget[] =
-        queryClient.getQueryData(["budgets"]) ?? [];
+        queryClient.getQueryData([budgetsQueryKey]) ?? [];
 
-      queryClient.setQueryData(["budgets"], (oldBudgets: IBudget[]) =>
+      queryClient.setQueryData([budgetsQueryKey], (oldBudgets: IBudget[]) =>
         oldBudgets?.map((oldBudget) =>
           oldBudget.id === variables.id
             ? { ...oldBudget, limit: variables.limit }
@@ -128,13 +128,13 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       return { previousBudgets };
     },
     onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
-      queryClient.setQueryData(["budgets"], context?.previousBudgets ?? []);
+      queryClient.setQueryData([budgetsQueryKey], context?.previousBudgets ?? []);
       notifications.show({
         message: translateAxiosError(error),
         color: "var(--button-color-destructive)",
       });
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] }),
   });
 
   const doDeleteBudget = useMutation({
@@ -145,7 +145,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
         params: { guid: id },
       }),
     onSuccess: async () =>
-      await queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+      await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] }),
   });
 
   const handleEdit = (newLimit?: number | string) => {

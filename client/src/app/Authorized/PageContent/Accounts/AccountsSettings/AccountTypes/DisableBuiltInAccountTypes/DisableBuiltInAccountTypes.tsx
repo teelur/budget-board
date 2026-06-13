@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { accountTypesQueryKey, translateAxiosError } from "~/helpers/requests";
+import { accountTypesQueryKey, translateAxiosError , accountsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -21,7 +21,7 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
   const { disableBuiltInAccountTypes } = useUserSettings();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -45,7 +45,7 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
         data: updatedUserSettings,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
       await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
     },
     onError: (error: any) => {

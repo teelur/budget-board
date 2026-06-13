@@ -14,6 +14,8 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { chartColors } from "~/helpers/charts";
 import { DateString } from "~/helpers/datetime";
 import { buildValueChartData, IItem, IValue } from "./helpers/valueChart";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 /**
  * Builds the series for the value chart.
@@ -43,7 +45,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

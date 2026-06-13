@@ -9,6 +9,8 @@ import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "../core/Select/AccountMultiSelect/AccountMultiSelect";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
+import { accountsQueryKey } from "~/helpers/requests";
+
 
 interface AccountsSelectHeaderProps {
   selectedAccountIds: string[];
@@ -25,7 +27,7 @@ const AccountsSelectHeader = (
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",

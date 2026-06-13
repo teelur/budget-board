@@ -13,7 +13,7 @@ import { SplitIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , transactionsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { ICategory } from "~/models/category";
 import { ITransactionSplitRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
@@ -45,7 +45,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -69,7 +69,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
         data: splitTransaction,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
       notifications.show({
         message: t("transaction_split_successfully"),
         color: "var(--button-color-confirm)",

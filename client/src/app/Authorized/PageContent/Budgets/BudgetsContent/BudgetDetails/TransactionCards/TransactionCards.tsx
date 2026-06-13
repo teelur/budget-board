@@ -10,6 +10,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -25,7 +27,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

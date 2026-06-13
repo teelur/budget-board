@@ -7,13 +7,14 @@ import AddAutomaticRule from "./AddAutomaticRule/AddAutomaticRule";
 import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { automaticRulesQueryKey } from "~/helpers/requests";
 
 const AutomaticRules = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
   const automaticRuleQuery = useQuery({
-    queryKey: ["automaticRule"],
+    queryKey: [automaticRulesQueryKey],
     queryFn: async () => {
       const res = await request({
         url: "/api/automaticRule",

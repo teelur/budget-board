@@ -22,7 +22,7 @@ import {
 } from "~/models/netWorthWidgetConfiguration";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
@@ -67,7 +67,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
         data: updatedLine,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -88,7 +88,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
         },
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -106,7 +106,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
         data: categoryRequest,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

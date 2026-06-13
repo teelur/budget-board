@@ -1,5 +1,5 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , budgetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import {
   ActionIcon,
   LoadingOverlay,
@@ -42,7 +42,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -66,7 +66,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
         data: newBudget,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

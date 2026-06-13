@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey, institutionsQueryKey, transactionsQueryKey} from "~/helpers/requests";
 import { IAccountResponse } from "~/models/account";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -33,9 +33,9 @@ const DeletedAccountCard = (
         params: { guid: props.account.id },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

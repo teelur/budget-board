@@ -16,6 +16,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
   translateAxiosError,
@@ -50,7 +52,7 @@ const SimpleFinAccountCard = (
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -100,8 +102,8 @@ const SimpleFinAccountCard = (
         queryKey: [simpleFinOrganizationQueryKey],
       });
       queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({
@@ -156,8 +158,8 @@ const SimpleFinAccountCard = (
       queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({

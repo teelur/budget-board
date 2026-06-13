@@ -9,6 +9,8 @@ import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import AssetSelect from "../core/Select/AssetSelect/AssetSelect";
 import { useTranslation } from "react-i18next";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
+import { assetsQueryKey } from "~/helpers/requests";
+
 
 interface AssetsSelectHeaderProps {
   selectedAssetIds: string[];
@@ -25,7 +27,7 @@ const AssetsSelectHeader = (
   const { request } = useAuth();
 
   const assetsQuery = useQuery({
-    queryKey: ["assets"],
+    queryKey: [assetsQueryKey],
     queryFn: async (): Promise<IAssetResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/asset",

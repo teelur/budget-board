@@ -7,7 +7,11 @@ import { AxiosError } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  translateAxiosError,
+  assetsQueryKey,
+  valuesQueryKey,
+} from "~/helpers/requests";
 import { IAssetCreateRequest } from "~/models/asset";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -35,8 +39,8 @@ const CreateAsset = (): React.ReactNode => {
         data: newAsset,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
-      await queryClient.invalidateQueries({ queryKey: ["values"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [valuesQueryKey] });
 
       assetNameField.reset();
     },
