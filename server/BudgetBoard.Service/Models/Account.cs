@@ -15,40 +15,6 @@ public class AccountCreateRequest() : IAccountCreateRequest
     public required Guid InstitutionID { get; set; }
 }
 
-public interface IAccountUpdateRequest
-{
-    public Guid ID { get; }
-    public string? Name { get; }
-    public string? Type { get; }
-    public bool? HideTransactions { get; }
-    public bool? HideAccount { get; }
-    public decimal? InterestRate { get; }
-    public string? Source { get; }
-}
-
-public class AccountUpdateRequest() : IAccountUpdateRequest
-{
-    public required Guid ID { get; set; }
-    public string? Name { get; set; } = null;
-    public string? Type { get; set; } = null;
-    public bool? HideTransactions { get; set; } = null;
-    public bool? HideAccount { get; set; } = null;
-    public decimal? InterestRate { get; set; } = null;
-    public string? Source { get; set; } = null;
-}
-
-public interface IAccountIndexRequest
-{
-    public Guid ID { get; }
-    public int Index { get; }
-}
-
-public class AccountIndexRequest : IAccountIndexRequest
-{
-    public required Guid ID { get; set; }
-    public required int Index { get; set; }
-}
-
 public interface IAccountResponse
 {
     public Guid ID { get; }
@@ -116,4 +82,38 @@ public class AccountResponse : IAccountResponse
         Source = account.Source;
         UserID = account.UserID;
     }
+}
+
+public interface IAccountUpdateRequest
+{
+    public Guid ID { get; }
+    public string? Name { get; }
+    public string? Type { get; }
+    public bool? HideTransactions { get; }
+    public bool? HideAccount { get; }
+    public decimal? InterestRate { get; }
+    public string? Source { get; }
+}
+
+public class AccountUpdateRequest() : IAccountUpdateRequest
+{
+    public required Guid ID { get; set; }
+    public string? Name { get; set; } = null;
+    public string? Type { get; set; } = null;
+    public bool? HideTransactions { get; set; } = null;
+    public bool? HideAccount { get; set; } = null;
+    public decimal? InterestRate { get; set; } = null;
+    public string? Source { get; set; } = null;
+}
+
+public interface IAccountIndexRequest
+{
+    public Guid ID { get; }
+    public int Index { get; }
+}
+
+public class AccountIndexRequest : IAccountIndexRequest
+{
+    public required Guid ID { get; set; }
+    public required int Index { get; set; }
 }
