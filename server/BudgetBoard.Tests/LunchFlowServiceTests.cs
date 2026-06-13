@@ -276,7 +276,9 @@ public class LunchFlowServiceTests
             _ =>
                 _.UpdateAccountAsync(
                     helper.demoUser.Id,
-                    new AccountUpdateRequest { ID = account.ID, Source = AccountSource.Manual }
+                    It.Is<IAccountUpdateRequest>(req =>
+                        req.ID == account.ID && req.Source == AccountSource.Manual
+                    )
                 ),
             Times.Once
         );

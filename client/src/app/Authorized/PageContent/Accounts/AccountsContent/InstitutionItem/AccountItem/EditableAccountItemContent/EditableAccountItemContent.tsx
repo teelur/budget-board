@@ -71,15 +71,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
 
   const updateAccountMutation = useUpdateAccountMutation();
 
-  const buildUpdatedAccount = (): IAccountUpdateRequest => ({
-    id: props.account.id,
-    name: accountNameField.getValue(),
-    type: accountTypeField.getValue(),
-    hideAccount: hideAccountField.getValue(),
-    hideTransactions: hideTransactionsField.getValue(),
-    interestRate: ((interestRateField.getValue() ?? 0) as number) / 100,
-  });
-
   const resetFormToServerValues = () => {
     accountNameField.setValue(props.account.name);
     interestRateField.setValue(
@@ -90,11 +81,18 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     hideTransactionsField.setValue(props.account.hideTransactions ?? false);
   };
 
-  // TODO: We should change this to better handle updates to these fields. This is dependent on some backend updates in a separate PR.
   useDidUpdate(() => {
-    updateAccountMutation.mutate(buildUpdatedAccount(), {
-      onError: resetFormToServerValues,
-    });
+    updateAccountMutation.mutate(
+      {
+        id: props.account.id,
+        type: accountTypeField.getValue(),
+        hideAccount: hideAccountField.getValue(),
+        hideTransactions: hideTransactionsField.getValue(),
+      },
+      {
+        onError: resetFormToServerValues,
+      },
+    );
   }, [
     accountTypeField.getValue(),
     hideAccountField.getValue(),
@@ -111,9 +109,15 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               {...accountNameField.getInputProps()}
               label={<PrimaryText size="xs">{t("name")}</PrimaryText>}
               onBlur={() =>
-                updateAccountMutation.mutate(buildUpdatedAccount(), {
-                  onError: resetFormToServerValues,
-                })
+                updateAccountMutation.mutate(
+                  {
+                    id: props.account.id,
+                    name: accountNameField.getValue(),
+                  },
+                  {
+                    onError: resetFormToServerValues,
+                  },
+                )
               }
               elevation={2}
             />
@@ -141,9 +145,16 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               suffix="%"
               maw={90}
               onBlur={() =>
-                updateAccountMutation.mutate(buildUpdatedAccount(), {
-                  onError: resetFormToServerValues,
-                })
+                updateAccountMutation.mutate(
+                  {
+                    id: props.account.id,
+                    interestRate:
+                      ((interestRateField.getValue() ?? 0) as number) / 100,
+                  },
+                  {
+                    onError: resetFormToServerValues,
+                  },
+                )
               }
               elevation={2}
             />

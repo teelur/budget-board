@@ -374,7 +374,7 @@ public class AccountServiceTests()
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
-        nowProviderMock.Setup(np => np.Now).Returns(fakeDate);
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var helper = new TestHelper();
         var accountService = new AccountService(
@@ -440,7 +440,7 @@ public class AccountServiceTests()
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
-        nowProviderMock.Setup(np => np.Now).Returns(fakeDate);
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var transactionServiceMock = new Mock<ITransactionService>();
 
@@ -487,7 +487,7 @@ public class AccountServiceTests()
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
 
         var nowProviderMock = new Mock<INowProvider>();
-        nowProviderMock.Setup(np => np.Now).Returns(fakeDate);
+        nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
         var helper = new TestHelper();
         var accountService = new AccountService(

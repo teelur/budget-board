@@ -902,7 +902,7 @@ public class AccountTypeServiceTests
         // Assert
         helper.UserDataContext.AccountTypes.Should().NotContain(parentAccountType);
         helper.UserDataContext.AccountTypes.Should().NotContain(childAccountType);
-        account.Type.Should().BeNull();
+        account.Type.Should().Be(string.Empty);
     }
 
     [Fact]
@@ -935,6 +935,6 @@ public class AccountTypeServiceTests
 
         // Assert
         helper.UserDataContext.AccountTypes.Should().NotContain(accountType);
-        account.Type.Should().BeNull();
+        account.Type.Should().Be(string.Empty);
     }
 }

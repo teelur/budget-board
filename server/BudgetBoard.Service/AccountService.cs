@@ -103,8 +103,8 @@ public class AccountService(
             throw new BudgetBoardServiceException(responseLocalizer["AccountDeleteNotFoundError"]);
         }
 
-        var now = nowProvider.Now;
-        account.Deleted = now;
+        var utcNow = nowProvider.UtcNow;
+        account.Deleted = utcNow;
         account.Type = string.Empty;
         account.Source = AccountSource.Manual;
 
@@ -119,7 +119,7 @@ public class AccountService(
 
         if (account.Institution?.Accounts.All(a => a.Deleted != null) ?? false)
         {
-            account.Institution.Deleted = now;
+            account.Institution.Deleted = utcNow;
             account.Institution.Index = 0;
         }
 
