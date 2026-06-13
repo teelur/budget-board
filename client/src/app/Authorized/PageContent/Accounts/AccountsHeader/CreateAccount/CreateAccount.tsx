@@ -104,16 +104,20 @@ const CreateAccount = () => {
       }
     }
 
-    createAccountMutation.mutate({
-      name: accountNameField.getValue(),
-      institutionID: institutionForAccount.id,
-      source: AccountSource.Manual,
-    } as IAccountCreateRequest);
+    createAccountMutation.mutate(
+      {
+        name: accountNameField.getValue(),
+        institutionID: institutionForAccount.id,
+        source: AccountSource.Manual,
+      } as IAccountCreateRequest,
+      {
+        onSuccess: () => {
+          accountNameField.reset();
+          institutionField.reset();
+        },
+      },
+    );
   };
-  if (createAccountMutation.isSuccess) {
-    accountNameField.reset();
-    institutionField.reset();
-  }
 
   if (institutionQuery.isPending) {
     return null;
