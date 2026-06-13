@@ -82,6 +82,9 @@
   <data name="AccountPermanentDeleteNotFoundError" xml:space="preserve">
     <value>The account you are trying to permanently delete does not exist.</value>
   </data>
+  <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
+    <value>The account must be deleted before it can be permanently deleted.</value>
+  </data>
   <data name="AccountRestoreNotFoundError" xml:space="preserve">
     <value>The account you are trying to restore does not exist.</value>
   </data>
