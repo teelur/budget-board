@@ -19,6 +19,8 @@ import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBa
 import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -32,7 +34,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

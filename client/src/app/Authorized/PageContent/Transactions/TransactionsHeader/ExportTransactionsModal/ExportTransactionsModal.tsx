@@ -19,6 +19,8 @@ import { ITransaction, Filters } from "~/models/transaction";
 import { IInstitution } from "~/models/institution";
 import { getFilteredTransactions } from "~/helpers/transactions";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { institutionsQueryKey, transactionsQueryKey } from "~/helpers/requests";
+
 
 const escapeCsvValue = (value: string): string =>
   `"${value.replace(/"/g, '""')}"`;
@@ -91,7 +93,7 @@ const ExportTransactionsModal = (): React.ReactNode => {
   const isMobile = useIsMobile();
 
   const transactionsQuery = useQuery({
-    queryKey: ["transactions", { getHidden: false }],
+    queryKey: [transactionsQueryKey, { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",
@@ -107,7 +109,7 @@ const ExportTransactionsModal = (): React.ReactNode => {
   });
 
   const institutionsQuery = useQuery({
-    queryKey: ["institutions"],
+    queryKey: [institutionsQueryKey],
     queryFn: async (): Promise<IInstitution[]> => {
       const res: AxiosResponse = await request({
         url: "/api/institution",

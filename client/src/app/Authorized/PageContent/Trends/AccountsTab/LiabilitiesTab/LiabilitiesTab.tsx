@@ -12,6 +12,8 @@ import { AccountTypeClassification, IAccountResponse } from "~/models/account";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { accountsQueryKey, balancesQueryKey } from "~/helpers/requests";
+
 
 const LiabilitiesTab = (): React.ReactNode => {
   const { request } = useAuth();
@@ -28,7 +30,7 @@ const LiabilitiesTab = (): React.ReactNode => {
 
   const balancesQuery = useQueries({
     queries: selectedAccountIds.map((accountId: string) => ({
-      queryKey: ["balances", accountId],
+      queryKey: [balancesQueryKey, accountId],
       queryFn: async (): Promise<IBalanceResponse[]> => {
         const res: AxiosResponse = await request({
           url: "/api/balance",
@@ -52,7 +54,7 @@ const LiabilitiesTab = (): React.ReactNode => {
   });
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",

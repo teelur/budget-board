@@ -17,7 +17,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import {
   INetWorthWidgetLineCreateRequest,
   INetWorthWidgetLineReorderRequest,
@@ -58,7 +58,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
         data: newLine,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -76,7 +76,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
         data: reorderRequest,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

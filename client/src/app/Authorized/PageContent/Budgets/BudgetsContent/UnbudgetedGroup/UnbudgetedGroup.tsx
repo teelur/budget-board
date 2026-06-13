@@ -17,6 +17,8 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -33,7 +35,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

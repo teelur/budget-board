@@ -26,6 +26,8 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
+import { accountTypesQueryKey, accountsQueryKey, budgetsQueryKey, goalsQueryKey, transactionsQueryKey, widgetSettingsQueryKey } from "~/helpers/requests";
+
 
 interface MetricWidgetProps {
   widgetId: string;
@@ -44,7 +46,7 @@ const MetricWidget = ({
   const { intlLocale, dayjs } = useLocale();
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -128,7 +130,7 @@ const MetricWidget = ({
   });
 
   const allTimeTransactionsQuery = useQuery({
-    queryKey: ["transactions", { allTime: true }],
+    queryKey: [transactionsQueryKey, { allTime: true }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",
@@ -144,7 +146,7 @@ const MetricWidget = ({
   const budgetQueries = useQueries({
     queries: requirements.needsBudgets
       ? requirements.budgetMonths.map((date: Date) => ({
-          queryKey: ["budgets", dayjs(date).format("YYYY-MM")],
+          queryKey: [budgetsQueryKey, dayjs(date).format("YYYY-MM")],
           queryFn: async (): Promise<IBudget[]> => {
             const res: AxiosResponse = await request({
               url: "/api/budget",
@@ -163,7 +165,7 @@ const MetricWidget = ({
   });
 
   const goalsQuery = useQuery({
-    queryKey: ["goals", { includeInterest: false }],
+    queryKey: [goalsQueryKey, { includeInterest: false }],
     queryFn: async (): Promise<IGoalResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/goal",
@@ -177,7 +179,7 @@ const MetricWidget = ({
   });
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -190,7 +192,7 @@ const MetricWidget = ({
   });
 
   const accountTypesQuery = useQuery({
-    queryKey: ["accountTypes"],
+    queryKey: [accountTypesQueryKey],
     queryFn: async (): Promise<IAccountType[]> => {
       const res: AxiosResponse = await request({
         url: "/api/accountType",

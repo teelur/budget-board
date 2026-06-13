@@ -8,6 +8,7 @@ import {
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
   translateAxiosError,
+  userQueryKey,
 } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { isNotEmpty, useField } from "@mantine/form";
@@ -28,7 +29,7 @@ const LinkSimpleFin = (): React.ReactNode => {
   const { request } = useAuth();
 
   const userQuery = useQuery({
-    queryKey: ["user"],
+    queryKey: [userQueryKey],
     queryFn: async (): Promise<IApplicationUser | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/applicationUser",
@@ -52,7 +53,7 @@ const LinkSimpleFin = (): React.ReactNode => {
         params: { setupToken },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });

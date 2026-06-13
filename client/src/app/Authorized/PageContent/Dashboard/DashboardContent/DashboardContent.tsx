@@ -15,7 +15,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import AccountsWidget from "~/components/ui/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/ui/widgets/NetWorthWidget/NetWorthWidget";
 import WidgetShell from "~/components/ui/widgets/shared/WidgetShell/WidgetShell";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import {
   IWidgetSettingsBatchUpdateRequest,
   IWidgetSettingsResponse,
@@ -53,7 +53,7 @@ const DashboardContent = ({
   const queryClient = useQueryClient();
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -116,7 +116,7 @@ const DashboardContent = ({
         params: { widgetGuid: widgetId },
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

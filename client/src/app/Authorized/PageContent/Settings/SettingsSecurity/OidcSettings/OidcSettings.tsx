@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError, userQueryKey } from "~/helpers/requests";
 import { IApplicationUser } from "~/models/applicationUser";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -15,7 +15,7 @@ const OidcSettings = (): React.ReactNode => {
   const { request } = useAuth();
 
   const userQuery = useQuery({
-    queryKey: ["user"],
+    queryKey: [userQueryKey],
     queryFn: async (): Promise<IApplicationUser | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/applicationUser",
@@ -38,7 +38,7 @@ const OidcSettings = (): React.ReactNode => {
         method: "DELETE",
       }),
     onSuccess: async (res: AxiosResponse) => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
 
       notifications.show({
         color: "var(--button-color-confirm)",

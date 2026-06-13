@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface DashboardMobileHeaderProps {
@@ -28,7 +28,7 @@ const DashboardMobileHeader = ({
         method: "POST",
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

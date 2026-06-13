@@ -24,6 +24,8 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { accountsQueryKey, transactionsQueryKey } from "~/helpers/requests";
+
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -102,7 +104,7 @@ const ConfigureTransactions = (
   >(new Map<ITransactionImportTableData, ITransaction>());
 
   const transactionsQuery = useQuery({
-    queryKey: ["transactions", { getHidden: false }],
+    queryKey: [transactionsQueryKey, { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",
@@ -118,7 +120,7 @@ const ConfigureTransactions = (
   });
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",

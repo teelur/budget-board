@@ -11,7 +11,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , userSettingsQueryKey} from "~/helpers/requests";
 import {
   IUserSettings,
   IUserSettingsUpdateRequest,
@@ -24,7 +24,7 @@ const BudgetsSettings = (): React.ReactNode => {
   const navigate = useNavigate();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -56,7 +56,7 @@ const BudgetsSettings = (): React.ReactNode => {
         data: updatedUserSettings,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({

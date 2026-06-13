@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { assetsQueryKey, valuesQueryKey } from "~/helpers/requests";
 
 interface AddValueProps {
   assetId: string;
@@ -50,8 +51,10 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
       return undefined;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["assets"] });
-      queryClient.invalidateQueries({ queryKey: ["values", props.assetId] });
+      queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
+      queryClient.invalidateQueries({
+        queryKey: [valuesQueryKey, props.assetId],
+      });
 
       amountField.reset();
       dateField.reset();

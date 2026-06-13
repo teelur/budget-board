@@ -14,7 +14,7 @@ import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { AxiosError } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey} from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
 import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
@@ -79,7 +79,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
         data: accounts,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({

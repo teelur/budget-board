@@ -8,7 +8,7 @@ import React from "react";
 import GoalCard from "./GoalCard/GoalCard";
 import GoalsHeader from "./GoalsHeader/GoalsHeader";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , goalsQueryKey} from "~/helpers/requests";
 import CompletedGoalsAccordion from "./CompletedGoalsAccordion/CompletedGoalsAccordion";
 import GoalDetails from "./GoalDetails/GoalDetails";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -29,7 +29,7 @@ const Goals = (): React.ReactNode => {
   const { request } = useAuth();
 
   const goalsQuery = useQuery({
-    queryKey: ["goals", { includeInterest }],
+    queryKey: [goalsQueryKey, { includeInterest }],
     queryFn: async (): Promise<IGoalResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/goal",

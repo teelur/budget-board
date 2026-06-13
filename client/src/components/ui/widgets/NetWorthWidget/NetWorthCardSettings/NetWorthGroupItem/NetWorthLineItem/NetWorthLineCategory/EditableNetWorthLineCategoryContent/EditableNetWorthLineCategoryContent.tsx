@@ -9,7 +9,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import Select from "~/components/core/Select/Select/Select";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { getSubtypeOptions, NET_WORTH_CATEGORY_TYPES } from "~/helpers/widgets";
 import { INetWorthWidgetCategoryUpdateRequest } from "~/models/netWorthWidgetConfiguration";
@@ -58,7 +58,7 @@ const EditableNetWorthLineCategoryContent = (
         data: updatedCategory,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -80,7 +80,7 @@ const EditableNetWorthLineCategoryContent = (
         },
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

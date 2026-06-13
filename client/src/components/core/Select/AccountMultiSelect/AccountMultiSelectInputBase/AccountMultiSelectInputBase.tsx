@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
 import { useTranslation } from "react-i18next";
+import { accountsQueryKey } from "~/helpers/requests";
+
 
 export interface AccountMultiSelectInputBaseProps extends MultiSelectProps {
   hideHidden?: boolean;
@@ -24,7 +26,7 @@ const AccountMultiSelectInputBase = ({
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",

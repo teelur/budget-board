@@ -14,7 +14,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , institutionsQueryKey, widgetSettingsQueryKey} from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -42,7 +42,7 @@ const AccountsWidgetSettings = ({
   const [initialized, setInitialized] = React.useState(false);
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -56,7 +56,7 @@ const AccountsWidgetSettings = ({
   });
 
   const institutionQuery = useQuery({
-    queryKey: ["institutions"],
+    queryKey: [institutionsQueryKey],
     queryFn: async (): Promise<IInstitution[]> => {
       const res: AxiosResponse = await request({
         url: "/api/institution",
@@ -140,7 +140,7 @@ const AccountsWidgetSettings = ({
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

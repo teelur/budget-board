@@ -6,6 +6,8 @@ import { useAuth } from "../AuthProvider/AuthProvider";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { getCurrencySymbol } from "~/helpers/currency";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 const localeMap: Record<string, string> = {
   "en-us": "en",
@@ -48,7 +50,7 @@ export const LocaleProvider = ({
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

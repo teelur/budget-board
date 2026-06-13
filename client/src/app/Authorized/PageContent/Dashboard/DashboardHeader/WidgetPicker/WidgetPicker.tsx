@@ -12,7 +12,7 @@ import {
   IWidgetSettingsResponse,
 } from "~/models/widgetSettings";
 import { AxiosError, AxiosResponse } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface WidgetPickerProps {
@@ -29,7 +29,7 @@ const WidgetPicker = ({
   const queryClient = useQueryClient();
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -50,7 +50,7 @@ const WidgetPicker = ({
         data: newWidget,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

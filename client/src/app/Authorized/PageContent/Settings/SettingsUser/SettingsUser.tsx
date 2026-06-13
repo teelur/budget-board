@@ -13,7 +13,7 @@ import { AxiosResponse } from "axios";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , userSettingsQueryKey} from "~/helpers/requests";
 import {
   DATE_SEPARATOR_PLACEHOLDER,
   DateFormatItem,
@@ -53,7 +53,7 @@ const SettingsUser = (): React.ReactNode => {
   ];
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -78,7 +78,7 @@ const SettingsUser = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       // Need to explicitly refetch to get updated settings
-      await queryClient.refetchQueries({ queryKey: ["userSettings"] });
+      await queryClient.refetchQueries({ queryKey: [userSettingsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({
