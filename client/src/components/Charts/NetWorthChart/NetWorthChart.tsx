@@ -18,6 +18,8 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { buildValueChartData } from "../ValueChart/helpers/valueChart";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface NetWorthChartData {
   date: DateString;
@@ -89,7 +91,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

@@ -19,7 +19,7 @@ import {
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , assetsQueryKey} from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -111,7 +111,7 @@ const EditableAssetItemContent = (
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -133,7 +133,7 @@ const EditableAssetItemContent = (
         params: { guid: props.asset.id },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
 
       notifications.show({
         color: "var(--button-color-confirm)",
@@ -155,7 +155,7 @@ const EditableAssetItemContent = (
         params: { guid: props.asset.id },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
 
       notifications.show({
         color: "var(--button-color-confirm)",

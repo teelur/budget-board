@@ -1,5 +1,5 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey, institutionsQueryKey} from "~/helpers/requests";
 import { ActionIcon, Button, Checkbox, Popover, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -33,8 +33,8 @@ const DeleteAccountPopover = (
       }),
     onSuccess: async () => {
       // Refetch the accounts and institutions queries immediatly after the account is deleted
-      await queryClient.refetchQueries({ queryKey: ["institutions"] });
-      await queryClient.refetchQueries({ queryKey: ["accounts"] });
+      await queryClient.refetchQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.refetchQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

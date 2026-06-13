@@ -16,6 +16,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   lunchFlowAccountQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
@@ -49,7 +51,7 @@ const LunchFlowAccountCard = (
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -96,8 +98,8 @@ const LunchFlowAccountCard = (
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({
@@ -144,8 +146,8 @@ const LunchFlowAccountCard = (
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({

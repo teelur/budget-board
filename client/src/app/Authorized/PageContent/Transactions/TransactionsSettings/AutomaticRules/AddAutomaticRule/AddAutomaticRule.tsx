@@ -4,7 +4,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
 
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  translateAxiosError,
+  transactionsQueryKey,
+  automaticRulesQueryKey,
+} from "~/helpers/requests";
 import {
   ActionOperators,
   FieldToOperatorType,
@@ -31,8 +35,8 @@ const AddAutomaticRule = (): React.ReactNode => {
       operator:
         Operators.filter((op) =>
           op.type.includes(
-            FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING
-          )
+            FieldToOperatorType.get(defaultField) ?? OperatorTypes.STRING,
+          ),
         )
           .map((op) => op.value)
           .at(0) ?? "",
@@ -61,7 +65,7 @@ const AddAutomaticRule = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["automaticRule"],
+        queryKey: [automaticRulesQueryKey],
       });
     },
     onError: (error: AxiosError) => {
@@ -81,7 +85,7 @@ const AddAutomaticRule = (): React.ReactNode => {
       }),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: ["transactions"],
+        queryKey: [transactionsQueryKey],
       });
 
       notifications.show({
@@ -134,8 +138,8 @@ const AddAutomaticRule = (): React.ReactNode => {
                   Operators.filter((op) =>
                     op.type.includes(
                       FieldToOperatorType.get(defaultField) ??
-                        OperatorTypes.STRING
-                    )
+                        OperatorTypes.STRING,
+                    ),
                   )
                     .map((op) => op.value)
                     .at(0) ?? "",
@@ -149,8 +153,8 @@ const AddAutomaticRule = (): React.ReactNode => {
                   Operators.find((op) =>
                     op.type.includes(
                       FieldToOperatorType.get(defaultField) ??
-                        OperatorTypes.STRING
-                    )
+                        OperatorTypes.STRING,
+                    ),
                   )?.value ?? "",
                 value: "",
               },

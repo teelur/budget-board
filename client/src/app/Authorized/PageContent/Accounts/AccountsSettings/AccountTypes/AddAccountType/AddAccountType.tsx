@@ -9,7 +9,7 @@ import Card from "~/components/core/Card/Card";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { accountTypesQueryKey, translateAxiosError } from "~/helpers/requests";
+import { accountTypesQueryKey, translateAxiosError , accountsQueryKey} from "~/helpers/requests";
 import { AccountTypeClassification } from "~/models/account";
 import { IAccountTypeCreateRequest } from "~/models/accountType";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -46,7 +46,7 @@ const AddAccountType = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
       nameField.reset();
       parentField.reset();
       classificationField.setValue(AccountTypeClassification.Asset);

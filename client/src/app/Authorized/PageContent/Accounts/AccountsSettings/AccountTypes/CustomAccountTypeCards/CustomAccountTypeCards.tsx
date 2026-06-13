@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import React from "react";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { accountTypesQueryKey, translateAxiosError } from "~/helpers/requests";
+import { accountTypesQueryKey, translateAxiosError , accountsQueryKey, institutionsQueryKey} from "~/helpers/requests";
 import {
   IAccountTypeResponse,
   IAccountTypeUpdateRequest,
@@ -30,8 +30,8 @@ const CustomAccountTypeCards = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({
@@ -49,8 +49,8 @@ const CustomAccountTypeCards = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({

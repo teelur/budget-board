@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import React from "react";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { assetTypesQueryKey, translateAxiosError } from "~/helpers/requests";
+import { assetTypesQueryKey, translateAxiosError , assetsQueryKey} from "~/helpers/requests";
 import {
   IAssetTypeResponse,
   IAssetTypeUpdateRequest,
@@ -30,7 +30,7 @@ const CustomAssetTypeCards = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({
@@ -48,7 +48,7 @@ const CustomAssetTypeCards = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({

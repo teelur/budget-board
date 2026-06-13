@@ -17,6 +17,8 @@ import TransactionCard from "~/components/core/Card/TransactionCard/TransactionC
 import { IUserSettings } from "~/models/userSettings";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { InfoIcon } from "lucide-react";
+import { transactionsQueryKey, userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface TransactionCardsProps {
   sort: Sorts;
@@ -38,7 +40,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({
-    queryKey: ["transactions", { getHidden: false }],
+    queryKey: [transactionsQueryKey, { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",
@@ -54,7 +56,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   });
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

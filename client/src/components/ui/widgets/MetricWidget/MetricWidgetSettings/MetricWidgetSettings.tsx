@@ -18,7 +18,7 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import Modal from "~/components/core/Modal/Modal";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey, budgetsQueryKey, goalsQueryKey, widgetSettingsQueryKey} from "~/helpers/requests";
 import { IAccountResponse } from "~/models/account";
 import { IBudget } from "~/models/budget";
 import { IGoalResponse } from "~/models/goal";
@@ -58,7 +58,7 @@ const MetricWidgetSettings = ({
   const [initialized, setInitialized] = React.useState(false);
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -70,7 +70,7 @@ const MetricWidgetSettings = ({
   });
 
   const goalsQuery = useQuery({
-    queryKey: ["goals", { includeInterest: false }],
+    queryKey: [goalsQueryKey, { includeInterest: false }],
     queryFn: async (): Promise<IGoalResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/goal",
@@ -88,7 +88,7 @@ const MetricWidgetSettings = ({
   });
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -110,7 +110,7 @@ const MetricWidgetSettings = ({
   }, [dayjs]);
 
   const budgetsQuery = useQuery({
-    queryKey: ["budgets", dayjs(currentMonth).format("YYYY-MM")],
+    queryKey: [budgetsQueryKey, dayjs(currentMonth).format("YYYY-MM")],
     queryFn: async (): Promise<IBudget[]> => {
       const res: AxiosResponse = await request({
         url: "/api/budget",
@@ -234,7 +234,7 @@ const MetricWidgetSettings = ({
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError | Error) => {
       const message =

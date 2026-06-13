@@ -22,6 +22,8 @@ import Select from "~/components/core/Select/Select/Select";
 import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 export interface ActionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -39,7 +41,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

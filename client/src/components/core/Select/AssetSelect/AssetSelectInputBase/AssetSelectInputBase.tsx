@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { IAssetResponse } from "~/models/asset";
 import { useTranslation } from "react-i18next";
+import { assetsQueryKey } from "~/helpers/requests";
+
 
 export interface AssetSelectInputBaseProps extends MultiSelectProps {
   selectedAssetIds?: string[];
@@ -24,7 +26,7 @@ const AssetSelectInputBase = ({
   const { request } = useAuth();
 
   const assetsQuery = useQuery({
-    queryKey: ["assets"],
+    queryKey: [assetsQueryKey],
     queryFn: async (): Promise<IAssetResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/asset",

@@ -6,7 +6,7 @@ import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey, institutionsQueryKey} from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import { IInstitution, IInstitutionCreateRequest } from "~/models/institution";
@@ -35,7 +35,7 @@ const CreateAccount = () => {
   const { request } = useAuth();
 
   const institutionQuery = useQuery({
-    queryKey: ["institutions"],
+    queryKey: [institutionsQueryKey],
     queryFn: async (): Promise<IInstitution[]> => {
       const res: AxiosResponse = await request({
         url: "/api/institution",
@@ -75,8 +75,8 @@ const CreateAccount = () => {
         data: newAccount,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
 
       notifications.show({
         message: t("account_created_successfully_message"),

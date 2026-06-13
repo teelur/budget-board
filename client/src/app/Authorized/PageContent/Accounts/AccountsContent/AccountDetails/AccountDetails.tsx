@@ -20,6 +20,7 @@ import {
 } from "~/helpers/accountType";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { balancesQueryKey } from "~/helpers/requests";
 
 interface AccountDetailsProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const { request } = useAuth();
 
   const balancesQuery = useQuery({
-    queryKey: ["balances", props.account?.id],
+    queryKey: [balancesQueryKey, props.account?.id],
     queryFn: async (): Promise<IBalanceResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/balance",

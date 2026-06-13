@@ -7,7 +7,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
@@ -30,7 +30,7 @@ const DashboardEditor = ({
   const queryClient = useQueryClient();
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -50,7 +50,7 @@ const DashboardEditor = ({
         method: "POST",
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -72,7 +72,7 @@ const DashboardEditor = ({
           }),
         ),
       );
-      await queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      await queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     } catch {
       notifications.show({
         color: "var(--button-color-destructive)",

@@ -8,6 +8,8 @@ import { AxiosResponse } from "axios";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface NetWorthItemProps {
   title: string;
@@ -20,7 +22,7 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

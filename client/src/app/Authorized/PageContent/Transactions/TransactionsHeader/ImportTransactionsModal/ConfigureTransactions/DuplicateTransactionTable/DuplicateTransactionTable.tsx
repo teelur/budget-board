@@ -20,6 +20,8 @@ import {
 import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { accountsQueryKey, userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -45,7 +47,7 @@ const DuplicateTransactionTable = (
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -61,7 +63,7 @@ const DuplicateTransactionTable = (
   });
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",

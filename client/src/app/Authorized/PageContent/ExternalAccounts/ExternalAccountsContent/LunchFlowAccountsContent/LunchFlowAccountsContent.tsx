@@ -7,8 +7,11 @@ import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";
 import { notifications } from "@mantine/notifications";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   lunchFlowAccountQueryKey,
   translateAxiosError,
+  userQueryKey,
 } from "~/helpers/requests";
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
 import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
@@ -19,7 +22,7 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
   const { request } = useAuth();
 
   const userQuery = useQuery({
-    queryKey: ["user"],
+    queryKey: [userQueryKey],
     queryFn: async (): Promise<IApplicationUser | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/applicationUser",
@@ -42,12 +45,12 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
         method: "POST",
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [lunchFlowAccountQueryKey],
       });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

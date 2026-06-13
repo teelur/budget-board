@@ -15,6 +15,8 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTranslation } from "react-i18next";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { CategoryTypes } from "~/models/category";
+import { transactionsQueryKey } from "~/helpers/requests";
+
 
 const SpendingCategoriesTab = (): React.ReactNode => {
   const { request } = useAuth();
@@ -33,7 +35,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
   // while also not potentially querying for a large amount of data.
   const transactionsQuery = useQueries({
     queries: getUniqueYears(selectedMonths).map((year: number) => ({
-      queryKey: ["transactions", { year }],
+      queryKey: [transactionsQueryKey, { year }],
       queryFn: async (): Promise<ITransaction[]> => {
         const res: AxiosResponse = await request({
           url: "/api/transaction",

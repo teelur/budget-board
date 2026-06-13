@@ -7,6 +7,7 @@ import {
   transactionCategoriesQueryKey,
   transactionsQueryKey,
   translateAxiosError,
+  userSettingsQueryKey,
 } from "~/helpers/requests";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -50,7 +51,7 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
         data: updatedUserSettings,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [transactionCategoriesQueryKey],
       });

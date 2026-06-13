@@ -7,13 +7,15 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IAccountResponse } from "~/models/account";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedAccountCard from "./DeletedAccountCard";
+import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
+
 
 const DeletedAccounts = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
   const institutionsQuery = useQuery({
-    queryKey: ["institutions"],
+    queryKey: [institutionsQueryKey],
     queryFn: async (): Promise<any[]> => {
       const res: AxiosResponse = await request({
         url: "/api/institution",
@@ -29,7 +31,7 @@ const DeletedAccounts = (): React.ReactNode => {
   });
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",

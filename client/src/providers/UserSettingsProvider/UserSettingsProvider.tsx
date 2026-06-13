@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { IUserSettings } from "~/models/userSettings";
 import { AxiosResponse } from "axios";
 import { useTranslation } from "react-i18next";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 export interface UserSettingsContextValue {
   preferredCurrency: string;
@@ -31,7 +33,7 @@ export const UserSettingsProvider = ({
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

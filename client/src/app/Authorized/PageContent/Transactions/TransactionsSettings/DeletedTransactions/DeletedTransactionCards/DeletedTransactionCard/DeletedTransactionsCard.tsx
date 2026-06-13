@@ -8,7 +8,7 @@ import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , transactionsQueryKey} from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -35,7 +35,7 @@ const DeletedTransactionsCard = (
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
       notifications.show({
         color: "var(--button-color-success)",
         message: t("transaction_restored_successfully_message"),

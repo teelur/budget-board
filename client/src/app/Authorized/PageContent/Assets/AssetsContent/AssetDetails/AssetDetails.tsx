@@ -6,6 +6,7 @@ import AddValue from "./AddValue/AddValue";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
+import { valuesQueryKey } from "~/helpers/requests";
 import { IValueResponse } from "~/models/value";
 import { AxiosResponse } from "axios";
 import ValueItems from "./ValueItems/ValueItems";
@@ -34,7 +35,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const { request } = useAuth();
 
   const valuesQuery = useQuery({
-    queryKey: ["values", props.asset?.id],
+    queryKey: [valuesQueryKey, props.asset?.id],
     queryFn: async (): Promise<IValueResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/value",

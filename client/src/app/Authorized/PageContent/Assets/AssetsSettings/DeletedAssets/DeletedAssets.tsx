@@ -6,13 +6,15 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedAssetCard from "./DeletedAssetCard";
+import { assetsQueryKey } from "~/helpers/requests";
+
 
 const DeletedAssets = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
   const assetsQuery = useQuery({
-    queryKey: ["assets"],
+    queryKey: [assetsQueryKey],
     queryFn: async (): Promise<any[]> => {
       const res: AxiosResponse = await request({
         url: "/api/asset",

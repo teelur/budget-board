@@ -7,7 +7,11 @@ import InstitutionItem from "./InstitutionItem/InstitutionItem";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import { AxiosError } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  institutionsQueryKey,
+  translateAxiosError,
+  userSettingsQueryKey,
+} from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AccountDetails from "./AccountDetails/AccountDetails";
@@ -35,7 +39,7 @@ const AccountsContent = (props: AccountsContentProps) => {
 
   const { request } = useAuth();
   const institutionQuery = useQuery({
-    queryKey: ["institutions"],
+    queryKey: [institutionsQueryKey],
     queryFn: async () => {
       const res = await request({
         url: "/api/institution",
@@ -51,7 +55,7 @@ const AccountsContent = (props: AccountsContentProps) => {
   });
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async () => {
       const res = await request({
         url: "/api/userSettings",
@@ -92,7 +96,7 @@ const AccountsContent = (props: AccountsContentProps) => {
         data: institutions,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({

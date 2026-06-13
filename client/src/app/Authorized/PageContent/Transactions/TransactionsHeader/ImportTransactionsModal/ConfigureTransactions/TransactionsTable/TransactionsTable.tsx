@@ -16,6 +16,8 @@ import { ITransactionImportTableData } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
@@ -31,7 +33,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

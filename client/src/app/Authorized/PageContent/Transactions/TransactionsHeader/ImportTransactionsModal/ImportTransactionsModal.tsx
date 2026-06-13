@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import { FileDownIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , transactionsQueryKey} from "~/helpers/requests";
 import {
   IAccountNameToIDKeyValuePair,
   ITransactionImport,
@@ -103,7 +103,7 @@ const ImportTransactionsModal = () => {
       }),
     onSuccess: async () => {
       setActiveStep(3);
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

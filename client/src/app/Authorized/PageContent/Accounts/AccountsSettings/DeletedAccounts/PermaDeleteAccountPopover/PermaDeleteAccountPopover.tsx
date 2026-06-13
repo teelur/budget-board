@@ -1,7 +1,10 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   lunchFlowAccountQueryKey,
   simpleFinAccountQueryKey,
+  transactionsQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
 import { ActionIcon, Button, Popover, Stack } from "@mantine/core";
@@ -33,9 +36,9 @@ const PermaDeleteAccountPopover = (
         params: { guid: props.accountId },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [simpleFinAccountQueryKey],
       });

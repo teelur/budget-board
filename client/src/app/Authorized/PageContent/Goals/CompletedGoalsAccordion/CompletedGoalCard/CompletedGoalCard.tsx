@@ -12,6 +12,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface CompletedGoalCardProps {
   goal: IGoalResponse;
@@ -22,7 +24,7 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
   const { dayjs, intlLocale } = useLocale();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

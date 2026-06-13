@@ -9,7 +9,7 @@ import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey, balancesQueryKey, institutionsQueryKey, transactionsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
@@ -60,7 +60,7 @@ const CreateTransactionModal = (): React.ReactNode => {
   });
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -84,10 +84,10 @@ const CreateTransactionModal = (): React.ReactNode => {
         data: newTransaction,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      await queryClient.invalidateQueries({ queryKey: ["balances"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [balancesQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

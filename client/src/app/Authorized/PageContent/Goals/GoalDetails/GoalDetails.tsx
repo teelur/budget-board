@@ -15,6 +15,8 @@ import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { balancesQueryKey } from "~/helpers/requests";
+
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;
@@ -36,7 +38,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
 
   const balancesQuery = useQueries({
     queries: (props.goal?.accounts ?? []).map((account: IAccountResponse) => ({
-      queryKey: ["balances", account.id],
+      queryKey: [balancesQueryKey, account.id],
       queryFn: async (): Promise<IBalanceResponse[]> => {
         const res: AxiosResponse = await request({
           url: "/api/balance",

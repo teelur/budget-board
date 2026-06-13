@@ -1,12 +1,24 @@
 import { AxiosError } from "axios";
 
+export const accountsQueryKey: string = "accounts";
 export const accountTypesQueryKey: string = "accountTypes";
+export const assetsQueryKey: string = "assets";
 export const assetTypesQueryKey: string = "assetTypes";
-export const transactionsQueryKey: string = "transactions";
-export const transactionCategoriesQueryKey: string = "transactionCategories";
+export const automaticRulesQueryKey: string = "automaticRules";
+export const balancesQueryKey: string = "balances";
+export const budgetsQueryKey: string = "budgets";
+export const goalsQueryKey: string = "goals";
+export const institutionsQueryKey: string = "institutions";
+export const lunchFlowAccountQueryKey: string = "lunchFlowAccounts";
 export const simpleFinOrganizationQueryKey: string = "simpleFinOrganizations";
 export const simpleFinAccountQueryKey: string = "simpleFinAccounts";
-export const lunchFlowAccountQueryKey: string = "lunchFlowAccounts";
+export const transactionCategoriesQueryKey: string = "transactionCategories";
+export const transactionsQueryKey: string = "transactions";
+export const twoFactorAuthQueryKey: string = "twoFactorAuth";
+export const userQueryKey: string = "user";
+export const userSettingsQueryKey: string = "userSettings";
+export const valuesQueryKey: string = "values";
+export const widgetSettingsQueryKey: string = "widgetSettings";
 
 export interface ValidationError {
   title: string;
