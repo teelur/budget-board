@@ -891,7 +891,7 @@ public class AccountServiceTests()
 
     #region PermanentlyDeleteAccountAsync
     [Fact]
-    public async Task PermanentlyDeleteAccountAsync_ExistingAccount_ShouldRemoveAccount()
+    public async Task PermanentlyDeleteAccountAsync_DeletedAccount_ShouldRemoveAccount()
     {
         // Arrange
         var helper = new TestHelper();
@@ -906,6 +906,7 @@ public class AccountServiceTests()
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
+        account.Deleted = new Faker().Date.Past().ToUniversalTime();
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -963,6 +964,7 @@ public class AccountServiceTests()
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
+        account.Deleted = new Faker().Date.Past().ToUniversalTime();
 
         var transactionFaker = new TransactionFaker([account.ID]);
         var transactions = transactionFaker.Generate(3);
@@ -989,7 +991,7 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task PermanentlyDeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldRemoveAccount()
+    public async Task PermanentlyDeleteAccountAsync_WhenAccountNotDeleted_ShouldThrowError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -1005,55 +1007,17 @@ public class AccountServiceTests()
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
 
-        var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
-        var lunchFlowAccount = lunchFlowAccountFaker.Generate();
-        lunchFlowAccount.LinkedAccountId = account.ID;
-
         helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
         helper.UserDataContext.SaveChanges();
 
         // Act
-        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, account.ID);
+        var act = () =>
+            accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, account.ID);
 
         // Assert
-        helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
-    }
-
-    [Fact]
-    public async Task PermanentlyDeleteAccountAsync_WithLinkedSimpleFinAccount_ShouldRemoveAccount()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(
-            Mock.Of<ILogger<IAccountService>>(),
-            helper.UserDataContext,
-            Mock.Of<ITransactionService>(),
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountFaker = new AccountFaker(helper.demoUser.Id);
-        var account = accountFaker.Generate();
-
-        var orgFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
-        var org = orgFaker.Generate();
-
-        var simpleFinAccountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, org.ID);
-        var simpleFinAccount = simpleFinAccountFaker.Generate();
-        simpleFinAccount.LinkedAccountId = account.ID;
-
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.SimpleFinOrganizations.Add(org);
-        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, account.ID);
-
-        // Assert
-        helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountPermanentDeleteNotDeletedError");
     }
     #endregion
 }

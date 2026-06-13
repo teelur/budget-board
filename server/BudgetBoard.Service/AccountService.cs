@@ -214,6 +214,14 @@ public class AccountService(
             );
         }
 
+        if (account.Deleted == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["AccountPermanentDeleteNotDeletedLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["AccountPermanentDeleteNotDeletedError"]
+            );
+        }
+
         userDataContext.Transactions.RemoveRange(account.Transactions);
         userDataContext.Balances.RemoveRange(account.Balances);
         userDataContext.Accounts.Remove(account);
