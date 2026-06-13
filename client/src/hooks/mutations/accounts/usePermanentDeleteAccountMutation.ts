@@ -19,7 +19,7 @@ export const usePermanentDeleteAccountMutation = () => {
       await request({
         url: "/api/account/permanentDelete",
         method: "DELETE",
-        params: { guid: accountId },
+        params: { accountId },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });

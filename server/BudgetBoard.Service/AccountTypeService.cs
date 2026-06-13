@@ -300,7 +300,7 @@ public class AccountTypeService(
         }
 
         RemoveChildrenUsingType(accountType.Value);
-        UpdateAccountsUsingType(userData.Accounts, accountType.Value, null);
+        UpdateAccountsUsingType(userData.Accounts, accountType.Value, string.Empty);
 
         userData.AccountTypes.Remove(accountType);
         await userDataContext.SaveChangesAsync();
@@ -314,7 +314,7 @@ public class AccountTypeService(
                 .ToList();
             foreach (var child in children)
             {
-                UpdateAccountsUsingType(userData.Accounts, child.Value, null);
+                UpdateAccountsUsingType(userData.Accounts, child.Value, string.Empty);
                 userData.AccountTypes.Remove(child);
             }
         }
@@ -322,17 +322,12 @@ public class AccountTypeService(
         static void UpdateAccountsUsingType(
             ICollection<Account> accounts,
             string oldType,
-            string? newType
+            string newType
         )
         {
             foreach (var account in accounts)
             {
-                if (
-                    (account.Type ?? string.Empty).Equals(
-                        oldType,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
+                if (account.Type.Equals(oldType, StringComparison.OrdinalIgnoreCase))
                     account.Type = newType;
             }
         }

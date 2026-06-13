@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace BudgetBoard.Database.Data;
+namespace BudgetBoard.Database.Helpers;
 
 /// <summary>
 /// EF Core interceptor that automatically removes null bytes from all string properties
@@ -31,7 +31,9 @@ public class StringSanitizationInterceptor : SaveChangesInterceptor
     private static void SanitizeStrings(DbContext? context)
     {
         if (context == null)
+        {
             return;
+        }
 
         var entries = context
             .ChangeTracker.Entries()

@@ -18,7 +18,7 @@ export const useRestoreAccountMutation = () => {
       await request({
         url: `/api/account/restore`,
         method: "POST",
-        params: { guid: accountId },
+        params: { accountId },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
