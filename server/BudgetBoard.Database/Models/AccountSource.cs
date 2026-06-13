@@ -6,10 +6,14 @@ public static class AccountSource
     public const string SimpleFIN = "SimpleFIN";
     public const string LunchFlow = "LunchFlow";
 
-    public static readonly HashSet<string> AllowedValues = [Manual, SimpleFIN, LunchFlow];
+    private static readonly HashSet<string> _allowedValues = new(
+        [Manual, SimpleFIN, LunchFlow],
+        StringComparer.Ordinal
+    );
+    public static IReadOnlyCollection<string> AllowedValues => _allowedValues;
 
     public static bool IsValid(string source)
     {
-        return AllowedValues.Contains(source);
+        return _allowedValues.Contains(source);
     }
 }

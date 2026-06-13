@@ -16,6 +16,8 @@ namespace BudgetBoard.Database.Migrations
                 table: "Account"
             );
 
+            migrationBuilder.Sql("UPDATE \"Account\" SET \"Type\" = '' WHERE \"Type\" IS NULL;");
+
             migrationBuilder.AlterColumn<string>(
                 name: "Type",
                 table: "Account",
@@ -25,6 +27,10 @@ namespace BudgetBoard.Database.Migrations
                 oldClrType: typeof(string),
                 oldType: "text",
                 oldNullable: true
+            );
+
+            migrationBuilder.Sql(
+                "UPDATE \"Account\" SET \"InterestRate\" = 0 WHERE \"InterestRate\" IS NULL;"
             );
 
             migrationBuilder.AlterColumn<decimal>(
