@@ -11,25 +11,7 @@ export enum AccountTypeClassification {
 
 export interface IAccountCreateRequest {
   name: string;
-  institutionID?: string;
-  type: string;
-  hideTransactions: boolean;
-  hideAccount: boolean;
-  source: AccountSource;
-}
-
-export interface IAccountUpdateRequest {
-  id: string;
-  name: string;
-  type: string;
-  hideTransactions: boolean;
-  hideAccount: boolean;
-  interestRate: number | null;
-}
-
-export interface IAccountIndexRequest {
-  id: string;
-  index: number;
+  institutionID: string;
 }
 
 export interface IAccountResponse {
@@ -46,4 +28,19 @@ export interface IAccountResponse {
   interestRate: number | null;
   source: string;
   userID: string;
+}
+
+export interface IAccountUpdateRequest {
+  id: string;
+  name?: string;
+  type?: string;
+  hideTransactions?: boolean;
+  hideAccount?: boolean;
+  interestRate?: number;
+  source?: AccountSource;
+}
+
+export interface IAccountIndexRequest {
+  id: string;
+  index: number;
 }

@@ -1,7 +1,6 @@
 ﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -22,13 +21,13 @@ public class AccountController(
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] AccountCreateRequest account)
+    public async Task<IActionResult> Create([FromBody] AccountCreateRequest newAccount)
     {
         return await HandleRequestAsync(async () =>
         {
             await accountService.CreateAccountAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                account
+                newAccount
             );
             return Ok();
         });
@@ -48,39 +47,15 @@ public class AccountController(
         });
     }
 
-    [HttpGet("{guid}")]
-    [Authorize]
-    public async Task<IActionResult> Read(Guid guid)
-    {
-        try
-        {
-            return Ok(
-                await _accountService.ReadAccountsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    guid
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
-    }
-
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] AccountUpdateRequest editedAccount)
+    public async Task<IActionResult> Update([FromBody] AccountUpdateRequest updatedAccount)
     {
         return await HandleRequestAsync(async () =>
         {
             await accountService.UpdateAccountAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                editedAccount
+                updatedAccount
             );
             return Ok();
         });
@@ -88,13 +63,13 @@ public class AccountController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid, bool deleteTransactions = false)
+    public async Task<IActionResult> Delete(Guid accountId, bool deleteTransactions = false)
     {
         return await HandleRequestAsync(async () =>
         {
             await accountService.DeleteAccountAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                guid,
+                accountId,
                 deleteTransactions
             );
             return Ok();
@@ -104,13 +79,13 @@ public class AccountController(
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Restore(Guid guid)
+    public async Task<IActionResult> Restore(Guid accountId)
     {
         return await HandleRequestAsync(async () =>
         {
             await accountService.RestoreAccountAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                guid
+                accountId
             );
             return Ok();
         });
@@ -119,13 +94,13 @@ public class AccountController(
     [HttpPut]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Order([FromBody] List<AccountIndexRequest> accounts)
+    public async Task<IActionResult> Order([FromBody] List<AccountIndexRequest> orderedAccounts)
     {
         return await HandleRequestAsync(async () =>
         {
             await accountService.OrderAccountsAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                accounts
+                orderedAccounts
             );
             return Ok();
         });
@@ -134,13 +109,13 @@ public class AccountController(
     [HttpDelete]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> PermanentDelete(Guid guid)
+    public async Task<IActionResult> PermanentDelete(Guid accountId)
     {
         return await HandleRequestAsync(async () =>
         {
             await accountService.PermanentlyDeleteAccountAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                guid
+                accountId
             );
             return Ok();
         });
