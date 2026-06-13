@@ -1,20 +1,9 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import {
-  accountsQueryKey,
-  institutionsQueryKey,
-  lunchFlowAccountQueryKey,
-  simpleFinAccountQueryKey,
-  transactionsQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
 import { ActionIcon, Button, Popover, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { usePermanentDeleteAccountMutation } from "~/hooks/mutations/accounts/usePermanentDeleteAccountMutation";
 
 interface PermaDeleteAccountPopoverProps {
   accountId: string;
@@ -24,35 +13,8 @@ const PermaDeleteAccountPopover = (
   props: PermaDeleteAccountPopoverProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
 
-  const queryClient = useQueryClient();
-
-  const doPermaDeleteAccount = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/account/permanentDelete",
-        method: "DELETE",
-        params: { guid: props.accountId },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-      await queryClient.invalidateQueries({
-        queryKey: [simpleFinAccountQueryKey],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: [lunchFlowAccountQueryKey],
-      });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const permenantDeleteAccountMutation = usePermanentDeleteAccountMutation();
   return (
     <Popover>
       <Popover.Target>
@@ -68,8 +30,10 @@ const PermaDeleteAccountPopover = (
           <Button
             size="xs"
             color="var(--button-color-destructive)"
-            loading={doPermaDeleteAccount.isPending}
-            onClick={() => doPermaDeleteAccount.mutate()}
+            loading={permenantDeleteAccountMutation.isPending}
+            onClick={() =>
+              permenantDeleteAccountMutation.mutate(props.accountId)
+            }
           >
             {t("permanently_delete_account")}
           </Button>
