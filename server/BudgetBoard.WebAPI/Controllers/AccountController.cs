@@ -18,46 +18,46 @@ public class AccountController(
     IAccountService accountService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<AccountController>(logger, logLocalizer, responseLocalizer)
 {
-    private readonly ILogger<AccountController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IAccountService _accountService = accountService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create([FromBody] AccountCreateRequest account)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _accountService.CreateAccountAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await accountService.CreateAccountAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 account
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
+        return await HandleRequestAsync(async () =>
+        {
+            return Ok(
+                await accountService.ReadAccountsAsync(
+                    new Guid(userManager.GetUserId(User) ?? string.Empty)
+                )
+            );
+        });
+    }
+
+    [HttpGet("{guid}")]
+    [Authorize]
+    public async Task<IActionResult> Read(Guid guid)
+    {
         try
         {
             return Ok(
                 await _accountService.ReadAccountsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
+                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                    guid
                 )
             );
         }
@@ -76,47 +76,29 @@ public class AccountController(
     [Authorize]
     public async Task<IActionResult> Update([FromBody] AccountUpdateRequest editedAccount)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _accountService.UpdateAccountAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await accountService.UpdateAccountAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 editedAccount
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
     public async Task<IActionResult> Delete(Guid guid, bool deleteTransactions = false)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _accountService.DeleteAccountAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await accountService.DeleteAccountAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 guid,
                 deleteTransactions
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
@@ -124,23 +106,14 @@ public class AccountController(
     [Route("[action]")]
     public async Task<IActionResult> Restore(Guid guid)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _accountService.RestoreAccountAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await accountService.RestoreAccountAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 guid
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
@@ -148,23 +121,14 @@ public class AccountController(
     [Route("[action]")]
     public async Task<IActionResult> Order([FromBody] List<AccountIndexRequest> accounts)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _accountService.OrderAccountsAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await accountService.OrderAccountsAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 accounts
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
@@ -172,22 +136,13 @@ public class AccountController(
     [Route("[action]")]
     public async Task<IActionResult> PermanentDelete(Guid guid)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _accountService.PermanentlyDeleteAccountAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            await accountService.PermanentlyDeleteAccountAsync(
+                new Guid(userManager.GetUserId(User) ?? string.Empty),
                 guid
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

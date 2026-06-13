@@ -25,7 +25,7 @@ public interface IAccountService
     /// Updates an existing account for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="editedAccount">The account update details.</param>
+    /// <param name="request">The account update details.</param>
     Task UpdateAccountAsync(Guid userGuid, IAccountUpdateRequest request);
 
     /// <summary>
