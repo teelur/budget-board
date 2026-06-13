@@ -106,7 +106,6 @@ public class AccountService(
         var utcNow = nowProvider.UtcNow;
         account.Deleted = utcNow;
         account.Type = string.Empty;
-        account.Source = AccountSource.Manual;
 
         if (deleteTransactions)
         {
@@ -140,6 +139,10 @@ public class AccountService(
             simpleFinAccount.LinkedAccountId = null;
             simpleFinAccount.LastSync = null;
         }
+
+        // It's important that this gets set after we delete the transactions, since the
+        // source determines whether transactions affect the account balance.
+        account.Source = AccountSource.Manual;
 
         await userDataContext.SaveChangesAsync();
     }
