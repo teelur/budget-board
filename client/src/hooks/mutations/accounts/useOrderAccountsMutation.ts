@@ -10,11 +10,11 @@ export const useOrderAccountsMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (accounts: IAccountIndexRequest[]) =>
+    mutationFn: async (orderedAccounts: IAccountIndexRequest[]) =>
       await request({
         url: "/api/account/order",
         method: "PUT",
-        data: accounts,
+        data: orderedAccounts,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });

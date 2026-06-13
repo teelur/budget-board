@@ -28,7 +28,7 @@ export const useDeleteAccountMutation = () => {
         url: "/api/account",
         method: "DELETE",
         params: {
-          guid: accountId,
+          accountId,
           deleteTransactions,
         },
       }),

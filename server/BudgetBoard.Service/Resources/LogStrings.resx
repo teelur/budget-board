@@ -79,6 +79,9 @@
   <data name="AccountPermanentDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to permanently delete an account that does not exist.</value>
   </data>
+  <data name="AccountPermanentDeleteNotDeletedLog" xml:space="preserve">
+    <value>Attempted to permanently delete an account that has not been soft-deleted.</value>
+  </data>
   <data name="AccountRestoreNotFoundLog" xml:space="preserve">
     <value>Attempted to restore an account that does not exist.</value>
   </data>

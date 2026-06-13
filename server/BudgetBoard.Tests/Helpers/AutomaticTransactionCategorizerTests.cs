@@ -17,6 +17,7 @@ public class AutomaticTransactionCategorizerTests
             Name = "account name",
             UserID = new Guid("dddddddddddddddddddddddddddddddd"),
             ID = new Guid("dddddddddddddddddddddddddddddddd"),
+            InstitutionID = Guid.NewGuid(),
         };
 
         // Create transactions to be used to train the model.

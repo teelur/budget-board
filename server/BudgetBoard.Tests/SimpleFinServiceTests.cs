@@ -1101,6 +1101,7 @@ public class SimpleFinServiceTests
         {
             Name = "My Account",
             Type = "checking",
+            InstitutionID = Guid.NewGuid(),
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(account);
@@ -1223,7 +1224,7 @@ public class SimpleFinServiceTests
         var account = new Database.Models.Account
         {
             Name = "My Checking",
-            InstitutionID = null,
+            InstitutionID = Guid.NewGuid(),
             Type = "checking",
             UserID = helper.demoUser.Id,
         };
@@ -1396,7 +1397,7 @@ public class SimpleFinServiceTests
         var deletedAccount = new Database.Models.Account
         {
             Name = "Deleted Checking",
-            InstitutionID = null,
+            InstitutionID = Guid.NewGuid(),
             Type = "checking",
             UserID = helper.demoUser.Id,
             Deleted = DateTime.UtcNow.AddDays(-1),
@@ -1721,6 +1722,7 @@ public class SimpleFinServiceTests
         {
             Name = "My Checking",
             Type = "checking",
+            InstitutionID = Guid.NewGuid(),
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(account1);
@@ -1729,6 +1731,7 @@ public class SimpleFinServiceTests
         {
             Name = "My Savings",
             Type = "savings",
+            InstitutionID = Guid.NewGuid(),
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(account2);
@@ -1892,6 +1895,7 @@ public class SimpleFinServiceTests
         {
             Name = "Bad Balance",
             Type = "checking",
+            InstitutionID = Guid.NewGuid(),
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(accountBad);
@@ -1915,6 +1919,7 @@ public class SimpleFinServiceTests
         {
             Name = "Valid Checking",
             Type = "checking",
+            InstitutionID = Guid.NewGuid(),
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(accountValid);

@@ -163,10 +163,13 @@ public class LunchFlowService(
             );
             if (linkedAccount != null)
             {
-                await accountService.UpdateAccountSourceAsync(
+                await accountService.UpdateAccountAsync(
                     userData.Id,
-                    linkedAccount.ID,
-                    AccountSource.Manual
+                    new AccountUpdateRequest
+                    {
+                        ID = linkedAccount.ID,
+                        Source = AccountSource.Manual,
+                    }
                 );
             }
 
