@@ -13,7 +13,9 @@ export const simpleFinOrganizationQueryKey: string = "simpleFinOrganizations";
 export const simpleFinAccountQueryKey: string = "simpleFinAccounts";
 export const transactionCategoriesQueryKey: string = "transactionCategories";
 export const transactionsQueryKey: string = "transactions";
+export const userQueryKey: string = "user";
 export const userSettingsQueryKey: string = "userSettings";
+export const valuesQueryKey: string = "values";
 export const widgetSettingsQueryKey: string = "widgetSettings";
 
 export interface ValidationError {
