@@ -7,6 +7,7 @@ import {
   transactionCategoriesQueryKey,
   transactionsQueryKey,
   translateAxiosError,
+  userSettingsQueryKey,
 } from "~/helpers/requests";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -17,8 +18,6 @@ import { defaultGuid } from "~/models/applicationUser";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
 
 const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   const { t } = useTranslation();

@@ -1,7 +1,10 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   lunchFlowAccountQueryKey,
   simpleFinAccountQueryKey,
+  transactionsQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
 import { ActionIcon, Button, Popover, Stack } from "@mantine/core";
@@ -12,8 +15,6 @@ import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { accountsQueryKey, institutionsQueryKey, transactionsQueryKey } from "~/helpers/requests";
-
 
 interface PermaDeleteAccountPopoverProps {
   accountId: string;

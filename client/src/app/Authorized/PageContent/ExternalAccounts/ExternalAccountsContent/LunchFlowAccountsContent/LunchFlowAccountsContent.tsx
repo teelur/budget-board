@@ -7,6 +7,8 @@ import { IApplicationUser } from "~/models/applicationUser";
 import { AxiosError, AxiosResponse } from "axios";
 import { notifications } from "@mantine/notifications";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   lunchFlowAccountQueryKey,
   translateAxiosError,
   userQueryKey,
@@ -14,7 +16,6 @@ import {
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
 import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
 
 const LunchFlowAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();

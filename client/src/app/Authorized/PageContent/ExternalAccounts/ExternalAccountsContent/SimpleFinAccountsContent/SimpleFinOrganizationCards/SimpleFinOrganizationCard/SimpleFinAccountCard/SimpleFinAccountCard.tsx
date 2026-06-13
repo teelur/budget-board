@@ -16,6 +16,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
   translateAxiosError,
@@ -24,8 +26,6 @@ import { AccountSource, IAccountResponse } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
-
 
 interface ISimpleFinAccountCardProps {
   simpleFinAccount: ISimpleFinAccountResponse;

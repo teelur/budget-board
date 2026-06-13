@@ -16,6 +16,8 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   lunchFlowAccountQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
@@ -23,8 +25,6 @@ import { AccountSource, IAccountResponse } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
-
 
 interface ILunchFlowAccountCardProps {
   lunchFlowAccount: ILunchFlowAccountResponse;

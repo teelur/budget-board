@@ -8,6 +8,8 @@ import { AxiosError, AxiosResponse } from "axios";
 import SimpleFinOrganizationCards from "./SimpleFinOrganizationCards/SimpleFinOrganizationCards";
 import { notifications } from "@mantine/notifications";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
   translateAxiosError,
@@ -15,7 +17,6 @@ import {
 } from "~/helpers/requests";
 import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
 
 const SimpleFinAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
