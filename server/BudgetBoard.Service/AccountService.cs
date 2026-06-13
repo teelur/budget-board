@@ -14,6 +14,7 @@ namespace BudgetBoard.Service;
 public class AccountService(
     ILogger<IAccountService> logger,
     UserDataContext userDataContext,
+    ITransactionService transactionService,
     INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer
@@ -109,10 +110,11 @@ public class AccountService(
 
         if (deleteTransactions)
         {
-            foreach (var transaction in account.Transactions)
-            {
-                transaction.Deleted = now;
-            }
+            await transactionService.DeleteTransactionBatchAsync(
+                userGuid,
+                account.Transactions.Select(t => t.ID),
+                true
+            );
         }
 
         if (account.Institution?.Accounts.All(a => a.Deleted != null) ?? false)
@@ -163,10 +165,11 @@ public class AccountService(
 
         if (restoreTransactions)
         {
-            foreach (var transaction in account.Transactions)
-            {
-                transaction.Deleted = null;
-            }
+            await transactionService.RestoreTransactionBatchAsync(
+                userGuid,
+                account.Transactions.Where(t => t.Deleted != null).Select(t => t.ID),
+                true
+            );
         }
 
         await userDataContext.SaveChangesAsync();
@@ -193,30 +196,6 @@ public class AccountService(
 
             account.Index = orderedAccount.Index;
         }
-
-        await userDataContext.SaveChangesAsync();
-    }
-
-    /// <inheritdoc />
-    public async Task UpdateAccountSourceAsync(Guid userGuid, Guid accountGuid, string source)
-    {
-        if (!AccountSource.IsValid(source))
-        {
-            throw new BudgetBoardServiceException(responseLocalizer["InvalidAccountSourceError"]);
-        }
-
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
-        if (account == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountSourceUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AccountSourceUpdateNotFoundError"]
-            );
-        }
-
-        account.Source = source;
 
         await userDataContext.SaveChangesAsync();
     }
