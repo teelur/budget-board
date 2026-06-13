@@ -1,17 +1,13 @@
 import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , accountsQueryKey, institutionsQueryKey, transactionsQueryKey} from "~/helpers/requests";
 import { IAccountResponse } from "~/models/account";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import PermaDeleteAccountPopover from "./PermaDeleteAccountPopover/PermaDeleteAccountPopover";
 import Card from "~/components/core/Card/Card";
+import { useRestoreAccountMutation } from "~/hooks/mutations/accounts/useRestoreAccountMutation";
 
 interface DeletedAccountCardProps {
   account: IAccountResponse;
@@ -22,28 +18,8 @@ const DeletedAccountCard = (
   props: DeletedAccountCardProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
 
-  const queryClient = useQueryClient();
-  const doRestoreAccount = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/account/restore`,
-        method: "POST",
-        params: { guid: props.account.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const doRestoreAccount = useRestoreAccountMutation();
 
   return (
     <Card elevation={1}>
@@ -65,7 +41,10 @@ const DeletedAccountCard = (
           <Badge bg="blue">{t(props.account.source)}</Badge>
         </Group>
         <Group style={{ alignSelf: "stretch" }} wrap="nowrap" gap="0.5rem">
-          <ActionIcon h="100%" onClick={() => doRestoreAccount.mutate()}>
+          <ActionIcon
+            h="100%"
+            onClick={() => doRestoreAccount.mutate(props.account.id)}
+          >
             <Undo2Icon size="1.2rem" />
           </ActionIcon>
           <PermaDeleteAccountPopover accountId={props.account.id} />
