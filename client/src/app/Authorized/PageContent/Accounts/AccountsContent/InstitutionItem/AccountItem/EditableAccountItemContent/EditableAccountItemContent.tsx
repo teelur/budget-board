@@ -10,7 +10,7 @@ import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { IAccountResponse, IAccountUpdateRequest } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
