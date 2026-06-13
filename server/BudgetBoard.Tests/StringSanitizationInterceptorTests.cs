@@ -59,6 +59,7 @@ public class StringSanitizationInterceptorTests
             Name = "Test\0Account",
             Type = "Check\0ing",
             Source = "Man\0ual",
+            InstitutionID = Guid.NewGuid(),
             UserID = helper.demoUser.Id,
         };
 
