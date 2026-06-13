@@ -583,4 +583,10 @@
   <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
     <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
   </data>
+  <data name="InvalidAccountSourceError" xml:space="preserve">
+    <value>The account source is invalid.</value>
+  </data>
+  <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
+    <value>The account must be deleted before it can be permanently deleted.</value>
+  </data>
 </root>

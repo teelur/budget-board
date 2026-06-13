@@ -583,4 +583,10 @@
   <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
     <value>Vordefinierte Vermögensarten können nicht deaktiviert werden, da sie derzeit von bestehenden Vermögenswerten oder benutzerdefinierten Vermögensarten verwendet werden.</value>
   </data>
+  <data name="InvalidAccountSourceError" xml:space="preserve">
+    <value>The account source is invalid.</value>
+  </data>
+  <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
+    <value>The account must be deleted before it can be permanently deleted.</value>
+  </data>
 </root>
