@@ -96,11 +96,9 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       onError: resetFormToServerValues,
     });
   }, [
-    accountNameField.getValue(),
     accountTypeField.getValue(),
     hideAccountField.getValue(),
     hideTransactionsField.getValue(),
-    interestRateField.getValue(),
   ]);
 
   return (
