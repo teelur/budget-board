@@ -12,6 +12,8 @@ import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { accountsQueryKey, institutionsQueryKey, transactionsQueryKey } from "~/helpers/requests";
+
 
 interface PermaDeleteAccountPopoverProps {
   accountId: string;
@@ -33,9 +35,9 @@ const PermaDeleteAccountPopover = (
         params: { guid: props.accountId },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [simpleFinAccountQueryKey],
       });

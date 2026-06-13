@@ -8,7 +8,7 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey, balancesQueryKey, institutionsQueryKey} from "~/helpers/requests";
 import { IBalanceResponse, IBalanceUpdateRequest } from "~/models/balance";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -62,10 +62,10 @@ const EditableBalanceItemContent = (
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["balances", props.balance.accountID],
+        queryKey: [balancesQueryKey, props.balance.accountID],
       });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({
@@ -83,10 +83,10 @@ const EditableBalanceItemContent = (
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["balances", props.balance.accountID],
+        queryKey: [balancesQueryKey, props.balance.accountID],
       });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
 
       notifications.show({
         color: "var(--button-color-confirm)",

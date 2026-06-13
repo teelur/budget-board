@@ -17,6 +17,8 @@ import { defaultGuid } from "~/models/applicationUser";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { ITransaction } from "~/models/transaction";
 import { AxiosResponse } from "axios";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -50,7 +52,7 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
         data: updatedUserSettings,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [transactionCategoriesQueryKey],
       });

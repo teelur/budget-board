@@ -9,7 +9,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { CornerDownRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , budgetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
@@ -30,7 +30,7 @@ const UnbudgetedChildCard = (
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -54,7 +54,7 @@ const UnbudgetedChildCard = (
         data: newBudget,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

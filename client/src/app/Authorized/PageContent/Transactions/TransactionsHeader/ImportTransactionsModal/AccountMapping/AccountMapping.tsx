@@ -10,6 +10,8 @@ import { ITransactionImportTableData } from "~/models/transaction";
 import { MoveLeftIcon } from "lucide-react";
 import { areStringsEqual } from "~/helpers/utils";
 import { useTranslation } from "react-i18next";
+import { accountsQueryKey } from "~/helpers/requests";
+
 
 export interface IAccountItem {
   value: string;
@@ -32,7 +34,7 @@ const AccountMapping = (props: AccountMappingProps) => {
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",

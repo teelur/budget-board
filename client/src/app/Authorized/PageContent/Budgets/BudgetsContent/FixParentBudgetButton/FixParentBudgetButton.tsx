@@ -3,7 +3,7 @@ import { notifications } from "@mantine/notifications";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , budgetsQueryKey} from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import { ICategoryNode } from "~/models/category";
@@ -27,12 +27,12 @@ const FixParentBudgetButton = (props: FixParentBudgetButtonProps) => {
         data: newBudget,
       }),
     onMutate: async (variables: IBudgetUpdateRequest) => {
-      await queryClient.cancelQueries({ queryKey: ["budgets"] });
+      await queryClient.cancelQueries({ queryKey: [budgetsQueryKey] });
 
       const previousBudgets: IBudget[] =
-        queryClient.getQueryData(["budgets"]) ?? [];
+        queryClient.getQueryData([budgetsQueryKey]) ?? [];
 
-      queryClient.setQueryData(["budgets"], (oldBudgets: IBudget[]) =>
+      queryClient.setQueryData([budgetsQueryKey], (oldBudgets: IBudget[]) =>
         oldBudgets?.map((oldBudget) =>
           oldBudget.id === variables.id
             ? { ...oldBudget, limit: variables.limit }
@@ -43,13 +43,13 @@ const FixParentBudgetButton = (props: FixParentBudgetButtonProps) => {
       return { previousBudgets };
     },
     onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
-      queryClient.setQueryData(["budgets"], context?.previousBudgets ?? []);
+      queryClient.setQueryData([budgetsQueryKey], context?.previousBudgets ?? []);
       notifications.show({
         message: translateAxiosError(error),
         color: "var(--button-color-destructive)",
       });
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["budgets"] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] }),
   });
 
   const budgetedCategories = props.budgets.map((budget) =>

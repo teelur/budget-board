@@ -24,6 +24,8 @@ import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 export interface ConditionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -41,7 +43,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

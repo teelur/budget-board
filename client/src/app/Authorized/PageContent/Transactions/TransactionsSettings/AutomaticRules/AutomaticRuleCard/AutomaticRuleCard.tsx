@@ -14,7 +14,7 @@ import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { notifications } from "@mantine/notifications";
 import { AxiosError, AxiosResponse } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey, transactionsQueryKey} from "~/helpers/requests";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -43,7 +43,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   const { preferredCurrency } = useUserSettings();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -111,7 +111,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       }),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: ["transactions"],
+        queryKey: [transactionsQueryKey],
       });
 
       notifications.show({

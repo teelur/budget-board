@@ -5,9 +5,13 @@ import { AxiosResponse, AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
+  accountsQueryKey,
+  goalsQueryKey,
+  institutionsQueryKey,
   lunchFlowAccountQueryKey,
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
+  transactionsQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
 import { useTranslation } from "react-i18next";
@@ -23,10 +27,10 @@ const SyncButton = (): React.ReactNode => {
     mutationFn: async () =>
       await request({ url: "/api/simplefin/sync", method: "GET" }),
     onSuccess: async (data: AxiosResponse) => {
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["goals"] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [goalsQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });

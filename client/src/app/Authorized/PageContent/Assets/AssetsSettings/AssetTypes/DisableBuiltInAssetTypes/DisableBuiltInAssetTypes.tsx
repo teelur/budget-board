@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { assetTypesQueryKey, translateAxiosError } from "~/helpers/requests";
+import { assetTypesQueryKey, translateAxiosError , assetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -21,7 +21,7 @@ const DisableBuiltInAssetTypes = (): React.ReactNode => {
   const { disableBuiltInAssetTypes } = useUserSettings();
 
   const assetsQuery = useQuery({
-    queryKey: ["assets"],
+    queryKey: [assetsQueryKey],
     queryFn: async (): Promise<IAssetResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/asset",
@@ -45,7 +45,7 @@ const DisableBuiltInAssetTypes = (): React.ReactNode => {
         data: updatedUserSettings,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userSettings"] });
+      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
       await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
     },
     onError: (error: any) => {

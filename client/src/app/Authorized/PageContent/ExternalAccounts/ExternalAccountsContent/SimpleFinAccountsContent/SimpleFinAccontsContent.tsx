@@ -14,6 +14,8 @@ import {
 } from "~/helpers/requests";
 import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
+
 
 const SimpleFinAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -50,8 +52,8 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
       await queryClient.invalidateQueries({
         queryKey: [simpleFinAccountQueryKey],
       });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

@@ -13,6 +13,8 @@ import {
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
 import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
+
 
 const LunchFlowAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -46,8 +48,8 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
       await queryClient.invalidateQueries({
         queryKey: [lunchFlowAccountQueryKey],
       });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

@@ -13,6 +13,8 @@ import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBa
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -28,7 +30,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

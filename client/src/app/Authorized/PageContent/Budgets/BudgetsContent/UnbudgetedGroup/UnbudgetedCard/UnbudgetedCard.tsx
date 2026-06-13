@@ -7,7 +7,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , budgetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { ICategoryNode } from "~/models/category";
 import UnbudgetedChildCard from "./UnbudgetedChildCard/UnbudgetedChildCard";
 import { roundAwayFromZero } from "~/helpers/utils";
@@ -31,7 +31,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   const { request } = useAuth();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -55,7 +55,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
         data: newBudget,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

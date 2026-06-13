@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React from "react";
 
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , transactionsQueryKey} from "~/helpers/requests";
 import {
   ActionOperators,
   FieldToOperatorType,
@@ -81,7 +81,7 @@ const AddAutomaticRule = (): React.ReactNode => {
       }),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: ["transactions"],
+        queryKey: [transactionsQueryKey],
       });
 
       notifications.show({

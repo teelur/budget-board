@@ -15,7 +15,7 @@ import { IGoalCreateRequest } from "~/models/goal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , goalsQueryKey} from "~/helpers/requests";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 const AddGoalModal = (): React.ReactNode => {
@@ -46,7 +46,7 @@ const AddGoalModal = (): React.ReactNode => {
         data: newGoal,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["goals"] });
+      await queryClient.invalidateQueries({ queryKey: [goalsQueryKey] });
       setActiveStep(3);
     },
     onError: (error: any) => {

@@ -19,6 +19,8 @@ import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { transactionsQueryKey } from "~/helpers/requests";
+
 
 const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const itemsPerPage = 15;
@@ -32,7 +34,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const { preferredCurrency } = useUserSettings();
 
   const transactionsQuery = useQuery({
-    queryKey: ["transactions", { getHidden: false }],
+    queryKey: [transactionsQueryKey, { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",

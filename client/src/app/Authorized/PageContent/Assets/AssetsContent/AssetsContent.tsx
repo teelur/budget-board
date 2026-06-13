@@ -8,7 +8,7 @@ import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , assetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AssetDetails from "./AssetDetails/AssetDetails";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -32,7 +32,7 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
 
   const { request } = useAuth();
   const assetsQuery = useQuery({
-    queryKey: ["assets"],
+    queryKey: [assetsQueryKey],
     queryFn: async () => {
       const res = await request({
         url: "/api/asset",
@@ -48,7 +48,7 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
   });
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async () => {
       const res = await request({
         url: "/api/userSettings",
@@ -89,7 +89,7 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
         data: assets,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({

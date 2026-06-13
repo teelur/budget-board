@@ -24,6 +24,8 @@ import { AccountSource, IAccountResponse } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
+
 
 interface ISimpleFinAccountCardProps {
   simpleFinAccount: ISimpleFinAccountResponse;
@@ -50,7 +52,7 @@ const SimpleFinAccountCard = (
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -100,8 +102,8 @@ const SimpleFinAccountCard = (
         queryKey: [simpleFinOrganizationQueryKey],
       });
       queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({
@@ -156,8 +158,8 @@ const SimpleFinAccountCard = (
       queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({

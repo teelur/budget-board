@@ -14,7 +14,7 @@ import { AxiosError } from "axios";
 import { PencilIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , accountsQueryKey, institutionsQueryKey, transactionsQueryKey} from "~/helpers/requests";
 import { IAccountResponse, IAccountUpdateRequest } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -93,9 +93,9 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

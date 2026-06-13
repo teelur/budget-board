@@ -13,6 +13,8 @@ import StatusText from "../core/Text/StatusText/StatusText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { userSettingsQueryKey } from "~/helpers/requests";
+
 
 interface AccountItemProps {
   account: IAccountResponse;
@@ -25,7 +27,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
   const { dayjs, dateFormat, intlLocale } = useLocale();
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",

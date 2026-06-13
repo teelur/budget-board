@@ -13,6 +13,8 @@ import NetCashFlowChart from "~/components/Charts/NetCashFlowChart/NetCashFlowCh
 import { Stack } from "@mantine/core";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import SelectLastNMonths from "~/components/SelectLastNMonths/SelectLastNMonths";
+import { transactionsQueryKey } from "~/helpers/requests";
+
 
 const NetCashFlowTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];
@@ -29,7 +31,7 @@ const NetCashFlowTab = (): React.ReactNode => {
   const { request } = useAuth();
   const transactionsQuery = useQueries({
     queries: getUniqueYears(selectedMonths).map((year: number) => ({
-      queryKey: ["transactions", { year }],
+      queryKey: [transactionsQueryKey, { year }],
       queryFn: async (): Promise<ITransaction[]> => {
         const res: AxiosResponse = await request({
           url: "/api/transaction",

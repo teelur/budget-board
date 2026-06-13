@@ -19,6 +19,8 @@ import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage"
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import NetWorthGroup from "./NetWorthGroup/NetWorthGroup";
 import Divider from "~/components/core/Divider/Divider";
+import { accountsQueryKey, assetsQueryKey, widgetSettingsQueryKey } from "~/helpers/requests";
+
 
 interface NetWorthWidgetProps {
   widgetId: string;
@@ -35,7 +37,7 @@ const NetWorthWidget = ({
   const { request } = useAuth();
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -49,7 +51,7 @@ const NetWorthWidget = ({
   });
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -65,7 +67,7 @@ const NetWorthWidget = ({
   });
 
   const assetsQuery = useQuery({
-    queryKey: ["assets"],
+    queryKey: [assetsQueryKey],
     queryFn: async (): Promise<IAssetResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/asset",

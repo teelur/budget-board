@@ -10,6 +10,8 @@ import { mantineDateFormat } from "~/helpers/datetime";
 import { IAssetResponse } from "~/models/asset";
 import { IValueResponse } from "~/models/value";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { assetsQueryKey } from "~/helpers/requests";
+
 
 const ValuesTab = (): React.ReactNode => {
   const { dayjs } = useLocale();
@@ -47,7 +49,7 @@ const ValuesTab = (): React.ReactNode => {
   });
 
   const assetsQuery = useQuery({
-    queryKey: ["assets"],
+    queryKey: [assetsQueryKey],
     queryFn: async (): Promise<IAssetResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/asset",

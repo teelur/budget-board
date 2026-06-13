@@ -9,7 +9,7 @@ import Card from "~/components/core/Card/Card";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { assetTypesQueryKey, translateAxiosError } from "~/helpers/requests";
+import { assetTypesQueryKey, translateAxiosError , assetsQueryKey} from "~/helpers/requests";
 import { IAssetTypeCreateRequest } from "~/models/assetType";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -41,7 +41,7 @@ const AddAssetType = (): React.ReactNode => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: ["assets"] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
       nameField.reset();
       parentField.reset();
       setIsChildType(false);

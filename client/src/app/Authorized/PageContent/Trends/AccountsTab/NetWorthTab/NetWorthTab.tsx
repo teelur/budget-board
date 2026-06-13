@@ -10,6 +10,8 @@ import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { IAccountResponse } from "~/models/account";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { accountsQueryKey, balancesQueryKey } from "~/helpers/requests";
+
 
 const NetWorthTab = (): React.ReactNode => {
   const { dayjs } = useLocale();
@@ -25,7 +27,7 @@ const NetWorthTab = (): React.ReactNode => {
 
   const balancesQuery = useQueries({
     queries: selectedAccountIds.map((accountId: string) => ({
-      queryKey: ["balances", accountId],
+      queryKey: [balancesQueryKey, accountId],
       queryFn: async (): Promise<IBalanceResponse[]> => {
         const res: AxiosResponse = await request({
           url: "/api/balance",
@@ -49,7 +51,7 @@ const NetWorthTab = (): React.ReactNode => {
   });
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",

@@ -23,6 +23,8 @@ import { AccountSource, IAccountResponse } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { accountsQueryKey, institutionsQueryKey } from "~/helpers/requests";
+
 
 interface ILunchFlowAccountCardProps {
   lunchFlowAccount: ILunchFlowAccountResponse;
@@ -49,7 +51,7 @@ const LunchFlowAccountCard = (
   const { request } = useAuth();
 
   const accountsQuery = useQuery({
-    queryKey: ["accounts"],
+    queryKey: [accountsQueryKey],
     queryFn: async (): Promise<IAccountResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/account",
@@ -96,8 +98,8 @@ const LunchFlowAccountCard = (
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({
@@ -144,8 +146,8 @@ const LunchFlowAccountCard = (
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({
