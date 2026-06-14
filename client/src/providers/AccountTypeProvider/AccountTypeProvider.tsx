@@ -1,4 +1,6 @@
 import React from "react";
+import { notifications } from "@mantine/notifications";
+import { useTranslation } from "react-i18next";
 import { IAccountTypeResponse } from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
 import { useAccountTypesQuery } from "~/hooks/queries/useAccountTypesQuery";
@@ -21,6 +23,16 @@ interface AccountTypeProviderProps {
 
 export const AccountTypeProvider = (props: AccountTypeProviderProps) => {
   const accountTypesQuery = useAccountTypesQuery();
+  const { t } = useTranslation();
+
+  React.useEffect(() => {
+    if (accountTypesQuery.isError) {
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: t("account_types_query_error"),
+      });
+    }
+  }, [accountTypesQuery.isError, t]);
 
   const customAccountTypes = React.useMemo(
     () =>
