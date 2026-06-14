@@ -21,7 +21,7 @@ import {
   lunchFlowAccountQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { AccountSource } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";

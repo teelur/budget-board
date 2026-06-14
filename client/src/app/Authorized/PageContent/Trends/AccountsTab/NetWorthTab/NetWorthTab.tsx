@@ -10,7 +10,7 @@ import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { balancesQueryKey } from "~/helpers/requests";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 const NetWorthTab = (): React.ReactNode => {
   const { dayjs } = useLocale();

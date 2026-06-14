@@ -19,7 +19,7 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import NetWorthGroup from "./NetWorthGroup/NetWorthGroup";
 import Divider from "~/components/core/Divider/Divider";
 import { assetsQueryKey, widgetSettingsQueryKey } from "~/helpers/requests";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface NetWorthWidgetProps {
   widgetId: string;

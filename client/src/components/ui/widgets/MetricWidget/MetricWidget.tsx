@@ -32,7 +32,7 @@ import {
   transactionsQueryKey,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface MetricWidgetProps {
   widgetId: string;

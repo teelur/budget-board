@@ -13,7 +13,7 @@ import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { balancesQueryKey } from "~/helpers/requests";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 const AssetsTab = (): React.ReactNode => {
   const { request } = useAuth();

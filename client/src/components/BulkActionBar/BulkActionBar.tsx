@@ -38,7 +38,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface BulkActionBarProps {
   selectedIds: Set<string>;
