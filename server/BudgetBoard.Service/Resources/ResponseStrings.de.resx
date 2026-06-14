@@ -64,15 +64,6 @@
   <data name="AccountNotFoundError" xml:space="preserve">
     <value>Das Konto, auf das Sie zugreifen möchten, existiert nicht.</value>
   </data>
-  <data name="AccountDeleteNotFoundError" xml:space="preserve">
-    <value>Das Konto, das Sie löschen möchten, existiert nicht.</value>
-  </data>
-  <data name="AccountRestoreNotFoundError" xml:space="preserve">
-    <value>Das Konto, das Sie wiederherstellen möchten, existiert nicht.</value>
-  </data>
-  <data name="AccountOrderNotFoundError" xml:space="preserve">
-    <value>Das Konto, das Sie bestellen möchten, existiert nicht.</value>
-  </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
     <value>Beim Abrufen der Benutzerdaten ist ein Fehler aufgetreten.</value>
   </data>
@@ -403,9 +394,6 @@
   <data name="InvalidDateFormatError" xml:space="preserve">
     <value>Das angegebene Datumsformat ist ungültig.</value>
   </data>
-  <data name="AccountPermanentDeleteNotFoundError" xml:space="preserve">
-    <value>Das Konto, das Sie dauerhaft löschen möchten, existiert nicht.</value>
-  </data>
   <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
     <value>Die Anfrage zur Massenaktualisierung enthält doppelte Transaktions-IDs.</value>
   </data>
@@ -430,32 +418,8 @@
   <data name="LunchFlowAccountSyncException" xml:space="preserve">
     <value>Bei der Synchronisierung des LunchFlow-Kontos „{0}“ ist ein unerwarteter Fehler aufgetreten.</value>
   </data>
-  <data name="AccountTypeCreateDuplicateNameError" xml:space="preserve">
-    <value>Ein Kontotyp mit diesem Namen existiert bereits.</value>
-  </data>
-  <data name="AccountTypeCreateEmptyNameError" xml:space="preserve">
-    <value>Der Name des Kontotyps darf nicht leer sein.</value>
-  </data>
-  <data name="AccountTypeCreateSameNameAsParentError" xml:space="preserve">
-    <value>Der Name des Kontotyps darf nicht mit dem seines übergeordneten Kontotyps übereinstimmen.</value>
-  </data>
-  <data name="AccountTypeCreateParentNotFoundError" xml:space="preserve">
-    <value>Der übergeordnete Kontotyp existiert nicht.</value>
-  </data>
   <data name="AccountTypeNotFoundError" xml:space="preserve">
     <value>Der Kontotyp, auf den Sie zugreifen möchten, existiert nicht.</value>
-  </data>
-  <data name="AccountTypeUpdateDuplicateNameError" xml:space="preserve">
-    <value>Ein Kontotyp mit diesem Namen existiert bereits.</value>
-  </data>
-  <data name="AccountTypeUpdateEmptyNameError" xml:space="preserve">
-    <value>Der Name des Kontotyps darf nicht leer sein.</value>
-  </data>
-  <data name="AccountTypeUpdateSameNameAsParentError" xml:space="preserve">
-    <value>Der Name des Kontotyps darf nicht mit dem seines übergeordneten Kontotyps übereinstimmen.</value>
-  </data>
-  <data name="AccountTypeUpdateParentNotFoundError" xml:space="preserve">
-    <value>Der übergeordnete Kontotyp existiert nicht.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
     <value>Die angegebene Kontotyp-Klassifizierung ist ungültig. Gültige Werte sind "Vermögenswert" und "Verbindlichkeit".</value>
@@ -513,5 +477,17 @@
   </data>
   <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
     <value>The account must be deleted before it can be permanently deleted.</value>
+  </data>
+  <data name="AccountTypeDuplicateNameError" xml:space="preserve">
+    <value>An account type with this name already exists.</value>
+  </data>
+  <data name="AccountTypeEmptyNameError" xml:space="preserve">
+    <value>The account type name cannot be empty.</value>
+  </data>
+  <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
+    <value>The account type name cannot be the same as its parent.</value>
+  </data>
+  <data name="AccountTypeParentNotFoundError" xml:space="preserve">
+    <value>The parent account type does not exist.</value>
   </data>
 </root>
