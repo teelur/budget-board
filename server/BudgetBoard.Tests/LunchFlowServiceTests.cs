@@ -273,7 +273,13 @@ public class LunchFlowServiceTests
         // Assert
         helper.UserDataContext.Users.Single().LunchFlowApiKey.Should().BeEmpty();
         accountServiceMock.Verify(
-            _ => _.UpdateAccountSourceAsync(helper.demoUser.Id, account.ID, AccountSource.Manual),
+            _ =>
+                _.UpdateAccountAsync(
+                    helper.demoUser.Id,
+                    It.Is<IAccountUpdateRequest>(req =>
+                        req.ID == account.ID && req.Source == AccountSource.Manual
+                    )
+                ),
             Times.Once
         );
         lunchFlowAccountServiceMock.Verify(
@@ -1204,6 +1210,7 @@ public class LunchFlowServiceTests
         {
             Name = "Bad Account",
             Type = "checking",
+            InstitutionID = Guid.NewGuid(),
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(accountBad);
@@ -1217,6 +1224,7 @@ public class LunchFlowServiceTests
         {
             Name = "Valid Account",
             Type = "checking",
+            InstitutionID = Guid.NewGuid(),
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(accountValid);

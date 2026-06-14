@@ -18,18 +18,14 @@ public interface IAccountService
     /// Retrieves accounts for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="accountGuid">Optional. The unique identifier of a specific account to retrieve.</param>
     /// <returns>A collection of account details ordered by index.</returns>
-    Task<IReadOnlyList<IAccountResponse>> ReadAccountsAsync(
-        Guid userGuid,
-        Guid accountGuid = default
-    );
+    Task<IReadOnlyList<IAccountResponse>> ReadAccountsAsync(Guid userGuid);
 
     /// <summary>
     /// Updates an existing account for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="editedAccount">The account update details.</param>
+    /// <param name="request">The account update details.</param>
     Task UpdateAccountAsync(Guid userGuid, IAccountUpdateRequest request);
 
     /// <summary>
@@ -54,15 +50,6 @@ public interface IAccountService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="orderedAccounts">A collection of account index requests defining the new order.</param>
     Task OrderAccountsAsync(Guid userGuid, IEnumerable<IAccountIndexRequest> orderedAccounts);
-
-    /// <summary>
-    /// Updates the source of a specific account for the specified user.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="accountGuid">The unique identifier of the account to update.</param>
-    /// <param name="source">The new source value for the account.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task UpdateAccountSourceAsync(Guid userGuid, Guid accountGuid, string source);
 
     /// <summary>
     /// Permanently deletes an account for the specified user, removing it and all associated transactions and balances from the database entirely.

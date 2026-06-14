@@ -19,6 +19,7 @@ public class AccountTypeServiceTests
             .RuleFor(a => a.Value, f => f.Random.String(20))
             .RuleFor(a => a.Parent, f => f.Random.String(20));
 
+    #region CreateAccountTypeAsync
     [Fact]
     public async Task CreateAccountTypeAsync_WhenCalledWithValidData_ShouldCreateAccountType()
     {
@@ -49,10 +50,14 @@ public class AccountTypeServiceTests
 
         // Assert
         helper.UserDataContext.AccountTypes.Should().HaveCount(2);
+        var createdAccountType = helper.UserDataContext.AccountTypes.Single(at =>
+            at.Value == accountTypeCreateRequest.Value
+        );
+        createdAccountType.Parent.Should().Be(accountTypeCreateRequest.Parent);
     }
 
     [Fact]
-    public async Task CreateAccountTypeAsync_InvalidUserId_ThrowsError()
+    public async Task CreateAccountTypeAsync_WhenCreatingEmptyName_ShouldThrowAccountTypeEmptyNameError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -65,22 +70,23 @@ public class AccountTypeServiceTests
         );
 
         var accountTypeCreateRequest = _accountTypeCreateRequestFaker.Generate();
+        accountTypeCreateRequest.Value = string.Empty;
 
         // Act
         Func<Task> act = async () =>
             await accountTypeService.CreateAccountTypeAsync(
-                Guid.NewGuid(),
+                helper.demoUser.Id,
                 accountTypeCreateRequest
             );
 
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("InvalidUserError");
+            .WithMessage("AccountTypeEmptyNameError");
     }
 
     [Fact]
-    public async Task CreateAccountTypeAsync_WhenCreatingDuplicate_ShouldThrowError()
+    public async Task CreateAccountTypeAsync_WhenCreatingDuplicate_ShouldThrowAccountTypeDuplicateNameError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -114,40 +120,11 @@ public class AccountTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeCreateDuplicateNameError");
+            .WithMessage("AccountTypeDuplicateNameError");
     }
 
     [Fact]
-    public async Task CreateAccountTypeAsync_WhenCreatingEmptyName_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var accountTypeService = new AccountTypeService(
-            Mock.Of<ILogger<IAccountTypeService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountTypeCreateRequest = _accountTypeCreateRequestFaker.Generate();
-        accountTypeCreateRequest.Value = string.Empty;
-
-        // Act
-        Func<Task> act = async () =>
-            await accountTypeService.CreateAccountTypeAsync(
-                helper.demoUser.Id,
-                accountTypeCreateRequest
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeCreateEmptyNameError");
-    }
-
-    [Fact]
-    public async Task CreateAccountTypeAsync_WhenParentSameAsValue_ShouldThrowError()
+    public async Task CreateAccountTypeAsync_WhenParentSameAsValue_ShouldThrowAccountTypeSameNameAsParentError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -172,11 +149,11 @@ public class AccountTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeCreateSameNameAsParentError");
+            .WithMessage("AccountTypeSameNameAsParentError");
     }
 
     [Fact]
-    public async Task CreateAccountTypeAsync_WhenParentDoesNotExist_ShouldThrowError()
+    public async Task CreateAccountTypeAsync_WhenParentDoesNotExist_ShouldThrowAccountTypeParentNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -200,11 +177,11 @@ public class AccountTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeCreateParentNotFoundError");
+            .WithMessage("AccountTypeParentNotFoundError");
     }
 
     [Fact]
-    public async Task CreateAccountTypeAsync_WhenClassificationIsInvalid_ShouldThrowError()
+    public async Task CreateAccountTypeAsync_WhenClassificationIsInvalid_ShouldThrowAccountTypeInvalidClassificationError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -280,9 +257,9 @@ public class AccountTypeServiceTests
 
         var accountTypeCreateRequest = _accountTypeCreateRequestFaker.Generate();
         accountTypeCreateRequest.Parent = AccountTypeConstants
-            .DefaultAccountTypes.First(at => at.Classification == AccountClassifications.Asset)
+            .DefaultAccountTypes.First(at => at.Classification == AccountTypeClassification.Asset)
             .Value;
-        accountTypeCreateRequest.Classification = AccountClassifications.Liability;
+        accountTypeCreateRequest.Classification = AccountTypeClassification.Liability;
 
         // Act
         await accountTypeService.CreateAccountTypeAsync(
@@ -294,9 +271,11 @@ public class AccountTypeServiceTests
         helper
             .UserDataContext.AccountTypes.Single()
             .Classification.Should()
-            .Be(AccountClassifications.Asset);
+            .Be(AccountTypeClassification.Asset);
     }
+    #endregion
 
+    #region ReadAccountTypesAsync
     [Fact]
     public async Task ReadAccountTypesAsync_WhenCalledWithValidData_ShouldReturnAccountTypes()
     {
@@ -351,7 +330,9 @@ public class AccountTypeServiceTests
                 AccountTypeConstants.DefaultAccountTypes.Any(dat => dat.Value == r.Value)
             );
     }
+    #endregion
 
+    #region UpdateAccountTypeAsync
     [Fact]
     public async Task UpdateAccountTypeAsync_WhenCalledWithValidData_ShouldUpdateAccountType()
     {
@@ -395,7 +376,7 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
-    public async Task UpdateAccountTypeAsync_WhenCalledWithInvalidAccountTypeID_ShouldThrowError()
+    public async Task UpdateAccountTypeAsync_WhenCalledWithInvalidAccountTypeID_ShouldThrowAccountTypeNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -429,50 +410,11 @@ public class AccountTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeUpdateNotFoundError");
+            .WithMessage("AccountTypeNotFoundError");
     }
 
     [Fact]
-    public async Task UpdateAccountTypeAsync_WhenCalledWithDuplicateName_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var accountTypeService = new AccountTypeService(
-            Mock.Of<ILogger<IAccountTypeService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
-        var accountTypes = accountTypeFaker.Generate(5);
-
-        helper.UserDataContext.AccountTypes.AddRange(accountTypes);
-        helper.UserDataContext.SaveChanges();
-
-        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
-        {
-            ID = accountTypes.First().ID,
-            Parent = accountTypes.First().Parent,
-            Value = accountTypes.Last().Value,
-        };
-
-        // Act
-        Func<Task> act = async () =>
-            await accountTypeService.UpdateAccountTypeAsync(
-                helper.demoUser.Id,
-                accountTypeUpdateRequest
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeUpdateDuplicateNameError");
-    }
-
-    [Fact]
-    public async Task UpdateAccountTypeAsync_WhenCalledWithEmptyName_ShouldThrowError()
+    public async Task UpdateAccountTypeAsync_WhenCalledWithEmptyName_ShouldThrowAccountTypeEmptyNameError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -507,11 +449,50 @@ public class AccountTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeUpdateEmptyNameError");
+            .WithMessage("AccountTypeEmptyNameError");
     }
 
     [Fact]
-    public async Task UpdateAccountTypeAsync_WhenCalledWithSameNameAsParent_ShouldThrowError()
+    public async Task UpdateAccountTypeAsync_WhenCalledWithDuplicateName_ShouldThrowAccountTypeDuplicateNameError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var accountTypes = accountTypeFaker.Generate(5);
+
+        helper.UserDataContext.AccountTypes.AddRange(accountTypes);
+        helper.UserDataContext.SaveChanges();
+
+        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
+        {
+            ID = accountTypes.First().ID,
+            Parent = accountTypes.First().Parent,
+            Value = accountTypes.Last().Value,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await accountTypeService.UpdateAccountTypeAsync(
+                helper.demoUser.Id,
+                accountTypeUpdateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AccountTypeDuplicateNameError");
+    }
+
+    [Fact]
+    public async Task UpdateAccountTypeAsync_WhenCalledWithSameNameAsParent_ShouldThrowAccountTypeSameNameAsParentError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -546,11 +527,11 @@ public class AccountTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeUpdateSameNameAsParentError");
+            .WithMessage("AccountTypeSameNameAsParentError");
     }
 
     [Fact]
-    public async Task UpdateAccountTypeAsync_WhenCalledWithParentThatDoesNotExist_ShouldThrowError()
+    public async Task UpdateAccountTypeAsync_WhenCalledWithParentThatDoesNotExist_ShouldThrowAccountTypeParentNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -585,11 +566,11 @@ public class AccountTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeUpdateParentNotFoundError");
+            .WithMessage("AccountTypeParentNotFoundError");
     }
 
     [Fact]
-    public async Task UpdateAccountTypeAsync_WhenCalledWithInvalidClassification_ShouldThrowError()
+    public async Task UpdateAccountTypeAsync_WhenCalledWithInvalidClassification_ShouldThrowAccountTypeInvalidClassificationError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -645,7 +626,7 @@ public class AccountTypeServiceTests
         var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
         var accountType = accountTypeFaker.Generate();
         accountType.Parent = string.Empty;
-        accountType.Classification = AccountClassifications.Liability;
+        accountType.Classification = AccountTypeClassification.Liability;
 
         helper.UserDataContext.AccountTypes.Add(accountType);
         helper.UserDataContext.SaveChanges();
@@ -654,10 +635,12 @@ public class AccountTypeServiceTests
         {
             ID = accountType.ID,
             Parent = AccountTypeConstants
-                .DefaultAccountTypes.First(at => at.Classification == AccountClassifications.Asset)
+                .DefaultAccountTypes.First(at =>
+                    at.Classification == AccountTypeClassification.Asset
+                )
                 .Value,
             Value = accountType.Value,
-            Classification = AccountClassifications.Liability,
+            Classification = AccountTypeClassification.Liability,
         };
 
         // Act
@@ -670,7 +653,7 @@ public class AccountTypeServiceTests
         helper
             .UserDataContext.AccountTypes.Single(at => at.ID == accountType.ID)
             .Classification.Should()
-            .Be(AccountClassifications.Asset);
+            .Be(AccountTypeClassification.Asset);
     }
 
     [Fact]
@@ -717,6 +700,59 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
+    public async Task UpdateAccountTypeAsync_WhenParentIsChangedToChild_ShouldUpdateChildrenToBeParents()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var parentAccountType = accountTypeFaker.Generate();
+        parentAccountType.Parent = string.Empty;
+
+        var childAccountType = accountTypeFaker.Generate();
+        childAccountType.Parent = parentAccountType.Value;
+
+        var anotherParentAccountType = accountTypeFaker.Generate();
+        anotherParentAccountType.Parent = string.Empty;
+
+        helper.UserDataContext.AccountTypes.AddRange(
+            [parentAccountType, childAccountType, anotherParentAccountType]
+        );
+        helper.UserDataContext.SaveChanges();
+
+        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
+        {
+            ID = parentAccountType.ID,
+            Parent = anotherParentAccountType.Value,
+            Value = parentAccountType.Value,
+        };
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeUpdateRequest
+        );
+
+        // Assert
+        helper
+            .UserDataContext.AccountTypes.Single(at => at.ID == parentAccountType.ID)
+            .Parent.Should()
+            .Be(anotherParentAccountType.Value);
+
+        helper
+            .UserDataContext.AccountTypes.Single(at => at.ID == childAccountType.ID)
+            .Parent.Should()
+            .Be(string.Empty);
+    }
+
+    [Fact]
     public async Task UpdateAccountTypeAsync_WhenUpdateClassification_ShouldAlsoUpdateChildrenClassification()
     {
         // Arrange
@@ -732,11 +768,11 @@ public class AccountTypeServiceTests
         var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
         var parentAccountType = accountTypeFaker.Generate();
         parentAccountType.Parent = string.Empty;
-        parentAccountType.Classification = AccountClassifications.Asset;
+        parentAccountType.Classification = AccountTypeClassification.Asset;
 
         var childAccountType = accountTypeFaker.Generate();
         childAccountType.Parent = parentAccountType.Value;
-        childAccountType.Classification = AccountClassifications.Asset;
+        childAccountType.Classification = AccountTypeClassification.Asset;
 
         helper.UserDataContext.AccountTypes.AddRange([parentAccountType, childAccountType]);
         helper.UserDataContext.SaveChanges();
@@ -746,7 +782,7 @@ public class AccountTypeServiceTests
             ID = parentAccountType.ID,
             Parent = parentAccountType.Parent,
             Value = parentAccountType.Value,
-            Classification = AccountClassifications.Liability,
+            Classification = AccountTypeClassification.Liability,
         };
 
         // Act
@@ -759,12 +795,12 @@ public class AccountTypeServiceTests
         helper
             .UserDataContext.AccountTypes.Single(at => at.ID == parentAccountType.ID)
             .Classification.Should()
-            .Be(AccountClassifications.Liability);
+            .Be(AccountTypeClassification.Liability);
 
         helper
             .UserDataContext.AccountTypes.Single(at => at.ID == childAccountType.ID)
             .Classification.Should()
-            .Be(AccountClassifications.Liability);
+            .Be(AccountTypeClassification.Liability);
     }
 
     [Fact]
@@ -809,7 +845,9 @@ public class AccountTypeServiceTests
             .Parent.Should()
             .Be(accountTypeUpdateRequest.Value);
     }
+    #endregion
 
+    #region DeleteAccountTypeAsync
     [Fact]
     public async Task DeleteAccountTypeAsync_WhenCalledWithValidData_ShouldDeleteAccountType()
     {
@@ -841,7 +879,7 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
-    public async Task DeleteAccountTypeAsync_WhenCalledWithInvalidAccountTypeID_ShouldThrowError()
+    public async Task DeleteAccountTypeAsync_WhenCalledWithInvalidAccountTypeID_ShouldThrowAccountTypeNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -866,7 +904,7 @@ public class AccountTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountTypeDeleteNotFoundError");
+            .WithMessage("AccountTypeNotFoundError");
     }
 
     [Fact]
@@ -902,7 +940,7 @@ public class AccountTypeServiceTests
         // Assert
         helper.UserDataContext.AccountTypes.Should().NotContain(parentAccountType);
         helper.UserDataContext.AccountTypes.Should().NotContain(childAccountType);
-        account.Type.Should().BeNull();
+        account.Type.Should().Be(string.Empty);
     }
 
     [Fact]
@@ -935,6 +973,7 @@ public class AccountTypeServiceTests
 
         // Assert
         helper.UserDataContext.AccountTypes.Should().NotContain(accountType);
-        account.Type.Should().BeNull();
+        account.Type.Should().Be(string.Empty);
     }
+    #endregion
 }

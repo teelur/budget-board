@@ -7,7 +7,11 @@ import { AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  balancesQueryKey,
+  institutionsQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
 import { IBalanceCreateRequest } from "~/models/balance";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
@@ -47,9 +51,9 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
         data: newBalance,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
       await queryClient.invalidateQueries({
-        queryKey: ["balances", props.accountId],
+        queryKey: [balancesQueryKey, props.accountId],
       });
     },
     onError: (error: AxiosError) =>

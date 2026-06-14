@@ -3,7 +3,6 @@ import React from "react";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
-import { IAccountResponse } from "~/models/account";
 import { AxiosResponse } from "axios";
 import { filterVisibleAssets } from "~/helpers/assets";
 import { IAssetResponse } from "~/models/asset";
@@ -19,6 +18,8 @@ import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage"
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import NetWorthGroup from "./NetWorthGroup/NetWorthGroup";
 import Divider from "~/components/core/Divider/Divider";
+import { assetsQueryKey, widgetSettingsQueryKey } from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface NetWorthWidgetProps {
   widgetId: string;
@@ -35,7 +36,7 @@ const NetWorthWidget = ({
   const { request } = useAuth();
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -48,24 +49,10 @@ const NetWorthWidget = ({
     },
   });
 
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const assetsQuery = useQuery({
-    queryKey: ["assets"],
+    queryKey: [assetsQueryKey],
     queryFn: async (): Promise<IAssetResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/asset",

@@ -8,14 +8,9 @@ import {
 } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { PencilIcon } from "lucide-react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { translateAxiosError } from "~/helpers/requests";
-import { IAccountResponse, IAccountUpdateRequest } from "~/models/account";
+import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
@@ -26,6 +21,7 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -72,69 +68,57 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
     decimalSeparator,
   } = useLocale();
   const { allAccountTypes } = useAccountTypes();
-  const { request } = useAuth();
 
-  const queryClient = useQueryClient();
-  const doUpdateAccount = useMutation({
-    mutationFn: async () => {
-      const editedAccount: IAccountUpdateRequest = {
+  const updateAccountMutation = useUpdateAccountMutation();
+
+  const resetFormToServerValues = () => {
+    accountNameField.setValue(props.account.name);
+    interestRateField.setValue(
+      props.account.interestRate ? props.account.interestRate * 100 : undefined,
+    );
+    accountTypeField.setValue(props.account.type);
+    hideAccountField.setValue(props.account.hideAccount ?? false);
+    hideTransactionsField.setValue(props.account.hideTransactions ?? false);
+  };
+
+  useDidUpdate(() => {
+    updateAccountMutation.mutate(
+      {
         id: props.account.id,
-        name: accountNameField.getValue(),
         type: accountTypeField.getValue(),
-        hideTransactions: hideTransactionsField.getValue(),
         hideAccount: hideAccountField.getValue(),
-        interestRate: ((interestRateField.getValue() ?? 0) as number) / 100,
-      };
-
-      return await request({
-        url: "/api/account",
-        method: "PUT",
-        data: editedAccount,
-      });
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-
-      // Reset fields to original values on error
-      accountNameField.setValue(props.account.name);
-      interestRateField.setValue(
-        props.account.interestRate
-          ? props.account.interestRate * 100
-          : undefined,
-      );
-      accountTypeField.setValue(props.account.type);
-      hideAccountField.setValue(props.account.hideAccount ?? false);
-      hideTransactionsField.setValue(props.account.hideTransactions ?? false);
-    },
-  });
-
-  useDidUpdate(
-    () => doUpdateAccount.mutate(),
-    [
-      accountTypeField.getValue(),
-      hideAccountField.getValue(),
-      hideTransactionsField.getValue(),
-    ],
-  );
+        hideTransactions: hideTransactionsField.getValue(),
+      },
+      {
+        onError: resetFormToServerValues,
+      },
+    );
+  }, [
+    accountTypeField.getValue(),
+    hideAccountField.getValue(),
+    hideTransactionsField.getValue(),
+  ]);
 
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <Stack gap="0.5rem" flex="1 1 auto">
-        <LoadingOverlay visible={doUpdateAccount.isPending} />
+        <LoadingOverlay visible={updateAccountMutation.isPending} />
         <Group justify="space-between" align="flex-end">
           <Group gap="0.5rem" align="flex-end">
             <TextInput
               {...accountNameField.getInputProps()}
               label={<PrimaryText size="xs">{t("name")}</PrimaryText>}
-              onBlur={() => doUpdateAccount.mutate()}
+              onBlur={() =>
+                updateAccountMutation.mutate(
+                  {
+                    id: props.account.id,
+                    name: accountNameField.getValue(),
+                  },
+                  {
+                    onError: resetFormToServerValues,
+                  },
+                )
+              }
               elevation={2}
             />
             <Flex style={{ alignSelf: "stretch" }}>
@@ -160,7 +144,18 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               step={1}
               suffix="%"
               maw={90}
-              onBlur={() => doUpdateAccount.mutate()}
+              onBlur={() =>
+                updateAccountMutation.mutate(
+                  {
+                    id: props.account.id,
+                    interestRate:
+                      ((interestRateField.getValue() ?? 0) as number) / 100,
+                  },
+                  {
+                    onError: resetFormToServerValues,
+                  },
+                )
+              }
               elevation={2}
             />
             <Group gap="0.5rem">

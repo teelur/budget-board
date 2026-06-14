@@ -292,7 +292,11 @@ public class TransactionService(
     }
 
     /// <inheritdoc />
-    public async Task DeleteTransactionBatchAsync(Guid userGuid, IEnumerable<Guid> guids)
+    public async Task DeleteTransactionBatchAsync(
+        Guid userGuid,
+        IEnumerable<Guid> guids,
+        bool deferSave = false
+    )
     {
         var guidList = guids.ToList();
         var duplicateIds = guidList
@@ -325,7 +329,10 @@ public class TransactionService(
             MarkTransactionAsDeleted(transaction);
         }
 
-        await userDataContext.SaveChangesAsync();
+        if (!deferSave)
+        {
+            await userDataContext.SaveChangesAsync();
+        }
     }
 
     /// <inheritdoc />
@@ -346,6 +353,50 @@ public class TransactionService(
 
         transaction.Deleted = null;
         await userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task RestoreTransactionBatchAsync(
+        Guid userGuid,
+        IEnumerable<Guid> guids,
+        bool deferSave = false
+    )
+    {
+        var guidList = guids.ToList();
+        var duplicateIds = guidList
+            .GroupBy(id => id)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+        if (duplicateIds.Count > 0)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionBatchRestoreDuplicateIdsLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionBatchRestoreDuplicateIdsError"]
+            );
+        }
+
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
+
+        foreach (var guid in guidList)
+        {
+            var transaction = allTransactions.FirstOrDefault(t => t.ID == guid);
+            if (transaction == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["TransactionRestoreNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionRestoreNotFoundError"]
+                );
+            }
+
+            transaction.Deleted = null;
+        }
+
+        if (!deferSave)
+        {
+            await userDataContext.SaveChangesAsync();
+        }
     }
 
     /// <inheritdoc />
@@ -460,32 +511,21 @@ public class TransactionService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await userDataContext
-                .ApplicationUsers.Include(u => u.Accounts)
-                .ThenInclude(a => a.Transactions)
-                .Include(u => u.Accounts)
-                .ThenInclude(a => a.Balances)
-                .Include(u => u.UserSettings)
-                .Include(u => u.TransactionCategories)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
-            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            id,
+            users =>
+                users
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Transactions)
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Balances)
+                    .Include(u => u.UserSettings)
+                    .Include(u => u.TransactionCategories)
+        );
     }
 
     private void UpdateBalancesForNewTransaction(

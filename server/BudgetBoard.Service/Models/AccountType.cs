@@ -3,13 +3,6 @@ using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
-public struct AccountClassifications
-{
-    public const string Asset = "asset";
-    public const string Liability = "liability";
-    public static readonly IEnumerable<string> AllClassifications = [Asset, Liability];
-}
-
 public interface IAccountType
 {
     public string Value { get; }
@@ -28,7 +21,7 @@ public class AccountTypeBase : IAccountType
     {
         Value = string.Empty;
         Parent = string.Empty;
-        Classification = AccountClassifications.Asset;
+        Classification = AccountTypeClassification.Asset;
     }
 }
 
@@ -45,7 +38,7 @@ public class AccountTypeCreateRequest : IAccountTypeCreateRequest
     {
         Value = string.Empty;
         Parent = string.Empty;
-        Classification = AccountClassifications.Asset;
+        Classification = AccountTypeClassification.Asset;
     }
 }
 
@@ -70,7 +63,7 @@ public class AccountTypeUpdateRequest : IAccountTypeUpdateRequest
         ID = Guid.Empty;
         Value = string.Empty;
         Parent = string.Empty;
-        Classification = AccountClassifications.Asset;
+        Classification = AccountTypeClassification.Asset;
     }
 }
 
@@ -95,7 +88,7 @@ public class AccountTypeResponse : IAccountTypeResponse
         ID = Guid.Empty;
         Value = string.Empty;
         Parent = string.Empty;
-        Classification = AccountClassifications.Asset;
+        Classification = AccountTypeClassification.Asset;
     }
 
     public AccountTypeResponse(AccountType accountType)

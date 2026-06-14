@@ -1,26 +1,20 @@
 import { Button, LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { accountTypesQueryKey, translateAxiosError } from "~/helpers/requests";
 import { AccountTypeClassification } from "~/models/account";
-import { IAccountTypeCreateRequest } from "~/models/accountType";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { useCreateAccountTypeMutation } from "~/hooks/mutations/accountTypes/useCreateAccountTypeMutation";
 
 const AddAccountType = (): React.ReactNode => {
   const [isChildType, setIsChildType] = React.useState(false);
 
   const { t } = useTranslation();
   const { allAccountTypes } = useAccountTypes();
-  const { request } = useAuth();
 
   const nameField = useField<string>({
     initialValue: "",
@@ -36,28 +30,7 @@ const AddAccountType = (): React.ReactNode => {
     initialValue: AccountTypeClassification.Asset,
   });
 
-  const queryClient = useQueryClient();
-  const doAddAccountType = useMutation({
-    mutationFn: async (accountType: IAccountTypeCreateRequest) =>
-      await request({
-        url: "/api/accountType",
-        method: "POST",
-        data: accountType,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      nameField.reset();
-      parentField.reset();
-      classificationField.setValue(AccountTypeClassification.Asset);
-      setIsChildType(false);
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
+  const createAccountTypeMutation = useCreateAccountTypeMutation();
 
   const parentTypes = allAccountTypes.filter((type) => type.parent === "");
 
@@ -73,7 +46,7 @@ const AddAccountType = (): React.ReactNode => {
 
   return (
     <Card elevation={1}>
-      <LoadingOverlay visible={doAddAccountType.isPending} />
+      <LoadingOverlay visible={createAccountTypeMutation.isPending} />
       <Stack>
         <TextInput
           {...nameField.getInputProps()}
@@ -132,11 +105,21 @@ const AddAccountType = (): React.ReactNode => {
         <Button
           w="100%"
           onClick={() => {
-            doAddAccountType.mutate({
-              value: nameField.getValue(),
-              parent: isChildType ? parentField.getValue() : "",
-              classification: getClassificationForSubmit(),
-            });
+            createAccountTypeMutation.mutate(
+              {
+                value: nameField.getValue(),
+                parent: isChildType ? parentField.getValue() : "",
+                classification: getClassificationForSubmit(),
+              },
+              {
+                onSuccess: () => {
+                  nameField.reset();
+                  parentField.reset();
+                  classificationField.setValue(AccountTypeClassification.Asset);
+                  setIsChildType(false);
+                },
+              },
+            );
           }}
         >
           {t("add_account_type")}

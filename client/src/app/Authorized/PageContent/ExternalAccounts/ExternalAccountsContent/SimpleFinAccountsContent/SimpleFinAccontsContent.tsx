@@ -8,9 +8,12 @@ import { AxiosError, AxiosResponse } from "axios";
 import SimpleFinOrganizationCards from "./SimpleFinOrganizationCards/SimpleFinOrganizationCards";
 import { notifications } from "@mantine/notifications";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
   translateAxiosError,
+  userQueryKey,
 } from "~/helpers/requests";
 import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
@@ -20,7 +23,7 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
   const { request } = useAuth();
 
   const userQuery = useQuery({
-    queryKey: ["user"],
+    queryKey: [userQueryKey],
     queryFn: async (): Promise<IApplicationUser | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/applicationUser",
@@ -43,15 +46,15 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
         method: "POST",
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
       await queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });
       await queryClient.invalidateQueries({
         queryKey: [simpleFinAccountQueryKey],
       });
-      await queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

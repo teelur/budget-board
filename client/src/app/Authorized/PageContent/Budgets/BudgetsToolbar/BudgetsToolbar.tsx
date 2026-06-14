@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IBudget, IBudgetCreateRequest } from "~/models/budget";
 import { AxiosError, AxiosResponse } from "axios";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , budgetsQueryKey} from "~/helpers/requests";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { SettingsIcon } from "lucide-react";
@@ -44,7 +44,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
       }),
     onSuccess: async (_, variables: IBudgetCreateRequest[]) =>
       await queryClient.invalidateQueries({
-        queryKey: ["budgets", dayjs(variables[0]?.month).format("YYYY-MM")],
+        queryKey: [budgetsQueryKey, dayjs(variables[0]?.month).format("YYYY-MM")],
       }),
     onError: (error: AxiosError) =>
       notifications.show({

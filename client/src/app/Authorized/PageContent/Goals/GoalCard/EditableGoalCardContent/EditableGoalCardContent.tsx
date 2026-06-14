@@ -22,7 +22,7 @@ import {
 import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError } from "~/helpers/requests";
+import { translateAxiosError , goalsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
@@ -75,7 +75,7 @@ const EditableGoalCardContent = (
   });
 
   const userSettingsQuery = useQuery({
-    queryKey: ["userSettings"],
+    queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/userSettings",
@@ -100,7 +100,7 @@ const EditableGoalCardContent = (
       }),
     onMutate: async (variables: IGoalUpdateRequest) => {
       await queryClient.cancelQueries({
-        queryKey: ["goals", { includeInterest: props.includeInterest }],
+        queryKey: [goalsQueryKey, { includeInterest: props.includeInterest }],
       });
 
       const previousGoals: IGoalResponse[] =
@@ -110,7 +110,7 @@ const EditableGoalCardContent = (
         ]) ?? [];
 
       queryClient.setQueryData(
-        ["goals", { includeInterest: props.includeInterest }],
+        [goalsQueryKey, { includeInterest: props.includeInterest }],
         (oldGoals: IGoalResponse[]) =>
           oldGoals?.map((oldGoal: IGoalResponse) =>
             oldGoal.id === variables.id
@@ -129,7 +129,7 @@ const EditableGoalCardContent = (
     },
     onError: (error: AxiosError, _variables: IGoalUpdateRequest, context) => {
       queryClient.setQueryData(
-        ["goals", { includeInterest: props.includeInterest }],
+        [goalsQueryKey, { includeInterest: props.includeInterest }],
         context?.previousGoals ?? [],
       );
       notifications.show({
@@ -139,7 +139,7 @@ const EditableGoalCardContent = (
     },
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: ["goals", { includeInterest: props.includeInterest }],
+        queryKey: [goalsQueryKey, { includeInterest: props.includeInterest }],
       });
     },
   });
@@ -153,7 +153,7 @@ const EditableGoalCardContent = (
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["goals"],
+        queryKey: [goalsQueryKey],
       });
       notifications.show({
         color: "var(--button-color-confirm)",
@@ -177,7 +177,7 @@ const EditableGoalCardContent = (
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["goals"],
+        queryKey: [goalsQueryKey],
       });
       notifications.show({
         color: "var(--button-color-confirm)",

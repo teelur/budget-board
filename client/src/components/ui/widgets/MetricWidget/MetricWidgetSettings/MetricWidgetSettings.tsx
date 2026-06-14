@@ -18,8 +18,12 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import Modal from "~/components/core/Modal/Modal";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { translateAxiosError } from "~/helpers/requests";
-import { IAccountResponse } from "~/models/account";
+import {
+  translateAxiosError,
+  budgetsQueryKey,
+  goalsQueryKey,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
 import { IBudget } from "~/models/budget";
 import { IGoalResponse } from "~/models/goal";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -27,6 +31,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
@@ -58,7 +63,7 @@ const MetricWidgetSettings = ({
   const [initialized, setInitialized] = React.useState(false);
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -70,7 +75,7 @@ const MetricWidgetSettings = ({
   });
 
   const goalsQuery = useQuery({
-    queryKey: ["goals", { includeInterest: false }],
+    queryKey: [goalsQueryKey, { includeInterest: false }],
     queryFn: async (): Promise<IGoalResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/goal",
@@ -87,22 +92,7 @@ const MetricWidgetSettings = ({
     enabled: opened,
   });
 
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-    enabled: opened,
-  });
+  const accountsQuery = useAccountsQuery({ enabled: opened });
 
   const currentMonth = React.useMemo(() => {
     const now = dayjs();
@@ -110,7 +100,7 @@ const MetricWidgetSettings = ({
   }, [dayjs]);
 
   const budgetsQuery = useQuery({
-    queryKey: ["budgets", dayjs(currentMonth).format("YYYY-MM")],
+    queryKey: [budgetsQueryKey, dayjs(currentMonth).format("YYYY-MM")],
     queryFn: async (): Promise<IBudget[]> => {
       const res: AxiosResponse = await request({
         url: "/api/budget",
@@ -234,7 +224,7 @@ const MetricWidgetSettings = ({
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["widgetSettings"] });
+      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError | Error) => {
       const message =

@@ -1,7 +1,6 @@
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,97 +17,61 @@ public class AccountTypeController(
     IAccountTypeService accountTypeService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<AccountTypeController>(logger, logLocalizer, responseLocalizer)
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] AccountTypeCreateRequest accountType)
+    public async Task<IActionResult> Create([FromBody] AccountTypeCreateRequest newAccountType)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
             await accountTypeService.CreateAccountTypeAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                accountType
+                newAccountType
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
             return Ok(
                 await accountTypeService.ReadAccountTypesAsync(
                     new Guid(userManager.GetUserId(User) ?? string.Empty)
                 )
             );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] AccountTypeUpdateRequest accountType)
+    public async Task<IActionResult> Update([FromBody] AccountTypeUpdateRequest updatedAccountType)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
             await accountTypeService.UpdateAccountTypeAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                accountType
+                updatedAccountType
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid accountId)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
             await accountTypeService.DeleteAccountTypeAsync(
                 new Guid(userManager.GetUserId(User) ?? string.Empty),
-                guid
+                accountId
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

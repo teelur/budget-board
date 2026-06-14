@@ -18,12 +18,13 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
-import { IAccountResponse } from "~/models/account";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { transactionsQueryKey } from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -41,7 +42,8 @@ const ConfigureTransactions = (
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
   const { request } = useAuth();
 
   // The raw CSV data imported from the user's file.
@@ -102,7 +104,7 @@ const ConfigureTransactions = (
   >(new Map<ITransactionImportTableData, ITransaction>());
 
   const transactionsQuery = useQuery({
-    queryKey: ["transactions", { getHidden: false }],
+    queryKey: [transactionsQueryKey, { getHidden: false }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",
@@ -117,21 +119,7 @@ const ConfigureTransactions = (
     },
   });
 
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const disableNextButton = () => {
     // Cannot proceed if there are no imported transactions.

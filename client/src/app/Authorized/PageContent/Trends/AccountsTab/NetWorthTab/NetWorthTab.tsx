@@ -5,11 +5,12 @@ import { mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import NetWorthChart from "~/components/Charts/NetWorthChart/NetWorthChart";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
 import { AxiosResponse } from "axios";
-import { IAccountResponse } from "~/models/account";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { balancesQueryKey } from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 const NetWorthTab = (): React.ReactNode => {
   const { dayjs } = useLocale();
@@ -25,7 +26,7 @@ const NetWorthTab = (): React.ReactNode => {
 
   const balancesQuery = useQueries({
     queries: selectedAccountIds.map((accountId: string) => ({
-      queryKey: ["balances", accountId],
+      queryKey: [balancesQueryKey, accountId],
       queryFn: async (): Promise<IBalanceResponse[]> => {
         const res: AxiosResponse = await request({
           url: "/api/balance",
@@ -48,21 +49,7 @@ const NetWorthTab = (): React.ReactNode => {
     },
   });
 
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   return (
     <Stack p="0.5rem">

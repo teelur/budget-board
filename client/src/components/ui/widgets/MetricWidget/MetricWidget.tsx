@@ -17,8 +17,6 @@ import {
 } from "~/helpers/metricWidget";
 import { IBudget } from "~/models/budget";
 import { IGoalResponse } from "~/models/goal";
-import { IAccountResponse } from "~/models/account";
-import { IAccountType } from "~/models/accountType";
 import { ITransaction } from "~/models/transaction";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -26,6 +24,14 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
+import {
+  budgetsQueryKey,
+  goalsQueryKey,
+  transactionsQueryKey,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 interface MetricWidgetProps {
   widgetId: string;
@@ -42,9 +48,10 @@ const MetricWidget = ({
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
   const { intlLocale, dayjs } = useLocale();
+  const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
 
   const widgetSettingsQuery = useQuery({
-    queryKey: ["widgetSettings"],
+    queryKey: [widgetSettingsQueryKey],
     queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/widgetSettings",
@@ -128,7 +135,7 @@ const MetricWidget = ({
   });
 
   const allTimeTransactionsQuery = useQuery({
-    queryKey: ["transactions", { allTime: true }],
+    queryKey: [transactionsQueryKey, { allTime: true }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",
@@ -144,7 +151,7 @@ const MetricWidget = ({
   const budgetQueries = useQueries({
     queries: requirements.needsBudgets
       ? requirements.budgetMonths.map((date: Date) => ({
-          queryKey: ["budgets", dayjs(date).format("YYYY-MM")],
+          queryKey: [budgetsQueryKey, dayjs(date).format("YYYY-MM")],
           queryFn: async (): Promise<IBudget[]> => {
             const res: AxiosResponse = await request({
               url: "/api/budget",
@@ -163,7 +170,7 @@ const MetricWidget = ({
   });
 
   const goalsQuery = useQuery({
-    queryKey: ["goals", { includeInterest: false }],
+    queryKey: [goalsQueryKey, { includeInterest: false }],
     queryFn: async (): Promise<IGoalResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/goal",
@@ -176,29 +183,7 @@ const MetricWidget = ({
     enabled: requirements.needsGoals,
   });
 
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as IAccountResponse[];
-      return [];
-    },
-    enabled: requirements.needsAccounts,
-  });
-
-  const accountTypesQuery = useQuery({
-    queryKey: ["accountTypes"],
-    queryFn: async (): Promise<IAccountType[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/accountType",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as IAccountType[];
-      return [];
-    },
+  const accountsQuery = useAccountsQuery({
     enabled: requirements.needsAccounts,
   });
 
@@ -211,7 +196,7 @@ const MetricWidget = ({
     (requirements.needsBudgets && budgetQueries.isPending) ||
     (requirements.needsGoals && goalsQuery.isPending) ||
     (requirements.needsAccounts &&
-      (accountsQuery.isPending || accountTypesQuery.isPending));
+      (accountsQuery.isPending || accountTypesPending));
 
   const metricDataContext: MetricDataContext = React.useMemo(
     () => ({
@@ -221,7 +206,7 @@ const MetricWidget = ({
       budgets: budgetQueries.data,
       goals: goalsQuery.data ?? [],
       accounts: accountsQuery.data ?? [],
-      accountTypes: accountTypesQuery.data ?? [],
+      accountTypes: allAccountTypes ?? [],
       preferredCurrency,
       intlLocale,
     }),
@@ -232,7 +217,7 @@ const MetricWidget = ({
       budgetQueries.data,
       goalsQuery.data,
       accountsQuery.data,
-      accountTypesQuery.data,
+      allAccountTypes,
       preferredCurrency,
       intlLocale,
     ],

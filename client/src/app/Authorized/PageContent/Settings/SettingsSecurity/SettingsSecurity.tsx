@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IApplicationUser } from "~/models/applicationUser";
+import { userQueryKey } from "~/helpers/requests";
 import TwoFactorAuth from "./TwoFactorAuth/TwoFactorAuth";
 import OidcSettings from "./OidcSettings/OidcSettings";
 import ResetPassword from "./ResetPassword/ResetPassword";
@@ -13,7 +14,7 @@ const SettingsSecurity = (): React.ReactNode => {
   const { request } = useAuth();
 
   const userQuery = useQuery({
-    queryKey: ["user"],
+    queryKey: [userQueryKey],
     queryFn: async (): Promise<IApplicationUser | undefined> => {
       const res: AxiosResponse = await request({
         url: "/api/applicationUser",

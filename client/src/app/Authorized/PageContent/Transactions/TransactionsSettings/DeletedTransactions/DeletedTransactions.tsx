@@ -8,13 +8,15 @@ import { getDeletedTransactions } from "~/helpers/transactions";
 import DeletedTransactionCards from "./DeletedTransactionCards/DeletedTransactionCards";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
+import { transactionsQueryKey } from "~/helpers/requests";
+
 
 const Deleted = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
   const transactionsQuery = useQuery({
-    queryKey: ["transactions", { getHidden: true }],
+    queryKey: [transactionsQueryKey, { getHidden: true }],
     queryFn: async (): Promise<ITransaction[]> => {
       const res: AxiosResponse = await request({
         url: "/api/transaction",

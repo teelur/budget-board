@@ -55,10 +55,10 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<int>("Index")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("InstitutionID")
+                    b.Property<Guid>("InstitutionID")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal?>("InterestRate")
+                    b.Property<decimal>("InterestRate")
                         .HasColumnType("numeric");
 
                     b.Property<string>("Name")
@@ -70,6 +70,7 @@ namespace BudgetBoard.Database.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Type")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("UserID")
@@ -922,7 +923,9 @@ namespace BudgetBoard.Database.Migrations
                 {
                     b.HasOne("BudgetBoard.Database.Models.Institution", "Institution")
                         .WithMany("Accounts")
-                        .HasForeignKey("InstitutionID");
+                        .HasForeignKey("InstitutionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
                         .WithMany("Accounts")

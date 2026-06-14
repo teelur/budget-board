@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Group, Stack } from "@mantine/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, PlayIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -13,14 +13,18 @@ import ConditionItem from "./ConditionItem/ConditionItem";
 import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { notifications } from "@mantine/notifications";
-import { AxiosError, AxiosResponse } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import { AxiosError } from "axios";
+import {
+  translateAxiosError,
+  transactionsQueryKey,
+  automaticRulesQueryKey,
+} from "~/helpers/requests";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { IAccountResponse } from "~/models/account";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -42,21 +46,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
 
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const queryClient = useQueryClient();
   const doDeleteAutomaticRule = useMutation({
@@ -69,7 +59,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["automaticRule"],
+        queryKey: [automaticRulesQueryKey],
       });
     },
     onError: (error: AxiosError) => {
@@ -90,7 +80,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
     },
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["automaticRule"],
+        queryKey: [automaticRulesQueryKey],
       });
       setIsSelected(false);
     },
@@ -111,7 +101,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       }),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: ["transactions"],
+        queryKey: [transactionsQueryKey],
       });
 
       notifications.show({

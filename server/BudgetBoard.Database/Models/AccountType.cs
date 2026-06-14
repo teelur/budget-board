@@ -1,5 +1,8 @@
 namespace BudgetBoard.Database.Models;
 
+/// <summary>
+/// Represents a type of account.
+/// </summary>
 public class AccountType
 {
     /// <summary>
@@ -18,9 +21,9 @@ public class AccountType
     public string Parent { get; set; } = string.Empty;
 
     /// <summary>
-    /// The account classification.
+    /// Used to classify accounts into broader categories (e.g., "Asset", "Liability").
     /// </summary>
-    public string Classification { get; set; } = string.Empty;
+    public string Classification { get; set; } = AccountTypeClassification.Asset;
 
     /// <summary>
     /// Identifier for the user who owns the account type.

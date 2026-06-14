@@ -229,34 +229,20 @@ public class GoalService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await _userDataContext
-                .ApplicationUsers.Include(u => u.Goals)
-                .ThenInclude((g) => g.Accounts)
-                .ThenInclude((a) => a.Transactions)
-                .Include(u => u.Accounts)
-                .ThenInclude(a => a.Balances)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                "{LogMessage}",
-                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
-            );
-            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            _userDataContext,
+            _logger,
+            _logLocalizer,
+            _responseLocalizer,
+            id,
+            users =>
+                users
+                    .Include(u => u.Goals)
+                    .ThenInclude((g) => g.Accounts)
+                    .ThenInclude((a) => a.Transactions)
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Balances)
+        );
     }
 
     private DateTime EstimateGoalCompleteDate(Goal goal, bool includeInterest = false)
@@ -493,7 +479,7 @@ public class GoalService(
             if (balance == null || balance.Amount == 0)
                 continue;
 
-            var interestRate = account.InterestRate ?? 0;
+            var interestRate = account.InterestRate;
             var weightedInterestRate = interestRate * balance.Amount;
 
             if (weightedInterestRate == 0)

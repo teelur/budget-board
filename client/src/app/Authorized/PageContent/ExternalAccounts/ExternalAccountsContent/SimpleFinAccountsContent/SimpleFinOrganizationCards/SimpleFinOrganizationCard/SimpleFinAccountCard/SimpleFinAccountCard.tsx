@@ -16,11 +16,14 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import {
+  accountsQueryKey,
+  institutionsQueryKey,
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
-import { AccountSource, IAccountResponse } from "~/models/account";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { AccountSource } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -49,21 +52,7 @@ const SimpleFinAccountCard = (
   const { dayjs, dateFormat, intlLocale, dayjsLocale } = useLocale();
   const { request } = useAuth();
 
-  const accountsQuery = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async (): Promise<IAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/account",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountsQuery = useAccountsQuery();
 
   const simpleFinAccountsQuery = useQuery({
     queryKey: [simpleFinAccountQueryKey],
@@ -100,8 +89,8 @@ const SimpleFinAccountCard = (
         queryKey: [simpleFinOrganizationQueryKey],
       });
       queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({
@@ -156,8 +145,8 @@ const SimpleFinAccountCard = (
       queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({
