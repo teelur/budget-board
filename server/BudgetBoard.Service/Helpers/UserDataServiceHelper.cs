@@ -28,7 +28,11 @@ public static class UserDataServiceHelper
         }
         catch (Exception ex)
         {
-            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
+            logger.LogError(
+                ex,
+                "{LogMessage}",
+                logLocalizer["UserDataRetrievalErrorLog", ex.Message]
+            );
             throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
         }
 
