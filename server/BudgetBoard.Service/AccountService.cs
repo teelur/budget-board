@@ -59,13 +59,7 @@ public class AccountService(
     public async Task UpdateAccountAsync(Guid userGuid, IAccountUpdateRequest editedAccount)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == editedAccount.ID);
-        if (account == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountEditNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["AccountEditNotFoundError"]);
-        }
+        var account = GetAccountById(userData, editedAccount.ID);
 
         account.Name = editedAccount.Name ?? account.Name;
         account.Type = editedAccount.Type ?? account.Type;
@@ -80,7 +74,6 @@ public class AccountService(
                     responseLocalizer["InvalidAccountSourceError"]
                 );
             }
-
             account.Source = editedAccount.Source;
         }
 
@@ -95,13 +88,7 @@ public class AccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
-        if (account == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["AccountDeleteNotFoundError"]);
-        }
+        var account = GetAccountById(userData, accountGuid);
 
         var utcNow = nowProvider.UtcNow;
         account.Deleted = utcNow;
@@ -155,13 +142,7 @@ public class AccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
-        if (account == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountRestoreNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["AccountRestoreNotFoundError"]);
-        }
+        var account = GetAccountById(userData, accountGuid);
 
         account.Deleted = null;
         account.Institution?.Deleted = null;
@@ -188,15 +169,7 @@ public class AccountService(
 
         foreach (var orderedAccount in orderedAccounts)
         {
-            var account = userData.Accounts.FirstOrDefault(a => a.ID == orderedAccount.ID);
-            if (account == null)
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AccountOrderNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountOrderNotFoundError"]
-                );
-            }
-
+            var account = GetAccountById(userData, orderedAccount.ID);
             account.Index = orderedAccount.Index;
         }
 
@@ -207,16 +180,7 @@ public class AccountService(
     public async Task PermanentlyDeleteAccountAsync(Guid userGuid, Guid accountGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountGuid);
-        if (account == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountPermanentDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AccountPermanentDeleteNotFoundError"]
-            );
-        }
-
+        var account = GetAccountById(userData, accountGuid);
         if (account.Deleted == null)
         {
             logger.LogError("{LogMessage}", logLocalizer["AccountPermanentDeleteNotDeletedLog"]);
@@ -251,5 +215,17 @@ public class AccountService(
                     .Include(u => u.LunchFlowAccounts)
                     .Include(u => u.SimpleFinAccounts)
         );
+    }
+
+    private Account GetAccountById(ApplicationUser userData, Guid accountId)
+    {
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountId);
+        if (account == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["AccountRestoreNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["AccountRestoreNotFoundError"]);
+        }
+
+        return account;
     }
 }
