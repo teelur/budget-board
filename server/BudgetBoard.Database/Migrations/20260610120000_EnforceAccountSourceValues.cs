@@ -16,11 +16,11 @@ namespace BudgetBoard.Database.Migrations
 
             migrationBuilder.Sql(
                 """
-                UPDATE \"Account\"
-                SET \"Source\" = 'Manual'
-                WHERE \"Source\" IS NULL
-                    OR \"Source\" = ''
-                    OR \"Source\" NOT IN ('Manual', 'SimpleFIN', 'LunchFlow');
+                UPDATE "Account"
+                SET "Source" = 'Manual'
+                WHERE "Source" IS NULL
+                    OR "Source" = ''
+                    OR "Source" NOT IN ('Manual', 'SimpleFIN', 'LunchFlow');
                 """
             );
 
