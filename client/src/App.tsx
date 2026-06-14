@@ -11,8 +11,13 @@ import {
   CSSVariablesResolver,
   MantineProvider,
 } from "@mantine/core";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Notifications } from "@mantine/notifications";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { notifications, Notifications } from "@mantine/notifications";
+import { translateAxiosError } from "~/helpers/requests";
 
 import Welcome from "~/app/Unauthorized/Welcome";
 import OidcCallback from "~/app/Unauthorized/OidcCallback/OidcCallback";
@@ -172,6 +177,21 @@ const resolver: CSSVariablesResolver = () => ({
 });
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      if (
+        (query.meta as { skipGlobalErrorToast?: boolean } | undefined)
+          ?.skipGlobalErrorToast
+      ) {
+        return;
+      }
+
+      notifications.show({
+        color: "var(--button-color-destructive)",
+        message: translateAxiosError(error as any),
+      });
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 30000,

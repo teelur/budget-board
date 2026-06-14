@@ -2,7 +2,7 @@ import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import React from "react";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { useTranslation } from "react-i18next";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 export interface AccountMultiSelectInputBaseProps extends MultiSelectProps {
   hideHidden?: boolean;

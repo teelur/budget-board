@@ -7,7 +7,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedAccountCard from "./DeletedAccountCard";
 import { institutionsQueryKey } from "~/helpers/requests";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 const DeletedAccounts = (): React.ReactNode => {
   const { t } = useTranslation();

@@ -24,7 +24,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { transactionsQueryKey } from "~/helpers/requests";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];

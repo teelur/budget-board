@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { defaultGuid } from "~/models/applicationUser";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 const DisableBuiltInAccountTypes = (): React.ReactNode => {
   const { t } = useTranslation();
