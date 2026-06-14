@@ -2,8 +2,8 @@ namespace BudgetBoard.Database.Models;
 
 public static class AccountTypeClassification
 {
-    public const string Asset = "Asset";
-    public const string Liability = "Liability";
+    public const string Asset = "asset";
+    public const string Liability = "liability";
 
     private static readonly HashSet<string> _allowedValues = new(
         [Asset, Liability],

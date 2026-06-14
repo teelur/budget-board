@@ -78,11 +78,29 @@ public class AccountTypeService(
         );
 
         UpdateAccountsUsingType(userData.Accounts, oldValue, request.Value);
-
+        if (!string.IsNullOrEmpty(request.Parent))
+        {
+            UpdateOrphanedChildren(userData.AccountTypes, oldValue);
+        }
         UpdateChildrenClassification(userData.AccountTypes, oldValue, accountType.Classification);
         UpdateChildrenParentValue(userData.AccountTypes, oldValue, request.Value);
 
         await userDataContext.SaveChangesAsync();
+
+        static void UpdateOrphanedChildren(
+            ICollection<AccountType> accountTypes,
+            string oldParentValue
+        )
+        {
+            foreach (
+                var child in accountTypes.Where(a =>
+                    a.Parent.Equals(oldParentValue, StringComparison.OrdinalIgnoreCase)
+                )
+            )
+            {
+                child.Parent = string.Empty;
+            }
+        }
 
         static void UpdateChildrenClassification(
             ICollection<AccountType> accountTypes,

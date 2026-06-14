@@ -700,6 +700,59 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
+    public async Task UpdateAccountTypeAsync_WhenParentIsChangedToChild_ShouldUpdateChildrenToBeParents()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var parentAccountType = accountTypeFaker.Generate();
+        parentAccountType.Parent = string.Empty;
+
+        var childAccountType = accountTypeFaker.Generate();
+        childAccountType.Parent = parentAccountType.Value;
+
+        var anotherParentAccountType = accountTypeFaker.Generate();
+        anotherParentAccountType.Parent = string.Empty;
+
+        helper.UserDataContext.AccountTypes.AddRange(
+            [parentAccountType, childAccountType, anotherParentAccountType]
+        );
+        helper.UserDataContext.SaveChanges();
+
+        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
+        {
+            ID = parentAccountType.ID,
+            Parent = anotherParentAccountType.Value,
+            Value = parentAccountType.Value,
+        };
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeUpdateRequest
+        );
+
+        // Assert
+        helper
+            .UserDataContext.AccountTypes.Single(at => at.ID == parentAccountType.ID)
+            .Parent.Should()
+            .Be(anotherParentAccountType.Value);
+
+        helper
+            .UserDataContext.AccountTypes.Single(at => at.ID == childAccountType.ID)
+            .Parent.Should()
+            .Be(string.Empty);
+    }
+
+    [Fact]
     public async Task UpdateAccountTypeAsync_WhenUpdateClassification_ShouldAlsoUpdateChildrenClassification()
     {
         // Arrange
