@@ -72,6 +72,8 @@
   "before": "Prima",
   "both_income_and_expense_values_present_message": "Per la riga {{uid}} sono presenti sia i valori di entrata che quelli di uscita.",
   "budget_amount_fraction_editable_total_styled": "<0>{{quantità}}</0> <1>di</1>",
+  "budget_copy_failed_message": "Si è verificato un errore durante la copia del budget del mese precedente.",
+  "budget_details": "Dettagli del budget",
   "transactions": "Transazioni",
   "transactions_settings": "Impostazioni transazioni",
   "trends": "Tendenze",

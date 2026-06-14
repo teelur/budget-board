@@ -64,15 +64,6 @@
   <data name="AccountNotFoundError" xml:space="preserve">
     <value>您尝试访问的账户不存在。</value>
   </data>
-  <data name="AccountDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的账户不存在。</value>
-  </data>
-  <data name="AccountRestoreNotFoundError" xml:space="preserve">
-    <value>您尝试恢复的账户不存在。</value>
-  </data>
-  <data name="AccountOrderNotFoundError" xml:space="preserve">
-    <value>您尝试排序的账户不存在。</value>
-  </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
     <value>检索用户数据时发生错误。</value>
   </data>
@@ -403,9 +394,6 @@
   <data name="InvalidDateFormatError" xml:space="preserve">
     <value>The provided date format is invalid.</value>
   </data>
-  <data name="AccountPermanentDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试永久删除的账户不存在。</value>
-  </data>
   <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
     <value>The batch update request contains duplicate transaction IDs.</value>
   </data>
@@ -430,32 +418,8 @@
   <data name="LunchFlowAccountSyncException" xml:space="preserve">
     <value>An unexpected error occurred while syncing LunchFlow account '{0}'.</value>
   </data>
-  <data name="AccountTypeCreateDuplicateNameError" xml:space="preserve">
-    <value>An account type with this name already exists.</value>
-  </data>
-  <data name="AccountTypeCreateEmptyNameError" xml:space="preserve">
-    <value>The account type name cannot be empty.</value>
-  </data>
-  <data name="AccountTypeCreateSameNameAsParentError" xml:space="preserve">
-    <value>The account type name cannot be the same as its parent.</value>
-  </data>
-  <data name="AccountTypeCreateParentNotFoundError" xml:space="preserve">
-    <value>The parent account type does not exist.</value>
-  </data>
   <data name="AccountTypeNotFoundError" xml:space="preserve">
     <value>The account type you are trying to access does not exist.</value>
-  </data>
-  <data name="AccountTypeUpdateDuplicateNameError" xml:space="preserve">
-    <value>An account type with this name already exists.</value>
-  </data>
-  <data name="AccountTypeUpdateEmptyNameError" xml:space="preserve">
-    <value>The account type name cannot be empty.</value>
-  </data>
-  <data name="AccountTypeUpdateSameNameAsParentError" xml:space="preserve">
-    <value>The account type name cannot be the same as its parent.</value>
-  </data>
-  <data name="AccountTypeUpdateParentNotFoundError" xml:space="preserve">
-    <value>The parent account type does not exist.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
     <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
@@ -507,5 +471,23 @@
   </data>
   <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
     <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
+  </data>
+  <data name="InvalidAccountSourceError" xml:space="preserve">
+    <value>The account source is invalid.</value>
+  </data>
+  <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
+    <value>The account must be deleted before it can be permanently deleted.</value>
+  </data>
+  <data name="AccountTypeDuplicateNameError" xml:space="preserve">
+    <value>An account type with this name already exists.</value>
+  </data>
+  <data name="AccountTypeEmptyNameError" xml:space="preserve">
+    <value>The account type name cannot be empty.</value>
+  </data>
+  <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
+    <value>The account type name cannot be the same as its parent.</value>
+  </data>
+  <data name="AccountTypeParentNotFoundError" xml:space="preserve">
+    <value>The parent account type does not exist.</value>
   </data>
 </root>
