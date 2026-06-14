@@ -362,7 +362,7 @@ public class AccountTypeService(
 
     private void ThrowIfInvalidClassification(string classification)
     {
-        if (!AccountClassifications.AllClassifications.Contains(classification))
+        if (!AccountTypeClassification.IsValid(classification))
         {
             logger.LogError("{LogMessage}", logLocalizer["AccountTypeInvalidClassificationLog"]);
             throw new BudgetBoardServiceException(
