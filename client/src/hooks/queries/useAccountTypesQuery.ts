@@ -17,5 +17,8 @@ export const useAccountTypesQuery = () => {
 
       return res.data as IAccountTypeResponse[];
     },
+    meta: {
+      skipGlobalErrorToast: true,
+    },
   });
 };
