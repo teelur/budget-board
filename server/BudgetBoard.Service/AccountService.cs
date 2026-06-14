@@ -233,36 +233,23 @@ public class AccountService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        try
-        {
-            var foundUser = await userDataContext
-                .ApplicationUsers.Include(u => u.Accounts)
-                .ThenInclude(a => a.Transactions)
-                .Include(u => u.Accounts)
-                .ThenInclude(a => a.Balances)
-                .Include(u => u.Accounts)
-                .ThenInclude(a => a.Institution)
-                .Include(u => u.Institutions)
-                .Include(u => u.LunchFlowAccounts)
-                .Include(u => u.SimpleFinAccounts)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-
-            if (foundUser == null)
-            {
-                logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
-                throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
-            }
-            return foundUser;
-        }
-        catch (BudgetBoardServiceException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
-            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
-        }
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            id,
+            users =>
+                users
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Transactions)
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Balances)
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Institution)
+                    .Include(u => u.Institutions)
+                    .Include(u => u.LunchFlowAccounts)
+                    .Include(u => u.SimpleFinAccounts)
+        );
     }
 }

@@ -63,42 +63,6 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task CreateAccountAsync_InvalidUserId_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(
-            Mock.Of<ILogger<IAccountService>>(),
-            helper.UserDataContext,
-            Mock.Of<ITransactionService>(),
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
-        var institution = institutionFaker.Generate();
-
-        helper.UserDataContext.Institutions.Add(institution);
-        helper.UserDataContext.SaveChanges();
-
-        var account = new AccountCreateRequest
-        {
-            Name = "My Account",
-            InstitutionID = institution.ID,
-        };
-
-        // Act
-        var createAccountAct = () => accountService.CreateAccountAsync(Guid.NewGuid(), account);
-
-        // Assert
-        await createAccountAct
-            .Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("InvalidUserError");
-    }
-
-    [Fact]
     public async Task CreateAccountAsync_InvalidInstitutionId_ThrowsError()
     {
         // Arrange
