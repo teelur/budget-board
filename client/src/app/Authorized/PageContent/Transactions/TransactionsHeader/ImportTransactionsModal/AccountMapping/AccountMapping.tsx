@@ -6,7 +6,7 @@ import { ITransactionImportTableData } from "~/models/transaction";
 import { MoveLeftIcon } from "lucide-react";
 import { areStringsEqual } from "~/helpers/utils";
 import { useTranslation } from "react-i18next";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 export interface IAccountItem {
   value: string;

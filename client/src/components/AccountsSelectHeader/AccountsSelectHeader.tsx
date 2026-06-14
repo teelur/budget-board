@@ -6,7 +6,7 @@ import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "../core/Select/AccountMultiSelect/AccountMultiSelect";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface AccountsSelectHeaderProps {
   selectedAccountIds: string[];

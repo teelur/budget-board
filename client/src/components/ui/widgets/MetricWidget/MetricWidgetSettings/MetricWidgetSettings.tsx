@@ -31,7 +31,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useAccountsQuery } from "~/hooks/queries/useAccountQuery";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
