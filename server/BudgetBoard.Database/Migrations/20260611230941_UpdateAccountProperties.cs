@@ -33,6 +33,78 @@ namespace BudgetBoard.Database.Migrations
                 "UPDATE \"Account\" SET \"InterestRate\" = 0 WHERE \"InterestRate\" IS NULL;"
             );
 
+            // Backfill missing or orphaned InstitutionID values before making the FK required.
+            // Orphaned accounts are assigned to a dedicated per-user "Orphans" institution.
+            migrationBuilder.Sql(
+                @"
+                INSERT INTO ""Institution"" (""ID"", ""Name"", ""Index"", ""UserID"")
+                SELECT
+                    (
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 1, 8) || '-' ||
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 9, 4) || '-' ||
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 13, 4) || '-' ||
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 17, 4) || '-' ||
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 21, 12)
+                    )::uuid AS ""ID"",
+                    'Orphans' AS ""Name"",
+                    0 AS ""Index"",
+                    a.""UserID""
+                FROM ""Account"" a
+                WHERE (a.""InstitutionID"" IS NULL
+                    OR NOT EXISTS (
+                        SELECT 1 FROM ""Institution"" i WHERE i.""ID"" = a.""InstitutionID""
+                    ))
+                    AND NOT EXISTS (
+                        SELECT 1 FROM ""Institution"" i2
+                        WHERE i2.""ID"" = (
+                            (
+                                substr(md5(a.""UserID""::text || '-orphans-institution'), 1, 8) || '-' ||
+                                substr(md5(a.""UserID""::text || '-orphans-institution'), 9, 4) || '-' ||
+                                substr(md5(a.""UserID""::text || '-orphans-institution'), 13, 4) || '-' ||
+                                substr(md5(a.""UserID""::text || '-orphans-institution'), 17, 4) || '-' ||
+                                substr(md5(a.""UserID""::text || '-orphans-institution'), 21, 12)
+                            )::uuid
+                        )
+                    )
+                GROUP BY a.""UserID"";
+
+                UPDATE ""Institution"" i
+                SET ""Deleted"" = COALESCE(i.""Deleted"", NOW())
+                WHERE i.""ID"" IN (
+                    SELECT DISTINCT (
+                        (
+                            substr(md5(a.""UserID""::text || '-orphans-institution'), 1, 8) || '-' ||
+                            substr(md5(a.""UserID""::text || '-orphans-institution'), 9, 4) || '-' ||
+                            substr(md5(a.""UserID""::text || '-orphans-institution'), 13, 4) || '-' ||
+                            substr(md5(a.""UserID""::text || '-orphans-institution'), 17, 4) || '-' ||
+                            substr(md5(a.""UserID""::text || '-orphans-institution'), 21, 12)
+                        )::uuid
+                    )
+                    FROM ""Account"" a
+                    WHERE a.""InstitutionID"" IS NULL
+                        OR NOT EXISTS (
+                            SELECT 1 FROM ""Institution"" i2 WHERE i2.""ID"" = a.""InstitutionID""
+                        )
+                );
+
+                UPDATE ""Account"" a
+                SET ""InstitutionID"" = (
+                    (
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 1, 8) || '-' ||
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 9, 4) || '-' ||
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 13, 4) || '-' ||
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 17, 4) || '-' ||
+                        substr(md5(a.""UserID""::text || '-orphans-institution'), 21, 12)
+                    )::uuid
+                ),
+                    ""Deleted"" = COALESCE(a.""Deleted"", NOW())
+                WHERE a.""InstitutionID"" IS NULL
+                    OR NOT EXISTS (
+                        SELECT 1 FROM ""Institution"" i2 WHERE i2.""ID"" = a.""InstitutionID""
+                    );
+                "
+            );
+
             migrationBuilder.AlterColumn<decimal>(
                 name: "InterestRate",
                 table: "Account",
@@ -49,7 +121,6 @@ namespace BudgetBoard.Database.Migrations
                 table: "Account",
                 type: "uuid",
                 nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
                 oldClrType: typeof(Guid),
                 oldType: "uuid",
                 oldNullable: true
