@@ -17,7 +17,6 @@ import {
 } from "~/helpers/metricWidget";
 import { IBudget } from "~/models/budget";
 import { IGoalResponse } from "~/models/goal";
-import { IAccountType } from "~/models/accountType";
 import { ITransaction } from "~/models/transaction";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -26,13 +25,13 @@ import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsPr
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
 import {
-  accountTypesQueryKey,
   budgetsQueryKey,
   goalsQueryKey,
   transactionsQueryKey,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 interface MetricWidgetProps {
   widgetId: string;
@@ -49,6 +48,7 @@ const MetricWidget = ({
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
   const { intlLocale, dayjs } = useLocale();
+  const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
 
   const widgetSettingsQuery = useQuery({
     queryKey: [widgetSettingsQueryKey],
@@ -187,19 +187,6 @@ const MetricWidget = ({
     enabled: requirements.needsAccounts,
   });
 
-  const accountTypesQuery = useQuery({
-    queryKey: [accountTypesQueryKey],
-    queryFn: async (): Promise<IAccountType[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/accountType",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as IAccountType[];
-      return [];
-    },
-    enabled: requirements.needsAccounts,
-  });
-
   const isPending =
     widgetSettingsQuery.isPending ||
     (requirements.needsTransactions &&
@@ -209,7 +196,7 @@ const MetricWidget = ({
     (requirements.needsBudgets && budgetQueries.isPending) ||
     (requirements.needsGoals && goalsQuery.isPending) ||
     (requirements.needsAccounts &&
-      (accountsQuery.isPending || accountTypesQuery.isPending));
+      (accountsQuery.isPending || accountTypesPending));
 
   const metricDataContext: MetricDataContext = React.useMemo(
     () => ({
@@ -219,7 +206,7 @@ const MetricWidget = ({
       budgets: budgetQueries.data,
       goals: goalsQuery.data ?? [],
       accounts: accountsQuery.data ?? [],
-      accountTypes: accountTypesQuery.data ?? [],
+      accountTypes: allAccountTypes ?? [],
       preferredCurrency,
       intlLocale,
     }),
@@ -230,7 +217,7 @@ const MetricWidget = ({
       budgetQueries.data,
       goalsQuery.data,
       accountsQuery.data,
-      accountTypesQuery.data,
+      allAccountTypes,
       preferredCurrency,
       intlLocale,
     ],

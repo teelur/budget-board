@@ -24,6 +24,7 @@
   "account_type": "Account Type",
   "account_type_name": "Account Type Name",
   "account_types": "Account Types",
+  "account_types_query_error": "There was a problem fetching your account types.",
   "accounts": "Accounts",
   "accounts_query_error": "There was a problem fetching your accounts.",
   "accounts_settings": "Accounts Settings",

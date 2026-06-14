@@ -1,19 +1,18 @@
 import React from "react";
-import { useAuth } from "../AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { IAccountTypeResponse } from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
-import { accountTypesQueryKey } from "~/helpers/requests";
+import { useAccountTypesQuery } from "~/hooks/queries/useAccountTypesQuery";
 
 interface AccountTypeContextType {
   allAccountTypes: IAccountTypeResponse[];
   customAccountTypes: IAccountTypeResponse[];
+  isPending: boolean;
 }
 
 export const AccountTypeContext = React.createContext<AccountTypeContextType>({
   allAccountTypes: [],
   customAccountTypes: [],
+  isPending: false,
 });
 
 interface AccountTypeProviderProps {
@@ -21,23 +20,7 @@ interface AccountTypeProviderProps {
 }
 
 export const AccountTypeProvider = (props: AccountTypeProviderProps) => {
-  const { request } = useAuth();
-
-  const accountTypesQuery = useQuery({
-    queryKey: [accountTypesQueryKey],
-    queryFn: async (): Promise<IAccountTypeResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/accountType",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAccountTypeResponse[];
-      }
-
-      return [];
-    },
-  });
+  const accountTypesQuery = useAccountTypesQuery();
 
   const customAccountTypes = React.useMemo(
     () =>
@@ -51,8 +34,9 @@ export const AccountTypeProvider = (props: AccountTypeProviderProps) => {
     () => ({
       allAccountTypes: accountTypesQuery.data ?? [],
       customAccountTypes: customAccountTypes,
+      isPending: accountTypesQuery.isPending,
     }),
-    [accountTypesQuery.data],
+    [accountTypesQuery.data, accountTypesQuery.isPending],
   );
 
   return (
