@@ -57,16 +57,7 @@ public class AccountTypeService(
     public async Task UpdateAccountTypeAsync(Guid userGuid, IAccountTypeUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var accountType = userData.AccountTypes.FirstOrDefault(a => a.ID == request.ID);
-        if (accountType == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountTypeUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AccountTypeUpdateNotFoundError"]
-            );
-        }
-
+        var accountType = GetAccountTypeById(userData, request.ID);
         var allAccountTypes = AccountTypeHelpers.GetAllAccountTypes(userData);
 
         ValidateAccountTypeData(
@@ -130,15 +121,7 @@ public class AccountTypeService(
     public async Task DeleteAccountTypeAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var accountType = userData.AccountTypes.FirstOrDefault(a => a.ID == guid);
-        if (accountType == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountTypeDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AccountTypeDeleteNotFoundError"]
-            );
-        }
+        var accountType = GetAccountTypeById(userData, guid);
 
         RemoveChildrenUsingType(accountType.Value);
         UpdateAccountsUsingType(userData.Accounts, accountType.Value, string.Empty);
@@ -177,6 +160,18 @@ public class AccountTypeService(
         );
     }
 
+    private AccountType GetAccountTypeById(ApplicationUser userData, Guid id)
+    {
+        var accountType = userData.AccountTypes.FirstOrDefault(a => a.ID == id);
+        if (accountType == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["AccountTypeNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["AccountTypeNotFoundError"]);
+        }
+
+        return accountType;
+    }
+
     private void ValidateAccountTypeData(
         string value,
         string parent,
@@ -194,9 +189,9 @@ public class AccountTypeService(
         {
             if (string.IsNullOrEmpty(value))
             {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeCreateEmptyNameLog"]);
+                logger.LogError("{LogMessage}", logLocalizer["AccountTypeEmptyNameLog"]);
                 throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeCreateEmptyNameError"]
+                    responseLocalizer["AccountTypeEmptyNameError"]
                 );
             }
         }
@@ -208,9 +203,9 @@ public class AccountTypeService(
         {
             if (allAccountTypes.Any(a => a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)))
             {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeCreateDuplicateNameLog"]);
+                logger.LogError("{LogMessage}", logLocalizer["AccountTypeDuplicateNameLog"]);
                 throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeCreateDuplicateNameError"]
+                    responseLocalizer["AccountTypeDuplicateNameError"]
                 );
             }
         }
@@ -223,12 +218,9 @@ public class AccountTypeService(
         {
             if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
             {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["AccountTypeCreateSameNameAsParentLog"]
-                );
+                logger.LogError("{LogMessage}", logLocalizer["AccountTypeSameNameAsParentLog"]);
                 throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeCreateSameNameAsParentError"]
+                    responseLocalizer["AccountTypeSameNameAsParentError"]
                 );
             }
         }
@@ -245,9 +237,9 @@ public class AccountTypeService(
                 )
             )
             {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeCreateParentNotFoundLog"]);
+                logger.LogError("{LogMessage}", logLocalizer["AccountTypeParentNotFoundLog"]);
                 throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeCreateParentNotFoundError"]
+                    responseLocalizer["AccountTypeParentNotFoundError"]
                 );
             }
         }
