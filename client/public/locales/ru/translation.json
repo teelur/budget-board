@@ -16,7 +16,6 @@
   "account_column_is_required_message": "Поле «Учётная запись» обязательно.",
   "account_created_check_your_email_message": " Проверьте почту: мы отправили письмо для подтверждения.",
   "account_created_message": "Аккаунт создан.",
-  "account_created_successfully_message": "Аккаунт создан успешно.",
   "account_details": "Информация об аккаунте",
   "account_is_required": "Необходим аккаунт.",
   "account_mapping": "Карта аккаунтов",
