@@ -52,7 +52,7 @@ namespace BudgetBoard.Database.Migrations
                 FROM ""Account"" a
                 WHERE (a.""InstitutionID"" IS NULL
                     OR NOT EXISTS (
-                        SELECT 1 FROM ""Institution"" i WHERE i.""ID"" = a.""InstitutionID""
+                        SELECT 1 FROM ""Institution"" i WHERE i.""ID"" = a.""InstitutionID"" AND i.""UserID"" = a.""UserID""
                     ))
                     AND NOT EXISTS (
                         SELECT 1 FROM ""Institution"" i2
@@ -83,7 +83,7 @@ namespace BudgetBoard.Database.Migrations
                     FROM ""Account"" a
                     WHERE a.""InstitutionID"" IS NULL
                         OR NOT EXISTS (
-                            SELECT 1 FROM ""Institution"" i2 WHERE i2.""ID"" = a.""InstitutionID""
+                            SELECT 1 FROM ""Institution"" i2 WHERE i2.""ID"" = a.""InstitutionID"" AND i2.""UserID"" = a.""UserID""
                         )
                 );
 
