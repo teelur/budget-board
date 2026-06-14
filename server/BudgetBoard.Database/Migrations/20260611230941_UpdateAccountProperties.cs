@@ -64,6 +64,7 @@ namespace BudgetBoard.Database.Migrations
                     SELECT 1
                     FROM ""Institution"" i2
                     WHERE i2.""ID"" = oa.""OrphansInstitutionID""
+                        AND i2.""UserID"" = oa.""UserID""
                 );
 
                 UPDATE ""Account"" a
@@ -73,7 +74,7 @@ namespace BudgetBoard.Database.Migrations
                     AND (
                         a.""InstitutionID"" IS NULL
                         OR NOT EXISTS (
-                            SELECT 1 FROM ""Institution"" i2 WHERE i2.""ID"" = a.""InstitutionID""
+                            SELECT 1 FROM ""Institution"" i2 WHERE i2.""ID"" = a.""InstitutionID"" AND i2.""UserID"" = a.""UserID""
                         )
                     );
 
