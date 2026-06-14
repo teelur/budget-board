@@ -58,38 +58,17 @@
     <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DuplicateSyncIDError" xml:space="preserve">
-    <value>An account with this SyncID already exists.</value>
-  </data>
   <data name="InvalidInstitutionIDError" xml:space="preserve">
     <value>The provided Institution ID is invalid.</value>
   </data>
   <data name="AccountNotFoundError" xml:space="preserve">
     <value>The account you are trying to access does not exist.</value>
   </data>
-  <data name="AccountEditNotFoundError" xml:space="preserve">
-    <value>The account you are trying to edit does not exist.</value>
-  </data>
-  <data name="AccountEditEmptyNameError" xml:space="preserve">
-    <value>The account name cannot be empty.</value>
-  </data>
   <data name="InvalidAccountSourceError" xml:space="preserve">
     <value>The account source is invalid.</value>
   </data>
-  <data name="AccountDeleteNotFoundError" xml:space="preserve">
-    <value>The account you are trying to delete does not exist.</value>
-  </data>
-  <data name="AccountPermanentDeleteNotFoundError" xml:space="preserve">
-    <value>The account you are trying to permanently delete does not exist.</value>
-  </data>
   <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
     <value>The account must be deleted before it can be permanently deleted.</value>
-  </data>
-  <data name="AccountRestoreNotFoundError" xml:space="preserve">
-    <value>The account you are trying to restore does not exist.</value>
-  </data>
-  <data name="AccountOrderNotFoundError" xml:space="preserve">
-    <value>The account you are trying to order does not exist.</value>
   </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
     <value>An error occurred while retrieving user data.</value>
@@ -103,9 +82,6 @@
   <data name="AssetEditNotFoundError" xml:space="preserve">
     <value>The asset you are trying to edit does not exist.</value>
   </data>
-  <data name="DuplicateAssetNameError" xml:space="preserve">
-    <value>An asset with this name already exists.</value>
-  </data>
   <data name="AssetDeleteNotFoundError" xml:space="preserve">
     <value>The asset you are trying to delete does not exist.</value>
   </data>
@@ -114,12 +90,6 @@
   </data>
   <data name="AssetOrderNotFoundError" xml:space="preserve">
     <value>The asset you are trying to order does not exist.</value>
-  </data>
-  <data name="NoConditionsError" xml:space="preserve">
-    <value>At least one condition must be provided for the rule.</value>
-  </data>
-  <data name="NoActionsError" xml:space="preserve">
-    <value>At least one action must be provided for the rule.</value>
   </data>
   <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
     <value>The automatic rule you are trying to update does not exist.</value>
@@ -175,12 +145,6 @@
   <data name="BalanceDuplicateDateError" xml:space="preserve">
     <value>A balance already exists for this account on that date.</value>
   </data>
-  <data name="BalanceAccountDeleteNotFoundError" xml:space="preserve">
-    <value>The account you are trying to delete does not exist.</value>
-  </data>
-  <data name="BalanceAccountRestoreNotFoundError" xml:space="preserve">
-    <value>The account you are trying to restore does not exist.</value>
-  </data>
   <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
     <value>A budget you are trying to create has no category.</value>
   </data>
@@ -189,9 +153,6 @@
   </data>
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
     <value>Budget creation completed with errors: {0}</value>
-  </data>
-  <data name="BudgetCreateParentInvalidError" xml:space="preserve">
-    <value>The budget you are trying to create has an invalid parent category: {0}</value>
   </data>
   <data name="BudgetUpdateNotFoundError" xml:space="preserve">
     <value>The budget you are trying to update does not exist.</value>
@@ -250,9 +211,6 @@
   <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
     <value>The institution you are trying to delete does not exist.</value>
   </data>
-  <data name="InstitutionDeleteHasAccountsError" xml:space="preserve">
-    <value>Cannot delete institution because it has associated accounts. Please delete or reassign these accounts first.</value>
-  </data>
   <data name="InstitutionOrderNotFoundError" xml:space="preserve">
     <value>The institution you are trying to order does not exist.</value>
   </data>
@@ -268,9 +226,6 @@
   <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
     <value>The parent transaction category you are trying to use does not exist.</value>
   </data>
-  <data name="TransactionCategoryNotFoundError" xml:space="preserve">
-    <value>The transaction category you are trying to access does not exist.</value>
-  </data>
   <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
     <value>The transaction category you are trying to update does not exist.</value>
   </data>
@@ -285,15 +240,6 @@
   </data>
   <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
     <value>The parent transaction category you are trying to use does not exist.</value>
-  </data>
-  <data name="TransactionCategoryDeleteInUseByTransactionsError" xml:space="preserve">
-    <value>The transaction category you are trying to delete is currently assigned to one or more transactions. Please reassign or remove these transactions first.</value>
-  </data>
-  <data name="TransactionCategoryDeleteInUseByBudgetsError" xml:space="preserve">
-    <value>The transaction category you are trying to delete is currently assigned to one or more budgets. Please reassign or remove these budgets first.</value>
-  </data>
-  <data name="TransactionCategoryDeleteHasChildrenError" xml:space="preserve">
-    <value>The transaction category you are trying to delete has child categories. Please reassign or delete the child categories first.</value>
   </data>
   <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
     <value>The transaction category you are trying to delete does not exist.</value>
@@ -325,9 +271,6 @@
   <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
     <value>The split amount must be less than the transaction amount.</value>
   </data>
-  <data name="TransactionSplitNoAccountError" xml:space="preserve">
-    <value>The transaction you are trying to split is not associated with any account.</value>
-  </data>
   <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
     <value>The account you are trying to add a transaction to does not exist.</value>
   </data>
@@ -352,14 +295,8 @@
   <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
     <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
   </data>
-  <data name="ValueCreateAssetNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to add a value to does not exist.</value>
-  </data>
   <data name="ValueAssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to access values for does not exist.</value>
-  </data>
-  <data name="ValueUpdateAssetNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to update does not exist.</value>
   </data>
   <data name="ValueUpdateNotFoundError" xml:space="preserve">
     <value>The value you are trying to update does not exist.</value>
@@ -369,9 +306,6 @@
   </data>
   <data name="ValueDeleteNotFoundError" xml:space="preserve">
     <value>The value you are trying to delete does not exist.</value>
-  </data>
-  <data name="ValueRestoreNotFoundError" xml:space="preserve">
-    <value>The value you are trying to restore does not exist.</value>
   </data>
   <data name="SimpleFin" xml:space="preserve">
     <value>SimpleFIN</value>
@@ -385,17 +319,8 @@
   <data name="SimpleFinDataRetrievalError" xml:space="preserve">
     <value>An error occurred while retrieving SimpleFIN data.</value>
   </data>
-  <data name="SimpleFinOrganizationMissingIdError" xml:space="preserve">
-    <value>Institution for account '{0}' is missing an ID. Skipping account sync.</value>
-  </data>
-  <data name="SyncInstitutionCreationError" xml:space="preserve">
-    <value>There was an error creating institution for account '{0}'. Skipping account sync.</value>
-  </data>
   <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
     <value>No matching account found for transaction with SyncID '{0}'.</value>
-  </data>
-  <data name="SimpleFinAccountNotFoundForBalanceError" xml:space="preserve">
-    <value>No matching account found for balance with SyncID '{0}'.</value>
   </data>
   <data name="SimpleFinDecodeTokenError" xml:space="preserve">
     <value>An error occurred while decoding the setup token.</value>
@@ -511,44 +436,20 @@
   <data name="LunchFlowAccountSyncException" xml:space="preserve">
     <value>An unexpected error occurred while syncing LunchFlow account '{0}'.</value>
   </data>
-  <data name="AccountTypeCreateDuplicateNameError" xml:space="preserve">
+  <data name="AccountTypeDuplicateNameError" xml:space="preserve">
     <value>An account type with this name already exists.</value>
   </data>
-  <data name="AccountTypeCreateEmptyNameError" xml:space="preserve">
+  <data name="AccountTypeEmptyNameError" xml:space="preserve">
     <value>The account type name cannot be empty.</value>
   </data>
-  <data name="AccountTypeCreateSameNameAsParentError" xml:space="preserve">
+  <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
     <value>The account type name cannot be the same as its parent.</value>
   </data>
-  <data name="AccountTypeCreateParentNotFoundError" xml:space="preserve">
+  <data name="AccountTypeParentNotFoundError" xml:space="preserve">
     <value>The parent account type does not exist.</value>
   </data>
   <data name="AccountTypeNotFoundError" xml:space="preserve">
     <value>The account type you are trying to access does not exist.</value>
-  </data>
-  <data name="AccountTypeUpdateNotFoundError" xml:space="preserve">
-    <value>The account type you are trying to update does not exist.</value>
-  </data>
-  <data name="AccountTypeUpdateDuplicateNameError" xml:space="preserve">
-    <value>An account type with this name already exists.</value>
-  </data>
-  <data name="AccountTypeUpdateEmptyNameError" xml:space="preserve">
-    <value>The account type name cannot be empty.</value>
-  </data>
-  <data name="AccountTypeUpdateSameNameAsParentError" xml:space="preserve">
-    <value>The account type name cannot be the same as its parent.</value>
-  </data>
-  <data name="AccountTypeUpdateParentNotFoundError" xml:space="preserve">
-    <value>The parent account type does not exist.</value>
-  </data>
-  <data name="AccountTypeDeleteNotFoundError" xml:space="preserve">
-    <value>The account type you are trying to delete does not exist.</value>
-  </data>
-  <data name="AccountTypeDeleteInUseByAccountsError" xml:space="preserve">
-    <value>The account type you are trying to delete is in use by existing accounts.</value>
-  </data>
-  <data name="AccountTypeDeleteHasChildrenError" xml:space="preserve">
-    <value>The account type you are trying to delete has child types. Please reassign or delete the child types first.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
     <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>

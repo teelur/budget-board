@@ -1,5 +1,6 @@
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
@@ -109,27 +110,13 @@ public class SimpleFinOrganizationService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await userDataContext
-                .ApplicationUsers.Include(u => u.SimpleFinOrganizations)
-                .ThenInclude(i => i.Accounts)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
-            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            id,
+            users => users.Include(u => u.SimpleFinOrganizations).ThenInclude(i => i.Accounts)
+        );
     }
 }

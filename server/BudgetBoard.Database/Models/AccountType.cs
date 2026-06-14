@@ -23,7 +23,7 @@ public class AccountType
     /// <summary>
     /// Used to classify accounts into broader categories (e.g., "Asset", "Liability").
     /// </summary>
-    public string Classification { get; set; } = string.Empty;
+    public string Classification { get; set; } = AccountTypeClassification.Asset;
 
     /// <summary>
     /// Identifier for the user who owns the account type.

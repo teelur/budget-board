@@ -511,32 +511,21 @@ public class TransactionService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await userDataContext
-                .ApplicationUsers.Include(u => u.Accounts)
-                .ThenInclude(a => a.Transactions)
-                .Include(u => u.Accounts)
-                .ThenInclude(a => a.Balances)
-                .Include(u => u.UserSettings)
-                .Include(u => u.TransactionCategories)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
-            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            id,
+            users =>
+                users
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Transactions)
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Balances)
+                    .Include(u => u.UserSettings)
+                    .Include(u => u.TransactionCategories)
+        );
     }
 
     private void UpdateBalancesForNewTransaction(

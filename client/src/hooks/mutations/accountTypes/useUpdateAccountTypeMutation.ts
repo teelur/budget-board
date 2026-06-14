@@ -15,11 +15,11 @@ export const useUpdateAccountTypeMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (req: IAccountTypeUpdateRequest) =>
+    mutationFn: async (updatedAccountType: IAccountTypeUpdateRequest) =>
       await request({
         url: "/api/accountType",
         method: "PUT",
-        data: req,
+        data: updatedAccountType,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });

@@ -18,7 +18,6 @@ public interface IAccountTypeService
     /// Retrieves all account types for the specified user. This includes both built-in (if configured) and custom account types.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="guid">Optional. When provided, returns only the account type with this ID.</param>
     /// <returns>A collection of account type details.</returns>
     Task<IReadOnlyList<IAccountTypeResponse>> ReadAccountTypesAsync(Guid userGuid);
 
@@ -33,6 +32,6 @@ public interface IAccountTypeService
     /// Deletes an account type.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="guid">The unique identifier of the account type to delete.</param>
-    Task DeleteAccountTypeAsync(Guid userGuid, Guid guid);
+    /// <param name="accountGuid">The unique identifier of the account type to delete.</param>
+    Task DeleteAccountTypeAsync(Guid userGuid, Guid accountGuid);
 }
