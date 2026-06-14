@@ -280,9 +280,9 @@ public class AccountTypeServiceTests
 
         var accountTypeCreateRequest = _accountTypeCreateRequestFaker.Generate();
         accountTypeCreateRequest.Parent = AccountTypeConstants
-            .DefaultAccountTypes.First(at => at.Classification == AccountClassifications.Asset)
+            .DefaultAccountTypes.First(at => at.Classification == AccountTypeClassification.Asset)
             .Value;
-        accountTypeCreateRequest.Classification = AccountClassifications.Liability;
+        accountTypeCreateRequest.Classification = AccountTypeClassification.Liability;
 
         // Act
         await accountTypeService.CreateAccountTypeAsync(
@@ -294,7 +294,7 @@ public class AccountTypeServiceTests
         helper
             .UserDataContext.AccountTypes.Single()
             .Classification.Should()
-            .Be(AccountClassifications.Asset);
+            .Be(AccountTypeClassification.Asset);
     }
 
     [Fact]
@@ -645,7 +645,7 @@ public class AccountTypeServiceTests
         var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
         var accountType = accountTypeFaker.Generate();
         accountType.Parent = string.Empty;
-        accountType.Classification = AccountClassifications.Liability;
+        accountType.Classification = AccountTypeClassification.Liability;
 
         helper.UserDataContext.AccountTypes.Add(accountType);
         helper.UserDataContext.SaveChanges();
@@ -654,10 +654,12 @@ public class AccountTypeServiceTests
         {
             ID = accountType.ID,
             Parent = AccountTypeConstants
-                .DefaultAccountTypes.First(at => at.Classification == AccountClassifications.Asset)
+                .DefaultAccountTypes.First(at =>
+                    at.Classification == AccountTypeClassification.Asset
+                )
                 .Value,
             Value = accountType.Value,
-            Classification = AccountClassifications.Liability,
+            Classification = AccountTypeClassification.Liability,
         };
 
         // Act
@@ -670,7 +672,7 @@ public class AccountTypeServiceTests
         helper
             .UserDataContext.AccountTypes.Single(at => at.ID == accountType.ID)
             .Classification.Should()
-            .Be(AccountClassifications.Asset);
+            .Be(AccountTypeClassification.Asset);
     }
 
     [Fact]
@@ -732,11 +734,11 @@ public class AccountTypeServiceTests
         var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
         var parentAccountType = accountTypeFaker.Generate();
         parentAccountType.Parent = string.Empty;
-        parentAccountType.Classification = AccountClassifications.Asset;
+        parentAccountType.Classification = AccountTypeClassification.Asset;
 
         var childAccountType = accountTypeFaker.Generate();
         childAccountType.Parent = parentAccountType.Value;
-        childAccountType.Classification = AccountClassifications.Asset;
+        childAccountType.Classification = AccountTypeClassification.Asset;
 
         helper.UserDataContext.AccountTypes.AddRange([parentAccountType, childAccountType]);
         helper.UserDataContext.SaveChanges();
@@ -746,7 +748,7 @@ public class AccountTypeServiceTests
             ID = parentAccountType.ID,
             Parent = parentAccountType.Parent,
             Value = parentAccountType.Value,
-            Classification = AccountClassifications.Liability,
+            Classification = AccountTypeClassification.Liability,
         };
 
         // Act
@@ -759,12 +761,12 @@ public class AccountTypeServiceTests
         helper
             .UserDataContext.AccountTypes.Single(at => at.ID == parentAccountType.ID)
             .Classification.Should()
-            .Be(AccountClassifications.Liability);
+            .Be(AccountTypeClassification.Liability);
 
         helper
             .UserDataContext.AccountTypes.Single(at => at.ID == childAccountType.ID)
             .Classification.Should()
-            .Be(AccountClassifications.Liability);
+            .Be(AccountTypeClassification.Liability);
     }
 
     [Fact]
