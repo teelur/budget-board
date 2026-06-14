@@ -223,37 +223,23 @@ public class AutomaticRuleService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await _userDataContext
-                .ApplicationUsers.Include(u => u.AutomaticRules)
-                .ThenInclude(r => r.Conditions)
-                .Include(u => u.AutomaticRules)
-                .ThenInclude(r => r.Actions)
-                .Include(u => u.TransactionCategories)
-                .Include(u => u.Accounts)
-                .ThenInclude(a => a.Transactions)
-                .Include(u => u.UserSettings)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                "{LogMessage}",
-                _logLocalizer["UserDataRetrievalErrorLog", ex.Message]
-            );
-            throw new BudgetBoardServiceException(_responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            _userDataContext,
+            _logger,
+            _logLocalizer,
+            _responseLocalizer,
+            id,
+            users =>
+                users
+                    .Include(u => u.AutomaticRules)
+                    .ThenInclude(r => r.Conditions)
+                    .Include(u => u.AutomaticRules)
+                    .ThenInclude(r => r.Actions)
+                    .Include(u => u.TransactionCategories)
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Transactions)
+                    .Include(u => u.UserSettings)
+        );
     }
 
     private async Task<int> RunAutomaticRule(
