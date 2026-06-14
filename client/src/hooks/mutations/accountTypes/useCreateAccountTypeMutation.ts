@@ -1,11 +1,7 @@
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import {
-  accountsQueryKey,
-  accountTypesQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
+import { accountTypesQueryKey, translateAxiosError } from "~/helpers/requests";
 import { IAccountTypeCreateRequest } from "~/models/accountType";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
@@ -22,7 +18,6 @@ export const useCreateAccountTypeMutation = () => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({
