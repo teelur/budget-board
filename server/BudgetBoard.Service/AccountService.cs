@@ -222,8 +222,8 @@ public class AccountService(
         var account = userData.Accounts.FirstOrDefault(a => a.ID == accountId);
         if (account == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["AccountRestoreNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["AccountRestoreNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["AccountNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["AccountNotFoundError"]);
         }
 
         return account;
