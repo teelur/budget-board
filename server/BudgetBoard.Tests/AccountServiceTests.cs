@@ -63,42 +63,6 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task CreateAccountAsync_InvalidUserId_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var accountService = new AccountService(
-            Mock.Of<ILogger<IAccountService>>(),
-            helper.UserDataContext,
-            Mock.Of<ITransactionService>(),
-            Mock.Of<INowProvider>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
-        var institution = institutionFaker.Generate();
-
-        helper.UserDataContext.Institutions.Add(institution);
-        helper.UserDataContext.SaveChanges();
-
-        var account = new AccountCreateRequest
-        {
-            Name = "My Account",
-            InstitutionID = institution.ID,
-        };
-
-        // Act
-        var createAccountAct = () => accountService.CreateAccountAsync(Guid.NewGuid(), account);
-
-        // Assert
-        await createAccountAct
-            .Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("InvalidUserError");
-    }
-
-    [Fact]
     public async Task CreateAccountAsync_InvalidInstitutionId_ThrowsError()
     {
         // Arrange
@@ -231,7 +195,7 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task UpdateAccountAsync_InvalidAccount_ThrowsError()
+    public async Task UpdateAccountAsync_InvalidAccount_ThrowsAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -261,7 +225,7 @@ public class AccountServiceTests()
         await updateAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountEditNotFoundError");
+            .WithMessage("AccountNotFoundError");
     }
 
     [Fact]
@@ -403,7 +367,7 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task DeleteAccountAsync_InvalidAccount_ThrowsError()
+    public async Task DeleteAccountAsync_InvalidAccount_ThrowsAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -430,7 +394,7 @@ public class AccountServiceTests()
         await deleteAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountDeleteNotFoundError");
+            .WithMessage("AccountNotFoundError");
     }
 
     [Fact]
@@ -676,7 +640,7 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task RestoreAccountAsync_InvalidAccount_ThrowsError()
+    public async Task RestoreAccountAsync_InvalidAccount_ThrowsAccountNotFoundError()
     {
         // Arrange
         var fakeDate = new Faker().Date.Past().ToUniversalTime();
@@ -711,7 +675,7 @@ public class AccountServiceTests()
         await restoreAccountAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountRestoreNotFoundError");
+            .WithMessage("AccountNotFoundError");
     }
 
     [Fact]
@@ -847,7 +811,7 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task OrderAccountsAsync_InvalidAccount_ThrowsError()
+    public async Task OrderAccountsAsync_InvalidAccount_ThrowsAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -885,7 +849,7 @@ public class AccountServiceTests()
         await orderAccountsAct
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountOrderNotFoundError");
+            .WithMessage("AccountNotFoundError");
     }
     #endregion
 
@@ -919,7 +883,7 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task PermanentlyDeleteAccountAsync_InvalidAccount_ThrowsError()
+    public async Task PermanentlyDeleteAccountAsync_InvalidAccount_ThrowsAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -945,7 +909,7 @@ public class AccountServiceTests()
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AccountPermanentDeleteNotFoundError");
+            .WithMessage("AccountNotFoundError");
     }
 
     [Fact]

@@ -58,35 +58,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DuplicateSyncIDLog" xml:space="preserve">
-    <value>Attempted to create an account with a duplicate SyncID.</value>
-  </data>
   <data name="InvalidInstitutionIDLog" xml:space="preserve">
     <value>Attempted to create an account with an invalid institution ID.</value>
   </data>
   <data name="AccountNotFoundLog" xml:space="preserve">
     <value>Attempted to access an account that does not exist.</value>
   </data>
-  <data name="AccountEditNotFoundLog" xml:space="preserve">
-    <value>Attempted to edit an account that does not exist.</value>
-  </data>
-  <data name="AccountEditEmptyNameLog" xml:space="preserve">
-    <value>Attempted to edit an account with an empty name.</value>
-  </data>
-  <data name="AccountDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to delete an account that does not exist.</value>
-  </data>
-  <data name="AccountPermanentDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to permanently delete an account that does not exist.</value>
-  </data>
   <data name="AccountPermanentDeleteNotDeletedLog" xml:space="preserve">
     <value>Attempted to permanently delete an account that has not been soft-deleted.</value>
-  </data>
-  <data name="AccountRestoreNotFoundLog" xml:space="preserve">
-    <value>Attempted to restore an account that does not exist.</value>
-  </data>
-  <data name="AccountOrderNotFoundLog" xml:space="preserve">
-    <value>Attempted to set index for account that does not exist.</value>
   </data>
   <data name="UserDataRetrievalErrorLog" xml:space="preserve">
     <value>An error occurred while retrieving the user data: {0}</value>
@@ -100,9 +79,6 @@
   <data name="AssetEditNotFoundLog" xml:space="preserve">
     <value>Attempted to edit an asset that does not exist.</value>
   </data>
-  <data name="DuplicateAssetNameLog" xml:space="preserve">
-    <value>Attempted to update an asset with a duplicate name.</value>
-  </data>
   <data name="AssetDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete an asset that does not exist.</value>
   </data>
@@ -114,9 +90,6 @@
   </data>
   <data name="NoConditionsCreateLog" xml:space="preserve">
     <value>Attempted to create an automatic rule with no conditions.</value>
-  </data>
-  <data name="NoActionsLog" xml:space="preserve">
-    <value>Attempted to create an automatic rule with no actions.</value>
   </data>
   <data name="AutomaticRuleUpdateNotFoundLog" xml:space="preserve">
     <value>Attempted to update an automatic rule that does not exist.</value>
@@ -160,9 +133,6 @@
   <data name="BalanceDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a balance that does not exist.</value>
   </data>
-  <data name="BalanceRestoreNotFoundLog" xml:space="preserve">
-    <value>Attempted to restore a balance that does not exist.</value>
-  </data>
   <data name="BudgetCreateEmptyCategoryLog" xml:space="preserve">
     <value>Attempted to create a budget with an empty category.</value>
   </data>
@@ -177,9 +147,6 @@
   </data>
   <data name="ParentBudgetNotFoundLog" xml:space="preserve">
     <value>Parent budget not found for category {0}.</value>
-  </data>
-  <data name="BudgetCopyCompletedLog" xml:space="preserve">
-    <value>Successfully copied {0} budgets.</value>
   </data>
   <data name="BudgetUpdateNotFoundLog" xml:space="preserve">
     <value>Attempted to update a budget that does not exist.</value>
@@ -238,9 +205,6 @@
   <data name="InstitutionDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete an institution that does not exist.</value>
   </data>
-  <data name="InstitutionDeleteHasAccountsLog" xml:space="preserve">
-    <value>Attempted to delete an institution that has undeleted accounts.</value>
-  </data>
   <data name="InstitutionOrderNotFoundLog" xml:space="preserve">
     <value>Attempted to set index for institution that does not exist.</value>
   </data>
@@ -255,9 +219,6 @@
   </data>
   <data name="TransactionCategoryCreateParentNotFoundLog" xml:space="preserve">
     <value>Attempted to create a transaction category with a parent that does not exist.</value>
-  </data>
-  <data name="TransactioCategoryNotFoundLog" xml:space="preserve">
-    <value>Attempted to access a transaction category that does not exist.</value>
   </data>
   <data name="TransactionCategoryUpdateNotFoundLog" xml:space="preserve">
     <value>Attempted to update a transaction category that does not exist.</value>
@@ -276,18 +237,6 @@
   </data>
   <data name="TransactionCategoryDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a transaction category that does not exist.</value>
-  </data>
-  <data name="TransactionCategoryDeleteInUseByTransactionsLog" xml:space="preserve">
-    <value>Attempted to delete a transaction category that is in use by existing transactions.</value>
-  </data>
-  <data name="TransactionCategoryDeleteInUseByBudgetsLog" xml:space="preserve">
-    <value>Attempted to delete a transaction category that is in use by existing budgets.</value>
-  </data>
-  <data name="TransactionCategoryDeleteHasChildrenLog" xml:space="preserve">
-    <value>Attempted to delete a transaction category that has child categories.</value>
-  </data>
-  <data name="TransactionCategoryRestoreNotFoundLog" xml:space="preserve">
-    <value>Attempted to restore a transaction category that does not exist.</value>
   </data>
   <data name="TransactionCreateAccountNotFoundLog" xml:space="preserve">
     <value>Attempted to create a transaction for an account that does not exist.</value>
@@ -316,9 +265,6 @@
   <data name="TransactionSplitInvalidAmountLog" xml:space="preserve">
     <value>Attempt to split transaction with amount less than or equal to the split amount.</value>
   </data>
-  <data name="TransactionSplitNoAccountLog" xml:space="preserve">
-    <value>Attempted to split a transaction for an account that does not exist.</value>
-  </data>
   <data name="TransactionImportAccountNotFoundLog" xml:space="preserve">
     <value>Attempted to import transactions for an account that does not exist.</value>
   </data>
@@ -343,14 +289,8 @@
   <data name="InvalidAutoCategorizerMinimumProbabilityPercentageLog" xml:space="preserve">
     <value>Attempted to update user settings with an invalid auto-categorizer minimum probability percentage value.</value>
   </data>
-  <data name="ValueCreateAssetNotFoundLog" xml:space="preserve">
-    <value>Attempted to create a value for an asset that does not exist.</value>
-  </data>
   <data name="ValueAssetNotFoundLog" xml:space="preserve">
     <value>Attempted to access values for an asset that does not exist.</value>
-  </data>
-  <data name="ValueUpdateAssetNotFoundLog" xml:space="preserve">
-    <value>Attempted to update a value for an asset that does not exist.</value>
   </data>
   <data name="ValueUpdateNotFoundLog" xml:space="preserve">
     <value>Attempted to update a value that does not exist.</value>
@@ -360,9 +300,6 @@
   </data>
   <data name="ValueDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a value that does not exist.</value>
-  </data>
-  <data name="ValueRestoreNotFoundLog" xml:space="preserve">
-    <value>Attempted to restore a value that does not exist.</value>
   </data>
   <data name="SimpleFinTokenConfiguredLog" xml:space="preserve">
     <value>SimpleFIN token is configured. Syncing bank data.</value>
@@ -379,17 +316,8 @@
   <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
     <value>SimpleFIN account {0} is deleted. Skipping.</value>
   </data>
-  <data name="SimpleFinOrganizationMissingIdLog" xml:space="preserve">
-    <value>SimpleFIN organization for account {0} is missing one of Name or Domain. Skipping account sync.</value>
-  </data>
-  <data name="SyncInstitutionCreationErrorLog" xml:space="preserve">
-    <value>Error creating institution for SimpleFIN account {0}</value>
-  </data>
   <data name="SimpleFinAccountNotFoundForTransactionLog" xml:space="preserve">
     <value>SimpleFIN account with SyncID {0} not found for transaction. Skipping transactions sync.</value>
-  </data>
-  <data name="SimpleFinAccountNotFoundForBalanceLog" xml:space="preserve">
-    <value>SimpleFIN account with SyncID {0} not found for balance. Skipping balances sync.</value>
   </data>
   <data name="SimpleFinTokenNotConfiguredLog" xml:space="preserve">
     <value>SimpleFIN token is not configured. Skipping bank sync.</value>
@@ -417,9 +345,6 @@
   </data>
   <data name="SimpleFinDataRequestErrorLog" xml:space="preserve">
     <value>Error requesting SimpleFIN account data: {0}</value>
-  </data>
-  <data name="GoalNoBalanceFoundLog" xml:space="preserve">
-    <value>No balance found for goal {0}</value>
   </data>
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
     <value>Attempted to update a widget that does not exist.</value>
@@ -517,44 +442,20 @@
   <data name="LunchFlowAccountSyncExceptionLog" xml:space="preserve">
     <value>An unexpected error occurred while syncing LunchFlow account {0}: {1}. Skipping.</value>
   </data>
-  <data name="AccountTypeCreateDuplicateNameLog" xml:space="preserve">
-    <value>Attempted to create an account type with a duplicate name.</value>
+  <data name="AccountTypeDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to create or update an account type with a duplicate name.</value>
   </data>
-  <data name="AccountTypeCreateEmptyNameLog" xml:space="preserve">
-    <value>Attempted to create an account type with an empty name.</value>
+  <data name="AccountTypeEmptyNameLog" xml:space="preserve">
+    <value>Attempted to create or update an account type with an empty name.</value>
   </data>
-  <data name="AccountTypeCreateSameNameAsParentLog" xml:space="preserve">
-    <value>Attempted to create an account type with the same name as its parent.</value>
+  <data name="AccountTypeSameNameAsParentLog" xml:space="preserve">
+    <value>Attempted to create or update an account type with the same name as its parent.</value>
   </data>
-  <data name="AccountTypeCreateParentNotFoundLog" xml:space="preserve">
-    <value>Attempted to create an account type with a parent that does not exist.</value>
+  <data name="AccountTypeParentNotFoundLog" xml:space="preserve">
+    <value>Attempted to create or update an account type with a parent that does not exist.</value>
   </data>
   <data name="AccountTypeNotFoundLog" xml:space="preserve">
     <value>Attempted to access an account type that does not exist.</value>
-  </data>
-  <data name="AccountTypeUpdateNotFoundLog" xml:space="preserve">
-    <value>Attempted to update an account type that does not exist.</value>
-  </data>
-  <data name="AccountTypeUpdateDuplicateNameLog" xml:space="preserve">
-    <value>Attempted to update an account type with a duplicate name.</value>
-  </data>
-  <data name="AccountTypeUpdateEmptyNameLog" xml:space="preserve">
-    <value>Attempted to update an account type with an empty name.</value>
-  </data>
-  <data name="AccountTypeUpdateSameNameAsParentLog" xml:space="preserve">
-    <value>Attempted to update an account type with the same name as its parent.</value>
-  </data>
-  <data name="AccountTypeUpdateParentNotFoundLog" xml:space="preserve">
-    <value>Attempted to update an account type with a parent that does not exist.</value>
-  </data>
-  <data name="AccountTypeDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to delete an account type that does not exist.</value>
-  </data>
-  <data name="AccountTypeDeleteInUseByAccountsLog" xml:space="preserve">
-    <value>Attempted to delete an account type that is in use by existing accounts.</value>
-  </data>
-  <data name="AccountTypeDeleteHasChildrenLog" xml:space="preserve">
-    <value>Attempted to delete an account type that has child types.</value>
   </data>
   <data name="AccountTypeInvalidClassificationLog" xml:space="preserve">
     <value>Attempted to create or update an account type with an invalid classification.</value>

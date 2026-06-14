@@ -23,11 +23,12 @@ public class AccountTypeService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var allAccountTypes = AccountTypeHelpers.GetAllAccountTypes(userData);
 
-        ThrowIfValueIsNullOrEmpty(request.Value);
-        ThrowIfValueAlreadyExists(request.Value, allAccountTypes);
-        ThrowIfValueSameNameAsParent(request.Value, request.Parent, allAccountTypes);
-        ThrowIfParentNotFound(request.Parent, allAccountTypes);
-        ThrowIfInvalidClassification(request.Classification);
+        ValidateAccountTypeData(
+            request.Value,
+            request.Parent,
+            request.Classification,
+            allAccountTypes
+        );
 
         var newAccountType = new AccountType
         {
@@ -43,79 +44,6 @@ public class AccountTypeService(
 
         userDataContext.AccountTypes.Add(newAccountType);
         await userDataContext.SaveChangesAsync();
-
-        void ThrowIfValueAlreadyExists(
-            string value,
-            IEnumerable<IAccountTypeResponse> allAccountTypes
-        )
-        {
-            if (allAccountTypes.Any(a => a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)))
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeCreateDuplicateNameLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeCreateDuplicateNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueIsNullOrEmpty(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeCreateEmptyNameLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeCreateEmptyNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueSameNameAsParent(
-            string value,
-            string parentValue,
-            IEnumerable<IAccountTypeResponse> allAccountTypes
-        )
-        {
-            if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["AccountTypeCreateSameNameAsParentLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeCreateSameNameAsParentError"]
-                );
-            }
-        }
-
-        void ThrowIfParentNotFound(
-            string parentValue,
-            IEnumerable<IAccountTypeResponse> allAccountTypes
-        )
-        {
-            if (
-                !string.IsNullOrEmpty(parentValue)
-                && !allAccountTypes.Any(a =>
-                    a.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeCreateParentNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeCreateParentNotFoundError"]
-                );
-            }
-        }
-
-        string ResolveClassification(
-            string parent,
-            string classification,
-            IEnumerable<IAccountTypeResponse> allAccountTypes
-        ) =>
-            string.IsNullOrEmpty(parent)
-                ? classification
-                : allAccountTypes
-                    .First(a => a.Value.Equals(parent, StringComparison.OrdinalIgnoreCase))
-                    .Classification;
     }
 
     /// <inheritdoc />
@@ -129,23 +57,15 @@ public class AccountTypeService(
     public async Task UpdateAccountTypeAsync(Guid userGuid, IAccountTypeUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var accountType = userData.AccountTypes.FirstOrDefault(a => a.ID == request.ID);
-        if (accountType == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountTypeUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AccountTypeUpdateNotFoundError"]
-            );
-        }
-
+        var accountType = GetAccountTypeById(userData, request.ID);
         var allAccountTypes = AccountTypeHelpers.GetAllAccountTypes(userData);
 
-        ThrowIfValueIsNullOrEmpty(request.Value);
-        ThrowIfValueAlreadyExists(request.Value, allAccountTypes);
-        ThrowIfValueSameNameAsParent(request.Value, request.Parent);
-        ThrowIfParentNotFound(request.Parent);
-        ThrowIfInvalidClassification(request.Classification);
+        ValidateAccountTypeData(
+            request.Value,
+            request.Parent,
+            request.Classification,
+            allAccountTypes.Where(a => a.ID != request.ID)
+        );
 
         var oldValue = accountType.Value;
 
@@ -158,97 +78,27 @@ public class AccountTypeService(
         );
 
         UpdateAccountsUsingType(userData.Accounts, oldValue, request.Value);
-
+        if (!string.IsNullOrEmpty(request.Parent))
+        {
+            UpdateOrphanedChildren(userData.AccountTypes, oldValue);
+        }
         UpdateChildrenClassification(userData.AccountTypes, oldValue, accountType.Classification);
         UpdateChildrenParentValue(userData.AccountTypes, oldValue, request.Value);
 
         await userDataContext.SaveChangesAsync();
 
-        void ThrowIfValueAlreadyExists(
-            string value,
-            IEnumerable<IAccountTypeResponse> allAccountTypes
+        static void UpdateOrphanedChildren(
+            ICollection<AccountType> accountTypes,
+            string oldParentValue
         )
         {
-            if (
-                allAccountTypes.Any(a =>
-                    a.ID != request.ID && a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)
+            foreach (
+                var child in accountTypes.Where(a =>
+                    a.Parent.Equals(oldParentValue, StringComparison.OrdinalIgnoreCase)
                 )
             )
             {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeUpdateDuplicateNameLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeUpdateDuplicateNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueIsNullOrEmpty(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeUpdateEmptyNameLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeUpdateEmptyNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueSameNameAsParent(string value, string parentValue)
-        {
-            if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["AccountTypeUpdateSameNameAsParentLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeUpdateSameNameAsParentError"]
-                );
-            }
-        }
-
-        void ThrowIfParentNotFound(string parentValue)
-        {
-            if (
-                !string.IsNullOrEmpty(parentValue)
-                && !allAccountTypes.Any(a =>
-                    a.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AccountTypeUpdateParentNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AccountTypeUpdateParentNotFoundError"]
-                );
-            }
-        }
-
-        string ResolveClassification(
-            string parent,
-            string classification,
-            IEnumerable<IAccountTypeResponse> allAccountTypes
-        ) =>
-            string.IsNullOrEmpty(parent)
-                ? classification
-                : allAccountTypes
-                    .First(a => a.Value.Equals(parent, StringComparison.OrdinalIgnoreCase))
-                    .Classification;
-
-        static void UpdateAccountsUsingType(
-            ICollection<Account> accounts,
-            string oldType,
-            string newType
-        )
-        {
-            foreach (var account in accounts)
-            {
-                if (
-                    (account.Type ?? string.Empty).Equals(
-                        oldType,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                    account.Type = newType;
+                child.Parent = string.Empty;
             }
         }
 
@@ -289,15 +139,7 @@ public class AccountTypeService(
     public async Task DeleteAccountTypeAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var accountType = userData.AccountTypes.FirstOrDefault(a => a.ID == guid);
-        if (accountType == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AccountTypeDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AccountTypeDeleteNotFoundError"]
-            );
-        }
+        var accountType = GetAccountTypeById(userData, guid);
 
         RemoveChildrenUsingType(accountType.Value);
         UpdateAccountsUsingType(userData.Accounts, accountType.Value, string.Empty);
@@ -318,56 +160,146 @@ public class AccountTypeService(
                 userData.AccountTypes.Remove(child);
             }
         }
-
-        static void UpdateAccountsUsingType(
-            ICollection<Account> accounts,
-            string oldType,
-            string newType
-        )
-        {
-            foreach (var account in accounts)
-            {
-                if (account.Type.Equals(oldType, StringComparison.OrdinalIgnoreCase))
-                    account.Type = newType;
-            }
-        }
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await userDataContext
-                .ApplicationUsers.Include(u => u.AccountTypes)
-                .Include(u => u.Accounts)
-                .Include(u => u.UserSettings)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalErrorLog", ex.Message]);
-            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            id,
+            users =>
+                users
+                    .Include(u => u.AccountTypes)
+                    .Include(u => u.Accounts)
+                    .Include(u => u.UserSettings)
+        );
     }
 
-    private void ThrowIfInvalidClassification(string classification)
+    private AccountType GetAccountTypeById(ApplicationUser userData, Guid id)
     {
-        if (!AccountClassifications.AllClassifications.Contains(classification))
+        var accountType = userData.AccountTypes.FirstOrDefault(a => a.ID == id);
+        if (accountType == null)
         {
-            logger.LogError("{LogMessage}", logLocalizer["AccountTypeInvalidClassificationLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AccountTypeInvalidClassificationError"]
-            );
+            logger.LogError("{LogMessage}", logLocalizer["AccountTypeNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["AccountTypeNotFoundError"]);
+        }
+
+        return accountType;
+    }
+
+    private void ValidateAccountTypeData(
+        string value,
+        string parent,
+        string classification,
+        IEnumerable<IAccountTypeResponse> allAccountTypes
+    )
+    {
+        ThrowIfValueIsNullOrEmpty(value);
+        ThrowIfValueAlreadyExists(value, allAccountTypes);
+        ThrowIfValueSameNameAsParent(value, parent, allAccountTypes);
+        ThrowIfParentNotFound(parent, allAccountTypes);
+        ThrowIfInvalidClassification(classification);
+
+        void ThrowIfValueIsNullOrEmpty(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AccountTypeEmptyNameLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AccountTypeEmptyNameError"]
+                );
+            }
+        }
+
+        void ThrowIfValueAlreadyExists(
+            string value,
+            IEnumerable<IAccountTypeResponse> allAccountTypes
+        )
+        {
+            if (allAccountTypes.Any(a => a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)))
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AccountTypeDuplicateNameLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AccountTypeDuplicateNameError"]
+                );
+            }
+        }
+
+        void ThrowIfValueSameNameAsParent(
+            string value,
+            string parentValue,
+            IEnumerable<IAccountTypeResponse> allAccountTypes
+        )
+        {
+            if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AccountTypeSameNameAsParentLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AccountTypeSameNameAsParentError"]
+                );
+            }
+        }
+
+        void ThrowIfParentNotFound(
+            string parentValue,
+            IEnumerable<IAccountTypeResponse> allAccountTypes
+        )
+        {
+            if (
+                !string.IsNullOrEmpty(parentValue)
+                && !allAccountTypes.Any(a =>
+                    a.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
+                )
+            )
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AccountTypeParentNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AccountTypeParentNotFoundError"]
+                );
+            }
+        }
+
+        void ThrowIfInvalidClassification(string classification)
+        {
+            if (!AccountTypeClassification.IsValid(classification))
+            {
+                logger.LogError(
+                    "{LogMessage}",
+                    logLocalizer["AccountTypeInvalidClassificationLog"]
+                );
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AccountTypeInvalidClassificationError"]
+                );
+            }
+        }
+    }
+
+    private static string ResolveClassification(
+        string parent,
+        string classification,
+        IEnumerable<IAccountTypeResponse> allAccountTypes
+    ) =>
+        string.IsNullOrEmpty(parent)
+            ? classification
+            : allAccountTypes
+                .First(a => a.Value.Equals(parent, StringComparison.OrdinalIgnoreCase))
+                .Classification;
+
+    private static void UpdateAccountsUsingType(
+        ICollection<Account> accounts,
+        string oldType,
+        string newType
+    )
+    {
+        foreach (var account in accounts)
+        {
+            if (account.Type.Equals(oldType, StringComparison.OrdinalIgnoreCase))
+            {
+                account.Type = newType;
+            }
         }
     }
 }

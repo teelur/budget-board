@@ -1,10 +1,10 @@
 ﻿using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -51,25 +51,13 @@ public class ApplicationUserService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await _userDataContext.ApplicationUsers.FirstOrDefaultAsync(u =>
-                u.Id == new Guid(id)
-            );
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["UserRetrievalErrorLog", ex.Message]);
-            throw new BudgetBoardServiceException(_responseLocalizer["UserRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InvalidUserErrorLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            _userDataContext,
+            _logger,
+            _logLocalizer,
+            _responseLocalizer,
+            id,
+            users => users
+        );
     }
 }
