@@ -5,15 +5,18 @@ import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import React from "react";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { accountTypesQueryKey, translateAxiosError , accountsQueryKey, institutionsQueryKey} from "~/helpers/requests";
 import {
-  IAccountTypeResponse,
-  IAccountTypeUpdateRequest,
-} from "~/models/accountType";
+  accountTypesQueryKey,
+  translateAxiosError,
+  accountsQueryKey,
+  institutionsQueryKey,
+} from "~/helpers/requests";
+import { IAccountTypeResponse } from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import CustomAccountTypeCard from "./CustomAccountTypeCard/CustomAccountTypeCard";
+import { useUpdateAccountTypeMutation } from "~/hooks/mutations/accountTypes/useUpdateAccountTypeMutation";
 
 const CustomAccountTypeCards = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -40,24 +43,7 @@ const CustomAccountTypeCards = (): React.ReactNode => {
       }),
   });
 
-  const doUpdateAccountType = useMutation({
-    mutationFn: async (req: IAccountTypeUpdateRequest) =>
-      await request({
-        url: "/api/accountType",
-        method: "PUT",
-        data: req,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
+  const updateAccountTypeMutation = useUpdateAccountTypeMutation();
 
   if (customAccountTypes.length === 0) {
     return (
@@ -125,7 +111,7 @@ const CustomAccountTypeCards = (): React.ReactNode => {
               await doDeleteAccountType.mutateAsync(group.parent.id);
             }}
             updateAccountType={async (req) => {
-              await doUpdateAccountType.mutateAsync(req);
+              await updateAccountTypeMutation.mutateAsync(req);
             }}
           />
           {group.children.map((child) => (
@@ -137,7 +123,7 @@ const CustomAccountTypeCards = (): React.ReactNode => {
                 await doDeleteAccountType.mutateAsync(child.id);
               }}
               updateAccountType={async (req) => {
-                await doUpdateAccountType.mutateAsync(req);
+                await updateAccountTypeMutation.mutateAsync(req);
               }}
             />
           ))}
