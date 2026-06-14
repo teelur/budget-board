@@ -1,49 +1,20 @@
 import { Group, Stack } from "@mantine/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import React from "react";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import {
-  accountTypesQueryKey,
-  translateAxiosError,
-  accountsQueryKey,
-  institutionsQueryKey,
-} from "~/helpers/requests";
 import { IAccountTypeResponse } from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import CustomAccountTypeCard from "./CustomAccountTypeCard/CustomAccountTypeCard";
 import { useUpdateAccountTypeMutation } from "~/hooks/mutations/accountTypes/useUpdateAccountTypeMutation";
+import { useDeleteAccountTypeMutation } from "~/hooks/mutations/accountTypes/useDeleteAccountTypeMutation";
 
 const CustomAccountTypeCards = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const { allAccountTypes, customAccountTypes } = useAccountTypes();
 
-  const queryClient = useQueryClient();
-  const doDeleteAccountType = useMutation({
-    mutationFn: async (guid: string) =>
-      await request({
-        url: "/api/accountType",
-        method: "DELETE",
-        params: { guid },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
   const updateAccountTypeMutation = useUpdateAccountTypeMutation();
+  const deleteAccountTypeMutation = useDeleteAccountTypeMutation();
 
   if (customAccountTypes.length === 0) {
     return (
@@ -108,7 +79,7 @@ const CustomAccountTypeCards = (): React.ReactNode => {
             accountType={group.parent}
             isBuiltIn={group.isBuiltIn}
             deleteAccountType={async () => {
-              await doDeleteAccountType.mutateAsync(group.parent.id);
+              await deleteAccountTypeMutation.mutateAsync(group.parent.id);
             }}
             updateAccountType={async (req) => {
               await updateAccountTypeMutation.mutateAsync(req);
@@ -120,7 +91,7 @@ const CustomAccountTypeCards = (): React.ReactNode => {
               accountType={child}
               isChildCard
               deleteAccountType={async () => {
-                await doDeleteAccountType.mutateAsync(child.id);
+                await deleteAccountTypeMutation.mutateAsync(child.id);
               }}
               updateAccountType={async (req) => {
                 await updateAccountTypeMutation.mutateAsync(req);
