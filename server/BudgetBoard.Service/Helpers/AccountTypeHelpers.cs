@@ -6,7 +6,7 @@ namespace BudgetBoard.Service.Helpers;
 internal static class AccountTypeHelpers
 {
     /// <summary>
-    /// Combines built-in and custom account types for the specified user.
+    /// Combines built-in and custom account types (if enabled) for the specified user.
     /// </summary>
     /// <param name="userData">The user whose account types are to be retrieved.</param>
     /// <returns>A read-only list containing all applicable account types.</returns>
