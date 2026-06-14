@@ -40,7 +40,7 @@ namespace BudgetBoard.Database.Migrations
             );
 
             migrationBuilder.Sql(
-                "ALTER TABLE \"AccountType\" ALTER COLUMN \"Classification\" SET DEFAULT 'asset';"
+                "ALTER TABLE \"AccountType\" ALTER COLUMN \"Classification\" DROP DEFAULT;"
             );
         }
     }
