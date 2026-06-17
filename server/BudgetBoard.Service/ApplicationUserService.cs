@@ -17,10 +17,7 @@ public class ApplicationUserService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : IApplicationUserService
 {
-    private readonly ILogger<IApplicationUserService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
+    public const string OidcLoginProvider = "oidc";
 
     /// <inheritdoc />
     public async Task<IApplicationUserResponse> ReadApplicationUserAsync(
@@ -45,17 +42,65 @@ public class ApplicationUserService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        _userDataContext.Entry(userData).CurrentValues.SetValues(request);
-        await _userDataContext.SaveChangesAsync();
+        userData.LastSync = request.LastSync;
+        await userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task DisconnectOidcLoginAsync(
+        Guid userGuid,
+        UserManager<ApplicationUser> userManager
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var logins = await userManager.GetLoginsAsync(userData);
+        var oidcLogin = logins.FirstOrDefault(l => l.LoginProvider == OidcLoginProvider);
+        if (oidcLogin == null)
+        {
+            logger.LogWarning("{LogMessage}", logLocalizer["NoOidcLoginFoundLog", userGuid]);
+            throw new BudgetBoardServiceException(responseLocalizer["NoOidcLoginFound"]);
+        }
+
+        // We can't allow a user to remove OIDC login if they don't have a local account,
+        // since they would not be able to login anymore.
+        var hasPassword = await userManager.HasPasswordAsync(userData);
+        var remainingLogins = logins.Count(l => l.LoginProvider != OidcLoginProvider);
+        if (!hasPassword && remainingLogins == 0)
+        {
+            logger.LogWarning("{LogMessage}", logLocalizer["RemoveOidcNoPasswordLog", userGuid]);
+            throw new BudgetBoardServiceException(responseLocalizer["RemoveOidcNoPassword"]);
+        }
+
+        var result = await userManager.RemoveLoginAsync(
+            userData,
+            oidcLogin.LoginProvider,
+            oidcLogin.ProviderKey
+        );
+
+        if (!result.Succeeded)
+        {
+            logger.LogError(
+                "{LogMessage}",
+                logLocalizer[
+                    "RemoveOidcFailedLog",
+                    userGuid,
+                    string.Join(", ", result.Errors.Select(e => e.Description))
+                ]
+            );
+            throw new BudgetBoardServiceException(responseLocalizer["RemoveOidcFailed"]);
+        }
+
+        logger.LogInformation("{LogMessage}", logLocalizer["RemoveOidcSuccessLog", userGuid]);
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
-            _userDataContext,
-            _logger,
-            _logLocalizer,
-            _responseLocalizer,
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
             id,
             users => users
         );

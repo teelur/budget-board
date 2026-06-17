@@ -58,20 +58,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="RemoveOidcFailed" xml:space="preserve">
-    <value>Failed to remove OIDC login.</value>
-  </data>
   <data name="UnexpectedServerError" xml:space="preserve">
     <value>An unexpected error occurred.</value>
   </data>
   <data name="LoginFailed" xml:space="preserve">
     <value>Unable to complete login.</value>
-  </data>
-  <data name="RemoveOidcNoPassword" xml:space="preserve">
-    <value>Cannot remove OIDC login. The user must have a local password set first to maintain account access.</value>
-  </data>
-  <data name="NoOidcLoginFound" xml:space="preserve">
-    <value>No OIDC login was found for this user.</value>
   </data>
   <data name="RegistrationDisabledError" xml:space="preserve">
     <value>Registration is disabled.</value>
@@ -87,9 +78,6 @@
   </data>
   <data name="LocalAccountProviderName" xml:space="preserve">
     <value>Local Account</value>
-  </data>
-  <data name="RemoveOidcSuccess" xml:space="preserve">
-    <value>OIDC login disconnected successfully.</value>
   </data>
   <data name="UserNotFound" xml:space="preserve">
     <value>The user was not found.</value>
