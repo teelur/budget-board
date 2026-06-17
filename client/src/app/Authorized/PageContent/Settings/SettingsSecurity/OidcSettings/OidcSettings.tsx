@@ -1,60 +1,21 @@
-import { Button, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
+import { Button, Skeleton, Stack } from "@mantine/core";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError, userQueryKey } from "~/helpers/requests";
-import { IApplicationUser } from "~/models/applicationUser";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
+import { useDisconnectOidcLoginMutation } from "~/hooks/mutations/applicationUser/useDisconnectOidcLoginMutation";
 
 const OidcSettings = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
+  const applicationUserQuery = useApplicationUserQuery();
+  const disconnectOidcLoginMutation = useDisconnectOidcLoginMutation();
 
-  const userQuery = useQuery({
-    queryKey: [userQueryKey],
-    queryFn: async (): Promise<IApplicationUser | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/applicationUser",
-        method: "GET",
-      });
+  if (applicationUserQuery.isPending) {
+    return <Skeleton height={100} radius="md" />;
+  }
 
-      if (res.status === 200) {
-        return res.data as IApplicationUser;
-      }
-
-      return undefined;
-    },
-  });
-
-  const queryClient = useQueryClient();
-  const doDisconnectOidc = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/applicationUser/disconnectOidcLogin",
-        method: "DELETE",
-      }),
-    onSuccess: async (res: AxiosResponse) => {
-      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message:
-          res?.data?.message ?? t("oidc_provider_disconnected_successfully"),
-      });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  if (!userQuery.data?.hasOidcLogin) {
+  if (!applicationUserQuery.data?.hasOidcLogin) {
     return null;
   }
 
@@ -64,8 +25,8 @@ const OidcSettings = (): React.ReactNode => {
         <PrimaryText size="lg">{t("oidc_settings")}</PrimaryText>
         <Button
           color="var(--button-color-destructive)"
-          onClick={() => doDisconnectOidc.mutate()}
-          loading={doDisconnectOidc.isPending}
+          onClick={() => disconnectOidcLoginMutation.mutate()}
+          loading={disconnectOidcLoginMutation.isPending}
         >
           {t("disconnect_oidc_provider")}
         </Button>

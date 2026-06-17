@@ -1,14 +1,13 @@
-import { Button, LoadingOverlay, Stack, Skeleton } from "@mantine/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, LoadingOverlay, Stack } from "@mantine/core";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { IApplicationUser } from "~/models/applicationUser";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import {
+  applicationUserQueryKey,
   simpleFinAccountQueryKey,
   simpleFinOrganizationQueryKey,
   translateAxiosError,
-  userQueryKey,
 } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { isNotEmpty, useField } from "@mantine/form";
@@ -20,28 +19,11 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 
 const LinkSimpleFin = (): React.ReactNode => {
   const { t } = useTranslation();
+  const { request } = useAuth();
 
   const simpleFinKeyField = useField<string>({
     initialValue: "",
     validate: isNotEmpty(t("simplefin_key_is_required")),
-  });
-
-  const { request } = useAuth();
-
-  const userQuery = useQuery({
-    queryKey: [userQueryKey],
-    queryFn: async (): Promise<IApplicationUser | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/applicationUser",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IApplicationUser;
-      }
-
-      return undefined;
-    },
   });
 
   const queryClient = useQueryClient();
@@ -53,7 +35,9 @@ const LinkSimpleFin = (): React.ReactNode => {
         params: { setupToken },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [applicationUserQueryKey],
+      });
       await queryClient.invalidateQueries({
         queryKey: [simpleFinOrganizationQueryKey],
       });
@@ -68,10 +52,6 @@ const LinkSimpleFin = (): React.ReactNode => {
       });
     },
   });
-
-  if (userQuery.isLoading) {
-    return <Skeleton height={150} radius="md" />;
-  }
 
   return (
     <Card elevation={1}>

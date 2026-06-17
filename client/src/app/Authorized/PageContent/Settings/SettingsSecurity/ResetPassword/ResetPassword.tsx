@@ -5,8 +5,8 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import {
+  applicationUserQueryKey,
   translateAxiosError,
-  userQueryKey,
   ValidationError,
 } from "~/helpers/requests";
 import { AxiosError } from "axios";
@@ -59,7 +59,9 @@ const ResetPassword = (): React.ReactNode => {
         },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [applicationUserQueryKey],
+      });
 
       oldPasswordField.reset();
       newPasswordField.reset();
