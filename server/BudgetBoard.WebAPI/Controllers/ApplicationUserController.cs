@@ -25,11 +25,15 @@ public class ApplicationUserController(
     {
         return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             return Ok(
-                await applicationUserService.ReadApplicationUserAsync(
-                    new Guid(userManager.GetUserId(User) ?? string.Empty),
-                    userManager
-                )
+                await applicationUserService.ReadApplicationUserAsync(parsedUserId, userManager)
             );
         });
     }
@@ -40,10 +44,14 @@ public class ApplicationUserController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await applicationUserService.UpdateApplicationUserAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                newUser
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await applicationUserService.UpdateApplicationUserAsync(parsedUserId, newUser);
             return Ok();
         });
     }
@@ -59,10 +67,14 @@ public class ApplicationUserController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await applicationUserService.DisconnectOidcLoginAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                userManager
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await applicationUserService.DisconnectOidcLoginAsync(parsedUserId, userManager);
             return Ok();
         });
     }

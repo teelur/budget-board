@@ -25,10 +25,14 @@ public class AccountController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await accountService.CreateAccountAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                newAccount
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await accountService.CreateAccountAsync(parsedUserId, newAccount);
             return Ok();
         });
     }
@@ -39,11 +43,14 @@ public class AccountController(
     {
         return await HandleRequestAsync(async () =>
         {
-            return Ok(
-                await accountService.ReadAccountsAsync(
-                    new Guid(userManager.GetUserId(User) ?? string.Empty)
-                )
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await accountService.ReadAccountsAsync(parsedUserId));
         });
     }
 
@@ -53,10 +60,14 @@ public class AccountController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await accountService.UpdateAccountAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                updatedAccount
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await accountService.UpdateAccountAsync(parsedUserId, updatedAccount);
             return Ok();
         });
     }
@@ -67,11 +78,14 @@ public class AccountController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await accountService.DeleteAccountAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                accountId,
-                deleteTransactions
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await accountService.DeleteAccountAsync(parsedUserId, accountId, deleteTransactions);
             return Ok();
         });
     }
@@ -83,10 +97,13 @@ public class AccountController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await accountService.RestoreAccountAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                accountId
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+            await accountService.RestoreAccountAsync(parsedUserId, accountId);
             return Ok();
         });
     }
@@ -98,10 +115,14 @@ public class AccountController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await accountService.OrderAccountsAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                orderedAccounts
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await accountService.OrderAccountsAsync(parsedUserId, orderedAccounts);
             return Ok();
         });
     }

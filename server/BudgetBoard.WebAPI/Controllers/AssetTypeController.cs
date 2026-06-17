@@ -26,10 +26,14 @@ public class AssetTypeController(
     {
         try
         {
-            await assetTypeService.CreateAssetTypeAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                assetType
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetTypeService.CreateAssetTypeAsync(parsedUserId, assetType);
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
@@ -49,11 +53,14 @@ public class AssetTypeController(
     {
         try
         {
-            return Ok(
-                await assetTypeService.ReadAssetTypesAsync(
-                    new Guid(userManager.GetUserId(User) ?? string.Empty)
-                )
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await assetTypeService.ReadAssetTypesAsync(parsedUserId));
         }
         catch (BudgetBoardServiceException bbex)
         {
@@ -72,10 +79,14 @@ public class AssetTypeController(
     {
         try
         {
-            await assetTypeService.UpdateAssetTypeAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                assetType
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetTypeService.UpdateAssetTypeAsync(parsedUserId, assetType);
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)
@@ -95,10 +106,14 @@ public class AssetTypeController(
     {
         try
         {
-            await assetTypeService.DeleteAssetTypeAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetTypeService.DeleteAssetTypeAsync(parsedUserId, guid);
             return Ok();
         }
         catch (BudgetBoardServiceException bbex)

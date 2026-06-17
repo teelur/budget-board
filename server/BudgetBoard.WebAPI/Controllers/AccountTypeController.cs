@@ -25,10 +25,14 @@ public class AccountTypeController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await accountTypeService.CreateAccountTypeAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                newAccountType
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await accountTypeService.CreateAccountTypeAsync(parsedUserId, newAccountType);
             return Ok();
         });
     }
@@ -39,11 +43,14 @@ public class AccountTypeController(
     {
         return await HandleRequestAsync(async () =>
         {
-            return Ok(
-                await accountTypeService.ReadAccountTypesAsync(
-                    new Guid(userManager.GetUserId(User) ?? string.Empty)
-                )
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await accountTypeService.ReadAccountTypesAsync(parsedUserId));
         });
     }
 
@@ -53,10 +60,14 @@ public class AccountTypeController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await accountTypeService.UpdateAccountTypeAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                updatedAccountType
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await accountTypeService.UpdateAccountTypeAsync(parsedUserId, updatedAccountType);
             return Ok();
         });
     }
@@ -67,10 +78,14 @@ public class AccountTypeController(
     {
         return await HandleRequestAsync(async () =>
         {
-            await accountTypeService.DeleteAccountTypeAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                accountId
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await accountTypeService.DeleteAccountTypeAsync(parsedUserId, accountId);
             return Ok();
         });
     }
