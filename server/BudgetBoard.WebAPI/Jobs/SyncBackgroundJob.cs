@@ -13,16 +13,12 @@ public class SyncBackgroundJob(
     ILogger<SyncBackgroundJob> logger,
     UserDataContext userDataContext,
     ISyncService simpleFinService,
-    IApplicationUserService applicationUserService,
-    INowProvider nowProvider,
     IStringLocalizer<ApiLogStrings> logLocalizer
 ) : IJob
 {
     private readonly ILogger _logger = logger;
     private readonly UserDataContext _userDataContext = userDataContext;
     private readonly ISyncService _simpleFinService = simpleFinService;
-    private readonly IApplicationUserService _applicationUserService = applicationUserService;
-    private readonly INowProvider _nowProvider = nowProvider;
     private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
 
     public async Task Execute(IJobExecutionContext context)
