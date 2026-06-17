@@ -59,7 +59,7 @@ public class ApplicationUserService(
         if (oidcLogin == null)
         {
             logger.LogWarning("{LogMessage}", logLocalizer["NoOidcLoginFoundLog", userGuid]);
-            throw new BudgetBoardServiceException(responseLocalizer["NoOidcLoginFound"]);
+            throw new BudgetBoardServiceException(responseLocalizer["NoOidcLoginFoundError"]);
         }
 
         // We can't allow a user to remove OIDC login if they don't have a local account,
@@ -69,7 +69,7 @@ public class ApplicationUserService(
         if (!hasPassword && remainingLogins == 0)
         {
             logger.LogWarning("{LogMessage}", logLocalizer["RemoveOidcNoPasswordLog", userGuid]);
-            throw new BudgetBoardServiceException(responseLocalizer["RemoveOidcNoPassword"]);
+            throw new BudgetBoardServiceException(responseLocalizer["RemoveOidcNoPasswordError"]);
         }
 
         var result = await userManager.RemoveLoginAsync(
@@ -88,7 +88,7 @@ public class ApplicationUserService(
                     string.Join(", ", result.Errors.Select(e => e.Description))
                 ]
             );
-            throw new BudgetBoardServiceException(responseLocalizer["RemoveOidcFailed"]);
+            throw new BudgetBoardServiceException(responseLocalizer["RemoveOidcFailedError"]);
         }
 
         logger.LogInformation("{LogMessage}", logLocalizer["RemoveOidcSuccessLog", userGuid]);

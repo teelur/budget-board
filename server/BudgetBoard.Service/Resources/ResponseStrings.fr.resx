@@ -490,13 +490,13 @@
   <data name="AccountTypeParentNotFoundError" xml:space="preserve">
     <value>The parent account type does not exist.</value>
   </data>
-  <data name="NoOidcLoginFound" xml:space="preserve">
+  <data name="NoOidcLoginFoundError" xml:space="preserve">
     <value>Aucune connexion OIDC n’a été trouvée pour cet utilisateur.</value>
   </data>
-  <data name="RemoveOidcNoPassword" xml:space="preserve">
+  <data name="RemoveOidcNoPasswordError" xml:space="preserve">
     <value>Impossible de supprimer la connexion OIDC. L’utilisateur doit d’abord définir un mot de passe local afin de conserver l’accès au compte.</value>
   </data>
-  <data name="RemoveOidcFailed" xml:space="preserve">
+  <data name="RemoveOidcFailedError" xml:space="preserve">
     <value>Échec de la suppression de la connexion OIDC.</value>
   </data>
 </root>

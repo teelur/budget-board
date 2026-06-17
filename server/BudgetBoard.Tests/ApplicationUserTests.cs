@@ -14,6 +14,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class ApplicationUserTests
 {
+    #region ReadApplicationUserAsync
     [Fact]
     public async Task ReadApplicationUserAsync_WhenUserExists_ReturnsUser()
     {
@@ -122,7 +123,9 @@ public class ApplicationUserTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidUserError");
     }
+    #endregion
 
+    #region UpdateApplicationUserAsync
     [Fact]
     public async Task UpdateApplicationUserAsync_WhenUserExists_UpdatesUser()
     {
@@ -149,8 +152,145 @@ public class ApplicationUserTests
         // Assert
         helper.UserDataContext.Users.Single().Should().BeEquivalentTo(userUpdateRequest);
     }
+    #endregion
 
-    private static Mock<UserManager<ApplicationUser>> MockUserManager(ApplicationUser user)
+    #region DisconnectOidcLoginAsync
+    [Fact]
+    public async Task DisconnectOidcLoginAsync_WhenOidcLoginExists_RemovesOidcLogin()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(
+            helper.demoUser,
+            [
+                new UserLoginInfo("oidc", "oidcUserId", "oidc"),
+                new UserLoginInfo("local", "localUserId", "local"),
+            ],
+            hasPassword: true
+        );
+
+        // Act
+        await applicationUserService.DisconnectOidcLoginAsync(
+            helper.demoUser.Id,
+            mockUserManager.Object
+        );
+
+        // Assert
+        mockUserManager.Verify(
+            um => um.RemoveLoginAsync(helper.demoUser, "oidc", "oidcUserId"),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task DisconnectOidcLoginAsync_WhenNoOidcLogin_ThrowsNoOidcLoginFoundError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(helper.demoUser);
+
+        // Act
+        Func<Task> act = async () =>
+            await applicationUserService.DisconnectOidcLoginAsync(
+                helper.demoUser.Id,
+                mockUserManager.Object
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("NoOidcLoginFoundError");
+    }
+
+    [Fact]
+    public async Task DisconnectOidcLoginAsync_WhenOnlyOidcLoginAndNoPassword_ThrowsRemoveOidcNoPasswordError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(
+            helper.demoUser,
+            [new UserLoginInfo("oidc", "oidcUserId", "oidc")],
+            hasPassword: false
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await applicationUserService.DisconnectOidcLoginAsync(
+                helper.demoUser.Id,
+                mockUserManager.Object
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("RemoveOidcNoPasswordError");
+    }
+
+    [Fact]
+    public async Task DisconnectOidcLoginAsync_WhenRemoveLoginFails_ThrowsRemoveOidcFailedError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(
+            helper.demoUser,
+            [
+                new UserLoginInfo("oidc", "oidcUserId", "oidc"),
+                new UserLoginInfo("local", "localUserId", "local"),
+            ],
+            hasPassword: true,
+            removeLoginResult: IdentityResult.Failed(
+                new IdentityError { Description = "Remove login failed" }
+            )
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await applicationUserService.DisconnectOidcLoginAsync(
+                helper.demoUser.Id,
+                mockUserManager.Object
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("RemoveOidcFailedError");
+    }
+    #endregion
+
+    private static Mock<UserManager<ApplicationUser>> MockUserManager(
+        ApplicationUser user,
+        IList<UserLoginInfo>? logins = null,
+        bool hasPassword = true,
+        IdentityResult? removeLoginResult = null
+    )
     {
         var store = new Mock<IUserStore<ApplicationUser>>();
         var mockUserManager = new Mock<UserManager<ApplicationUser>>(
@@ -165,7 +305,11 @@ public class ApplicationUserTests
             null!
         );
 
-        mockUserManager.Setup(um => um.GetLoginsAsync(user)).ReturnsAsync([]);
+        mockUserManager.Setup(um => um.GetLoginsAsync(user)).ReturnsAsync(logins ?? []);
+        mockUserManager.Setup(um => um.HasPasswordAsync(user)).ReturnsAsync(hasPassword);
+        mockUserManager
+            .Setup(um => um.RemoveLoginAsync(user, It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(removeLoginResult ?? IdentityResult.Success);
 
         return mockUserManager;
     }
