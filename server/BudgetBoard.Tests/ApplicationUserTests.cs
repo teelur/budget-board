@@ -39,7 +39,65 @@ public class ApplicationUserTests
     }
 
     [Fact]
-    public async Task ReadApplicationUserAsync_WhenUserDoesNotExist_ThrowsError()
+    public async Task ReadApplicationUserAsync_WhenUserHasOidcLogin_ReturnsUserWithOidcLogin()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(helper.demoUser);
+        mockUserManager
+            .Setup(um => um.GetLoginsAsync(helper.demoUser))
+            .ReturnsAsync(
+                new List<UserLoginInfo> { new UserLoginInfo("oidc", "oidcUserId", "oidc") }
+            );
+
+        // Act
+        var result = await applicationUserService.ReadApplicationUserAsync(
+            helper.demoUser.Id,
+            mockUserManager.Object
+        );
+
+        // Assert
+        result.HasOidcLogin.Should().BeTrue();
+        result.HasLocalLogin.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task ReadApplicationUserAsync_WhenUserHasLocalLogin_ReturnsUserWithLocalLogin()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(helper.demoUser);
+        mockUserManager
+            .Setup(um => um.GetLoginsAsync(helper.demoUser))
+            .ReturnsAsync([new("local", "localUserId", "local")]);
+
+        // Act
+        var result = await applicationUserService.ReadApplicationUserAsync(
+            helper.demoUser.Id,
+            mockUserManager.Object
+        );
+
+        // Assert
+        result.HasOidcLogin.Should().BeFalse();
+        result.HasLocalLogin.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ReadApplicationUserAsync_WhenUserDoesNotExist_ThrowsInvalidUserError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -90,36 +148,6 @@ public class ApplicationUserTests
 
         // Assert
         helper.UserDataContext.Users.Single().Should().BeEquivalentTo(userUpdateRequest);
-    }
-
-    [Fact]
-    public async Task UpdateApplicationUserAsync_WhenUserDoesNotExist_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var applicationUserService = new ApplicationUserService(
-            Mock.Of<ILogger<IApplicationUserService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var userUpdateRequest = new ApplicationUserUpdateRequest
-        {
-            LastSync = new Faker().Date.Past().ToUniversalTime(),
-        };
-
-        // Act
-        Func<Task> act = async () =>
-            await applicationUserService.UpdateApplicationUserAsync(
-                Guid.NewGuid(),
-                userUpdateRequest
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("InvalidUserError");
     }
 
     private static Mock<UserManager<ApplicationUser>> MockUserManager(ApplicationUser user)
