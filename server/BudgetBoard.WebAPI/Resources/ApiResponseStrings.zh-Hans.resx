@@ -76,18 +76,6 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>未找到该用户。</value>
   </data>
-  <data name="NoOidcLoginFound" xml:space="preserve">
-    <value>未找到此用户的 OIDC 登录信息。</value>
-  </data>
-  <data name="RemoveOidcNoPassword" xml:space="preserve">
-    <value>无法移除 OIDC 登录。用户必须先设置本地密码以保持账户访问权限。</value>
-  </data>
-  <data name="RemoveOidcFailed" xml:space="preserve">
-    <value>移除 OIDC 登录失败。</value>
-  </data>
-  <data name="RemoveOidcSuccess" xml:space="preserve">
-    <value>OIDC 登录已成功断开连接。</value>
-  </data>
   <data name="UserIdNotFound" xml:space="preserve">
     <value>未找到用户 ID。</value>
   </data>

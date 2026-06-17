@@ -12,9 +12,9 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import {
+  applicationUserQueryKey,
   translateAxiosError,
   twoFactorAuthQueryKey,
-  userQueryKey,
   ValidationError,
 } from "~/helpers/requests";
 import { AxiosError, AxiosResponse } from "axios";
@@ -49,6 +49,7 @@ const TwoFactorAuth = (): React.ReactNode => {
   const [showAuthenticatorSetup, { toggle }] = useDisclosure();
 
   const { t } = useTranslation();
+  const { request } = useAuth();
 
   const validationCodeField = useField<string>({
     initialValue: "",
@@ -59,8 +60,6 @@ const TwoFactorAuth = (): React.ReactNode => {
       return null;
     },
   });
-
-  const { request } = useAuth();
 
   const twoFactorAuthQuery = useQuery({
     queryKey: [twoFactorAuthQueryKey],
@@ -87,7 +86,9 @@ const TwoFactorAuth = (): React.ReactNode => {
         data: { ...twoFactorAuthData },
       }),
     onSuccess: async (res: AxiosResponse) => {
-      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [applicationUserQueryKey],
+      });
       await queryClient.invalidateQueries({
         queryKey: [twoFactorAuthQueryKey],
       });

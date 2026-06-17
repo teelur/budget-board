@@ -490,4 +490,13 @@
   <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
     <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
   </data>
+  <data name="NoOidcLoginFoundError" xml:space="preserve">
+    <value>No OIDC login was found for this user.</value>
+  </data>
+  <data name="RemoveOidcNoPasswordError" xml:space="preserve">
+    <value>Cannot remove OIDC login. The user must have a local password set first to maintain account access.</value>
+  </data>
+  <data name="RemoveOidcFailedError" xml:space="preserve">
+    <value>Failed to remove OIDC login.</value>
+  </data>
 </root>

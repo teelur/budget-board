@@ -511,4 +511,16 @@
   <data name="DemoResetCreateUserFailedLog" xml:space="preserve">
     <value>Demo reset: failed to create demo user: {0}</value>
   </data>
+  <data name="NoOidcLoginFoundLog" xml:space="preserve">
+    <value>No OIDC login found for user {0}.</value>
+  </data>
+  <data name="RemoveOidcNoPasswordLog" xml:space="preserve">
+    <value>Attempt to remove OIDC login for user {0} without a local password set.</value>
+  </data>
+  <data name="RemoveOidcFailedLog" xml:space="preserve">
+    <value>Failed to remove OIDC login for user {0}: {1}</value>
+  </data>
+  <data name="RemoveOidcSuccessLog" xml:space="preserve">
+    <value>Successfully removed OIDC login for user {0}</value>
+  </data>
 </root>

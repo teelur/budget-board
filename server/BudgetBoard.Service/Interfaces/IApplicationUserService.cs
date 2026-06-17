@@ -26,4 +26,11 @@ public interface IApplicationUserService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The user update details.</param>
     Task UpdateApplicationUserAsync(Guid userGuid, IApplicationUserUpdateRequest request);
+
+    /// <summary>
+    /// Disconnects the OIDC login for a specific application user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="userManager">The user manager instance to manage logins.</param>
+    Task DisconnectOidcLoginAsync(Guid userGuid, UserManager<ApplicationUser> userManager);
 }

@@ -490,4 +490,13 @@
   <data name="AccountTypeParentNotFoundError" xml:space="preserve">
     <value>The parent account type does not exist.</value>
   </data>
+  <data name="NoOidcLoginFoundError" xml:space="preserve">
+    <value>未找到此用户的 OIDC 登录信息。</value>
+  </data>
+  <data name="RemoveOidcNoPasswordError" xml:space="preserve">
+    <value>无法移除 OIDC 登录。用户必须先设置本地密码以保持账户访问权限。</value>
+  </data>
+  <data name="RemoveOidcFailedError" xml:space="preserve">
+    <value>移除 OIDC 登录失败。</value>
+  </data>
 </root>

@@ -1,43 +1,35 @@
-import { Stack } from "@mantine/core";
+import { Skeleton, Stack } from "@mantine/core";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { IApplicationUser } from "~/models/applicationUser";
-import { userQueryKey } from "~/helpers/requests";
 import TwoFactorAuth from "./TwoFactorAuth/TwoFactorAuth";
 import OidcSettings from "./OidcSettings/OidcSettings";
 import ResetPassword from "./ResetPassword/ResetPassword";
 import CreatePassword from "./CreatePassword/CreatePassword";
+import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
 
 const SettingsSecurity = (): React.ReactNode => {
-  const { request } = useAuth();
+  const applicationUserQuery = useApplicationUserQuery();
 
-  const userQuery = useQuery({
-    queryKey: [userQueryKey],
-    queryFn: async (): Promise<IApplicationUser | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/applicationUser",
-        method: "GET",
-      });
+  const getPasswordManagementComponent = (): React.ReactNode => {
+    if (applicationUserQuery.isPending) {
+      return <Skeleton height={250} radius="md" />;
+    }
 
-      if (res.status === 200) {
-        return res.data as IApplicationUser;
-      }
+    if (!applicationUserQuery.data) {
+      return null;
+    }
 
-      return undefined;
-    },
-  });
+    if (applicationUserQuery.data.hasLocalLogin) {
+      return <ResetPassword />;
+    } else {
+      return <CreatePassword />;
+    }
+  };
 
   return (
     <Stack gap="1rem">
       <TwoFactorAuth />
       <OidcSettings />
-      {(userQuery.data?.hasLocalLogin ?? true) ? (
-        <ResetPassword />
-      ) : (
-        <CreatePassword />
-      )}
+      {getPasswordManagementComponent()}
     </Stack>
   );
 };

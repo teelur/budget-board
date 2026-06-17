@@ -6,8 +6,8 @@ import { AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
+  applicationUserQueryKey,
   translateAxiosError,
-  userQueryKey,
   ValidationError,
 } from "~/helpers/requests";
 import Card from "~/components/core/Card/Card";
@@ -46,7 +46,9 @@ const CreatePassword = (): React.ReactNode => {
         },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [applicationUserQueryKey],
+      });
       notifications.show({
         color: "var(--button-color-confirm)",
         message: t("password_updated_successfully"),

@@ -76,18 +76,6 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>The user was not found.</value>
   </data>
-  <data name="NoOidcLoginFound" xml:space="preserve">
-    <value>No OIDC login was found for this user.</value>
-  </data>
-  <data name="RemoveOidcNoPassword" xml:space="preserve">
-    <value>Cannot remove OIDC login. The user must have a local password set first to maintain account access.</value>
-  </data>
-  <data name="RemoveOidcFailed" xml:space="preserve">
-    <value>Failed to remove OIDC login.</value>
-  </data>
-  <data name="RemoveOidcSuccess" xml:space="preserve">
-    <value>OIDC login disconnected successfully.</value>
-  </data>
   <data name="UserIdNotFound" xml:space="preserve">
     <value>The user ID was not found.</value>
   </data>

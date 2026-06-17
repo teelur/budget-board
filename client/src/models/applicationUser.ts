@@ -1,4 +1,4 @@
-export interface IApplicationUser {
+export interface IApplicationUserResponse {
   id: string;
   simpleFinAccessToken: boolean;
   lunchFlowApiKey: boolean;

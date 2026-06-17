@@ -1,9 +1,6 @@
-﻿using BudgetBoard.Database.Data;
-using BudgetBoard.Database.Models;
+﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
-using BudgetBoard.WebAPI.Overrides;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,66 +14,46 @@ namespace BudgetBoard.WebAPI.Controllers;
 public class ApplicationUserController(
     ILogger<ApplicationUserController> logger,
     UserManager<ApplicationUser> userManager,
-    UserDataContext context,
     IApplicationUserService applicationUserService,
-    ISyncService simpleFinService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<ApplicationUserController>(logger, logLocalizer, responseLocalizer)
 {
-    private readonly ILogger<ApplicationUserController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly UserDataContext _userDataContext = context;
-    private readonly IApplicationUserService _applicationUserService = applicationUserService;
-    private readonly ISyncService _simpleFinService = simpleFinService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             return Ok(
-                await _applicationUserService.ReadApplicationUserAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    _userManager
-                )
+                await applicationUserService.ReadApplicationUserAsync(parsedUserId, userManager)
             );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> Update([FromBody] ApplicationUserUpdateRequest newUser)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _applicationUserService.UpdateApplicationUserAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                newUser
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await applicationUserService.UpdateApplicationUserAsync(parsedUserId, newUser);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
@@ -88,75 +65,17 @@ public class ApplicationUserController(
     [Authorize]
     public async Task<IActionResult> DisconnectOidcLogin()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
             {
-                _logger.LogWarning("{LogMessage}", _logLocalizer["UserIdNotFoundLog"]);
-                return Unauthorized(_responseLocalizer["UserNotAuthenticated"].Value);
+                return Unauthorized();
             }
 
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                _logger.LogWarning("{LogMessage}", _logLocalizer["UserNotFoundLog", userId]);
-                return NotFound(_responseLocalizer["UserNotFound"].Value);
-            }
-
-            // Get all external logins for the user
-            var logins = await _userManager.GetLoginsAsync(user);
-            var oidcLogin = logins.FirstOrDefault(l =>
-                l.LoginProvider == IdentityApiEndpointRouteBuilderConstants.OidcLoginProvider
-            );
-
-            if (oidcLogin == null)
-            {
-                _logger.LogWarning("{LogMessage}", _logLocalizer["NoOidcLoginFoundLog", userId]);
-                return BadRequest(_responseLocalizer["NoOidcLoginFound"].Value);
-            }
-
-            // Check if user has a password set (local auth) before removing OIDC
-            var hasPassword = await _userManager.HasPasswordAsync(user);
-            var remainingLogins = logins.Count(l =>
-                l.LoginProvider != IdentityApiEndpointRouteBuilderConstants.OidcLoginProvider
-            );
-            if (!hasPassword && remainingLogins == 0)
-            {
-                _logger.LogWarning(
-                    "{LogMessage}",
-                    _logLocalizer["RemoveOidcNoPasswordLog", userId]
-                );
-                return BadRequest(_responseLocalizer["RemoveOidcNoPassword"].Value);
-            }
-
-            // Remove the OIDC login
-            var result = await _userManager.RemoveLoginAsync(
-                user,
-                oidcLogin.LoginProvider,
-                oidcLogin.ProviderKey
-            );
-
-            if (!result.Succeeded)
-            {
-                _logger.LogError(
-                    "{LogMessage}",
-                    _logLocalizer[
-                        "RemoveOidcFailedLog",
-                        userId,
-                        string.Join(", ", result.Errors.Select(e => e.Description))
-                    ]
-                );
-                return StatusCode(500, _responseLocalizer["RemoveOidcFailed"].Value);
-            }
-
-            _logger.LogInformation("{LogMessage}", _logLocalizer["RemoveOidcSuccessLog", userId]);
-            return Ok(new { message = _responseLocalizer["RemoveOidcSuccess"].Value });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+            await applicationUserService.DisconnectOidcLoginAsync(parsedUserId, userManager);
+            return Ok();
+        });
     }
 }

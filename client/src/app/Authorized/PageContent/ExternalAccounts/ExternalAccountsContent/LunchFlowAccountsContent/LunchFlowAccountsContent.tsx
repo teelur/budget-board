@@ -1,41 +1,26 @@
-import { Badge, Button, Group, Stack } from "@mantine/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Badge, Button, Group, Skeleton, Stack } from "@mantine/core";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { IApplicationUser } from "~/models/applicationUser";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import {
   accountsQueryKey,
+  applicationUserQueryKey,
   institutionsQueryKey,
   lunchFlowAccountQueryKey,
   translateAxiosError,
-  userQueryKey,
 } from "~/helpers/requests";
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
 import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
 
 const LunchFlowAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
-
-  const userQuery = useQuery({
-    queryKey: [userQueryKey],
-    queryFn: async (): Promise<IApplicationUser | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/applicationUser",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IApplicationUser;
-      }
-
-      return undefined;
-    },
-  });
+  const applicationUserQuery = useApplicationUserQuery();
 
   const queryClient = useQueryClient();
   const doRemoveApiKey = useMutation({
@@ -45,7 +30,9 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
         method: "POST",
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [applicationUserQueryKey],
+      });
       await queryClient.invalidateQueries({
         queryKey: [lunchFlowAccountQueryKey],
       });
@@ -60,31 +47,42 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
     },
   });
 
+  const getContent = () => {
+    if (applicationUserQuery.isPending) {
+      return <Skeleton height={150} radius="md" />;
+    }
+
+    if (applicationUserQuery.data?.lunchFlowApiKey) {
+      return <LunchFlowInstitutionCards />;
+    }
+
+    return <LinkLunchFlow />;
+  };
+
   return (
     <Stack p={0} gap="0.5rem">
       <Group justify="space-between">
         <Group>
           <PrimaryHeading order={4}>{t("lunchflow")}</PrimaryHeading>
-          {userQuery.data?.lunchFlowApiKey && (
+          {applicationUserQuery.data?.lunchFlowApiKey && (
             <Badge color="var(--button-color-confirm)">{t("connected")}</Badge>
           )}
         </Group>
-        {userQuery.data?.lunchFlowApiKey && (
+        {applicationUserQuery.data?.lunchFlowApiKey && (
           <Button
             bg="var(--button-color-destructive)"
             size="xs"
             loading={doRemoveApiKey.isPending}
+            disabled={
+              doRemoveApiKey.isPending || applicationUserQuery.isPending
+            }
             onClick={() => doRemoveApiKey.mutate()}
           >
             {t("remove_lunchflow")}
           </Button>
         )}
       </Group>
-      {userQuery.data?.lunchFlowApiKey ? (
-        <LunchFlowInstitutionCards />
-      ) : (
-        <LinkLunchFlow />
-      )}
+      {getContent()}
     </Stack>
   );
 };

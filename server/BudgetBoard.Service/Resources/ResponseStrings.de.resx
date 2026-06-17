@@ -490,4 +490,13 @@
   <data name="AccountTypeParentNotFoundError" xml:space="preserve">
     <value>The parent account type does not exist.</value>
   </data>
+  <data name="NoOidcLoginFoundError" xml:space="preserve">
+    <value>Für diesen Benutzer wurde keine OIDC-Anmeldung gefunden.</value>
+  </data>
+  <data name="RemoveOidcNoPasswordError" xml:space="preserve">
+    <value>Die OIDC-Anmeldung kann nicht entfernt werden. Der Benutzer muss zunächst ein lokales Passwort festlegen, um den Zugriff auf das Konto aufrechtzuerhalten.</value>
+  </data>
+  <data name="RemoveOidcFailedError" xml:space="preserve">
+    <value>Konnte die OIDC-Anmeldung nicht entfernen.</value>
+  </data>
 </root>
