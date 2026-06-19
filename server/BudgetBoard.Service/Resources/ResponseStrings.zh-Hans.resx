@@ -73,18 +73,6 @@
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>您尝试访问的资产不存在。</value>
   </data>
-  <data name="AssetEditNotFoundError" xml:space="preserve">
-    <value>您尝试编辑的资产不存在。</value>
-  </data>
-  <data name="AssetDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的资产不存在。</value>
-  </data>
-  <data name="AssetRestoreNotFoundError" xml:space="preserve">
-    <value>您尝试恢复的资产不存在。</value>
-  </data>
-  <data name="AssetOrderNotFoundError" xml:space="preserve">
-    <value>您尝试排序的资产不存在。</value>
-  </data>
   <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
     <value>您尝试更新的自动规则不存在。</value>
   </data>

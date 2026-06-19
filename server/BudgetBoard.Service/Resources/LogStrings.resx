@@ -76,17 +76,8 @@
   <data name="AssetNotFoundLog" xml:space="preserve">
     <value>Attempted to access an asset that does not exist.</value>
   </data>
-  <data name="AssetEditNotFoundLog" xml:space="preserve">
-    <value>Attempted to edit an asset that does not exist.</value>
-  </data>
-  <data name="AssetDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to delete an asset that does not exist.</value>
-  </data>
-  <data name="AssetRestoreNotFoundLog" xml:space="preserve">
-    <value>Attempted to restore an asset that does not exist.</value>
-  </data>
-  <data name="AssetOrderNotFoundLog" xml:space="preserve">
-    <value>Attempted to set index for asset that does not exist.</value>
+  <data name="AssetPermanentDeleteNotDeletedLog" xml:space="preserve">
+    <value>Attempted to permanently delete an asset that has not been soft-deleted.</value>
   </data>
   <data name="NoConditionsCreateLog" xml:space="preserve">
     <value>Attempted to create an automatic rule with no conditions.</value>

@@ -73,18 +73,6 @@
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>La ressource que vous essayez d’accéder n’existe pas.</value>
   </data>
-  <data name="AssetEditNotFoundError" xml:space="preserve">
-    <value>La ressource que vous essayez de modifier n’existe pas.</value>
-  </data>
-  <data name="AssetDeleteNotFoundError" xml:space="preserve">
-    <value>La ressource que vous essayez de supprimer n’existe pas.</value>
-  </data>
-  <data name="AssetRestoreNotFoundError" xml:space="preserve">
-    <value>La ressource que vous essayez de restaurer n’existe pas.</value>
-  </data>
-  <data name="AssetOrderNotFoundError" xml:space="preserve">
-    <value>La ressource que vous essayez d’ordonner n’existe pas.</value>
-  </data>
   <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
     <value>La règle automatique que vous essayez de mettre à jour n’existe pas.</value>
   </data>
