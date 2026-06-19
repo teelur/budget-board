@@ -1,12 +1,8 @@
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { IAssetResponse } from "~/models/asset";
 import { useTranslation } from "react-i18next";
-import { assetsQueryKey } from "~/helpers/requests";
-
+import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
 
 export interface AssetSelectInputBaseProps extends MultiSelectProps {
   selectedAssetIds?: string[];
@@ -23,27 +19,11 @@ const AssetSelectInputBase = ({
   ...props
 }: AssetSelectInputBaseProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const assetsQuery = useQuery({
-    queryKey: [assetsQueryKey],
-    queryFn: async (): Promise<IAssetResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/asset",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAssetResponse[];
-      }
-
-      return [];
-    },
-  });
+  const assetsQuery = useAssetsQuery();
 
   const getFilteredAssets = (): IAssetResponse[] => {
     let filteredAssets = (assetsQuery.data ?? []).filter(
-      (a) => a.deleted === null
+      (a) => a.deleted === null,
     );
 
     if (hideHidden) {

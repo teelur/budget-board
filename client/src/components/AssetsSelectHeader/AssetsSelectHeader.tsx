@@ -1,16 +1,11 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { Button, Group } from "@mantine/core";
 import { DatesRangeValue } from "@mantine/dates";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
-import { IAssetResponse } from "~/models/asset";
 import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import AssetSelect from "../core/Select/AssetSelect/AssetSelect";
 import { useTranslation } from "react-i18next";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
-import { assetsQueryKey } from "~/helpers/requests";
-
+import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
 
 interface AssetsSelectHeaderProps {
   selectedAssetIds: string[];
@@ -24,23 +19,7 @@ const AssetsSelectHeader = (
   props: AssetsSelectHeaderProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const assetsQuery = useQuery({
-    queryKey: [assetsQueryKey],
-    queryFn: async (): Promise<IAssetResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/asset",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAssetResponse[];
-      }
-
-      return [];
-    },
-  });
+  const assetsQuery = useAssetsQuery();
 
   return (
     <Group>
@@ -64,7 +43,7 @@ const AssetsSelectHeader = (
           onClick={() => {
             props.setSelectedAssetIds(
               assetsQuery.data
-                ?.filter((asset: IAssetResponse) => !asset?.hide)
+                ?.filter((asset) => !asset?.hide)
                 ?.map((asset) => asset.id) ?? [],
             );
           }}

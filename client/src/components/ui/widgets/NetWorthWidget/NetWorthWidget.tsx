@@ -5,7 +5,6 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { filterVisibleAssets } from "~/helpers/assets";
-import { IAssetResponse } from "~/models/asset";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
@@ -18,8 +17,9 @@ import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage"
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import NetWorthGroup from "./NetWorthGroup/NetWorthGroup";
 import Divider from "~/components/core/Divider/Divider";
-import { assetsQueryKey, widgetSettingsQueryKey } from "~/helpers/requests";
+import { widgetSettingsQueryKey } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
 
 interface NetWorthWidgetProps {
   widgetId: string;
@@ -34,6 +34,8 @@ const NetWorthWidget = ({
 }: NetWorthWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
+  const accountsQuery = useAccountsQuery();
+  const assetsQuery = useAssetsQuery();
 
   const widgetSettingsQuery = useQuery({
     queryKey: [widgetSettingsQueryKey],
@@ -45,24 +47,6 @@ const NetWorthWidget = ({
       if (res.status === 200) {
         return res.data as IWidgetSettingsResponse[];
       }
-      return [];
-    },
-  });
-
-  const accountsQuery = useAccountsQuery();
-
-  const assetsQuery = useQuery({
-    queryKey: [assetsQueryKey],
-    queryFn: async (): Promise<IAssetResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/asset",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAssetResponse[];
-      }
-
       return [];
     },
   });
