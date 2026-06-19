@@ -18,12 +18,6 @@ public class AssetService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : IAssetService
 {
-    private readonly ILogger<IAssetService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly INowProvider _nowProvider = nowProvider;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task CreateAssetAsync(Guid userGuid, IAssetCreateRequest request)
     {
@@ -31,87 +25,80 @@ public class AssetService(
 
         var newAsset = new Asset { Name = request.Name, UserID = userData.Id };
 
-        _userDataContext.Assets.Add(newAsset);
-        await _userDataContext.SaveChangesAsync();
+        userDataContext.Assets.Add(newAsset);
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<IAssetResponse>> ReadAssetsAsync(
-        Guid userGuid,
-        Guid assetGuid = default
-    )
+    public async Task<IReadOnlyList<IAssetResponse>> ReadAssetsAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var assets = userData.Assets.ToList();
-
-        if (assetGuid != default)
-        {
-            assets = [.. assets.Where(a => a.ID == assetGuid)];
-            if (assets.Count == 0)
-            {
-                _logger.LogError("{LogMessage}", _logLocalizer["AssetNotFoundLog"]);
-                throw new BudgetBoardServiceException(_responseLocalizer["AssetNotFoundError"]);
-            }
-        }
-
-        return assets.OrderBy(a => a.Index).Select(a => new AssetResponse(a)).ToList();
+        return userData.Assets.OrderBy(a => a.Index).Select(a => new AssetResponse(a)).ToList();
     }
 
     /// <inheritdoc />
     public async Task UpdateAssetAsync(Guid userGuid, IAssetUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var asset = GetAssetById(userData, request.ID);
 
-        var asset = userData.Assets.SingleOrDefault(a => a.ID == request.ID);
-        if (asset == null)
+        if (request.Name.IsSpecified && !string.IsNullOrWhiteSpace(request.Name.Value))
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["AssetEditNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["AssetEditNotFoundError"]);
+            asset.Name = request.Name.Value;
         }
 
-        asset.Name = request.Name;
-        asset.PurchaseDate = request.PurchaseDate;
-        asset.PurchasePrice = request.PurchasePrice;
-        asset.SellDate = request.SellDate;
-        asset.SellPrice = request.SellPrice;
-        asset.Hide = request.Hide;
-        asset.Type = request.Type;
+        if (request.PurchaseDate.IsSpecified)
+        {
+            asset.PurchaseDate = request.PurchaseDate.Value;
+        }
 
-        await _userDataContext.SaveChangesAsync();
+        if (request.PurchasePrice.IsSpecified)
+        {
+            asset.PurchasePrice = request.PurchasePrice.Value;
+        }
+
+        if (request.SellDate.IsSpecified)
+        {
+            asset.SellDate = request.SellDate.Value;
+        }
+
+        if (request.SellPrice.IsSpecified)
+        {
+            asset.SellPrice = request.SellPrice.Value;
+        }
+
+        if (request.Hide.IsSpecified)
+        {
+            asset.Hide = request.Hide.Value;
+        }
+
+        if (request.Type.IsSpecified)
+        {
+            asset.Type = request.Type.Value ?? string.Empty;
+        }
+
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
     public async Task DeleteAssetAsync(Guid userGuid, Guid assetGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var asset = GetAssetById(userData, assetGuid);
 
-        var asset = userData.Assets.SingleOrDefault(a => a.ID == assetGuid);
-        if (asset == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["AssetDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["AssetDeleteNotFoundError"]);
-        }
-
-        asset.Type = null;
-        asset.Deleted = _nowProvider.UtcNow;
-        await _userDataContext.SaveChangesAsync();
+        asset.Type = string.Empty;
+        asset.Deleted = nowProvider.UtcNow;
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
     public async Task RestoreAssetAsync(Guid userGuid, Guid assetGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var asset = userData.Assets.SingleOrDefault(a => a.ID == assetGuid);
-        if (asset == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["AssetRestoreNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["AssetRestoreNotFoundError"]);
-        }
+        var asset = GetAssetById(userData, assetGuid);
 
         asset.Deleted = null;
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -121,29 +108,51 @@ public class AssetService(
 
         foreach (var orderedAsset in orderedAssets)
         {
-            var asset = userData.Assets.SingleOrDefault(a => a.ID == orderedAsset.ID);
-            if (asset == null)
-            {
-                _logger.LogError("{LogMessage}", _logLocalizer["AssetOrderNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    _responseLocalizer["AssetOrderNotFoundError"]
-                );
-            }
+            var asset = GetAssetById(userData, orderedAsset.ID);
             asset.Index = orderedAsset.Index;
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task PermanentlyDeleteAssetAsync(Guid userGuid, Guid assetGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var asset = GetAssetById(userData, assetGuid);
+        if (asset.Deleted == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["AssetPermanentDeleteNotDeletedLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["AssetPermanentDeleteNotDeletedError"]
+            );
+        }
+
+        userDataContext.Values.RemoveRange(asset.Values);
+        userDataContext.Assets.Remove(asset);
+        await userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
-            _userDataContext,
-            _logger,
-            _logLocalizer,
-            _responseLocalizer,
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
             id,
             users => users.Include(u => u.Assets).ThenInclude(a => a.Values)
         );
+    }
+
+    private Asset GetAssetById(ApplicationUser userData, Guid assetGuid)
+    {
+        var asset = userData.Assets.SingleOrDefault(a => a.ID == assetGuid);
+        if (asset == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["AssetNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["AssetNotFoundError"]);
+        }
+        return asset;
     }
 }

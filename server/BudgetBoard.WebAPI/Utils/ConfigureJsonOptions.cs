@@ -13,5 +13,6 @@ public class ConfigureJsonOptions(IStringLocalizer<ApiResponseStrings> localizer
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.Converters.Add(new FlexibleStringConverter(localizer));
+        options.JsonSerializerOptions.Converters.Add(new OptionalFieldJsonConverterFactory());
     }
 }

@@ -18,9 +18,8 @@ public interface IAssetService
     /// Retrieves assets for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="assetGuid">Optional. The unique identifier of a specific asset to retrieve.</param>
     /// <returns>A collection of asset details.</returns>
-    Task<IReadOnlyList<IAssetResponse>> ReadAssetsAsync(Guid userGuid, Guid assetGuid = default);
+    Task<IReadOnlyList<IAssetResponse>> ReadAssetsAsync(Guid userGuid);
 
     /// <summary>
     /// Updates an existing asset for the specified user.
@@ -49,4 +48,12 @@ public interface IAssetService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="orderedAssets">A collection of asset index requests defining the new order.</param>
     Task OrderAssetsAsync(Guid userGuid, IEnumerable<IAssetIndexRequest> orderedAssets);
+
+    /// <summary>
+    /// Permanently deletes assets for the specified user. This action is irreversible and should only be used for assets that have already been soft deleted.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="assetGuid">The unique identifier of the asset to permanently delete.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task PermanentlyDeleteAssetAsync(Guid userGuid, Guid assetGuid);
 }
