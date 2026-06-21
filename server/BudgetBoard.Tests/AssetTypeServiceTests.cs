@@ -623,7 +623,7 @@ public class AssetTypeServiceTests
         // Assert
         helper.UserDataContext.AssetTypes.Should().NotContain(parentAssetType);
         helper.UserDataContext.AssetTypes.Should().NotContain(childAssetType);
-        asset.Type.Should().BeNull();
+        asset.Type.Should().Be(string.Empty);
     }
 
     [Fact]
@@ -656,6 +656,6 @@ public class AssetTypeServiceTests
 
         // Assert
         helper.UserDataContext.AssetTypes.Should().NotContain(assetType);
-        asset.Type.Should().BeNull();
+        asset.Type.Should().Be(string.Empty);
     }
 }
