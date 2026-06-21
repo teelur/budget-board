@@ -1,33 +1,13 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedAssetCard from "./DeletedAssetCard";
-import { assetsQueryKey } from "~/helpers/requests";
-
+import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
 
 const DeletedAssets = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const assetsQuery = useQuery({
-    queryKey: [assetsQueryKey],
-    queryFn: async (): Promise<any[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/asset",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as any[];
-      }
-
-      return [];
-    },
-  });
+  const assetsQuery = useAssetsQuery();
 
   const getDeletedAssetsContent = (): React.ReactNode => {
     if (assetsQuery.isPending) {

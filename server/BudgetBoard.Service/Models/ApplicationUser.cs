@@ -30,31 +30,17 @@ public interface IApplicationUserResponse
     bool HasLocalLogin { get; }
 }
 
-public class ApplicationUserResponse : IApplicationUserResponse
+public class ApplicationUserResponse(
+    ApplicationUser user,
+    bool hasOidcLogin = false,
+    bool hasLocalLogin = false
+) : IApplicationUserResponse
 {
-    public Guid ID { get; set; } = Guid.NewGuid();
-    public bool SimpleFinAccessToken { get; set; } = false;
-    public bool LunchFlowApiKey { get; set; } = false;
-    public DateTime LastSync { get; set; } = DateTime.MinValue;
-    public bool TwoFactorEnabled { get; set; } = false;
-    public bool HasOidcLogin { get; set; } = false;
-    public bool HasLocalLogin { get; set; } = false;
-
-    [JsonConstructor]
-    public ApplicationUserResponse() { }
-
-    public ApplicationUserResponse(
-        ApplicationUser user,
-        bool hasOidcLogin = false,
-        bool hasLocalLogin = false
-    )
-    {
-        ID = user.Id;
-        SimpleFinAccessToken = user.SimpleFinAccessToken != string.Empty;
-        LunchFlowApiKey = user.LunchFlowApiKey != string.Empty;
-        LastSync = user.LastSync;
-        TwoFactorEnabled = user.TwoFactorEnabled;
-        HasOidcLogin = hasOidcLogin;
-        HasLocalLogin = hasLocalLogin;
-    }
+    public Guid ID { get; set; } = user.Id;
+    public bool SimpleFinAccessToken { get; set; } = user.SimpleFinAccessToken != string.Empty;
+    public bool LunchFlowApiKey { get; set; } = user.LunchFlowApiKey != string.Empty;
+    public DateTime LastSync { get; set; } = user.LastSync;
+    public bool TwoFactorEnabled { get; set; } = user.TwoFactorEnabled;
+    public bool HasOidcLogin { get; set; } = hasOidcLogin;
+    public bool HasLocalLogin { get; set; } = hasLocalLogin;
 }

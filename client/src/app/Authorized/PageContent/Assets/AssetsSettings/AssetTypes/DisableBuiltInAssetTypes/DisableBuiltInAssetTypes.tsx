@@ -1,40 +1,28 @@
 import { Button, Skeleton, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { assetTypesQueryKey, translateAxiosError , assetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import {
+  assetTypesQueryKey,
+  translateAxiosError,
+  userSettingsQueryKey,
+} from "~/helpers/requests";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { IAssetResponse } from "~/models/asset";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { defaultGuid } from "~/models/applicationUser";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
 
 const DisableBuiltInAssetTypes = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
   const { allAssetTypes, customAssetTypes } = useAssetTypes();
   const { disableBuiltInAssetTypes } = useUserSettings();
-
-  const assetsQuery = useQuery({
-    queryKey: [assetsQueryKey],
-    queryFn: async (): Promise<IAssetResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/asset",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAssetResponse[];
-      }
-
-      return [];
-    },
-  });
+  const assetsQuery = useAssetsQuery();
 
   const queryClient = useQueryClient();
   const doUpdateUserSettings = useMutation({

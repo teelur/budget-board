@@ -197,7 +197,7 @@ public class AssetTypeService(
                 if (
                     (asset.Type ?? string.Empty).Equals(oldType, StringComparison.OrdinalIgnoreCase)
                 )
-                    asset.Type = newType;
+                    asset.Type = newType ?? string.Empty;
             }
         }
 
@@ -263,7 +263,7 @@ public class AssetTypeService(
                 if (
                     (asset.Type ?? string.Empty).Equals(oldType, StringComparison.OrdinalIgnoreCase)
                 )
-                    asset.Type = newType;
+                    asset.Type = newType ?? string.Empty;
             }
         }
     }

@@ -73,9 +73,6 @@
   <data name="TransactionSplitNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to split does not exist.</value>
   </data>
-  <data name="AssetRestoreNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to restore does not exist.</value>
-  </data>
   <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
     <value>A transaction category with this name already exists.</value>
   </data>
@@ -159,9 +156,6 @@
   </data>
   <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
     <value>Cannot create a circular dependency. The target line already depends on this line.</value>
-  </data>
-  <data name="AssetDeleteNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to delete does not exist.</value>
   </data>
   <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
     <value>Transaction category cannot have the same name as its parent category.</value>
@@ -304,9 +298,6 @@
   <data name="SimpleFinDecodeTokenInvalidError" xml:space="preserve">
     <value>The setup token is invalid. Please check the token and try again.</value>
   </data>
-  <data name="AssetOrderNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to order does not exist.</value>
-  </data>
   <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
     <value>The net worth widget group you are trying to access does not exist.</value>
   </data>
@@ -396,9 +387,6 @@
   </data>
   <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
     <value>Unsupported operator '{0}' in rule action.</value>
-  </data>
-  <data name="AssetEditNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to edit does not exist.</value>
   </data>
   <data name="InvalidCurrencyCodeError" xml:space="preserve">
     <value>The provided currency code is invalid.</value>

@@ -18,155 +18,96 @@ public class AssetController(
     IAssetService assetService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<AssetController>(logger, logLocalizer, responseLocalizer)
 {
-    private readonly ILogger<AssetController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IAssetService _assetService = assetService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create([FromBody] AssetCreateRequest asset)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _assetService.CreateAssetAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                asset
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetService.CreateAssetAsync(parsedUserId, asset);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            return Ok(
-                await _assetService.ReadAssetsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
-    }
+            var userId = userManager.GetUserId(User);
 
-    [HttpGet("{guid}")]
-    [Authorize]
-    public async Task<IActionResult> Read(Guid guid)
-    {
-        try
-        {
-            var asset = await _assetService.ReadAssetsAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
-            if (asset == null)
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
             {
-                return NotFound();
+                return Unauthorized();
             }
-            return Ok(asset);
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+
+            return Ok(await assetService.ReadAssetsAsync(parsedUserId));
+        });
     }
 
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> Update([FromBody] AssetUpdateRequest asset)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _assetService.UpdateAssetAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                asset
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetService.UpdateAssetAsync(parsedUserId, asset);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid assetId)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _assetService.DeleteAssetAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetService.DeleteAssetAsync(parsedUserId, assetId);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Restore(Guid guid)
+    public async Task<IActionResult> Restore(Guid assetId)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _assetService.RestoreAssetAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetService.RestoreAssetAsync(parsedUserId, assetId);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
@@ -174,22 +115,36 @@ public class AssetController(
     [Route("[action]")]
     public async Task<IActionResult> Order([FromBody] List<AssetIndexRequest> assets)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _assetService.OrderAssetsAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                assets
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetService.OrderAssetsAsync(parsedUserId, assets);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
+        });
+    }
+
+    [HttpDelete]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> PermanentlyDelete(Guid assetId)
+    {
+        return await HandleRequestAsync(async () =>
         {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await assetService.PermanentlyDeleteAssetAsync(parsedUserId, assetId);
+            return Ok();
+        });
     }
 }

@@ -299,7 +299,13 @@ public class AccountTypeServiceTests
         var result = await accountTypeService.ReadAccountTypesAsync(helper.demoUser.Id);
 
         // Assert
-        result.Select(r => r.ID).Should().Contain(accountTypes.Select(a => a.ID));
+        result
+            .Should()
+            .HaveCount(accountTypes.Count + AccountTypeConstants.DefaultAccountTypes.Count());
+        var exampleResult = result.First(r => r.ID == accountTypes.First().ID);
+        exampleResult.Value.Should().Be(accountTypes.First().Value);
+        exampleResult.Parent.Should().Be(accountTypes.First().Parent);
+        exampleResult.Classification.Should().Be(accountTypes.First().Classification);
     }
 
     [Fact]
