@@ -5,13 +5,13 @@ export interface IAssetCreateRequest {
 
 export interface IAssetUpdateRequest {
   id: string;
-  name: string;
-  type: string;
-  purchaseDate: string | null;
-  purchasePrice: number | null;
-  sellDate: string | null;
-  sellPrice: number | null;
-  hide: boolean;
+  name?: string;
+  type?: string;
+  purchaseDate?: string | null;
+  purchasePrice?: number | null;
+  sellDate?: string | null;
+  sellPrice?: number | null;
+  hide?: boolean;
 }
 
 export interface IAssetIndexRequest {
