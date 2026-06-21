@@ -75,7 +75,7 @@ public class AssetController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid assetId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -86,7 +86,7 @@ public class AssetController(
                 return Unauthorized();
             }
 
-            await assetService.DeleteAssetAsync(parsedUserId, guid);
+            await assetService.DeleteAssetAsync(parsedUserId, assetId);
             return Ok();
         });
     }
@@ -94,7 +94,7 @@ public class AssetController(
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Restore(Guid guid)
+    public async Task<IActionResult> Restore(Guid assetId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -105,7 +105,7 @@ public class AssetController(
                 return Unauthorized();
             }
 
-            await assetService.RestoreAssetAsync(parsedUserId, guid);
+            await assetService.RestoreAssetAsync(parsedUserId, assetId);
             return Ok();
         });
     }
@@ -132,7 +132,7 @@ public class AssetController(
     [HttpDelete]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> PermanentlyDelete(Guid guid)
+    public async Task<IActionResult> PermanentlyDelete(Guid assetId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -143,7 +143,7 @@ public class AssetController(
                 return Unauthorized();
             }
 
-            await assetService.PermanentlyDeleteAssetAsync(parsedUserId, guid);
+            await assetService.PermanentlyDeleteAssetAsync(parsedUserId, assetId);
             return Ok();
         });
     }

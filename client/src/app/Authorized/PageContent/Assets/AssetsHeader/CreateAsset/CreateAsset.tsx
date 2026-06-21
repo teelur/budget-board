@@ -1,55 +1,25 @@
 import { ActionIcon, Button, Stack } from "@mantine/core";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import {
-  translateAxiosError,
-  assetsQueryKey,
-  valuesQueryKey,
-} from "~/helpers/requests";
 import { IAssetCreateRequest } from "~/models/asset";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useCreateAssetMutation } from "~/hooks/mutations/assets/useCreateAssetMutation";
 
 const CreateAsset = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
+  const createAssetMutation = useCreateAssetMutation();
 
   const assetNameField = useField<string>({
     initialValue: "",
     validate: isNotEmpty(t("name_is_required")),
-  });
-
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
-  const doCreateAsset = useMutation({
-    mutationFn: async (newAsset: IAssetCreateRequest) =>
-      await request({
-        url: "/api/asset",
-        method: "POST",
-        data: newAsset,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [valuesQueryKey] });
-
-      assetNameField.reset();
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
   });
 
   return (
@@ -74,9 +44,9 @@ const CreateAsset = (): React.ReactNode => {
             elevation={0}
           />
           <Button
-            loading={doCreateAsset.isPending}
+            loading={createAssetMutation.isPending}
             onClick={() =>
-              doCreateAsset.mutate({
+              createAssetMutation.mutate({
                 name: assetNameField.getValue(),
               } as IAssetCreateRequest)
             }

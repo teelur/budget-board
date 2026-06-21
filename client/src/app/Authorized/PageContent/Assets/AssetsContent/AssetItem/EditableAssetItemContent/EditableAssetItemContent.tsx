@@ -7,18 +7,13 @@ import {
   Flex,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   convertNumberToCurrency,
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
-import { translateAxiosError, assetsQueryKey } from "~/helpers/requests";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -31,6 +26,8 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { useUpdateAssetMutation } from "~/hooks/mutations/assets/useUpdateAssetMutation";
+import { useDeleteAssetsMutation } from "~/hooks/mutations/assets/useDeleteAssetsMutation";
+import { useRestoreAssetsMutation } from "~/hooks/mutations/assets/useRestoreAssetsMutation";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -51,9 +48,10 @@ const EditableAssetItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { request } = useAuth();
   const { allAssetTypes } = useAssetTypes();
   const updateAssetMutation = useUpdateAssetMutation();
+  const deleteAssetMutation = useDeleteAssetsMutation();
+  const restoreAssetMutation = useRestoreAssetsMutation();
 
   const assetNameField = useField<string>({
     initialValue: props.asset.name,
@@ -79,51 +77,6 @@ const EditableAssetItemContent = (
   });
   const hideAssetField = useField<boolean>({
     initialValue: props.asset.hide,
-  });
-
-  const queryClient = useQueryClient();
-  const doDeleteAsset = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/asset`,
-        method: "DELETE",
-        params: { guid: props.asset.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("asset_deleted_successfully_message"),
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
-  const doRestoreAsset = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/asset/restore`,
-        method: "POST",
-        params: { guid: props.asset.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("asset_restored_successfully_message"),
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
   });
 
   return (
@@ -298,7 +251,7 @@ const EditableAssetItemContent = (
           <ActionIcon
             h="100%"
             size="sm"
-            onClick={() => doRestoreAsset.mutate()}
+            onClick={() => restoreAssetMutation.mutate(props.asset.id)}
           >
             <Undo2Icon size={16} />
           </ActionIcon>
@@ -307,7 +260,7 @@ const EditableAssetItemContent = (
             h="100%"
             size="sm"
             bg="var(--button-color-destructive)"
-            onClick={() => doDeleteAsset.mutate()}
+            onClick={() => deleteAssetMutation.mutate(props.asset.id)}
           >
             <Trash2Icon size={16} />
           </ActionIcon>
