@@ -54,23 +54,23 @@ public class AccountResponse(Account account) : IAccountResponse
 public interface IAccountUpdateRequest
 {
     public Guid ID { get; }
-    public string? Name { get; }
-    public string? Type { get; }
-    public bool? HideTransactions { get; }
-    public bool? HideAccount { get; }
-    public decimal? InterestRate { get; }
-    public string? Source { get; }
+    public OptionalField<string> Name { get; }
+    public OptionalField<string> Type { get; }
+    public OptionalField<bool> HideTransactions { get; }
+    public OptionalField<bool> HideAccount { get; }
+    public OptionalField<decimal> InterestRate { get; }
+    public OptionalField<string> Source { get; }
 }
 
 public class AccountUpdateRequest() : IAccountUpdateRequest
 {
     public required Guid ID { get; set; }
-    public string? Name { get; set; } = null;
-    public string? Type { get; set; } = null;
-    public bool? HideTransactions { get; set; } = null;
-    public bool? HideAccount { get; set; } = null;
-    public decimal? InterestRate { get; set; } = null;
-    public string? Source { get; set; } = null;
+    public OptionalField<string> Name { get; set; }
+    public OptionalField<string> Type { get; set; }
+    public OptionalField<bool> HideTransactions { get; set; }
+    public OptionalField<bool> HideAccount { get; set; }
+    public OptionalField<decimal> InterestRate { get; set; }
+    public OptionalField<string> Source { get; set; }
 }
 
 public interface IAccountIndexRequest
