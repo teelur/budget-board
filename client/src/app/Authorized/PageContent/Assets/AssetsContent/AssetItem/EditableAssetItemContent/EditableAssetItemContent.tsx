@@ -118,11 +118,17 @@ const EditableAssetItemContent = (
               }
               variant={hideAssetField.getValue() ? "filled" : "outline"}
               onClick={() => {
-                updateAssetMutation.mutate({
-                  id: props.asset.id,
-                  hide: !hideAssetField.getValue(),
-                } as IAssetUpdateRequest);
-                hideAssetField.setValue(!hideAssetField.getValue());
+                updateAssetMutation.mutate(
+                  {
+                    id: props.asset.id,
+                    hide: !hideAssetField.getValue(),
+                  } as IAssetUpdateRequest,
+                  {
+                    onSuccess: () => {
+                      hideAssetField.setValue(!hideAssetField.getValue());
+                    },
+                  },
+                );
               }}
             >
               {t("hide_asset")}
@@ -189,7 +195,11 @@ const EditableAssetItemContent = (
                 onBlur={() =>
                   updateAssetMutation.mutate({
                     id: props.asset.id,
-                    purchasePrice: purchasePrice.getValue(),
+                    purchasePrice:
+                      purchasePrice.getValue() === undefined ||
+                      purchasePrice.getValue() === ""
+                        ? null
+                        : Number(purchasePrice.getValue()),
                   } as IAssetUpdateRequest)
                 }
                 label={
@@ -231,7 +241,11 @@ const EditableAssetItemContent = (
                 onBlur={() => {
                   updateAssetMutation.mutate({
                     id: props.asset.id,
-                    sellPrice: sellPrice.getValue(),
+                    sellPrice:
+                      sellPrice.getValue() === undefined ||
+                      sellPrice.getValue() === ""
+                        ? null
+                        : Number(sellPrice.getValue()),
                   } as IAssetUpdateRequest);
                 }}
                 label={<PrimaryText size="xs">{t("sell_price")}</PrimaryText>}

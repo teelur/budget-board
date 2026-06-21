@@ -46,9 +46,17 @@ const CreateAsset = (): React.ReactNode => {
           <Button
             loading={createAssetMutation.isPending}
             onClick={() =>
-              createAssetMutation.mutate({
-                name: assetNameField.getValue(),
-              } as IAssetCreateRequest)
+              createAssetMutation.mutate(
+                {
+                  name: assetNameField.getValue(),
+                } as IAssetCreateRequest,
+                {
+                  onSuccess: () => {
+                    assetNameField.reset();
+                    close();
+                  },
+                },
+              )
             }
           >
             {t("submit")}
