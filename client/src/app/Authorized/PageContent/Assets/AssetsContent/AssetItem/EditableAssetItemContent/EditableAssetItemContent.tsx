@@ -7,7 +7,7 @@ import {
   Flex,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { PencilIcon, Trash2Icon, Undo2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import {
   convertNumberToCurrency,
@@ -27,7 +27,6 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { useUpdateAssetMutation } from "~/hooks/mutations/assets/useUpdateAssetMutation";
 import { useDeleteAssetsMutation } from "~/hooks/mutations/assets/useDeleteAssetsMutation";
-import { useRestoreAssetsMutation } from "~/hooks/mutations/assets/useRestoreAssetsMutation";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -51,7 +50,6 @@ const EditableAssetItemContent = (
   const { allAssetTypes } = useAssetTypes();
   const updateAssetMutation = useUpdateAssetMutation();
   const deleteAssetMutation = useDeleteAssetsMutation();
-  const restoreAssetMutation = useRestoreAssetsMutation();
 
   const assetNameField = useField<string>({
     initialValue: props.asset.name,
@@ -82,7 +80,11 @@ const EditableAssetItemContent = (
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <Stack gap="0.5rem" flex="1 1 auto">
-        <LoadingOverlay visible={updateAssetMutation.isPending} />
+        <LoadingOverlay
+          visible={
+            updateAssetMutation.isPending || deleteAssetMutation.isPending
+          }
+        />
         <Group justify="space-between" align="flex-end">
           <Group gap="0.5rem" align="flex-end">
             <TextInput
@@ -247,24 +249,14 @@ const EditableAssetItemContent = (
         </Group>
       </Stack>
       <Group style={{ alignSelf: "stretch" }}>
-        {props.asset.deleted ? (
-          <ActionIcon
-            h="100%"
-            size="sm"
-            onClick={() => restoreAssetMutation.mutate(props.asset.id)}
-          >
-            <Undo2Icon size={16} />
-          </ActionIcon>
-        ) : (
-          <ActionIcon
-            h="100%"
-            size="sm"
-            bg="var(--button-color-destructive)"
-            onClick={() => deleteAssetMutation.mutate(props.asset.id)}
-          >
-            <Trash2Icon size={16} />
-          </ActionIcon>
-        )}
+        <ActionIcon
+          h="100%"
+          size="sm"
+          bg="var(--button-color-destructive)"
+          onClick={() => deleteAssetMutation.mutate(props.asset.id)}
+        >
+          <Trash2Icon size={16} />
+        </ActionIcon>
       </Group>
     </Group>
   );
