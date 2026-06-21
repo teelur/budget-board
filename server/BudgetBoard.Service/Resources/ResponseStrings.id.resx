@@ -73,18 +73,6 @@
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to access does not exist.</value>
   </data>
-  <data name="AssetEditNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to edit does not exist.</value>
-  </data>
-  <data name="AssetDeleteNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to delete does not exist.</value>
-  </data>
-  <data name="AssetRestoreNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to restore does not exist.</value>
-  </data>
-  <data name="AssetOrderNotFoundError" xml:space="preserve">
-    <value>The asset you are trying to order does not exist.</value>
-  </data>
   <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
     <value>The automatic rule you are trying to update does not exist.</value>
   </data>

@@ -73,18 +73,6 @@
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>Der Vermögenswert, auf den Sie zugreifen möchten, existiert nicht.</value>
   </data>
-  <data name="AssetEditNotFoundError" xml:space="preserve">
-    <value>Der Vermögenswert, den Sie bearbeiten möchten, existiert nicht.</value>
-  </data>
-  <data name="AssetDeleteNotFoundError" xml:space="preserve">
-    <value>Der Vermögenswert, den Sie löschen möchten, existiert nicht.</value>
-  </data>
-  <data name="AssetRestoreNotFoundError" xml:space="preserve">
-    <value>Der Vermögenswert, den Sie wiederherstellen möchten, existiert nicht.</value>
-  </data>
-  <data name="AssetOrderNotFoundError" xml:space="preserve">
-    <value>Der Vermögenswert, den Sie anfragen möchten, existiert nicht.</value>
-  </data>
   <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
     <value>Die automatische Regel, die Sie aktualisieren möchten, existiert nicht.</value>
   </data>

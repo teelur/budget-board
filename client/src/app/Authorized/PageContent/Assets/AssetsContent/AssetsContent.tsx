@@ -1,19 +1,19 @@
 import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IAssetIndexRequest, IAssetResponse } from "~/models/asset";
 import AssetItem from "./AssetItem/AssetItem";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
-import { AxiosError } from "axios";
-import { notifications } from "@mantine/notifications";
-import { translateAxiosError , assetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AssetDetails from "./AssetDetails/AssetDetails";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { InfoIcon } from "lucide-react";
+import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
+import { useOrderAssetsMutation } from "~/hooks/mutations/assets/useOrderAssetsMutation";
 
 interface AssetsContentProps {
   isSortable: boolean;
@@ -27,25 +27,10 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
   >(undefined);
 
   const { t } = useTranslation();
+  const { request } = useAuth();
+  const assetsQuery = useAssetsQuery();
 
   const [sortedAssets, setSortedAssets] = React.useState<IAssetResponse[]>([]);
-
-  const { request } = useAuth();
-  const assetsQuery = useQuery({
-    queryKey: [assetsQueryKey],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/asset",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAssetResponse[];
-      }
-
-      return undefined;
-    },
-  });
 
   const userSettingsQuery = useQuery({
     queryKey: [userSettingsQueryKey],
@@ -80,23 +65,7 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
     }
   }, [assetsQuery.data]);
 
-  const queryClient = useQueryClient();
-  const doIndexAssets = useMutation({
-    mutationFn: async (assets: IAssetIndexRequest[]) =>
-      await request({
-        url: "/api/asset/order",
-        method: "PUT",
-        data: assets,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
+  const orderAssetsMutation = useOrderAssetsMutation();
 
   useDidUpdate(() => {
     if (!props.isSortable) {
@@ -106,13 +75,13 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
           index,
         }),
       );
-      doIndexAssets.mutate(indexedAssets);
+      orderAssetsMutation.mutate(indexedAssets);
     }
   }, [props.isSortable]);
 
   return (
     <Stack id="assets-stack" gap="1rem">
-      <LoadingOverlay visible={doIndexAssets.isPending} />
+      <LoadingOverlay visible={orderAssetsMutation.isPending} />
       <AssetDetails
         isOpen={isDetailsOpen}
         close={closeDetails}

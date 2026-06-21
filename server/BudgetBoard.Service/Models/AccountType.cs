@@ -82,15 +82,6 @@ public class AccountTypeResponse : IAccountTypeResponse
     public string Parent { get; set; }
     public string Classification { get; set; }
 
-    [JsonConstructor]
-    public AccountTypeResponse()
-    {
-        ID = Guid.Empty;
-        Value = string.Empty;
-        Parent = string.Empty;
-        Classification = AccountTypeClassification.Asset;
-    }
-
     public AccountTypeResponse(AccountType accountType)
     {
         ID = accountType.ID;

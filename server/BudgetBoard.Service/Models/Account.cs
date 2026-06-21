@@ -32,56 +32,23 @@ public interface IAccountResponse
     public Guid UserID { get; }
 }
 
-public class AccountResponse : IAccountResponse
+public class AccountResponse(Account account) : IAccountResponse
 {
-    public Guid ID { get; set; }
-    public string Name { get; set; }
-    public Guid InstitutionID { get; set; }
-    public string Type { get; set; }
-    public decimal CurrentBalance { get; set; }
-    public DateOnly? BalanceDate { get; set; }
-    public bool HideTransactions { get; set; }
-    public bool HideAccount { get; set; }
-    public DateTime? Deleted { get; set; }
-    public int Index { get; set; }
-    public decimal InterestRate { get; set; }
-    public string Source { get; set; }
-    public Guid UserID { get; set; }
-
-    [JsonConstructor]
-    public AccountResponse()
-    {
-        ID = Guid.Empty;
-        Name = string.Empty;
-        InstitutionID = Guid.Empty;
-        Type = string.Empty;
-        CurrentBalance = 0.0M;
-        BalanceDate = null;
-        HideTransactions = false;
-        HideAccount = false;
-        Deleted = null;
-        Index = 0;
-        Source = string.Empty;
-        UserID = Guid.Empty;
-    }
-
-    public AccountResponse(Account account)
-    {
-        ID = account.ID;
-        Name = account.Name;
-        InstitutionID = account.InstitutionID;
-        Type = account.Type;
-        CurrentBalance =
-            account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0;
-        BalanceDate = account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Date;
-        HideTransactions = account.HideTransactions;
-        HideAccount = account.HideAccount;
-        Deleted = account.Deleted;
-        Index = account.Index;
-        InterestRate = account.InterestRate;
-        Source = account.Source;
-        UserID = account.UserID;
-    }
+    public Guid ID { get; set; } = account.ID;
+    public string Name { get; set; } = account.Name;
+    public Guid InstitutionID { get; set; } = account.InstitutionID;
+    public string Type { get; set; } = account.Type;
+    public decimal CurrentBalance { get; set; } =
+        account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0;
+    public DateOnly? BalanceDate { get; set; } =
+        account.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Date;
+    public bool HideTransactions { get; set; } = account.HideTransactions;
+    public bool HideAccount { get; set; } = account.HideAccount;
+    public DateTime? Deleted { get; set; } = account.Deleted;
+    public int Index { get; set; } = account.Index;
+    public decimal InterestRate { get; set; } = account.InterestRate;
+    public string Source { get; set; } = account.Source;
+    public Guid UserID { get; set; } = account.UserID;
 }
 
 public interface IAccountUpdateRequest

@@ -53,7 +53,7 @@ public class Asset
     /// <summary>
     /// The type of the asset.
     /// </summary>
-    public string? Type { get; set; } = null;
+    public string Type { get; set; } = string.Empty;
 
     /// <summary>
     /// Historical or current values associated with the asset.
