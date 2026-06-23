@@ -21,12 +21,9 @@ public class AssetTypeService(
     public async Task CreateAssetTypeAsync(Guid userGuid, IAssetTypeCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var allAssetTypes = AssetTypeHelpers.GetAllAssetTypes(userData);
+        var allAssetTypes = GetAllAssetTypes(userData);
 
-        ThrowIfValueIsNullOrEmpty(request.Value);
-        ThrowIfValueAlreadyExists(request.Value, allAssetTypes);
-        ThrowIfValueSameNameAsParent(request.Value, request.Parent, allAssetTypes);
-        ThrowIfParentNotFound(request.Parent, allAssetTypes);
+        ValidateAssetTypeData(request.Value, request.Parent, allAssetTypes);
 
         var newAssetType = new AssetType
         {
@@ -37,169 +34,53 @@ public class AssetTypeService(
 
         userDataContext.AssetTypes.Add(newAssetType);
         await userDataContext.SaveChangesAsync();
-
-        void ThrowIfValueAlreadyExists(string value, IEnumerable<IAssetTypeResponse> allAssetTypes)
-        {
-            if (allAssetTypes.Any(a => a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)))
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AssetTypeCreateDuplicateNameLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AssetTypeCreateDuplicateNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueIsNullOrEmpty(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AssetTypeCreateEmptyNameLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AssetTypeCreateEmptyNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueSameNameAsParent(
-            string value,
-            string parentValue,
-            IEnumerable<IAssetTypeResponse> allAssetTypes
-        )
-        {
-            if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AssetTypeCreateSameNameAsParentLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AssetTypeCreateSameNameAsParentError"]
-                );
-            }
-        }
-
-        void ThrowIfParentNotFound(
-            string parentValue,
-            IEnumerable<IAssetTypeResponse> allAssetTypes
-        )
-        {
-            if (
-                !string.IsNullOrEmpty(parentValue)
-                && !allAssetTypes.Any(a =>
-                    a.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AssetTypeCreateParentNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AssetTypeCreateParentNotFoundError"]
-                );
-            }
-        }
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<IAssetTypeResponse>> ReadAssetTypesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        return AssetTypeHelpers.GetAllAssetTypes(userData);
+        return GetAllAssetTypes(userData);
     }
 
     /// <inheritdoc />
     public async Task UpdateAssetTypeAsync(Guid userGuid, IAssetTypeUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var assetType = GetAssetTypeById(userData, request.ID);
+        var allAssetTypes = GetAllAssetTypes(userData);
 
-        var assetType = userData.AssetTypes.FirstOrDefault(a => a.ID == request.ID);
-        if (assetType == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AssetTypeUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AssetTypeUpdateNotFoundError"]
-            );
-        }
-
-        var allAssetTypes = AssetTypeHelpers.GetAllAssetTypes(userData);
-
-        ThrowIfValueIsNullOrEmpty(request.Value);
-        ThrowIfValueAlreadyExists(request.Value, allAssetTypes);
-        ThrowIfValueSameNameAsParent(request.Value, request.Parent);
-        ThrowIfParentNotFound(request.Parent, allAssetTypes);
+        ValidateAssetTypeData(
+            request.Value ?? assetType.Value,
+            request.Parent ?? assetType.Parent,
+            allAssetTypes.Where(a => a.ID != request.ID)
+        );
 
         var oldValue = assetType.Value;
+        var oldParent = assetType.Parent;
 
-        assetType.Value = request.Value;
-        assetType.Parent = request.Parent;
-
-        UpdateAssetsUsingType(userData.Assets, oldValue, request.Value);
-
-        UpdateChildrenParentValue(userData.AssetTypes, oldValue, request.Value);
-
-        await userDataContext.SaveChangesAsync();
-
-        void ThrowIfValueAlreadyExists(string value, IEnumerable<IAssetTypeResponse> allAssetTypes)
-        {
-            if (
-                allAssetTypes.Any(a =>
-                    a.ID != request.ID && a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AssetTypeUpdateDuplicateNameLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AssetTypeUpdateDuplicateNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueIsNullOrEmpty(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AssetTypeUpdateEmptyNameLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AssetTypeUpdateEmptyNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueSameNameAsParent(string value, string parentValue)
-        {
-            if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogError("{LogMessage}", logLocalizer["AssetTypeUpdateSameNameAsParentLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AssetTypeUpdateSameNameAsParentError"]
-                );
-            }
-        }
-
-        void ThrowIfParentNotFound(
-            string parentValue,
-            IEnumerable<IAssetTypeResponse> allAssetTypes
+        if (
+            request.Value != null
+            && !request.Value.Equals(oldValue, StringComparison.OrdinalIgnoreCase)
         )
         {
+            assetType.Value = request.Value;
+            UpdateAssetsUsingType(userData.Assets, oldValue, request.Value);
+            UpdateChildrenParentValue(userData.AssetTypes, oldValue, request.Value);
+        }
+        if (request.Parent != null)
+        {
+            assetType.Parent = request.Parent;
             if (
-                !string.IsNullOrEmpty(parentValue)
-                && !allAssetTypes.Any(a =>
-                    a.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
-                )
+                string.IsNullOrEmpty(oldParent)
+                && !request.Parent.Equals(oldParent, StringComparison.OrdinalIgnoreCase)
             )
             {
-                logger.LogError("{LogMessage}", logLocalizer["AssetTypeUpdateParentNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AssetTypeUpdateParentNotFoundError"]
-                );
+                UpdateOrphanedChildren(userData.AssetTypes, oldValue);
             }
         }
 
-        static void UpdateAssetsUsingType(ICollection<Asset> assets, string oldType, string newType)
-        {
-            foreach (var asset in assets)
-            {
-                if (
-                    (asset.Type ?? string.Empty).Equals(oldType, StringComparison.OrdinalIgnoreCase)
-                )
-                    asset.Type = newType ?? string.Empty;
-            }
-        }
+        await userDataContext.SaveChangesAsync();
 
         static void UpdateChildrenParentValue(
             ICollection<AssetType> assetTypes,
@@ -216,24 +97,28 @@ public class AssetTypeService(
                 child.Parent = newParentValue;
             }
         }
+
+        static void UpdateOrphanedChildren(ICollection<AssetType> assetTypes, string oldParentValue)
+        {
+            foreach (
+                var child in assetTypes.Where(a =>
+                    a.Parent.Equals(oldParentValue, StringComparison.OrdinalIgnoreCase)
+                )
+            )
+            {
+                child.Parent = string.Empty;
+            }
+        }
     }
 
     /// <inheritdoc />
     public async Task DeleteAssetTypeAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var assetType = userData.AssetTypes.FirstOrDefault(a => a.ID == guid);
-        if (assetType == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["AssetTypeDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AssetTypeDeleteNotFoundError"]
-            );
-        }
+        var assetType = GetAssetTypeById(userData, guid);
 
         RemoveChildrenUsingType(assetType.Value);
-        UpdateAssetsUsingType(userData.Assets, assetType.Value, null);
+        UpdateAssetsUsingType(userData.Assets, assetType.Value, string.Empty);
 
         userData.AssetTypes.Remove(assetType);
         await userDataContext.SaveChangesAsync();
@@ -247,23 +132,8 @@ public class AssetTypeService(
                 .ToList();
             foreach (var child in children)
             {
-                UpdateAssetsUsingType(userData.Assets, child.Value, null);
+                UpdateAssetsUsingType(userData.Assets, child.Value, string.Empty);
                 userData.AssetTypes.Remove(child);
-            }
-        }
-
-        static void UpdateAssetsUsingType(
-            ICollection<Asset> assets,
-            string oldType,
-            string? newType
-        )
-        {
-            foreach (var asset in assets)
-            {
-                if (
-                    (asset.Type ?? string.Empty).Equals(oldType, StringComparison.OrdinalIgnoreCase)
-                )
-                    asset.Type = newType ?? string.Empty;
             }
         }
     }
@@ -279,5 +149,117 @@ public class AssetTypeService(
             users =>
                 users.Include(u => u.AssetTypes).Include(u => u.Assets).Include(u => u.UserSettings)
         );
+    }
+
+    private static List<IAssetTypeResponse> GetAllAssetTypes(ApplicationUser userData)
+    {
+        var allAssetTypes = new List<IAssetTypeResponse>();
+        allAssetTypes.AddRange(
+            userData.AssetTypes.Select(at => new AssetTypeResponse(at)).ToList()
+        );
+
+        if (userData.UserSettings?.DisableBuiltInAssetTypes != true)
+        {
+            allAssetTypes.AddRange(
+                AssetTypeConstants
+                    .DefaultAssetTypes.Select(at => new AssetTypeResponse(at))
+                    .ToList()
+            );
+        }
+
+        return allAssetTypes;
+    }
+
+    private AssetType GetAssetTypeById(ApplicationUser userData, Guid id)
+    {
+        var assetType = userData.AssetTypes.FirstOrDefault(a => a.ID == id);
+        if (assetType == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["AssetTypeNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["AssetTypeNotFoundError"]);
+        }
+
+        return assetType;
+    }
+
+    private void ValidateAssetTypeData(
+        string value,
+        string parentValue,
+        IEnumerable<IAssetTypeResponse> allAssetTypes
+    )
+    {
+        ThrowIfValueIsNullOrEmpty(value);
+        ThrowIfValueAlreadyExists(value, allAssetTypes);
+        ThrowIfValueSameNameAsParent(value, parentValue, allAssetTypes);
+        ThrowIfParentNotFound(parentValue, allAssetTypes);
+
+        void ThrowIfValueIsNullOrEmpty(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AssetTypeEmptyNameLog"]);
+                throw new BudgetBoardServiceException(responseLocalizer["AssetTypeEmptyNameError"]);
+            }
+        }
+
+        void ThrowIfValueAlreadyExists(string value, IEnumerable<IAssetTypeResponse> allAssetTypes)
+        {
+            if (allAssetTypes.Any(a => a.Value.Equals(value, StringComparison.OrdinalIgnoreCase)))
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AssetTypeDuplicateNameLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AssetTypeDuplicateNameError"]
+                );
+            }
+        }
+
+        void ThrowIfValueSameNameAsParent(
+            string value,
+            string parentValue,
+            IEnumerable<IAssetTypeResponse> allAssetTypes
+        )
+        {
+            if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AssetTypeSameNameAsParentLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AssetTypeSameNameAsParentError"]
+                );
+            }
+        }
+
+        void ThrowIfParentNotFound(
+            string parentValue,
+            IEnumerable<IAssetTypeResponse> allAssetTypes
+        )
+        {
+            if (
+                !string.IsNullOrEmpty(parentValue)
+                && !allAssetTypes.Any(a =>
+                    a.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
+                )
+            )
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AssetTypeParentNotFoundLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AssetTypeParentNotFoundError"]
+                );
+            }
+        }
+    }
+
+    private static void UpdateAssetsUsingType(
+        ICollection<Asset> assets,
+        string oldType,
+        string newType
+    )
+    {
+        foreach (var asset in assets)
+        {
+            if (asset.Type.Equals(oldType, StringComparison.OrdinalIgnoreCase))
+            {
+                asset.Type = newType;
+            }
+        }
     }
 }

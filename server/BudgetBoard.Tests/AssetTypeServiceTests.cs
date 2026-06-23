@@ -19,6 +19,7 @@ public class AssetTypeServiceTests
             .RuleFor(a => a.Value, f => f.Random.String(20))
             .RuleFor(a => a.Parent, f => f.Random.String(20));
 
+    #region CreateAssetTypeAsync
     [Fact]
     public async Task CreateAssetTypeAsync_WhenCalledWithValidData_ShouldCreateAssetType()
     {
@@ -49,7 +50,7 @@ public class AssetTypeServiceTests
     }
 
     [Fact]
-    public async Task CreateAssetTypeAsync_InvalidUserId_ThrowsError()
+    public async Task CreateAssetTypeAsync_WhenInvalidUserId_ThrowsInvalidUserError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -74,7 +75,33 @@ public class AssetTypeServiceTests
     }
 
     [Fact]
-    public async Task CreateAssetTypeAsync_WhenCreatingDuplicate_ShouldThrowError()
+    public async Task CreateAssetTypeAsync_WhenCreatingEmptyName_ShouldThrowEmptyNameError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var assetTypeService = new AssetTypeService(
+            Mock.Of<ILogger<IAssetTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var assetTypeCreateRequest = _assetTypeCreateRequestFaker.Generate();
+        assetTypeCreateRequest.Value = string.Empty;
+
+        // Act
+        Func<Task> act = async () =>
+            await assetTypeService.CreateAssetTypeAsync(helper.demoUser.Id, assetTypeCreateRequest);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AssetTypeEmptyNameError");
+    }
+
+    [Fact]
+    public async Task CreateAssetTypeAsync_WhenCreatingDuplicate_ShouldThrowDuplicateNameError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -105,37 +132,11 @@ public class AssetTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeCreateDuplicateNameError");
+            .WithMessage("AssetTypeDuplicateNameError");
     }
 
     [Fact]
-    public async Task CreateAssetTypeAsync_WhenCreatingEmptyName_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var assetTypeService = new AssetTypeService(
-            Mock.Of<ILogger<IAssetTypeService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var assetTypeCreateRequest = _assetTypeCreateRequestFaker.Generate();
-        assetTypeCreateRequest.Value = string.Empty;
-
-        // Act
-        Func<Task> act = async () =>
-            await assetTypeService.CreateAssetTypeAsync(helper.demoUser.Id, assetTypeCreateRequest);
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeCreateEmptyNameError");
-    }
-
-    [Fact]
-    public async Task CreateAssetTypeAsync_WhenParentSameAsValue_ShouldThrowError()
+    public async Task CreateAssetTypeAsync_WhenParentSameAsValue_ShouldThrowSameNameAsParentError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -157,11 +158,11 @@ public class AssetTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeCreateSameNameAsParentError");
+            .WithMessage("AssetTypeSameNameAsParentError");
     }
 
     [Fact]
-    public async Task CreateAssetTypeAsync_WhenParentDoesNotExist_ShouldThrowError()
+    public async Task CreateAssetTypeAsync_WhenParentDoesNotExist_ShouldThrowAssetTypeParentNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -182,9 +183,11 @@ public class AssetTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeCreateParentNotFoundError");
+            .WithMessage("AssetTypeParentNotFoundError");
     }
+    #endregion
 
+    #region ReadAssetTypesAsync
     [Fact]
     public async Task ReadAssetTypesAsync_WhenCalledWithValidData_ShouldReturnAssetTypes()
     {
@@ -237,7 +240,9 @@ public class AssetTypeServiceTests
             .Should()
             .NotContain(r => AssetTypeConstants.DefaultAssetTypes.Any(dat => dat.Value == r.Value));
     }
+    #endregion
 
+    #region UpdateAssetTypeAsync
     [Fact]
     public async Task UpdateAssetTypeAsync_WhenCalledWithValidData_ShouldUpdateAssetType()
     {
@@ -261,7 +266,7 @@ public class AssetTypeServiceTests
         var assetTypeUpdateRequest = new AssetTypeUpdateRequest
         {
             ID = assetTypes.First().ID,
-            Parent = assetTypes.First().Parent,
+            Parent = assetTypes.Last().Value,
             Value = "UpdatedValue",
         };
 
@@ -269,11 +274,49 @@ public class AssetTypeServiceTests
         await assetTypeService.UpdateAssetTypeAsync(helper.demoUser.Id, assetTypeUpdateRequest);
 
         // Assert
-        helper.UserDataContext.AssetTypes.First().Value.Should().Be(assetTypeUpdateRequest.Value);
+        var updatedAssetType = helper.UserDataContext.AssetTypes.First(at =>
+            at.ID == assetTypeUpdateRequest.ID
+        );
+        updatedAssetType.Value.Should().Be(assetTypeUpdateRequest.Value);
+        updatedAssetType.Parent.Should().Be(assetTypeUpdateRequest.Parent);
     }
 
     [Fact]
-    public async Task UpdateAssetTypeAsync_WhenCalledWithInvalidAssetTypeID_ShouldThrowError()
+    public async Task UpdateAssetTypeAsync_WhenOmitProperties_ShouldNotUpdateThem()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var assetTypeService = new AssetTypeService(
+            Mock.Of<ILogger<IAssetTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var assetTypeFaker = new AssetTypeFaker(helper.demoUser.Id);
+        var assetTypes = assetTypeFaker.Generate(5);
+        assetTypes.ForEach(at => at.Parent = string.Empty);
+
+        helper.UserDataContext.AssetTypes.AddRange(assetTypes);
+        helper.UserDataContext.SaveChanges();
+
+        var oldAssetType = new AssetTypeResponse(assetTypes.First());
+        var assetTypeUpdateRequest = new AssetTypeUpdateRequest { ID = assetTypes.First().ID };
+
+        // Act
+        await assetTypeService.UpdateAssetTypeAsync(helper.demoUser.Id, assetTypeUpdateRequest);
+
+        // Assert
+        var updatedAssetType = helper.UserDataContext.AssetTypes.First(at =>
+            at.ID == assetTypeUpdateRequest.ID
+        );
+        updatedAssetType.Value.Should().Be(oldAssetType.Value);
+        updatedAssetType.Parent.Should().Be(oldAssetType.Parent);
+    }
+
+    [Fact]
+    public async Task UpdateAssetTypeAsync_WhenCalledWithInvalidAssetTypeID_ShouldThrowAssetTypeNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -304,47 +347,11 @@ public class AssetTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeUpdateNotFoundError");
+            .WithMessage("AssetTypeNotFoundError");
     }
 
     [Fact]
-    public async Task UpdateAssetTypeAsync_WhenCalledWithDuplicateName_ShouldThrowError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var assetTypeService = new AssetTypeService(
-            Mock.Of<ILogger<IAssetTypeService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var assetTypeFaker = new AssetTypeFaker(helper.demoUser.Id);
-        var assetTypes = assetTypeFaker.Generate(5);
-
-        helper.UserDataContext.AssetTypes.AddRange(assetTypes);
-        helper.UserDataContext.SaveChanges();
-
-        var assetTypeUpdateRequest = new AssetTypeUpdateRequest
-        {
-            ID = assetTypes.First().ID,
-            Parent = assetTypes.First().Parent,
-            Value = assetTypes.Last().Value,
-        };
-
-        // Act
-        Func<Task> act = async () =>
-            await assetTypeService.UpdateAssetTypeAsync(helper.demoUser.Id, assetTypeUpdateRequest);
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeUpdateDuplicateNameError");
-    }
-
-    [Fact]
-    public async Task UpdateAssetTypeAsync_WhenCalledWithEmptyName_ShouldThrowError()
+    public async Task UpdateAssetTypeAsync_WhenCalledWithEmptyValue_ShouldThrowAssetTypeEmptyNameError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -376,11 +383,47 @@ public class AssetTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeUpdateEmptyNameError");
+            .WithMessage("AssetTypeEmptyNameError");
     }
 
     [Fact]
-    public async Task UpdateAssetTypeAsync_WhenCalledWithSameNameAsParent_ShouldThrowError()
+    public async Task UpdateAssetTypeAsync_WhenCalledWithDuplicateName_ShouldThrowAssetTypeDuplicateNameError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var assetTypeService = new AssetTypeService(
+            Mock.Of<ILogger<IAssetTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var assetTypeFaker = new AssetTypeFaker(helper.demoUser.Id);
+        var assetTypes = assetTypeFaker.Generate(5);
+
+        helper.UserDataContext.AssetTypes.AddRange(assetTypes);
+        helper.UserDataContext.SaveChanges();
+
+        var assetTypeUpdateRequest = new AssetTypeUpdateRequest
+        {
+            ID = assetTypes.First().ID,
+            Parent = assetTypes.First().Parent,
+            Value = assetTypes.Last().Value,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await assetTypeService.UpdateAssetTypeAsync(helper.demoUser.Id, assetTypeUpdateRequest);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AssetTypeDuplicateNameError");
+    }
+
+    [Fact]
+    public async Task UpdateAssetTypeAsync_WhenCalledWithSameNameAsParent_ShouldThrowAssetTypeSameNameAsParentError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -412,11 +455,11 @@ public class AssetTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeUpdateSameNameAsParentError");
+            .WithMessage("AssetTypeSameNameAsParentError");
     }
 
     [Fact]
-    public async Task UpdateAssetTypeAsync_WhenCalledWithParentThatDoesNotExist_ShouldThrowError()
+    public async Task UpdateAssetTypeAsync_WhenCalledWithParentThatDoesNotExist_ShouldThrowAssetTypeParentNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -448,7 +491,7 @@ public class AssetTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeUpdateParentNotFoundError");
+            .WithMessage("AssetTypeParentNotFoundError");
     }
 
     [Fact]
@@ -492,6 +535,51 @@ public class AssetTypeServiceTests
     }
 
     [Fact]
+    public async Task UpdateAssetTypeAsync_WhenParentAlreadyHasParent_ShouldNotResetChildrenParent()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var assetTypeService = new AssetTypeService(
+            Mock.Of<ILogger<IAssetTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var assetTypeFaker = new AssetTypeFaker(helper.demoUser.Id);
+        var parentAssetType = assetTypeFaker.Generate();
+        parentAssetType.Parent = "ExistingParent";
+
+        var childAssetType = assetTypeFaker.Generate();
+        childAssetType.Parent = parentAssetType.Value;
+
+        var newParentType = assetTypeFaker.Generate();
+        newParentType.Parent = string.Empty;
+
+        helper.UserDataContext.AssetTypes.AddRange(
+            [parentAssetType, childAssetType, newParentType]
+        );
+        helper.UserDataContext.SaveChanges();
+
+        var assetTypeUpdateRequest = new AssetTypeUpdateRequest
+        {
+            ID = parentAssetType.ID,
+            Parent = newParentType.Value,
+            Value = parentAssetType.Value,
+        };
+
+        // Act
+        await assetTypeService.UpdateAssetTypeAsync(helper.demoUser.Id, assetTypeUpdateRequest);
+
+        // Assert
+        helper
+            .UserDataContext.AssetTypes.Single(at => at.ID == childAssetType.ID)
+            .Parent.Should()
+            .Be(parentAssetType.Value);
+    }
+
+    [Fact]
     public async Task UpdateAssetTypeAsync_WhenUpdateParentValue_ShouldUpdateChildrenParent()
     {
         // Arrange
@@ -531,6 +619,96 @@ public class AssetTypeServiceTests
             .Be(assetTypeUpdateRequest.Value);
     }
 
+    [Fact]
+    public async Task UpdateAssetTypeAsync_WhenParentSpecifiedButDoesNotUpdate_ShouldNotUpdateChildrenParent()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var assetTypeService = new AssetTypeService(
+            Mock.Of<ILogger<IAssetTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var assetTypeFaker = new AssetTypeFaker(helper.demoUser.Id);
+        var parentAssetType = assetTypeFaker.Generate();
+        parentAssetType.Parent = string.Empty;
+
+        var childAssetType = assetTypeFaker.Generate();
+        childAssetType.Parent = parentAssetType.Value;
+
+        helper.UserDataContext.AssetTypes.AddRange([parentAssetType, childAssetType]);
+        helper.UserDataContext.SaveChanges();
+
+        var assetTypeUpdateRequest = new AssetTypeUpdateRequest
+        {
+            ID = parentAssetType.ID,
+            Parent = parentAssetType.Parent,
+            Value = parentAssetType.Value,
+        };
+
+        // Act
+        await assetTypeService.UpdateAssetTypeAsync(helper.demoUser.Id, assetTypeUpdateRequest);
+
+        // Assert
+        helper
+            .UserDataContext.AssetTypes.Single(at => at.ID == childAssetType.ID)
+            .Parent.Should()
+            .Be(parentAssetType.Value);
+    }
+
+    [Fact]
+    public async Task UpdateAssetTypeAsync_WhenParentChangesFromEmptyToNonEmpty_ShouldResetChildrenParent()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var assetTypeService = new AssetTypeService(
+            Mock.Of<ILogger<IAssetTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var assetTypeFaker = new AssetTypeFaker(helper.demoUser.Id);
+        var parentAssetType = assetTypeFaker.Generate();
+        parentAssetType.Parent = string.Empty;
+
+        var childAssetType = assetTypeFaker.Generate();
+        childAssetType.Parent = parentAssetType.Value;
+
+        var newParentType = assetTypeFaker.Generate();
+        newParentType.Parent = string.Empty;
+
+        helper.UserDataContext.AssetTypes.AddRange(
+            [parentAssetType, childAssetType, newParentType]
+        );
+        helper.UserDataContext.SaveChanges();
+
+        var assetTypeUpdateRequest = new AssetTypeUpdateRequest
+        {
+            ID = parentAssetType.ID,
+            Parent = newParentType.Value,
+        };
+
+        // Act
+        await assetTypeService.UpdateAssetTypeAsync(helper.demoUser.Id, assetTypeUpdateRequest);
+
+        // Assert
+        helper
+            .UserDataContext.AssetTypes.Single(at => at.ID == childAssetType.ID)
+            .Parent.Should()
+            .Be(string.Empty);
+        helper
+            .UserDataContext.AssetTypes.Single(at => at.ID == parentAssetType.ID)
+            .Parent.Should()
+            .Be(newParentType.Value);
+    }
+    #endregion
+
+    #region DeleteAssetTypeAsync
     [Fact]
     public async Task DeleteAssetTypeAsync_WhenCalledWithValidData_ShouldDeleteAssetType()
     {
@@ -587,7 +765,7 @@ public class AssetTypeServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AssetTypeDeleteNotFoundError");
+            .WithMessage("AssetTypeNotFoundError");
     }
 
     [Fact]
@@ -658,4 +836,5 @@ public class AssetTypeServiceTests
         helper.UserDataContext.AssetTypes.Should().NotContain(assetType);
         asset.Type.Should().Be(string.Empty);
     }
+    #endregion
 }

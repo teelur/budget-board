@@ -424,36 +424,6 @@
   <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
     <value>Der Operator '{0}' wird für das Feld "Konto" nicht unterstützt.</value>
   </data>
-  <data name="AssetTypeCreateDuplicateNameError" xml:space="preserve">
-    <value>Es gibt bereits eine Vermögensart mit diesem Namen.</value>
-  </data>
-  <data name="AssetTypeCreateEmptyNameError" xml:space="preserve">
-    <value>Der Name der Vermögensart darf nicht leer sein.</value>
-  </data>
-  <data name="AssetTypeCreateSameNameAsParentError" xml:space="preserve">
-    <value>Der Name der Vermögensart darf nicht mit dem der übergeordneten Vermögensart übereinstimmen.</value>
-  </data>
-  <data name="AssetTypeCreateParentNotFoundError" xml:space="preserve">
-    <value>Die übergeordnete Vermögensart existiert nicht.</value>
-  </data>
-  <data name="AssetTypeUpdateNotFoundError" xml:space="preserve">
-    <value>Die Vermögensart, die Sie aktualisieren möchten, existiert nicht.</value>
-  </data>
-  <data name="AssetTypeUpdateDuplicateNameError" xml:space="preserve">
-    <value>Es gibt bereits eine Vermögensart mit diesem Namen.</value>
-  </data>
-  <data name="AssetTypeUpdateEmptyNameError" xml:space="preserve">
-    <value>Der Name der Vermögensart darf nicht leer sein.</value>
-  </data>
-  <data name="AssetTypeUpdateSameNameAsParentError" xml:space="preserve">
-    <value>Der Name der Vermögensart darf nicht mit dem der übergeordneten Vermögensart übereinstimmen.</value>
-  </data>
-  <data name="AssetTypeUpdateParentNotFoundError" xml:space="preserve">
-    <value>Die übergeordnete Vermögensart existiert nicht.</value>
-  </data>
-  <data name="AssetTypeDeleteNotFoundError" xml:space="preserve">
-    <value>Die Vermögensart, die Sie löschen möchten, existiert nicht.</value>
-  </data>
   <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
     <value>Vordefinierte Vermögensarten können nicht wieder aktiviert werden, da ein oder mehrere benutzerdefinierte Vermögensarten denselben Namen wie ein vordefinierter Typ haben. Bitte benennen Sie die in Konflikt stehenden benutzerdefinierten Typen zunächst um oder entfernen Sie sie.</value>
   </data>

@@ -21,7 +21,7 @@ public class AccountTypeService(
     public async Task CreateAccountTypeAsync(Guid userGuid, IAccountTypeCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var allAccountTypes = AccountTypeHelpers.GetAllAccountTypes(userData);
+        var allAccountTypes = GetAllAccountTypes(userData);
 
         ValidateAccountTypeData(
             request.Value,
@@ -50,7 +50,7 @@ public class AccountTypeService(
     public async Task<IReadOnlyList<IAccountTypeResponse>> ReadAccountTypesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        return AccountTypeHelpers.GetAllAccountTypes(userData);
+        return GetAllAccountTypes(userData);
     }
 
     /// <inheritdoc />
@@ -58,7 +58,7 @@ public class AccountTypeService(
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var accountType = GetAccountTypeById(userData, request.ID);
-        var allAccountTypes = AccountTypeHelpers.GetAllAccountTypes(userData);
+        var allAccountTypes = GetAllAccountTypes(userData);
 
         ValidateAccountTypeData(
             request.Value,
@@ -78,7 +78,10 @@ public class AccountTypeService(
         );
 
         UpdateAccountsUsingType(userData.Accounts, oldValue, request.Value);
-        if (!string.IsNullOrEmpty(request.Parent))
+        if (
+            !string.IsNullOrEmpty(request.Parent)
+            && !request.Parent.Equals(oldValue, StringComparison.OrdinalIgnoreCase)
+        )
         {
             UpdateOrphanedChildren(userData.AccountTypes, oldValue);
         }
@@ -176,6 +179,25 @@ public class AccountTypeService(
                     .Include(u => u.Accounts)
                     .Include(u => u.UserSettings)
         );
+    }
+
+    private static List<IAccountTypeResponse> GetAllAccountTypes(ApplicationUser userData)
+    {
+        var allAccountTypes = new List<IAccountTypeResponse>();
+        allAccountTypes.AddRange(
+            userData.AccountTypes.Select(at => new AccountTypeResponse(at)).ToList()
+        );
+
+        if (userData.UserSettings?.DisableBuiltInAccountTypes != true)
+        {
+            allAccountTypes.AddRange(
+                AccountTypeConstants
+                    .DefaultAccountTypes.Select(at => new AccountTypeResponse(at))
+                    .ToList()
+            );
+        }
+
+        return allAccountTypes;
     }
 
     private AccountType GetAccountTypeById(ApplicationUser userData, Guid id)
