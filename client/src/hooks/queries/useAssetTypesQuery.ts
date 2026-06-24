@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { assetTypesQueryKey } from "~/helpers/requests";
-import { IAccountTypeResponse } from "~/models/accountType";
+import { IAssetTypeResponse } from "~/models/assetType";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 export const useAssetTypesQuery = () => {
@@ -9,13 +9,13 @@ export const useAssetTypesQuery = () => {
 
   return useQuery({
     queryKey: [assetTypesQueryKey],
-    queryFn: async (): Promise<IAccountTypeResponse[]> => {
+    queryFn: async (): Promise<IAssetTypeResponse[]> => {
       const res: AxiosResponse = await request({
         url: "/api/assetType",
         method: "GET",
       });
 
-      return res.data as IAccountTypeResponse[];
+      return res.data as IAssetTypeResponse[];
     },
     meta: {
       skipGlobalErrorToast: true,
