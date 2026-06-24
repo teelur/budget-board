@@ -9,7 +9,6 @@ public static class AccountTypeClassification
         [Asset, Liability],
         StringComparer.Ordinal
     );
-    public static IReadOnlyCollection<string> AllowedValues => _allowedValues;
 
     public static bool IsValid(string source)
     {

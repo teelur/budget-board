@@ -17,19 +17,16 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useDeleteAccountTypeMutation } from "~/hooks/mutations/accountTypes/useDeleteAccountTypeMutation";
+import { useUpdateAccountTypeMutation } from "~/hooks/mutations/accountTypes/useUpdateAccountTypeMutation";
 import { AccountTypeClassification } from "~/models/account";
-import {
-  IAccountTypeResponse,
-  IAccountTypeUpdateRequest,
-} from "~/models/accountType";
+import { IAccountTypeResponse } from "~/models/accountType";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 
 interface CustomAccountTypeCardProps {
   accountType: IAccountTypeResponse;
   isBuiltIn?: boolean;
   isChildCard?: boolean;
-  deleteAccountType: () => Promise<void>;
-  updateAccountType: (req: IAccountTypeUpdateRequest) => Promise<void>;
 }
 
 const CustomAccountTypeCard = (
@@ -37,6 +34,8 @@ const CustomAccountTypeCard = (
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { allAccountTypes } = useAccountTypes();
+  const updateAccountTypeMutation = useUpdateAccountTypeMutation();
+  const deleteAccountTypeMutation = useDeleteAccountTypeMutation();
 
   const [isEditing, setIsEditing] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -75,7 +74,7 @@ const CustomAccountTypeCard = (
     if (nameField.error) return;
     setIsSaving(true);
     try {
-      await props.updateAccountType({
+      await updateAccountTypeMutation.mutateAsync({
         id: props.accountType.id,
         value: nameField.getValue(),
         parent: isChildType ? parentField.getValue() : "",
@@ -205,7 +204,9 @@ const CustomAccountTypeCard = (
                 </ActionIcon>
                 <ActionIcon
                   size="sm"
-                  onClick={props.deleteAccountType}
+                  onClick={() =>
+                    deleteAccountTypeMutation.mutateAsync(props.accountType.id)
+                  }
                   bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />

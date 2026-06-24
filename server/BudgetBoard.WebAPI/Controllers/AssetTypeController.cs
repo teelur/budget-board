@@ -18,13 +18,13 @@ public class AssetTypeController(
     IAssetTypeService assetTypeService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<AssetTypeController>(logger, logLocalizer, responseLocalizer)
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] AssetTypeCreateRequest assetType)
+    public async Task<IActionResult> Create([FromBody] AssetTypeCreateRequest newAssetType)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
             var userId = userManager.GetUserId(User);
 
@@ -33,25 +33,16 @@ public class AssetTypeController(
                 return Unauthorized();
             }
 
-            await assetTypeService.CreateAssetTypeAsync(parsedUserId, assetType);
+            await assetTypeService.CreateAssetTypeAsync(parsedUserId, newAssetType);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
             var userId = userManager.GetUserId(User);
 
@@ -61,23 +52,14 @@ public class AssetTypeController(
             }
 
             return Ok(await assetTypeService.ReadAssetTypesAsync(parsedUserId));
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] AssetTypeUpdateRequest assetType)
+    public async Task<IActionResult> Update([FromBody] AssetTypeUpdateRequest updatedAssetType)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
             var userId = userManager.GetUserId(User);
 
@@ -86,25 +68,16 @@ public class AssetTypeController(
                 return Unauthorized();
             }
 
-            await assetTypeService.UpdateAssetTypeAsync(parsedUserId, assetType);
+            await assetTypeService.UpdateAssetTypeAsync(parsedUserId, updatedAssetType);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid assetId)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
             var userId = userManager.GetUserId(User);
 
@@ -113,17 +86,8 @@ public class AssetTypeController(
                 return Unauthorized();
             }
 
-            await assetTypeService.DeleteAssetTypeAsync(parsedUserId, guid);
+            await assetTypeService.DeleteAssetTypeAsync(parsedUserId, assetId);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

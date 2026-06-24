@@ -4,10 +4,17 @@ export interface IAccountType extends ICategory {
   classification: string;
 }
 
-export interface IAccountTypeCreateRequest extends IAccountType {}
+export interface IAccountTypeCreateRequest {
+  value: string;
+  parent: string;
+  classification: string;
+}
 
-export interface IAccountTypeUpdateRequest extends IAccountType {
+export interface IAccountTypeUpdateRequest {
   id: string;
+  value?: string;
+  parent?: string;
+  classification?: string;
 }
 
 export interface IAccountTypeResponse extends IAccountType {
