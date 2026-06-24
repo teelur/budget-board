@@ -56,25 +56,43 @@ public class AccountService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateAccountAsync(Guid userGuid, IAccountUpdateRequest editedAccount)
+    public async Task UpdateAccountAsync(Guid userGuid, IAccountUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-        var account = GetAccountById(userData, editedAccount.ID);
+        var account = GetAccountById(userData, request.ID);
 
-        account.Name = editedAccount.Name ?? account.Name;
-        account.Type = editedAccount.Type ?? account.Type;
-        account.HideTransactions = editedAccount.HideTransactions ?? account.HideTransactions;
-        account.HideAccount = editedAccount.HideAccount ?? account.HideAccount;
-        account.InterestRate = editedAccount.InterestRate ?? account.InterestRate;
-        if (editedAccount.Source != null)
+        if (request.Name.IsSpecified && !string.IsNullOrWhiteSpace(request.Name.Value))
         {
-            if (!AccountSource.IsValid(editedAccount.Source))
+            account.Name = request.Name.Value;
+        }
+        if (request.Type.IsSpecified)
+        {
+            account.Type = request.Type.Value ?? string.Empty;
+        }
+        if (request.HideTransactions.IsSpecified)
+        {
+            account.HideTransactions = request.HideTransactions.Value;
+        }
+        if (request.HideAccount.IsSpecified)
+        {
+            account.HideAccount = request.HideAccount.Value;
+        }
+        if (request.InterestRate.IsSpecified)
+        {
+            account.InterestRate = request.InterestRate.Value;
+        }
+        if (request.Source.IsSpecified)
+        {
+            if (
+                string.IsNullOrEmpty(request.Source.Value)
+                || !AccountSource.IsValid(request.Source.Value ?? string.Empty)
+            )
             {
                 throw new BudgetBoardServiceException(
                     responseLocalizer["InvalidAccountSourceError"]
                 );
             }
-            account.Source = editedAccount.Source;
+            account.Source = request.Source.Value!;
         }
 
         await userDataContext.SaveChangesAsync();

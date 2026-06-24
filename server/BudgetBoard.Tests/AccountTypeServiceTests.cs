@@ -355,8 +355,10 @@ public class AccountTypeServiceTests
         var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
         var accountTypes = accountTypeFaker.Generate(5);
         accountTypes.ForEach(at =>
-            at.Parent = AccountTypeConstants.DefaultAccountTypes.First().Value
-        );
+        {
+            at.Parent = AccountTypeConstants.DefaultAccountTypes.First().Value;
+            at.Classification = AccountTypeClassification.Asset;
+        });
 
         helper.UserDataContext.AccountTypes.AddRange(accountTypes);
         helper.UserDataContext.SaveChanges();
@@ -364,8 +366,9 @@ public class AccountTypeServiceTests
         var accountTypeUpdateRequest = new AccountTypeUpdateRequest
         {
             ID = accountTypes.First().ID,
-            Parent = accountTypes.First().Parent,
+            Parent = string.Empty,
             Value = "UpdatedValue",
+            Classification = AccountTypeClassification.Liability,
         };
 
         // Act
@@ -375,10 +378,47 @@ public class AccountTypeServiceTests
         );
 
         // Assert
-        helper
-            .UserDataContext.AccountTypes.First()
-            .Value.Should()
-            .Be(accountTypeUpdateRequest.Value);
+        var updatedAccountType = helper.UserDataContext.AccountTypes.First();
+        updatedAccountType.Parent.Should().Be(accountTypeUpdateRequest.Parent);
+        updatedAccountType.Value.Should().Be(accountTypeUpdateRequest.Value);
+        updatedAccountType.Classification.Should().Be(accountTypeUpdateRequest.Classification);
+    }
+
+    [Fact]
+    public async Task UpdateAccountTypeAsync_WhenOmitProperties_ShouldNotUpdateThem()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var accountTypes = accountTypeFaker.Generate(5);
+
+        helper.UserDataContext.AccountTypes.AddRange(accountTypes);
+        helper.UserDataContext.SaveChanges();
+
+        var oldAccountType = new AccountTypeResponse(accountTypes.First());
+        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
+        {
+            ID = accountTypes.First().ID,
+        };
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeUpdateRequest
+        );
+
+        // Assert
+        var updatedAccountType = helper.UserDataContext.AccountTypes.First();
+        updatedAccountType.Parent.Should().Be(oldAccountType.Parent);
+        updatedAccountType.Value.Should().Be(oldAccountType.Value);
     }
 
     [Fact]
@@ -420,7 +460,7 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
-    public async Task UpdateAccountTypeAsync_WhenCalledWithEmptyName_ShouldThrowAccountTypeEmptyNameError()
+    public async Task UpdateAccountTypeAsync_WhenCalledWithEmptyValue_ShouldThrowAccountTypeEmptyNameError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -441,7 +481,6 @@ public class AccountTypeServiceTests
         var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
         {
             ID = accountTypes.First().ID,
-            Parent = accountTypes.First().Parent,
             Value = string.Empty,
         };
 
@@ -480,7 +519,6 @@ public class AccountTypeServiceTests
         var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
         {
             ID = accountTypes.First().ID,
-            Parent = accountTypes.First().Parent,
             Value = accountTypes.Last().Value,
         };
 
@@ -598,8 +636,6 @@ public class AccountTypeServiceTests
         var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
         {
             ID = accountType.ID,
-            Parent = accountType.Parent,
-            Value = accountType.Value,
             Classification = "InvalidClassification",
         };
 
@@ -614,52 +650,6 @@ public class AccountTypeServiceTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("AccountTypeInvalidClassificationError");
-    }
-
-    [Fact]
-    public async Task UpdateAccountTypeAsync_WhenParentIsDifferentClassification_ShouldResolveClassification()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var accountTypeService = new AccountTypeService(
-            Mock.Of<ILogger<IAccountTypeService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
-        var accountType = accountTypeFaker.Generate();
-        accountType.Parent = string.Empty;
-        accountType.Classification = AccountTypeClassification.Liability;
-
-        helper.UserDataContext.AccountTypes.Add(accountType);
-        helper.UserDataContext.SaveChanges();
-
-        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
-        {
-            ID = accountType.ID,
-            Parent = AccountTypeConstants
-                .DefaultAccountTypes.First(at =>
-                    at.Classification == AccountTypeClassification.Asset
-                )
-                .Value,
-            Value = accountType.Value,
-            Classification = AccountTypeClassification.Liability,
-        };
-
-        // Act
-        await accountTypeService.UpdateAccountTypeAsync(
-            helper.demoUser.Id,
-            accountTypeUpdateRequest
-        );
-
-        // Assert
-        helper
-            .UserDataContext.AccountTypes.Single(at => at.ID == accountType.ID)
-            .Classification.Should()
-            .Be(AccountTypeClassification.Asset);
     }
 
     [Fact]
@@ -703,6 +693,49 @@ public class AccountTypeServiceTests
 
         // Assert
         account.Type.Should().Be(accountTypeUpdateRequest.Value);
+    }
+
+    [Fact]
+    public async Task UpdateAccountTypeAsync_WhenUpdateParentValue_ShouldUpdateChildrenParent()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var parentAccountType = accountTypeFaker.Generate();
+        parentAccountType.Parent = string.Empty;
+
+        var childAccountType = accountTypeFaker.Generate();
+        childAccountType.Parent = parentAccountType.Value;
+
+        helper.UserDataContext.AccountTypes.AddRange([parentAccountType, childAccountType]);
+        helper.UserDataContext.SaveChanges();
+
+        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
+        {
+            ID = parentAccountType.ID,
+            Parent = parentAccountType.Parent,
+            Value = "UpdatedParentValue",
+        };
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeUpdateRequest
+        );
+
+        // Assert
+        helper
+            .UserDataContext.AccountTypes.Single(at => at.ID == childAccountType.ID)
+            .Parent.Should()
+            .Be(accountTypeUpdateRequest.Value);
     }
 
     [Fact]
@@ -759,6 +792,50 @@ public class AccountTypeServiceTests
     }
 
     [Fact]
+    public async Task UpdateAccountTypeAsync_WhenParentIsDifferentClassification_ShouldResolveClassification()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
+        var parentAccountType = accountTypeFaker.Generate();
+        parentAccountType.Parent = string.Empty;
+        parentAccountType.Classification = AccountTypeClassification.Asset;
+
+        var accountType = accountTypeFaker.Generate();
+        accountType.Parent = parentAccountType.Value;
+        accountType.Classification = AccountTypeClassification.Asset;
+
+        helper.UserDataContext.AccountTypes.AddRange([parentAccountType, accountType]);
+        helper.UserDataContext.SaveChanges();
+
+        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
+        {
+            ID = accountType.ID,
+            Classification = AccountTypeClassification.Liability,
+        };
+
+        // Act
+        await accountTypeService.UpdateAccountTypeAsync(
+            helper.demoUser.Id,
+            accountTypeUpdateRequest
+        );
+
+        // Assert
+        helper
+            .UserDataContext.AccountTypes.Single(at => at.ID == accountType.ID)
+            .Classification.Should()
+            .Be(AccountTypeClassification.Asset);
+    }
+
+    [Fact]
     public async Task UpdateAccountTypeAsync_WhenUpdateClassification_ShouldAlsoUpdateChildrenClassification()
     {
         // Arrange
@@ -807,49 +884,6 @@ public class AccountTypeServiceTests
             .UserDataContext.AccountTypes.Single(at => at.ID == childAccountType.ID)
             .Classification.Should()
             .Be(AccountTypeClassification.Liability);
-    }
-
-    [Fact]
-    public async Task UpdateAccountTypeAsync_WhenUpdateParentValue_ShouldUpdateChildrenParent()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var accountTypeService = new AccountTypeService(
-            Mock.Of<ILogger<IAccountTypeService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
-        var parentAccountType = accountTypeFaker.Generate();
-        parentAccountType.Parent = string.Empty;
-
-        var childAccountType = accountTypeFaker.Generate();
-        childAccountType.Parent = parentAccountType.Value;
-
-        helper.UserDataContext.AccountTypes.AddRange([parentAccountType, childAccountType]);
-        helper.UserDataContext.SaveChanges();
-
-        var accountTypeUpdateRequest = new AccountTypeUpdateRequest()
-        {
-            ID = parentAccountType.ID,
-            Parent = parentAccountType.Parent,
-            Value = "UpdatedParentValue",
-        };
-
-        // Act
-        await accountTypeService.UpdateAccountTypeAsync(
-            helper.demoUser.Id,
-            accountTypeUpdateRequest
-        );
-
-        // Assert
-        helper
-            .UserDataContext.AccountTypes.Single(at => at.ID == childAccountType.ID)
-            .Parent.Should()
-            .Be(accountTypeUpdateRequest.Value);
     }
     #endregion
 

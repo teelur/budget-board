@@ -1,25 +1,20 @@
 import { Button, LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { assetTypesQueryKey, translateAxiosError , assetsQueryKey} from "~/helpers/requests";
-import { IAssetTypeCreateRequest } from "~/models/assetType";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
+import { useCreateAssetTypeMutation } from "~/hooks/mutations/assetTypes/useCreateAssetTypeMutation";
 
 const AddAssetType = (): React.ReactNode => {
   const [isChildType, setIsChildType] = React.useState(false);
 
   const { t } = useTranslation();
   const { allAssetTypes } = useAssetTypes();
-  const { request } = useAuth();
+  const createAssetTypeMutation = useCreateAssetTypeMutation();
 
   const nameField = useField<string>({
     initialValue: "",
@@ -31,33 +26,11 @@ const AddAssetType = (): React.ReactNode => {
     initialValue: "",
   });
 
-  const queryClient = useQueryClient();
-  const doAddAssetType = useMutation({
-    mutationFn: async (assetType: IAssetTypeCreateRequest) =>
-      await request({
-        url: "/api/assettype",
-        method: "POST",
-        data: assetType,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
-      nameField.reset();
-      parentField.reset();
-      setIsChildType(false);
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
   const parentTypes = allAssetTypes.filter((type) => type.parent === "");
 
   return (
     <Card elevation={1}>
-      <LoadingOverlay visible={doAddAssetType.isPending} />
+      <LoadingOverlay visible={createAssetTypeMutation.isPending} />
       <Stack>
         <TextInput
           {...nameField.getInputProps()}
@@ -99,10 +72,19 @@ const AddAssetType = (): React.ReactNode => {
         <Button
           w="100%"
           onClick={() => {
-            doAddAssetType.mutate({
-              value: nameField.getValue(),
-              parent: isChildType ? parentField.getValue() : "",
-            });
+            createAssetTypeMutation.mutate(
+              {
+                value: nameField.getValue(),
+                parent: isChildType ? parentField.getValue() : "",
+              },
+              {
+                onSuccess: () => {
+                  nameField.reset();
+                  parentField.reset();
+                  setIsChildType(false);
+                },
+              },
+            );
           }}
         >
           {t("add_asset_type")}

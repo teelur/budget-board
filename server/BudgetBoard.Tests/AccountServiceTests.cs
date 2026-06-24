@@ -191,7 +191,13 @@ public class AccountServiceTests()
         await accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
 
         // Assert
-        account.Should().BeEquivalentTo(editedAccount);
+        var updatedAccount = helper.UserDataContext.Accounts.Single(a => a.ID == account.ID);
+        updatedAccount.Name.Should().Be(editedAccount.Name.Value);
+        updatedAccount.Type.Should().Be(editedAccount.Type.Value);
+        updatedAccount.HideTransactions.Should().Be(editedAccount.HideTransactions.Value);
+        updatedAccount.HideAccount.Should().Be(editedAccount.HideAccount.Value);
+        updatedAccount.InterestRate.Should().Be(editedAccount.InterestRate.Value);
+        updatedAccount.Source.Should().Be(editedAccount.Source.Value);
     }
 
     [Fact]
@@ -229,7 +235,7 @@ public class AccountServiceTests()
     }
 
     [Fact]
-    public async Task UpdateAccountAsync_WhenValueIsNull_DoesNotUpdateAccount()
+    public async Task UpdateAccountAsync_WhenPropertyIsOmitted_DoesNotUpdateAccount()
     {
         // Arrange
         var helper = new TestHelper();
@@ -266,33 +272,20 @@ public class AccountServiceTests()
         var editedAccount = new AccountUpdateRequest
         {
             ID = account.ID,
-            Name = null,
-            Type = null,
-            HideTransactions = null,
-            HideAccount = null,
-            InterestRate = null,
-            Source = null,
+            Name = "test",
+            HideAccount = true,
         };
 
         // Act
         await accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
 
         // Assert
-        helper
-            .UserDataContext.Accounts.Single(a => a.ID == account.ID)
-            .Should()
-            .BeEquivalentTo(
-                originalAccount,
-                options =>
-                    options
-                        .Excluding(a => a.User)
-                        .Excluding(a => a.Institution)
-                        .Excluding(a => a.Transactions)
-                        .Excluding(a => a.Goals)
-                        .Excluding(a => a.Balances)
-                        .Excluding(a => a.SimpleFinAccount)
-                        .Excluding(a => a.LunchFlowAccount)
-            );
+        var updatedAccount = helper.UserDataContext.Accounts.Single(a => a.ID == account.ID);
+        updatedAccount.Name.Should().Be("test");
+        updatedAccount.HideAccount.Should().BeTrue();
+        updatedAccount.Type.Should().Be(originalAccount.Type);
+        updatedAccount.HideTransactions.Should().Be(originalAccount.HideTransactions);
+        updatedAccount.InterestRate.Should().Be(originalAccount.InterestRate);
     }
 
     [Fact]

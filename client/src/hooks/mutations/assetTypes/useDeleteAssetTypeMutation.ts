@@ -2,28 +2,26 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import {
-  accountsQueryKey,
-  accountTypesQueryKey,
-  institutionsQueryKey,
+  assetsQueryKey,
+  assetTypesQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-export const useDeleteAccountTypeMutation = () => {
+export const useDeleteAssetTypeMutation = () => {
   const queryClient = useQueryClient();
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (accountTypeId: string) =>
+    mutationFn: async (assetTypeId: string) =>
       await request({
-        url: "/api/accountType",
+        url: "/api/assetType",
         method: "DELETE",
-        params: { accountTypeId },
+        params: { assetTypeId },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
     },
     onError: (error: AxiosError) =>
       notifications.show({

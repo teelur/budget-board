@@ -17,18 +17,15 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import {
-  IAssetTypeResponse,
-  IAssetTypeUpdateRequest,
-} from "~/models/assetType";
+import { useDeleteAssetTypeMutation } from "~/hooks/mutations/assetTypes/useDeleteAssetTypeMutation";
+import { useUpdateAssetTypeMutation } from "~/hooks/mutations/assetTypes/useUpdateAssetTypeMutation";
+import { IAssetTypeResponse } from "~/models/assetType";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 
 interface CustomAssetTypeCardProps {
   assetType: IAssetTypeResponse;
   isBuiltIn?: boolean;
   isChildCard?: boolean;
-  deleteAssetType: () => Promise<void>;
-  updateAssetType: (req: IAssetTypeUpdateRequest) => Promise<void>;
 }
 
 const CustomAssetTypeCard = (
@@ -36,9 +33,10 @@ const CustomAssetTypeCard = (
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { allAssetTypes } = useAssetTypes();
+  const updateAssetTypeMutation = useUpdateAssetTypeMutation();
+  const deleteAssetTypeMutation = useDeleteAssetTypeMutation();
 
   const [isEditing, setIsEditing] = React.useState(false);
-  const [isSaving, setIsSaving] = React.useState(false);
   const [isChildType, setIsChildType] = React.useState(
     props.assetType.parent !== "",
   );
@@ -55,22 +53,6 @@ const CustomAssetTypeCard = (
 
   const parentTypes = allAssetTypes.filter((type) => type.parent === "");
 
-  const handleSave = async () => {
-    await nameField.validate();
-    if (nameField.error) return;
-    setIsSaving(true);
-    try {
-      await props.updateAssetType({
-        id: props.assetType.id,
-        value: nameField.getValue(),
-        parent: isChildType ? parentField.getValue() : "",
-      });
-      setIsEditing(false);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleCancel = () => {
     nameField.setValue(props.assetType.value);
     parentField.setValue(props.assetType.parent);
@@ -83,7 +65,12 @@ const CustomAssetTypeCard = (
       <Group w="100%" maw={600} wrap="nowrap">
         {props.isChildCard && <CornerDownRight />}
         <Card flex={1} p="0.5rem" elevation={1}>
-          <LoadingOverlay visible={isSaving} />
+          <LoadingOverlay
+            visible={
+              updateAssetTypeMutation.isPending ||
+              deleteAssetTypeMutation.isPending
+            }
+          />
           <Stack gap="0.5rem">
             <TextInput
               {...nameField.getInputProps()}
@@ -128,7 +115,23 @@ const CustomAssetTypeCard = (
               <Button variant="default" size="xs" onClick={handleCancel}>
                 {t("cancel")}
               </Button>
-              <Button size="xs" onClick={handleSave}>
+              <Button
+                size="xs"
+                onClick={() =>
+                  updateAssetTypeMutation.mutate(
+                    {
+                      id: props.assetType.id,
+                      value: nameField.getValue(),
+                      parent: isChildType ? parentField.getValue() : "",
+                    },
+                    {
+                      onSuccess: () => {
+                        setIsEditing(false);
+                      },
+                    },
+                  )
+                }
+              >
                 {t("save")}
               </Button>
             </Group>
@@ -163,7 +166,9 @@ const CustomAssetTypeCard = (
                 </ActionIcon>
                 <ActionIcon
                   size="sm"
-                  onClick={() => props.deleteAssetType()}
+                  onClick={() =>
+                    deleteAssetTypeMutation.mutateAsync(props.assetType.id)
+                  }
                   bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />
