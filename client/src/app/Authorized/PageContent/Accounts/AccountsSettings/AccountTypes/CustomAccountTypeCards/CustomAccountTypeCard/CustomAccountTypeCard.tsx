@@ -38,7 +38,6 @@ const CustomAccountTypeCard = (
   const deleteAccountTypeMutation = useDeleteAccountTypeMutation();
 
   const [isEditing, setIsEditing] = React.useState(false);
-  const [isSaving, setIsSaving] = React.useState(false);
   const [isChildType, setIsChildType] = React.useState(
     props.accountType.parent !== "",
   );
@@ -69,23 +68,6 @@ const CustomAccountTypeCard = (
     return classificationField.getValue();
   };
 
-  const handleSave = async () => {
-    await nameField.validate();
-    if (nameField.error) return;
-    setIsSaving(true);
-    try {
-      await updateAccountTypeMutation.mutateAsync({
-        id: props.accountType.id,
-        value: nameField.getValue(),
-        parent: isChildType ? parentField.getValue() : "",
-        classification: getClassificationForSubmit(),
-      });
-      setIsEditing(false);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleCancel = () => {
     nameField.setValue(props.accountType.value);
     parentField.setValue(props.accountType.parent);
@@ -99,7 +81,12 @@ const CustomAccountTypeCard = (
       <Group w="100%" maw={600} wrap="nowrap">
         {props.isChildCard && <CornerDownRight />}
         <Card flex={1} p="0.5rem" elevation={1}>
-          <LoadingOverlay visible={isSaving} />
+          <LoadingOverlay
+            visible={
+              updateAccountTypeMutation.isPending ||
+              deleteAccountTypeMutation.isPending
+            }
+          />
           <Stack gap="0.5rem">
             <TextInput
               {...nameField.getInputProps()}
@@ -164,7 +151,24 @@ const CustomAccountTypeCard = (
               <Button variant="default" size="xs" onClick={handleCancel}>
                 {t("cancel")}
               </Button>
-              <Button size="xs" onClick={handleSave}>
+              <Button
+                size="xs"
+                onClick={() =>
+                  updateAccountTypeMutation.mutate(
+                    {
+                      id: props.accountType.id,
+                      value: nameField.getValue(),
+                      parent: isChildType ? parentField.getValue() : "",
+                      classification: getClassificationForSubmit(),
+                    },
+                    {
+                      onSuccess: () => {
+                        setIsEditing(false);
+                      },
+                    },
+                  )
+                }
+              >
                 {t("save")}
               </Button>
             </Group>

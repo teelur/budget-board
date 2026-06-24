@@ -1,10 +1,7 @@
 import React from "react";
-import { useAuth } from "../AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { IAssetTypeResponse } from "~/models/assetType";
 import { defaultGuid } from "~/models/applicationUser";
-import { assetTypesQueryKey } from "~/helpers/requests";
+import { useAssetTypesQuery } from "~/hooks/queries/useAssetTypesQuery";
 
 interface AssetTypeContextType {
   allAssetTypes: IAssetTypeResponse[];
@@ -21,23 +18,7 @@ interface AssetTypeProviderProps {
 }
 
 export const AssetTypeProvider = (props: AssetTypeProviderProps) => {
-  const { request } = useAuth();
-
-  const assetTypesQuery = useQuery({
-    queryKey: [assetTypesQueryKey],
-    queryFn: async (): Promise<IAssetTypeResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/assettype",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IAssetTypeResponse[];
-      }
-
-      return [];
-    },
-  });
+  const assetTypesQuery = useAssetTypesQuery();
 
   const customAssetTypes = React.useMemo(
     () =>
