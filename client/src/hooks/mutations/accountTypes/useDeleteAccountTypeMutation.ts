@@ -14,11 +14,11 @@ export const useDeleteAccountTypeMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (accountId: string) =>
+    mutationFn: async (accountTypeId: string) =>
       await request({
         url: "/api/accountType",
         method: "DELETE",
-        params: { accountId },
+        params: { accountTypeId },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });

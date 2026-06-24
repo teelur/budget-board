@@ -75,7 +75,7 @@ public class AssetTypeController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid assetId)
+    public async Task<IActionResult> Delete(Guid assetTypeId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -86,7 +86,7 @@ public class AssetTypeController(
                 return Unauthorized();
             }
 
-            await assetTypeService.DeleteAssetTypeAsync(parsedUserId, assetId);
+            await assetTypeService.DeleteAssetTypeAsync(parsedUserId, assetTypeId);
             return Ok();
         });
     }

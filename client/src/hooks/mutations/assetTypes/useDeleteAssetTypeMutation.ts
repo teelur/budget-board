@@ -13,11 +13,11 @@ export const useDeleteAssetTypeMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (assetId: string) =>
+    mutationFn: async (assetTypeId: string) =>
       await request({
         url: "/api/assetType",
         method: "DELETE",
-        params: { assetId },
+        params: { assetTypeId },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
