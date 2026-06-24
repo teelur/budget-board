@@ -372,7 +372,6 @@ public class AssetTypeServiceTests
         var assetTypeUpdateRequest = new AssetTypeUpdateRequest
         {
             ID = assetTypes.First().ID,
-            Parent = assetTypes.First().Parent,
             Value = string.Empty,
         };
 
@@ -408,7 +407,6 @@ public class AssetTypeServiceTests
         var assetTypeUpdateRequest = new AssetTypeUpdateRequest
         {
             ID = assetTypes.First().ID,
-            Parent = assetTypes.First().Parent,
             Value = assetTypes.Last().Value,
         };
 

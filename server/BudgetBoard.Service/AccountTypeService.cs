@@ -61,32 +61,57 @@ public class AccountTypeService(
         var allAccountTypes = GetAllAccountTypes(userData);
 
         ValidateAccountTypeData(
-            request.Value,
-            request.Parent,
-            request.Classification,
+            request.Value ?? accountType.Value,
+            request.Parent ?? accountType.Parent,
+            request.Classification ?? accountType.Classification,
             allAccountTypes.Where(a => a.ID != request.ID)
         );
 
         var oldValue = accountType.Value;
 
-        accountType.Value = request.Value;
-        accountType.Parent = request.Parent;
-        accountType.Classification = ResolveClassification(
-            request.Parent,
-            request.Classification,
-            allAccountTypes
-        );
-
-        UpdateAccountsUsingType(userData.Accounts, oldValue, request.Value);
         if (
-            !string.IsNullOrEmpty(request.Parent)
-            && !request.Parent.Equals(oldValue, StringComparison.OrdinalIgnoreCase)
+            request.Value != null
+            && !request.Value.Equals(oldValue, StringComparison.OrdinalIgnoreCase)
         )
         {
-            UpdateOrphanedChildren(userData.AccountTypes, oldValue);
+            accountType.Value = request.Value;
+            UpdateAccountsUsingType(userData.Accounts, oldValue, request.Value);
+            UpdateChildrenParentValue(userData.AccountTypes, oldValue, request.Value);
         }
-        UpdateChildrenClassification(userData.AccountTypes, oldValue, accountType.Classification);
-        UpdateChildrenParentValue(userData.AccountTypes, oldValue, request.Value);
+        if (
+            request.Parent != null
+            && !request.Parent.Equals(accountType.Parent, StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            var oldParent = accountType.Parent;
+            accountType.Parent = request.Parent;
+            if (
+                string.IsNullOrEmpty(oldParent)
+                && !request.Parent.Equals(oldParent, StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                UpdateOrphanedChildren(userData.AccountTypes, oldValue);
+            }
+        }
+        if (
+            request.Classification != null
+            && !request.Classification.Equals(
+                accountType.Classification,
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
+        {
+            accountType.Classification = ResolveClassification(
+                request.Parent ?? accountType.Parent,
+                request.Classification,
+                allAccountTypes
+            );
+            UpdateChildrenClassification(
+                userData.AccountTypes,
+                oldValue,
+                accountType.Classification
+            );
+        }
 
         await userDataContext.SaveChangesAsync();
 
