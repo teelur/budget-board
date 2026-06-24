@@ -19,10 +19,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteAssetTypeMutation } from "~/hooks/mutations/assetTypes/useDeleteAssetTypeMutation";
 import { useUpdateAssetTypeMutation } from "~/hooks/mutations/assetTypes/useUpdateAssetTypeMutation";
-import {
-  IAssetTypeResponse,
-  IAssetTypeUpdateRequest,
-} from "~/models/assetType";
+import { IAssetTypeResponse } from "~/models/assetType";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 
 interface CustomAssetTypeCardProps {
