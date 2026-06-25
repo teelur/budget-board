@@ -347,7 +347,7 @@
     <value>An error occurred while requesting SimpleFIN data.</value>
   </data>
   <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
-    <value>No transactions in the range selected to train the Auto-Categorizer.</value>
+    <value>Aucune transaction dans la plage sélectionnée pour l'entraînement du catégoriseur automatique.</value>
   </data>
   <data name="AutoCategorizerNotTrained" xml:space="preserve">
     <value>Auto-Categorizer cannot be enabled before training.</value>
@@ -356,31 +356,31 @@
     <value>Failed to configure LunchFlow API key. Status code: {0}</value>
   </data>
   <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
-    <value>LunchFlow API key is not configured.</value>
+    <value>La clé API LunchFlow n'est pas configurée.</value>
   </data>
   <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
-    <value>Failed to retrieve LunchFlow account data.</value>
+    <value>Impossible de récupérer les données du compte LunchFlow.</value>
   </data>
   <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
     <value>A LunchFlow account with this SyncID already exists.</value>
   </data>
   <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
-    <value>The LunchFlow account you are trying to access does not exist.</value>
+    <value>Le compte LunchFlow auquel vous essayez d'accéder n'existe pas.</value>
   </data>
   <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
-    <value>Failed to retrieve transaction data for LunchFlow account {0}.</value>
+    <value>Impossible de récupérer les données de transaction pour le compte LunchFlow {0}.</value>
   </data>
   <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
-    <value>Linked account not found for LunchFlow account {0}.</value>
+    <value>Compte lié introuvable pour le compte LunchFlow {0}.</value>
   </data>
   <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
-    <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
+    <value>Impossible de récupérer les données de solde du compte LunchFlow {0}.</value>
   </data>
   <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
-    <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
+    <value>La probabilité minimale du système de catégorisation automatique doit être comprise entre 0 % et 100 %.</value>
   </data>
   <data name="InvalidDateFormatError" xml:space="preserve">
-    <value>The provided date format is invalid.</value>
+    <value>Le format de la date fourni est invalide.</value>
   </data>
   <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
     <value>The batch update request contains duplicate transaction IDs.</value>
@@ -395,19 +395,19 @@
     <value>Une balance existe déjà pour ce compte à cette date.</value>
   </data>
   <data name="ValueUpdateNotFoundError" xml:space="preserve">
-    <value>The value you are trying to update does not exist.</value>
+    <value>La valeur que vous essayez de mettre à jour n'existe pas.</value>
   </data>
   <data name="ValueDuplicateDateError" xml:space="preserve">
-    <value>A value for this date already exists for this asset.</value>
+    <value>Une valeur existe déjà pour cette date pour cet actif.</value>
   </data>
   <data name="SimpleFinAccountSyncException" xml:space="preserve">
     <value>An unexpected error occurred while syncing SimpleFIN account '{0}'.</value>
   </data>
   <data name="LunchFlowAccountSyncException" xml:space="preserve">
-    <value>An unexpected error occurred while syncing LunchFlow account '{0}'.</value>
+    <value>Une erreur inattendue s'est produite lors de la synchronisation du compte LunchFlow '{0}'.</value>
   </data>
   <data name="AccountTypeNotFoundError" xml:space="preserve">
-    <value>The account type you are trying to access does not exist.</value>
+    <value>Le type de compte auquel vous essayez d'accéder n'existe pas.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
     <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
@@ -434,7 +434,7 @@
     <value>The account source is invalid.</value>
   </data>
   <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
-    <value>The account must be deleted before it can be permanently deleted.</value>
+    <value>Le compte doit être supprimé avant de pouvoir être supprimé définitivement.</value>
   </data>
   <data name="AccountTypeDuplicateNameError" xml:space="preserve">
     <value>An account type with this name already exists.</value>
@@ -456,5 +456,8 @@
   </data>
   <data name="RemoveOidcFailedError" xml:space="preserve">
     <value>Échec de la suppression de la connexion OIDC.</value>
+  </data>
+  <data name="AssetPermanentDeleteNotDeletedError" xml:space="preserve">
+    <value>The asset must be deleted before it can be permanently deleted.</value>
   </data>
 </root>
