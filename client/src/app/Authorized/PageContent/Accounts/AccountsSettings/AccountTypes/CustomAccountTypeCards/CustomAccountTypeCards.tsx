@@ -6,15 +6,10 @@ import { IAccountTypeResponse } from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import CustomAccountTypeCard from "./CustomAccountTypeCard/CustomAccountTypeCard";
-import { useUpdateAccountTypeMutation } from "~/hooks/mutations/accountTypes/useUpdateAccountTypeMutation";
-import { useDeleteAccountTypeMutation } from "~/hooks/mutations/accountTypes/useDeleteAccountTypeMutation";
 
 const CustomAccountTypeCards = (): React.ReactNode => {
   const { t } = useTranslation();
   const { allAccountTypes, customAccountTypes } = useAccountTypes();
-
-  const updateAccountTypeMutation = useUpdateAccountTypeMutation();
-  const deleteAccountTypeMutation = useDeleteAccountTypeMutation();
 
   if (customAccountTypes.length === 0) {
     return (
@@ -78,24 +73,12 @@ const CustomAccountTypeCards = (): React.ReactNode => {
           <CustomAccountTypeCard
             accountType={group.parent}
             isBuiltIn={group.isBuiltIn}
-            deleteAccountType={async () => {
-              await deleteAccountTypeMutation.mutateAsync(group.parent.id);
-            }}
-            updateAccountType={async (req) => {
-              await updateAccountTypeMutation.mutateAsync(req);
-            }}
           />
           {group.children.map((child) => (
             <CustomAccountTypeCard
               key={child.id}
               accountType={child}
               isChildCard
-              deleteAccountType={async () => {
-                await deleteAccountTypeMutation.mutateAsync(child.id);
-              }}
-              updateAccountType={async (req) => {
-                await updateAccountTypeMutation.mutateAsync(req);
-              }}
             />
           ))}
         </Stack>

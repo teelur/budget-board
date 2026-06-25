@@ -424,36 +424,6 @@
   <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
     <value>Unsupported operator '{0}' for Account field.</value>
   </data>
-  <data name="AssetTypeCreateDuplicateNameError" xml:space="preserve">
-    <value>Un actif type portant ce nom existe déjà.</value>
-  </data>
-  <data name="AssetTypeCreateEmptyNameError" xml:space="preserve">
-    <value>Le nom du type d'actif ne peut pas être vide.</value>
-  </data>
-  <data name="AssetTypeCreateSameNameAsParentError" xml:space="preserve">
-    <value>Le nom du type d'actif ne peut pas être identique à celui de son parent.</value>
-  </data>
-  <data name="AssetTypeCreateParentNotFoundError" xml:space="preserve">
-    <value>Le parent du type actif n'existe pas.</value>
-  </data>
-  <data name="AssetTypeUpdateNotFoundError" xml:space="preserve">
-    <value>Le type de ressource que vous essayez de mettre à jour n'existe pas.</value>
-  </data>
-  <data name="AssetTypeUpdateDuplicateNameError" xml:space="preserve">
-    <value>Un actif type portant ce nom existe déjà.</value>
-  </data>
-  <data name="AssetTypeUpdateEmptyNameError" xml:space="preserve">
-    <value>Le nom de l'actif type ne peut pas être vide.</value>
-  </data>
-  <data name="AssetTypeUpdateSameNameAsParentError" xml:space="preserve">
-    <value>Le nom du type d'actif ne peut pas être identique à celui de son parent.</value>
-  </data>
-  <data name="AssetTypeUpdateParentNotFoundError" xml:space="preserve">
-    <value>Le type de ressource parent n'existe pas.</value>
-  </data>
-  <data name="AssetTypeDeleteNotFoundError" xml:space="preserve">
-    <value>Le type de ressource que vous essayez de supprimer n'existe pas.</value>
-  </data>
   <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
     <value>Built-in asset types cannot be re-enabled because one or more custom asset types share a name with a built-in type. Please rename or remove the conflicting custom types first.</value>
   </data>

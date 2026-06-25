@@ -74,7 +74,7 @@ public class AccountTypeController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid accountId)
+    public async Task<IActionResult> Delete(Guid accountTypeId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -85,7 +85,7 @@ public class AccountTypeController(
                 return Unauthorized();
             }
 
-            await accountTypeService.DeleteAccountTypeAsync(parsedUserId, accountId);
+            await accountTypeService.DeleteAccountTypeAsync(parsedUserId, accountTypeId);
             return Ok();
         });
     }

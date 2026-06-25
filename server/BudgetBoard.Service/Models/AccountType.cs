@@ -45,26 +45,17 @@ public class AccountTypeCreateRequest : IAccountTypeCreateRequest
 public interface IAccountTypeUpdateRequest
 {
     Guid ID { get; }
-    string Value { get; }
-    string Parent { get; }
-    string Classification { get; }
+    string? Value { get; }
+    string? Parent { get; }
+    string? Classification { get; }
 }
 
 public class AccountTypeUpdateRequest : IAccountTypeUpdateRequest
 {
-    public Guid ID { get; set; }
-    public string Value { get; set; }
-    public string Parent { get; set; }
-    public string Classification { get; set; }
-
-    [JsonConstructor]
-    public AccountTypeUpdateRequest()
-    {
-        ID = Guid.Empty;
-        Value = string.Empty;
-        Parent = string.Empty;
-        Classification = AccountTypeClassification.Asset;
-    }
+    public required Guid ID { get; set; }
+    public string? Value { get; set; }
+    public string? Parent { get; set; }
+    public string? Classification { get; set; }
 }
 
 public interface IAccountTypeResponse
