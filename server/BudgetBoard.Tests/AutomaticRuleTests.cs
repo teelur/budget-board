@@ -13,6 +13,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class AutomaticRuleTests
 {
+    #region CreateAutomaticRuleAsync
     [Fact]
     public async Task CreateAutomaticRuleAsync_WhenRuleIsValid_CreatesRule()
     {
@@ -35,7 +36,6 @@ public class AutomaticRuleTests
                     Field = "Description",
                     Operator = "matches",
                     Value = ".*test.*",
-                    Type = "string",
                 },
             ],
 
@@ -48,7 +48,6 @@ public class AutomaticRuleTests
                     Value = TransactionCategoriesConstants
                         .DefaultTransactionCategories.First()
                         .Value,
-                    Type = "string",
                 },
             ],
         };
@@ -57,14 +56,28 @@ public class AutomaticRuleTests
         await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
 
         // Assert
-        helper.demoUser.AutomaticRules.Should().HaveCount(1);
-        helper.demoUser.AutomaticRules.First().Conditions.Should().HaveCount(1);
-        helper.demoUser.AutomaticRules.First().Actions.Should().HaveCount(1);
-        helper.demoUser.AutomaticRules.First().Conditions.First().Field.Should().Be("Description");
+        var createdRule = helper.demoUser.AutomaticRules.First();
+        createdRule.Should().NotBeNull();
+
+        var createdConditions = createdRule.Conditions;
+        createdConditions.Should().HaveCount(1);
+        var condition = createdConditions.First();
+        condition.Field.Should().Be("Description");
+        condition.Operator.Should().Be("matches");
+        condition.Value.Should().Be(".*test.*");
+
+        var createdActions = createdRule.Actions;
+        createdActions.Should().HaveCount(1);
+        var action = createdActions.First();
+        action.Field.Should().Be("Category");
+        action.Operator.Should().Be("set");
+        action
+            .Value.Should()
+            .Be(TransactionCategoriesConstants.DefaultTransactionCategories.First().Value);
     }
 
     [Fact]
-    public async Task CreateAutomaticRuleAsync_WhenConditionsAreEmpty_ThrowsException()
+    public async Task CreateAutomaticRuleAsync_WhenConditionsAreEmpty_ShouldThrowNoConditionsCreateError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -87,7 +100,6 @@ public class AutomaticRuleTests
                     Value = TransactionCategoriesConstants
                         .DefaultTransactionCategories.First()
                         .Value,
-                    Type = "string",
                 },
             ],
         };
@@ -102,7 +114,7 @@ public class AutomaticRuleTests
     }
 
     [Fact]
-    public async Task CreateAutomaticRuleAsync_WhenActionsAreEmpty_ThrowsException()
+    public async Task CreateAutomaticRuleAsync_WhenActionsAreEmpty_ShouldThrowNoActionsCreateError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -122,7 +134,6 @@ public class AutomaticRuleTests
                     Field = "Description",
                     Operator = "matches",
                     Value = ".*test.*",
-                    Type = "string",
                 },
             ],
             Actions = [],
@@ -137,7 +148,9 @@ public class AutomaticRuleTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("NoActionsCreateError");
     }
+    #endregion
 
+    #region ReadAutomaticRulesAsync
     [Fact]
     public async Task ReadAutomaticRulesAsync_WhenCalled_ReturnsRules()
     {
@@ -169,7 +182,9 @@ public class AutomaticRuleTests
             rules.First(r => r.ID == rule.ID).Actions.Should().HaveCount(rule.Actions.Count);
         }
     }
+    #endregion
 
+    #region UpdateAutomaticRuleAsync
     [Fact]
     public async Task UpdateAutomaticRuleAsync_WhenValidData_ShouldUpdateRule()
     {
@@ -200,7 +215,6 @@ public class AutomaticRuleTests
                     Field = "Amount",
                     Operator = "greater_than",
                     Value = "100",
-                    Type = "number",
                 },
             ],
             Actions =
@@ -212,7 +226,6 @@ public class AutomaticRuleTests
                     Value = TransactionCategoriesConstants
                         .DefaultTransactionCategories.Last()
                         .Value,
-                    Type = "string",
                 },
             ],
         };
@@ -254,7 +267,6 @@ public class AutomaticRuleTests
                     Field = "Amount",
                     Operator = "greater_than",
                     Value = "100",
-                    Type = "number",
                 },
             ],
             Actions =
@@ -266,7 +278,6 @@ public class AutomaticRuleTests
                     Value = TransactionCategoriesConstants
                         .DefaultTransactionCategories.Last()
                         .Value,
-                    Type = "string",
                 },
             ],
         };
@@ -278,8 +289,9 @@ public class AutomaticRuleTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleUpdateNotFoundError");
+            .WithMessage("AutomaticRuleNotFoundError");
     }
+    #endregion
 
     [Fact]
     public async Task DeleteAutomaticRuleAsync_WhenRuleExists_DeletesRule()
@@ -330,7 +342,7 @@ public class AutomaticRuleTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleDeleteNotFoundError");
+            .WithMessage("AutomaticRuleNotFoundError");
     }
 
     [Fact]
@@ -363,7 +375,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.MatchesRegex,
                     Value = ".*test.*",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -375,7 +386,6 @@ public class AutomaticRuleTests
                     Value = TransactionCategoriesConstants
                         .DefaultTransactionCategories.First()
                         .Value,
-                    Type = "string",
                 },
             ],
         };
@@ -499,7 +509,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Account,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Is,
                     Value = matchingAccount.ID.ToString(),
-                    Type = "string",
                 },
             ],
             Actions =
@@ -509,7 +518,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "updated",
-                    Type = "string",
                 },
             ],
         };
@@ -575,7 +583,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Account,
                     Operator = AutomaticRuleConstants.ConditionalOperators.IsNot,
                     Value = excludedAccount.ID.ToString(),
-                    Type = "string",
                 },
             ],
             Actions =
@@ -585,7 +592,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "updated",
-                    Type = "string",
                 },
             ],
         };
@@ -653,7 +659,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Account,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Is,
                     Value = $"{accountA.ID},{accountB.ID}",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -663,7 +668,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "updated",
-                    Type = "string",
                 },
             ],
         };
@@ -739,7 +743,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Account,
                     Operator = AutomaticRuleConstants.ConditionalOperators.IsNot,
                     Value = $"{accountA.ID},{accountB.ID}",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -749,7 +752,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "updated",
-                    Type = "string",
                 },
             ],
         };
@@ -801,7 +803,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Account,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Is,
                     Value = "not-a-valid-guid",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -811,7 +812,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "updated",
-                    Type = "string",
                 },
             ],
         };
@@ -851,7 +851,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Account,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Is,
                     Value = $"{validGuid},not-a-valid-guid",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -861,7 +860,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "updated",
-                    Type = "string",
                 },
             ],
         };
@@ -916,7 +914,6 @@ public class AutomaticRuleTests
             Field = AutomaticRuleConstants.TransactionFields.Merchant,
             Operator = AutomaticRuleConstants.ActionOperators.Set,
             Value = value,
-            Type = "string",
         };
 
     // -----------------------------------------------------------------------
@@ -949,7 +946,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "acme corp",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1001,7 +997,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.NotEquals,
                     Value = "ACME Corp",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1053,7 +1048,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Contains,
                     Value = "acme",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1105,7 +1099,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.NotContains,
                     Value = "acme",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1157,7 +1150,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.StartsWith,
                     Value = "acme",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1209,7 +1201,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EndsWith,
                     Value = "acme",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1261,7 +1252,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.MatchesRegex,
                     Value = @"^ACME\d+$",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1302,7 +1292,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.MatchesRegex,
                     Value = "[invalid regex",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1330,7 +1319,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = "unsupportedOperator",
                     Value = "some value",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1375,7 +1363,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Is,
                     Value = "Auto & Transport",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1429,7 +1416,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Is,
                     Value = "Auto Insurance",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1483,7 +1469,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = AutomaticRuleConstants.ConditionalOperators.IsNot,
                     Value = "Auto & Transport",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1537,7 +1522,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = AutomaticRuleConstants.ConditionalOperators.IsNot,
                     Value = "Auto Insurance",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1578,7 +1562,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Is,
                     Value = "NonexistentCategory",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1606,7 +1589,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = "contains",
                     Value = "Auto & Transport",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1649,7 +1631,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "100.00",
-                    Type = "number",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1701,7 +1682,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = AutomaticRuleConstants.ConditionalOperators.NotEquals,
                     Value = "100.00",
-                    Type = "number",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1753,7 +1733,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = AutomaticRuleConstants.ConditionalOperators.GreaterThan,
                     Value = "100.00",
-                    Type = "number",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1805,7 +1784,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = AutomaticRuleConstants.ConditionalOperators.LessThan,
                     Value = "100.00",
-                    Type = "number",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1846,7 +1824,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "not-a-number",
-                    Type = "number",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1874,7 +1851,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = "contains",
                     Value = "100",
-                    Type = "number",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1917,7 +1893,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Date,
                     Operator = AutomaticRuleConstants.ConditionalOperators.On,
                     Value = "2024-01-15",
-                    Type = "date",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -1969,7 +1944,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Date,
                     Operator = AutomaticRuleConstants.ConditionalOperators.Before,
                     Value = "2024-01-15",
-                    Type = "date",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -2021,7 +1995,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Date,
                     Operator = AutomaticRuleConstants.ConditionalOperators.After,
                     Value = "2024-01-15",
-                    Type = "date",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -2062,7 +2035,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Date,
                     Operator = AutomaticRuleConstants.ConditionalOperators.On,
                     Value = "not-a-date",
-                    Type = "date",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -2090,7 +2062,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Date,
                     Operator = "contains",
                     Value = "2024-01-15",
-                    Type = "date",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -2133,7 +2104,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Delete Me",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2143,7 +2113,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ActionOperators.Delete,
                     Value = string.Empty,
-                    Type = "string",
                 },
             ],
         };
@@ -2178,7 +2147,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Old Name",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2188,7 +2156,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "New Name",
-                    Type = "string",
                 },
             ],
         };
@@ -2231,7 +2198,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Test Merchant",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2241,7 +2207,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "Auto & Transport",
-                    Type = "string",
                 },
             ],
         };
@@ -2286,7 +2251,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Test Merchant",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2296,7 +2260,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "Auto Insurance",
-                    Type = "string",
                 },
             ],
         };
@@ -2341,7 +2304,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "100.00",
-                    Type = "number",
                 },
             ],
             Actions =
@@ -2351,7 +2313,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "150.50",
-                    Type = "number",
                 },
             ],
         };
@@ -2394,7 +2355,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Date,
                     Operator = AutomaticRuleConstants.ConditionalOperators.On,
                     Value = "2024-01-15",
-                    Type = "date",
                 },
             ],
             Actions =
@@ -2404,7 +2364,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Date,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "2024-06-15",
-                    Type = "date",
                 },
             ],
         };
@@ -2447,7 +2406,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Test Merchant",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2457,7 +2415,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Category,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "NonexistentCategory",
-                    Type = "string",
                 },
             ],
         };
@@ -2495,7 +2452,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Test Merchant",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2505,7 +2461,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Amount,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "not-a-number",
-                    Type = "number",
                 },
             ],
         };
@@ -2543,7 +2498,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Test Merchant",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2553,7 +2507,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Date,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "not-a-date",
-                    Type = "date",
                 },
             ],
         };
@@ -2591,7 +2544,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Test Merchant",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2601,7 +2553,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = "unsupportedOperator",
                     Value = "value",
-                    Type = "string",
                 },
             ],
         };
@@ -2630,7 +2581,6 @@ public class AutomaticRuleTests
                     Field = "unsupportedField",
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Test",
-                    Type = "string",
                 },
             ],
             Actions = [MerchantSetAction()],
@@ -2667,7 +2617,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Merchant,
                     Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
                     Value = "Test Merchant",
-                    Type = "string",
                 },
             ],
             Actions =
@@ -2677,7 +2626,6 @@ public class AutomaticRuleTests
                     Field = AutomaticRuleConstants.TransactionFields.Account,
                     Operator = AutomaticRuleConstants.ActionOperators.Set,
                     Value = "value",
-                    Type = "string",
                 },
             ],
         };

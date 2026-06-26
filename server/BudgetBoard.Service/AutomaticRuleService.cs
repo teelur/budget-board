@@ -18,12 +18,6 @@ public class AutomaticRuleService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : IAutomaticRuleService
 {
-    private readonly ILogger<IAutomaticRuleService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly ITransactionService _transactionService = transactionService;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request)
     {
@@ -31,14 +25,14 @@ public class AutomaticRuleService(
 
         if (request.Conditions.Count == 0)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["NoConditionsCreateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["NoConditionsCreateError"]);
+            logger.LogError("{LogMessage}", logLocalizer["NoConditionsCreateLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["NoConditionsCreateError"]);
         }
 
         if (request.Actions.Count == 0)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["NoActionsCreateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["NoActionsCreateError"]);
+            logger.LogError("{LogMessage}", logLocalizer["NoActionsCreateLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["NoActionsCreateError"]);
         }
 
         var newRuleId = Guid.NewGuid();
@@ -50,7 +44,6 @@ public class AutomaticRuleService(
             [
                 .. request.Conditions.Select(c => new RuleCondition
                 {
-                    ID = Guid.NewGuid(),
                     Field = c.Field,
                     Operator = c.Operator,
                     Value = c.Value,
@@ -61,7 +54,6 @@ public class AutomaticRuleService(
             [
                 .. request.Actions.Select(a => new RuleAction
                 {
-                    ID = Guid.NewGuid(),
                     Field = a.Field,
                     Operator = a.Operator,
                     Value = a.Value,
@@ -70,55 +62,39 @@ public class AutomaticRuleService(
             ],
         };
 
-        _userDataContext.AutomaticRules.Add(newRule);
-        await _userDataContext.SaveChangesAsync();
+        userDataContext.AutomaticRules.Add(newRule);
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        return userData
-            .AutomaticRules.Select(r => new AutomaticRuleResponse
-            {
-                ID = r.ID,
-                Conditions = [.. r.Conditions.Select(c => new RuleParameterResponse(c))],
-                Actions = [.. r.Actions.Select(a => new RuleParameterResponse(a))],
-            })
-            .ToList();
+        return userData.AutomaticRules.Select(r => new AutomaticRuleResponse(r)).ToList();
     }
 
     /// <inheritdoc />
     public async Task UpdateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var existingRule = userData.AutomaticRules.FirstOrDefault(r => r.ID == request.ID);
-        if (existingRule == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["AutomaticRuleUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["AutomaticRuleUpdateNotFoundError"]
-            );
-        }
+        var existingRule = GetAutomaticRuleById(userData, request.ID);
 
         if (request.Conditions.Count == 0)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["NoConditionsUpdateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["NoConditionsUpdateError"]);
+            logger.LogError("{LogMessage}", logLocalizer["NoConditionsUpdateLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["NoConditionsUpdateError"]);
         }
 
         if (request.Actions.Count == 0)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["NoActionsUpdateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["NoActionsUpdateError"]);
+            logger.LogError("{LogMessage}", logLocalizer["NoActionsUpdateLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["NoActionsUpdateError"]);
         }
 
-        _userDataContext.RuleConditions.RemoveRange(existingRule.Conditions);
+        userDataContext.RuleConditions.RemoveRange(existingRule.Conditions);
         foreach (var condition in request.Conditions)
         {
-            _userDataContext.RuleConditions.Add(
+            userDataContext.RuleConditions.Add(
                 new RuleCondition
                 {
                     Field = condition.Field,
@@ -129,10 +105,10 @@ public class AutomaticRuleService(
             );
         }
 
-        _userDataContext.RuleActions.RemoveRange(existingRule.Actions);
+        userDataContext.RuleActions.RemoveRange(existingRule.Actions);
         foreach (var action in request.Actions)
         {
-            _userDataContext.RuleActions.Add(
+            userDataContext.RuleActions.Add(
                 new RuleAction
                 {
                     Field = action.Field,
@@ -143,25 +119,17 @@ public class AutomaticRuleService(
             );
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
     public async Task DeleteAutomaticRuleAsync(Guid userGuid, Guid ruleGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var rule = userData.AutomaticRules.FirstOrDefault(r => r.ID == ruleGuid);
-        if (rule == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["AutomaticRuleDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["AutomaticRuleDeleteNotFoundError"]
-            );
-        }
+        var rule = GetAutomaticRuleById(userData, ruleGuid);
 
         userData.AutomaticRules.Remove(rule);
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -174,12 +142,9 @@ public class AutomaticRuleService(
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         int updatedCount = await RunAutomaticRule(userData, request, allCategories);
-        _logger.LogInformation(
-            "{LogMessage}",
-            _logLocalizer["RuleAppliedActionsLog", updatedCount]
-        );
+        logger.LogInformation("{LogMessage}", logLocalizer["RuleAppliedActionsLog", updatedCount]);
 
-        return _responseLocalizer["RuleRunSummary", updatedCount];
+        return responseLocalizer["RuleRunSummary", updatedCount];
     }
 
     /// <inheritdoc />
@@ -189,34 +154,14 @@ public class AutomaticRuleService(
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         var rules = await ReadAutomaticRulesAsync(userGuid);
-        var ruleRequests = rules.Select(r => new AutomaticRuleCreateRequest
-        {
-            Conditions =
-            [
-                .. r.Conditions.Select(c => new RuleParameterCreateRequest
-                {
-                    Field = c.Field,
-                    Operator = c.Operator,
-                    Value = c.Value,
-                }),
-            ],
-            Actions =
-            [
-                .. r.Actions.Select(a => new RuleParameterCreateRequest
-                {
-                    Field = a.Field,
-                    Operator = a.Operator,
-                    Value = a.Value,
-                }),
-            ],
-        });
+        var ruleRequests = rules.Select(r => new AutomaticRuleCreateRequest(r));
 
         foreach (var rule in ruleRequests)
         {
             int updatedCount = await RunAutomaticRule(userData, rule, allCategories);
-            _logger.LogInformation(
+            logger.LogInformation(
                 "{LogMessage}",
-                _logLocalizer["RuleAppliedActionsLog", updatedCount]
+                logLocalizer["RuleAppliedActionsLog", updatedCount]
             );
         }
     }
@@ -224,10 +169,10 @@ public class AutomaticRuleService(
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
-            _userDataContext,
-            _logger,
-            _logLocalizer,
-            _responseLocalizer,
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
             id,
             users =>
                 users
@@ -242,6 +187,17 @@ public class AutomaticRuleService(
         );
     }
 
+    private AutomaticRule GetAutomaticRuleById(ApplicationUser userData, Guid ruleId)
+    {
+        var rule = userData.AutomaticRules.FirstOrDefault(r => r.ID == ruleId);
+        if (rule == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["AutomaticRuleNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["AutomaticRuleNotFoundError"]);
+        }
+        return rule;
+    }
+
     private async Task<int> RunAutomaticRule(
         ApplicationUser userData,
         IAutomaticRuleCreateRequest rule,
@@ -254,10 +210,9 @@ public class AutomaticRuleService(
             allCategories
         );
 
-        var matchedTransactionsCount = matchedTransactions.Count;
-        _logger.LogInformation(
+        logger.LogInformation(
             "{LogMessage}",
-            _logLocalizer["RuleMatchedTransactionsLog", matchedTransactionsCount]
+            logLocalizer["RuleMatchedTransactionsLog", matchedTransactions.Count]
         );
 
         return await ApplyActionsToTransactions(
@@ -282,8 +237,8 @@ public class AutomaticRuleService(
         {
             if (condition == null)
             {
-                _logger.LogError("{LogMessage}", _logLocalizer["InvalidConditionLog"]);
-                throw new BudgetBoardServiceException(_responseLocalizer["InvalidConditionError"]);
+                logger.LogError("{LogMessage}", logLocalizer["InvalidConditionLog"]);
+                throw new BudgetBoardServiceException(responseLocalizer["InvalidConditionError"]);
             }
 
             try
@@ -292,12 +247,12 @@ public class AutomaticRuleService(
                     condition,
                     matchedTransactions,
                     allCategories,
-                    _responseLocalizer
+                    responseLocalizer
                 );
             }
             catch (BudgetBoardServiceException bbex)
             {
-                _logger.LogError(bbex, "{LogMessage}", _logLocalizer["ErrorApplyingConditionLog"]);
+                logger.LogError(bbex, "{LogMessage}", logLocalizer["ErrorApplyingConditionLog"]);
                 throw;
             }
         }
@@ -321,17 +276,17 @@ public class AutomaticRuleService(
                     action,
                     transactions,
                     allCategories,
-                    _transactionService,
+                    transactionService,
                     userId,
-                    _responseLocalizer
+                    responseLocalizer
                 );
             }
             catch (BudgetBoardServiceException bbex)
             {
-                _logger.LogError(
+                logger.LogError(
                     bbex,
                     "{LogMessage}",
-                    _logLocalizer["ErrorApplyingActionLog", bbex.Message]
+                    logLocalizer["ErrorApplyingActionLog", bbex.Message]
                 );
                 continue;
             }
