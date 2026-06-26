@@ -79,44 +79,37 @@ public class AutomaticRuleService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var existingRule = GetAutomaticRuleById(userData, request.ID);
 
-        if (request.Conditions.Count == 0)
+        if (request.Conditions.Count > 0)
         {
-            logger.LogError("{LogMessage}", logLocalizer["NoConditionsUpdateLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["NoConditionsUpdateError"]);
+            userDataContext.RuleConditions.RemoveRange(existingRule.Conditions);
+            foreach (var condition in request.Conditions)
+            {
+                userDataContext.RuleConditions.Add(
+                    new RuleCondition
+                    {
+                        Field = condition.Field,
+                        Operator = condition.Operator,
+                        Value = condition.Value,
+                        RuleID = existingRule.ID,
+                    }
+                );
+            }
         }
-
-        if (request.Actions.Count == 0)
+        if (request.Actions.Count > 0)
         {
-            logger.LogError("{LogMessage}", logLocalizer["NoActionsUpdateLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["NoActionsUpdateError"]);
-        }
-
-        userDataContext.RuleConditions.RemoveRange(existingRule.Conditions);
-        foreach (var condition in request.Conditions)
-        {
-            userDataContext.RuleConditions.Add(
-                new RuleCondition
-                {
-                    Field = condition.Field,
-                    Operator = condition.Operator,
-                    Value = condition.Value,
-                    RuleID = existingRule.ID,
-                }
-            );
-        }
-
-        userDataContext.RuleActions.RemoveRange(existingRule.Actions);
-        foreach (var action in request.Actions)
-        {
-            userDataContext.RuleActions.Add(
-                new RuleAction
-                {
-                    Field = action.Field,
-                    Operator = action.Operator,
-                    Value = action.Value,
-                    RuleID = existingRule.ID,
-                }
-            );
+            userDataContext.RuleActions.RemoveRange(existingRule.Actions);
+            foreach (var action in request.Actions)
+            {
+                userDataContext.RuleActions.Add(
+                    new RuleAction
+                    {
+                        Field = action.Field,
+                        Operator = action.Operator,
+                        Value = action.Value,
+                        RuleID = existingRule.ID,
+                    }
+                );
+            }
         }
 
         await userDataContext.SaveChangesAsync();

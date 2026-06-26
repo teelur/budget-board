@@ -73,12 +73,6 @@
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>您尝试访问的资产不存在。</value>
   </data>
-  <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的自动规则不存在。</value>
-  </data>
-  <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的自动规则不存在。</value>
-  </data>
   <data name="InvalidConditionError" xml:space="preserve">
     <value>自动规则中的一个或多个条件无效。</value>
   </data>

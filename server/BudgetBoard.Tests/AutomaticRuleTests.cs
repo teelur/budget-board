@@ -245,7 +245,7 @@ public class AutomaticRuleTests
     }
 
     [Fact]
-    public async Task UpdateAutomaticRuleAsync_WhenRuleDoesNotExist_ThrowsException()
+    public async Task UpdateAutomaticRuleAsync_WhenRuleDoesNotExist_ThrowsAutomaticRuleNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -290,6 +290,94 @@ public class AutomaticRuleTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("AutomaticRuleNotFoundError");
+    }
+
+    [Fact]
+    public async Task UpdateAutomaticRuleAsync_WhenConditionsAreEmpty_ShouldNotUpdateConditions()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var automaticRuleFaker = new AutomaticRuleFaker(helper.demoUser.Id);
+        var demoRule = automaticRuleFaker.Generate();
+
+        helper.UserDataContext.AutomaticRules.Add(demoRule);
+        helper.UserDataContext.SaveChanges();
+
+        var createdRuleId = helper.demoUser.AutomaticRules.First().ID;
+        var updatedRule = new AutomaticRuleUpdateRequest
+        {
+            ID = createdRuleId,
+            Conditions = [], // Empty conditions
+            Actions =
+            [
+                new RuleParameterUpdateRequest
+                {
+                    Field = "Category",
+                    Operator = "set",
+                    Value = TransactionCategoriesConstants
+                        .DefaultTransactionCategories.Last()
+                        .Value,
+                },
+            ],
+        };
+
+        // Act
+        await automaticRuleService.UpdateAutomaticRuleAsync(helper.demoUser.Id, updatedRule);
+
+        // Assert
+        var updatedRuleFromDb = helper.demoUser.AutomaticRules.First(r => r.ID == createdRuleId);
+        updatedRuleFromDb.Conditions.Should().HaveCount(demoRule.Conditions.Count); // Should remain unchanged
+    }
+
+    [Fact]
+    public async Task UpdateAutomaticRuleAsync_WhenActionsAreEmpty_ShouldNotUpdateActions()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var automaticRuleFaker = new AutomaticRuleFaker(helper.demoUser.Id);
+        var demoRule = automaticRuleFaker.Generate();
+
+        helper.UserDataContext.AutomaticRules.Add(demoRule);
+        helper.UserDataContext.SaveChanges();
+
+        var createdRuleId = helper.demoUser.AutomaticRules.First().ID;
+        var updatedRule = new AutomaticRuleUpdateRequest
+        {
+            ID = createdRuleId,
+            Conditions =
+            [
+                new RuleParameterUpdateRequest
+                {
+                    Field = "Amount",
+                    Operator = "greater_than",
+                    Value = "100",
+                },
+            ],
+            Actions = [], // Empty actions
+        };
+
+        // Act
+        await automaticRuleService.UpdateAutomaticRuleAsync(helper.demoUser.Id, updatedRule);
+
+        // Assert
+        var updatedRuleFromDb = helper.demoUser.AutomaticRules.First(r => r.ID == createdRuleId);
+        updatedRuleFromDb.Actions.Should().HaveCount(demoRule.Actions.Count); // Should remain unchanged
     }
     #endregion
 

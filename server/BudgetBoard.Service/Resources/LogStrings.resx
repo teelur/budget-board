@@ -82,17 +82,11 @@
   <data name="NoConditionsCreateLog" xml:space="preserve">
     <value>Attempted to create an automatic rule with no conditions.</value>
   </data>
-  <data name="AutomaticRuleUpdateNotFoundLog" xml:space="preserve">
-    <value>Attempted to update an automatic rule that does not exist.</value>
+  <data name="NoActionsCreateLog" xml:space="preserve">
+    <value>Attempted to create an automatic rule with no actions.</value>
   </data>
-  <data name="NoConditionsUpdateLog" xml:space="preserve">
-    <value>Attempted to update an automatic rule with no conditions.</value>
-  </data>
-  <data name="NoActionsUpdateLog" xml:space="preserve">
-    <value>Attempted to update an automatic rule with no actions.</value>
-  </data>
-  <data name="AutomaticRuleDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to delete an automatic rule that does not exist.</value>
+  <data name="AutomaticRuleNotFoundLog" xml:space="preserve">
+    <value>Attempted to access an automatic rule that does not exist.</value>
   </data>
   <data name="InvalidConditionLog" xml:space="preserve">
     <value>Encountered null condition in automatic rule.</value>

@@ -82,11 +82,8 @@
   <data name="AssetPermanentDeleteNotDeletedError" xml:space="preserve">
     <value>The asset must be deleted before it can be permanently deleted.</value>
   </data>
-  <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value>The automatic rule you are trying to update does not exist.</value>
-  </data>
-  <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
-    <value>The automatic rule you are trying to delete does not exist.</value>
+  <data name="AutomaticRuleNotFoundError" xml:space="preserve">
+    <value>The automatic rule you are trying to access does not exist.</value>
   </data>
   <data name="InvalidConditionError" xml:space="preserve">
     <value>One or more conditions in the automatic rule are invalid.</value>
@@ -444,6 +441,12 @@
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
     <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
+  </data>
+  <data name="NoConditionsCreateError" xml:space="preserve">
+    <value>No conditions were provided for the automatic rule.</value>
+  </data>
+  <data name="NoActionsCreateError" xml:space="preserve">
+    <value>No actions were provided for the automatic rule.</value>
   </data>
   <data name="AssetTypeDuplicateNameError" xml:space="preserve">
     <value>An asset type with that name already exists.</value>
