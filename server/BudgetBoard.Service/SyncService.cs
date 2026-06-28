@@ -73,7 +73,7 @@ public class SyncService(
         }
 
         await goalService.CompleteGoalsAsync(userData.Id);
-        await automaticRuleService.RunAutomaticRulesAsync(userData.Id);
+        await automaticRuleService.RunSavedAutomaticRulesAsync(userData.Id);
 
         await applicationUserService.UpdateApplicationUserAsync(
             userData.Id,
