@@ -475,4 +475,7 @@
   <data name="NoActionsCreateError" xml:space="preserve">
     <value>No actions were provided for the automatic rule.</value>
   </data>
+  <data name="BalanceNotFoundError" xml:space="preserve">
+    <value>The balance you are trying to access does not exist.</value>
+  </data>
 </root>
