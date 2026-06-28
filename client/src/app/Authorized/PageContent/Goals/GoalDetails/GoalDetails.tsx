@@ -5,18 +5,14 @@ import AccountItem from "~/components/AccountItem/AccountItem";
 import { IAccountResponse } from "~/models/account";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { DatesRangeValue } from "@mantine/dates";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQueries } from "@tanstack/react-query";
 import { IBalanceResponse } from "~/models/balance";
-import { AxiosResponse } from "axios";
 import Drawer from "~/components/core/Drawer/Drawer";
 import Card from "~/components/core/Card/Card";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { balancesQueryKey } from "~/helpers/requests";
-
+import { useBalancesQuery } from "~/hooks/queries/useBalancesQuery";
 
 interface GoalDetailsProps {
   goal: IGoalResponse | null;
@@ -27,7 +23,10 @@ interface GoalDetailsProps {
 const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { request } = useAuth();
+  const balancesQuery = useBalancesQuery({
+    accountIds: props.goal?.accounts.map((account) => account.id) ?? [],
+    enabled: props.isOpen && props.goal !== null,
+  });
 
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(3);
 
@@ -35,31 +34,6 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
     dayjs().subtract(chartLookbackMonths, "month").toISOString(),
     dayjs().toISOString(),
   ];
-
-  const balancesQuery = useQueries({
-    queries: (props.goal?.accounts ?? []).map((account: IAccountResponse) => ({
-      queryKey: [balancesQueryKey, account.id],
-      queryFn: async (): Promise<IBalanceResponse[]> => {
-        const res: AxiosResponse = await request({
-          url: "/api/balance",
-          method: "GET",
-          params: { accountId: account.id },
-        });
-
-        if (res.status === 200) {
-          return res.data as IBalanceResponse[];
-        }
-
-        return [];
-      },
-    })),
-    combine: (results) => {
-      return {
-        data: results.map((result) => result.data ?? []).flat(1),
-        isPending: results.some((result) => result.isPending),
-      };
-    },
-  });
 
   return (
     <Drawer

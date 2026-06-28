@@ -1,19 +1,14 @@
 import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { useDidUpdate } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { translateAxiosError , accountsQueryKey, balancesQueryKey, institutionsQueryKey} from "~/helpers/requests";
-import { IBalanceResponse, IBalanceUpdateRequest } from "~/models/balance";
-import { useTranslation } from "react-i18next";
+import { IBalanceResponse } from "~/models/balance";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { useUpdateBalanceMutation } from "~/hooks/mutations/balances/useUpdateBalanceMutation";
+import { useDeleteBalanceMutation } from "~/hooks/mutations/balances/useDeleteBalanceMutation";
 
 interface EditableBalanceItemContentProps {
   balance: IBalanceResponse;
@@ -24,7 +19,6 @@ interface EditableBalanceItemContentProps {
 const EditableBalanceItemContent = (
   props: EditableBalanceItemContentProps,
 ): React.ReactNode => {
-  const { t } = useTranslation();
   const {
     dayjs,
     longDateFormat,
@@ -32,7 +26,12 @@ const EditableBalanceItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { request } = useAuth();
+  const updateBalanceMutation = useUpdateBalanceMutation({
+    accountID: props.balance.accountID,
+  });
+  const deleteBalanceMutation = useDeleteBalanceMutation({
+    accountID: props.balance.accountID,
+  });
 
   const balanceAmountField = useField<string | number | undefined>({
     initialValue: props.balance.amount,
@@ -48,66 +47,12 @@ const EditableBalanceItemContent = (
     initialValue: dayjs(props.balance.date).toDate(),
   });
 
-  const queryClient = useQueryClient();
-  const doUpdateBalance = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/balance`,
-        method: "PUT",
-        data: {
-          id: props.balance.id,
-          amount: Number(balanceAmountField.getValue()),
-          date: dayjs(balanceDateField.getValue()).format("YYYY-MM-DD"),
-        } as IBalanceUpdateRequest,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [balancesQueryKey, props.balance.accountID],
-      });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
-  const doDeleteBalance = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/balance`,
-        method: "DELETE",
-        params: { guid: props.balance.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [balancesQueryKey, props.balance.accountID],
-      });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("balance_deleted_successfully_message"),
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
-  useDidUpdate(() => {
-    doUpdateBalance.mutate();
-  }, [balanceDateField.getValue()]);
-
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <LoadingOverlay
-        visible={doUpdateBalance.isPending || doDeleteBalance.isPending}
+        visible={
+          updateBalanceMutation.isPending || deleteBalanceMutation.isPending
+        }
       />
       <Stack w="100%" gap="0.5rem">
         <DateInput
@@ -115,6 +60,14 @@ const EditableBalanceItemContent = (
           flex="1 1 auto"
           locale={dayjsLocale}
           valueFormat={longDateFormat}
+          onChange={(date) => {
+            updateBalanceMutation.mutate({
+              id: props.balance.id,
+              date: dayjs(date).format("YYYY-MM-DD"),
+            });
+            const { onChange } = balanceDateField.getInputProps();
+            onChange(date);
+          }}
           elevation={2}
         />
         <NumberInput
@@ -125,7 +78,14 @@ const EditableBalanceItemContent = (
           decimalSeparator={decimalSeparator}
           decimalScale={2}
           fixedDecimalScale
-          onBlur={() => doUpdateBalance.mutate()}
+          onBlur={() => {
+            const { onBlur } = balanceAmountField.getInputProps();
+            onBlur();
+            updateBalanceMutation.mutate({
+              id: props.balance.id,
+              amount: Number(balanceAmountField.getValue()),
+            });
+          }}
           elevation={2}
         />
       </Stack>
@@ -145,7 +105,7 @@ const EditableBalanceItemContent = (
           h="100%"
           size="sm"
           bg="var(--button-color-destructive)"
-          onClick={() => doDeleteBalance.mutate()}
+          onClick={() => deleteBalanceMutation.mutate(props.balance.id)}
         >
           <Trash2Icon size={16} />
         </ActionIcon>
