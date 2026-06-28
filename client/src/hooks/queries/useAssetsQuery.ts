@@ -8,7 +8,9 @@ interface UseAssetsQueryProps {
   enabled?: boolean;
 }
 
-export const useAssetsQuery = ({ enabled = true }: UseAssetsQueryProps) => {
+export const useAssetsQuery = ({
+  enabled = true,
+}: UseAssetsQueryProps = {}) => {
   const { request } = useAuth();
 
   return useQuery({
