@@ -72,7 +72,6 @@
     "postcss": "^8.5.15",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
-    "react-scan": "^0.5.7",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.0",
     "vite": "^8.1.0"
@@ -80,8 +79,7 @@
   "resolutions": {
     "react-is": "^19.0.0",
     "glob/minimatch": "^9.0.6",
-    "ip-address": "^10.2.0",
-    "@opentelemetry/core": "2.8.0"
+    "ip-address": "^10.2.0"
   },
   "packageManager": "yarn@4.14.1"
 }
