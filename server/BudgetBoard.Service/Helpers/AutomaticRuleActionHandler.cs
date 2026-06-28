@@ -10,7 +10,7 @@ internal static class AutomaticRuleActionHandler
 {
     internal static async Task<int> ApplyActionToTransactions(
         IRuleParameterRequest action,
-        IEnumerable<Transaction> transactions,
+        IList<Transaction> transactions,
         IEnumerable<ITransactionCategory> allCategories,
         ITransactionService transactionService,
         Guid userGuid,
@@ -28,7 +28,7 @@ internal static class AutomaticRuleActionHandler
                 userGuid,
                 transactions.Select(t => t.ID)
             );
-            return transactions.Count();
+            return transactions.Count;
         }
         if (
             action.Operator.Equals(

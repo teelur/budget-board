@@ -261,7 +261,7 @@ public class AutomaticRuleService(
             {
                 updatedCount += await AutomaticRuleActionHandler.ApplyActionToTransactions(
                     action,
-                    transactions,
+                    [.. transactions],
                     allCategories,
                     transactionService,
                     userId,
