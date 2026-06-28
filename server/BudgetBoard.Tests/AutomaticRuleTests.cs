@@ -172,15 +172,28 @@ public class AutomaticRuleTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        var rules = await automaticRuleService.ReadAutomaticRulesAsync(helper.demoUser.Id);
+        var readRules = await automaticRuleService.ReadAutomaticRulesAsync(helper.demoUser.Id);
 
         // Assert
-        rules.Should().HaveCount(5);
-        foreach (var rule in demoRules)
+        readRules.Should().HaveCount(5);
+        foreach (var demoRule in demoRules)
         {
-            rules.Should().ContainSingle(r => r.ID == rule.ID);
-            rules.First(r => r.ID == rule.ID).Conditions.Should().HaveCount(rule.Conditions.Count);
-            rules.First(r => r.ID == rule.ID).Actions.Should().HaveCount(rule.Actions.Count);
+            var readRule = readRules.SingleOrDefault(r => r.ID == demoRule.ID);
+            readRule.Should().NotBeNull();
+            readRule.Conditions.Should().HaveCount(demoRule.Conditions.Count);
+            readRule
+                .Conditions.Should()
+                .BeEquivalentTo(
+                    demoRule.Conditions.Select(c => new RuleParameterResponse(c)),
+                    options => options.WithStrictOrdering()
+                );
+            readRule.Actions.Should().HaveCount(demoRule.Actions.Count);
+            readRule
+                .Actions.Should()
+                .BeEquivalentTo(
+                    demoRule.Actions.Select(a => new RuleParameterResponse(a)),
+                    options => options.WithStrictOrdering()
+                );
         }
     }
     #endregion

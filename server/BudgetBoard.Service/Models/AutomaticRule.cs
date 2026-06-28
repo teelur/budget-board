@@ -61,18 +61,10 @@ public interface IRuleParameterResponse : IRuleParameterRequest
 
 public class RuleParameterResponse : IRuleParameterResponse
 {
-    public Guid ID { get; set; }
-    public string Field { get; set; }
-    public string Operator { get; set; }
-    public string Value { get; set; }
-
-    public RuleParameterResponse()
-    {
-        ID = Guid.NewGuid();
-        Field = string.Empty;
-        Operator = string.Empty;
-        Value = string.Empty;
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public string Field { get; set; } = string.Empty;
+    public string Operator { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
 
     public RuleParameterResponse(RuleCondition condition)
     {
@@ -100,16 +92,9 @@ public interface IAutomaticRuleResponse
 
 public class AutomaticRuleResponse : IAutomaticRuleResponse
 {
-    public Guid ID { get; set; }
+    public Guid ID { get; set; } = Guid.NewGuid();
     public ICollection<RuleParameterResponse> Conditions { get; set; } = [];
     public ICollection<RuleParameterResponse> Actions { get; set; } = [];
-
-    public AutomaticRuleResponse()
-    {
-        ID = Guid.NewGuid();
-        Conditions = [];
-        Actions = [];
-    }
 
     public AutomaticRuleResponse(AutomaticRule rule)
     {

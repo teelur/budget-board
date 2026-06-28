@@ -11,10 +11,9 @@ export interface IRuleParameterCreateRequest {
   field: string;
   operator: string;
   value: string;
-  type: string;
 }
 
-export interface IAutomaticRuleRequest {
+export interface IAutomaticRuleCreateRequest {
   conditions: IRuleParameterCreateRequest[];
   actions: IRuleParameterCreateRequest[];
 }
@@ -24,7 +23,6 @@ export interface IRuleParameterResponse {
   field: string;
   operator: string;
   value: string;
-  type: string;
 }
 
 export interface IAutomaticRuleResponse {
@@ -37,7 +35,6 @@ export interface IRuleParameterUpdateRequest {
   field: string;
   operator: string;
   value: string;
-  type: string;
 }
 
 export interface IAutomaticRuleUpdateRequest {
