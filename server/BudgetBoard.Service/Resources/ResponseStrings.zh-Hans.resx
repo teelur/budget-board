@@ -469,4 +469,13 @@
   <data name="AssetTypeNotFoundError" xml:space="preserve">
     <value>The asset type you are trying to access does not exist.</value>
   </data>
+  <data name="AutomaticRuleNotFoundError" xml:space="preserve">
+    <value>The automatic rule you are trying to access does not exist.</value>
+  </data>
+  <data name="NoConditionsCreateError" xml:space="preserve">
+    <value>No conditions were provided for the automatic rule.</value>
+  </data>
+  <data name="NoActionsCreateError" xml:space="preserve">
+    <value>No actions were provided for the automatic rule.</value>
+  </data>
 </root>
