@@ -72,7 +72,6 @@
     "postcss": "^8.5.15",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
-    "react-scan": "^0.5.7",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.0",
     "vite": "^8.1.0"
