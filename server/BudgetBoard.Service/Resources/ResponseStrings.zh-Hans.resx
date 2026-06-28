@@ -451,4 +451,7 @@
   <data name="RemoveOidcFailedError" xml:space="preserve">
     <value>移除 OIDC 登录失败。</value>
   </data>
+  <data name="AssetPermanentDeleteNotDeletedError" xml:space="preserve">
+    <value>The asset must be deleted before it can be permanently deleted.</value>
+  </data>
 </root>
