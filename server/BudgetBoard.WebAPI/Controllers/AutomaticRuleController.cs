@@ -18,104 +18,79 @@ public class AutomaticRuleController(
     IAutomaticRuleService automaticRuleService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<AutomaticRuleController>(logger, logLocalizer, responseLocalizer)
 {
-    private readonly ILogger<AutomaticRuleController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IAutomaticRuleService _automaticRuleService = automaticRuleService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] AutomaticRuleCreateRequest automaticRule)
+    public async Task<IActionResult> Create([FromBody] AutomaticRuleCreateRequest newAutomaticRule)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _automaticRuleService.CreateAutomaticRuleAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                automaticRule
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await automaticRuleService.CreateAutomaticRuleAsync(parsedUserId, newAutomaticRule);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            return Ok(
-                await _automaticRuleService.ReadAutomaticRulesAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await automaticRuleService.ReadAutomaticRulesAsync(parsedUserId));
+        });
     }
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] AutomaticRuleUpdateRequest automaticRule)
+    public async Task<IActionResult> Update(
+        [FromBody] AutomaticRuleUpdateRequest updatedAutomaticRule
+    )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _automaticRuleService.UpdateAutomaticRuleAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                automaticRule
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await automaticRuleService.UpdateAutomaticRuleAsync(parsedUserId, updatedAutomaticRule);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid automaticRuleId)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _automaticRuleService.DeleteAutomaticRuleAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await automaticRuleService.DeleteAutomaticRuleAsync(parsedUserId, automaticRuleId);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
@@ -123,23 +98,18 @@ public class AutomaticRuleController(
     [Route("[action]")]
     public async Task<IActionResult> Run([FromBody] AutomaticRuleCreateRequest automaticRule)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             return Ok(
-                await _automaticRuleService.RunOneOffAutomaticRuleAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    automaticRule
-                )
+                await automaticRuleService.RunOneOffAutomaticRuleAsync(parsedUserId, automaticRule)
             );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }
