@@ -119,12 +119,14 @@ const AccountsContent = (props: AccountsContentProps) => {
   return (
     <Stack id="institutions-stack" gap="1rem">
       <LoadingOverlay visible={doIndexInstitutions.isPending} />
-      <AccountDetails
-        isOpen={isDetailsOpen}
-        close={closeDetails}
-        account={selectedAccount}
-        currency={userSettingsQuery.data?.currency || "USD"}
-      />
+      {selectedAccount && (
+        <AccountDetails
+          isOpen={isDetailsOpen}
+          close={closeDetails}
+          account={selectedAccount}
+          currency={userSettingsQuery.data?.currency || "USD"}
+        />
+      )}
       {institutionQuery.isPending ? (
         <>
           <Skeleton height={60} radius="md" />

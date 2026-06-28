@@ -1,11 +1,7 @@
 import { Button, Group, Skeleton, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
-import { IBalanceResponse } from "~/models/balance";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
 import Drawer from "~/components/core/Drawer/Drawer";
@@ -20,12 +16,12 @@ import {
 } from "~/helpers/accountType";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { balancesQueryKey } from "~/helpers/requests";
+import { useBalancesQuery } from "~/hooks/queries/useBalancesQuery";
 
 interface AccountDetailsProps {
   isOpen: boolean;
   close: () => void;
-  account: IAccountResponse | undefined;
+  account: IAccountResponse;
   currency: string;
 }
 
@@ -35,24 +31,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs } = useLocale();
   const { allAccountTypes } = useAccountTypes();
-  const { request } = useAuth();
-
-  const balancesQuery = useQuery({
-    queryKey: [balancesQueryKey, props.account?.id],
-    queryFn: async (): Promise<IBalanceResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/balance",
-        method: "GET",
-        params: { accountId: props.account?.id },
-      });
-
-      if (res.status === 200) {
-        return res.data as IBalanceResponse[];
-      }
-
-      return [];
-    },
-    enabled: !!props.account?.id && props.isOpen,
+  const balancesQuery = useBalancesQuery({
+    accountIds: props.account.id ? [props.account.id] : [],
+    enabled: props.isOpen,
   });
 
   const sortedBalances =

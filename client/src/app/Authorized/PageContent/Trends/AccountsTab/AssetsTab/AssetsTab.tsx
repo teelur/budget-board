@@ -3,20 +3,15 @@ import React from "react";
 import { mantineDateFormat } from "~/helpers/datetime";
 import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQueries } from "@tanstack/react-query";
-import { IBalanceResponse } from "~/models/balance";
-import { AxiosResponse } from "axios";
 import { AccountTypeClassification } from "~/models/account";
 import { DatesRangeValue } from "@mantine/dates";
 import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
-import { balancesQueryKey } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useBalancesQuery } from "~/hooks/queries/useBalancesQuery";
 
 const AssetsTab = (): React.ReactNode => {
-  const { request } = useAuth();
   const { dayjs } = useLocale();
   const { allAccountTypes } = useAccountTypes();
 
@@ -28,31 +23,10 @@ const AssetsTab = (): React.ReactNode => {
     dayjs().format(mantineDateFormat),
   ]);
 
-  const balancesQuery = useQueries({
-    queries: selectedAccountIds.map((accountId: string) => ({
-      queryKey: [balancesQueryKey, accountId],
-      queryFn: async (): Promise<IBalanceResponse[]> => {
-        const res: AxiosResponse = await request({
-          url: "/api/balance",
-          method: "GET",
-          params: { accountId },
-        });
-
-        if (res.status === 200) {
-          return res.data as IBalanceResponse[];
-        }
-
-        return [];
-      },
-    })),
-    combine: (results) => {
-      return {
-        data: results.map((result) => result.data ?? []).flat(1),
-        isPending: results.some((result) => result.isPending),
-      };
-    },
+  const balancesQuery = useBalancesQuery({
+    accountIds: selectedAccountIds,
+    enabled: selectedAccountIds.length > 0,
   });
-
   const accountsQuery = useAccountsQuery();
 
   const assetAccountTypes = allAccountTypes

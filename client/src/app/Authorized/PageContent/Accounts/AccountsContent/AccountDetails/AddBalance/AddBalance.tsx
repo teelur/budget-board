@@ -1,23 +1,13 @@
 import { Button, Stack } from "@mantine/core";
-
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
-import {
-  balancesQueryKey,
-  institutionsQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
-import { IBalanceCreateRequest } from "~/models/balance";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { useCreateBalanceMutation } from "~/hooks/mutations/balances/useCreateBalanceMutation";
 
 interface AddBalanceProps {
   accountId: string;
@@ -33,34 +23,15 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { request } = useAuth();
+  const createBalanceMutation = useCreateBalanceMutation({
+    accountId: props.accountId,
+  });
 
   const dateField = useField<Date>({
     initialValue: dayjs().toDate(),
   });
   const amountField = useField<string | number>({
     initialValue: 0,
-  });
-
-  const queryClient = useQueryClient();
-  const doCreateBalance = useMutation({
-    mutationFn: async (newBalance: IBalanceCreateRequest) =>
-      await request({
-        url: "/api/balance",
-        method: "POST",
-        data: newBalance,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({
-        queryKey: [balancesQueryKey, props.accountId],
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
   });
 
   return (
@@ -82,9 +53,9 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
         elevation={0}
       />
       <Button
-        loading={doCreateBalance.isPending}
+        loading={createBalanceMutation.isPending}
         onClick={() =>
-          doCreateBalance.mutate({
+          createBalanceMutation.mutate({
             accountID: props.accountId,
             amount: Number(amountField.getValue()),
             date: dayjs(dateField.getValue()).format("YYYY-MM-DD"),
