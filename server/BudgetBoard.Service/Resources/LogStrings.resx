@@ -109,7 +109,7 @@
   <data name="BalanceAccountNotFoundLog" xml:space="preserve">
     <value>Attempted to access balances for an account that does not exist.</value>
   </data>
-  <data name="BalanceUpdateNotFound" xml:space="preserve">
+  <data name="BalanceNotFoundLog" xml:space="preserve">
     <value>Attempted to access a balance that does not exist.</value>
   </data>
   <data name="BalanceDuplicateDateLog" xml:space="preserve">

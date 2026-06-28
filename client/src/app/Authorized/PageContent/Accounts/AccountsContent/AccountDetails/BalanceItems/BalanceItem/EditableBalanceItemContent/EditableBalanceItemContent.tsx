@@ -60,12 +60,14 @@ const EditableBalanceItemContent = (
           flex="1 1 auto"
           locale={dayjsLocale}
           valueFormat={longDateFormat}
-          onChange={(date) =>
+          onChange={(date) => {
             updateBalanceMutation.mutate({
               id: props.balance.id,
               date: dayjs(date).format("YYYY-MM-DD"),
-            })
-          }
+            });
+            const { onChange } = balanceDateField.getInputProps();
+            onChange(date);
+          }}
           elevation={2}
         />
         <NumberInput
@@ -76,12 +78,14 @@ const EditableBalanceItemContent = (
           decimalSeparator={decimalSeparator}
           decimalScale={2}
           fixedDecimalScale
-          onBlur={() =>
+          onBlur={() => {
+            const { onBlur } = balanceAmountField.getInputProps();
+            onBlur();
             updateBalanceMutation.mutate({
               id: props.balance.id,
               amount: Number(balanceAmountField.getValue()),
-            })
-          }
+            });
+          }}
           elevation={2}
         />
       </Stack>
