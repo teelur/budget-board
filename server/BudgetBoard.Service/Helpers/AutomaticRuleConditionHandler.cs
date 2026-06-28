@@ -6,9 +6,9 @@ using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.Service.Helpers;
 
-public static class AutomaticRuleHelpers
+internal static class AutomaticRuleConditionHandler
 {
-    public static IEnumerable<Transaction> FilterOnCondition(
+    internal static IEnumerable<Transaction> FilterOnCondition(
         IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions,
         IEnumerable<ITransactionCategory> allCategories,
@@ -71,110 +71,12 @@ public static class AutomaticRuleHelpers
         );
     }
 
-    public static async Task<int> ApplyActionToTransactions(
-        IRuleParameterRequest action,
-        IEnumerable<Transaction> transactions,
-        IEnumerable<ITransactionCategory> allCategories,
-        ITransactionService transactionService,
-        Guid userGuid,
-        IStringLocalizer<ResponseStrings> responseLocalizer
-    )
-    {
-        if (
-            action.Operator.Equals(
-                AutomaticRuleConstants.ActionOperators.Delete,
-                StringComparison.CurrentCultureIgnoreCase
-            )
-        )
-        {
-            int deletedTransactions = 0;
-            foreach (var transaction in transactions)
-            {
-                // TODO: Add batch delete
-                await transactionService.DeleteTransactionAsync(userGuid, transaction.ID);
-                deletedTransactions++;
-            }
-            return deletedTransactions;
-        }
-        else
-        {
-            if (
-                action.Field.Equals(
-                    AutomaticRuleConstants.TransactionFields.Merchant,
-                    StringComparison.CurrentCultureIgnoreCase
-                )
-            )
-            {
-                return await ApplyActionForMerchant(
-                    action,
-                    transactions,
-                    transactionService,
-                    userGuid,
-                    responseLocalizer
-                );
-            }
-            else if (
-                action.Field.Equals(
-                    AutomaticRuleConstants.TransactionFields.Category,
-                    StringComparison.CurrentCultureIgnoreCase
-                )
-            )
-            {
-                return await ApplyActionForCategory(
-                    action,
-                    transactions,
-                    allCategories,
-                    transactionService,
-                    userGuid,
-                    responseLocalizer
-                );
-            }
-            else if (
-                action.Field.Equals(
-                    AutomaticRuleConstants.TransactionFields.Amount,
-                    StringComparison.CurrentCultureIgnoreCase
-                )
-            )
-            {
-                return await ApplyActionForAmount(
-                    action,
-                    transactions,
-                    transactionService,
-                    userGuid,
-                    responseLocalizer
-                );
-            }
-            else if (
-                action.Field.Equals(
-                    AutomaticRuleConstants.TransactionFields.Date,
-                    StringComparison.CurrentCultureIgnoreCase
-                )
-            )
-            {
-                return await ApplyActionForDate(
-                    action,
-                    transactions,
-                    transactionService,
-                    userGuid,
-                    responseLocalizer
-                );
-            }
-            else
-            {
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AutomaticRuleUnsupportedActionFieldError", action.Field]
-                );
-            }
-        }
-    }
-
     private static IEnumerable<Transaction> FilterOnMerchantCondition(
         IRuleParameterRequest condition,
         IEnumerable<Transaction> transactions,
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
-        // Equals
         if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.EqualsString,
@@ -189,7 +91,6 @@ public static class AutomaticRuleHelpers
                 )
             );
         }
-        // Not equals
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.NotEquals,
@@ -204,7 +105,6 @@ public static class AutomaticRuleHelpers
                 )
             );
         }
-        // Contains
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.Contains,
@@ -219,7 +119,6 @@ public static class AutomaticRuleHelpers
                 )
             );
         }
-        // Not contains
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.NotContains,
@@ -234,7 +133,6 @@ public static class AutomaticRuleHelpers
                 )
             );
         }
-        // Starts with
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.StartsWith,
@@ -249,7 +147,6 @@ public static class AutomaticRuleHelpers
                 )
             );
         }
-        // Ends with
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.EndsWith,
@@ -264,7 +161,6 @@ public static class AutomaticRuleHelpers
                 )
             );
         }
-        // Matches regex
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.MatchesRegex,
@@ -300,17 +196,13 @@ public static class AutomaticRuleHelpers
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
-        if (
-            condition.Value != string.Empty
-            && !allCategories.Any(c => c.Value.Equals(condition.Value))
-        )
+        if (!allCategories.Any(c => c.Value.Equals(condition.Value)))
         {
             throw new BudgetBoardServiceException(
                 responseLocalizer["AutomaticRuleCategoryDoesNotExistError", condition.Value]
             );
         }
 
-        // Is
         if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.Is,
@@ -332,7 +224,6 @@ public static class AutomaticRuleHelpers
                 );
             }
         }
-        // Is not
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.IsNot,
@@ -376,7 +267,6 @@ public static class AutomaticRuleHelpers
             );
         }
 
-        // Equals
         if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.EqualsString,
@@ -386,7 +276,6 @@ public static class AutomaticRuleHelpers
         {
             return transactions.Where(t => t.Amount == conditionAmount);
         }
-        // Not equals
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.NotEquals,
@@ -396,7 +285,6 @@ public static class AutomaticRuleHelpers
         {
             return transactions.Where(t => t.Amount != conditionAmount);
         }
-        // Greater than
         if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.GreaterThan,
@@ -406,7 +294,6 @@ public static class AutomaticRuleHelpers
         {
             return transactions.Where(t => t.Amount > conditionAmount);
         }
-        // Less than
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.LessThan,
@@ -435,7 +322,6 @@ public static class AutomaticRuleHelpers
             );
         }
 
-        // On
         if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.On,
@@ -445,7 +331,6 @@ public static class AutomaticRuleHelpers
         {
             return transactions.Where(t => t.Date == conditionDate);
         }
-        // Before
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.Before,
@@ -455,7 +340,6 @@ public static class AutomaticRuleHelpers
         {
             return transactions.Where(t => t.Date < conditionDate);
         }
-        // After
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.After,
@@ -494,7 +378,6 @@ public static class AutomaticRuleHelpers
             accountIds.Add(parsed);
         }
 
-        // Is
         if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.Is,
@@ -504,7 +387,6 @@ public static class AutomaticRuleHelpers
         {
             return transactions.Where(t => accountIds.Contains(t.AccountID));
         }
-        // Is not
         else if (
             condition.Operator.Equals(
                 AutomaticRuleConstants.ConditionalOperators.IsNot,
@@ -517,175 +399,6 @@ public static class AutomaticRuleHelpers
 
         throw new BudgetBoardServiceException(
             responseLocalizer["AutomaticRuleUnsupportedOperatorForAccountError", condition.Operator]
-        );
-    }
-
-    private static async Task<int> ApplyActionForMerchant(
-        IRuleParameterRequest action,
-        IEnumerable<Transaction> transactions,
-        ITransactionService transactionService,
-        Guid userGuid,
-        IStringLocalizer<ResponseStrings> responseLocalizer
-    )
-    {
-        if (
-            action.Operator.Equals(
-                AutomaticRuleConstants.ActionOperators.Set,
-                StringComparison.CurrentCultureIgnoreCase
-            )
-        )
-        {
-            var updatedTransactions = 0;
-            foreach (var transaction in transactions)
-            {
-                await transactionService.UpdateTransactionAsync(
-                    userGuid,
-                    new TransactionUpdateRequest(transaction) { MerchantName = action.Value }
-                );
-
-                updatedTransactions++;
-            }
-            return updatedTransactions;
-        }
-
-        throw new BudgetBoardServiceException(
-            responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
-        );
-    }
-
-    private static async Task<int> ApplyActionForCategory(
-        IRuleParameterRequest action,
-        IEnumerable<Transaction> transactions,
-        IEnumerable<ITransactionCategory> allCategories,
-        ITransactionService transactionService,
-        Guid userGuid,
-        IStringLocalizer<ResponseStrings> responseLocalizer
-    )
-    {
-        if (
-            action.Operator.Equals(
-                AutomaticRuleConstants.ActionOperators.Set,
-                StringComparison.CurrentCultureIgnoreCase
-            )
-        )
-        {
-            string newCategory = string.Empty;
-
-            if (!string.IsNullOrEmpty(action.Value))
-            {
-                var foundCategory = allCategories
-                    .FirstOrDefault(c =>
-                        c.Value.Equals(action.Value, StringComparison.CurrentCultureIgnoreCase)
-                    )
-                    ?.Value;
-
-                if (foundCategory != null)
-                {
-                    newCategory = foundCategory;
-                }
-                else
-                {
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["AutomaticRuleCategoryNotFoundError", action.Value]
-                    );
-                }
-            }
-
-            int updatedTransactions = 0;
-            foreach (var transaction in transactions)
-            {
-                var updateRequest = new TransactionUpdateRequest(transaction);
-                (updateRequest.Category, updateRequest.Subcategory) =
-                    TransactionCategoriesHelpers.GetFullCategory(newCategory, allCategories);
-                await transactionService.UpdateTransactionAsync(userGuid, updateRequest);
-
-                updatedTransactions++;
-            }
-            return updatedTransactions;
-        }
-
-        throw new BudgetBoardServiceException(
-            responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
-        );
-    }
-
-    private static async Task<int> ApplyActionForAmount(
-        IRuleParameterRequest action,
-        IEnumerable<Transaction> transactions,
-        ITransactionService transactionService,
-        Guid userGuid,
-        IStringLocalizer<ResponseStrings> responseLocalizer
-    )
-    {
-        if (
-            action.Operator.Equals(
-                AutomaticRuleConstants.ActionOperators.Set,
-                StringComparison.CurrentCultureIgnoreCase
-            )
-        )
-        {
-            if (!decimal.TryParse(action.Value, out var newAmount))
-            {
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AutomaticRuleInvalidAmountError", action.Value]
-                );
-            }
-
-            int updatedTransactions = 0;
-            foreach (var transaction in transactions)
-            {
-                await transactionService.UpdateTransactionAsync(
-                    userGuid,
-                    new TransactionUpdateRequest(transaction) { Amount = newAmount }
-                );
-
-                updatedTransactions++;
-            }
-            return updatedTransactions;
-        }
-
-        throw new BudgetBoardServiceException(
-            responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
-        );
-    }
-
-    private static async Task<int> ApplyActionForDate(
-        IRuleParameterRequest action,
-        IEnumerable<Transaction> transactions,
-        ITransactionService transactionService,
-        Guid userGuid,
-        IStringLocalizer<ResponseStrings> responseLocalizer
-    )
-    {
-        if (
-            action.Operator.Equals(
-                AutomaticRuleConstants.ActionOperators.Set,
-                StringComparison.CurrentCultureIgnoreCase
-            )
-        )
-        {
-            if (!DateOnly.TryParse(action.Value, out var newDate))
-            {
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["AutomaticRuleInvalidDateError", action.Value]
-                );
-            }
-
-            int updatedTransactions = 0;
-            foreach (var transaction in transactions)
-            {
-                await transactionService.UpdateTransactionAsync(
-                    userGuid,
-                    new TransactionUpdateRequest(transaction) { Date = newDate }
-                );
-
-                updatedTransactions++;
-            }
-            return updatedTransactions;
-        }
-
-        throw new BudgetBoardServiceException(
-            responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
         );
     }
 }

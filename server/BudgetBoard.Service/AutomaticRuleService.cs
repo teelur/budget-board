@@ -126,7 +126,7 @@ public class AutomaticRuleService(
     }
 
     /// <inheritdoc />
-    public async Task<string> RunAutomaticRuleAsync(
+    public async Task<string> RunOneOffAutomaticRuleAsync(
         Guid userGuid,
         IAutomaticRuleCreateRequest request
     )
@@ -141,7 +141,7 @@ public class AutomaticRuleService(
     }
 
     /// <inheritdoc />
-    public async Task RunAutomaticRulesAsync(Guid userGuid)
+    public async Task RunSavedAutomaticRulesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
@@ -223,20 +223,14 @@ public class AutomaticRuleService(
     )
     {
         var matchedTransactions = transactions.Where(t =>
-            t.Deleted == null && !(t.Account?.HideTransactions ?? false)
+            t.Deleted == null && !t.Account!.HideTransactions
         );
 
         foreach (var condition in conditions)
         {
-            if (condition == null)
-            {
-                logger.LogError("{LogMessage}", logLocalizer["InvalidConditionLog"]);
-                throw new BudgetBoardServiceException(responseLocalizer["InvalidConditionError"]);
-            }
-
             try
             {
-                matchedTransactions = AutomaticRuleHelpers.FilterOnCondition(
+                matchedTransactions = AutomaticRuleConditionHandler.FilterOnCondition(
                     condition,
                     matchedTransactions,
                     allCategories,
@@ -265,7 +259,7 @@ public class AutomaticRuleService(
         {
             try
             {
-                updatedCount += await AutomaticRuleHelpers.ApplyActionToTransactions(
+                updatedCount += await AutomaticRuleActionHandler.ApplyActionToTransactions(
                     action,
                     transactions,
                     allCategories,

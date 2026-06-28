@@ -126,7 +126,7 @@ public class AutomaticRuleController(
         try
         {
             return Ok(
-                await _automaticRuleService.RunAutomaticRuleAsync(
+                await _automaticRuleService.RunOneOffAutomaticRuleAsync(
                     new Guid(_userManager.GetUserId(User) ?? string.Empty),
                     automaticRule
                 )

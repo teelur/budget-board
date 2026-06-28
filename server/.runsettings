@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RunSettings>
+  <RunConfiguration>
+    <ResultsDirectory>BudgetBoard.Tests/TestResults</ResultsDirectory>
+  </RunConfiguration>
   <DataCollectionRunSettings>
     <DataCollectors>
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
-          <Exclude>[*]BudgetBoard.Tests.*</Exclude>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+          <Format>cobertura</Format>
+          <Exclude>[BudgetBoard.Tests*]*,[BudgetBoard.IntegrationTests*]*</Exclude>
           <ExcludeByFile>**/obj/**,**/bin/**</ExcludeByFile>
         </Configuration>
       </DataCollector>
