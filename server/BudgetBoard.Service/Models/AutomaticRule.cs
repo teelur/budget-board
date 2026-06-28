@@ -7,15 +7,27 @@ public interface IRuleParameterRequest
     string Field { get; }
     string Operator { get; }
     string Value { get; }
-    string Type { get; }
 }
 
-public class RuleParameterCreateRequest() : IRuleParameterRequest
+public class RuleParameterCreateRequest : IRuleParameterRequest
 {
-    public string Field { get; set; } = string.Empty;
-    public string Operator { get; set; } = string.Empty;
-    public string Value { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty;
+    public string Field { get; set; }
+    public string Operator { get; set; }
+    public string Value { get; set; }
+
+    public RuleParameterCreateRequest()
+    {
+        Field = string.Empty;
+        Operator = string.Empty;
+        Value = string.Empty;
+    }
+
+    public RuleParameterCreateRequest(IRuleParameterResponse condition)
+    {
+        Field = condition.Field;
+        Operator = condition.Operator;
+        Value = condition.Value;
+    }
 }
 
 public interface IAutomaticRuleCreateRequest
@@ -24,10 +36,22 @@ public interface IAutomaticRuleCreateRequest
     ICollection<RuleParameterCreateRequest> Actions { get; }
 }
 
-public class AutomaticRuleCreateRequest() : IAutomaticRuleCreateRequest
+public class AutomaticRuleCreateRequest : IAutomaticRuleCreateRequest
 {
-    public ICollection<RuleParameterCreateRequest> Conditions { get; set; } = [];
-    public ICollection<RuleParameterCreateRequest> Actions { get; set; } = [];
+    public ICollection<RuleParameterCreateRequest> Conditions { get; set; }
+    public ICollection<RuleParameterCreateRequest> Actions { get; set; }
+
+    public AutomaticRuleCreateRequest()
+    {
+        Conditions = [];
+        Actions = [];
+    }
+
+    public AutomaticRuleCreateRequest(IAutomaticRuleResponse rule)
+    {
+        Conditions = [.. rule.Conditions.Select(c => new RuleParameterCreateRequest(c))];
+        Actions = [.. rule.Actions.Select(a => new RuleParameterCreateRequest(a))];
+    }
 }
 
 public interface IRuleParameterResponse : IRuleParameterRequest
@@ -37,11 +61,10 @@ public interface IRuleParameterResponse : IRuleParameterRequest
 
 public class RuleParameterResponse : IRuleParameterResponse
 {
-    public Guid ID { get; set; } = Guid.Empty;
+    public Guid ID { get; set; } = Guid.NewGuid();
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty;
 
     public RuleParameterResponse(RuleCondition condition)
     {
@@ -67,11 +90,18 @@ public interface IAutomaticRuleResponse
     ICollection<RuleParameterResponse> Actions { get; }
 }
 
-public class AutomaticRuleResponse() : IAutomaticRuleResponse
+public class AutomaticRuleResponse : IAutomaticRuleResponse
 {
-    public Guid ID { get; set; }
+    public Guid ID { get; set; } = Guid.NewGuid();
     public ICollection<RuleParameterResponse> Conditions { get; set; } = [];
     public ICollection<RuleParameterResponse> Actions { get; set; } = [];
+
+    public AutomaticRuleResponse(AutomaticRule rule)
+    {
+        ID = rule.ID;
+        Conditions = [.. rule.Conditions.Select(c => new RuleParameterResponse(c))];
+        Actions = [.. rule.Actions.Select(a => new RuleParameterResponse(a))];
+    }
 }
 
 public class RuleParameterUpdateRequest() : IRuleParameterRequest
@@ -79,7 +109,6 @@ public class RuleParameterUpdateRequest() : IRuleParameterRequest
     public string Field { get; set; } = string.Empty;
     public string Operator { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty;
 }
 
 public interface IAutomaticRuleUpdateRequest

@@ -73,12 +73,6 @@
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to access does not exist.</value>
   </data>
-  <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value>The automatic rule you are trying to update does not exist.</value>
-  </data>
-  <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
-    <value>The automatic rule you are trying to delete does not exist.</value>
-  </data>
   <data name="InvalidConditionError" xml:space="preserve">
     <value>One or more conditions in the automatic rule are invalid.</value>
   </data>

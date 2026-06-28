@@ -356,7 +356,7 @@ public class SyncServiceTests
 
         var automaticRuleServiceMock = new Mock<IAutomaticRuleService>();
         automaticRuleServiceMock
-            .Setup(_ => _.RunAutomaticRulesAsync(It.IsAny<Guid>()))
+            .Setup(_ => _.RunSavedAutomaticRulesAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -384,7 +384,7 @@ public class SyncServiceTests
 
         // Assert
         automaticRuleServiceMock.Verify(
-            _ => _.RunAutomaticRulesAsync(helper.demoUser.Id),
+            _ => _.RunSavedAutomaticRulesAsync(helper.demoUser.Id),
             Times.Once
         );
     }
@@ -405,7 +405,7 @@ public class SyncServiceTests
 
         var automaticRuleServiceMock = new Mock<IAutomaticRuleService>();
         automaticRuleServiceMock
-            .Setup(_ => _.RunAutomaticRulesAsync(It.IsAny<Guid>()))
+            .Setup(_ => _.RunSavedAutomaticRulesAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -428,7 +428,7 @@ public class SyncServiceTests
         // Assert
         goalServiceMock.Verify(_ => _.CompleteGoalsAsync(helper.demoUser.Id), Times.Once);
         automaticRuleServiceMock.Verify(
-            _ => _.RunAutomaticRulesAsync(helper.demoUser.Id),
+            _ => _.RunSavedAutomaticRulesAsync(helper.demoUser.Id),
             Times.Once
         );
     }
@@ -933,7 +933,7 @@ public class SyncServiceTests
 
         var automaticRuleServiceMock = new Mock<IAutomaticRuleService>();
         automaticRuleServiceMock
-            .Setup(_ => _.RunAutomaticRulesAsync(It.IsAny<Guid>()))
+            .Setup(_ => _.RunSavedAutomaticRulesAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -956,7 +956,7 @@ public class SyncServiceTests
         // Assert
         goalServiceMock.Verify(_ => _.CompleteGoalsAsync(helper.demoUser.Id), Times.Once);
         automaticRuleServiceMock.Verify(
-            _ => _.RunAutomaticRulesAsync(helper.demoUser.Id),
+            _ => _.RunSavedAutomaticRulesAsync(helper.demoUser.Id),
             Times.Once
         );
     }

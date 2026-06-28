@@ -73,12 +73,6 @@
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>Der Vermögenswert, auf den Sie zugreifen möchten, existiert nicht.</value>
   </data>
-  <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value>Die automatische Regel, die Sie aktualisieren möchten, existiert nicht.</value>
-  </data>
-  <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
-    <value>Die automatische Regel, die Sie löschen möchten, existiert nicht.</value>
-  </data>
   <data name="InvalidConditionError" xml:space="preserve">
     <value>Eine oder mehrere Bedingungen in der automatischen Regel sind ungültig.</value>
   </data>
