@@ -13,6 +13,6 @@ export interface IBalanceCreateRequest {
 
 export interface IBalanceUpdateRequest {
   id: string;
-  amount: number;
-  date: string;
+  amount?: number;
+  date?: string;
 }

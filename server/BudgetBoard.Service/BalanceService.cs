@@ -13,30 +13,15 @@ namespace BudgetBoard.Service;
 public class BalanceService(
     ILogger<IBalanceService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer
 ) : IBalanceService
 {
-    private readonly ILogger<IBalanceService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly INowProvider _nowProvider = nowProvider;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID);
-        if (account == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["BalanceAccountCreateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["BalanceAccountCreateNotFoundError"]
-            );
-        }
+        var account = GetAccountById(userData, request.AccountID);
 
         // We only want to create a balance if a balance doesn't already exist for the same date.
         var existingBalance = account.Balances.FirstOrDefault(b => b.Date == request.Date);
@@ -53,10 +38,10 @@ public class BalanceService(
                 AccountID = request.AccountID,
             };
 
-            _userDataContext.Balances.Add(newBalance);
+            userDataContext.Balances.Add(newBalance);
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -66,15 +51,7 @@ public class BalanceService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountId);
-        if (account == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["BalanceAccountNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["BalanceAccountNotFoundError"]
-            );
-        }
+        var account = GetAccountById(userData, accountId);
 
         return account.Balances.Select(b => new BalanceResponse(b)).ToList();
     }
@@ -83,67 +60,75 @@ public class BalanceService(
     public async Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var balance = userData
-            .Accounts.SelectMany(a => a.Balances)
-            .FirstOrDefault(b => b.ID == request.ID);
-        if (balance == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["BalanceUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["BalanceUpdateNotFoundError"]);
-        }
-
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == balance.AccountID);
-        if (account == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["BalanceAccountNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["BalanceAccountNotFoundError"]
-            );
-        }
+        var balance = GetBalanceById(userData, request.ID);
+        var account = GetAccountById(userData, balance.AccountID);
 
         var duplicateBalance = account.Balances.FirstOrDefault(b =>
             b.Date == request.Date && b.ID != request.ID
         );
         if (duplicateBalance != null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["BalanceDuplicateDateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["BalanceDuplicateDateError"]);
+            logger.LogError("{LogMessage}", logLocalizer["BalanceDuplicateDateLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["BalanceDuplicateDateError"]);
         }
 
-        balance.Date = request.Date;
-        balance.Amount = request.Amount;
+        if (request.Amount.HasValue)
+        {
+            balance.Amount = request.Amount.Value;
+        }
+        if (request.Date.HasValue)
+        {
+            balance.Date = request.Date.Value;
+        }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
     public async Task DeleteBalanceAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var balance = GetBalanceById(userData, guid);
 
-        var balance = userData
-            .Accounts.SelectMany(a => a.Balances)
-            .FirstOrDefault(b => b.ID == guid);
-        if (balance == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["BalanceDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["BalanceDeleteNotFoundError"]);
-        }
-
-        _userDataContext.Balances.Remove(balance);
-        await _userDataContext.SaveChangesAsync();
+        userDataContext.Balances.Remove(balance);
+        await userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
-            _userDataContext,
-            _logger,
-            _logLocalizer,
-            _responseLocalizer,
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
             id,
             users => users.Include(u => u.Accounts).ThenInclude(a => a.Balances)
         );
+    }
+
+    private Account GetAccountById(ApplicationUser userData, Guid accountId)
+    {
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountId);
+        if (account == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["AccountNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["AccountNotFoundError"]);
+        }
+
+        return account;
+    }
+
+    private Balance GetBalanceById(ApplicationUser userData, Guid balanceId)
+    {
+        var balance = userData
+            .Accounts.SelectMany(a => a.Balances)
+            .FirstOrDefault(b => b.ID == balanceId);
+        if (balance == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["BalanceNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["BalanceNotFoundError"]);
+        }
+
+        return balance;
     }
 }

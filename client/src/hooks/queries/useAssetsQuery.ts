@@ -4,9 +4,13 @@ import { assetsQueryKey } from "~/helpers/requests";
 import { IAssetResponse } from "~/models/asset";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
+interface UseAssetsQueryProps {
+  enabled?: boolean;
+}
+
 export const useAssetsQuery = ({
   enabled = true,
-}: { enabled?: boolean } = {}) => {
+}: UseAssetsQueryProps = {}) => {
   const { request } = useAuth();
 
   return useQuery({

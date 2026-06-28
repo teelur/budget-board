@@ -172,9 +172,6 @@
   <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
     <value>The LunchFlow account you are trying to access does not exist.</value>
   </data>
-  <data name="BalanceUpdateNotFoundError" xml:space="preserve">
-    <value>The balance you are trying to update does not exist.</value>
-  </data>
   <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
     <value>The batch update request contains duplicate transaction IDs.</value>
   </data>
