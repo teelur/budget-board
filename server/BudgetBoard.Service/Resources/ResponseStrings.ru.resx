@@ -259,9 +259,6 @@
   <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
     <value>The SimpleFIN organization you are trying to update does not exist.</value>
   </data>
-  <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value>The automatic rule you are trying to update does not exist.</value>
-  </data>
   <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
     <value>The SimpleFIN organization you are trying to delete does not exist.</value>
   </data>

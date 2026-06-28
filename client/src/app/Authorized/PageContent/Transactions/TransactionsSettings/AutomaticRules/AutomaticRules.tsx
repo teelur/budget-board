@@ -1,33 +1,15 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
 import { IAutomaticRuleResponse } from "~/models/automaticRule";
 import AddAutomaticRule from "./AddAutomaticRule/AddAutomaticRule";
 import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { automaticRulesQueryKey } from "~/helpers/requests";
+import { useAutomaticRulesQuery } from "~/hooks/queries/useAutomaticRulesQuery";
 
 const AutomaticRules = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const automaticRuleQuery = useQuery({
-    queryKey: [automaticRulesQueryKey],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/automaticRule",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data;
-      }
-
-      return undefined;
-    },
-  });
+  const automaticRuleQuery = useAutomaticRulesQuery();
 
   const getAutomaticRulesContent = (): React.ReactNode => {
     if (automaticRuleQuery.isPending) {

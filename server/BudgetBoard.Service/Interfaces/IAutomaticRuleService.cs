@@ -41,12 +41,12 @@ public interface IAutomaticRuleService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The automatic rule details to run.</param>
     /// <returns>A summary string describing the result of the rule execution.</returns>
-    Task<string> RunAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request);
+    Task<string> RunOneOffAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request);
 
     /// <summary>
     /// Runs all automatic rules for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task RunAutomaticRulesAsync(Guid userGuid);
+    Task RunSavedAutomaticRulesAsync(Guid userGuid);
 }

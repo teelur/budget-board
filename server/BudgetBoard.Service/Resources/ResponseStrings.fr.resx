@@ -73,12 +73,6 @@
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>La ressource que vous essayez d’accéder n’existe pas.</value>
   </data>
-  <data name="AutomaticRuleUpdateNotFoundError" xml:space="preserve">
-    <value>La règle automatique que vous essayez de mettre à jour n’existe pas.</value>
-  </data>
-  <data name="AutomaticRuleDeleteNotFoundError" xml:space="preserve">
-    <value>La règle automatique que vous essayez de supprimer n’existe pas.</value>
-  </data>
   <data name="InvalidConditionError" xml:space="preserve">
     <value>Une ou plusieurs conditions de la règle automatique sont invalides.</value>
   </data>

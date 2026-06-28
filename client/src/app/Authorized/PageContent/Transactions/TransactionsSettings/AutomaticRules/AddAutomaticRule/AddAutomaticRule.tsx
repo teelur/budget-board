@@ -1,18 +1,8 @@
 import { Button, Group, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import React from "react";
-
-import {
-  translateAxiosError,
-  transactionsQueryKey,
-  automaticRulesQueryKey,
-} from "~/helpers/requests";
 import {
   ActionOperators,
   FieldToOperatorType,
-  IAutomaticRuleRequest,
   IRuleParameterEdit,
   Operators,
   OperatorTypes,
@@ -20,8 +10,9 @@ import {
 } from "~/models/automaticRule";
 
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTranslation } from "react-i18next";
+import { useCreateAutomaticRuleMutation } from "~/hooks/mutations/automaticRules/useCreateAutomaticRuleMutation";
+import { useRunAutomaticRuleMutation } from "~/hooks/mutations/automaticRules/useRunAutomaticRuleMutation";
 
 const AddAutomaticRule = (): React.ReactNode => {
   const defaultField =
@@ -53,54 +44,8 @@ const AddAutomaticRule = (): React.ReactNode => {
   ]);
 
   const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const queryClient = useQueryClient();
-  const doAddRule = useMutation({
-    mutationFn: async (automaticRule: IAutomaticRuleRequest) =>
-      await request({
-        url: "/api/automaticRule",
-        method: "POST",
-        data: automaticRule,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [automaticRulesQueryKey],
-      });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
-  });
-
-  const doRunRule = useMutation({
-    mutationFn: async (automaticRule: IAutomaticRuleRequest) =>
-      await request({
-        url: "/api/automaticRule/run",
-        method: "POST",
-        data: automaticRule,
-      }),
-    onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: [transactionsQueryKey],
-      });
-
-      notifications.show({
-        title: t("rule_executed"),
-        message: data?.data ?? t("rule_run_successfully"),
-        color: "var(--button-color-confirm)",
-      });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
-  });
+  const createAutomaticRuleMutation = useCreateAutomaticRuleMutation();
+  const runAutomaticRuleMutation = useRunAutomaticRuleMutation();
 
   return (
     <Stack gap="0.5rem">
@@ -113,20 +58,18 @@ const AddAutomaticRule = (): React.ReactNode => {
       <Group w="100%">
         <Button
           flex="1 1 auto"
-          loading={doAddRule.isPending}
+          loading={createAutomaticRuleMutation.isPending}
           onClick={() => {
-            doAddRule.mutate({
+            createAutomaticRuleMutation.mutate({
               conditions: conditionItems.map((item) => ({
                 field: item.field,
                 operator: item.operator,
                 value: item.value,
-                type: "",
               })),
               actions: actionItems.map((item) => ({
                 field: item.field,
                 operator: item.operator,
                 value: item.value,
-                type: "",
               })),
             });
 
@@ -166,20 +109,18 @@ const AddAutomaticRule = (): React.ReactNode => {
         <Button
           variant="outline"
           flex="1 1 auto"
-          loading={doRunRule.isPending}
+          loading={runAutomaticRuleMutation.isPending}
           onClick={() => {
-            doRunRule.mutate({
+            runAutomaticRuleMutation.mutate({
               conditions: conditionItems.map((item) => ({
                 field: item.field,
                 operator: item.operator,
                 value: item.value,
-                type: "",
               })),
               actions: actionItems.map((item) => ({
                 field: item.field,
                 operator: item.operator,
                 value: item.value,
-                type: "",
               })),
             });
           }}
