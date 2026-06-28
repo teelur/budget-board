@@ -382,9 +382,6 @@
   <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
     <value>The batch delete request contains duplicate transaction IDs.</value>
   </data>
-  <data name="BalanceUpdateNotFoundError" xml:space="preserve">
-    <value>La balance que vous essayez de mettre à jour n'existe pas.</value>
-  </data>
   <data name="BalanceDuplicateDateError" xml:space="preserve">
     <value>Une balance existe déjà pour ce compte à cette date.</value>
   </data>

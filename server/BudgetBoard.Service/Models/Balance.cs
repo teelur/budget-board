@@ -21,16 +21,16 @@ public class BalanceCreateRequest() : IBalanceCreateRequest
 public interface IBalanceUpdateRequest
 {
     Guid ID { get; }
-    decimal Amount { get; }
-    DateOnly Date { get; }
+    decimal? Amount { get; }
+    DateOnly? Date { get; }
 }
 
 [method: JsonConstructor]
 public class BalanceUpdateRequest() : IBalanceUpdateRequest
 {
     public Guid ID { get; set; } = Guid.NewGuid();
-    public decimal Amount { get; set; } = 0;
-    public DateOnly Date { get; set; } = DateOnly.MinValue;
+    public decimal? Amount { get; set; } = null;
+    public DateOnly? Date { get; set; } = null;
 }
 
 public interface IBalanceResponse
