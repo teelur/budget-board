@@ -1,9 +1,5 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import {
-  translateAxiosError,
-  budgetsQueryKey,
-  userSettingsQueryKey,
-} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import {
   ActionIcon,
   LoadingOverlay,
@@ -12,11 +8,9 @@ import {
   Group,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { IBudgetCreateRequest } from "~/models/budget";
 import { ICategory } from "~/models/category";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { IUserSettings } from "~/models/userSettings";
