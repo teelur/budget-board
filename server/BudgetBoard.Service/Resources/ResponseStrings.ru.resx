@@ -358,9 +358,6 @@
   <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
     <value>Failed to configure LunchFlow API key. Status code: {0}</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>A budget you are trying to create has no category.</value>
-  </data>
   <data name="InvalidLanguageCodeError" xml:space="preserve">
     <value>The provided language code is invalid.</value>
   </data>

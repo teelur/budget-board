@@ -31,7 +31,7 @@ public class BudgetService(
         List<string> errors = [];
         foreach (var request in requests)
         {
-            var error = TryAddBudget(userData, request, out var newBudget);
+            var error = TryAddBudget(userData, request, allCategories, out var newBudget);
             if (error != null)
             {
                 errors.Add(error);
@@ -74,14 +74,17 @@ public class BudgetService(
                     Limit = GetBudgetChildrenLimit(parentCategory, request.Month, userData),
                 };
 
-                error = TryAddBudget(userData, parentBudgetRequest, out var newParentBudget);
+                error = TryAddBudget(
+                    userData,
+                    parentBudgetRequest,
+                    allCategories,
+                    out var newParentBudget
+                );
                 if (error != null)
                 {
                     errors.Add(error);
                     continue;
                 }
-
-                userDataContext.Budgets.Add(newParentBudget!);
                 newBudgetsCount++;
             }
         }
@@ -154,6 +157,12 @@ public class BudgetService(
                 budget.Category,
                 allCategories
             );
+
+            if (string.IsNullOrWhiteSpace(parentCategory))
+            {
+                await userDataContext.SaveChangesAsync();
+                return;
+            }
 
             var parentBudget = userData.Budgets.SingleOrDefault(b =>
                 b.Category.Equals(parentCategory, StringComparison.CurrentCultureIgnoreCase)
@@ -249,14 +258,22 @@ public class BudgetService(
     private string? TryAddBudget(
         ApplicationUser userData,
         IBudgetCreateRequest request,
+        IEnumerable<ITransactionCategoryResponse> allCategories,
         out Budget? newBudget
     )
     {
         newBudget = null;
-        if (string.IsNullOrEmpty(request.Category))
+        if (
+            allCategories.All(c =>
+                !c.Value.Equals(request.Category, StringComparison.InvariantCultureIgnoreCase)
+            )
+        )
         {
-            logger.LogWarning("{LogMessage}", logLocalizer["BudgetCreateEmptyCategoryLog"]);
-            return responseLocalizer["BudgetCreateEmptyCategoryError"];
+            logger.LogWarning(
+                "{LogMessage}",
+                logLocalizer["BudgetCreateCategoryNotFoundLog", request.Category]
+            );
+            return responseLocalizer["BudgetCreateCategoryNotFoundError", request.Category];
         }
 
         var budgetForCategoryAlreadyExists = userData.Budgets.Any(b =>

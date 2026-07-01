@@ -151,7 +151,7 @@ public class BudgetServiceTests
     }
 
     [Fact]
-    public async Task CreateBudgetsAsync_AutoManageParents_WhenUnknownChildCategory_ShouldThrowFromParentCreation()
+    public async Task CreateBudgetsAsync_AutoManageParents_WhenCategoryHasNoParent_ShouldNotDoubleBudgetLimit()
     {
         // Arrange
         var helper = new TestHelper();
@@ -164,7 +164,49 @@ public class BudgetServiceTests
 
         var budget = new BudgetCreateRequest
         {
-            Category = "Category That Does Not Exist",
+            Category = "Auto & Transport",
+            Limit = 100,
+            Month = DateOnly.FromDateTime(DateTime.Today),
+        };
+
+        // Act
+        await budgetService.CreateBudgetsAsync(helper.demoUser.Id, [budget], true);
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(1);
+        var createdBudget = helper.UserDataContext.Budgets.Single(b =>
+            b.Category == "Auto & Transport"
+        );
+        createdBudget.Category.Should().NotBeNull();
+        createdBudget.Month.Should().Be(budget.Month);
+        createdBudget.Limit.Should().Be(100);
+    }
+
+    [Fact]
+    public async Task CreateBudgetsAsync_AutoManageParents_WhenUnknownParentCategory_ShouldThrowFromParentCreation()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var testCategory = new Category
+        {
+            Value = "Test",
+            Parent = "Parent Category That Does Not Exist",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.TransactionCategories.Add(testCategory);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var budget = new BudgetCreateRequest
+        {
+            Category = "Test",
             Limit = 123,
             Month = DateOnly.FromDateTime(DateTime.Today),
         };
@@ -176,7 +218,9 @@ public class BudgetServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("BudgetCreateCompletedWithErrorsError [BudgetCreateEmptyCategoryError]");
+            .WithMessage(
+                "BudgetCreateCompletedWithErrorsError [BudgetCreateCategoryNotFoundError [Parent Category That Does Not Exist]]"
+            );
 
         helper.UserDataContext.Budgets.Should().HaveCount(1);
         var createdBudget = helper.UserDataContext.Budgets.Single();
@@ -439,7 +483,7 @@ public class BudgetServiceTests
     }
 
     [Fact]
-    public async Task CreateBudgetsAsync_WhenCategoryIsEmpty_ShouldThrowBudgetCreateEmptyCategoryError()
+    public async Task CreateBudgetsAsync_WhenCategoryIsEmpty_ShouldThrowBudgetCreateCategoryNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -464,11 +508,13 @@ public class BudgetServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("BudgetCreateCompletedWithErrorsError [BudgetCreateEmptyCategoryError]");
+            .WithMessage(
+                "BudgetCreateCompletedWithErrorsError [BudgetCreateCategoryNotFoundError []]"
+            );
     }
 
     [Fact]
-    public async Task CreateBudgetsAsync_WithMixOfValidAndInvalid_ShouldThrowWithPartialCreation()
+    public async Task CreateBudgetsAsync_WithMixOfValidAndInvalid_ShouldThrowBudgetCreateCategoryNotFoundErrorWithPartialCreation()
     {
         // Arrange
         var helper = new TestHelper();
@@ -510,7 +556,9 @@ public class BudgetServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("BudgetCreateCompletedWithErrorsError [BudgetCreateEmptyCategoryError]");
+            .WithMessage(
+                "BudgetCreateCompletedWithErrorsError [BudgetCreateCategoryNotFoundError []]"
+            );
         helper.UserDataContext.Budgets.Should().HaveCount(2);
         var firstBudget = helper.UserDataContext.Budgets.FirstOrDefault(b =>
             b.Category == validBudget1.Category
@@ -773,6 +821,39 @@ public class BudgetServiceTests
             .UserDataContext.Budgets.Single((b) => b.Category == "Income")
             .Limit.Should()
             .Be(newBudgetLimit);
+    }
+
+    [Fact]
+    public async Task UpdateBudgetAsync_WhenCategoryHasNoResolvedParent_ShouldNotCreateParentBudget()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = new BudgetService(
+            Mock.Of<ILogger<IBudgetService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var budgetFaker = new BudgetFaker(helper.demoUser.Id);
+
+        var childBudget = budgetFaker.Generate();
+        childBudget.Category = "Category That Does Not Exist";
+        childBudget.Limit = 200;
+        childBudget.Month = DateOnly.FromDateTime(DateTime.Today);
+
+        helper.UserDataContext.Budgets.Add(childBudget);
+        helper.UserDataContext.SaveChanges();
+
+        var budget = new BudgetUpdateRequest { ID = childBudget.ID, Limit = 300 };
+
+        // Act
+        await budgetService.UpdateBudgetAsync(helper.demoUser.Id, budget);
+
+        // Assert
+        helper.UserDataContext.Budgets.Should().HaveCount(1);
+        helper.UserDataContext.Budgets.Should().ContainSingle(b => b.ID == childBudget.ID);
+        helper.UserDataContext.Budgets.Should().NotContain(b => b.Category == string.Empty);
     }
 
     [Fact]

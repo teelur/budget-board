@@ -112,9 +112,6 @@
   <data name="BalanceDuplicateDateError" xml:space="preserve">
     <value>A balance already exists for this account on that date.</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>A budget you are trying to create has no category.</value>
-  </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
     <value>A budget with the category '{0}' and date '{1}' already exists.</value>
   </data>

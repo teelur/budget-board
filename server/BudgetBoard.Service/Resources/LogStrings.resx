@@ -118,8 +118,8 @@
   <data name="BalanceDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a balance that does not exist.</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryLog" xml:space="preserve">
-    <value>Attempted to create a budget with an empty category.</value>
+  <data name="BudgetCreateCategoryNotFoundLog" xml:space="preserve">
+    <value>Attempted to create a budget for a category that does not exist: {0}</value>
   </data>
   <data name="BudgetCreateDuplicateLog" xml:space="preserve">
     <value>Attempted to create a duplicate budget for {0} in {1}.</value>

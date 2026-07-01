@@ -109,9 +109,6 @@
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
     <value>您尝试访问的账户不存在。</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>您尝试创建的预算没有类别。</value>
-  </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
     <value>类别为 '{0}'、日期为 '{1}' 的预算已存在。</value>
   </data>

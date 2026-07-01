@@ -10,9 +10,6 @@ public interface IBudgetService
     /// <summary>
     /// Creates new budget entries for the specified user.
     /// </summary>
-    /// <remarks>
-    /// This method does not automatically create or update parent budgets.
-    /// </remarks>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="requests">The collection of budget creation requests.</param>
     /// <param name="autoManageParents">If true, parent budgets will be automatically created or updated; otherwise, they will not be managed.</param>

@@ -109,9 +109,6 @@
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
     <value>Le compte auquel vous tentez d’accéder n’existe pas.</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>Le budget que vous essayez de créer n’a pas de catégorie.</value>
-  </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
     <value>Un budget avec la catégorie '{0}' et la date '{1}' existe déjà.</value>
   </data>
