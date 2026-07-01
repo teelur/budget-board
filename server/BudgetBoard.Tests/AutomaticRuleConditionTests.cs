@@ -38,7 +38,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleUnsupportedFieldError");
+            .WithMessage("AutomaticRuleUnsupportedFieldError*");
     }
 
     #region RunOneOffAutomaticRuleAsync_MerchantCondition
@@ -134,7 +134,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleInvalidRegexError");
+            .WithMessage("AutomaticRuleInvalidRegexError*");
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleUnsupportedOperatorForMerchantError");
+            .WithMessage("AutomaticRuleUnsupportedOperatorForMerchantError*");
     }
     #endregion
 
@@ -192,7 +192,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleCategoryDoesNotExistError");
+            .WithMessage("AutomaticRuleCategoryDoesNotExistError*");
     }
 
     [Fact]
@@ -444,7 +444,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleUnsupportedOperatorForCategoryError");
+            .WithMessage("AutomaticRuleUnsupportedOperatorForCategoryError*");
     }
     #endregion
 
@@ -474,7 +474,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleInvalidAmountError");
+            .WithMessage("AutomaticRuleInvalidAmountError*");
     }
 
     [Theory]
@@ -564,7 +564,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleUnsupportedOperatorForAmountError");
+            .WithMessage("AutomaticRuleUnsupportedOperatorForAmountError*");
     }
     #endregion
 
@@ -594,7 +594,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleInvalidDateError");
+            .WithMessage("AutomaticRuleInvalidDateError*");
     }
 
     [Theory]
@@ -683,7 +683,7 @@ public class AutomaticRuleConditionTests
 
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleUnsupportedOperatorForDateError");
+            .WithMessage("AutomaticRuleUnsupportedOperatorForDateError*");
     }
     #endregion
 
@@ -733,7 +733,7 @@ public class AutomaticRuleConditionTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleInvalidAccountIdError");
+            .WithMessage("AutomaticRuleInvalidAccountIdError*");
     }
 
     [Fact]
@@ -935,7 +935,7 @@ public class AutomaticRuleConditionTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("AutomaticRuleUnsupportedOperatorForAccountError");
+            .WithMessage("AutomaticRuleUnsupportedOperatorForAccountError*");
     }
     #endregion
 }

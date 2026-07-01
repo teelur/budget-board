@@ -43,19 +43,10 @@ public interface IBalanceResponse
 
 public class BalanceResponse : IBalanceResponse
 {
-    public Guid ID { get; set; }
-    public decimal Amount { get; set; }
-    public DateOnly Date { get; set; }
-    public Guid AccountID { get; set; }
-
-    [JsonConstructor]
-    public BalanceResponse()
-    {
-        ID = Guid.NewGuid();
-        Amount = 0;
-        Date = DateOnly.MinValue;
-        AccountID = Guid.NewGuid();
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public decimal Amount { get; set; } = 0;
+    public DateOnly Date { get; set; } = DateOnly.MinValue;
+    public Guid AccountID { get; set; } = Guid.NewGuid();
 
     public BalanceResponse(Balance balance)
     {

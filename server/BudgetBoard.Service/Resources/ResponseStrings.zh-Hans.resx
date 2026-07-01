@@ -109,23 +109,14 @@
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
     <value>您尝试访问的账户不存在。</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>您尝试创建的预算没有类别。</value>
-  </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
     <value>类别为 '{0}'、日期为 '{1}' 的预算已存在。</value>
   </data>
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
     <value>预算创建完成，但有错误：{0}</value>
   </data>
-  <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的预算不存在。</value>
-  </data>
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>父预算不能小于其子预算的总和。</value>
-  </data>
-  <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的预算不存在。</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
     <value>目标必须设置每月存入金额或目标日期。</value>

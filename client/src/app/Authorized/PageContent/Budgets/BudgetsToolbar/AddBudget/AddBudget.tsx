@@ -1,5 +1,5 @@
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , budgetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import {
   ActionIcon,
   LoadingOverlay,
@@ -8,11 +8,9 @@ import {
   Group,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { IBudgetCreateRequest } from "~/models/budget";
 import { ICategory } from "~/models/category";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { IUserSettings } from "~/models/userSettings";
@@ -22,6 +20,7 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 
 interface AddBudgetProps {
   date: Date;
@@ -31,6 +30,7 @@ interface AddBudgetProps {
 const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { thousandsSeparator, decimalSeparator, dayjs } = useLocale();
+  const createBudgetMutation = useCreateBudgetMutation();
 
   const categoryField = useField<string>({
     initialValue: "",
@@ -57,25 +57,6 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
     },
   });
 
-  const queryClient = useQueryClient();
-  const doCreateBudget = useMutation({
-    mutationFn: async (newBudget: IBudgetCreateRequest[]) =>
-      await request({
-        url: "/api/budget",
-        method: "POST",
-        data: newBudget,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
-  });
-
   return (
     <Popover>
       <MantinePopover.Target>
@@ -84,7 +65,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
         </ActionIcon>
       </MantinePopover.Target>
       <MantinePopover.Dropdown p="0.5rem">
-        <LoadingOverlay visible={doCreateBudget.isPending} />
+        <LoadingOverlay visible={createBudgetMutation.isPending} />
         <Group gap="0.5rem">
           <Stack gap="0.5rem">
             <CategorySelect
@@ -115,7 +96,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
                 categoryField.getValue() === "" || limitField.getValue() === ""
               }
               onClick={() =>
-                doCreateBudget.mutate([
+                createBudgetMutation.mutate([
                   {
                     month: dayjs(props.date).format("YYYY-MM-DD"),
                     category: categoryField.getValue(),

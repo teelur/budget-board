@@ -7,14 +7,12 @@ import {
 } from "~/helpers/transactions";
 import { useQueries } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { IBudget } from "~/models/budget";
 import { AxiosResponse } from "axios";
 import { ITransaction } from "~/models/transaction";
 import BudgetsContent from "./BudgetsContent/BudgetsContent";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { budgetsQueryKey } from "~/helpers/requests";
-
+import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 
 const Budgets = (): React.ReactNode => {
   const { allTransactionCategories: transactionCategories } =
@@ -26,29 +24,9 @@ const Budgets = (): React.ReactNode => {
     dayjs().startOf("month").toDate(),
   ]);
 
-  const budgetsQuery = useQueries({
-    queries: selectedDates.map((date: Date) => ({
-      queryKey: [budgetsQueryKey, dayjs(date).format("YYYY-MM")],
-      queryFn: async (): Promise<IBudget[]> => {
-        const res: AxiosResponse = await request({
-          url: "/api/budget",
-          method: "GET",
-          params: { month: dayjs(date).format("YYYY-MM-DD") },
-        });
-
-        if (res.status === 200) {
-          return res.data as IBudget[];
-        }
-
-        return [];
-      },
-    })),
-    combine: (results) => {
-      return {
-        data: results.map((result) => result.data ?? []).flat(1),
-        isPending: results.some((result) => result.isPending),
-      };
-    },
+  const budgetsQuery = useBudgetsQuery({
+    months: selectedDates,
+    enabled: selectedDates.length > 0,
   });
 
   const transactionsForMonthsQuery = useQueries({

@@ -15,7 +15,6 @@ import {
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
-import { IBudget } from "~/models/budget";
 import { IGoalResponse } from "~/models/goal";
 import { ITransaction } from "~/models/transaction";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -25,13 +24,13 @@ import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsPr
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
 import {
-  budgetsQueryKey,
   goalsQueryKey,
   transactionsQueryKey,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 
 interface MetricWidgetProps {
   widgetId: string;
@@ -47,7 +46,7 @@ const MetricWidget = ({
   const { t } = useTranslation();
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
-  const { intlLocale, dayjs } = useLocale();
+  const { intlLocale } = useLocale();
   const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
 
   const widgetSettingsQuery = useQuery({
@@ -148,25 +147,9 @@ const MetricWidget = ({
       requirements.needsTransactions && requirements.needsAllTimeTransactions,
   });
 
-  const budgetQueries = useQueries({
-    queries: requirements.needsBudgets
-      ? requirements.budgetMonths.map((date: Date) => ({
-          queryKey: [budgetsQueryKey, dayjs(date).format("YYYY-MM")],
-          queryFn: async (): Promise<IBudget[]> => {
-            const res: AxiosResponse = await request({
-              url: "/api/budget",
-              method: "GET",
-              params: { month: dayjs(date).format("YYYY-MM-DD") },
-            });
-            if (res.status === 200) return res.data as IBudget[];
-            return [];
-          },
-        }))
-      : [],
-    combine: (results) => ({
-      data: results.flatMap((r) => r.data ?? []),
-      isPending: results.length > 0 && results.some((r) => r.isPending),
-    }),
+  const budgetQueries = useBudgetsQuery({
+    months: requirements.budgetMonths,
+    enabled: requirements.needsBudgets,
   });
 
   const goalsQuery = useQuery({

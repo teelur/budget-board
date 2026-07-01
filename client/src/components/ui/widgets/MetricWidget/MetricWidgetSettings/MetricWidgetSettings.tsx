@@ -20,11 +20,9 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import {
   translateAxiosError,
-  budgetsQueryKey,
   goalsQueryKey,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
-import { IBudget } from "~/models/budget";
 import { IGoalResponse } from "~/models/goal";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -32,6 +30,7 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
@@ -99,21 +98,8 @@ const MetricWidgetSettings = ({
     return now.startOf("month").toDate();
   }, [dayjs]);
 
-  const budgetsQuery = useQuery({
-    queryKey: [budgetsQueryKey, dayjs(currentMonth).format("YYYY-MM")],
-    queryFn: async (): Promise<IBudget[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/budget",
-        method: "GET",
-        params: { month: dayjs(currentMonth).format("YYYY-MM-DD") },
-      });
-
-      if (res.status === 200) {
-        return res.data as IBudget[];
-      }
-
-      return [];
-    },
+  const budgetsQuery = useBudgetsQuery({
+    months: [currentMonth],
     enabled: opened,
   });
 

@@ -118,8 +118,8 @@
   <data name="BalanceDeleteNotFoundLog" xml:space="preserve">
     <value>Attempted to delete a balance that does not exist.</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryLog" xml:space="preserve">
-    <value>Attempted to create a budget with an empty category.</value>
+  <data name="BudgetCreateCategoryNotFoundLog" xml:space="preserve">
+    <value>Attempted to create a budget for a category that does not exist: {0}</value>
   </data>
   <data name="BudgetCreateDuplicateLog" xml:space="preserve">
     <value>Attempted to create a duplicate budget for {0} in {1}.</value>
@@ -130,17 +130,11 @@
   <data name="BudgetCreateCompletedWithErrorsLog" xml:space="preserve">
     <value>Successfully created {0} budgets with errors: {1}</value>
   </data>
-  <data name="ParentBudgetNotFoundLog" xml:space="preserve">
-    <value>Parent budget not found for category {0}.</value>
-  </data>
-  <data name="BudgetUpdateNotFoundLog" xml:space="preserve">
-    <value>Attempted to update a budget that does not exist.</value>
+  <data name="BudgetNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a budget that does not exist.</value>
   </data>
   <data name="BudgetUpdateParentLimitErrorLog" xml:space="preserve">
     <value>Attempted to update parent budget to a value less than the sum of its children.</value>
-  </data>
-  <data name="BudgetDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to delete a budget that does not exist.</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateLog" xml:space="preserve">
     <value>Attempt to create goal without a monthly contribution and target date.</value>

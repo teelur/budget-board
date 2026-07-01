@@ -2,19 +2,18 @@ import classes from "./UnbudgetedChildCard.module.css";
 
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { IBudgetCreateRequest } from "~/models/budget";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { CornerDownRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , budgetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 
 interface UnbudgetedChildCardProps {
   category: string;
@@ -28,6 +27,7 @@ const UnbudgetedChildCard = (
 ): React.ReactNode => {
   const { intlLocale, dayjs } = useLocale();
   const { request } = useAuth();
+  const createBudgetMutation = useCreateBudgetMutation();
 
   const userSettingsQuery = useQuery({
     queryKey: [userSettingsQueryKey],
@@ -42,25 +42,6 @@ const UnbudgetedChildCard = (
       }
 
       return undefined;
-    },
-  });
-
-  const queryClient = useQueryClient();
-  const doAddBudget = useMutation({
-    mutationFn: async (newBudget: IBudgetCreateRequest[]) =>
-      await request({
-        url: "/api/budget",
-        method: "POST",
-        data: newBudget,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
     },
   });
 
@@ -82,7 +63,7 @@ const UnbudgetedChildCard = (
         hoverEffect
         elevation={2}
       >
-        <LoadingOverlay visible={doAddBudget.isPending} />
+        <LoadingOverlay visible={createBudgetMutation.isPending} />
         <Group w="100%" justify="space-between">
           <PrimaryText className={classes.text}>{props.category}</PrimaryText>
           <Group gap="sm">
@@ -102,7 +83,7 @@ const UnbudgetedChildCard = (
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  doAddBudget.mutate([
+                  createBudgetMutation.mutate([
                     {
                       month: dayjs(props.selectedDate!).format("YYYY-MM-DD"),
                       category: props.category,

@@ -133,8 +133,8 @@
   <data name="BalanceDuplicateDateError" xml:space="preserve">
     <value>A balance already exists for this account on that date.</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>A budget you are trying to create has no category.</value>
+  <data name="BudgetCreateCategoryNotFoundError" xml:space="preserve">
+    <value>The category '{0}' does not exist.</value>
   </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
     <value>A budget with the category '{0}' and date '{1}' already exists.</value>
@@ -142,14 +142,11 @@
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
     <value>Budget creation completed with errors: {0}</value>
   </data>
-  <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value>The budget you are trying to update does not exist.</value>
+  <data name="BudgetNotFoundError" xml:space="preserve">
+    <value>The budget you are trying to access does not exist.</value>
   </data>
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>The parent budget cannot be less than the sum of its children.</value>
-  </data>
-  <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value>The budget you are trying to delete does not exist.</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
     <value>A goal must have a monthly contribution or target date.</value>

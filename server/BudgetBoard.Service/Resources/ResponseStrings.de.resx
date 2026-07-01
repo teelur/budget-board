@@ -109,23 +109,14 @@
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
     <value>Das Konto, auf das Sie zugreifen möchten, existiert nicht.</value>
   </data>
-  <data name="BudgetCreateEmptyCategoryError" xml:space="preserve">
-    <value>Ein Budget, welches Sie erstellen möchten, hat keine Kategorie.</value>
-  </data>
   <data name="BudgetCreateDuplicateError" xml:space="preserve">
     <value>Ein Budget mit der Kategorie "{0}" und dem Datum "{1}" existiert bereits.</value>
   </data>
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
     <value>Budgeterstellung mit Fehlern abgeschlossen: {0}</value>
   </data>
-  <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value>Das Budget, das aktualisieren möchten, existiert nicht.</value>
-  </data>
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>Das übergeordnete Budget darf nicht kleiner sein als die Summe seiner untergeordneten Budgets.</value>
-  </data>
-  <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value>Das Budget, das Sie löschen möchten, existiert nicht.</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
     <value>Ein Ziel muss einen monatlichen Beitrag oder ein Zieldatum haben.</value>
