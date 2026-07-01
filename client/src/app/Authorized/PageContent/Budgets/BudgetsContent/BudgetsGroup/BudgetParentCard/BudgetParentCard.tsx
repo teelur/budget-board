@@ -14,7 +14,7 @@ import {
   Popover as MantinePopover,
   Stack,
 } from "@mantine/core";
-import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
+import { IBudget } from "~/models/budget";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
@@ -24,11 +24,10 @@ import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
 import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
-import { notifications } from "@mantine/notifications";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , budgetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -40,6 +39,8 @@ import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
+import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -56,6 +57,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale, thousandsSeparator, decimalSeparator } =
     useLocale();
+  const updateBudgetMutation = useUpdateBudgetMutation();
+  const deleteBudgetMutation = useDeleteBudgetMutation();
+  const { request } = useAuth();
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
   const limit =
@@ -85,8 +89,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       100,
   );
 
-  const { request } = useAuth();
-
   const userSettingsQuery = useQuery({
     queryKey: [userSettingsQueryKey],
     queryFn: async (): Promise<IUserSettings | undefined> => {
@@ -103,51 +105,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     },
   });
 
-  const queryClient = useQueryClient();
-  const doEditBudget = useMutation({
-    mutationFn: async (newBudget: IBudgetUpdateRequest) =>
-      await request({
-        url: "/api/budget",
-        method: "PUT",
-        data: newBudget,
-      }),
-    onMutate: async (variables: IBudgetUpdateRequest) => {
-      await queryClient.cancelQueries({ queryKey: [budgetsQueryKey] });
-
-      const previousBudgets: IBudget[] =
-        queryClient.getQueryData([budgetsQueryKey]) ?? [];
-
-      queryClient.setQueryData([budgetsQueryKey], (oldBudgets: IBudget[]) =>
-        oldBudgets?.map((oldBudget) =>
-          oldBudget.id === variables.id
-            ? { ...oldBudget, limit: variables.limit }
-            : oldBudget,
-        ),
-      );
-
-      return { previousBudgets };
-    },
-    onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
-      queryClient.setQueryData([budgetsQueryKey], context?.previousBudgets ?? []);
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] }),
-  });
-
-  const doDeleteBudget = useMutation({
-    mutationFn: async (id: string) =>
-      await request({
-        url: "/api/budget",
-        method: "DELETE",
-        params: { guid: id },
-      }),
-    onSuccess: async () =>
-      await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] }),
-  });
-
   const handleEdit = (newLimit?: number | string) => {
     if (newLimit === "") {
       return;
@@ -155,7 +112,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     if (id.length === 0) {
       return;
     }
-    doEditBudget.mutate({
+    updateBudgetMutation.mutate({
       id,
       limit: Number(newLimit),
     });
@@ -250,7 +207,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
         elevation={1}
       >
         <LoadingOverlay
-          visible={doEditBudget.isPending || doDeleteBudget.isPending}
+          visible={
+            updateBudgetMutation.isPending || deleteBudgetMutation.isPending
+          }
         />
         <Group gap="0.75rem" align="flex-start" wrap="nowrap">
           <Stack gap={0} w="100%">
@@ -437,7 +396,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       color="var(--button-color-destructive)"
                       size="compact-xs"
                       onClick={() => {
-                        doDeleteBudget.mutate(id);
+                        deleteBudgetMutation.mutate(id);
                         close();
                       }}
                     >

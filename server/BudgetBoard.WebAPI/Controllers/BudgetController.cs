@@ -1,7 +1,6 @@
 ﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,118 +17,80 @@ public class BudgetController(
     IBudgetService budgetService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<BudgetController>(logger, logLocalizer, responseLocalizer)
 {
-    private readonly ILogger<BudgetController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IBudgetService _budgetService = budgetService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create(
         [FromBody] BudgetCreateRequest[] budgets,
-        [FromQuery] bool? isCopy
+        [FromQuery] bool isCopying
     )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            if (isCopy ?? false)
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
             {
-                await _budgetService.CreateBudgetsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    budgets
-                );
-            }
-            else
-            {
-                await _budgetService.CreateBudgetsWithParentsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    budgets
-                );
+                return Unauthorized();
             }
 
+            await budgetService.CreateBudgetsAsync(parsedUserId, budgets, !isCopying);
+
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read(DateOnly month)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            return Ok(
-                await _budgetService.ReadBudgetsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    month
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await budgetService.ReadBudgetsAsync(parsedUserId, month));
+        });
     }
 
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> Update([FromBody] BudgetUpdateRequest editBudget)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _budgetService.UpdateBudgetAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                editBudget
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await budgetService.UpdateBudgetAsync(parsedUserId, editBudget);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
     public async Task<IActionResult> Delete(Guid guid)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _budgetService.DeleteBudgetAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await budgetService.DeleteBudgetAsync(parsedUserId, guid);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

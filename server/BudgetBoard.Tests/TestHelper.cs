@@ -40,7 +40,8 @@ internal class TestHelper
             .Returns((string key) => new LocalizedString(key, key));
         mock.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
             .Returns(
-                (string key, object[] args) => new LocalizedString(key, string.Format(key, args))
+                (string key, object[] args) =>
+                    new LocalizedString(key, $"{key} [{string.Join(", ", args)}]")
             );
         return mock.Object;
     }

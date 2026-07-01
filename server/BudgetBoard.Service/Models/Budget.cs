@@ -12,17 +12,9 @@ public interface IBudgetCreateRequest
 
 public class BudgetCreateRequest : IBudgetCreateRequest
 {
-    public DateOnly Month { get; set; }
-    public string Category { get; set; }
-    public decimal Limit { get; set; }
-
-    [JsonConstructor]
-    public BudgetCreateRequest()
-    {
-        Month = DateOnly.MinValue;
-        Category = string.Empty;
-        Limit = 0;
-    }
+    public DateOnly Month { get; set; } = DateOnly.MinValue;
+    public string Category { get; set; } = string.Empty;
+    public decimal Limit { get; set; } = 0;
 }
 
 public interface IBudgetUpdateRequest
@@ -55,21 +47,11 @@ public interface IBudgetResponse
 
 public class BudgetResponse : IBudgetResponse
 {
-    public Guid ID { get; set; }
-    public DateOnly Month { get; set; }
-    public string Category { get; set; }
-    public decimal Limit { get; set; }
-    public Guid UserID { get; set; }
-
-    [JsonConstructor]
-    public BudgetResponse()
-    {
-        ID = Guid.NewGuid();
-        Month = DateOnly.MinValue;
-        Category = string.Empty;
-        Limit = 0;
-        UserID = Guid.NewGuid();
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public DateOnly Month { get; set; } = DateOnly.MinValue;
+    public string Category { get; set; } = string.Empty;
+    public decimal Limit { get; set; } = 0;
+    public Guid UserID { get; set; } = Guid.NewGuid();
 
     public BudgetResponse(Budget budget)
     {
