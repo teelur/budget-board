@@ -181,12 +181,6 @@
   <data name="ValueDuplicateDateError" xml:space="preserve">
     <value>A value for this date already exists for this asset.</value>
   </data>
-  <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value>The budget you are trying to update does not exist.</value>
-  </data>
-  <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value>The budget you are trying to delete does not exist.</value>
-  </data>
   <data name="RuleRunSummary" xml:space="preserve">
     <value>Rule applied {0} updates.</value>
   </data>

@@ -8,17 +8,6 @@ namespace BudgetBoard.Service.Interfaces;
 public interface IBudgetService
 {
     /// <summary>
-    /// Creates new budget entries for the specified user, automatically managing parent budgets.
-    /// </summary>
-    /// <remarks>
-    /// If a parent budget doesn't exist for a child budget, it will be created automatically.
-    /// Otherwise, the parent budget is updated to include the new child budget.
-    /// </remarks>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="requests">The collection of budget creation requests.</param>
-    Task CreateBudgetsWithParentsAsync(Guid userGuid, IEnumerable<IBudgetCreateRequest> requests);
-
-    /// <summary>
     /// Creates new budget entries for the specified user.
     /// </summary>
     /// <remarks>
@@ -26,7 +15,12 @@ public interface IBudgetService
     /// </remarks>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="requests">The collection of budget creation requests.</param>
-    Task CreateBudgetsAsync(Guid userGuid, IEnumerable<IBudgetCreateRequest> requests);
+    /// <param name="autoManageParents">If true, parent budgets will be automatically created or updated; otherwise, they will not be managed.</param>
+    Task CreateBudgetsAsync(
+        Guid userGuid,
+        IEnumerable<IBudgetCreateRequest> requests,
+        bool autoManageParents = false
+    );
 
     /// <summary>
     /// Retrieves budgets for a specific month.

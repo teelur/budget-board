@@ -118,14 +118,8 @@
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
     <value>预算创建完成，但有错误：{0}</value>
   </data>
-  <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的预算不存在。</value>
-  </data>
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>父预算不能小于其子预算的总和。</value>
-  </data>
-  <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的预算不存在。</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
     <value>目标必须设置每月存入金额或目标日期。</value>

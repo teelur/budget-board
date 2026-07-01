@@ -118,14 +118,8 @@
   <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
     <value>Création du budget terminée avec des erreurs : {0}</value>
   </data>
-  <data name="BudgetUpdateNotFoundError" xml:space="preserve">
-    <value>Le budget que vous essayez de mettre à jour n’existe pas.</value>
-  </data>
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>Le budget parent ne peut pas être inférieur à la somme de ses sous-budgets.</value>
-  </data>
-  <data name="BudgetDeleteNotFoundError" xml:space="preserve">
-    <value>Le budget que vous essayez de supprimer n’existe pas.</value>
   </data>
   <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
     <value>Un objectif doit avoir une contribution mensuelle ou une date cible.</value>
