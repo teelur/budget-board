@@ -6,18 +6,16 @@ import {
   SignDisplay,
 } from "~/helpers/currency";
 import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
 import React from "react";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import { StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , budgetsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -28,6 +26,8 @@ import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
+import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 
 interface BudgetChildCardProps {
   id: string;
@@ -45,6 +45,8 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { intlLocale, thousandsSeparator, decimalSeparator } = useLocale();
   const { request } = useAuth();
+  const updateBudgetMutation = useUpdateBudgetMutation();
+  const deleteBudgetMutation = useDeleteBudgetMutation();
 
   const newLimitField = useField<number | string>({
     initialValue: props.limit ?? 0,
@@ -67,51 +69,6 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     },
   });
 
-  const queryClient = useQueryClient();
-  const doEditBudget = useMutation({
-    mutationFn: async (newBudget: IBudgetUpdateRequest) =>
-      await request({
-        url: "/api/budget",
-        method: "PUT",
-        data: newBudget,
-      }),
-    onMutate: async (variables: IBudgetUpdateRequest) => {
-      await queryClient.cancelQueries({ queryKey: [budgetsQueryKey] });
-
-      const previousBudgets: IBudget[] =
-        queryClient.getQueryData([budgetsQueryKey]) ?? [];
-
-      queryClient.setQueryData([budgetsQueryKey], (oldBudgets: IBudget[]) =>
-        oldBudgets?.map((oldBudget) =>
-          oldBudget.id === variables.id
-            ? { ...oldBudget, limit: variables.limit }
-            : oldBudget,
-        ),
-      );
-
-      return { previousBudgets };
-    },
-    onError: (error: AxiosError, _variables: IBudgetUpdateRequest, context) => {
-      queryClient.setQueryData([budgetsQueryKey], context?.previousBudgets ?? []);
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] }),
-  });
-
-  const doDeleteBudget = useMutation({
-    mutationFn: async (id: string) =>
-      await request({
-        url: "/api/budget",
-        method: "DELETE",
-        params: { guid: id },
-      }),
-    onSuccess: async () =>
-      await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] }),
-  });
-
   const handleEdit = (newLimit?: number | string) => {
     if (newLimit === "") {
       return;
@@ -119,7 +76,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     if (props.id.length === 0) {
       return;
     }
-    doEditBudget.mutate({
+    updateBudgetMutation.mutate({
       id: props.id,
       limit: Number(newLimit),
     });
@@ -144,7 +101,9 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
         elevation={1}
       >
         <LoadingOverlay
-          visible={doEditBudget.isPending || doDeleteBudget.isPending}
+          visible={
+            updateBudgetMutation.isPending || deleteBudgetMutation.isPending
+          }
         />
         <Group gap="0.75rem" align="flex-start" wrap="nowrap">
           <Stack gap={0} w="100%">
@@ -325,7 +284,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 color="var(--button-color-destructive)"
                 onClick={(e) => {
                   e.stopPropagation();
-                  doDeleteBudget.mutate(props.id);
+                  deleteBudgetMutation.mutate(props.id);
                 }}
                 h="100%"
               >

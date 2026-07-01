@@ -23,7 +23,7 @@ export const useUpdateBalanceMutation = ({
   return useMutation({
     mutationFn: async (updatedBalance: IBalanceUpdateRequest) =>
       await request({
-        url: `/api/balance`,
+        url: "/api/balance",
         method: "PUT",
         data: updatedBalance,
       }),
