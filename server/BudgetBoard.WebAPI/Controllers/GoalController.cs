@@ -1,4 +1,5 @@
 ﻿using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
@@ -16,6 +17,7 @@ public class GoalController(
     ILogger<GoalController> logger,
     UserManager<ApplicationUser> userManager,
     IGoalService goalService,
+    INowProvider nowProvider,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
@@ -129,7 +131,7 @@ public class GoalController(
             await _goalService.CompleteGoalAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
                 goalID,
-                DateTime.UtcNow
+                nowProvider.Today
             );
             return Ok();
         }

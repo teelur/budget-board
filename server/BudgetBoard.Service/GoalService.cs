@@ -18,12 +18,6 @@ public class GoalService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : IGoalService
 {
-    private readonly ILogger<IGoalService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly INowProvider _nowProvider = nowProvider;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task CreateGoalAsync(Guid userGuid, IGoalCreateRequest request)
     {
@@ -34,25 +28,22 @@ public class GoalService(
             && !request.CompleteDate.HasValue
         )
         {
-            _logger.LogError(
-                "{LogMessage}",
-                _logLocalizer["GoalCreateMissingContributionOrDateLog"]
-            );
+            logger.LogError("{LogMessage}", logLocalizer["GoalCreateMissingContributionOrDateLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["GoalCreateMissingContributionOrDateError"]
+                responseLocalizer["GoalCreateMissingContributionOrDateError"]
             );
         }
 
-        if (request.CompleteDate.HasValue && request.CompleteDate.Value < _nowProvider.UtcNow)
+        if (request.CompleteDate.HasValue && request.CompleteDate.Value < nowProvider.Today)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GoalCreatePastDateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["GoalCreateInPastError"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalCreatePastDateLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["GoalCreateInPastError"]);
         }
 
         if (!request.AccountIds.Any())
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GoalCreateNoAccountsLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["GoalCreateNoAccountsError"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalCreateNoAccountsLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["GoalCreateNoAccountsError"]);
         }
 
         decimal runningBalance = 0.0M;
@@ -62,9 +53,9 @@ public class GoalService(
             var account = userData.Accounts.FirstOrDefault((a) => a.ID == accountId);
             if (account == null)
             {
-                _logger.LogError("{LogMessage}", _logLocalizer["GoalCreateInvalidAccountLog"]);
+                logger.LogError("{LogMessage}", logLocalizer["GoalCreateInvalidAccountLog"]);
                 throw new BudgetBoardServiceException(
-                    _responseLocalizer["GoalCreateInvalidAccountError"]
+                    responseLocalizer["GoalCreateInvalidAccountError"]
                 );
             }
 
@@ -84,8 +75,8 @@ public class GoalService(
             UserID = userData.Id,
         };
 
-        _userDataContext.Goals.Add(newGoal);
-        await _userDataContext.SaveChangesAsync();
+        userDataContext.Goals.Add(newGoal);
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -129,25 +120,25 @@ public class GoalService(
         var goal = userData.Goals.FirstOrDefault(g => g.ID == request.ID);
         if (goal == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["GoalUpdateNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalUpdateNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["GoalUpdateNotFoundError"]);
         }
 
         if (
             request.CompleteDate.HasValue
             && request.IsCompleteDateEditable
-            && request.CompleteDate.Value < _nowProvider.UtcNow
+            && request.CompleteDate.Value < nowProvider.Today
         )
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdatePastDateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["GoalUpdatePastDateError"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalUpdatePastDateLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["GoalUpdatePastDateError"]);
         }
 
         if (((request.MonthlyContribution ?? -1) <= 0) && request.IsMonthlyContributionEditable)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GoalUpdateNoMonthlyContributionLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalUpdateNoMonthlyContributionLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["GoalUpdateNoMonthlyContributionError"]
+                responseLocalizer["GoalUpdateNoMonthlyContributionError"]
             );
         }
 
@@ -160,7 +151,7 @@ public class GoalService(
             ? request.MonthlyContribution
             : goal.MonthlyContribution;
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -171,36 +162,36 @@ public class GoalService(
         var goal = userData.Goals.FirstOrDefault(g => g.ID == guid);
         if (goal == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GoalDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["GoalDeleteNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalDeleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["GoalDeleteNotFoundError"]);
         }
 
-        _userDataContext.Goals.Remove(goal);
-        await _userDataContext.SaveChangesAsync();
+        userDataContext.Goals.Remove(goal);
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task CompleteGoalAsync(Guid userGuid, Guid goalID, DateTime completedDate)
+    public async Task CompleteGoalAsync(Guid userGuid, Guid goalID, DateOnly completedDate)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
         var goal = userData.Goals.FirstOrDefault(g => g.ID == goalID);
         if (goal == null)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GoalCompleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["GoalCompleteNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalCompleteNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["GoalCompleteNotFoundError"]);
         }
 
         if (goal.Completed.HasValue)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["GoalCompleteAlreadyCompletedLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalCompleteAlreadyCompletedLog"]);
             throw new BudgetBoardServiceException(
-                _responseLocalizer["GoalCompleteAlreadyCompletedError"]
+                responseLocalizer["GoalCompleteAlreadyCompletedError"]
             );
         }
 
         goal.Completed = completedDate;
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
@@ -220,20 +211,20 @@ public class GoalService(
             // Complete the goal if it's 100% complete
             if (percentComplete >= 100.0M)
             {
-                goal.Completed = _nowProvider.UtcNow;
+                goal.Completed = nowProvider.Today;
             }
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
-            _userDataContext,
-            _logger,
-            _logLocalizer,
-            _responseLocalizer,
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
             id,
             users =>
                 users
@@ -245,7 +236,7 @@ public class GoalService(
         );
     }
 
-    private DateTime EstimateGoalCompleteDate(Goal goal, bool includeInterest = false)
+    private DateOnly EstimateGoalCompleteDate(Goal goal, bool includeInterest = false)
     {
         if (goal.CompleteDate.HasValue)
             return goal.CompleteDate.Value;
@@ -253,8 +244,8 @@ public class GoalService(
         if (goal.MonthlyContribution == null || goal.MonthlyContribution == 0)
         {
             // If a complete date has not been set, then a monthly contribution is required.
-            _logger.LogError("A target date cannot be estimated without a monthly contribution.");
-            return DateTime.UnixEpoch;
+            logger.LogError("A target date cannot be estimated without a monthly contribution.");
+            return DateOnly.FromDateTime(DateTime.UnixEpoch);
         }
 
         decimal totalBalance = goal.Accounts.Sum(a =>
@@ -318,12 +309,12 @@ public class GoalService(
                 }
             }
 
-            return new DateTime(_nowProvider.UtcNow.Year, _nowProvider.UtcNow.Month, 1).AddMonths(
+            return new DateOnly(nowProvider.Today.Year, nowProvider.Today.Month, 1).AddMonths(
                 (int)numberOfMonthsLeftWithInterest
             );
         }
 
-        return new DateTime(_nowProvider.UtcNow.Year, _nowProvider.UtcNow.Month, 1).AddMonths(
+        return new DateOnly(nowProvider.Today.Year, nowProvider.Today.Month, 1).AddMonths(
             (int)numberOfMonthsLeftWithoutInterest
         );
     }
@@ -336,7 +327,7 @@ public class GoalService(
         // If a monthly contribution has not been set, then a complete date is required.
         if (!goal.CompleteDate.HasValue)
         {
-            _logger.LogError("A monthly contribution cannot be estimated without a target date.");
+            logger.LogError("A monthly contribution cannot be estimated without a target date.");
             return 0;
         }
 
@@ -358,8 +349,8 @@ public class GoalService(
         }
 
         var numberOfMonthsLeft =
-            (goal.CompleteDate.Value.Year - _nowProvider.UtcNow.Year) * 12
-            + (goal.CompleteDate.Value.Month - _nowProvider.UtcNow.Month);
+            (goal.CompleteDate.Value.Year - nowProvider.Today.Year) * 12
+            + (goal.CompleteDate.Value.Month - nowProvider.Today.Month);
 
         if (numberOfMonthsLeft <= 0)
         {
@@ -430,7 +421,7 @@ public class GoalService(
 
         var monthlyContribution = transactions
             .Where(t =>
-                t.Date.Year == _nowProvider.UtcNow.Year && t.Date.Month == _nowProvider.UtcNow.Month
+                t.Date.Year == nowProvider.UtcNow.Year && t.Date.Month == nowProvider.UtcNow.Month
             )
             .Sum(t => t.Amount);
 
