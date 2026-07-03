@@ -2,7 +2,6 @@
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,105 +19,77 @@ public class GoalController(
     INowProvider nowProvider,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<GoalController>(logger, logLocalizer, responseLocalizer)
 {
-    private readonly ILogger<GoalController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IGoalService _goalService = goalService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create([FromBody] GoalCreateRequest newGoal)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _goalService.CreateGoalAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                newGoal
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await goalService.CreateGoalAsync(parsedUserId, newGoal);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read(bool includeInterest = false)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            return Ok(
-                await _goalService.ReadGoalsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    includeInterest
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await goalService.ReadGoalsAsync(parsedUserId, includeInterest));
+        });
     }
 
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> Update([FromBody] GoalUpdateRequest editedGoal)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _goalService.UpdateGoalAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                editedGoal
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await goalService.UpdateGoalAsync(parsedUserId, editedGoal);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
     public async Task<IActionResult> Delete(Guid guid)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _goalService.DeleteGoalAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await goalService.DeleteGoalAsync(parsedUserId, guid);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
@@ -126,23 +97,17 @@ public class GoalController(
     [Route("[action]")]
     public async Task<IActionResult> Complete(Guid goalID)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _goalService.CompleteGoalAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                goalID,
-                nowProvider.Today
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await goalService.CompleteGoalAsync(parsedUserId, goalID, nowProvider.Today);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }
