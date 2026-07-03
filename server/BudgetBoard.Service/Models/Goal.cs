@@ -28,10 +28,8 @@ public interface IGoalUpdateRequest
     Guid ID { get; }
     string Name { get; }
     DateOnly? CompleteDate { get; }
-    bool IsCompleteDateEditable { get; }
     decimal Amount { get; }
     decimal? MonthlyContribution { get; }
-    bool IsMonthlyContributionEditable { get; }
 }
 
 public class GoalUpdateRequest : IGoalUpdateRequest
@@ -39,10 +37,8 @@ public class GoalUpdateRequest : IGoalUpdateRequest
     public Guid ID { get; set; }
     public string Name { get; set; } = string.Empty;
     public DateOnly? CompleteDate { get; set; } = null;
-    public bool IsCompleteDateEditable { get; set; } = false;
     public decimal Amount { get; set; } = 0.0M;
     public decimal? MonthlyContribution { get; set; } = null;
-    public bool IsMonthlyContributionEditable { get; set; } = false;
 }
 
 public interface IGoalResponse

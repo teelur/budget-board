@@ -84,6 +84,7 @@ public class DemoSeedServiceTests
         return new DemoSeedService(
             Mock.Of<ILogger<DemoSeedService>>(),
             helper.UserDataContext,
+            Mock.Of<INowProvider>(),
             mockUserManager.Object,
             TestHelper.CreateMockLocalizer<LogStrings>(),
             mockTransactionService.Object,

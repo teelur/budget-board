@@ -49,5 +49,5 @@ public interface IGoalService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task CompleteGoalsAsync(Guid userGuid);
+    Task CompleteEligibleGoalsAsync(Guid userGuid);
 }

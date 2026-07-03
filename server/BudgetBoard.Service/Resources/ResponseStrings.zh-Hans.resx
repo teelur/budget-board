@@ -130,20 +130,11 @@
   <data name="GoalCreateInvalidAccountError" xml:space="preserve">
     <value>您尝试使用的账户不存在。</value>
   </data>
-  <data name="GoalUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的目标不存在。</value>
-  </data>
   <data name="GoalUpdatePastDateError" xml:space="preserve">
     <value>目标的目标日期不能是过去的日期。</value>
   </data>
   <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
     <value>目标的每月存入金额必须大于 0。</value>
-  </data>
-  <data name="GoalDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的目标不存在。</value>
-  </data>
-  <data name="GoalCompleteNotFoundError" xml:space="preserve">
-    <value>您尝试完成的目标不存在。</value>
   </data>
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
     <value>您尝试完成的目标已经完成。</value>
