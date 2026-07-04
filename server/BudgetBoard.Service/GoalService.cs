@@ -475,7 +475,6 @@ public class GoalService(
                 t.Date.Year == nowProvider.Today.Year && t.Date.Month == nowProvider.Today.Month
             )
             .Sum(t => t.Amount);
-        ;
     }
 
     private decimal CalculatePercentComplete(Goal goal)
