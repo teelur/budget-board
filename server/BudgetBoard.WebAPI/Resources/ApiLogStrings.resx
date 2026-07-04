@@ -85,9 +85,6 @@
   <data name="OidcConnectEmailClaimMissingLog" xml:space="preserve">
     <value>OIDC connect rejected for user {0}: email claim is missing.</value>
   </data>
-  <data name="OidcConnectEmailNotVerifiedLog" xml:space="preserve">
-    <value>OIDC connect rejected for user {0}: email is not verified by provider.</value>
-  </data>
   <data name="OidcConnectEmailMismatchLog" xml:space="preserve">
     <value>OIDC connect rejected for user {0}: OIDC email does not match local account email.</value>
   </data>

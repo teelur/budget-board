@@ -99,7 +99,7 @@ public class ApplicationUserController(
 
             if (string.IsNullOrWhiteSpace(request.Code))
             {
-                return BadRequest(responseLocalizer["AuthCodeRequired"].Value);
+                return BadRequest(ResponseLocalizer["AuthCodeRequired"].Value);
             }
 
             var principal = await oidcTokenService.ExchangeCodeForUserAsync(
@@ -108,24 +108,24 @@ public class ApplicationUserController(
             );
             if (principal == null)
             {
-                return StatusCode(500, responseLocalizer["AuthFailed"].Value);
+                return StatusCode(500, ResponseLocalizer["AuthFailed"].Value);
             }
 
             var oidcEmail =
                 principal.FindFirst(ClaimTypes.Email)?.Value ?? principal.FindFirst("email")?.Value;
             if (string.IsNullOrWhiteSpace(oidcEmail))
             {
-                logger.LogWarning(
+                Logger.LogWarning(
                     "{LogMessage}",
-                    logLocalizer["OidcConnectEmailClaimMissingLog", parsedUserId]
+                    LogLocalizer["OidcConnectEmailClaimMissingLog", parsedUserId]
                 );
-                return BadRequest(responseLocalizer["OidcEmailClaimMissingError"].Value);
+                return BadRequest(ResponseLocalizer["OidcEmailClaimMissingError"].Value);
             }
 
             var currentUser = await userManager.FindByIdAsync(parsedUserId.ToString());
             if (currentUser == null)
             {
-                return NotFound(responseLocalizer["UserNotFound"].Value);
+                return NotFound(ResponseLocalizer["UserNotFound"].Value);
             }
 
             if (
@@ -133,11 +133,11 @@ public class ApplicationUserController(
                 || !string.Equals(currentUser.Email, oidcEmail, StringComparison.OrdinalIgnoreCase)
             )
             {
-                logger.LogWarning(
+                Logger.LogWarning(
                     "{LogMessage}",
-                    logLocalizer["OidcConnectEmailMismatchLog", parsedUserId]
+                    LogLocalizer["OidcConnectEmailMismatchLog", parsedUserId]
                 );
-                return Conflict(responseLocalizer["OidcEmailMismatchError"].Value);
+                return Conflict(ResponseLocalizer["OidcEmailMismatchError"].Value);
             }
 
             var providerKey =
@@ -145,7 +145,7 @@ public class ApplicationUserController(
                 ?? principal.FindFirst("sub")?.Value;
             if (string.IsNullOrWhiteSpace(providerKey))
             {
-                return BadRequest(responseLocalizer["LoginFailed"].Value);
+                return BadRequest(ResponseLocalizer["LoginFailed"].Value);
             }
 
             await applicationUserService.ConnectOidcLoginAsync(

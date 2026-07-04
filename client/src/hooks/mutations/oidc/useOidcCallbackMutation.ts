@@ -5,30 +5,27 @@ import {
   applicationUserQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
-import { IOidcConnectRequest } from "~/models/oidc";
+import { IOidcCallbackRequest } from "~/models/oidc";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-export const useConnectOidcLoginMutation = () => {
+export const useOidcCallbackMutation = () => {
   const queryClient = useQueryClient();
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (oidcConnectRequest: IOidcConnectRequest) =>
+    mutationFn: async (oidcCallbackRequest: IOidcCallbackRequest) =>
       await request({
-        url: "/api/applicationUser/connectOidcLogin",
+        url: "/api/oidc/callback",
         method: "POST",
-        data: oidcConnectRequest,
+        data: oidcCallbackRequest,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [applicationUserQueryKey],
-      });
+      queryClient.invalidateQueries({ queryKey: [applicationUserQueryKey] });
     },
-    onError: (error: AxiosError) => {
+    onError: (error: AxiosError) =>
       notifications.show({
         color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
-      });
-    },
+      }),
   });
 };
