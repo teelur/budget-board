@@ -15,7 +15,6 @@ import {
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
-import { IGoalResponse } from "~/models/goal";
 import { ITransaction } from "~/models/transaction";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -24,7 +23,6 @@ import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsPr
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
 import {
-  goalsQueryKey,
   transactionsQueryKey,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
