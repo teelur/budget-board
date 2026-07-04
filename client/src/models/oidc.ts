@@ -4,6 +4,18 @@ export interface IOidcCallbackRequest {
   remember_me: boolean;
 }
 
+export interface IOidcConnectRequest {
+  code: string;
+  redirect_uri: string;
+}
+
+export const OidcAuthFlows = {
+  SignIn: "signin",
+  Connect: "connect",
+} as const;
+
+export type OidcAuthFlow = (typeof OidcAuthFlows)[keyof typeof OidcAuthFlows];
+
 export interface IOidcCallbackResponse {
   success: boolean;
   error?: string;

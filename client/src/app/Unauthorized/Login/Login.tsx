@@ -21,6 +21,7 @@ import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
+import { OidcAuthFlows } from "~/models/oidc";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -246,7 +247,10 @@ const Login = (props: LoginProps): React.ReactNode => {
           <Button
             variant="outline"
             fullWidth
-            onClick={() => startOidcLogin && startOidcLogin(props.rememberMe)}
+            onClick={() =>
+              startOidcLogin &&
+              startOidcLogin(props.rememberMe, OidcAuthFlows.SignIn)
+            }
             loading={oidcLoading}
           >
             {t("login_with_oidc")}

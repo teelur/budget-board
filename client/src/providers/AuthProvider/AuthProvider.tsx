@@ -2,7 +2,11 @@ import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
 import { notifications } from "@mantine/notifications";
-import { IOidcDiscoveryDocument } from "~/models/oidc";
+import {
+  IOidcDiscoveryDocument,
+  OidcAuthFlow,
+  OidcAuthFlows,
+} from "~/models/oidc";
 import { t } from "i18next";
 
 export interface AuthContextValue {
@@ -10,7 +14,7 @@ export interface AuthContextValue {
   setIsUserAuthenticated: (isLoggedIn: boolean) => void;
   loading: boolean;
   request: ({ ...options }) => Promise<AxiosResponse>;
-  startOidcLogin?: (rememberMe: boolean) => void;
+  startOidcLogin?: (rememberMe: boolean, flow?: OidcAuthFlow) => void;
   oidcLoading: boolean;
 }
 
@@ -90,7 +94,10 @@ export const AuthProvider = ({
       });
   }, []);
 
-  const startOidcLogin = async (rememberMe: boolean): Promise<void> => {
+  const startOidcLogin = async (
+    rememberMe: boolean,
+    flow: OidcAuthFlow = OidcAuthFlows.SignIn,
+  ): Promise<void> => {
     setOidcLoading(true);
     try {
       let authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
@@ -106,12 +113,14 @@ export const AuthProvider = ({
           message:
             "OIDC is enabled but not configured. Be sure all required environment variables are set.",
         });
+        setOidcLoading(false);
         return;
       }
 
       const state = crypto.randomUUID();
       sessionStorage.setItem(`oidc_state_${state}`, state);
       sessionStorage.setItem(`oidc_remember_me_${state}`, String(rememberMe));
+      sessionStorage.setItem(`oidc_flow_${state}`, flow);
 
       const params = new URLSearchParams({
         client_id: clientId,

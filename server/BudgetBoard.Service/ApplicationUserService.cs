@@ -46,6 +46,52 @@ public class ApplicationUserService(
         await userDataContext.SaveChangesAsync();
     }
 
+    public async Task ConnectOidcLoginAsync(
+        Guid userGuid,
+        string providerKey,
+        UserManager<ApplicationUser> userManager
+    )
+    {
+        if (string.IsNullOrWhiteSpace(providerKey))
+        {
+            logger.LogError(
+                "{LogMessage}",
+                logLocalizer["AddOidcFailedLog", userGuid, "OIDC provider key is missing"]
+            );
+            throw new BudgetBoardServiceException(responseLocalizer["AddOidcFailedError"]);
+        }
+
+        var userData = await GetCurrentUserAsync(userGuid.ToString());
+
+        var logins = await userManager.GetLoginsAsync(userData);
+        var oidcLogin = logins.FirstOrDefault(l => l.LoginProvider == OidcLoginProvider);
+        if (oidcLogin != null)
+        {
+            logger.LogWarning("{LogMessage}", logLocalizer["OidcLoginAlreadyExistsLog", userGuid]);
+            throw new BudgetBoardServiceException(responseLocalizer["OidcLoginAlreadyExistsError"]);
+        }
+
+        var result = await userManager.AddLoginAsync(
+            userData,
+            new UserLoginInfo(OidcLoginProvider, providerKey, OidcLoginProvider)
+        );
+
+        if (!result.Succeeded)
+        {
+            logger.LogError(
+                "{LogMessage}",
+                logLocalizer[
+                    "AddOidcFailedLog",
+                    userGuid,
+                    string.Join(", ", result.Errors.Select(e => e.Description))
+                ]
+            );
+            throw new BudgetBoardServiceException(responseLocalizer["AddOidcFailedError"]);
+        }
+
+        logger.LogInformation("{LogMessage}", logLocalizer["AddOidcSuccessLog", userGuid]);
+    }
+
     /// <inheritdoc />
     public async Task DisconnectOidcLoginAsync(
         Guid userGuid,

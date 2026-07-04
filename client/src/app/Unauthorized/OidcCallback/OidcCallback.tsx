@@ -1,15 +1,25 @@
 import React from "react";
 import { notifications } from "@mantine/notifications";
 import { AxiosError, AxiosResponse } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
+import {
+  applicationUserQueryKey,
+  translateAxiosError,
+} from "~/helpers/requests";
 import {
   AuthContext,
   AuthContextValue,
 } from "~/providers/AuthProvider/AuthProvider";
 import { useNavigate } from "react-router";
-import { IOidcCallbackRequest, IOidcCallbackResponse } from "~/models/oidc";
+import {
+  IOidcCallbackRequest,
+  IOidcCallbackResponse,
+  IOidcConnectRequest,
+  OidcAuthFlow,
+  OidcAuthFlows,
+} from "~/models/oidc";
 import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 
 const OidcCallback = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -17,6 +27,7 @@ const OidcCallback = (): React.ReactNode => {
   const { request, setIsUserAuthenticated } =
     React.useContext<AuthContextValue>(AuthContext);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const hasProcessed = React.useRef(false);
 
@@ -37,38 +48,47 @@ const OidcCallback = (): React.ReactNode => {
       const savedState = state
         ? sessionStorage.getItem(`oidc_state_${state}`)
         : null;
+      const flow = state
+        ? (sessionStorage.getItem(`oidc_flow_${state}`) as OidcAuthFlow | null)
+        : null;
+      const oidcFlow = flow ?? OidcAuthFlows.SignIn;
+
+      const clearOidcState = (stateValue: string | null): void => {
+        if (!stateValue) {
+          return;
+        }
+
+        sessionStorage.removeItem(`oidc_state_${stateValue}`);
+        sessionStorage.removeItem(`oidc_remember_me_${stateValue}`);
+        sessionStorage.removeItem(`oidc_flow_${stateValue}`);
+      };
 
       if (error) {
-        if (savedState) {
-          sessionStorage.removeItem(`oidc_state_${state}`);
-          sessionStorage.removeItem(`oidc_remember_me_${state}`);
-        }
+        clearOidcState(state);
         notifications.show({
           color: "var(--button-color-destructive)",
           message: `Authentication failed: ${errorDescription || error}`,
         });
-        navigate("/");
+        navigate(
+          oidcFlow === OidcAuthFlows.Connect ? "/settings/security" : "/",
+        );
         return;
       }
 
       if (!code) {
-        if (savedState) {
-          sessionStorage.removeItem(`oidc_state_${state}`);
-          sessionStorage.removeItem(`oidc_remember_me_${state}`);
-        }
+        clearOidcState(state);
         notifications.show({
           color: "var(--button-color-destructive)",
           message: t("authorization_code_missing_message"),
         });
-        navigate("/");
+        navigate(
+          oidcFlow === OidcAuthFlows.Connect ? "/settings/security" : "/",
+        );
         return;
       }
 
       if (!state || state !== savedState) {
-        if (savedState) {
-          sessionStorage.removeItem(`oidc_state_${state}`);
-          sessionStorage.removeItem(`oidc_remember_me_${state}`);
-        }
+        clearOidcState(state);
         notifications.show({
           color: "var(--button-color-destructive)",
           message: t("state_parameter_invalid_message"),
@@ -81,6 +101,25 @@ const OidcCallback = (): React.ReactNode => {
         const rememberMe =
           sessionStorage.getItem(`oidc_remember_me_${state}`) === "true";
 
+        if (oidcFlow === OidcAuthFlows.Connect) {
+          await request({
+            url: "/api/applicationuser/connectoidclogin",
+            method: "POST",
+            data: {
+              code,
+              redirect_uri: `${window.location.origin}/oidc-callback`,
+            } as IOidcConnectRequest,
+          });
+
+          await queryClient.invalidateQueries({
+            queryKey: [applicationUserQueryKey],
+          });
+
+          clearOidcState(state);
+          navigate("/settings/security");
+          return;
+        }
+
         const response: AxiosResponse<IOidcCallbackResponse> = await request({
           url: "/api/oidc/callback",
           method: "POST",
@@ -91,10 +130,7 @@ const OidcCallback = (): React.ReactNode => {
           } as IOidcCallbackRequest,
         });
 
-        if (savedState) {
-          sessionStorage.removeItem(`oidc_state_${state}`);
-          sessionStorage.removeItem(`oidc_remember_me_${state}`);
-        }
+        clearOidcState(state);
 
         setIsUserAuthenticated(response.data?.success ?? false);
 
@@ -109,16 +145,15 @@ const OidcCallback = (): React.ReactNode => {
 
         navigate("/dashboard");
       } catch (e) {
-        if (savedState) {
-          sessionStorage.removeItem(`oidc_state_${state}`);
-          sessionStorage.removeItem(`oidc_remember_me_${state}`);
-        }
+        clearOidcState(state);
         const err = e as AxiosError;
         notifications.show({
           color: "var(--button-color-destructive)",
           message: translateAxiosError(err),
         });
-        navigate("/");
+        navigate(
+          oidcFlow === OidcAuthFlows.Connect ? "/settings/security" : "/",
+        );
       }
     })();
   }, []);

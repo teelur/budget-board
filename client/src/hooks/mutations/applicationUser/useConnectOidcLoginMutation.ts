@@ -7,15 +7,15 @@ import {
 } from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-export const useDisconnectOidcLoginMutation = () => {
+export const useConnectOidcLoginMutation = () => {
   const queryClient = useQueryClient();
   const { request } = useAuth();
 
   return useMutation({
     mutationFn: async () =>
       await request({
-        url: "/api/applicationUser/disconnectOidcLogin",
-        method: "DELETE",
+        url: "/api/applicationUser/connectOidcLogin",
+        method: "POST",
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({

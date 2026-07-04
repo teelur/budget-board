@@ -28,7 +28,7 @@ namespace BudgetBoard.Utils
             logger ?? throw new ArgumentNullException(nameof(logger));
         private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
 
-        public async Task<bool> ProvisionExternalUserAsync(
+        public async Task<ExternalUserProvisioningResult> ProvisionExternalUserAsync(
             ClaimsPrincipal principal,
             HttpContext httpContext,
             string schemeName,
@@ -52,11 +52,12 @@ namespace BudgetBoard.Utils
                     "{LogMessage}",
                     _logLocalizer["ExternalProviderClaimsMissingLog"]
                 );
-                return false;
+                return ExternalUserProvisioningResult.Failed();
             }
 
             // Find or create local user
             var user = await _userManager.FindByEmailAsync(email);
+            var wasUserCreated = false;
             if (user == null)
             {
                 // Check if new user creation is disabled
@@ -64,7 +65,7 @@ namespace BudgetBoard.Utils
                 if (disableNewUsers)
                 {
                     _logger.LogWarning("{LogMessage}", _logLocalizer["NewUserCreationDisabledLog"]);
-                    return false;
+                    return ExternalUserProvisioningResult.Failed();
                 }
 
                 user = new ApplicationUser
@@ -84,8 +85,10 @@ namespace BudgetBoard.Utils
                             string.Join(", ", createResult.Errors.Select(e => e.Description))
                         ]
                     );
-                    return false;
+                    return ExternalUserProvisioningResult.Failed();
                 }
+
+                wasUserCreated = true;
 
                 try
                 {
@@ -128,12 +131,14 @@ namespace BudgetBoard.Utils
             );
             if (!hasLogin)
             {
-                // Check if adding new logins is disabled
-                var disableNewUsers = _configuration.GetValue<bool>("DISABLE_NEW_USERS");
-                if (disableNewUsers)
+                // Existing local accounts must link OIDC explicitly through the authenticated settings flow.
+                if (!wasUserCreated)
                 {
-                    _logger.LogWarning("{LogMessage}", _logLocalizer["AddingLoginDisabledLog"]);
-                    return false;
+                    _logger.LogInformation(
+                        "{LogMessage}",
+                        _logLocalizer["OidcExplicitLinkRequiredLog", user.Id]
+                    );
+                    return ExternalUserProvisioningResult.ExplicitLinkingRequired();
                 }
 
                 var loginInfo = new UserLoginInfo(schemeName, providerKey, schemeName);
@@ -148,7 +153,7 @@ namespace BudgetBoard.Utils
                             string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
                         ]
                     );
-                    return false;
+                    return ExternalUserProvisioningResult.Failed();
                 }
             }
 
@@ -167,7 +172,7 @@ namespace BudgetBoard.Utils
                 new AuthenticationProperties { IsPersistent = isPersistent }
             );
 
-            return true;
+            return ExternalUserProvisioningResult.Success();
         }
     }
 }
