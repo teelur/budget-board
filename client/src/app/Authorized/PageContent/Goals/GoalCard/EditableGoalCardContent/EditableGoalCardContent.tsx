@@ -9,8 +9,8 @@ import {
   LoadingOverlay,
   Stack,
 } from "@mantine/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
@@ -22,7 +22,7 @@ import {
 import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError , goalsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
@@ -38,6 +38,9 @@ import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useCompleteGoalMutation } from "~/hooks/mutations/goals/useCompleteGoalMutation";
+import { useUpdateGoalMutation } from "~/hooks/mutations/goals/useUpdateGoalMutation";
+import { useDeleteGoalMutation } from "~/hooks/mutations/goals/useDeleteGoalMutation";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -58,6 +61,9 @@ const EditableGoalCardContent = (
     decimalSeparator,
   } = useLocale();
   const { request } = useAuth();
+  const updateGoalMutation = useUpdateGoalMutation();
+  const deleteGoalMutation = useDeleteGoalMutation();
+  const completeGoalMutation = useCompleteGoalMutation();
 
   const goalNameField = useField<string>({
     initialValue: props.goal.name,
@@ -90,169 +96,13 @@ const EditableGoalCardContent = (
     },
   });
 
-  const queryClient = useQueryClient();
-  const doEditGoal = useMutation({
-    mutationFn: async (newGoal: IGoalUpdateRequest) =>
-      await request({
-        url: "/api/goal",
-        method: "PUT",
-        data: newGoal,
-      }),
-    onMutate: async (variables: IGoalUpdateRequest) => {
-      await queryClient.cancelQueries({
-        queryKey: [goalsQueryKey, { includeInterest: props.includeInterest }],
-      });
-
-      const previousGoals: IGoalResponse[] =
-        queryClient.getQueryData([
-          "goals",
-          { includeInterest: props.includeInterest },
-        ]) ?? [];
-
-      queryClient.setQueryData(
-        [goalsQueryKey, { includeInterest: props.includeInterest }],
-        (oldGoals: IGoalResponse[]) =>
-          oldGoals?.map((oldGoal: IGoalResponse) =>
-            oldGoal.id === variables.id
-              ? {
-                  ...oldGoal,
-                  name: variables.name,
-                  completeDate: variables.completeDate,
-                  amount: variables.amount,
-                  monthlyContribution: variables.monthlyContribution,
-                }
-              : oldGoal,
-          ),
-      );
-
-      return { previousGoals };
-    },
-    onError: (error: AxiosError, _variables: IGoalUpdateRequest, context) => {
-      queryClient.setQueryData(
-        [goalsQueryKey, { includeInterest: props.includeInterest }],
-        context?.previousGoals ?? [],
-      );
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: [goalsQueryKey, { includeInterest: props.includeInterest }],
-      });
-    },
-  });
-
-  const doCompleteGoal = useMutation({
-    mutationFn: async (id: string) =>
-      await request({
-        url: "/api/goal/complete",
-        method: "POST",
-        params: { goalID: id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [goalsQueryKey],
-      });
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("goal_successfully_marked_complete"),
-      });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const doDeleteGoal = useMutation({
-    mutationFn: async (id: string) =>
-      await request({
-        url: "/api/goal",
-        method: "DELETE",
-        params: { guid: id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [goalsQueryKey],
-      });
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("goal_deleted_successfully"),
-      });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const submitChanges = (): void => {
-    const newGoal: IGoalUpdateRequest = { ...props.goal };
-
-    if (goalNameField.getValue().length > 0) {
-      newGoal.name = goalNameField.getValue();
-    } else {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: t("invalid_goal_name"),
-      });
-    }
-
-    if (goalTargetAmountField.getValue() > 0) {
-      newGoal.amount = goalTargetAmountField.getValue();
-    } else {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: t("invalid_target_amount"),
-      });
-    }
-
-    if (goalMonthlyContributionField.getValue() > 0) {
-      newGoal.monthlyContribution = goalMonthlyContributionField.getValue();
-    } else {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: t("invalid_monthly_contribution"),
-      });
-    }
-
-    doEditGoal.mutate(newGoal);
-  };
-
-  // The DateInput doesn't have an onBlur property, so we need to handle this manually.
-  const submitTargetDateChanges = (date: DateValue): void => {
-    const parsedDate = dayjs(date);
-
-    if (parsedDate.isValid()) {
-      goalTargetDateField.setValue(parsedDate.toDate());
-    } else {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: t("invalid_target_date"),
-      });
-    }
-
-    const newGoal: IGoalUpdateRequest = {
-      ...props.goal,
-      completeDate: parsedDate.toDate(),
-    };
-
-    doEditGoal.mutate(newGoal);
-  };
-
   return (
     <>
       <LoadingOverlay
         visible={
-          doEditGoal.isPending ||
-          doDeleteGoal.isPending ||
-          doCompleteGoal.isPending
+          updateGoalMutation.isPending ||
+          deleteGoalMutation.isPending ||
+          completeGoalMutation.isPending
         }
       />
       <Group style={{ containerType: "inline-size" }} wrap="nowrap">
@@ -261,7 +111,20 @@ const EditableGoalCardContent = (
             <Group align="center" gap={10}>
               <TextInput
                 {...goalNameField.getInputProps()}
-                onBlur={submitChanges}
+                onBlur={(event) => {
+                  if (event.currentTarget.value.length > 0) {
+                    goalNameField.setValue(event.currentTarget.value);
+                    updateGoalMutation.mutate({
+                      id: props.goal.id,
+                      name: event.currentTarget.value,
+                    });
+                  } else {
+                    notifications.show({
+                      color: "var(--button-color-destructive)",
+                      message: t("invalid_goal_name"),
+                    });
+                  }
+                }}
                 onClick={(e) => e.stopPropagation()}
                 elevation={1}
               />
@@ -282,9 +145,9 @@ const EditableGoalCardContent = (
                   bg="var(--button-color-confirm)"
                   onClick={(e) => {
                     e.stopPropagation();
-                    doCompleteGoal.mutate(props.goal.id);
+                    completeGoalMutation.mutate(props.goal.id);
                   }}
-                  loading={doCompleteGoal.isPending}
+                  loading={completeGoalMutation.isPending}
                 >
                   {t("mark_as_complete")}
                 </Button>
@@ -334,7 +197,22 @@ const EditableGoalCardContent = (
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
                       {...goalTargetAmountField.getInputProps()}
-                      onBlur={submitChanges}
+                      onBlur={(event) => {
+                        if (event.currentTarget.valueAsNumber > 0) {
+                          goalTargetAmountField.setValue(
+                            event.currentTarget.valueAsNumber,
+                          );
+                          updateGoalMutation.mutate({
+                            id: props.goal.id,
+                            amount: event.currentTarget.valueAsNumber,
+                          });
+                        } else {
+                          notifications.show({
+                            color: "var(--button-color-destructive)",
+                            message: t("invalid_target_amount"),
+                          });
+                        }
+                      }}
                       elevation={1}
                     />
                   </Flex>
@@ -408,7 +286,22 @@ const EditableGoalCardContent = (
                         {...goalTargetDateField.getInputProps()}
                         locale={dayjsLocale}
                         valueFormat={longDateFormat}
-                        onChange={submitTargetDateChanges}
+                        onChange={(date) => {
+                          const parsedDate = dayjs(date);
+
+                          if (parsedDate.isValid()) {
+                            goalTargetDateField.setValue(parsedDate.toDate());
+                            updateGoalMutation.mutate({
+                              id: props.goal.id,
+                              completeDate: parsedDate.toDate(),
+                            });
+                          } else {
+                            notifications.show({
+                              color: "var(--button-color-destructive)",
+                              message: t("invalid_target_date"),
+                            });
+                          }
+                        }}
                       />
                     </Flex>
                   </>
@@ -465,7 +358,23 @@ const EditableGoalCardContent = (
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
                       {...goalMonthlyContributionField.getInputProps()}
-                      onBlur={submitChanges}
+                      onBlur={(event) => {
+                        if (event.currentTarget.valueAsNumber > 0) {
+                          goalMonthlyContributionField.setValue(
+                            event.currentTarget.valueAsNumber,
+                          );
+                          updateGoalMutation.mutate({
+                            id: props.goal.id,
+                            monthlyContribution:
+                              event.currentTarget.valueAsNumber,
+                          });
+                        } else {
+                          notifications.show({
+                            color: "var(--button-color-destructive)",
+                            message: t("invalid_monthly_contribution"),
+                          });
+                        }
+                      }}
                       elevation={1}
                     />
                   </Flex>
@@ -513,7 +422,7 @@ const EditableGoalCardContent = (
             color="var(--button-color-destructive)"
             onClick={(e) => {
               e.stopPropagation();
-              doDeleteGoal.mutate(props.goal.id);
+              deleteGoalMutation.mutate(props.goal.id);
             }}
             h="100%"
           >

@@ -76,7 +76,7 @@ public class GoalController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid goalId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -87,7 +87,7 @@ public class GoalController(
                 return Unauthorized();
             }
 
-            await goalService.DeleteGoalAsync(parsedUserId, guid);
+            await goalService.DeleteGoalAsync(parsedUserId, goalId);
             return Ok();
         });
     }
@@ -95,7 +95,7 @@ public class GoalController(
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Complete(Guid goalID)
+    public async Task<IActionResult> Complete(Guid goalId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -106,7 +106,7 @@ public class GoalController(
                 return Unauthorized();
             }
 
-            await goalService.CompleteGoalAsync(parsedUserId, goalID, nowProvider.Today);
+            await goalService.CompleteGoalAsync(parsedUserId, goalId, nowProvider.Today);
             return Ok();
         });
     }

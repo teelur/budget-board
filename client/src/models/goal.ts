@@ -11,12 +11,10 @@ export interface IGoalCreateRequest {
 
 export interface IGoalUpdateRequest {
   id: string;
-  name: string;
-  completeDate: Date | null;
-  isCompleteDateEditable: boolean;
-  amount: number;
-  monthlyContribution: number | null;
-  isMonthlyContributionEditable: boolean;
+  name?: string;
+  completeDate?: Date | null;
+  amount?: number;
+  monthlyContribution?: number | null;
 }
 
 export interface IGoalResponse {

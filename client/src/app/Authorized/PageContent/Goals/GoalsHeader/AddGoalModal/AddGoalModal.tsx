@@ -12,11 +12,8 @@ import ConfigureGoal, {
 import SetTarget from "./SetTarget/SetTarget";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { IGoalCreateRequest } from "~/models/goal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { notifications } from "@mantine/notifications";
-import { translateAxiosError , goalsQueryKey} from "~/helpers/requests";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useCreateGoalMutation } from "~/hooks/mutations/goals/useCreateGoalMutation";
 
 const AddGoalModal = (): React.ReactNode => {
   const [selectedGoalType, setSelectedGoalType] = React.useState<string | null>(
@@ -35,27 +32,7 @@ const AddGoalModal = (): React.ReactNode => {
 
   const { dayjs } = useLocale();
   const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const queryClient = useQueryClient();
-  const doAddGoal = useMutation({
-    mutationFn: async (newGoal: IGoalCreateRequest) =>
-      await request({
-        url: "/api/goal",
-        method: "POST",
-        data: newGoal,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [goalsQueryKey] });
-      setActiveStep(3);
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const createGoalMutation = useCreateGoalMutation();
 
   useDidUpdate(() => {
     if (!isOpen) {
@@ -87,7 +64,11 @@ const AddGoalModal = (): React.ReactNode => {
       accountIds: goalConfiguration.accounts,
     };
 
-    doAddGoal.mutate(newGoal);
+    createGoalMutation.mutate(newGoal, {
+      onSuccess: () => {
+        setActiveStep(3);
+      },
+    });
   };
 
   return (
@@ -134,7 +115,7 @@ const AddGoalModal = (): React.ReactNode => {
             <SetTarget
               goBackToPreviousDialog={() => setActiveStep(1)}
               createGoal={createGoal}
-              isCreatingGoal={doAddGoal.isPending}
+              isCreatingGoal={createGoalMutation.isPending}
             />
           </Stepper.Step>
           <Stepper.Completed>

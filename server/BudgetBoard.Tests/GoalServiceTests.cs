@@ -391,6 +391,52 @@ public class GoalServiceTests
     #endregion
 
     #region ReadGoalsAsync
+    [Fact]
+    public async Task ReadGoalsAsync_WhenValidData_ShouldReturnGoal()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var fakeNowProvider = CreateNowProviderMock();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            fakeNowProvider,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(5);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
+        var goal = goalFaker.Generate();
+        goal.CompleteDate = fakeNowProvider.Today.AddMonths(6);
+        goal.MonthlyContribution = null;
+        goal.Accounts = accounts;
+        helper.UserDataContext.Goals.Add(goal);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var result = await goalService.ReadGoalsAsync(helper.demoUser.Id, false);
+
+        // Assert
+        var readGoal = result.Single();
+        readGoal.ID.Should().Be(goal.ID);
+        readGoal.Name.Should().Be(goal.Name);
+        readGoal.CompleteDate.Should().Be(goal.CompleteDate);
+        readGoal.IsCompleteDateEditable.Should().Be(true);
+        readGoal.Amount.Should().Be(goal.Amount);
+        readGoal.InitialAmount.Should().Be(goal.InitialAmount);
+        readGoal.MonthlyContribution.Should().NotBe(0);
+        readGoal.IsMonthlyContributionEditable.Should().Be(false);
+        readGoal.InterestRate.Should().Be(0);
+        readGoal.Completed.Should().Be(goal.Completed);
+        readGoal.Accounts.Should().BeEquivalentTo(accounts.Select(a => new AccountResponse(a)));
+        readGoal.UserID.Should().Be(goal.UserID);
+    }
+
     // This test is created with an APR of 48%. The expected values were validated with an online calculator.
     [Theory]
     [InlineData(-54080, -60000, 0, false, 19)]
@@ -937,8 +983,8 @@ public class GoalServiceTests
         var updatedGoalEntity = helper.UserDataContext.Goals.Single();
         updatedGoalEntity.Name.Should().Be(updatedGoal.Name);
         updatedGoalEntity.Amount.Should().Be(updatedGoal.Amount);
-        updatedGoalEntity.MonthlyContribution.Should().Be(updatedGoal.MonthlyContribution);
-        updatedGoalEntity.CompleteDate.Should().Be(updatedGoal.CompleteDate);
+        updatedGoalEntity.MonthlyContribution.Should().Be(updatedGoal.MonthlyContribution.Value);
+        updatedGoalEntity.CompleteDate.Should().Be(updatedGoal.CompleteDate.Value);
     }
 
     [Fact]

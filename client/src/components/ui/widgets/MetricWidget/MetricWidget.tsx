@@ -31,6 +31,7 @@ import {
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
+import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 
 interface MetricWidgetProps {
   widgetId: string;
@@ -152,17 +153,8 @@ const MetricWidget = ({
     enabled: requirements.needsBudgets,
   });
 
-  const goalsQuery = useQuery({
-    queryKey: [goalsQueryKey, { includeInterest: false }],
-    queryFn: async (): Promise<IGoalResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/goal",
-        method: "GET",
-        params: { includeInterest: false },
-      });
-      if (res.status === 200) return res.data as IGoalResponse[];
-      return [];
-    },
+  const goalsQuery = useGoalsQuery({
+    includeInterest: false,
     enabled: requirements.needsGoals,
   });
 

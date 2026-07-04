@@ -118,7 +118,12 @@ public class GoalService(
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var goal = GetGoalById(userData, request.ID);
 
-        if (request.CompleteDate.HasValue && request.MonthlyContribution.HasValue)
+        if (
+            request.CompleteDate.IsSpecified
+            && request.CompleteDate.Value.HasValue
+            && request.MonthlyContribution.IsSpecified
+            && request.MonthlyContribution.Value.HasValue
+        )
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalUpdateBothDateAndContributionLog"]);
             throw new BudgetBoardServiceException(
@@ -126,13 +131,21 @@ public class GoalService(
             );
         }
 
-        if (request.CompleteDate.HasValue && request.CompleteDate.Value < nowProvider.Today)
+        if (
+            request.CompleteDate.IsSpecified
+            && request.CompleteDate.Value.HasValue
+            && request.CompleteDate.Value < nowProvider.Today
+        )
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalUpdatePastDateLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["GoalUpdatePastDateError"]);
         }
 
-        if (request.MonthlyContribution.HasValue && request.MonthlyContribution.Value <= 0)
+        if (
+            request.MonthlyContribution.IsSpecified
+            && request.MonthlyContribution.Value.HasValue
+            && request.MonthlyContribution.Value <= 0
+        )
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalUpdateNoMonthlyContributionLog"]);
             throw new BudgetBoardServiceException(
@@ -140,10 +153,22 @@ public class GoalService(
             );
         }
 
-        goal.Name = request.Name;
-        goal.Amount = request.Amount;
-        goal.CompleteDate = request.CompleteDate;
-        goal.MonthlyContribution = request.MonthlyContribution;
+        if (!string.IsNullOrEmpty(request.Name))
+        {
+            goal.Name = request.Name;
+        }
+        if (request.Amount.HasValue)
+        {
+            goal.Amount = request.Amount.Value;
+        }
+        if (request.CompleteDate.IsSpecified)
+        {
+            goal.CompleteDate = request.CompleteDate.Value;
+        }
+        if (request.MonthlyContribution.IsSpecified)
+        {
+            goal.MonthlyContribution = request.MonthlyContribution.Value;
+        }
 
         await userDataContext.SaveChangesAsync();
     }

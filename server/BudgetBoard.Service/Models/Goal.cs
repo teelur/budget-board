@@ -26,19 +26,20 @@ public class GoalCreateRequest : IGoalCreateRequest
 public interface IGoalUpdateRequest
 {
     Guid ID { get; }
-    string Name { get; }
-    DateOnly? CompleteDate { get; }
-    decimal Amount { get; }
-    decimal? MonthlyContribution { get; }
+    string? Name { get; }
+    OptionalField<DateOnly?> CompleteDate { get; }
+    decimal? Amount { get; }
+    OptionalField<decimal?> MonthlyContribution { get; }
 }
 
 public class GoalUpdateRequest : IGoalUpdateRequest
 {
     public Guid ID { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public DateOnly? CompleteDate { get; set; } = null;
-    public decimal Amount { get; set; } = 0.0M;
-    public decimal? MonthlyContribution { get; set; } = null;
+    public string? Name { get; set; } = string.Empty;
+    public OptionalField<DateOnly?> CompleteDate { get; set; } = new OptionalField<DateOnly?>();
+    public decimal? Amount { get; set; } = 0.0M;
+    public OptionalField<decimal?> MonthlyContribution { get; set; } =
+        new OptionalField<decimal?>();
 }
 
 public interface IGoalResponse

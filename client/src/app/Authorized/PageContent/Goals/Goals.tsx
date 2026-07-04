@@ -8,12 +8,13 @@ import React from "react";
 import GoalCard from "./GoalCard/GoalCard";
 import GoalsHeader from "./GoalsHeader/GoalsHeader";
 import { notifications } from "@mantine/notifications";
-import { translateAxiosError , goalsQueryKey} from "~/helpers/requests";
+import { translateAxiosError, goalsQueryKey } from "~/helpers/requests";
 import CompletedGoalsAccordion from "./CompletedGoalsAccordion/CompletedGoalsAccordion";
 import GoalDetails from "./GoalDetails/GoalDetails";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { InfoIcon } from "lucide-react";
+import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 
 const Goals = (): React.ReactNode => {
   const [includeInterest, { toggle: toggleIncludeInterest }] = useDisclosure();
@@ -21,29 +22,11 @@ const Goals = (): React.ReactNode => {
     useDisclosure();
 
   const { t } = useTranslation();
+  const goalsQuery = useGoalsQuery({ includeInterest });
 
   const [selectedGoal, setSelectedGoal] = React.useState<IGoalResponse | null>(
     null,
   );
-
-  const { request } = useAuth();
-
-  const goalsQuery = useQuery({
-    queryKey: [goalsQueryKey, { includeInterest }],
-    queryFn: async (): Promise<IGoalResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/goal",
-        method: "GET",
-        params: { includeInterest },
-      });
-
-      if (res.status === 200) {
-        return res.data as IGoalResponse[];
-      }
-
-      return [];
-    },
-  });
 
   React.useEffect(() => {
     if (goalsQuery.isError) {
