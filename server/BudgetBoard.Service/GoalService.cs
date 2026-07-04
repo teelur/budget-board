@@ -131,20 +131,22 @@ public class GoalService(
             );
         }
 
+        var completeDate = request.CompleteDate;
         if (
-            request.CompleteDate.IsSpecified
-            && request.CompleteDate.Value.HasValue
-            && request.CompleteDate.Value < nowProvider.Today
+            completeDate.IsSpecified
+            && completeDate.Value is DateOnly completeDateValue
+            && completeDateValue < nowProvider.Today
         )
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalUpdatePastDateLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["GoalUpdatePastDateError"]);
         }
 
+        var monthlyContribution = request.MonthlyContribution;
         if (
-            request.MonthlyContribution.IsSpecified
-            && request.MonthlyContribution.Value.HasValue
-            && request.MonthlyContribution.Value <= 0
+            monthlyContribution.IsSpecified
+            && monthlyContribution.Value is decimal monthlyContributionValue
+            && monthlyContributionValue <= 0
         )
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalUpdateNoMonthlyContributionLog"]);
