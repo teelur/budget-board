@@ -184,9 +184,6 @@
   <data name="RuleRunSummary" xml:space="preserve">
     <value>Rule applied {0} updates.</value>
   </data>
-  <data name="GoalCompleteNotFoundError" xml:space="preserve">
-    <value>The goal you are trying to complete does not exist.</value>
-  </data>
   <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
     <value>A LunchFlow account with this SyncID already exists.</value>
   </data>
@@ -294,9 +291,6 @@
   </data>
   <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
     <value>The category '{0}' does not exist.</value>
-  </data>
-  <data name="GoalDeleteNotFoundError" xml:space="preserve">
-    <value>The goal you are trying to delete does not exist.</value>
   </data>
   <data name="GoalCreateInvalidAccountError" xml:space="preserve">
     <value>The account you are trying to use does not exist.</value>
@@ -471,5 +465,11 @@
   </data>
   <data name="BudgetNotFoundError" xml:space="preserve">
     <value>The budget you are trying to access does not exist.</value>
+  </data>
+  <data name="GoalNotFoundError" xml:space="preserve">
+    <value>The goal you are trying to access does not exist.</value>
+  </data>
+  <data name="GoalBothDateAndContributionError" xml:space="preserve">
+    <value>A goal cannot have both a target date and a monthly contribution.</value>
   </data>
 </root>

@@ -466,4 +466,10 @@
   <data name="BudgetNotFoundError" xml:space="preserve">
     <value>The budget you are trying to access does not exist.</value>
   </data>
+  <data name="GoalNotFoundError" xml:space="preserve">
+    <value>The goal you are trying to access does not exist.</value>
+  </data>
+  <data name="GoalBothDateAndContributionError" xml:space="preserve">
+    <value>A goal cannot have both a target date and a monthly contribution.</value>
+  </data>
 </root>
