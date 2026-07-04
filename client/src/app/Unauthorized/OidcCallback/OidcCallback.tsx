@@ -53,10 +53,11 @@ const OidcCallback = (): React.ReactNode => {
     const savedState = state
       ? sessionStorage.getItem(`oidc_state_${state}`)
       : null;
-    const flow = state
-      ? (sessionStorage.getItem(`oidc_flow_${state}`) as OidcAuthFlow | null)
-      : null;
-    const oidcFlow = flow ?? OidcAuthFlows.SignIn;
+    const rawFlow = state ? sessionStorage.getItem(`oidc_flow_${state}`) : null;
+    const oidcFlow =
+      rawFlow === OidcAuthFlows.Connect || rawFlow === OidcAuthFlows.SignIn
+        ? rawFlow
+        : OidcAuthFlows.SignIn;
 
     // The OIDC provider provided an error
     if (error) {

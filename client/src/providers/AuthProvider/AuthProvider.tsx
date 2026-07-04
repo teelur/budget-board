@@ -115,7 +115,6 @@ export const AuthProvider = ({
           color: "var(--button-color-destructive)",
           message: t("oidc_enabled_but_not_configured"),
         });
-        setOidcLoading(false);
         return;
       }
 
@@ -142,6 +141,7 @@ export const AuthProvider = ({
           color: "var(--button-color-destructive)",
           message: t("oidc_discovery_document_failed_message"),
         });
+        return;
       }
 
       const discoveryData: IOidcDiscoveryDocument =
