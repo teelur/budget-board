@@ -9,11 +9,11 @@ export const useDeleteGoalMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (id: string) =>
+    mutationFn: async (goalId: string) =>
       await request({
         url: "/api/goal",
         method: "DELETE",
-        params: { guid: id },
+        params: { goalId },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({

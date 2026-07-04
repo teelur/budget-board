@@ -19,7 +19,7 @@ import {
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
-import { IGoalResponse, IGoalUpdateRequest } from "~/models/goal";
+import { IGoalResponse } from "~/models/goal";
 import { IUserSettings } from "~/models/userSettings";
 import { notifications } from "@mantine/notifications";
 import { userSettingsQueryKey } from "~/helpers/requests";
@@ -197,14 +197,11 @@ const EditableGoalCardContent = (
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
                       {...goalTargetAmountField.getInputProps()}
-                      onBlur={(event) => {
-                        if (event.currentTarget.valueAsNumber > 0) {
-                          goalTargetAmountField.setValue(
-                            event.currentTarget.valueAsNumber,
-                          );
+                      onBlur={() => {
+                        if (goalTargetAmountField.getValue() > 0) {
                           updateGoalMutation.mutate({
                             id: props.goal.id,
-                            amount: event.currentTarget.valueAsNumber,
+                            amount: goalTargetAmountField.getValue(),
                           });
                         } else {
                           notifications.show({
@@ -293,7 +290,7 @@ const EditableGoalCardContent = (
                             goalTargetDateField.setValue(parsedDate.toDate());
                             updateGoalMutation.mutate({
                               id: props.goal.id,
-                              completeDate: parsedDate.toDate(),
+                              completeDate: parsedDate.format("YYYY-MM-DD"),
                             });
                           } else {
                             notifications.show({
@@ -358,15 +355,12 @@ const EditableGoalCardContent = (
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
                       {...goalMonthlyContributionField.getInputProps()}
-                      onBlur={(event) => {
-                        if (event.currentTarget.valueAsNumber > 0) {
-                          goalMonthlyContributionField.setValue(
-                            event.currentTarget.valueAsNumber,
-                          );
+                      onBlur={() => {
+                        if (goalMonthlyContributionField.getValue() > 0) {
                           updateGoalMutation.mutate({
                             id: props.goal.id,
                             monthlyContribution:
-                              event.currentTarget.valueAsNumber,
+                              goalMonthlyContributionField.getValue(),
                           });
                         } else {
                           notifications.show({

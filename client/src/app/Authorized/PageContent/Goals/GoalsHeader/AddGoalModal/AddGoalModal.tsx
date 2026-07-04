@@ -55,7 +55,7 @@ const AddGoalModal = (): React.ReactNode => {
     const newGoal: IGoalCreateRequest = {
       name: goalConfiguration.name,
       completeDate: parsedCompleteDate.isValid()
-        ? parsedCompleteDate.toDate()
+        ? parsedCompleteDate.format("YYYY-MM-DD")
         : null,
       amount: goalConfiguration.targetAmount,
       applyExistingBalanceTowardsGoal: goalConfiguration.applyAccountAmount,

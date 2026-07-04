@@ -37,7 +37,7 @@ public class GoalUpdateRequest : IGoalUpdateRequest
     public Guid ID { get; set; }
     public string? Name { get; set; } = string.Empty;
     public OptionalField<DateOnly?> CompleteDate { get; set; } = new OptionalField<DateOnly?>();
-    public decimal? Amount { get; set; } = 0.0M;
+    public decimal? Amount { get; set; } = null;
     public OptionalField<decimal?> MonthlyContribution { get; set; } =
         new OptionalField<decimal?>();
 }

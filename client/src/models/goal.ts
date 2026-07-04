@@ -2,7 +2,7 @@ import { IAccountResponse } from "./account";
 
 export interface IGoalCreateRequest {
   name: string;
-  completeDate: Date | null;
+  completeDate: string | null;
   amount: number;
   applyExistingBalanceTowardsGoal: boolean;
   monthlyContribution: number | null;
@@ -12,7 +12,7 @@ export interface IGoalCreateRequest {
 export interface IGoalUpdateRequest {
   id: string;
   name?: string;
-  completeDate?: Date | null;
+  completeDate?: string | null;
   amount?: number;
   monthlyContribution?: number | null;
 }
