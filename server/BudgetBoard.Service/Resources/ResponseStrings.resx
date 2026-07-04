@@ -148,7 +148,7 @@
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>The parent budget cannot be less than the sum of its children.</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
     <value>A goal must have a monthly contribution or target date.</value>
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">
@@ -169,7 +169,7 @@
   <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
     <value>A goal must have a monthly contribution greater than 0.</value>
   </data>
-  <data name="GoalUpdateBothDateAndContributionError" xml:space="preserve">
+  <data name="GoalBothDateAndContributionError" xml:space="preserve">
     <value>A goal cannot have both a target date and a monthly contribution.</value>
   </data>
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">

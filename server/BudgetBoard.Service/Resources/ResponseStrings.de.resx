@@ -118,7 +118,7 @@
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>Das übergeordnete Budget darf nicht kleiner sein als die Summe seiner untergeordneten Budgets.</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
     <value>Ein Ziel muss einen monatlichen Beitrag oder ein Zieldatum haben.</value>
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">

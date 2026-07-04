@@ -136,8 +136,8 @@
   <data name="BudgetUpdateParentLimitErrorLog" xml:space="preserve">
     <value>Attempted to update parent budget to a value less than the sum of its children.</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateLog" xml:space="preserve">
-    <value>Attempted to create goal without a monthly contribution and target date.</value>
+  <data name="GoalMissingContributionOrDateLog" xml:space="preserve">
+    <value>Goal is missing either a monthly contribution or a target date.</value>
   </data>
   <data name="GoalCreatePastDateLog" xml:space="preserve">
     <value>Attempted to create goal with a target date in the past.</value>
@@ -157,8 +157,8 @@
   <data name="GoalUpdateNoMonthlyContributionLog" xml:space="preserve">
     <value>Attempted to update goal without a monthly contribution.</value>
   </data>
-  <data name="GoalUpdateBothDateAndContributionLog" xml:space="preserve">
-    <value>Attempted to update goal with both a target date and a monthly contribution.</value>
+  <data name="GoalBothDateAndContributionLog" xml:space="preserve">
+    <value>Goal cannot have both a target date and a monthly contribution.</value>
   </data>
   <data name="GoalCompleteAlreadyCompletedLog" xml:space="preserve">
     <value>Attempted to complete a goal that is already completed.</value>

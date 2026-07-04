@@ -118,7 +118,7 @@
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>父预算不能小于其子预算的总和。</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
     <value>目标必须设置每月存入金额或目标日期。</value>
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">

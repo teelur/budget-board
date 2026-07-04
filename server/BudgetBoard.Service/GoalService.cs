@@ -28,9 +28,17 @@ public class GoalService(
             && !request.CompleteDate.HasValue
         )
         {
-            logger.LogError("{LogMessage}", logLocalizer["GoalCreateMissingContributionOrDateLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalMissingContributionOrDateLog"]);
             throw new BudgetBoardServiceException(
-                responseLocalizer["GoalCreateMissingContributionOrDateError"]
+                responseLocalizer["GoalMissingContributionOrDateError"]
+            );
+        }
+
+        if (request.MonthlyContribution.HasValue && request.CompleteDate.HasValue)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["GoalBothDateAndContributionLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["GoalBothDateAndContributionError"]
             );
         }
 
@@ -120,14 +128,30 @@ public class GoalService(
 
         if (
             request.CompleteDate.IsSpecified
+            && !request.CompleteDate.Value.HasValue
+            && request.MonthlyContribution.IsSpecified
+            && (
+                !request.MonthlyContribution.Value.HasValue
+                || request.MonthlyContribution.Value <= 0
+            )
+        )
+        {
+            logger.LogError("{LogMessage}", logLocalizer["GoalMissingContributionOrDateLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["GoalMissingContributionOrDateError"]
+            );
+        }
+
+        if (
+            request.CompleteDate.IsSpecified
             && request.CompleteDate.Value.HasValue
             && request.MonthlyContribution.IsSpecified
             && request.MonthlyContribution.Value.HasValue
         )
         {
-            logger.LogError("{LogMessage}", logLocalizer["GoalUpdateBothDateAndContributionLog"]);
+            logger.LogError("{LogMessage}", logLocalizer["GoalBothDateAndContributionLog"]);
             throw new BudgetBoardServiceException(
-                responseLocalizer["GoalUpdateBothDateAndContributionError"]
+                responseLocalizer["GoalBothDateAndContributionError"]
             );
         }
 

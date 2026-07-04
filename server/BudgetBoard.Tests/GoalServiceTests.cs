@@ -1,5 +1,4 @@
-﻿using Bogus;
-using BudgetBoard.Database.Models;
+﻿using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
@@ -61,7 +60,7 @@ public class GoalServiceTests
         {
             Name = "Test Goal",
             Amount = 1000,
-            MonthlyContribution = 100,
+            MonthlyContribution = null,
             CompleteDate = fakeNowProvider.Today.AddMonths(6),
             ApplyExistingBalanceTowardsGoal = false,
             AccountIds = [.. accounts.Select(a => a.ID)],
@@ -115,7 +114,7 @@ public class GoalServiceTests
         {
             Name = "Test Goal",
             Amount = 1000,
-            MonthlyContribution = 100,
+            MonthlyContribution = null,
             CompleteDate = fakeNowProvider.Today.AddMonths(6),
             ApplyExistingBalanceTowardsGoal = true,
             AccountIds = [.. accounts.Select(a => a.ID)],
@@ -159,7 +158,7 @@ public class GoalServiceTests
         {
             Name = "Test Goal",
             Amount = 1000,
-            MonthlyContribution = 100,
+            MonthlyContribution = null,
             CompleteDate = fakeNowProvider.Today.AddMonths(6),
             ApplyExistingBalanceTowardsGoal = false,
             AccountIds = [.. accounts.Select(a => a.ID)],
@@ -246,7 +245,7 @@ public class GoalServiceTests
     }
 
     [Fact]
-    public async Task CreateGoalAsync_WhenNoMonthlyContributionOrCompleteDate_ShouldThrowGoalCreateMissingContributionOrDateError()
+    public async Task CreateGoalAsync_WhenNoMonthlyContributionOrCompleteDate_ShouldThrowGoalMissingContributionOrDateError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -281,7 +280,46 @@ public class GoalServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("GoalCreateMissingContributionOrDateError");
+            .WithMessage("GoalMissingContributionOrDateError");
+    }
+
+    [Fact]
+    public async Task CreateGoalAsync_WhenMonthlyContributionAndCompleteDate_ShouldThrowGoalBothDateAndContributionError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var fakeNowProvider = CreateNowProviderMock();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            fakeNowProvider,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(5);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        var goal = new GoalCreateRequest
+        {
+            Name = "Test Goal",
+            Amount = 1000,
+            MonthlyContribution = 100,
+            CompleteDate = fakeNowProvider.Today.AddMonths(6),
+            ApplyExistingBalanceTowardsGoal = true,
+            AccountIds = [.. accounts.Select(a => a.ID)],
+        };
+
+        // Act
+        Func<Task> act = async () => await goalService.CreateGoalAsync(helper.demoUser.Id, goal);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalBothDateAndContributionError");
     }
 
     [Fact]
@@ -308,7 +346,7 @@ public class GoalServiceTests
         {
             Name = "Test Goal",
             Amount = 1000,
-            MonthlyContribution = 100,
+            MonthlyContribution = null,
             CompleteDate = fakeNowProvider.Today.AddDays(-1),
             ApplyExistingBalanceTowardsGoal = true,
             AccountIds = [.. accounts.Select(a => a.ID)],
@@ -341,7 +379,7 @@ public class GoalServiceTests
         {
             Name = "Test Goal",
             Amount = 1000,
-            MonthlyContribution = 100,
+            MonthlyContribution = null,
             CompleteDate = fakeNowProvider.Today.AddMonths(6),
             ApplyExistingBalanceTowardsGoal = true,
             AccountIds = [],
@@ -374,7 +412,7 @@ public class GoalServiceTests
         {
             Name = "Test Goal",
             Amount = 1000,
-            MonthlyContribution = 100,
+            MonthlyContribution = null,
             CompleteDate = fakeNowProvider.Today.AddMonths(6),
             ApplyExistingBalanceTowardsGoal = true,
             AccountIds = [Guid.NewGuid()],
@@ -988,8 +1026,7 @@ public class GoalServiceTests
     public static IEnumerable<object[]> UpdateGoalData =>
         [
             [2000m, null],
-            [null, "2024-12-31"],
-            [null, null],
+            [null, "2099-12-31"],
         ];
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
@@ -1002,10 +1039,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+        var fakeNowProvider = CreateNowProviderMock();
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>(),
+            fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
@@ -1098,10 +1136,11 @@ public class GoalServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+        var fakeNowProvider = CreateNowProviderMock();
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),
             helper.UserDataContext,
-            Mock.Of<INowProvider>(),
+            fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
@@ -1126,7 +1165,7 @@ public class GoalServiceTests
             Name = "Updated Goal Name",
             Amount = 2000,
             MonthlyContribution = null,
-            CompleteDate = null,
+            CompleteDate = fakeNowProvider.Today.AddMonths(6),
         };
 
         // Act
@@ -1137,7 +1176,7 @@ public class GoalServiceTests
         updatedGoalEntity.Name.Should().Be(updatedGoal.Name);
         updatedGoalEntity.Amount.Should().Be(updatedGoal.Amount);
         updatedGoalEntity.MonthlyContribution.Should().BeNull();
-        updatedGoalEntity.CompleteDate.Should().BeNull();
+        updatedGoalEntity.CompleteDate.Should().Be(updatedGoal.CompleteDate.Value);
     }
 
     [Fact]
@@ -1172,7 +1211,7 @@ public class GoalServiceTests
             ID = goal.ID,
             Name = "Updated Goal Name",
             Amount = 2000,
-            MonthlyContribution = null,
+            MonthlyContribution = 100,
             CompleteDate = null,
         };
 
@@ -1183,8 +1222,8 @@ public class GoalServiceTests
         var updatedGoalEntity = helper.UserDataContext.Goals.Single();
         updatedGoalEntity.Name.Should().Be(updatedGoal.Name);
         updatedGoalEntity.Amount.Should().Be(updatedGoal.Amount);
-        updatedGoalEntity.MonthlyContribution.Should().BeNull();
-        updatedGoalEntity.CompleteDate.Should().BeNull();
+        updatedGoalEntity.MonthlyContribution.Should().Be(updatedGoal.MonthlyContribution.Value);
+        updatedGoalEntity.CompleteDate.Should().Be(updatedGoal.CompleteDate.Value);
     }
 
     [Fact]
@@ -1220,7 +1259,7 @@ public class GoalServiceTests
     }
 
     [Fact]
-    public async Task UpdateGoalAsync_WhenTryToEditBothCompleteDateAndMonthlyContribution_ShouldThrowGoalUpdateBothDateAndContributionError()
+    public async Task UpdateGoalAsync_WhenTryToEditBothCompleteDateAndMonthlyContribution_ShouldThrowGoalBothDateAndContributionError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -1262,7 +1301,53 @@ public class GoalServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("GoalUpdateBothDateAndContributionError");
+            .WithMessage("GoalBothDateAndContributionError");
+    }
+
+    [Fact]
+    public async Task UpdateGoalAsync_WhenBothCompleteDateAndMonthlyContributionNull_ShouldThrowGoalMissingContributionOrDateError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var goalService = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(5);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+
+        var goalFaker = new GoalFaker(helper.demoUser.Id);
+        var goal = goalFaker.Generate();
+        goal.CompleteDate = null;
+        goal.MonthlyContribution = null;
+        goal.Accounts = accounts;
+
+        helper.UserDataContext.Goals.Add(goal);
+        helper.UserDataContext.SaveChanges();
+
+        var updatedGoal = new GoalUpdateRequest
+        {
+            ID = goal.ID,
+            Name = "Updated Goal Name",
+            Amount = 2000,
+            MonthlyContribution = null,
+            CompleteDate = null,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await goalService.UpdateGoalAsync(helper.demoUser.Id, updatedGoal);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("GoalMissingContributionOrDateError");
     }
 
     [Fact]

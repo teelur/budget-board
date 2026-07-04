@@ -334,7 +334,7 @@
   <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
     <value>LunchFlow API key is not configured.</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
     <value>A goal must have a monthly contribution or target date.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
