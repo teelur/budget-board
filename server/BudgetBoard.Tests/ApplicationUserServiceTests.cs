@@ -12,7 +12,7 @@ using Moq;
 namespace BudgetBoard.IntegrationTests;
 
 [Collection("IntegrationTests")]
-public class ApplicationUserTests
+public class ApplicationUserServiceTests
 {
     #region ReadApplicationUserAsync
     [Fact]
@@ -154,6 +154,145 @@ public class ApplicationUserTests
     }
     #endregion
 
+    #region ConnectOidcLoginAsync
+    [Fact]
+    public async Task ConnectOidcLoginAsync_WhenNoOidcLoginExists_AddsOidcLogin()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(
+            helper.demoUser,
+            [new("local", "localUserId", "local")]
+        );
+
+        var providerKey = "oidc-provider-user-123";
+
+        // Act
+        await applicationUserService.ConnectOidcLoginAsync(
+            helper.demoUser.Id,
+            providerKey,
+            mockUserManager.Object
+        );
+
+        // Assert
+        mockUserManager.Verify(
+            um =>
+                um.AddLoginAsync(
+                    helper.demoUser,
+                    It.Is<UserLoginInfo>(l =>
+                        l.LoginProvider == ApplicationUserService.OidcLoginProvider
+                        && l.ProviderKey == providerKey
+                        && l.ProviderDisplayName == ApplicationUserService.OidcLoginProvider
+                    )
+                ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task ConnectOidcLoginAsync_WhenOidcLoginExists_ThrowsOidcLoginAlreadyExistsError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(
+            helper.demoUser,
+            [new("oidc", helper.demoUser.Id.ToString(), "oidc")]
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await applicationUserService.ConnectOidcLoginAsync(
+                helper.demoUser.Id,
+                "oidc-provider-user-123",
+                mockUserManager.Object
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("OidcLoginAlreadyExistsError");
+    }
+
+    [Fact]
+    public async Task ConnectOidcLoginAsync_WhenAddLoginFails_ThrowsAddOidcFailedError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(
+            helper.demoUser,
+            [new("local", "localUserId", "local")],
+            addLoginResult: IdentityResult.Failed(
+                new IdentityError { Description = "Add login failed" }
+            )
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await applicationUserService.ConnectOidcLoginAsync(
+                helper.demoUser.Id,
+                "oidc-provider-user-123",
+                mockUserManager.Object
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AddOidcFailedError");
+    }
+
+    [Fact]
+    public async Task ConnectOidcLoginAsync_WhenProviderKeyIsMissing_ThrowsAddOidcFailedError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(
+            helper.demoUser,
+            [new("local", "localUserId", "local")]
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await applicationUserService.ConnectOidcLoginAsync(
+                helper.demoUser.Id,
+                null!,
+                mockUserManager.Object
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AddOidcFailedError");
+    }
+    #endregion
+
     #region DisconnectOidcLoginAsync
     [Fact]
     public async Task DisconnectOidcLoginAsync_WhenOidcLoginExists_RemovesOidcLogin()
@@ -289,6 +428,7 @@ public class ApplicationUserTests
         ApplicationUser user,
         IList<UserLoginInfo>? logins = null,
         bool hasPassword = true,
+        IdentityResult? addLoginResult = null,
         IdentityResult? removeLoginResult = null
     )
     {
@@ -307,6 +447,9 @@ public class ApplicationUserTests
 
         mockUserManager.Setup(um => um.GetLoginsAsync(user)).ReturnsAsync(logins ?? []);
         mockUserManager.Setup(um => um.HasPasswordAsync(user)).ReturnsAsync(hasPassword);
+        mockUserManager
+            .Setup(um => um.AddLoginAsync(user, It.IsAny<UserLoginInfo>()))
+            .ReturnsAsync(addLoginResult ?? IdentityResult.Success);
         mockUserManager
             .Setup(um => um.RemoveLoginAsync(user, It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(removeLoginResult ?? IdentityResult.Success);

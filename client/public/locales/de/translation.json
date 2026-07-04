@@ -380,7 +380,6 @@
   "no_widgets": "Es wurden keine Widgets gefunden. Füge ein Widget hinzu, um loszulegen.",
   "none": "Keine",
   "oidc_authentication_failed_message": "Die OIDC-Authentifizierung ist fehlgeschlagen. Bitte versuchen Sie erneut, sich anzumelden.",
-  "oidc_provider_disconnected_successfully": "OIDC-Anbieter erfolgreich getrennt.",
   "oidc_settings": "OIDC-Einstellungen",
   "on": "An",
   "one_or_more_validation_errors_occurred": "Es sind Validierungsfehler aufgetreten. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",

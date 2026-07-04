@@ -79,6 +79,15 @@
   <data name="OidcProvisioningSucceededLog" xml:space="preserve">
     <value>User provisioning succeeded.</value>
   </data>
+  <data name="OidcExplicitLinkRequiredControllerLog" xml:space="preserve">
+    <value>OIDC callback rejected: existing local account requires explicit OIDC linking.</value>
+  </data>
+  <data name="OidcConnectEmailClaimMissingLog" xml:space="preserve">
+    <value>OIDC connect rejected for user: email claim is missing.</value>
+  </data>
+  <data name="OidcConnectEmailMismatchLog" xml:space="preserve">
+    <value>OIDC connect rejected for user: OIDC email does not match local account email.</value>
+  </data>
   <data name="OidcCallbackErrorLog" xml:space="preserve">
     <value>Error occurred during OIDC callback processing.</value>
   </data>
@@ -186,6 +195,9 @@
   </data>
   <data name="AddingLoginErrorLog" xml:space="preserve">
     <value>Failed to add an external login to user {0}: {1}</value>
+  </data>
+  <data name="OidcExplicitLinkRequiredLog" xml:space="preserve">
+    <value>Existing user {0} requires explicit OIDC linking. Skipping automatic OIDC login association.</value>
   </data>
   <data name="DefaultWidgetSeedingFailedLog" xml:space="preserve">
     <value>Failed to seed default widget settings for newly provisioned user {0}. Error: {1}</value>

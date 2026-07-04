@@ -4,6 +4,32 @@ export interface IOidcCallbackRequest {
   remember_me: boolean;
 }
 
+export interface IOidcConnectRequest {
+  code: string;
+  redirect_uri: string;
+}
+
+export const OidcAuthFlows = {
+  SignIn: "signin",
+  Connect: "connect",
+} as const;
+
+export type OidcAuthFlow = (typeof OidcAuthFlows)[keyof typeof OidcAuthFlows];
+
+export const OidcAuthFlowFailedRedirectEndpoints: Record<OidcAuthFlow, string> =
+  {
+    [OidcAuthFlows.SignIn]: "/",
+    [OidcAuthFlows.Connect]: "/settings/security",
+  };
+
+export const OidcAuthFlowSuccessRedirectEndpoints: Record<
+  OidcAuthFlow,
+  string
+> = {
+  [OidcAuthFlows.SignIn]: "/dashboard",
+  [OidcAuthFlows.Connect]: "/settings/security",
+};
+
 export interface IOidcCallbackResponse {
   success: boolean;
   error?: string;

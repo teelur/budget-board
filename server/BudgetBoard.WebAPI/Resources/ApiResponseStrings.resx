@@ -70,6 +70,15 @@
   <data name="LoginFailed" xml:space="preserve">
     <value>Unable to complete login.</value>
   </data>
+  <data name="OidcExplicitLinkRequiredError" xml:space="preserve">
+    <value>An account with this email already exists. Sign in and link your OIDC account from account settings.</value>
+  </data>
+  <data name="OidcEmailClaimMissingError" xml:space="preserve">
+    <value>The OIDC provider did not return an email claim required for account linking.</value>
+  </data>
+  <data name="OidcEmailMismatchError" xml:space="preserve">
+    <value>The OIDC email does not match the currently signed-in account email.</value>
+  </data>
   <data name="UserNotAuthenticated" xml:space="preserve">
     <value>The user is not authenticated.</value>
   </data>

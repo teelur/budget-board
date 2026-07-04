@@ -373,7 +373,6 @@
   "no_widgets": "Pas de widget trouvé. Ajouter un widget pour commencer.",
   "none": "Aucun",
   "oidc_authentication_failed_message": "L'authentification OIDC a échoué. Veuillez réessayer de vous connecter.",
-  "oidc_provider_disconnected_successfully": "Le fournisseur OIDC s'est déconnecté avec succès.",
   "oidc_settings": "Paramètres OIDC",
   "on": "Activé",
   "one_or_more_validation_errors_occurred": "Une ou plusieurs erreurs de validation se sont produites. Veuillez vérifier vos données et réessayer.",

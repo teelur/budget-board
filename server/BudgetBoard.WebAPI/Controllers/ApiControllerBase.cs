@@ -12,6 +12,13 @@ public abstract class ApiControllerBase<TController>(
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
+    private protected ILogger<TController> Logger { get; } = logger;
+
+    private protected IStringLocalizer<ApiLogStrings> LogLocalizer { get; } = logLocalizer;
+
+    private protected IStringLocalizer<ApiResponseStrings> ResponseLocalizer { get; } =
+        responseLocalizer;
+
     protected async Task<IActionResult> HandleRequestAsync(Func<Task<IActionResult>> action)
     {
         try
@@ -24,8 +31,8 @@ public abstract class ApiControllerBase<TController>(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
+            Logger.LogError(ex, "{LogMessage}", LogLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(ResponseLocalizer["UnexpectedServerError"]);
         }
     }
 }
