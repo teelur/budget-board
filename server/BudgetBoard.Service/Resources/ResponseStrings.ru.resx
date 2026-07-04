@@ -253,9 +253,6 @@
   <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
     <value>The SimpleFIN organization you are trying to delete does not exist.</value>
   </data>
-  <data name="GoalUpdateNotFoundError" xml:space="preserve">
-    <value>The goal you are trying to update does not exist.</value>
-  </data>
   <data name="AutoCategorizerNotTrained" xml:space="preserve">
     <value>Auto-Categorizer cannot be enabled before training.</value>
   </data>
@@ -337,7 +334,7 @@
   <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
     <value>LunchFlow API key is not configured.</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
     <value>A goal must have a monthly contribution or target date.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">

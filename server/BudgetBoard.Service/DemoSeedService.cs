@@ -14,6 +14,7 @@ namespace BudgetBoard.Service;
 public class DemoSeedService(
     ILogger<DemoSeedService> logger,
     UserDataContext userDataContext,
+    INowProvider nowProvider,
     UserManager<ApplicationUser> userManager,
     IStringLocalizer<LogStrings> logLocalizer,
     ITransactionService transactionService,
@@ -470,15 +471,7 @@ public class DemoSeedService(
                 Amount = 20_000m,
                 InitialAmount = 12_500m,
                 MonthlyContribution = 400m,
-                CompleteDate = new DateTime(
-                    DateTime.UtcNow.Year + 2,
-                    DateTime.UtcNow.Month,
-                    1,
-                    0,
-                    0,
-                    0,
-                    DateTimeKind.Utc
-                ),
+                CompleteDate = new DateOnly(nowProvider.Today.Year + 2, nowProvider.Today.Month, 1),
                 Accounts = [savingsAccount],
                 UserID = user.Id,
             }

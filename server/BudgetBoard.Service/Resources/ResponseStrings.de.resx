@@ -118,7 +118,7 @@
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>Das übergeordnete Budget darf nicht kleiner sein als die Summe seiner untergeordneten Budgets.</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
     <value>Ein Ziel muss einen monatlichen Beitrag oder ein Zieldatum haben.</value>
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">
@@ -130,20 +130,11 @@
   <data name="GoalCreateInvalidAccountError" xml:space="preserve">
     <value>Das Konto, das Sie verwenden möchten, existiert nicht.</value>
   </data>
-  <data name="GoalUpdateNotFoundError" xml:space="preserve">
-    <value>Das Ziel, das Sie aktualisieren möchten, existiert nicht.</value>
-  </data>
   <data name="GoalUpdatePastDateError" xml:space="preserve">
     <value>Das Zieldatum für das Ziel darf nicht in der Vergangenheit liegen.</value>
   </data>
   <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
     <value>Ein Ziel muss einen monatlichen Beitrag von mehr als 0 haben.</value>
-  </data>
-  <data name="GoalDeleteNotFoundError" xml:space="preserve">
-    <value>Das Ziel, das Sie löschen möchten, existiert nicht.</value>
-  </data>
-  <data name="GoalCompleteNotFoundError" xml:space="preserve">
-    <value>Das Ziel, das Sie erledigen möchten, existiert nicht.</value>
   </data>
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
     <value>Das Ziel, das Sie erledigen möchten, wurde bereits erreicht.</value>

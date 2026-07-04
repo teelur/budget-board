@@ -311,14 +311,14 @@ public class SyncServiceTests
     }
 
     [Fact]
-    public async Task SyncAsync_ShouldCallCompleteGoalsAsync()
+    public async Task SyncAsync_ShouldCallCompleteEligibleGoalsAsync()
     {
         // Arrange
         var helper = new TestHelper();
 
         var goalServiceMock = new Mock<IGoalService>();
         goalServiceMock
-            .Setup(_ => _.CompleteGoalsAsync(It.IsAny<Guid>()))
+            .Setup(_ => _.CompleteEligibleGoalsAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -345,7 +345,7 @@ public class SyncServiceTests
         await syncService.SyncAsync(helper.demoUser.Id);
 
         // Assert
-        goalServiceMock.Verify(_ => _.CompleteGoalsAsync(helper.demoUser.Id), Times.Once);
+        goalServiceMock.Verify(_ => _.CompleteEligibleGoalsAsync(helper.demoUser.Id), Times.Once);
     }
 
     [Fact]
@@ -399,7 +399,7 @@ public class SyncServiceTests
 
         var goalServiceMock = new Mock<IGoalService>();
         goalServiceMock
-            .Setup(_ => _.CompleteGoalsAsync(It.IsAny<Guid>()))
+            .Setup(_ => _.CompleteEligibleGoalsAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -426,7 +426,7 @@ public class SyncServiceTests
         await syncService.SyncAsync(helper.demoUser.Id);
 
         // Assert
-        goalServiceMock.Verify(_ => _.CompleteGoalsAsync(helper.demoUser.Id), Times.Once);
+        goalServiceMock.Verify(_ => _.CompleteEligibleGoalsAsync(helper.demoUser.Id), Times.Once);
         automaticRuleServiceMock.Verify(
             _ => _.RunSavedAutomaticRulesAsync(helper.demoUser.Id),
             Times.Once
@@ -927,7 +927,7 @@ public class SyncServiceTests
 
         var goalServiceMock = new Mock<IGoalService>();
         goalServiceMock
-            .Setup(_ => _.CompleteGoalsAsync(It.IsAny<Guid>()))
+            .Setup(_ => _.CompleteEligibleGoalsAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -954,7 +954,7 @@ public class SyncServiceTests
         await syncService.SyncAsync(helper.demoUser.Id);
 
         // Assert
-        goalServiceMock.Verify(_ => _.CompleteGoalsAsync(helper.demoUser.Id), Times.Once);
+        goalServiceMock.Verify(_ => _.CompleteEligibleGoalsAsync(helper.demoUser.Id), Times.Once);
         automaticRuleServiceMock.Verify(
             _ => _.RunSavedAutomaticRulesAsync(helper.demoUser.Id),
             Times.Once

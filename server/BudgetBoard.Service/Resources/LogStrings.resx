@@ -136,32 +136,29 @@
   <data name="BudgetUpdateParentLimitErrorLog" xml:space="preserve">
     <value>Attempted to update parent budget to a value less than the sum of its children.</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateLog" xml:space="preserve">
-    <value>Attempt to create goal without a monthly contribution and target date.</value>
+  <data name="GoalMissingContributionOrDateLog" xml:space="preserve">
+    <value>Goal is missing either a monthly contribution or a target date.</value>
   </data>
   <data name="GoalCreatePastDateLog" xml:space="preserve">
-    <value>Attempt to create goal with a target date in the past.</value>
+    <value>Attempted to create goal with a target date in the past.</value>
   </data>
   <data name="GoalCreateNoAccountsLog" xml:space="preserve">
-    <value>Attempt to create goal without associated accounts.</value>
+    <value>Attempted to create goal without associated accounts.</value>
   </data>
   <data name="GoalCreateInvalidAccountLog" xml:space="preserve">
-    <value>Attempt to create goal with an invalid account.</value>
+    <value>Attempted to create goal with an invalid account.</value>
   </data>
-  <data name="GoalUpdateNotFoundLog" xml:space="preserve">
-    <value>Attempted to update a goal that does not exist.</value>
+  <data name="GoalNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a goal that does not exist.</value>
   </data>
   <data name="GoalUpdatePastDateLog" xml:space="preserve">
-    <value>Attempt to update goal with a target date in the past.</value>
+    <value>Attempted to update goal with a target date in the past.</value>
   </data>
   <data name="GoalUpdateNoMonthlyContributionLog" xml:space="preserve">
-    <value>Attempt to update goal without a monthly contribution.</value>
+    <value>Attempted to update goal without a monthly contribution.</value>
   </data>
-  <data name="GoalDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to delete a goal that does not exist.</value>
-  </data>
-  <data name="GoalCompleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to complete a goal that does not exist.</value>
+  <data name="GoalBothDateAndContributionLog" xml:space="preserve">
+    <value>Goal cannot have both a target date and a monthly contribution.</value>
   </data>
   <data name="GoalCompleteAlreadyCompletedLog" xml:space="preserve">
     <value>Attempted to complete a goal that is already completed.</value>
@@ -486,5 +483,14 @@
   </data>
   <data name="RemoveOidcSuccessLog" xml:space="preserve">
     <value>Successfully removed OIDC login for user {0}</value>
+  </data>
+  <data name="GoalEstimateNoMonthlyContributionLog" xml:space="preserve">
+    <value>A target date cannot be estimated without a monthly contribution.</value>
+  </data>
+  <data name="GoalEstimateNoCompleteDateLog" xml:space="preserve">
+    <value>A monthly contribution cannot be estimated without a target date.</value>
+  </data>
+  <data name="GoalPercentCompleteZeroTargetAmountLog" xml:space="preserve">
+    <value>Effective target amount is zero, cannot calculate percent complete.</value>
   </data>
 </root>

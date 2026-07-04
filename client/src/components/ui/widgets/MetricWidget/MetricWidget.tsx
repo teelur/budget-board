@@ -15,7 +15,6 @@ import {
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
-import { IGoalResponse } from "~/models/goal";
 import { ITransaction } from "~/models/transaction";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -24,13 +23,13 @@ import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsPr
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
 import {
-  goalsQueryKey,
   transactionsQueryKey,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
+import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 
 interface MetricWidgetProps {
   widgetId: string;
@@ -152,17 +151,8 @@ const MetricWidget = ({
     enabled: requirements.needsBudgets,
   });
 
-  const goalsQuery = useQuery({
-    queryKey: [goalsQueryKey, { includeInterest: false }],
-    queryFn: async (): Promise<IGoalResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/goal",
-        method: "GET",
-        params: { includeInterest: false },
-      });
-      if (res.status === 200) return res.data as IGoalResponse[];
-      return [];
-    },
+  const goalsQuery = useGoalsQuery({
+    includeInterest: false,
     enabled: requirements.needsGoals,
   });
 
