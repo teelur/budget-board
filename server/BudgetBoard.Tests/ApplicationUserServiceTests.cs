@@ -12,7 +12,7 @@ using Moq;
 namespace BudgetBoard.IntegrationTests;
 
 [Collection("IntegrationTests")]
-public class ApplicationUserTests
+public class ApplicationUserServiceTests
 {
     #region ReadApplicationUserAsync
     [Fact]
@@ -252,6 +252,37 @@ public class ApplicationUserTests
             await applicationUserService.ConnectOidcLoginAsync(
                 helper.demoUser.Id,
                 "oidc-provider-user-123",
+                mockUserManager.Object
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AddOidcFailedError");
+    }
+
+    [Fact]
+    public async Task ConnectOidcLoginAsync_WhenProviderKeyIsMissing_ThrowsAddOidcFailedError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(
+            helper.demoUser,
+            [new("local", "localUserId", "local")]
+        );
+
+        // Act
+        Func<Task> act = async () =>
+            await applicationUserService.ConnectOidcLoginAsync(
+                helper.demoUser.Id,
+                null!,
                 mockUserManager.Object
             );
 
