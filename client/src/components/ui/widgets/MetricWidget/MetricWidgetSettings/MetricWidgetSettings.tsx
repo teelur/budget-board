@@ -20,10 +20,8 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import {
   translateAxiosError,
-  goalsQueryKey,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
-import { IGoalResponse } from "~/models/goal";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -31,6 +29,7 @@ import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
+import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
@@ -73,33 +72,15 @@ const MetricWidgetSettings = ({
     },
   });
 
-  const goalsQuery = useQuery({
-    queryKey: [goalsQueryKey, { includeInterest: false }],
-    queryFn: async (): Promise<IGoalResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/goal",
-        method: "GET",
-        params: { includeInterest: false },
-      });
-
-      if (res.status === 200) {
-        return res.data as IGoalResponse[];
-      }
-
-      return [];
-    },
+  const goalsQuery = useGoalsQuery({
+    includeInterest: false,
     enabled: opened,
   });
 
   const accountsQuery = useAccountsQuery({ enabled: opened });
 
-  const currentMonth = React.useMemo(() => {
-    const now = dayjs();
-    return now.startOf("month").toDate();
-  }, [dayjs]);
-
   const budgetsQuery = useBudgetsQuery({
-    months: [currentMonth],
+    months: [dayjs().startOf("month").toDate()],
     enabled: opened,
   });
 

@@ -9,7 +9,7 @@ class GoalFaker : Faker<Goal>
     {
         RuleFor(g => g.ID, f => Guid.NewGuid())
             .RuleFor(g => g.Name, f => f.Lorem.Word())
-            .RuleFor(g => g.CompleteDate, f => f.Date.Future())
+            .RuleFor(g => g.CompleteDate, f => DateOnly.FromDateTime(f.Date.Future()))
             .RuleFor(g => g.Amount, f => f.Finance.Amount())
             .RuleFor(g => g.InitialAmount, f => f.Finance.Amount())
             .RuleFor(g => g.MonthlyContribution, f => f.Finance.Amount())

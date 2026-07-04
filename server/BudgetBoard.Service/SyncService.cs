@@ -72,7 +72,7 @@ public class SyncService(
             logger.LogInformation("{LogMessage}", logLocalizer["LunchFlowApiKeyNotConfiguredLog"]);
         }
 
-        await goalService.CompleteGoalsAsync(userData.Id);
+        await goalService.CompleteEligibleGoalsAsync(userData.Id);
         await automaticRuleService.RunSavedAutomaticRulesAsync(userData.Id);
 
         await applicationUserService.UpdateApplicationUserAsync(

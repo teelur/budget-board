@@ -118,7 +118,7 @@
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
     <value>Le budget parent ne peut pas être inférieur à la somme de ses sous-budgets.</value>
   </data>
-  <data name="GoalCreateMissingContributionOrDateError" xml:space="preserve">
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
     <value>Un objectif doit avoir une contribution mensuelle ou une date cible.</value>
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">
@@ -130,20 +130,11 @@
   <data name="GoalCreateInvalidAccountError" xml:space="preserve">
     <value>Le compte que vous essayez d’utiliser n’existe pas.</value>
   </data>
-  <data name="GoalUpdateNotFoundError" xml:space="preserve">
-    <value>L’objectif que vous essayez de mettre à jour n’existe pas.</value>
-  </data>
   <data name="GoalUpdatePastDateError" xml:space="preserve">
     <value>La date cible de l’objectif ne peut pas être dans le passé.</value>
   </data>
   <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
     <value>Un objectif doit avoir une contribution mensuelle supérieure à 0.</value>
-  </data>
-  <data name="GoalDeleteNotFoundError" xml:space="preserve">
-    <value>L’objectif que vous essayez de supprimer n’existe pas.</value>
-  </data>
-  <data name="GoalCompleteNotFoundError" xml:space="preserve">
-    <value>L’objectif que vous essayez de terminer n’existe pas.</value>
   </data>
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
     <value>L’objectif que vous essayez de terminer a déjà été terminé.</value>

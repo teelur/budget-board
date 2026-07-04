@@ -18,7 +18,7 @@ public class Goal
     /// <summary>
     /// The target completion date for the goal, if any.
     /// </summary>
-    public DateTime? CompleteDate { get; set; } = null;
+    public DateOnly? CompleteDate { get; set; } = null;
 
     /// <summary>
     /// The target amount for the goal.
@@ -38,7 +38,7 @@ public class Goal
     /// <summary>
     /// The date the goal was completed, if any.
     /// </summary>
-    public DateTime? Completed { get; set; } = null;
+    public DateOnly? Completed { get; set; } = null;
 
     /// <summary>
     /// Accounts associated with the goal.
