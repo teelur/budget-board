@@ -433,4 +433,43 @@
   <data name="AssetPermanentDeleteNotDeletedError" xml:space="preserve">
     <value>The asset must be deleted before it can be permanently deleted.</value>
   </data>
+  <data name="AssetTypeDuplicateNameError" xml:space="preserve">
+    <value>An asset type with that name already exists.</value>
+  </data>
+  <data name="AssetTypeEmptyNameError" xml:space="preserve">
+    <value>The asset type name cannot be empty.</value>
+  </data>
+  <data name="AssetTypeSameNameAsParentError" xml:space="preserve">
+    <value>The asset type name cannot be the same as its parent.</value>
+  </data>
+  <data name="AssetTypeParentNotFoundError" xml:space="preserve">
+    <value>The parent asset type does not exist.</value>
+  </data>
+  <data name="AssetTypeNotFoundError" xml:space="preserve">
+    <value>The asset type you are trying to access does not exist.</value>
+  </data>
+  <data name="AutomaticRuleNotFoundError" xml:space="preserve">
+    <value>The automatic rule you are trying to access does not exist.</value>
+  </data>
+  <data name="NoConditionsCreateError" xml:space="preserve">
+    <value>No conditions were provided for the automatic rule.</value>
+  </data>
+  <data name="NoActionsCreateError" xml:space="preserve">
+    <value>No actions were provided for the automatic rule.</value>
+  </data>
+  <data name="BalanceNotFoundError" xml:space="preserve">
+    <value>The balance you are trying to access does not exist.</value>
+  </data>
+  <data name="BudgetCreateCategoryNotFoundError" xml:space="preserve">
+    <value>The category '{0}' does not exist.</value>
+  </data>
+  <data name="BudgetNotFoundError" xml:space="preserve">
+    <value>The budget you are trying to access does not exist.</value>
+  </data>
+  <data name="GoalNotFoundError" xml:space="preserve">
+    <value>The goal you are trying to access does not exist.</value>
+  </data>
+  <data name="GoalBothDateAndContributionError" xml:space="preserve">
+    <value>A goal cannot have both a target date and a monthly contribution.</value>
+  </data>
 </root>
