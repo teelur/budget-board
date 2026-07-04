@@ -1,6 +1,6 @@
 import React from "react";
 import { notifications } from "@mantine/notifications";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import {
   AuthContext,
@@ -9,10 +9,10 @@ import {
 import { useNavigate } from "react-router";
 import {
   IOidcCallbackRequest,
-  IOidcCallbackResponse,
   IOidcConnectRequest,
   OidcAuthFlow,
-  OidcAuthFlowRedirectEndpoints,
+  OidcAuthFlowFailedRedirectEndpoints,
+  OidcAuthFlowSuccessRedirectEndpoints,
   OidcAuthFlows,
 } from "~/models/oidc";
 import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
@@ -67,7 +67,7 @@ const OidcCallback = (): React.ReactNode => {
           error: errorDescription ?? error,
         }),
       });
-      navigate(OidcAuthFlowRedirectEndpoints[oidcFlow]);
+      navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);
       return;
     }
 
@@ -78,7 +78,7 @@ const OidcCallback = (): React.ReactNode => {
         color: "var(--button-color-destructive)",
         message: t("authorization_code_missing_message"),
       });
-      navigate(OidcAuthFlowRedirectEndpoints[oidcFlow]);
+      navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);
       return;
     }
 
@@ -89,7 +89,7 @@ const OidcCallback = (): React.ReactNode => {
         color: "var(--button-color-destructive)",
         message: t("state_parameter_invalid_message"),
       });
-      navigate(OidcAuthFlowRedirectEndpoints[oidcFlow]);
+      navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);
       return;
     }
 
@@ -106,38 +106,35 @@ const OidcCallback = (): React.ReactNode => {
             },
           },
         );
+        navigate(OidcAuthFlowSuccessRedirectEndpoints[oidcFlow]);
         return;
       } else if (oidcFlow == OidcAuthFlows.SignIn) {
-      }
-      const rememberMe =
-        sessionStorage.getItem(`oidc_remember_me_${state}`) === "true";
-      await oidcCallbackMutation.mutateAsync(
-        {
+        const rememberMe =
+          sessionStorage.getItem(`oidc_remember_me_${state}`) === "true";
+        const response = await oidcCallbackMutation.mutateAsync({
           code,
           redirect_uri: `${window.location.origin}/oidc-callback`,
           remember_me: rememberMe,
-        } as IOidcCallbackRequest,
-        {
-          onSuccess: (response: AxiosResponse<IOidcCallbackResponse>) => {
-            clearOidcState(state);
-            setIsUserAuthenticated(response.data?.success ?? false);
-          },
-          onError: () => {
-            notifications.show({
-              color: "var(--button-color-destructive)",
-              message: t("oidc_authentication_failed_message"),
-            });
-          },
-        },
-      );
+        } as IOidcCallbackRequest);
+        clearOidcState(state);
+        setIsUserAuthenticated(response.data?.success ?? false);
+        if (response.data?.success) {
+          navigate(OidcAuthFlowSuccessRedirectEndpoints[oidcFlow]);
+        } else {
+          notifications.show({
+            color: "var(--button-color-destructive)",
+            message: t("oidc_authentication_failed_message"),
+          });
+          navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);
+        }
+      }
     } catch (error) {
       clearOidcState(state);
       notifications.show({
         color: "var(--button-color-destructive)",
         message: translateAxiosError(error as AxiosError),
       });
-    } finally {
-      navigate(OidcAuthFlowRedirectEndpoints[oidcFlow]);
+      navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);
     }
   };
 

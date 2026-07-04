@@ -16,8 +16,17 @@ export const OidcAuthFlows = {
 
 export type OidcAuthFlow = (typeof OidcAuthFlows)[keyof typeof OidcAuthFlows];
 
-export const OidcAuthFlowRedirectEndpoints: Record<OidcAuthFlow, string> = {
-  [OidcAuthFlows.SignIn]: "/",
+export const OidcAuthFlowFailedRedirectEndpoints: Record<OidcAuthFlow, string> =
+  {
+    [OidcAuthFlows.SignIn]: "/",
+    [OidcAuthFlows.Connect]: "/settings/security",
+  };
+
+export const OidcAuthFlowSuccessRedirectEndpoints: Record<
+  OidcAuthFlow,
+  string
+> = {
+  [OidcAuthFlows.SignIn]: "/dashboard",
   [OidcAuthFlows.Connect]: "/settings/security",
 };
 
