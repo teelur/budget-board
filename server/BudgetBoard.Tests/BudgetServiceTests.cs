@@ -595,26 +595,27 @@ public class BudgetServiceTests
         helper.UserDataContext.SaveChanges();
 
         // Act
-        var result = await budgetService.ReadBudgetsAsync(
+        var readBudgets = await budgetService.ReadBudgetsAsync(
             helper.demoUser.Id,
             DateOnly.FromDateTime(DateTime.Now)
         );
 
         // Assert
-        result
+        readBudgets
             .Should()
             .HaveCount(
                 budgets.Count(b =>
                     b.Month.Month == DateTime.Now.Month && b.Month.Year == DateTime.Now.Year
                 )
             );
-        result
-            .Should()
-            .BeEquivalentTo(
-                budgets
-                    .Where(b => b.Month.Month == DateTime.Now.Month)
-                    .Select(b => new BudgetResponse(b))
-            );
+        foreach (var budget in readBudgets)
+        {
+            var expectedBudget = budgets.Single(b => b.ID == budget.ID);
+            budget.Category.Should().Be(expectedBudget.Category);
+            budget.Limit.Should().Be(expectedBudget.Limit);
+            budget.Month.Should().Be(expectedBudget.Month);
+            budget.UserID.Should().Be(expectedBudget.UserID);
+        }
     }
     #endregion
 
