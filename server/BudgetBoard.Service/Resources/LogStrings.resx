@@ -487,6 +487,9 @@
   <data name="GoalEstimateNoMonthlyContributionLog" xml:space="preserve">
     <value>A target date cannot be estimated without a monthly contribution.</value>
   </data>
+  <data name="GoalEstimateNoCompleteDateLog" xml:space="preserve">
+    <value>A monthly contribution cannot be estimated without a target date.</value>
+  </data>
   <data name="GoalPercentCompleteZeroTargetAmountLog" xml:space="preserve">
     <value>Effective target amount is zero, cannot calculate percent complete.</value>
   </data>

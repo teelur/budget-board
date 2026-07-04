@@ -376,7 +376,7 @@ public class GoalService(
         // If a monthly contribution has not been set, then a complete date is required.
         if (!goal.CompleteDate.HasValue)
         {
-            logger.LogError("A monthly contribution cannot be estimated without a target date.");
+            logger.LogError("{LogMessage}", logLocalizer["GoalEstimateNoCompleteDateLog"]);
             return 0;
         }
 
