@@ -115,10 +115,7 @@ public class ApplicationUserController(
                 principal.FindFirst(ClaimTypes.Email)?.Value ?? principal.FindFirst("email")?.Value;
             if (string.IsNullOrWhiteSpace(oidcEmail))
             {
-                Logger.LogWarning(
-                    "{LogMessage}",
-                    LogLocalizer["OidcConnectEmailClaimMissingLog", parsedUserId]
-                );
+                Logger.LogWarning("{LogMessage}", LogLocalizer["OidcConnectEmailClaimMissingLog"]);
                 return BadRequest(ResponseLocalizer["OidcEmailClaimMissingError"].Value);
             }
 
@@ -133,10 +130,7 @@ public class ApplicationUserController(
                 || !string.Equals(currentUser.Email, oidcEmail, StringComparison.OrdinalIgnoreCase)
             )
             {
-                Logger.LogWarning(
-                    "{LogMessage}",
-                    LogLocalizer["OidcConnectEmailMismatchLog", parsedUserId]
-                );
+                Logger.LogWarning("{LogMessage}", LogLocalizer["OidcConnectEmailMismatchLog"]);
                 return Conflict(ResponseLocalizer["OidcEmailMismatchError"].Value);
             }
 

@@ -83,10 +83,10 @@
     <value>OIDC callback rejected: existing local account requires explicit OIDC linking.</value>
   </data>
   <data name="OidcConnectEmailClaimMissingLog" xml:space="preserve">
-    <value>OIDC connect rejected for user {0}: email claim is missing.</value>
+    <value>OIDC connect rejected for user: email claim is missing.</value>
   </data>
   <data name="OidcConnectEmailMismatchLog" xml:space="preserve">
-    <value>OIDC connect rejected for user {0}: OIDC email does not match local account email.</value>
+    <value>OIDC connect rejected for user: OIDC email does not match local account email.</value>
   </data>
   <data name="OidcCallbackErrorLog" xml:space="preserve">
     <value>Error occurred during OIDC callback processing.</value>
