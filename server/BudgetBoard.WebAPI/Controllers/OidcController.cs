@@ -82,16 +82,25 @@ public class OidcController(
             );
 
             // Provision the user in our system
-            var provisioned = await _provisioner.ProvisionExternalUserAsync(
+            var provisioningResult = await _provisioner.ProvisionExternalUserAsync(
                 principal,
                 HttpContext,
                 IdentityApiEndpointRouteBuilderConstants.OidcLoginProvider,
                 request.RememberMe
             );
 
-            if (!provisioned)
+            if (provisioningResult.RequiresExplicitLinking)
             {
-                _logger.LogWarning("{LogMessage}", _logLocalizer["OidcProvisioningFailedLog"]);
+                _logger.LogInformation(
+                    "{LogMessage}",
+                    _logLocalizer["OidcExplicitLinkRequiredControllerLog"]
+                );
+                return Conflict(_responseLocalizer["OidcExplicitLinkRequiredError"].Value);
+            }
+
+            if (!provisioningResult.Succeeded)
+            {
+                _logger.LogError("{LogMessage}", _logLocalizer["OidcProvisioningFailedLog"]);
                 return StatusCode(500, _responseLocalizer["LoginFailed"].Value);
             }
 

@@ -1,10 +1,13 @@
-﻿using BudgetBoard.Database.Data;
+﻿using System.Security.Claims;
+using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Models;
 using BudgetBoard.WebAPI.Overrides;
 using BudgetBoard.WebAPI.Resources;
+using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +21,7 @@ public class ApplicationUserController(
     ILogger<ApplicationUserController> logger,
     UserManager<ApplicationUser> userManager,
     UserDataContext context,
+    IOidcTokenService oidcTokenService,
     IApplicationUserService applicationUserService,
     ISyncService simpleFinService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
@@ -82,6 +86,85 @@ public class ApplicationUserController(
     [HttpGet]
     [Route("[action]")]
     public IActionResult IsSignedIn() => Ok(HttpContext.User?.Identity?.IsAuthenticated ?? false);
+
+    [HttpPost]
+    [Route("[action]")]
+    [Authorize]
+    public async Task<IActionResult> ConnectOidcLogin([FromBody] OidcCallbackRequest request)
+    {
+        try
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Code))
+            {
+                return BadRequest(_responseLocalizer["AuthCodeRequired"].Value);
+            }
+
+            var principal = await oidcTokenService.ExchangeCodeForUserAsync(
+                request.Code,
+                request.RedirectUri
+            );
+            if (principal == null)
+            {
+                return StatusCode(500, _responseLocalizer["AuthFailed"].Value);
+            }
+
+            var oidcEmail =
+                principal.FindFirst(ClaimTypes.Email)?.Value ?? principal.FindFirst("email")?.Value;
+            if (string.IsNullOrWhiteSpace(oidcEmail))
+            {
+                _logger.LogWarning(
+                    "{LogMessage}",
+                    _logLocalizer["OidcConnectEmailClaimMissingLog"]
+                );
+                return BadRequest(_responseLocalizer["OidcEmailClaimMissingError"].Value);
+            }
+
+            var currentUser = await _userManager.FindByIdAsync(userId);
+            if (currentUser == null)
+            {
+                return NotFound(_responseLocalizer["UserNotFound"].Value);
+            }
+
+            if (
+                string.IsNullOrWhiteSpace(currentUser.Email)
+                || !string.Equals(currentUser.Email, oidcEmail, StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                _logger.LogWarning("{LogMessage}", _logLocalizer["OidcConnectEmailMismatchLog"]);
+                return Conflict(_responseLocalizer["OidcEmailMismatchError"].Value);
+            }
+
+            var providerKey =
+                principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? principal.FindFirst("sub")?.Value;
+            if (string.IsNullOrWhiteSpace(providerKey))
+            {
+                return BadRequest(_responseLocalizer["LoginFailed"].Value);
+            }
+
+            await _applicationUserService.ConnectOidcLoginAsync(
+                Guid.Parse(userId),
+                providerKey,
+                _userManager
+            );
+            return Ok();
+        }
+        catch (BudgetBoardServiceException bbex)
+        {
+            return Helpers.BuildErrorResponse(bbex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
+            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
+        }
+    }
 
     [HttpDelete]
     [Route("[action]")]

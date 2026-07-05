@@ -91,6 +91,18 @@
   <data name="NoOidcLoginFoundLog" xml:space="preserve">
     <value>No OIDC login found for user {UserId}.</value>
   </data>
+  <data name="OidcExplicitLinkRequiredControllerLog" xml:space="preserve">
+    <value>OIDC callback rejected: existing local account requires explicit OIDC linking.</value>
+  </data>
+  <data name="OidcConnectEmailClaimMissingLog" xml:space="preserve">
+    <value>OIDC connect rejected for user: email claim is missing.</value>
+  </data>
+  <data name="OidcConnectEmailMismatchLog" xml:space="preserve">
+    <value>OIDC connect rejected for user: OIDC email does not match local account email.</value>
+  </data>
+  <data name="OidcExplicitLinkRequiredLog" xml:space="preserve">
+    <value>Existing user {0} requires explicit OIDC linking. Skipping automatic OIDC login association.</value>
+  </data>
   <data name="RemoveOidcNoPasswordLog" xml:space="preserve">
     <value>Attempt to remove OIDC login for user {UserId} without a local password set.</value>
   </data>

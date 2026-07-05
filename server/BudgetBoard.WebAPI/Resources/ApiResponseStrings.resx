@@ -79,6 +79,15 @@
   <data name="NoOidcLoginFound" xml:space="preserve">
     <value>No OIDC login was found for this user.</value>
   </data>
+  <data name="OidcExplicitLinkRequiredError" xml:space="preserve">
+    <value>An account with this email already exists. Sign in and link your OIDC account from account settings.</value>
+  </data>
+  <data name="OidcEmailClaimMissingError" xml:space="preserve">
+    <value>The OIDC provider did not return an email claim required for account linking.</value>
+  </data>
+  <data name="OidcEmailMismatchError" xml:space="preserve">
+    <value>The OIDC email does not match the currently signed-in account email.</value>
+  </data>
   <data name="RemoveOidcNoPassword" xml:space="preserve">
     <value>Cannot remove OIDC login. The user must have a local password set first to maintain account access.</value>
   </data>
