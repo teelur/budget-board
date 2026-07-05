@@ -199,14 +199,7 @@ function App() {
                   </UnauthorizedRoute>
                 }
               />
-              <Route
-                path="/oidc-callback"
-                element={
-                  <UnauthorizedRoute>
-                    <OidcCallback />
-                  </UnauthorizedRoute>
-                }
-              />
+              <Route path="/oidc-callback" element={<OidcCallback />} />
               <Route
                 path="/*"
                 element={

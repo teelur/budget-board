@@ -30,8 +30,8 @@ const SettingsSecurity = (): React.ReactNode => {
 
   return (
     <Stack gap="1rem">
-      <TwoFactorAuth />
       <OidcSettings />
+      <TwoFactorAuth />
       {(userQuery.data?.hasLocalLogin ?? true) ? (
         <ResetPassword />
       ) : (

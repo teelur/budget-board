@@ -2,15 +2,19 @@ import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
 import { notifications } from "@mantine/notifications";
-import { IOidcDiscoveryDocument } from "~/models/oidc";
-import { t } from "i18next";
+import {
+  IOidcDiscoveryDocument,
+  OidcAuthFlow,
+  OidcAuthFlows,
+} from "~/models/oidc";
+import { useTranslation } from "react-i18next";
 
 export interface AuthContextValue {
   isUserAuthenticated: boolean;
   setIsUserAuthenticated: (isLoggedIn: boolean) => void;
   loading: boolean;
   request: ({ ...options }) => Promise<AxiosResponse>;
-  startOidcLogin?: (rememberMe: boolean) => void;
+  startOidcLogin?: (rememberMe: boolean, flow?: OidcAuthFlow) => void;
   oidcLoading: boolean;
 }
 
@@ -36,6 +40,7 @@ export const AuthProvider = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [oidcLoading, setOidcLoading] = useState<boolean>(false);
 
+  const { t } = useTranslation();
   const { envVariables } = getProjectEnvVariables();
 
   // base url is sourced from environment variables
@@ -90,10 +95,15 @@ export const AuthProvider = ({
       });
   }, []);
 
-  const startOidcLogin = async (rememberMe: boolean): Promise<void> => {
+  const startOidcLogin = async (
+    rememberMe: boolean,
+    flow: OidcAuthFlow = OidcAuthFlows.SignIn,
+  ): Promise<void> => {
     setOidcLoading(true);
     try {
       let authorizeUrl = envVariables.VITE_OIDC_PROVIDER;
+      // Trailing slashes can cause issues with the discovery document, so
+      // we need to remove them if present
       if (authorizeUrl) {
         authorizeUrl = authorizeUrl.replace(/\/+$/, "");
       }
@@ -103,15 +113,16 @@ export const AuthProvider = ({
       if (!authorizeUrl || !clientId) {
         notifications.show({
           color: "var(--button-color-destructive)",
-          message:
-            "OIDC is enabled but not configured. Be sure all required environment variables are set.",
+          message: t("oidc_enabled_but_not_configured"),
         });
         return;
       }
 
+      // These are stored in sessionStorage to be retrieved after the OIDC callback
       const state = crypto.randomUUID();
       sessionStorage.setItem(`oidc_state_${state}`, state);
       sessionStorage.setItem(`oidc_remember_me_${state}`, String(rememberMe));
+      sessionStorage.setItem(`oidc_flow_${state}`, flow);
 
       const params = new URLSearchParams({
         client_id: clientId,
@@ -121,26 +132,39 @@ export const AuthProvider = ({
         state,
       });
 
+      // The discovery document is used to retrieve the authorization endpoint,
+      // which may vary between OIDC providers.
       const discoveryUrl = `${authorizeUrl}/.well-known/openid-configuration`;
 
       const discoveryResponse = await fetch(discoveryUrl);
       if (!discoveryResponse.ok) {
-        throw new Error("Failed to fetch OIDC discovery document");
+        notifications.show({
+          color: "var(--button-color-destructive)",
+          message: t("oidc_discovery_document_failed_message"),
+        });
+        return;
       }
 
       const discoveryData: IOidcDiscoveryDocument =
         await discoveryResponse.json();
 
+      // This redirects the user to the OIDC provider's login page.
       if (discoveryData?.authorization_endpoint) {
         window.location.href = `${
           discoveryData.authorization_endpoint
         }?${params.toString()}`;
+      } else {
+        notifications.show({
+          color: "var(--button-color-destructive)",
+          message: t("oidc_redirect_failed_message"),
+        });
       }
     } catch (error) {
       notifications.show({
         color: "var(--button-color-destructive)",
-        message: "Failed to retrieve OIDC discovery document.",
+        message: t("oidc_redirect_unspecified_error_message"),
       });
+    } finally {
       setOidcLoading(false);
     }
   };
