@@ -20,7 +20,7 @@ import { IInstitution } from "~/models/institution";
 import { getFilteredTransactions } from "~/helpers/transactions";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { institutionsQueryKey, transactionsQueryKey } from "~/helpers/requests";
-
+import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 
 const escapeCsvValue = (value: string): string =>
   `"${value.replace(/"/g, '""')}"`;
@@ -89,6 +89,7 @@ const ExportTransactionsModal = (): React.ReactNode => {
   const { transactionFilters } = useTransactionFilters();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
+  const institutionsQuery = useInstitutionsQuery();
   const { request } = useAuth();
   const isMobile = useIsMobile();
 
@@ -102,22 +103,6 @@ const ExportTransactionsModal = (): React.ReactNode => {
 
       if (res.status === 200) {
         return res.data as ITransaction[];
-      }
-
-      return [];
-    },
-  });
-
-  const institutionsQuery = useQuery({
-    queryKey: [institutionsQueryKey],
-    queryFn: async (): Promise<IInstitution[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/institution",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IInstitution[];
       }
 
       return [];

@@ -97,8 +97,8 @@ public class InstitutionController(
     [HttpPut]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> SetIndices(
-        [FromBody] List<InstitutionIndexRequest> institutions
+    public async Task<IActionResult> Order(
+        [FromBody] List<InstitutionIndexRequest> orderedInstitutions
     )
     {
         return await HandleRequestAsync(async () =>
@@ -110,7 +110,7 @@ public class InstitutionController(
                 return Unauthorized();
             }
 
-            await institutionService.OrderInstitutionsAsync(parsedUserId, institutions);
+            await institutionService.OrderInstitutionsAsync(parsedUserId, orderedInstitutions);
             return Ok();
         });
     }

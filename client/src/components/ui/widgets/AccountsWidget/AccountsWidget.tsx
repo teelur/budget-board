@@ -16,8 +16,11 @@ import AccountsWidgetSettings from "./AccountsWidgetSettings/AccountsWidgetSetti
 import WidgetErrorMessage from "~/components/ui/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
 import Divider from "~/components/core/Divider/Divider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { institutionsQueryKey, widgetSettingsQueryKey } from "~/helpers/requests";
-
+import {
+  institutionsQueryKey,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
+import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 
 interface AccountsWidgetProps {
   widgetId: string;
@@ -31,23 +34,8 @@ const AccountsWidget = ({
   onSettingsClose,
 }: AccountsWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
-
+  const institutionQuery = useInstitutionsQuery();
   const { request } = useAuth();
-  const institutionQuery = useQuery({
-    queryKey: [institutionsQueryKey],
-    queryFn: async (): Promise<IInstitution[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/institution",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IInstitution[];
-      }
-
-      return [];
-    },
-  });
 
   const widgetSettingsQuery = useQuery({
     queryKey: [widgetSettingsQueryKey],
