@@ -1,20 +1,20 @@
-import { Button, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Stack } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
 import { IApplicationUser } from "~/models/applicationUser";
-import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import DisconnectOidcContent from "./DisconnectOidcContent/DisconnectOidcContent";
+import ConnectOidcContent from "./ConnectOidcContent/ConnectOidcContent";
 
 const OidcSettings = (): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
 
-  const userQuery = useQuery({
+  const applicationUserQuery = useQuery({
     queryKey: ["user"],
     queryFn: async (): Promise<IApplicationUser | undefined> => {
       const res: AxiosResponse = await request({
@@ -30,47 +30,16 @@ const OidcSettings = (): React.ReactNode => {
     },
   });
 
-  const queryClient = useQueryClient();
-  const doDisconnectOidc = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/applicationUser/disconnectOidcLogin",
-        method: "DELETE",
-      }),
-    onSuccess: async (res: AxiosResponse) => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message:
-          res?.data?.message ?? t("oidc_provider_disconnected_successfully"),
-      });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  if (!userQuery.data?.hasOidcLogin) {
-    return null;
-  }
-
   return (
-    <Card elevation={1}>
-      <Stack gap="1rem">
-        <PrimaryText size="lg">{t("oidc_settings")}</PrimaryText>
-        <Button
-          color="var(--button-color-destructive)"
-          onClick={() => doDisconnectOidc.mutate()}
-          loading={doDisconnectOidc.isPending}
-        >
-          {t("disconnect_oidc_provider")}
-        </Button>
-      </Stack>
-    </Card>
+    <Stack gap="0.25rem">
+      <PrimaryText size="sm">{t("oidc_settings")}</PrimaryText>
+      <DimmedText size="xs">{t("oidc_settings_description")}</DimmedText>
+      {applicationUserQuery.data?.hasOidcLogin ? (
+        <DisconnectOidcContent />
+      ) : (
+        <ConnectOidcContent />
+      )}
+    </Stack>
   );
 };
 
