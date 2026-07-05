@@ -16,10 +16,7 @@ import AccountsWidgetSettings from "./AccountsWidgetSettings/AccountsWidgetSetti
 import WidgetErrorMessage from "~/components/ui/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
 import Divider from "~/components/core/Divider/Divider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import {
-  institutionsQueryKey,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
+import { widgetSettingsQueryKey } from "~/helpers/requests";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 
 interface AccountsWidgetProps {

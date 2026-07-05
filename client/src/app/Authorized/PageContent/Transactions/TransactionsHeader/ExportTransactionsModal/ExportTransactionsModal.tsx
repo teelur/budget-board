@@ -16,10 +16,9 @@ import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/Tr
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { ITransaction, Filters } from "~/models/transaction";
-import { IInstitution } from "~/models/institution";
 import { getFilteredTransactions } from "~/helpers/transactions";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { institutionsQueryKey, transactionsQueryKey } from "~/helpers/requests";
+import { transactionsQueryKey } from "~/helpers/requests";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 
 const escapeCsvValue = (value: string): string =>

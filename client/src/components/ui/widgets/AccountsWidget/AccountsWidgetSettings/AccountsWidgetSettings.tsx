@@ -11,12 +11,10 @@ import Modal from "~/components/core/Modal/Modal";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
-import { IInstitution } from "~/models/institution";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import {
   translateAxiosError,
-  institutionsQueryKey,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
