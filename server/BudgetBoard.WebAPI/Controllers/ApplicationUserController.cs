@@ -206,10 +206,7 @@ public class ApplicationUserController(
             );
             if (!hasPassword && remainingLogins == 0)
             {
-                _logger.LogWarning(
-                    "{LogMessage}",
-                    _logLocalizer["RemoveOidcNoPasswordLog", userId]
-                );
+                _logger.LogWarning("{LogMessage}", _logLocalizer["RemoveOidcNoPasswordLog"]);
                 return BadRequest(_responseLocalizer["RemoveOidcNoPassword"].Value);
             }
 
@@ -233,7 +230,7 @@ public class ApplicationUserController(
                 return StatusCode(500, _responseLocalizer["RemoveOidcFailed"].Value);
             }
 
-            _logger.LogInformation("{LogMessage}", _logLocalizer["RemoveOidcSuccessLog", userId]);
+            _logger.LogInformation("{LogMessage}", _logLocalizer["RemoveOidcSuccessLog"]);
             return Ok(new { message = _responseLocalizer["RemoveOidcSuccess"].Value });
         }
         catch (Exception ex)

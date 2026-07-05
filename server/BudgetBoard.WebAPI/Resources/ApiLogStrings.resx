@@ -104,13 +104,13 @@
     <value>Existing user {0} requires explicit OIDC linking. Skipping automatic OIDC login association.</value>
   </data>
   <data name="RemoveOidcNoPasswordLog" xml:space="preserve">
-    <value>Attempt to remove OIDC login for user {UserId} without a local password set.</value>
+    <value>Attempt to remove OIDC login for user without a local password set.</value>
   </data>
   <data name="RemoveOidcFailedLog" xml:space="preserve">
-    <value>Failed to remove OIDC login for user {UserId}: {Errors}</value>
+    <value>Failed to remove OIDC login for user: {0}</value>
   </data>
   <data name="RemoveOidcSuccessLog" xml:space="preserve">
-    <value>Successfully removed OIDC login for user {UserId}</value>
+    <value>Successfully removed OIDC login for user.</value>
   </data>
   <data name="SyncBackgroundJobStartLog" xml:space="preserve">
     <value>Syncing SimpleFin data for {0}...</value>
