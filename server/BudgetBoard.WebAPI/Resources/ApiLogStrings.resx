@@ -86,10 +86,10 @@
     <value>User ID not found in the current context.</value>
   </data>
   <data name="UserNotFoundLog" xml:space="preserve">
-    <value>User not found for ID {UserId}.</value>
+    <value>User not found for ID {0}.</value>
   </data>
   <data name="NoOidcLoginFoundLog" xml:space="preserve">
-    <value>No OIDC login found for user {UserId}.</value>
+    <value>No OIDC login found for user {0}.</value>
   </data>
   <data name="OidcExplicitLinkRequiredControllerLog" xml:space="preserve">
     <value>OIDC callback rejected: existing local account requires explicit OIDC linking.</value>

@@ -223,7 +223,6 @@ public class ApplicationUserController(
                     "{LogMessage}",
                     _logLocalizer[
                         "RemoveOidcFailedLog",
-                        userId,
                         string.Join(", ", result.Errors.Select(e => e.Description))
                     ]
                 );

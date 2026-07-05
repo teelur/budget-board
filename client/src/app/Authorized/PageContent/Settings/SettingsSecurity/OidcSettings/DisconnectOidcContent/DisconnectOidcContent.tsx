@@ -36,15 +36,13 @@ const DisconnectOidcContent = (): React.ReactNode => {
 
   return (
     <Stack>
-      {" "}
       <Button
         color="var(--button-color-destructive)"
         onClick={() => doDisconnectOidc.mutate()}
         loading={doDisconnectOidc.isPending}
       >
-        {" "}
-        {t("disconnect_oidc_provider")}{" "}
-      </Button>{" "}
+        {t("disconnect_oidc_provider")}
+      </Button>
     </Stack>
   );
 };
