@@ -34,17 +34,10 @@ const EditableInstitutionItemContent = (
           maw="100%"
           {...institutionNameField.getInputProps()}
           onBlur={() =>
-            updateInstitutionMutation.mutate(
-              {
-                id: props.institution.id,
-                name: institutionNameField.getValue(),
-              } as IInstitutionUpdateRequest,
-              {
-                onSuccess: () => {
-                  institutionNameField.setValue(props.institution.name);
-                },
-              },
-            )
+            updateInstitutionMutation.mutate({
+              id: props.institution.id,
+              name: institutionNameField.getValue(),
+            } as IInstitutionUpdateRequest)
           }
           elevation={1}
         />
