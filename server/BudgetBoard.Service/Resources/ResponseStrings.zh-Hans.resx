@@ -139,26 +139,14 @@
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
     <value>您尝试完成的目标已经完成。</value>
   </data>
-  <data name="InstitutionCreateDuplicateNameError" xml:space="preserve">
+  <data name="InstitutionDuplicateNameError" xml:space="preserve">
     <value>具有此名称的机构已存在。</value>
   </data>
   <data name="InstitutionNotFoundError" xml:space="preserve">
     <value>您尝试访问的机构不存在。</value>
   </data>
-  <data name="InstitutionUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的机构不存在。</value>
-  </data>
-  <data name="InstitutionUpdateEmptyNameError" xml:space="preserve">
+  <data name="InstitutionEmptyNameError" xml:space="preserve">
     <value>机构名称不能为空。</value>
-  </data>
-  <data name="InstitutionUpdateDuplicateNameError" xml:space="preserve">
-    <value>具有此名称的机构已存在。</value>
-  </data>
-  <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的机构不存在。</value>
-  </data>
-  <data name="InstitutionOrderNotFoundError" xml:space="preserve">
-    <value>您尝试排序的机构不存在。</value>
   </data>
   <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
     <value>具有此名称的交易类别已存在。</value>

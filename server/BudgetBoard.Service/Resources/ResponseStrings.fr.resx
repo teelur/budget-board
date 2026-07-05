@@ -139,26 +139,14 @@
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
     <value>L’objectif que vous essayez de terminer a déjà été terminé.</value>
   </data>
-  <data name="InstitutionCreateDuplicateNameError" xml:space="preserve">
+  <data name="InstitutionDuplicateNameError" xml:space="preserve">
     <value>Un établissement portant ce nom existe déjà.</value>
   </data>
   <data name="InstitutionNotFoundError" xml:space="preserve">
     <value>L’établissement auquel vous essayez d’accéder n’existe pas.</value>
   </data>
-  <data name="InstitutionUpdateNotFoundError" xml:space="preserve">
-    <value>L’établissement que vous essayez de mettre à jour n’existe pas.</value>
-  </data>
-  <data name="InstitutionUpdateEmptyNameError" xml:space="preserve">
+  <data name="InstitutionEmptyNameError" xml:space="preserve">
     <value>Le nom de l’établissement ne peut pas être vide.</value>
-  </data>
-  <data name="InstitutionUpdateDuplicateNameError" xml:space="preserve">
-    <value>Un établissement portant ce nom existe déjà.</value>
-  </data>
-  <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
-    <value>L’établissement que vous essayez de supprimer n’existe pas.</value>
-  </data>
-  <data name="InstitutionOrderNotFoundError" xml:space="preserve">
-    <value>L’établissement que vous essayez de réorganiser n’existe pas.</value>
   </data>
   <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
     <value>Une catégorie de transaction portant ce nom existe déjà.</value>
