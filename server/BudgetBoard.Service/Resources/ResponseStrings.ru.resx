@@ -361,9 +361,6 @@
   <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
     <value>The force sync lookback period must be between 0 and 12 months.</value>
   </data>
-  <data name="InstitutionDuplicateNameError" xml:space="preserve">
-    <value>An institution with this name already exists.</value>
-  </data>
   <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
     <value>Transaction category cannot have the same name as its parent category.</value>
   </data>

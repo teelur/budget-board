@@ -169,9 +169,6 @@
   <data name="InstitutionNotFoundLog" xml:space="preserve">
     <value>Attempted to access an institution that does not exist.</value>
   </data>
-  <data name="InstitutionNotFoundLog" xml:space="preserve">
-    <value>Attempted to access an institution that does not exist.</value>
-  </data>
   <data name="InstitutionEmptyNameLog" xml:space="preserve">
     <value>Attempted to create or update an institution with an empty name.</value>
   </data>
