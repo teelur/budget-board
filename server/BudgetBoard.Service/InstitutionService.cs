@@ -53,7 +53,12 @@ public class InstitutionService(
     }
 
     /// <inheritdoc />
-    public async Task DeleteInstitutionAsync(Guid userGuid, Guid id, bool deleteTransactions)
+    public async Task DeleteInstitutionAsync(
+        Guid userGuid,
+        Guid id,
+        bool deleteTransactions,
+        bool deferSave = false
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
         var institution = GetInstitutionById(userData.Institutions, id);
@@ -71,7 +76,11 @@ public class InstitutionService(
         accountsToDelete.ForEach(a => a.Deleted = nowProvider.UtcNow);
 
         institution.Deleted = nowProvider.UtcNow;
-        await userDataContext.SaveChangesAsync();
+        institution.Index = 0;
+        if (!deferSave)
+        {
+            await userDataContext.SaveChangesAsync();
+        }
     }
 
     /// <inheritdoc />

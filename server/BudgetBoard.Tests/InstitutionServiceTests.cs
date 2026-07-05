@@ -7,6 +7,7 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -363,6 +364,7 @@ public class InstitutionServiceTests
 
         // Assert
         helper.UserDataContext.Institutions.Single().Deleted.Should().NotBeNull();
+        helper.UserDataContext.Institutions.Single().Index.Should().Be(0);
         helper.UserDataContext.Accounts.Single().Deleted.Should().NotBeNull();
         helper
             .UserDataContext.Transactions.Select(t => t.Deleted)
@@ -408,6 +410,38 @@ public class InstitutionServiceTests
         helper.UserDataContext.Institutions.Single().Deleted.Should().NotBeNull();
         helper.UserDataContext.Accounts.Single().Deleted.Should().NotBeNull();
         helper.UserDataContext.Transactions.All(t => t.Deleted != null).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task DeleteInstitutionAsync_WhenCalledWithDeferSave_ShouldNotSaveChanges()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var institutionService = new InstitutionService(
+            Mock.Of<ILogger<IInstitutionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institutionFaker = new InstitutionFaker(helper.demoUser.Id);
+        var institution = institutionFaker.Generate();
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await institutionService.DeleteInstitutionAsync(
+            helper.demoUser.Id,
+            institution.ID,
+            false,
+            deferSave: true
+        );
+
+        // Assert
+        helper.UserDataContext.Institutions.Single().Deleted.Should().NotBeNull();
+        helper.UserDataContext.Entry(institution).State.Should().Be(EntityState.Modified);
     }
 
     [Fact]

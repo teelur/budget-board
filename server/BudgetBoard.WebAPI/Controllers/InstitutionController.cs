@@ -72,28 +72,6 @@ public class InstitutionController(
         });
     }
 
-    [HttpDelete]
-    [Authorize]
-    public async Task<IActionResult> Delete(Guid institutionId, bool deleteTransactions = false)
-    {
-        return await HandleRequestAsync(async () =>
-        {
-            var userId = userManager.GetUserId(User);
-
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
-            {
-                return Unauthorized();
-            }
-
-            await institutionService.DeleteInstitutionAsync(
-                parsedUserId,
-                institutionId,
-                deleteTransactions
-            );
-            return Ok();
-        });
-    }
-
     [HttpPut]
     [Authorize]
     [Route("[action]")]

@@ -25,7 +25,7 @@ interface IInstitutionItemProps {
 }
 
 const InstitutionItem = (props: IInstitutionItemProps) => {
-  const [isSelected, { toggle }] = useDisclosure(false);
+  const [isEditable, { toggle }] = useDisclosure(false);
 
   // Some accounts might have conflicting indices, so we need to re-index them here
   // to ensure the drag-and-drop functionality works correctly
@@ -108,7 +108,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
           </Flex>
         )}
         <Stack gap="0.5rem" flex="1 1 auto">
-          {isSelected ? (
+          {isEditable ? (
             <EditableInstitutionItemContent
               institution={props.institution}
               totalBalance={totalBalance}

@@ -34,7 +34,13 @@ public interface IInstitutionService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="id">The unique identifier of the institution to delete.</param>
     /// <param name="deleteTransactions">If true, also deletes associated transactions.</param>
-    Task DeleteInstitutionAsync(Guid userGuid, Guid id, bool deleteTransactions);
+    /// <param name="deferSave">If true, defers saving changes to the database.</param>
+    Task DeleteInstitutionAsync(
+        Guid userGuid,
+        Guid id,
+        bool deleteTransactions,
+        bool deferSave = false
+    );
 
     /// <summary>
     /// Updates the order of institutions for the specified user.
