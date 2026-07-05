@@ -33,6 +33,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -70,6 +71,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -100,6 +102,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -137,6 +140,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -172,6 +176,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -208,6 +213,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -242,6 +248,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -296,6 +303,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -309,6 +317,177 @@ public class AccountServiceTests()
         helper.UserDataContext.SaveChanges();
 
         var editedAccount = new AccountUpdateRequest { ID = account.ID, Source = "InvalidSource" };
+
+        // Act
+        var updateAccountAct = () =>
+            accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
+
+        // Assert
+        await updateAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidAccountSourceError");
+    }
+
+    [Fact]
+    public async Task UpdateAccountAsync_WhenNameIsWhitespace_ShouldNotUpdateName()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        var originalHideAccount = account.HideAccount;
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var editedAccount = new AccountUpdateRequest
+        {
+            ID = account.ID,
+            Name = "   ",
+            HideAccount = !originalHideAccount,
+        };
+
+        // Act
+        await accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
+
+        // Assert
+        var updatedAccount = helper.UserDataContext.Accounts.Single(a => a.ID == account.ID);
+        updatedAccount.Name.Should().Be(account.Name);
+        updatedAccount.HideAccount.Should().Be(!originalHideAccount);
+    }
+
+    [Fact]
+    public async Task UpdateAccountAsync_WhenTypeIsNull_ShouldSetTypeToEmptyString()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var editedAccount = new AccountUpdateRequest { ID = account.ID, Type = (string?)null };
+
+        // Act
+        await accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
+
+        // Assert
+        var updatedAccount = helper.UserDataContext.Accounts.Single(a => a.ID == account.ID);
+        updatedAccount.Type.Should().Be(string.Empty);
+    }
+
+    [Fact]
+    public async Task UpdateAccountAsync_WhenSourceIsEmpty_ShouldThrowInvalidAccountSourceError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var editedAccount = new AccountUpdateRequest { ID = account.ID, Source = string.Empty };
+
+        // Act
+        var updateAccountAct = () =>
+            accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
+
+        // Assert
+        await updateAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidAccountSourceError");
+    }
+
+    [Fact]
+    public async Task UpdateAccountAsync_WhenSourceIsNull_ShouldThrowInvalidAccountSourceError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var editedAccount = new AccountUpdateRequest { ID = account.ID, Source = (string?)null };
+
+        // Act
+        var updateAccountAct = () =>
+            accountService.UpdateAccountAsync(helper.demoUser.Id, editedAccount);
+
+        // Assert
+        await updateAccountAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidAccountSourceError");
+    }
+
+    [Fact]
+    public async Task UpdateAccountAsync_WhenSourceIsWhitespace_ShouldThrowInvalidAccountSourceError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.SaveChanges();
+
+        var editedAccount = new AccountUpdateRequest { ID = account.ID, Source = " " };
 
         // Act
         var updateAccountAct = () =>
@@ -337,6 +516,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -367,6 +547,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -405,6 +586,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             transactionServiceMock.Object,
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -446,10 +628,13 @@ public class AccountServiceTests()
         var nowProviderMock = new Mock<INowProvider>();
         nowProviderMock.Setup(np => np.UtcNow).Returns(fakeDate);
 
+        var institutionServiceMock = new Mock<IInstitutionService>();
+
         var helper = new TestHelper();
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            institutionServiceMock.Object,
             Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -471,10 +656,10 @@ public class AccountServiceTests()
         await accountService.DeleteAccountAsync(helper.demoUser.Id, account.ID);
 
         // Assert
-        helper
-            .demoUser.Institutions.Single(i => i.ID == institution.ID)
-            .Deleted.Should()
-            .Be(fakeDate);
+        institutionServiceMock.Verify(
+            isvc => isvc.DeleteInstitutionAsync(helper.demoUser.Id, institution.ID, false, true),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -485,6 +670,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -521,6 +707,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -561,6 +748,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -612,6 +800,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -645,6 +834,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -686,6 +876,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             transactionServiceMock.Object,
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -730,6 +921,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             nowProviderMock.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -765,6 +957,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -811,6 +1004,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -855,6 +1049,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -883,6 +1078,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -913,6 +1109,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
@@ -955,6 +1152,7 @@ public class AccountServiceTests()
         var accountService = new AccountService(
             Mock.Of<ILogger<IAccountService>>(),
             helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),

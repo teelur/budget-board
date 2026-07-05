@@ -175,26 +175,14 @@
   <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
     <value>The goal you are trying to complete has already been completed.</value>
   </data>
-  <data name="InstitutionCreateDuplicateNameError" xml:space="preserve">
+  <data name="InstitutionDuplicateNameError" xml:space="preserve">
     <value>An institution with this name already exists.</value>
   </data>
   <data name="InstitutionNotFoundError" xml:space="preserve">
     <value>The institution you are trying to access does not exist.</value>
   </data>
-  <data name="InstitutionUpdateNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to update does not exist.</value>
-  </data>
-  <data name="InstitutionUpdateEmptyNameError" xml:space="preserve">
+  <data name="InstitutionEmptyNameError" xml:space="preserve">
     <value>The institution name cannot be empty.</value>
-  </data>
-  <data name="InstitutionUpdateDuplicateNameError" xml:space="preserve">
-    <value>An institution with this name already exists.</value>
-  </data>
-  <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to delete does not exist.</value>
-  </data>
-  <data name="InstitutionOrderNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to order does not exist.</value>
   </data>
   <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
     <value>A transaction category with this name already exists.</value>

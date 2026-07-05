@@ -1,24 +1,20 @@
 import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IInstitution, InstitutionIndexRequest } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
-import { AxiosError } from "axios";
-import {
-  institutionsQueryKey,
-  translateAxiosError,
-  userSettingsQueryKey,
-} from "~/helpers/requests";
-import { notifications } from "@mantine/notifications";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AccountDetails from "./AccountDetails/AccountDetails";
 import { IAccountResponse } from "~/models/account";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { InfoIcon } from "lucide-react";
+import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
+import { useOrderInstitutionsMutation } from "~/hooks/mutations/institutions/useOrderInstitutionMutation";
 
 interface AccountsContentProps {
   isSortable: boolean;
@@ -32,28 +28,14 @@ const AccountsContent = (props: AccountsContentProps) => {
   >(undefined);
 
   const { t } = useTranslation();
+  const institutionQuery = useInstitutionsQuery();
+  const orderInstitutionsMutation = useOrderInstitutionsMutation();
 
   const [sortedInstitutions, setSortedInstitutions] = React.useState<
     IInstitution[]
   >([]);
 
   const { request } = useAuth();
-  const institutionQuery = useQuery({
-    queryKey: [institutionsQueryKey],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/institution",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IInstitution[];
-      }
-
-      return undefined;
-    },
-  });
-
   const userSettingsQuery = useQuery({
     queryKey: [userSettingsQueryKey],
     queryFn: async () => {
@@ -87,38 +69,20 @@ const AccountsContent = (props: AccountsContentProps) => {
     }
   }, [institutionQuery.data]);
 
-  const queryClient = useQueryClient();
-  const doIndexInstitutions = useMutation({
-    mutationFn: async (institutions: InstitutionIndexRequest[]) =>
-      await request({
-        url: "/api/institution/setindices",
-        method: "PUT",
-        data: institutions,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
   useDidUpdate(() => {
     if (!props.isSortable) {
-      const indexedInstitutions: InstitutionIndexRequest[] =
+      const orderedInstitutions: InstitutionIndexRequest[] =
         sortedInstitutions.map((inst, index) => ({
           id: inst.id,
           index,
         }));
-      doIndexInstitutions.mutate(indexedInstitutions);
+      orderInstitutionsMutation.mutate(orderedInstitutions);
     }
   }, [props.isSortable]);
 
   return (
     <Stack id="institutions-stack" gap="1rem">
-      <LoadingOverlay visible={doIndexInstitutions.isPending} />
+      <LoadingOverlay visible={orderInstitutionsMutation.isPending} />
       {selectedAccount && (
         <AccountDetails
           isOpen={isDetailsOpen}

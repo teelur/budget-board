@@ -11,16 +11,19 @@ import Modal from "~/components/core/Modal/Modal";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
-import { IInstitution } from "~/models/institution";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
-import { translateAxiosError , institutionsQueryKey, widgetSettingsQueryKey} from "~/helpers/requests";
+import {
+  translateAxiosError,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
+import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 
 interface AccountsWidgetSettingsProps {
   widgetId: string;
@@ -36,6 +39,7 @@ const AccountsWidgetSettings = ({
   const { t } = useTranslation();
   const { request } = useAuth();
   const queryClient = useQueryClient();
+  const institutionQuery = useInstitutionsQuery();
 
   const [showAll, setShowAll] = React.useState(true);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
@@ -50,20 +54,6 @@ const AccountsWidgetSettings = ({
       });
       if (res.status === 200) {
         return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
-
-  const institutionQuery = useQuery({
-    queryKey: [institutionsQueryKey],
-    queryFn: async (): Promise<IInstitution[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/institution",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IInstitution[];
       }
       return [];
     },

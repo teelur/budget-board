@@ -18,57 +18,22 @@ public class InstitutionService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : IInstitutionService
 {
-    private readonly ILogger<IInstitutionService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly INowProvider _nowProvider = nowProvider;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task CreateInstitutionAsync(Guid userGuid, IInstitutionCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        if (
-            userData.Institutions.Any(i =>
-                i.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
-            )
-        )
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionCreateDuplicateNameLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["InstitutionCreateDuplicateNameError"]
-            );
-        }
+        ValidateInstitutionName(userData.Institutions, request.Name);
 
         var institution = new Institution { Name = request.Name, UserID = userGuid };
 
-        _userDataContext.Institutions.Add(institution);
-        await _userDataContext.SaveChangesAsync();
+        userDataContext.Institutions.Add(institution);
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<IInstitutionResponse>> ReadInstitutionsAsync(
-        Guid userGuid,
-        Guid guid = default
-    )
+    public async Task<IReadOnlyList<IInstitutionResponse>> ReadInstitutionsAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        if (guid != default)
-        {
-            var insitution = userData.Institutions.FirstOrDefault(i => i.ID == guid);
-            if (insitution == null)
-            {
-                _logger.LogError("{LogMessage}", _logLocalizer["InstitutionNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    _responseLocalizer["InstitutionNotFoundError"]
-                );
-            }
-
-            return [new InstitutionResponse(insitution)];
-        }
-
         return userData.Institutions.Select(i => new InstitutionResponse(i)).ToList();
     }
 
@@ -76,105 +41,72 @@ public class InstitutionService(
     public async Task UpdateInstitutionAsync(Guid userGuid, IInstitutionUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var institution = GetInstitutionById(userData.Institutions, request.ID);
+        ValidateInstitutionName(
+            userData.Institutions.Where(i => i.ID != request.ID).ToList(),
+            request.Name
+        );
 
-        var institution = userData.Institutions.FirstOrDefault(i => i.ID == request.ID);
-        if (institution == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["InstitutionUpdateNotFoundError"]
-            );
-        }
+        institution.Name = request.Name;
 
-        if (string.IsNullOrEmpty(request.Name))
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionUpdateEmptyNameLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["InstitutionUpdateEmptyNameError"]
-            );
-        }
-
-        if (
-            !institution.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
-            && userData.Institutions.Any(i =>
-                i.Name.Equals(request.Name, StringComparison.InvariantCultureIgnoreCase)
-            )
-        )
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionUpdateDuplicateNameLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["InstitutionUpdateDuplicateNameError"]
-            );
-        }
-
-        _userDataContext.Entry(institution).CurrentValues.SetValues(request);
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task DeleteInstitutionAsync(Guid userGuid, Guid id, bool deleteTransactions)
+    public async Task DeleteInstitutionAsync(
+        Guid userGuid,
+        Guid id,
+        bool deleteTransactions,
+        bool deferSave = false
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var institution = userData.Institutions.FirstOrDefault(i => i.ID == id);
-        if (institution == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["InstitutionDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                _responseLocalizer["InstitutionDeleteNotFoundError"]
-            );
-        }
+        var institution = GetInstitutionById(userData.Institutions, id);
 
         if (deleteTransactions)
         {
-            foreach (var transaction in institution.Accounts.SelectMany(a => a.Transactions))
-            {
-                transaction.Deleted = _nowProvider.UtcNow;
-            }
+            var transactionsToDelete = institution
+                .Accounts.SelectMany(a => a.Transactions)
+                .Where(t => t.Deleted == null)
+                .ToList();
+            transactionsToDelete.ForEach(t => t.Deleted = nowProvider.UtcNow);
         }
 
         var accountsToDelete = institution.Accounts.Where(a => a.Deleted == null).ToList();
-        if (accountsToDelete.Count != 0)
-        {
-            accountsToDelete.ForEach(a => a.Deleted = _nowProvider.UtcNow);
-        }
+        accountsToDelete.ForEach(a => a.Deleted = nowProvider.UtcNow);
 
-        institution.Deleted = _nowProvider.UtcNow;
-        await _userDataContext.SaveChangesAsync();
+        institution.Deleted = nowProvider.UtcNow;
+        institution.Index = 0;
+        if (!deferSave)
+        {
+            await userDataContext.SaveChangesAsync();
+        }
     }
 
     /// <inheritdoc />
     public async Task OrderInstitutionsAsync(
         Guid userGuid,
-        IEnumerable<IInstitutionIndexRequest> orderedInstitutions
+        IEnumerable<IInstitutionIndexRequest> request
     )
     {
         var userData = await GetCurrentUserAsync(userGuid.ToString());
 
-        foreach (var institution in orderedInstitutions)
+        foreach (var requestInstitution in request)
         {
-            var insitution = userData.Institutions.FirstOrDefault(i => i.ID == institution.ID);
-            if (insitution == null)
-            {
-                _logger.LogError("{LogMessage}", _logLocalizer["InstitutionOrderNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    _responseLocalizer["InstitutionOrderNotFoundError"]
-                );
-            }
-
-            insitution.Index = institution.Index;
+            var institution = GetInstitutionById(userData.Institutions, requestInstitution.ID);
+            institution.Index = requestInstitution.Index;
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(string id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
-            _userDataContext,
-            _logger,
-            _logLocalizer,
-            _responseLocalizer,
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
             id,
             users =>
                 users
@@ -182,5 +114,32 @@ public class InstitutionService(
                     .ThenInclude(i => i.Accounts)
                     .ThenInclude(a => a.Balances)
         );
+    }
+
+    private void ValidateInstitutionName(ICollection<Institution> institutions, string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            logger.LogError("{LogMessage}", logLocalizer["InstitutionEmptyNameLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["InstitutionEmptyNameError"]);
+        }
+        if (institutions.Any(i => i.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)))
+        {
+            logger.LogError("{LogMessage}", logLocalizer["InstitutionDuplicateNameLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["InstitutionDuplicateNameError"]
+            );
+        }
+    }
+
+    private Institution GetInstitutionById(ICollection<Institution> institutions, Guid id)
+    {
+        var institution = institutions.FirstOrDefault(i => i.ID == id);
+        if (institution == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["InstitutionNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["InstitutionNotFoundError"]);
+        }
+        return institution;
     }
 }

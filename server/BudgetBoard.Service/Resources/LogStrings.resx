@@ -163,26 +163,14 @@
   <data name="GoalCompleteAlreadyCompletedLog" xml:space="preserve">
     <value>Attempted to complete a goal that is already completed.</value>
   </data>
-  <data name="InstitutionCreateDuplicateNameLog" xml:space="preserve">
-    <value>Attempted to create an institution with a duplicate name.</value>
+  <data name="InstitutionDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to create or update an institution with a duplicate name.</value>
   </data>
   <data name="InstitutionNotFoundLog" xml:space="preserve">
     <value>Attempted to access an institution that does not exist.</value>
   </data>
-  <data name="InstitutionUpdateNotFoundLog" xml:space="preserve">
-    <value>Attempted to update an institution that does not exist.</value>
-  </data>
-  <data name="InstitutionUpdateEmptyNameLog" xml:space="preserve">
-    <value>Attempted to update an institution with an empty name.</value>
-  </data>
-  <data name="InstitutionUpdateDuplicateNameLog" xml:space="preserve">
-    <value>Attempted to update an institution with a duplicate name.</value>
-  </data>
-  <data name="InstitutionDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to delete an institution that does not exist.</value>
-  </data>
-  <data name="InstitutionOrderNotFoundLog" xml:space="preserve">
-    <value>Attempted to set index for institution that does not exist.</value>
+  <data name="InstitutionEmptyNameLog" xml:space="preserve">
+    <value>Attempted to create or update an institution with an empty name.</value>
   </data>
   <data name="TransactionCategoryCreateDuplicateNameLog" xml:space="preserve">
     <value>Attempted to create a transaction category with a duplicate name.</value>

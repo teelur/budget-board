@@ -14,6 +14,7 @@ namespace BudgetBoard.Service;
 public class AccountService(
     ILogger<IAccountService> logger,
     UserDataContext userDataContext,
+    IInstitutionService institutionService,
     ITransactionService transactionService,
     INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
@@ -85,7 +86,7 @@ public class AccountService(
         {
             if (
                 string.IsNullOrEmpty(request.Source.Value)
-                || !AccountSource.IsValid(request.Source.Value ?? string.Empty)
+                || !AccountSource.IsValid(request.Source.Value)
             )
             {
                 throw new BudgetBoardServiceException(
@@ -123,8 +124,12 @@ public class AccountService(
 
         if (account.Institution?.Accounts.All(a => a.Deleted != null) ?? false)
         {
-            account.Institution.Deleted = utcNow;
-            account.Institution.Index = 0;
+            await institutionService.DeleteInstitutionAsync(
+                userGuid,
+                account.Institution.ID,
+                deleteTransactions,
+                true
+            );
         }
 
         var lunchFlowAccount = await userDataContext.LunchFlowAccounts.FirstOrDefaultAsync(a =>

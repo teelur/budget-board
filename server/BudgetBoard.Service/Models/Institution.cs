@@ -10,13 +10,7 @@ public interface IInstitutionCreateRequest
 
 public class InstitutionCreateRequest : IInstitutionCreateRequest
 {
-    public string Name { get; set; }
-
-    [JsonConstructor]
-    public InstitutionCreateRequest()
-    {
-        Name = string.Empty;
-    }
+    public string Name { get; set; } = string.Empty;
 }
 
 public interface IInstitutionUpdateRequest
@@ -27,15 +21,8 @@ public interface IInstitutionUpdateRequest
 
 public class InstitutionUpdateRequest : IInstitutionUpdateRequest
 {
-    public Guid ID { get; set; }
-    public string Name { get; set; }
-
-    [JsonConstructor]
-    public InstitutionUpdateRequest()
-    {
-        ID = Guid.NewGuid();
-        Name = string.Empty;
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = string.Empty;
 }
 
 public interface IInstitutionIndexRequest
@@ -46,14 +33,15 @@ public interface IInstitutionIndexRequest
 
 public class InstitutionIndexRequest : IInstitutionIndexRequest
 {
-    public Guid ID { get; set; }
-    public int Index { get; set; }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public int Index { get; set; } = 0;
 }
 
 public interface IInstitutionResponse
 {
     Guid ID { get; }
     string Name { get; }
+    DateTime? Deleted { get; }
     int Index { get; }
     Guid UserID { get; }
     IEnumerable<IAccountResponse> Accounts { get; }
@@ -61,23 +49,12 @@ public interface IInstitutionResponse
 
 public class InstitutionResponse : IInstitutionResponse
 {
-    public Guid ID { get; set; }
-    public string Name { get; set; }
-    public int Index { get; set; }
-    public DateTime? Deleted { get; set; }
-    public Guid UserID { get; set; }
-    public IEnumerable<IAccountResponse> Accounts { get; set; }
-
-    [JsonConstructor]
-    public InstitutionResponse()
-    {
-        ID = Guid.NewGuid();
-        Name = string.Empty;
-        Index = 0;
-        Deleted = null;
-        UserID = Guid.NewGuid();
-        Accounts = [];
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = string.Empty;
+    public int Index { get; set; } = 0;
+    public DateTime? Deleted { get; set; } = null;
+    public Guid UserID { get; set; } = Guid.NewGuid();
+    public IEnumerable<IAccountResponse> Accounts { get; set; } = [];
 
     public InstitutionResponse(Institution institution)
     {

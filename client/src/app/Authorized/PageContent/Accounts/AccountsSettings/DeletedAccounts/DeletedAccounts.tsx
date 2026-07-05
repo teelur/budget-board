@@ -1,44 +1,23 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedAccountCard from "./DeletedAccountCard";
-import { institutionsQueryKey } from "~/helpers/requests";
-import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 
 const DeletedAccounts = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const institutionsQuery = useQuery({
-    queryKey: [institutionsQueryKey],
-    queryFn: async (): Promise<any[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/institution",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as any[];
-      }
-
-      return [];
-    },
-  });
-
-  const accountsQuery = useAccountsQuery();
+  const institutionsQuery = useInstitutionsQuery();
 
   const getDeletedAccountsContent = (): React.ReactNode => {
-    if (accountsQuery.isPending) {
+    if (institutionsQuery.isPending) {
       return <Skeleton height={55} radius="md" />;
     }
 
-    const deletedAccounts = (accountsQuery.data ?? []).filter(
-      (account) => account.deleted,
-    );
+    const deletedAccounts = (institutionsQuery.data ?? [])
+      .map((institution) => institution.accounts ?? [])
+      .flat()
+      .filter((account) => account.deleted);
 
     if (deletedAccounts.length === 0) {
       return (

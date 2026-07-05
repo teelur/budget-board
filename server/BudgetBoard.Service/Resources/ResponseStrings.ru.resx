@@ -166,17 +166,11 @@
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
     <value>The widget you are trying to update does not exist.</value>
   </data>
-  <data name="InstitutionUpdateEmptyNameError" xml:space="preserve">
-    <value>The institution name cannot be empty.</value>
-  </data>
   <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
     <value>The LunchFlow account you are trying to access does not exist.</value>
   </data>
   <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
     <value>The batch update request contains duplicate transaction IDs.</value>
-  </data>
-  <data name="InstitutionDeleteNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to delete does not exist.</value>
   </data>
   <data name="ValueDuplicateDateError" xml:space="preserve">
     <value>A value for this date already exists for this asset.</value>
@@ -198,9 +192,6 @@
   </data>
   <data name="TransactionDeleteNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to delete does not exist.</value>
-  </data>
-  <data name="InstitutionOrderNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to order does not exist.</value>
   </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
     <value>An error occurred while retrieving user data.</value>
@@ -298,9 +289,6 @@
   <data name="InvalidOrganizationIDError" xml:space="preserve">
     <value>The provided organization ID is invalid.</value>
   </data>
-  <data name="InstitutionUpdateNotFoundError" xml:space="preserve">
-    <value>The institution you are trying to update does not exist.</value>
-  </data>
   <data name="BalanceDuplicateDateError" xml:space="preserve">
     <value>A balance already exists for this account on that date.</value>
   </data>
@@ -334,7 +322,7 @@
   <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
     <value>The transaction category name cannot be empty.</value>
   </data>
-  <data name="InstitutionUpdateDuplicateNameError" xml:space="preserve">
+  <data name="InstitutionDuplicateNameError" xml:space="preserve">
     <value>An institution with this name already exists.</value>
   </data>
   <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
@@ -372,9 +360,6 @@
   </data>
   <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
     <value>The force sync lookback period must be between 0 and 12 months.</value>
-  </data>
-  <data name="InstitutionCreateDuplicateNameError" xml:space="preserve">
-    <value>An institution with this name already exists.</value>
   </data>
   <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
     <value>Transaction category cannot have the same name as its parent category.</value>
