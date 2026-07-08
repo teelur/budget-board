@@ -24,7 +24,7 @@ public class BudgetService(
         bool autoManageParents = false
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         int newBudgetsCount = 0;
@@ -115,7 +115,7 @@ public class BudgetService(
         DateOnly month
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var budgets = userData.Budgets.Where(b =>
             b.Month.Month == month.Month && b.Month.Year == month.Year
@@ -127,7 +127,7 @@ public class BudgetService(
     /// <inheritdoc />
     public async Task UpdateBudgetAsync(Guid userGuid, IBudgetUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var budget = GetBudgetById(userData, request.ID);
 
         budget.Limit = request.Limit;
@@ -204,7 +204,7 @@ public class BudgetService(
     /// <inheritdoc />
     public async Task DeleteBudgetAsync(Guid userGuid, Guid budgetGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var budget = GetBudgetById(userData, budgetGuid);
 
         userDataContext.Budgets.Remove(budget);
@@ -227,7 +227,7 @@ public class BudgetService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

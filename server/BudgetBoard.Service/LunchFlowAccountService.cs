@@ -24,7 +24,7 @@ public class LunchFlowAccountService(
         ILunchFlowAccountCreateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         if (userData.LunchFlowAccounts.Any(a => a.SyncID == request.SyncID))
         {
@@ -59,7 +59,7 @@ public class LunchFlowAccountService(
         Guid userGuid
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         return userData.LunchFlowAccounts.Select(a => new LunchFlowAccountResponse(a)).ToList();
     }
@@ -70,7 +70,7 @@ public class LunchFlowAccountService(
         ILunchFlowAccountUpdateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a => a.ID == request.ID);
         if (lunchFlowAccount == null)
@@ -98,7 +98,7 @@ public class LunchFlowAccountService(
     /// <inheritdoc />
     public async Task DeleteLunchFlowAccountAsync(Guid userGuid, Guid accountGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a => a.ID == accountGuid);
         if (lunchFlowAccount == null)
@@ -128,7 +128,7 @@ public class LunchFlowAccountService(
         Guid? linkedAccountGuid
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a =>
             a.ID == lunchFlowAccountGuid
@@ -172,7 +172,7 @@ public class LunchFlowAccountService(
         DateOnly? syncStartDate
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a =>
             a.ID == lunchFlowAccountGuid
@@ -190,7 +190,7 @@ public class LunchFlowAccountService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

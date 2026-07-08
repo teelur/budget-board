@@ -27,7 +27,7 @@ public class SyncService(
     public async Task<IReadOnlyList<SyncError>> SyncAsync(Guid userGuid)
     {
         var errors = new List<SyncError>();
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         // The external sync provider update changed how the Source is determined. Need to reconcile existing accounts.
         SetManualSourceForUnlinkedAccounts(userData.Accounts);
@@ -83,7 +83,7 @@ public class SyncService(
         return errors;
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

@@ -24,7 +24,7 @@ public class SimpleFinAccountService(
         ISimpleFinAccountCreateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var organization = userData.SimpleFinOrganizations.SingleOrDefault(i =>
             i.ID == request.OrganizationId
@@ -55,7 +55,7 @@ public class SimpleFinAccountService(
         Guid userGuid
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         return userData
             .SimpleFinOrganizations.SelectMany(o => o.Accounts)
@@ -69,7 +69,7 @@ public class SimpleFinAccountService(
         ISimpleFinAccountUpdateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var accountToUpdate = userData
             .SimpleFinOrganizations.SelectMany(o => o.Accounts)
@@ -95,7 +95,7 @@ public class SimpleFinAccountService(
     /// <inheritdoc />
     public async Task DeleteSimpleFinAccountAsync(Guid userGuid, Guid accountGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var accountToDelete = userData
             .SimpleFinOrganizations.SelectMany(o => o.Accounts)
@@ -126,7 +126,7 @@ public class SimpleFinAccountService(
         Guid? linkedAccountGuid
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var accountToUpdate = userData.SimpleFinAccounts.SingleOrDefault(o =>
             o.ID == simpleFinAccountGuid
@@ -170,7 +170,7 @@ public class SimpleFinAccountService(
         DateOnly? syncStartDate
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var accountToUpdate = userData.SimpleFinAccounts.SingleOrDefault(o =>
             o.ID == simpleFinAccountGuid
@@ -188,7 +188,7 @@ public class SimpleFinAccountService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

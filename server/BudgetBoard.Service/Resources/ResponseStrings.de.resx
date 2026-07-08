@@ -148,36 +148,6 @@
   <data name="InstitutionEmptyNameError" xml:space="preserve">
     <value>Der Name der Institution darf nicht leer sein.</value>
   </data>
-  <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
-    <value>Eine Transaktionskategorie mit diesem Namen existiert bereits.</value>
-  </data>
-  <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
-    <value>Der Name der Transaktionskategorie darf nicht leer sein.</value>
-  </data>
-  <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
-    <value>Die Transaktionskategorie darf nicht denselben Namen wie ihre übergeordnete Kategorie haben.</value>
-  </data>
-  <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
-    <value>Die übergeordnete Transaktionskategorie, die Sie verwenden möchten, existiert nicht.</value>
-  </data>
-  <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
-    <value>Die Transaktionskategorie, die Sie aktualisieren möchten, existiert nicht.</value>
-  </data>
-  <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
-    <value>Der Name der Transaktionskategorie darf nicht leer sein.</value>
-  </data>
-  <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
-    <value>Eine Transaktionskategorie mit diesem Namen existiert bereits.</value>
-  </data>
-  <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
-    <value>Die Transaktionskategorie darf nicht denselben Namen wie ihre übergeordnete Kategorie haben.</value>
-  </data>
-  <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
-    <value>Die übergeordnete Transaktionskategorie, die Sie verwenden möchten, existiert nicht.</value>
-  </data>
-  <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
-    <value>Die Transaktionskategorie, die Sie löschen möchten, existiert nicht.</value>
-  </data>
   <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
     <value>Das Konto, zu dem Sie eine Transaktion hinzufügen möchten, existiert nicht.</value>
   </data>

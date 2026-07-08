@@ -21,7 +21,7 @@ public class GoalService(
     /// <inheritdoc />
     public async Task CreateGoalAsync(Guid userGuid, IGoalCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         if (
             (request.MonthlyContribution == 0 || !request.MonthlyContribution.HasValue)
@@ -93,7 +93,7 @@ public class GoalService(
         bool includeInterest
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var goalsResponse = new List<IGoalResponse>();
         var goals = userData.Goals.ToList();
@@ -123,7 +123,7 @@ public class GoalService(
     /// <inheritdoc />
     public async Task UpdateGoalAsync(Guid userGuid, IGoalUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var goal = GetGoalById(userData, request.ID);
 
         if (
@@ -202,7 +202,7 @@ public class GoalService(
     /// <inheritdoc />
     public async Task DeleteGoalAsync(Guid userGuid, Guid guid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var goal = GetGoalById(userData, guid);
 
         userDataContext.Goals.Remove(goal);
@@ -212,7 +212,7 @@ public class GoalService(
     /// <inheritdoc />
     public async Task CompleteGoalAsync(Guid userGuid, Guid goalID, DateOnly completedDate)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var goal = GetGoalById(userData, goalID);
 
         if (goal.Completed.HasValue)
@@ -230,7 +230,7 @@ public class GoalService(
     /// <inheritdoc />
     public async Task CompleteEligibleGoalsAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var goals = userData.Goals.ToList();
         foreach (var goal in goals)
@@ -251,7 +251,7 @@ public class GoalService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

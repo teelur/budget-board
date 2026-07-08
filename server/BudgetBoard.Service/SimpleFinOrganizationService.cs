@@ -24,7 +24,7 @@ public class SimpleFinOrganizationService(
         ISimpleFinOrganizationCreateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         if (userData.SimpleFinOrganizations.Any(i => i.Domain == request.Domain))
         {
@@ -53,7 +53,7 @@ public class SimpleFinOrganizationService(
         IReadOnlyList<ISimpleFinOrganizationResponse>
     > ReadSimpleFinOrganizationsAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         return userData
             .SimpleFinOrganizations.Select(o => new SimpleFinOrganizationResponse(o))
@@ -66,7 +66,7 @@ public class SimpleFinOrganizationService(
         ISimpleFinOrganizationUpdateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var organizationToUpdate = userData.SimpleFinOrganizations.SingleOrDefault(a =>
             a.ID == request.ID
@@ -91,7 +91,7 @@ public class SimpleFinOrganizationService(
     /// <inheritdoc />
     public async Task DeleteSimpleFinOrganizationAsync(Guid userGuid, Guid organizationGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var organizationToDelete = userData.SimpleFinOrganizations.SingleOrDefault(o =>
             o.ID == organizationGuid
@@ -108,7 +108,7 @@ public class SimpleFinOrganizationService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

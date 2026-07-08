@@ -113,7 +113,7 @@ public class TransactionService(
         AutomaticTransactionCategorizerHelper? autoCategorizer = null
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         await CreateTransactionAsync(userData, request, allCategories, autoCategorizer);
     }
 
@@ -126,7 +126,7 @@ public class TransactionService(
         Guid guid = default
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var transactions = userData
             .Accounts.SelectMany(t => t.Transactions)
@@ -167,7 +167,7 @@ public class TransactionService(
         ITransactionUpdateRequest editedTransaction
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
@@ -223,7 +223,7 @@ public class TransactionService(
             );
         }
 
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
 
         foreach (var editedTransaction in requestList)
@@ -273,7 +273,7 @@ public class TransactionService(
     /// <inheritdoc />
     public async Task DeleteTransactionAsync(Guid userGuid, Guid guid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
@@ -312,7 +312,7 @@ public class TransactionService(
             );
         }
 
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
 
         foreach (var guid in guidList)
@@ -338,7 +338,7 @@ public class TransactionService(
     /// <inheritdoc />
     public async Task RestoreTransactionAsync(Guid userGuid, Guid guid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
@@ -376,7 +376,7 @@ public class TransactionService(
             );
         }
 
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
 
         foreach (var guid in guidList)
@@ -405,7 +405,7 @@ public class TransactionService(
         ITransactionSplitRequest transactionSplitRequest
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var transaction = userData
             .Accounts.SelectMany(t => t.Transactions)
@@ -447,7 +447,7 @@ public class TransactionService(
     /// <inheritdoc />
     public async Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var transactions = request.Transactions;
         var accountNameToIDMap = request.AccountNameToIDMap;
 
@@ -509,7 +509,7 @@ public class TransactionService(
         }
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

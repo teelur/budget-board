@@ -22,7 +22,7 @@ public class WidgetSettingsService(
 {
     public async Task CreateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var defaultLayout = WidgetSettingsHelpers.GetDefaultWidgetLayout(request.WidgetType);
 
@@ -45,7 +45,7 @@ public class WidgetSettingsService(
 
     public async Task<IEnumerable<IWidgetResponse>> ReadWidgetSettingsAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var widgetSettings = userData.WidgetSettings.Select(ws => new WidgetResponse
         {
@@ -67,7 +67,7 @@ public class WidgetSettingsService(
 
     public async Task UpdateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == request.ID);
         if (widget == null)
         {
@@ -93,7 +93,7 @@ public class WidgetSettingsService(
         IEnumerable<IWidgetSettingsBatchUpdateRequest> requests
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         foreach (var req in requests)
         {
@@ -119,7 +119,7 @@ public class WidgetSettingsService(
 
     public async Task DeleteWidgetSettingsAsync(Guid userGuid, Guid widgetGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == widgetGuid);
         if (widget == null)
@@ -134,7 +134,7 @@ public class WidgetSettingsService(
 
     public async Task ResetWidgetSettingsConfiguration(Guid userGuid, Guid widgetGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == widgetGuid);
         if (widget == null)
@@ -149,7 +149,7 @@ public class WidgetSettingsService(
 
     public async Task ResetSmallScreenToLargeScreenLayout(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var widgetsInSmallScreenOrder = userData
             .WidgetSettings.OrderBy(ws => ws.LgY)
@@ -166,7 +166,7 @@ public class WidgetSettingsService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

@@ -20,7 +20,7 @@ public class AssetTypeService(
     /// <inheritdoc />
     public async Task CreateAssetTypeAsync(Guid userGuid, IAssetTypeCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allAssetTypes = GetAllAssetTypes(userData);
 
         ValidateAssetTypeData(request.Value, request.Parent, allAssetTypes);
@@ -39,14 +39,14 @@ public class AssetTypeService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<IAssetTypeResponse>> ReadAssetTypesAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         return GetAllAssetTypes(userData);
     }
 
     /// <inheritdoc />
     public async Task UpdateAssetTypeAsync(Guid userGuid, IAssetTypeUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var assetType = GetAssetTypeById(userData, request.ID);
         var allAssetTypes = GetAllAssetTypes(userData);
 
@@ -114,7 +114,7 @@ public class AssetTypeService(
     /// <inheritdoc />
     public async Task DeleteAssetTypeAsync(Guid userGuid, Guid guid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var assetType = GetAssetTypeById(userData, guid);
 
         RemoveChildrenUsingType(assetType.Value);
@@ -138,7 +138,7 @@ public class AssetTypeService(
         }
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

@@ -148,36 +148,6 @@
   <data name="InstitutionEmptyNameError" xml:space="preserve">
     <value>机构名称不能为空。</value>
   </data>
-  <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
-    <value>具有此名称的交易类别已存在。</value>
-  </data>
-  <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
-    <value>交易类别名称不能为空。</value>
-  </data>
-  <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
-    <value>交易类别不能与其父类别同名。</value>
-  </data>
-  <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
-    <value>您尝试使用的父交易类别不存在。</value>
-  </data>
-  <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
-    <value>您尝试更新的交易类别不存在。</value>
-  </data>
-  <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
-    <value>交易类别名称不能为空。</value>
-  </data>
-  <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
-    <value>具有此名称的交易类别已存在。</value>
-  </data>
-  <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
-    <value>交易类别不能与其父类别同名。</value>
-  </data>
-  <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
-    <value>您尝试使用的父交易类别不存在。</value>
-  </data>
-  <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
-    <value>您尝试删除的交易类别不存在。</value>
-  </data>
   <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
     <value>您尝试向其添加交易的账户不存在。</value>
   </data>

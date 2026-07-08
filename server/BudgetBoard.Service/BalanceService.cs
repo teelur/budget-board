@@ -20,7 +20,7 @@ public class BalanceService(
     /// <inheritdoc />
     public async Task CreateBalancesAsync(Guid userGuid, IBalanceCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var account = GetAccountById(userData, request.AccountID);
 
         // We only want to create a balance if a balance doesn't already exist for the same date.
@@ -50,7 +50,7 @@ public class BalanceService(
         Guid accountId
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var account = GetAccountById(userData, accountId);
 
         return account.Balances.Select(b => new BalanceResponse(b)).ToList();
@@ -59,7 +59,7 @@ public class BalanceService(
     /// <inheritdoc />
     public async Task UpdateBalanceAsync(Guid userGuid, IBalanceUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var balance = GetBalanceById(userData, request.ID);
         var account = GetAccountById(userData, balance.AccountID);
 
@@ -87,14 +87,14 @@ public class BalanceService(
     /// <inheritdoc />
     public async Task DeleteBalanceAsync(Guid userGuid, Guid guid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var balance = GetBalanceById(userData, guid);
 
         userDataContext.Balances.Remove(balance);
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

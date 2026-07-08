@@ -58,12 +58,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
-    <value>The transaction category you are trying to delete does not exist.</value>
-  </data>
-  <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
-    <value>The transaction category you are trying to update does not exist.</value>
-  </data>
   <data name="AccountTypeNotFoundError" xml:space="preserve">
     <value>The account type you are trying to access does not exist.</value>
   </data>
@@ -157,9 +151,6 @@
   <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
     <value>Cannot create a circular dependency. The target line already depends on this line.</value>
   </data>
-  <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
-    <value>Transaction category cannot have the same name as its parent category.</value>
-  </data>
   <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
     <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
   </data>
@@ -186,9 +177,6 @@
   </data>
   <data name="TransactionUpdateNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to update does not exist.</value>
-  </data>
-  <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
-    <value>The parent transaction category you are trying to use does not exist.</value>
   </data>
   <data name="TransactionDeleteNotFoundError" xml:space="preserve">
     <value>The transaction you are trying to delete does not exist.</value>
@@ -277,9 +265,6 @@
   <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
     <value>Unsupported field '{0}' in rule action.</value>
   </data>
-  <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
-    <value>The parent transaction category you are trying to use does not exist.</value>
-  </data>
   <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
     <value>The category '{0}' does not exist.</value>
   </data>
@@ -319,9 +304,6 @@
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
     <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
   </data>
-  <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
-    <value>The transaction category name cannot be empty.</value>
-  </data>
   <data name="InstitutionDuplicateNameError" xml:space="preserve">
     <value>An institution with this name already exists.</value>
   </data>
@@ -360,9 +342,6 @@
   </data>
   <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
     <value>The force sync lookback period must be between 0 and 12 months.</value>
-  </data>
-  <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
-    <value>Transaction category cannot have the same name as its parent category.</value>
   </data>
   <data name="GoalCreateInPastError" xml:space="preserve">
     <value>A goal cannot have a target date in the past.</value>

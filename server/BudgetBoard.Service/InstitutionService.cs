@@ -21,7 +21,7 @@ public class InstitutionService(
     /// <inheritdoc />
     public async Task CreateInstitutionAsync(Guid userGuid, IInstitutionCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         ValidateInstitutionName(userData.Institutions, request.Name);
 
         var institution = new Institution { Name = request.Name, UserID = userGuid };
@@ -33,14 +33,14 @@ public class InstitutionService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<IInstitutionResponse>> ReadInstitutionsAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         return userData.Institutions.Select(i => new InstitutionResponse(i)).ToList();
     }
 
     /// <inheritdoc />
     public async Task UpdateInstitutionAsync(Guid userGuid, IInstitutionUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var institution = GetInstitutionById(userData.Institutions, request.ID);
         ValidateInstitutionName(
             userData.Institutions.Where(i => i.ID != request.ID).ToList(),
@@ -60,7 +60,7 @@ public class InstitutionService(
         bool deferSave = false
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var institution = GetInstitutionById(userData.Institutions, id);
 
         if (deleteTransactions)
@@ -89,7 +89,7 @@ public class InstitutionService(
         IEnumerable<IInstitutionIndexRequest> request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         foreach (var requestInstitution in request)
         {
@@ -100,7 +100,7 @@ public class InstitutionService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,
