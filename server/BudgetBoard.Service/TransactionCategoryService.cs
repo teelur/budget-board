@@ -270,21 +270,15 @@ public class TransactionCategoryService(
         IEnumerable<ITransactionCategoryResponse> categories
     )
     {
-        foreach (var category in categories)
+        if (
+            categories.Any(c =>
+            {
+                var valueMatches = c.Value.Equals(value, StringComparison.OrdinalIgnoreCase);
+                var idMatches = id.HasValue && c.ID == id.Value;
+                return valueMatches && !idMatches;
+            })
+        )
         {
-            if (!category.Value.Equals(value, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (id.HasValue)
-            {
-                if (category.ID == id.Value)
-                {
-                    continue;
-                }
-            }
-
             logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryDuplicateNameLog"]);
             throw new BudgetBoardServiceException(
                 responseLocalizer["TransactionCategoryDuplicateNameError"]
