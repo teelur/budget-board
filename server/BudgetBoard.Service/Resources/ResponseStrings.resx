@@ -391,12 +391,6 @@
     <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
         <value>Transaction category cannot have the same name as its parent category.</value>
     </data>
-    <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
-        <value>A transaction category with this name already exists.</value>
-    </data>
-    <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
-        <value>The transaction category name cannot be empty.</value>
-    </data>
     <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
         <value>The account you are trying to add a transaction to does not exist.</value>
     </data>
