@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
 
@@ -79,21 +78,11 @@ public interface ITransactionCategoryResponse : ITransactionCategory
 
 public class CategoryResponse : ITransactionCategoryResponse
 {
-    public Guid ID { get; set; }
-    public string Value { get; set; }
-    public string Parent { get; set; }
-    public string CategoryType { get; set; }
-    public Guid UserID { get; set; }
-
-    [JsonConstructor]
-    public CategoryResponse()
-    {
-        ID = Guid.Empty;
-        Value = string.Empty;
-        Parent = string.Empty;
-        CategoryType = TransactionCategoryTypes.Expense;
-        UserID = Guid.Empty;
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public string Value { get; set; } = string.Empty;
+    public string Parent { get; set; } = string.Empty;
+    public string CategoryType { get; set; } = TransactionCategoryTypes.Expense;
+    public Guid UserID { get; set; } = Guid.NewGuid();
 
     public CategoryResponse(Category category)
     {
