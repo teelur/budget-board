@@ -18,97 +18,91 @@ public class TransactionCategoryController(
     ITransactionCategoryService transactionCategoryService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<TransactionCategoryController>(logger, logLocalizer, responseLocalizer)
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] TransactionCategoryCreateRequest category)
+    public async Task<IActionResult> Create(
+        [FromBody] TransactionCategoryCreateRequest newTransactionCategory
+    )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await transactionCategoryService.CreateTransactionCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                category
+                parsedUserId,
+                newTransactionCategory
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             return Ok(
-                await transactionCategoryService.ReadTransactionCategoriesAsync(
-                    new Guid(userManager.GetUserId(User) ?? string.Empty)
-                )
+                await transactionCategoryService.ReadTransactionCategoriesAsync(parsedUserId)
             );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] TransactionCategoryUpdateRequest category)
+    public async Task<IActionResult> Update(
+        [FromBody] TransactionCategoryUpdateRequest updatedTransactionCategory
+    )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await transactionCategoryService.UpdateTransactionCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                category
+                parsedUserId,
+                updatedTransactionCategory
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid transactionCategoryId)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await transactionCategoryService.DeleteTransactionCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                guid
+                parsedUserId,
+                transactionCategoryId
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

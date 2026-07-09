@@ -20,7 +20,7 @@ public class AccountTypeService(
     /// <inheritdoc />
     public async Task CreateAccountTypeAsync(Guid userGuid, IAccountTypeCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allAccountTypes = GetAllAccountTypes(userData);
 
         ValidateAccountTypeData(
@@ -49,14 +49,14 @@ public class AccountTypeService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<IAccountTypeResponse>> ReadAccountTypesAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         return GetAllAccountTypes(userData);
     }
 
     /// <inheritdoc />
     public async Task UpdateAccountTypeAsync(Guid userGuid, IAccountTypeUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var accountType = GetAccountTypeById(userData, request.ID);
         var allAccountTypes = GetAllAccountTypes(userData);
 
@@ -166,7 +166,7 @@ public class AccountTypeService(
     /// <inheritdoc />
     public async Task DeleteAccountTypeAsync(Guid userGuid, Guid guid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var accountType = GetAccountTypeById(userData, guid);
 
         RemoveChildrenUsingType(accountType.Value);
@@ -190,7 +190,7 @@ public class AccountTypeService(
         }
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

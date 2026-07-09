@@ -23,16 +23,17 @@ public class TransactionCategoryService(
         ITransactionCategoryCreateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allTransactionCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
             userData
         );
 
-        ThrowIfDuplicateName(request.Value, allTransactionCategories);
-        ThrowIfValueIsNullOrEmpty(request.Value);
-        ThrowIfValueSameNameAsParent(request.Value, request.Parent);
-        ThrowIfParentNotFound(request.Parent, allTransactionCategories);
-        ThrowIfInvalidCategoryType(request.CategoryType);
+        ValidateTransactionCategoryData(
+            request.Value,
+            request.Parent,
+            request.CategoryType,
+            allTransactionCategories
+        );
 
         var newCategory = new Category
         {
@@ -48,78 +49,6 @@ public class TransactionCategoryService(
 
         userDataContext.TransactionCategories.Add(newCategory);
         await userDataContext.SaveChangesAsync();
-
-        void ThrowIfDuplicateName(string value, IEnumerable<ITransactionCategory> categories)
-        {
-            if (categories.Any(c => c.Value.Equals(value, StringComparison.OrdinalIgnoreCase)))
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["TransactionCategoryCreateDuplicateNameLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionCategoryCreateDuplicateNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueIsNullOrEmpty(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["TransactionCategoryCreateEmptyNameLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionCategoryCreateEmptyNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueSameNameAsParent(string value, string parentValue)
-        {
-            if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["TransactionCategoryCreateSameNameAsParentLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionCategoryCreateSameNameAsParentError"]
-                );
-            }
-        }
-
-        void ThrowIfParentNotFound(string parentValue, IEnumerable<ITransactionCategory> categories)
-        {
-            if (
-                !string.IsNullOrEmpty(parentValue)
-                && !categories.Any(c =>
-                    c.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["TransactionCategoryCreateParentNotFoundLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionCategoryCreateParentNotFoundError"]
-                );
-            }
-        }
-
-        string ResolveCategoryType(
-            string parent,
-            string categoryType,
-            IEnumerable<ITransactionCategoryResponse> allCategoryTypes
-        ) =>
-            string.IsNullOrEmpty(parent)
-                ? categoryType
-                : allCategoryTypes
-                    .First(a => a.Value.Equals(parent, StringComparison.OrdinalIgnoreCase))
-                    .CategoryType;
     }
 
     /// <inheritdoc />
@@ -127,7 +56,7 @@ public class TransactionCategoryService(
         Guid userGuid
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         return TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
     }
 
@@ -137,28 +66,19 @@ public class TransactionCategoryService(
         ITransactionCategoryUpdateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var transactionCategory = userData.TransactionCategories.FirstOrDefault(t =>
-            t.ID == request.ID
-        );
-        if (transactionCategory == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["TransactionCategoryUpdateNotFoundError"]
-            );
-        }
-
+        var userData = await GetCurrentUserAsync(userGuid);
+        var transactionCategory = GetTransactionCategoryById(userData, request.ID);
         var allTransactionCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
             userData
         );
 
-        ThrowIfDuplicateName(request.Value, allTransactionCategories);
-        ThrowIfValueIsNullOrEmpty(request.Value);
-        ThrowIfValueSameNameAsParent(request.Value, request.Parent);
-        ThrowIfParentNotFound(request.Parent, allTransactionCategories);
-        ThrowIfInvalidCategoryType(request.CategoryType);
+        ValidateTransactionCategoryData(
+            request.Value,
+            request.Parent,
+            request.CategoryType,
+            allTransactionCategories,
+            request.ID
+        );
 
         var oldValue = transactionCategory.Value;
 
@@ -191,111 +111,6 @@ public class TransactionCategoryService(
         UpdateChildrenParentValue(userData.TransactionCategories, oldValue, request.Value);
 
         await userDataContext.SaveChangesAsync();
-
-        void ThrowIfDuplicateName(
-            string value,
-            IEnumerable<ITransactionCategoryResponse> categories
-        )
-        {
-            if (
-                categories.Any(c =>
-                    c.ID != request.ID && c.Value.Equals(value, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["TransactionCategoryUpdateDuplicateNameLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionCategoryUpdateDuplicateNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueIsNullOrEmpty(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["TransactionCategoryUpdateEmptyNameLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionCategoryUpdateEmptyNameError"]
-                );
-            }
-        }
-
-        void ThrowIfValueSameNameAsParent(string value, string parentValue)
-        {
-            if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["TransactionCategoryUpdateSameNameAsParentLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionCategoryUpdateSameNameAsParentError"]
-                );
-            }
-        }
-
-        void ThrowIfParentNotFound(string parentValue, IEnumerable<ITransactionCategory> categories)
-        {
-            if (
-                !string.IsNullOrEmpty(parentValue)
-                && !categories.Any(c =>
-                    c.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase)
-                )
-            )
-            {
-                logger.LogError(
-                    "{LogMessage}",
-                    logLocalizer["TransactionCategoryUpdateParentNotFoundLog"]
-                );
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionCategoryUpdateParentNotFoundError"]
-                );
-            }
-        }
-
-        string ResolveCategoryType(
-            string parent,
-            string categoryType,
-            IEnumerable<ITransactionCategoryResponse> allTransactionCategories
-        ) =>
-            string.IsNullOrEmpty(parent)
-                ? categoryType
-                : allTransactionCategories
-                    .First(a => a.Value.Equals(parent, StringComparison.OrdinalIgnoreCase))
-                    .CategoryType;
-
-        static void UpdateTransactionsUsingCategory(
-            string oldValue,
-            string newValue,
-            IEnumerable<Transaction> transactions
-        )
-        {
-            foreach (var transaction in transactions)
-            {
-                if (
-                    (transaction.Category ?? string.Empty).Equals(
-                        oldValue,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                    transaction.Category = newValue;
-
-                if (
-                    (transaction.Subcategory ?? string.Empty).Equals(
-                        oldValue,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                    transaction.Subcategory = newValue;
-            }
-        }
 
         static void UpdateBudgetsUsingCategory(
             string oldValue,
@@ -334,25 +149,18 @@ public class TransactionCategoryService(
     /// <inheritdoc />
     public async Task DeleteTransactionCategoryAsync(Guid userGuid, Guid guid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
-
-        var transactionCategory = userData.TransactionCategories.FirstOrDefault(t => t.ID == guid);
-        if (transactionCategory == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["TransactionCategoryDeleteNotFoundError"]
-            );
-        }
-
+        var userData = await GetCurrentUserAsync(userGuid);
+        var transactionCategory = GetTransactionCategoryById(userData, guid);
         var allTransactionCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
             userData
         );
 
         RemoveChildrenUsingCategory(transactionCategory.Value);
-        NullOutTransactionsUsingCategory(
+        UpdateTransactionsUsingCategory(
             transactionCategory.Value,
-            userData.Accounts.SelectMany(a => a.Transactions)
+            null,
+            userData.Accounts.SelectMany(a => a.Transactions),
+            true
         );
         RemoveBudgetsUsingCategory(
             transactionCategory.Value,
@@ -377,9 +185,11 @@ public class TransactionCategoryService(
                 .ToList();
             foreach (var child in children)
             {
-                NullOutTransactionsUsingCategory(
+                UpdateTransactionsUsingCategory(
                     child.Value,
-                    userData.Accounts.SelectMany(a => a.Transactions)
+                    null,
+                    userData.Accounts.SelectMany(a => a.Transactions),
+                    true
                 );
                 RemoveBudgetsUsingCategory(child.Value, userData.Budgets, allTransactionCategories);
                 UpdateRuleActionsUsingCategory(
@@ -388,30 +198,6 @@ public class TransactionCategoryService(
                     userData.AutomaticRules.SelectMany(r => r.Actions)
                 );
                 userData.TransactionCategories.Remove(child);
-            }
-        }
-
-        static void NullOutTransactionsUsingCategory(
-            string value,
-            IEnumerable<Transaction> transactions
-        )
-        {
-            foreach (var transaction in transactions)
-            {
-                if (
-                    (transaction.Category ?? string.Empty).Equals(
-                        value,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                    || (transaction.Subcategory ?? string.Empty).Equals(
-                        value,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                {
-                    transaction.Category = null;
-                    transaction.Subcategory = null;
-                }
             }
         }
 
@@ -429,25 +215,7 @@ public class TransactionCategoryService(
         }
     }
 
-    private static void UpdateRuleActionsUsingCategory(
-        string oldValue,
-        string? newValue,
-        IEnumerable<RuleAction> actions
-    )
-    {
-        foreach (var action in actions)
-        {
-            if (
-                action.Field.Equals(
-                    AutomaticRuleConstants.TransactionFields.Category,
-                    StringComparison.OrdinalIgnoreCase
-                ) && action.Value.Equals(oldValue, StringComparison.OrdinalIgnoreCase)
-            )
-                action.Value = newValue ?? string.Empty;
-        }
-    }
-
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,
@@ -467,6 +235,96 @@ public class TransactionCategoryService(
         );
     }
 
+    private Category GetTransactionCategoryById(ApplicationUser userData, Guid id)
+    {
+        var transactionCategory = userData.TransactionCategories.FirstOrDefault(t => t.ID == id);
+        if (transactionCategory == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionCategoryNotFoundError"]
+            );
+        }
+
+        return transactionCategory;
+    }
+
+    private void ValidateTransactionCategoryData(
+        string value,
+        string parent,
+        string categoryType,
+        IEnumerable<ITransactionCategoryResponse> categories,
+        Guid? id = null
+    )
+    {
+        ThrowIfDuplicateName(value, id, categories);
+        ThrowIfValueIsNullOrEmpty(value);
+        ThrowIfValueSameNameAsParent(value, parent);
+        ThrowIfParentNotFound(parent, categories);
+        ThrowIfInvalidCategoryType(categoryType);
+    }
+
+    private void ThrowIfDuplicateName(
+        string value,
+        Guid? id,
+        IEnumerable<ITransactionCategoryResponse> categories
+    )
+    {
+        if (
+            categories.Any(c =>
+            {
+                var valueMatches = c.Value.Equals(value, StringComparison.OrdinalIgnoreCase);
+                var idMatches = id.HasValue && c.ID == id.Value;
+                return valueMatches && !idMatches;
+            })
+        )
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryDuplicateNameLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionCategoryDuplicateNameError"]
+            );
+        }
+    }
+
+    private void ThrowIfValueIsNullOrEmpty(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryEmptyNameLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionCategoryEmptyNameError"]
+            );
+        }
+    }
+
+    private void ThrowIfValueSameNameAsParent(string value, string parentValue)
+    {
+        if (value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionCategorySameNameAsParentLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionCategorySameNameAsParentError"]
+            );
+        }
+    }
+
+    private void ThrowIfParentNotFound(
+        string parentValue,
+        IEnumerable<ITransactionCategory> categories
+    )
+    {
+        if (
+            !string.IsNullOrEmpty(parentValue)
+            && !categories.Any(c => c.Value.Equals(parentValue, StringComparison.OrdinalIgnoreCase))
+        )
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryParentNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionCategoryParentNotFoundError"]
+            );
+        }
+    }
+
     private void ThrowIfInvalidCategoryType(string categoryType)
     {
         if (!TransactionCategoryTypes.AllTypes.Contains(categoryType))
@@ -475,6 +333,65 @@ public class TransactionCategoryService(
             throw new BudgetBoardServiceException(
                 responseLocalizer["TransactionCategoryInvalidTypeError"]
             );
+        }
+    }
+
+    private static string ResolveCategoryType(
+        string parent,
+        string categoryType,
+        IEnumerable<ITransactionCategoryResponse> allTransactionCategories
+    ) =>
+        string.IsNullOrEmpty(parent)
+            ? categoryType
+            : allTransactionCategories
+                .First(a => a.Value.Equals(parent, StringComparison.OrdinalIgnoreCase))
+                .CategoryType;
+
+    private static void UpdateTransactionsUsingCategory(
+        string value,
+        string? replacement,
+        IEnumerable<Transaction> transactions,
+        bool clearBoth = false
+    )
+    {
+        foreach (var transaction in transactions)
+        {
+            var categoryMatches = (transaction.Category ?? string.Empty).Equals(
+                value,
+                StringComparison.OrdinalIgnoreCase
+            );
+            var subcategoryMatches = (transaction.Subcategory ?? string.Empty).Equals(
+                value,
+                StringComparison.OrdinalIgnoreCase
+            );
+            var eitherMatches = categoryMatches || subcategoryMatches;
+
+            if (categoryMatches || (clearBoth && eitherMatches))
+            {
+                transaction.Category = replacement;
+            }
+            if (subcategoryMatches || (clearBoth && eitherMatches))
+            {
+                transaction.Subcategory = replacement;
+            }
+        }
+    }
+
+    private static void UpdateRuleActionsUsingCategory(
+        string oldValue,
+        string? newValue,
+        IEnumerable<RuleAction> actions
+    )
+    {
+        foreach (var action in actions)
+        {
+            if (
+                action.Field.Equals(
+                    AutomaticRuleConstants.TransactionFields.Category,
+                    StringComparison.OrdinalIgnoreCase
+                ) && action.Value.Equals(oldValue, StringComparison.OrdinalIgnoreCase)
+            )
+                action.Value = newValue ?? string.Empty;
         }
     }
 }

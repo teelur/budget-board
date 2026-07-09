@@ -39,7 +39,7 @@ public class SimpleFinService(
     /// <inheritdoc />
     public async Task ConfigureAccessTokenAsync(Guid userGuid, string setupToken)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var decodeAccessTokenResponse = await DecodeAccessToken(setupToken);
         if (!decodeAccessTokenResponse.IsSuccessStatusCode)
@@ -70,7 +70,7 @@ public class SimpleFinService(
     public async Task<IList<string>> RefreshAccountsAsync(Guid userGuid)
     {
         var errors = new List<string>();
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         try
         {
@@ -114,7 +114,7 @@ public class SimpleFinService(
     /// <inheritdoc />
     public async Task<IList<string>> SyncTransactionHistoryAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         logger.LogInformation("{LogMessage}", logLocalizer["SimpleFinTokenConfiguredLog"]);
 
@@ -180,7 +180,7 @@ public class SimpleFinService(
     /// <inheritdoc />
     public async Task RemoveAccessTokenAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         userData.SimpleFinAccessToken = string.Empty;
 
@@ -190,7 +190,7 @@ public class SimpleFinService(
         await RemoveSimpleFinDataAsync(userGuid);
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,
@@ -751,7 +751,7 @@ public class SimpleFinService(
     private async Task<List<string>> RemoveSimpleFinDataAsync(Guid userGuid)
     {
         List<string> errors = [];
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         foreach (var simpleFinAccount in userData.SimpleFinAccounts.ToList())
         {

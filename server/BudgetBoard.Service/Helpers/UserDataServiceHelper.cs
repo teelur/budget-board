@@ -15,7 +15,7 @@ public static class UserDataServiceHelper
         ILogger logger,
         IStringLocalizer<LogStrings> logLocalizer,
         IStringLocalizer<ResponseStrings> responseLocalizer,
-        string id,
+        Guid id,
         Func<IQueryable<ApplicationUser>, IQueryable<ApplicationUser>> includeQuery
     )
     {
@@ -24,7 +24,7 @@ public static class UserDataServiceHelper
         {
             foundUser = await includeQuery(userDataContext.ApplicationUsers)
                 .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(id));
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
         catch (Exception ex)
         {

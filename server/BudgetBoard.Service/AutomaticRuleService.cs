@@ -21,7 +21,7 @@ public class AutomaticRuleService(
     /// <inheritdoc />
     public async Task CreateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         if (request.Conditions.Count == 0)
         {
@@ -69,14 +69,14 @@ public class AutomaticRuleService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<IAutomaticRuleResponse>> ReadAutomaticRulesAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         return userData.AutomaticRules.Select(r => new AutomaticRuleResponse(r)).ToList();
     }
 
     /// <inheritdoc />
     public async Task UpdateAutomaticRuleAsync(Guid userGuid, IAutomaticRuleUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var existingRule = GetAutomaticRuleById(userData, request.ID);
 
         if (request.Conditions.Count > 0)
@@ -118,7 +118,7 @@ public class AutomaticRuleService(
     /// <inheritdoc />
     public async Task DeleteAutomaticRuleAsync(Guid userGuid, Guid ruleGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var rule = GetAutomaticRuleById(userData, ruleGuid);
 
         userData.AutomaticRules.Remove(rule);
@@ -131,7 +131,7 @@ public class AutomaticRuleService(
         IAutomaticRuleCreateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         int updatedCount = await RunAutomaticRule(userData, request, allCategories);
@@ -143,7 +143,7 @@ public class AutomaticRuleService(
     /// <inheritdoc />
     public async Task RunSavedAutomaticRulesAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         var rules = await ReadAutomaticRulesAsync(userGuid);
@@ -159,7 +159,7 @@ public class AutomaticRuleService(
         }
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

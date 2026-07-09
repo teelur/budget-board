@@ -11,25 +11,31 @@ namespace BudgetBoard.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             migrationBuilder.AlterColumn<string>(
                 name: "Currency",
                 table: "UserSettings",
                 type: "text",
                 nullable: false,
                 oldClrType: typeof(Currency),
-                oldType: "currency");
+                oldType: "currency"
+            );
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             migrationBuilder.AlterColumn<Currency>(
                 name: "Currency",
                 table: "UserSettings",
                 type: "currency",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

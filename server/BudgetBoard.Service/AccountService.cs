@@ -24,7 +24,7 @@ public class AccountService(
     /// <inheritdoc />
     public async Task CreateAccountAsync(Guid userGuid, IAccountCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var institution = userData.Institutions.SingleOrDefault(i => i.ID == request.InstitutionID);
         if (institution == null)
@@ -51,7 +51,7 @@ public class AccountService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<IAccountResponse>> ReadAccountsAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var accounts = userData.Accounts.ToList();
         return accounts.OrderBy(a => a.Index).Select(a => new AccountResponse(a)).ToList();
     }
@@ -59,7 +59,7 @@ public class AccountService(
     /// <inheritdoc />
     public async Task UpdateAccountAsync(Guid userGuid, IAccountUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var account = GetAccountById(userData, request.ID);
 
         if (request.Name.IsSpecified && !string.IsNullOrWhiteSpace(request.Name.Value))
@@ -106,7 +106,7 @@ public class AccountService(
         bool deleteTransactions = false
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var account = GetAccountById(userData, accountGuid);
 
         var utcNow = nowProvider.UtcNow;
@@ -164,7 +164,7 @@ public class AccountService(
         bool restoreTransactions = false
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var account = GetAccountById(userData, accountGuid);
 
         account.Deleted = null;
@@ -188,7 +188,7 @@ public class AccountService(
         IEnumerable<IAccountIndexRequest> orderedAccounts
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         foreach (var orderedAccount in orderedAccounts)
         {
@@ -202,7 +202,7 @@ public class AccountService(
     /// <inheritdoc />
     public async Task PermanentlyDeleteAccountAsync(Guid userGuid, Guid accountGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var account = GetAccountById(userData, accountGuid);
         if (account.Deleted == null)
         {
@@ -218,7 +218,7 @@ public class AccountService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

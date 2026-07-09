@@ -1,14 +1,6 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import {
-  transactionCategoriesQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
 import { Button, LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import { CategoryTypes, ICategoryCreateRequest } from "~/models/category";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Card from "~/components/core/Card/Card";
@@ -16,12 +8,15 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
+import { useCreateTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useCreateTransactionCategoryMutation";
 
 const AddCategory = (): React.ReactNode => {
   const [isChildCategory, setIsChildCategory] = React.useState(false);
 
   const { t } = useTranslation();
   const { allTransactionCategories } = useTransactionCategories();
+  const createTransactionCategoryMutation =
+    useCreateTransactionCategoryMutation();
 
   const nameField = useField<string>({
     initialValue: "",
@@ -32,32 +27,6 @@ const AddCategory = (): React.ReactNode => {
   });
   const categoryTypeField = useField<string>({
     initialValue: CategoryTypes.Expense,
-  });
-
-  const { request } = useAuth();
-
-  const queryClient = useQueryClient();
-  const doAddCategory = useMutation({
-    mutationFn: async (category: ICategoryCreateRequest) =>
-      await request({
-        url: "/api/transactionCategory",
-        method: "POST",
-        data: category,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [transactionCategoriesQueryKey],
-      });
-      nameField.reset();
-      parentField.reset();
-      categoryTypeField.setValue(CategoryTypes.Expense);
-      setIsChildCategory(false);
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
   });
 
   const parentCategories = allTransactionCategories.filter(
@@ -76,7 +45,7 @@ const AddCategory = (): React.ReactNode => {
 
   return (
     <Card elevation={1}>
-      <LoadingOverlay visible={doAddCategory.isPending} />
+      <LoadingOverlay visible={createTransactionCategoryMutation.isPending} />
       <Stack>
         <TextInput
           {...nameField.getInputProps()}
@@ -132,11 +101,21 @@ const AddCategory = (): React.ReactNode => {
         <Button
           w="100%"
           onClick={() =>
-            doAddCategory.mutate({
-              value: nameField.getValue(),
-              parent: parentField.getValue(),
-              categoryType: getCategoryTypeForSubmit(),
-            })
+            createTransactionCategoryMutation.mutate(
+              {
+                value: nameField.getValue(),
+                parent: parentField.getValue(),
+                categoryType: getCategoryTypeForSubmit(),
+              } as ICategoryCreateRequest,
+              {
+                onSuccess: () => {
+                  nameField.reset();
+                  parentField.reset();
+                  categoryTypeField.setValue(CategoryTypes.Expense);
+                  setIsChildCategory(false);
+                },
+              },
+            )
           }
         >
           {t("add_category")}

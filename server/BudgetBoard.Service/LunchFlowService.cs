@@ -43,7 +43,7 @@ public class LunchFlowService(
             throw new BudgetBoardServiceException(responseLocalizer["LunchFlowApiKeyMissingError"]);
         }
 
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var requestUrl = LunchFlowBaseUrl + LunchFlowAccountsEndpoint;
         var response = await SendQuery(requestUrl, apiKey);
@@ -70,7 +70,7 @@ public class LunchFlowService(
     /// <inheritdoc />
     public async Task RemoveApiKeyAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         userData.LunchFlowApiKey = string.Empty;
 
@@ -84,7 +84,7 @@ public class LunchFlowService(
     public async Task<IList<string>> RefreshAccountsAsync(Guid userGuid)
     {
         var errors = new List<string>();
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         if (string.IsNullOrEmpty(userData.LunchFlowApiKey))
         {
@@ -116,7 +116,7 @@ public class LunchFlowService(
         return errors;
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,
@@ -139,7 +139,7 @@ public class LunchFlowService(
     private async Task<List<string>> RemoveLunchFlowDataAsync(Guid userGuid)
     {
         List<string> errors = [];
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         foreach (var lunchFlowAccount in userData.LunchFlowAccounts.ToList())
         {
@@ -316,7 +316,7 @@ public class LunchFlowService(
     private async Task<IList<string>> SyncTransactionsAsync(Guid userGuid)
     {
         var errors = new List<string>();
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         if (string.IsNullOrEmpty(userData.LunchFlowApiKey))
         {
@@ -466,7 +466,7 @@ public class LunchFlowService(
     private async Task<IList<string>> SyncBalancesAsync(Guid userGuid)
     {
         var errors = new List<string>();
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         if (string.IsNullOrEmpty(userData.LunchFlowApiKey))
         {

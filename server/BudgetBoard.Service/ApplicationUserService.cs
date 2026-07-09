@@ -25,7 +25,7 @@ public class ApplicationUserService(
         UserManager<ApplicationUser> userManager
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var logins = await userManager.GetLoginsAsync(userData);
         var hasOidcLogin = logins.Any(l => l.LoginProvider == "oidc");
@@ -40,7 +40,7 @@ public class ApplicationUserService(
         IApplicationUserUpdateRequest request
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         userData.LastSync = request.LastSync;
         await userDataContext.SaveChangesAsync();
@@ -61,7 +61,7 @@ public class ApplicationUserService(
             throw new BudgetBoardServiceException(responseLocalizer["AddOidcFailedError"]);
         }
 
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var logins = await userManager.GetLoginsAsync(userData);
         var oidcLogin = logins.FirstOrDefault(l => l.LoginProvider == OidcLoginProvider);
@@ -98,7 +98,7 @@ public class ApplicationUserService(
         UserManager<ApplicationUser> userManager
     )
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var logins = await userManager.GetLoginsAsync(userData);
         var oidcLogin = logins.FirstOrDefault(l => l.LoginProvider == OidcLoginProvider);
@@ -140,7 +140,7 @@ public class ApplicationUserService(
         logger.LogInformation("{LogMessage}", logLocalizer["RemoveOidcSuccessLog", userGuid]);
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

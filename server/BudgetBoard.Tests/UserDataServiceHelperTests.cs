@@ -28,7 +28,7 @@ public class UserDataServiceHelperTests
             Mock.Of<ILogger>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            helper.demoUser.Id.ToString(),
+            helper.demoUser.Id,
             users => users.Include(u => u.Assets)
         );
 
@@ -51,7 +51,7 @@ public class UserDataServiceHelperTests
                 Mock.Of<ILogger>(),
                 TestHelper.CreateMockLocalizer<LogStrings>(),
                 TestHelper.CreateMockLocalizer<ResponseStrings>(),
-                Guid.NewGuid().ToString(),
+                Guid.NewGuid(),
                 users => users.Include(u => u.Assets)
             );
 
@@ -75,7 +75,7 @@ public class UserDataServiceHelperTests
                 Mock.Of<ILogger>(),
                 TestHelper.CreateMockLocalizer<LogStrings>(),
                 TestHelper.CreateMockLocalizer<ResponseStrings>(),
-                helper.demoUser.Id.ToString(),
+                helper.demoUser.Id,
                 users => users.Include(u => u.Assets)
             );
 

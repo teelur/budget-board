@@ -21,7 +21,7 @@ public class AssetService(
     /// <inheritdoc />
     public async Task CreateAssetAsync(Guid userGuid, IAssetCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var newAsset = new Asset { Name = request.Name, UserID = userData.Id };
 
@@ -32,14 +32,14 @@ public class AssetService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<IAssetResponse>> ReadAssetsAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         return userData.Assets.OrderBy(a => a.Index).Select(a => new AssetResponse(a)).ToList();
     }
 
     /// <inheritdoc />
     public async Task UpdateAssetAsync(Guid userGuid, IAssetUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var asset = GetAssetById(userData, request.ID);
 
         if (request.Name.IsSpecified && !string.IsNullOrWhiteSpace(request.Name.Value))
@@ -83,7 +83,7 @@ public class AssetService(
     /// <inheritdoc />
     public async Task DeleteAssetAsync(Guid userGuid, Guid assetGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var asset = GetAssetById(userData, assetGuid);
 
         asset.Type = string.Empty;
@@ -94,7 +94,7 @@ public class AssetService(
     /// <inheritdoc />
     public async Task RestoreAssetAsync(Guid userGuid, Guid assetGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var asset = GetAssetById(userData, assetGuid);
 
         asset.Deleted = null;
@@ -104,7 +104,7 @@ public class AssetService(
     /// <inheritdoc />
     public async Task OrderAssetsAsync(Guid userGuid, IEnumerable<IAssetIndexRequest> orderedAssets)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         foreach (var orderedAsset in orderedAssets)
         {
@@ -118,7 +118,7 @@ public class AssetService(
     /// <inheritdoc />
     public async Task PermanentlyDeleteAssetAsync(Guid userGuid, Guid assetGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var asset = GetAssetById(userData, assetGuid);
         if (asset.Deleted == null)
         {
@@ -133,7 +133,7 @@ public class AssetService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

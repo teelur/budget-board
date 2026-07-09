@@ -17,19 +17,15 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import {
-  CategoryTypes,
-  ICategoryResponse,
-  ICategoryUpdateRequest,
-} from "~/models/category";
+import { useDeleteTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useDeleteTransactionCategoryMutation";
+import { useUpdateTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useUpdateTransactionCategoryMutation";
+import { CategoryTypes, ICategoryResponse } from "~/models/category";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface CustomCategoryCardProps {
   category: ICategoryResponse;
   isBuiltIn?: boolean;
   isChildCard?: boolean;
-  deleteCategory: () => Promise<void>;
-  updateCategory: (req: ICategoryUpdateRequest) => Promise<void>;
 }
 
 const CustomCategoryCard = (
@@ -37,9 +33,12 @@ const CustomCategoryCard = (
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { allTransactionCategories } = useTransactionCategories();
+  const updateTransactionCategoryMutation =
+    useUpdateTransactionCategoryMutation();
+  const deleteTransactionCategoryMutation =
+    useDeleteTransactionCategoryMutation();
 
   const [isEditing, setIsEditing] = React.useState(false);
-  const [isSaving, setIsSaving] = React.useState(false);
   const [isChildCategory, setIsChildCategory] = React.useState(
     props.category.parent !== "",
   );
@@ -75,18 +74,13 @@ const CustomCategoryCard = (
   const handleSave = async () => {
     await nameField.validate();
     if (nameField.error) return;
-    setIsSaving(true);
-    try {
-      await props.updateCategory({
-        id: props.category.id,
-        value: nameField.getValue(),
-        parent: isChildCategory ? parentField.getValue() : "",
-        categoryType: getCategoryTypeForSubmit(),
-      });
-      setIsEditing(false);
-    } finally {
-      setIsSaving(false);
-    }
+    updateTransactionCategoryMutation.mutate({
+      id: props.category.id,
+      value: nameField.getValue(),
+      parent: isChildCategory ? parentField.getValue() : "",
+      categoryType: getCategoryTypeForSubmit(),
+    });
+    setIsEditing(false);
   };
 
   const handleCancel = () => {
@@ -102,7 +96,12 @@ const CustomCategoryCard = (
       <Group w="100%" maw={600} wrap="nowrap">
         {props.isChildCard && <CornerDownRight />}
         <Card flex={1} p="0.5rem" elevation={1}>
-          <LoadingOverlay visible={isSaving} />
+          <LoadingOverlay
+            visible={
+              updateTransactionCategoryMutation.isPending ||
+              deleteTransactionCategoryMutation.isPending
+            }
+          />
           <Stack gap="0.5rem">
             <TextInput
               {...nameField.getInputProps()}
@@ -199,7 +198,13 @@ const CustomCategoryCard = (
                 </ActionIcon>
                 <ActionIcon
                   size="sm"
-                  onClick={props.deleteCategory}
+                  onClick={() => {
+                    if (!props.isBuiltIn) {
+                      deleteTransactionCategoryMutation.mutate(
+                        props.category.id,
+                      );
+                    }
+                  }}
                   bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />

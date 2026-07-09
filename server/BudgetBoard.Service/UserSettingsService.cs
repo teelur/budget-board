@@ -20,7 +20,7 @@ public class UserSettingsService(
     /// <inheritdoc />
     public async Task<IUserSettingsResponse> ReadUserSettingsAsync(Guid userGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         // Ensure that the user has settings initialized
         if (userData.UserSettings == null)
@@ -39,7 +39,7 @@ public class UserSettingsService(
     /// <inheritdoc />
     public async Task UpdateUserSettingsAsync(Guid userGuid, IUserSettingsUpdateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var userSettings = userData.UserSettings;
         if (userSettings == null)
@@ -356,7 +356,7 @@ public class UserSettingsService(
         }
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

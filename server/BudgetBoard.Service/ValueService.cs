@@ -27,7 +27,7 @@ public class ValueService(
     /// <inheritdoc />
     public async Task CreateValueAsync(Guid userGuid, IValueCreateRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var asset = userData.Assets.FirstOrDefault(a => a.ID == request.AssetID);
         if (asset == null)
@@ -58,7 +58,7 @@ public class ValueService(
     /// <inheritdoc />
     public async Task<IReadOnlyList<IValueResponse>> ReadValuesAsync(Guid userGuid, Guid assetId)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var asset = userData.Assets.FirstOrDefault(a => a.ID == assetId);
         if (asset == null)
@@ -73,7 +73,7 @@ public class ValueService(
     /// <inheritdoc />
     public async Task UpdateValueAsync(Guid userGuid, IValueUpdateRequest editedValue)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var value = userData
             .Assets.SelectMany(a => a.Values)
@@ -109,7 +109,7 @@ public class ValueService(
     /// <inheritdoc />
     public async Task DeleteValueAsync(Guid userGuid, Guid valueGuid)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
 
         var value = userData
             .Assets.SelectMany(a => a.Values)
@@ -124,7 +124,7 @@ public class ValueService(
         await _userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             _userDataContext,

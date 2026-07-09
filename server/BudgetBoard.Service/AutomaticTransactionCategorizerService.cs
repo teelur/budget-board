@@ -21,7 +21,7 @@ public class AutomaticTransactionCategorizerService(
     /// <inheritdoc />
     public async Task TrainCategorizerAsync(Guid userGuid, ITrainAutoCategorizerRequest request)
     {
-        var userData = await GetCurrentUserAsync(userGuid.ToString());
+        var userData = await GetCurrentUserAsync(userGuid);
         var userSettings = userData.UserSettings;
         if (userSettings == null)
         {
@@ -66,7 +66,7 @@ public class AutomaticTransactionCategorizerService(
         await userDataContext.SaveChangesAsync();
     }
 
-    private async Task<ApplicationUser> GetCurrentUserAsync(string id)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,

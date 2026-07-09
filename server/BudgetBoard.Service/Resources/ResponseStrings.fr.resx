@@ -148,36 +148,6 @@
   <data name="InstitutionEmptyNameError" xml:space="preserve">
     <value>Le nom de l’établissement ne peut pas être vide.</value>
   </data>
-  <data name="TransactionCategoryCreateDuplicateNameError" xml:space="preserve">
-    <value>Une catégorie de transaction portant ce nom existe déjà.</value>
-  </data>
-  <data name="TransactionCategoryCreateEmptyNameError" xml:space="preserve">
-    <value>Le nom de la catégorie de transaction ne peut pas être vide.</value>
-  </data>
-  <data name="TransactionCategoryCreateSameNameAsParentError" xml:space="preserve">
-    <value>Une catégorie de transaction ne peut pas avoir le même nom que sa catégorie parente.</value>
-  </data>
-  <data name="TransactionCategoryCreateParentNotFoundError" xml:space="preserve">
-    <value>La catégorie de transaction parente que vous essayez d’utiliser n’existe pas.</value>
-  </data>
-  <data name="TransactionCategoryUpdateNotFoundError" xml:space="preserve">
-    <value>La catégorie de transaction que vous essayez de mettre à jour n’existe pas.</value>
-  </data>
-  <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
-    <value>Le nom de la catégorie de transaction ne peut pas être vide.</value>
-  </data>
-  <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
-    <value>Une catégorie de transaction portant ce nom existe déjà.</value>
-  </data>
-  <data name="TransactionCategoryUpdateSameNameAsParentError" xml:space="preserve">
-    <value>Une catégorie de transaction ne peut pas porter le même nom que sa catégorie parente.</value>
-  </data>
-  <data name="TransactionCategoryUpdateParentNotFoundError" xml:space="preserve">
-    <value>La catégorie de transaction parente que vous essayez d’utiliser n’existe pas.</value>
-  </data>
-  <data name="TransactionCategoryDeleteNotFoundError" xml:space="preserve">
-    <value>La catégorie de transaction que vous essayez de supprimer n’existe pas.</value>
-  </data>
   <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
     <value>Le compte auquel vous essayez d’ajouter une transaction n’existe pas.</value>
   </data>

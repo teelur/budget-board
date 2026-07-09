@@ -164,43 +164,34 @@
     <value>Attempted to complete a goal that is already completed.</value>
   </data>
   <data name="InstitutionDuplicateNameLog" xml:space="preserve">
-    <value>Attempted to create or update an institution with a duplicate name.</value>
+    <value>Attempted to save an institution with a duplicate name.</value>
   </data>
   <data name="InstitutionNotFoundLog" xml:space="preserve">
     <value>Attempted to access an institution that does not exist.</value>
   </data>
   <data name="InstitutionEmptyNameLog" xml:space="preserve">
-    <value>Attempted to create or update an institution with an empty name.</value>
+    <value>Attempted to save an institution with an empty name.</value>
   </data>
-  <data name="TransactionCategoryCreateDuplicateNameLog" xml:space="preserve">
-    <value>Attempted to create a transaction category with a duplicate name.</value>
+  <data name="TransactionCategoryDuplicateNameLog" xml:space="preserve">
+    <value>Attempted to save a transaction category with a duplicate name.</value>
   </data>
-  <data name="TransactionCategoryCreateEmptyNameLog" xml:space="preserve">
-    <value>Attempted to create a transaction category with an empty name.</value>
+  <data name="TransactionCategoryEmptyNameLog" xml:space="preserve">
+    <value>Attempted to save a transaction category with an empty name.</value>
   </data>
-  <data name="TransactionCategoryCreateSameNameAsParentLog" xml:space="preserve">
-    <value>Attempted to create a transaction category with the same name as its parent.</value>
+  <data name="TransactionCategorySameNameAsParentLog" xml:space="preserve">
+    <value>Attempted to save a transaction category with the same name as its parent.</value>
   </data>
-  <data name="TransactionCategoryCreateParentNotFoundLog" xml:space="preserve">
-    <value>Attempted to create a transaction category with a parent that does not exist.</value>
+  <data name="TransactionCategoryParentNotFoundLog" xml:space="preserve">
+    <value>Attempted to save a transaction category with a parent that does not exist.</value>
   </data>
-  <data name="TransactionCategoryUpdateNotFoundLog" xml:space="preserve">
-    <value>Attempted to update a transaction category that does not exist.</value>
+  <data name="TransactionCategoryNotFoundLog" xml:space="preserve">
+    <value>Attempted to access a transaction category that does not exist.</value>
   </data>
   <data name="TransactionCategoryUpdateDuplicateNameLog" xml:space="preserve">
     <value>Attempted to update a transaction category with a duplicate name.</value>
   </data>
   <data name="TransactionCategoryUpdateEmptyNameLog" xml:space="preserve">
     <value>Attempted to update a transaction category with an empty name.</value>
-  </data>
-  <data name="TransactionCategoryUpdateSameNameAsParentLog" xml:space="preserve">
-    <value>Attempted to update a transaction category with the same name as its parent.</value>
-  </data>
-  <data name="TransactionCategoryUpdateParentNotFoundLog" xml:space="preserve">
-    <value>Attempted to update a transaction category with a parent that does not exist.</value>
-  </data>
-  <data name="TransactionCategoryDeleteNotFoundLog" xml:space="preserve">
-    <value>Attempted to delete a transaction category that does not exist.</value>
   </data>
   <data name="TransactionCreateAccountNotFoundLog" xml:space="preserve">
     <value>Attempted to create a transaction for an account that does not exist.</value>
@@ -407,34 +398,34 @@
     <value>An unexpected error occurred while syncing LunchFlow account {0}: {1}. Skipping.</value>
   </data>
   <data name="AccountTypeDuplicateNameLog" xml:space="preserve">
-    <value>Attempted to create or update an account type with a duplicate name.</value>
+    <value>Attempted to save an account type with a duplicate name.</value>
   </data>
   <data name="AccountTypeEmptyNameLog" xml:space="preserve">
-    <value>Attempted to create or update an account type with an empty name.</value>
+    <value>Attempted to save an account type with an empty name.</value>
   </data>
   <data name="AccountTypeSameNameAsParentLog" xml:space="preserve">
-    <value>Attempted to create or update an account type with the same name as its parent.</value>
+    <value>Attempted to save an account type with the same name as its parent.</value>
   </data>
   <data name="AccountTypeParentNotFoundLog" xml:space="preserve">
-    <value>Attempted to create or update an account type with a parent that does not exist.</value>
+    <value>Attempted to save an account type with a parent that does not exist.</value>
   </data>
   <data name="AccountTypeNotFoundLog" xml:space="preserve">
     <value>Attempted to access an account type that does not exist.</value>
   </data>
   <data name="AccountTypeInvalidClassificationLog" xml:space="preserve">
-    <value>Attempted to create or update an account type with an invalid classification.</value>
+    <value>Attempted to save an account type with an invalid classification.</value>
   </data>
   <data name="AssetTypeDuplicateNameLog" xml:space="preserve">
-    <value>Attempted to create or update an asset type with a duplicate name.</value>
+    <value>Attempted to save an asset type with a duplicate name.</value>
   </data>
   <data name="AssetTypeEmptyNameLog" xml:space="preserve">
-    <value>Attempted to create or update an asset type with an empty name.</value>
+    <value>Attempted to save an asset type with an empty name.</value>
   </data>
   <data name="AssetTypeSameNameAsParentLog" xml:space="preserve">
-    <value>Attempted to create or update an asset type with the same name as its parent.</value>
+    <value>Attempted to save an asset type with the same name as its parent.</value>
   </data>
   <data name="AssetTypeParentNotFoundLog" xml:space="preserve">
-    <value>Attempted to create or update an asset type with a parent that does not exist.</value>
+    <value>Attempted to save an asset type with a parent that does not exist.</value>
   </data>
   <data name="AssetTypeNotFoundLog" xml:space="preserve">
     <value>Attempted to access an asset type that does not exist.</value>

@@ -15,6 +15,7 @@ namespace BudgetBoard.Database.Migrations
                 .AlterDatabase()
                 .Annotation("Npgsql:Enum:currency", "aud,cad,chf,cny,eur,gbp,inr,jpy,nzd,sek,usd");
 
+#pragma warning disable CS0618 // Type or member is obsolete
             migrationBuilder.CreateTable(
                 name: "UserSettings",
                 columns: table => new
@@ -35,6 +36,7 @@ namespace BudgetBoard.Database.Migrations
                     );
                 }
             );
+#pragma warning restore CS0618 // Type or member is obsolete
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserSettings_UserID",
