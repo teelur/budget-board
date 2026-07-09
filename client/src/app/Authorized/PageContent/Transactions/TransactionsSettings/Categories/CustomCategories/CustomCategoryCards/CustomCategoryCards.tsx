@@ -1,5 +1,4 @@
 import { Group, Stack } from "@mantine/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { ICategoryResponse } from "~/models/category";

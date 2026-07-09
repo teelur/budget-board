@@ -1,14 +1,6 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import {
-  transactionCategoriesQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
 import { Button, LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import { CategoryTypes, ICategoryCreateRequest } from "~/models/category";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Card from "~/components/core/Card/Card";
