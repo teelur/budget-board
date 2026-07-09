@@ -39,7 +39,6 @@ const CustomCategoryCard = (
     useDeleteTransactionCategoryMutation();
 
   const [isEditing, setIsEditing] = React.useState(false);
-  const [isSaving, setIsSaving] = React.useState(false);
   const [isChildCategory, setIsChildCategory] = React.useState(
     props.category.parent !== "",
   );
