@@ -2,62 +2,15 @@ import { Group, Stack } from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { ICategoryResponse, ICategoryUpdateRequest } from "~/models/category";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { ICategoryResponse } from "~/models/category";
 import CustomCategoryCard from "./CustomCategoryCard/CustomCategoryCard";
-import { notifications } from "@mantine/notifications";
-import {
-  transactionCategoriesQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
-import { AxiosError } from "axios";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { defaultGuid } from "~/models/applicationUser";
 
 const CustomCategoryCards = () => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const { allTransactionCategories, customTransactionCategories } =
     useTransactionCategories();
-
-  const queryClient = useQueryClient();
-  const doUpdateCategory = useMutation({
-    mutationFn: async (req: ICategoryUpdateRequest) =>
-      await request({
-        url: "/api/transactionCategory",
-        method: "PUT",
-        data: req,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [transactionCategoriesQueryKey],
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
-  const doDeleteCategory = useMutation({
-    mutationFn: async (guid: string) =>
-      await request({
-        url: "/api/transactionCategory",
-        method: "DELETE",
-        params: { guid },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [transactionCategoriesQueryKey],
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
 
   if (customTransactionCategories.length === 0) {
     return (
@@ -123,29 +76,9 @@ const CustomCategoryCards = () => {
           <CustomCategoryCard
             category={group.parent}
             isBuiltIn={group.isBuiltIn}
-            deleteCategory={
-              group.isBuiltIn
-                ? async () => {}
-                : async () => {
-                    await doDeleteCategory.mutateAsync(group.parent.id);
-                  }
-            }
-            updateCategory={async (req) => {
-              await doUpdateCategory.mutateAsync(req);
-            }}
           />
           {group.children.map((child) => (
-            <CustomCategoryCard
-              key={child.id}
-              category={child}
-              isChildCard
-              deleteCategory={async () => {
-                await doDeleteCategory.mutateAsync(child.id);
-              }}
-              updateCategory={async (req) => {
-                await doUpdateCategory.mutateAsync(req);
-              }}
-            />
+            <CustomCategoryCard key={child.id} category={child} isChildCard />
           ))}
         </Stack>
       ))}

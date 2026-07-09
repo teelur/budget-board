@@ -1,10 +1,7 @@
 import React from "react";
 import { ICategoryResponse } from "~/models/category";
-import { useAuth } from "../AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { defaultGuid } from "~/models/applicationUser";
-import { transactionCategoriesQueryKey } from "~/helpers/requests";
+import { useTransactionCategoriesQuery } from "~/hooks/queries/useTransactionCategoriesQuery";
 
 interface TransactionCategoriesContextType {
   allTransactionCategories: ICategoryResponse[];
@@ -24,23 +21,7 @@ interface TransactionCategoriesProviderProps {
 export const TransactionCategoryProvider = (
   props: TransactionCategoriesProviderProps,
 ) => {
-  const { request } = useAuth();
-
-  const transactionCategoriesQuery = useQuery({
-    queryKey: [transactionCategoriesQueryKey],
-    queryFn: async (): Promise<ICategoryResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/transactionCategory",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ICategoryResponse[];
-      }
-
-      return [];
-    },
-  });
+  const transactionCategoriesQuery = useTransactionCategoriesQuery();
 
   const customTransactionCategories = React.useMemo(
     () =>

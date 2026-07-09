@@ -17,19 +17,15 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import {
-  CategoryTypes,
-  ICategoryResponse,
-  ICategoryUpdateRequest,
-} from "~/models/category";
+import { useDeleteTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useDeleteTransactionCategoryMutation";
+import { useUpdateTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useUpdateTransactionCategoryMutation";
+import { CategoryTypes, ICategoryResponse } from "~/models/category";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface CustomCategoryCardProps {
   category: ICategoryResponse;
   isBuiltIn?: boolean;
   isChildCard?: boolean;
-  deleteCategory: () => Promise<void>;
-  updateCategory: (req: ICategoryUpdateRequest) => Promise<void>;
 }
 
 const CustomCategoryCard = (
@@ -37,6 +33,10 @@ const CustomCategoryCard = (
 ): React.ReactNode => {
   const { t } = useTranslation();
   const { allTransactionCategories } = useTransactionCategories();
+  const updateTransactionCategoryMutation =
+    useUpdateTransactionCategoryMutation();
+  const deleteTransactionCategoryMutation =
+    useDeleteTransactionCategoryMutation();
 
   const [isEditing, setIsEditing] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -77,7 +77,7 @@ const CustomCategoryCard = (
     if (nameField.error) return;
     setIsSaving(true);
     try {
-      await props.updateCategory({
+      updateTransactionCategoryMutation.mutate({
         id: props.category.id,
         value: nameField.getValue(),
         parent: isChildCategory ? parentField.getValue() : "",
@@ -199,7 +199,13 @@ const CustomCategoryCard = (
                 </ActionIcon>
                 <ActionIcon
                   size="sm"
-                  onClick={props.deleteCategory}
+                  onClick={() => {
+                    if (!props.isBuiltIn) {
+                      deleteTransactionCategoryMutation.mutate(
+                        props.category.id,
+                      );
+                    }
+                  }}
                   bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />
