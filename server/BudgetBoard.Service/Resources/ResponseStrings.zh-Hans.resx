@@ -1,433 +1,454 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-        <xsd:element name="root" msdata:IsDataSet="true">
-            <xsd:complexType>
-                <xsd:choice maxOccurs="unbounded">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
                     <xsd:element name="metadata">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" />
                             </xsd:sequence>
-                            <xsd:attribute name="name" use="required" type="xsd:string"/>
-                            <xsd:attribute name="type" type="xsd:string"/>
-                            <xsd:attribute name="mimetype" type="xsd:string"/>
-                            <xsd:attribute ref="xml:space"/>
+                            <xsd:attribute name="name" use="required" type="xsd:string" />
+                            <xsd:attribute name="type" type="xsd:string" />
+                            <xsd:attribute name="mimetype" type="xsd:string" />
+                            <xsd:attribute ref="xml:space" />
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="assembly">
                         <xsd:complexType>
-                            <xsd:attribute name="alias" type="xsd:string"/>
-                            <xsd:attribute name="name" type="xsd:string"/>
+                            <xsd:attribute name="alias" type="xsd:string" />
+                            <xsd:attribute name="name" type="xsd:string" />
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="data">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
-                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
                             </xsd:sequence>
-                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
-                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
-                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
-                            <xsd:attribute ref="xml:space"/>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+                            <xsd:attribute ref="xml:space" />
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="resheader">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                             </xsd:sequence>
-                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                            <xsd:attribute name="name" type="xsd:string" use="required" />
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:choice>
-            </xsd:complexType>
-        </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>2.0</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="AccountNotFoundError" xml:space="preserve">
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountNotFoundError" xml:space="preserve">
         <value>您尝试访问的账户不存在。</value>
-    </data>
-    <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
+  </data>
+  <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
         <value>The account must be deleted before it can be permanently deleted.</value>
-    </data>
-    <data name="AccountTypeDuplicateNameError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeDuplicateNameError" xml:space="preserve">
         <value>An account type with this name already exists.</value>
-    </data>
-    <data name="AccountTypeEmptyNameError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeEmptyNameError" xml:space="preserve">
         <value>The account type name cannot be empty.</value>
-    </data>
-    <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
         <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
-    </data>
-    <data name="AccountTypeNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeNotFoundError" xml:space="preserve">
         <value>The account type you are trying to access does not exist.</value>
-    </data>
-    <data name="AccountTypeParentNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeParentNotFoundError" xml:space="preserve">
         <value>The parent account type does not exist.</value>
-    </data>
-    <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
         <value>The account type name cannot be the same as its parent.</value>
-    </data>
-    <data name="AssetNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AssetNotFoundError" xml:space="preserve">
         <value>您尝试访问的资产不存在。</value>
-    </data>
-    <data name="AssetPermanentDeleteNotDeletedError" xml:space="preserve">
+  </data>
+  <data name="AssetPermanentDeleteNotDeletedError" xml:space="preserve">
         <value>The asset must be deleted before it can be permanently deleted.</value>
-    </data>
-    <data name="AssetTypeDuplicateNameError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeDuplicateNameError" xml:space="preserve">
         <value>An asset type with that name already exists.</value>
-    </data>
-    <data name="AssetTypeEmptyNameError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeEmptyNameError" xml:space="preserve">
         <value>The asset type name cannot be empty.</value>
-    </data>
-    <data name="AssetTypeNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeNotFoundError" xml:space="preserve">
         <value>The asset type you are trying to access does not exist.</value>
-    </data>
-    <data name="AssetTypeParentNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeParentNotFoundError" xml:space="preserve">
         <value>The parent asset type does not exist.</value>
-    </data>
-    <data name="AssetTypeSameNameAsParentError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeSameNameAsParentError" xml:space="preserve">
         <value>The asset type name cannot be the same as its parent.</value>
-    </data>
-    <data name="AutoCategorizerNotTrained" xml:space="preserve">
+  </data>
+  <data name="AutoCategorizerNotTrained" xml:space="preserve">
         <value>Auto-Categorizer cannot be enabled before training.</value>
-    </data>
-    <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
+  </data>
+  <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
         <value>No transactions in the range selected to train the Auto-Categorizer.</value>
-    </data>
-    <data name="AutomaticRuleCategoryDoesNotExistError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleCategoryDoesNotExistError" xml:space="preserve">
         <value>类别 '{0}' 不存在。</value>
-    </data>
-    <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
         <value>类别 '{0}' 不存在。</value>
-    </data>
-    <data name="AutomaticRuleInvalidAccountIdError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleInvalidAccountIdError" xml:space="preserve">
         <value>The account ID '{0}' is not a valid GUID.</value>
-    </data>
-    <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
         <value>金额 '{0}' 不是有效的小数。</value>
-    </data>
-    <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
         <value>日期 '{0}' 不是有效的日期。</value>
-    </data>
-    <data name="AutomaticRuleInvalidRegexError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleInvalidRegexError" xml:space="preserve">
         <value>正则表达式模式 '{0}' 无效。</value>
-    </data>
-    <data name="AutomaticRuleNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleNotFoundError" xml:space="preserve">
         <value>The automatic rule you are trying to access does not exist.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
         <value>规则操作中的字段 '{0}' 不受支持。</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
         <value>规则条件中的字段 '{0}' 不受支持。</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
         <value>规则操作中的运算符 '{0}' 不受支持。</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
         <value>Unsupported operator '{0}' for Account field.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForAmountError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForAmountError" xml:space="preserve">
         <value>金额字段不支持运算符 '{0}'。</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForCategoryError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForCategoryError" xml:space="preserve">
         <value>类别字段不支持运算符 '{0}'。</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForDateError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForDateError" xml:space="preserve">
         <value>日期字段不支持运算符 '{0}'。</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForMerchantError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForMerchantError" xml:space="preserve">
         <value>商户字段不支持运算符 '{0}'。</value>
-    </data>
-    <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
         <value>您尝试为其添加余额的账户不存在。</value>
-    </data>
-    <data name="BalanceAccountNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BalanceAccountNotFoundError" xml:space="preserve">
         <value>您尝试访问的账户不存在。</value>
-    </data>
-    <data name="BalanceDuplicateDateError" xml:space="preserve">
+  </data>
+  <data name="BalanceDuplicateDateError" xml:space="preserve">
         <value>A balance already exists for this account on that date.</value>
-    </data>
-    <data name="BalanceNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BalanceNotFoundError" xml:space="preserve">
         <value>The balance you are trying to access does not exist.</value>
-    </data>
-    <data name="BudgetCreateCategoryNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BudgetCreateCategoryNotFoundError" xml:space="preserve">
         <value>The category '{0}' does not exist.</value>
-    </data>
-    <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
+  </data>
+  <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
         <value>预算创建完成，但有错误：{0}</value>
-    </data>
-    <data name="BudgetCreateDuplicateError" xml:space="preserve">
+  </data>
+  <data name="BudgetCreateDuplicateError" xml:space="preserve">
         <value>类别为 '{0}'、日期为 '{1}' 的预算已存在。</value>
-    </data>
-    <data name="BudgetNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BudgetNotFoundError" xml:space="preserve">
         <value>The budget you are trying to access does not exist.</value>
-    </data>
-    <data name="BudgetUpdateParentLimitError" xml:space="preserve">
+  </data>
+  <data name="BudgetUpdateParentLimitError" xml:space="preserve">
         <value>父预算不能小于其子预算的总和。</value>
-    </data>
-    <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
+  </data>
+  <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
         <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
-    </data>
-    <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
+  </data>
+  <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
         <value>A LunchFlow account with this SyncID already exists.</value>
-    </data>
-    <data name="DuplicateOrganizationCreateError" xml:space="preserve">
+  </data>
+  <data name="DuplicateOrganizationCreateError" xml:space="preserve">
         <value>An organization with this domain already exists.</value>
-    </data>
-    <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
+  </data>
+  <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
         <value>Built-in asset types cannot be re-enabled because one or more custom asset types share a name with a built-in type. Please rename or remove the conflicting custom types first.</value>
-    </data>
-    <data name="GoalBothDateAndContributionError" xml:space="preserve">
+  </data>
+  <data name="GoalBothDateAndContributionError" xml:space="preserve">
         <value>A goal cannot have both a target date and a monthly contribution.</value>
-    </data>
-    <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
+  </data>
+  <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
         <value>您尝试完成的目标已经完成。</value>
-    </data>
-    <data name="GoalCreateInPastError" xml:space="preserve">
+  </data>
+  <data name="GoalCreateInPastError" xml:space="preserve">
         <value>目标的目标日期不能是过去的日期。</value>
-    </data>
-    <data name="GoalCreateInvalidAccountError" xml:space="preserve">
+  </data>
+  <data name="GoalCreateInvalidAccountError" xml:space="preserve">
         <value>您尝试使用的账户不存在。</value>
-    </data>
-    <data name="GoalCreateNoAccountsError" xml:space="preserve">
+  </data>
+  <data name="GoalCreateNoAccountsError" xml:space="preserve">
         <value>目标必须关联至少一个账户。</value>
-    </data>
-    <data name="GoalMissingContributionOrDateError" xml:space="preserve">
+  </data>
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
         <value>目标必须设置每月存入金额或目标日期。</value>
-    </data>
-    <data name="GoalNotFoundError" xml:space="preserve">
+  </data>
+  <data name="GoalNotFoundError" xml:space="preserve">
         <value>The goal you are trying to access does not exist.</value>
-    </data>
-    <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
+  </data>
+  <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
         <value>目标的每月存入金额必须大于 0。</value>
-    </data>
-    <data name="GoalUpdatePastDateError" xml:space="preserve">
+  </data>
+  <data name="GoalUpdatePastDateError" xml:space="preserve">
         <value>目标的目标日期不能是过去的日期。</value>
-    </data>
-    <data name="InstitutionDuplicateNameError" xml:space="preserve">
+  </data>
+  <data name="InstitutionDuplicateNameError" xml:space="preserve">
         <value>具有此名称的机构已存在。</value>
-    </data>
-    <data name="InstitutionEmptyNameError" xml:space="preserve">
+  </data>
+  <data name="InstitutionEmptyNameError" xml:space="preserve">
         <value>机构名称不能为空。</value>
-    </data>
-    <data name="InstitutionNotFoundError" xml:space="preserve">
+  </data>
+  <data name="InstitutionNotFoundError" xml:space="preserve">
         <value>您尝试访问的机构不存在。</value>
-    </data>
-    <data name="InvalidAccountSourceError" xml:space="preserve">
+  </data>
+  <data name="InvalidAccountSourceError" xml:space="preserve">
         <value>The account source is invalid.</value>
-    </data>
-    <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
+  </data>
+  <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
         <value>The auto-categorizer minimum probability must be between 0% and 100%.</value>
-    </data>
-    <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
+  </data>
+  <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
         <value>预算警告阈值必须在 0% 到 100% 之间。</value>
-    </data>
-    <data name="InvalidConditionError" xml:space="preserve">
+  </data>
+  <data name="InvalidConditionError" xml:space="preserve">
         <value>自动规则中的一个或多个条件无效。</value>
-    </data>
-    <data name="InvalidCurrencyCodeError" xml:space="preserve">
+  </data>
+  <data name="InvalidCurrencyCodeError" xml:space="preserve">
         <value>提供的货币代码无效。</value>
-    </data>
-    <data name="InvalidDateFormatError" xml:space="preserve">
+  </data>
+  <data name="InvalidDateFormatError" xml:space="preserve">
         <value>The provided date format is invalid.</value>
-    </data>
-    <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
+  </data>
+  <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
         <value>强制同步回溯期必须在 0 到 12 个月之间。</value>
-    </data>
-    <data name="InvalidInstitutionIDError" xml:space="preserve">
+  </data>
+  <data name="InvalidInstitutionIDError" xml:space="preserve">
         <value>提供的机构 ID 无效。</value>
-    </data>
-    <data name="InvalidLanguageCodeError" xml:space="preserve">
+  </data>
+  <data name="InvalidLanguageCodeError" xml:space="preserve">
         <value>提供的语言代码无效。</value>
-    </data>
-    <data name="InvalidLinkedAccountIDError" xml:space="preserve">
+  </data>
+  <data name="InvalidLinkedAccountIDError" xml:space="preserve">
         <value>The linked account ID you provided does not exist.</value>
-    </data>
-    <data name="InvalidOrganizationIDError" xml:space="preserve">
+  </data>
+  <data name="InvalidOrganizationIDError" xml:space="preserve">
         <value>The provided organization ID is invalid.</value>
-    </data>
-    <data name="InvalidUserError" xml:space="preserve">
+  </data>
+  <data name="InvalidUserError" xml:space="preserve">
         <value>提供的用户无效。</value>
-    </data>
-    <data name="LunchFlow" xml:space="preserve">
+  </data>
+  <data name="LunchFlow" xml:space="preserve">
         <value>LunchFlow</value>
-    </data>
-    <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
         <value>Failed to retrieve LunchFlow account data.</value>
-    </data>
-    <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
         <value>The LunchFlow account you are trying to access does not exist.</value>
-    </data>
-    <data name="LunchFlowAccountSyncException" xml:space="preserve">
+  </data>
+  <data name="LunchFlowAccountSyncException" xml:space="preserve">
         <value>An unexpected error occurred while syncing LunchFlow account '{0}'.</value>
-    </data>
-    <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
         <value>Failed to configure LunchFlow API key. Status code: {0}</value>
-    </data>
-    <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
         <value>LunchFlow API key is not configured.</value>
-    </data>
-    <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
         <value>Failed to retrieve balance data for LunchFlow account {0}.</value>
-    </data>
-    <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
         <value>Linked account not found for LunchFlow account {0}.</value>
-    </data>
-    <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
         <value>Failed to retrieve transaction data for LunchFlow account {0}.</value>
-    </data>
-    <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
+  </data>
+  <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
         <value>您尝试访问的净资产小组件类别不存在。</value>
-    </data>
-    <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
+  </data>
+  <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
         <value>无法创建循环依赖关系。目标行已经依赖于当前行。</value>
-    </data>
-    <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
+  </data>
+  <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
         <value>您尝试访问的净资产小组件组不存在。</value>
-    </data>
-    <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
+  </data>
+  <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
         <value>您尝试访问的净资产小组件行不存在。</value>
-    </data>
-    <data name="NoActionsCreateError" xml:space="preserve">
+  </data>
+  <data name="NoActionsCreateError" xml:space="preserve">
         <value>No actions were provided for the automatic rule.</value>
-    </data>
-    <data name="NoConditionsCreateError" xml:space="preserve">
+  </data>
+  <data name="NoConditionsCreateError" xml:space="preserve">
         <value>No conditions were provided for the automatic rule.</value>
-    </data>
-    <data name="NoOidcLoginFoundError" xml:space="preserve">
+  </data>
+  <data name="NoOidcLoginFoundError" xml:space="preserve">
         <value>未找到此用户的 OIDC 登录信息。</value>
-    </data>
-    <data name="RemoveOidcFailedError" xml:space="preserve">
+  </data>
+  <data name="RemoveOidcFailedError" xml:space="preserve">
         <value>移除 OIDC 登录失败。</value>
-    </data>
-    <data name="RemoveOidcNoPasswordError" xml:space="preserve">
+  </data>
+  <data name="RemoveOidcNoPasswordError" xml:space="preserve">
         <value>无法移除 OIDC 登录。用户必须先设置本地密码以保持账户访问权限。</value>
-    </data>
-    <data name="RuleRunSummary" xml:space="preserve">
+  </data>
+  <data name="RuleRunSummary" xml:space="preserve">
         <value>规则已应用 {0} 项更新。</value>
-    </data>
-    <data name="SimpleFin" xml:space="preserve">
+  </data>
+  <data name="SimpleFin" xml:space="preserve">
         <value>SimpleFIN</value>
-    </data>
-    <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
         <value>The SimpleFIN account you are trying to update does not exist.</value>
-    </data>
-    <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
         <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
-    </data>
-    <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
         <value>未找到与同步 ID '{0}' 的交易匹配的账户。</value>
-    </data>
-    <data name="SimpleFinAccountSyncException" xml:space="preserve">
+  </data>
+  <data name="SimpleFinAccountSyncException" xml:space="preserve">
         <value>An unexpected error occurred while syncing SimpleFIN account '{0}'.</value>
-    </data>
-    <data name="SimpleFinDataNotFoundError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDataNotFoundError" xml:space="preserve">
         <value>未找到 SimpleFIN 数据。</value>
-    </data>
-    <data name="SimpleFinDataRequestError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDataRequestError" xml:space="preserve">
         <value>An error occurred while requesting SimpleFIN data.</value>
-    </data>
-    <data name="SimpleFinDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDataRetrievalError" xml:space="preserve">
         <value>检索 SimpleFIN 数据时发生错误。</value>
-    </data>
-    <data name="SimpleFinDecodeTokenError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDecodeTokenError" xml:space="preserve">
         <value>解码设置令牌时发生错误。</value>
-    </data>
-    <data name="SimpleFinDecodeTokenInvalidError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDecodeTokenInvalidError" xml:space="preserve">
         <value>The setup token is invalid. Please check the token and try again.</value>
-    </data>
-    <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
         <value>An error occurred while connecting to SimpleFIN. Please try again later.</value>
-    </data>
-    <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
         <value>提供的访问令牌无效。</value>
-    </data>
-    <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
         <value>SimpleFIN access token is missing or empty.</value>
-    </data>
-    <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
         <value>The SimpleFIN organization you are trying to delete does not exist.</value>
-    </data>
-    <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
         <value>The SimpleFIN organization you are trying to update does not exist.</value>
-    </data>
-    <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
+  </data>
+  <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
         <value>Failed to create SimpleFIN organization for account {0}.</value>
-    </data>
-    <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
+  </data>
+  <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
         <value>The batch delete request contains duplicate transaction IDs.</value>
-    </data>
-    <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
+  </data>
+  <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
         <value>The batch update request contains duplicate transaction IDs.</value>
-    </data>
-    <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
         <value>您尝试向其添加交易的账户不存在。</value>
-    </data>
-    <data name="TransactionDeleteNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionDeleteNotFoundError" xml:space="preserve">
         <value>您尝试删除的交易不存在。</value>
-    </data>
-    <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
         <value>您尝试向其添加交易的账户不存在。</value>
-    </data>
-    <data name="TransactionNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionNotFoundError" xml:space="preserve">
         <value>您尝试访问的交易不存在。</value>
-    </data>
-    <data name="TransactionRestoreNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionRestoreNotFoundError" xml:space="preserve">
         <value>您尝试恢复的交易不存在。</value>
-    </data>
-    <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
+  </data>
+  <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
         <value>拆分金额必须小于交易金额。</value>
-    </data>
-    <data name="TransactionSplitNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionSplitNotFoundError" xml:space="preserve">
         <value>您尝试拆分的交易不存在。</value>
-    </data>
-    <data name="TransactionUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionUpdateNotFoundError" xml:space="preserve">
         <value>您尝试更新的交易不存在。</value>
-    </data>
-    <data name="UserDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="UserDataRetrievalError" xml:space="preserve">
         <value>检索用户数据时发生错误。</value>
-    </data>
-    <data name="UserSettingsNotFoundError" xml:space="preserve">
+  </data>
+  <data name="UserSettingsNotFoundError" xml:space="preserve">
         <value>您尝试访问的用户设置不存在。</value>
-    </data>
-    <data name="ValueAssetNotFoundError" xml:space="preserve">
+  </data>
+  <data name="ValueAssetNotFoundError" xml:space="preserve">
         <value>您尝试获取其数值的资产不存在。</value>
-    </data>
-    <data name="ValueDeleteNotFoundError" xml:space="preserve">
+  </data>
+  <data name="ValueDeleteNotFoundError" xml:space="preserve">
         <value>您尝试删除的值不存在。</value>
-    </data>
-    <data name="ValueDuplicateDateError" xml:space="preserve">
+  </data>
+  <data name="ValueDuplicateDateError" xml:space="preserve">
         <value>A value for this date already exists for this asset.</value>
-    </data>
-    <data name="ValueUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="ValueUpdateNotFoundError" xml:space="preserve">
         <value>The value you are trying to update does not exist.</value>
-    </data>
-    <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
+  </data>
+  <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
         <value>解析小组件配置失败。</value>
-    </data>
-    <data name="WidgetConfigurationNullError" xml:space="preserve">
+  </data>
+  <data name="WidgetConfigurationNullError" xml:space="preserve">
         <value>小组件配置为空或未设置。</value>
-    </data>
-    <data name="WidgetSettingsNotFoundError" xml:space="preserve">
+  </data>
+  <data name="WidgetSettingsNotFoundError" xml:space="preserve">
         <value>您尝试访问的小组件设置不存在。</value>
-    </data>
-    <data name="WidgetUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
         <value>您尝试更新的小组件不存在。</value>
-    </data>
+  </data>
+  <data name="TransactionCategoryDuplicateNameError" xml:space="preserve">
+    <value>A transaction category with this name already exists.</value>
+  </data>
+  <data name="TransactionCategoryEmptyNameError" xml:space="preserve">
+    <value>The transaction category name cannot be empty.</value>
+  </data>
+  <data name="TransactionCategoryNotFoundError" xml:space="preserve">
+    <value>The transaction category you are trying to access does not exist.</value>
+  </data>
+  <data name="TransactionCategoryParentNotFoundError" xml:space="preserve">
+    <value>The parent transaction category you are trying to use does not exist.</value>
+  </data>
+  <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
+    <value>Transaction category cannot have the same name as its parent category.</value>
+  </data>
+  <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
+    <value>A transaction category with this name already exists.</value>
+  </data>
+  <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
+    <value>The transaction category name cannot be empty.</value>
+  </data>
 </root>
