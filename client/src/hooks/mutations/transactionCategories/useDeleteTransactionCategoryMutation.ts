@@ -15,11 +15,11 @@ export const useDeleteTransactionCategoryMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (guid: string) =>
+    mutationFn: async (transactionCategoryId: string) =>
       await request({
         url: "/api/transactionCategory",
         method: "DELETE",
-        params: { guid },
+        params: { transactionCategoryId },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({

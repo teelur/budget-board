@@ -958,9 +958,9 @@ public class TransactionCategoryServiceTests
 
         var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
         var transactionCategories = transactionCategoryFaker.Generate(5);
-        foreach (var transactionCategory in transactionCategories)
+        for (var i = 1; i < transactionCategories.Count; i++)
         {
-            transactionCategory.Parent = transactionCategories.First().Value;
+            transactionCategories[i].Parent = transactionCategories.First().Value;
         }
 
         helper.UserDataContext.TransactionCategories.AddRange(transactionCategories);

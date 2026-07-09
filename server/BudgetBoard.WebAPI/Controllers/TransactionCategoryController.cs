@@ -36,7 +36,7 @@ public class TransactionCategoryController(
             }
 
             await transactionCategoryService.CreateTransactionCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                parsedUserId,
                 newTransactionCategory
             );
             return Ok();
@@ -57,16 +57,16 @@ public class TransactionCategoryController(
             }
 
             return Ok(
-                await transactionCategoryService.ReadTransactionCategoriesAsync(
-                    new Guid(userManager.GetUserId(User) ?? string.Empty)
-                )
+                await transactionCategoryService.ReadTransactionCategoriesAsync(parsedUserId)
             );
         });
     }
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] TransactionCategoryUpdateRequest category)
+    public async Task<IActionResult> Update(
+        [FromBody] TransactionCategoryUpdateRequest updatedTransactionCategory
+    )
     {
         return await HandleRequestAsync(async () =>
         {
@@ -78,8 +78,8 @@ public class TransactionCategoryController(
             }
 
             await transactionCategoryService.UpdateTransactionCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                category
+                parsedUserId,
+                updatedTransactionCategory
             );
             return Ok();
         });
@@ -87,7 +87,7 @@ public class TransactionCategoryController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete(Guid transactionCategoryId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -99,8 +99,8 @@ public class TransactionCategoryController(
             }
 
             await transactionCategoryService.DeleteTransactionCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                guid
+                parsedUserId,
+                transactionCategoryId
             );
             return Ok();
         });

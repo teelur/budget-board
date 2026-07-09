@@ -75,18 +75,13 @@ const CustomCategoryCard = (
   const handleSave = async () => {
     await nameField.validate();
     if (nameField.error) return;
-    setIsSaving(true);
-    try {
-      updateTransactionCategoryMutation.mutate({
-        id: props.category.id,
-        value: nameField.getValue(),
-        parent: isChildCategory ? parentField.getValue() : "",
-        categoryType: getCategoryTypeForSubmit(),
-      });
-      setIsEditing(false);
-    } finally {
-      setIsSaving(false);
-    }
+    updateTransactionCategoryMutation.mutate({
+      id: props.category.id,
+      value: nameField.getValue(),
+      parent: isChildCategory ? parentField.getValue() : "",
+      categoryType: getCategoryTypeForSubmit(),
+    });
+    setIsEditing(false);
   };
 
   const handleCancel = () => {
@@ -102,7 +97,12 @@ const CustomCategoryCard = (
       <Group w="100%" maw={600} wrap="nowrap">
         {props.isChildCard && <CornerDownRight />}
         <Card flex={1} p="0.5rem" elevation={1}>
-          <LoadingOverlay visible={isSaving} />
+          <LoadingOverlay
+            visible={
+              updateTransactionCategoryMutation.isPending ||
+              deleteTransactionCategoryMutation.isPending
+            }
+          />
           <Stack gap="0.5rem">
             <TextInput
               {...nameField.getInputProps()}
