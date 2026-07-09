@@ -430,4 +430,25 @@
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
         <value>Das Widget, das Sie aktualisieren möchten, existiert nicht.</value>
   </data>
+  <data name="TransactionCategoryDuplicateNameError" xml:space="preserve">
+    <value>A transaction category with this name already exists.</value>
+  </data>
+  <data name="TransactionCategoryEmptyNameError" xml:space="preserve">
+    <value>The transaction category name cannot be empty.</value>
+  </data>
+  <data name="TransactionCategoryNotFoundError" xml:space="preserve">
+    <value>The transaction category you are trying to access does not exist.</value>
+  </data>
+  <data name="TransactionCategoryParentNotFoundError" xml:space="preserve">
+    <value>The parent transaction category you are trying to use does not exist.</value>
+  </data>
+  <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
+    <value>Transaction category cannot have the same name as its parent category.</value>
+  </data>
+  <data name="TransactionCategoryUpdateDuplicateNameError" xml:space="preserve">
+    <value>A transaction category with this name already exists.</value>
+  </data>
+  <data name="TransactionCategoryUpdateEmptyNameError" xml:space="preserve">
+    <value>The transaction category name cannot be empty.</value>
+  </data>
 </root>
