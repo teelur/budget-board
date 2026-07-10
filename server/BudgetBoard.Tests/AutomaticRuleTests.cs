@@ -459,7 +459,10 @@ public class AutomaticRuleTests
         var transactionServiceMock = new Mock<ITransactionService>();
         transactionServiceMock
             .Setup(ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>())
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                )
             )
             .Returns(Task.CompletedTask);
 
@@ -516,7 +519,10 @@ public class AutomaticRuleTests
         // Assert
         transactionServiceMock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>()),
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                ),
             Times.Never
         );
     }
@@ -532,7 +538,10 @@ public class AutomaticRuleTests
         var transactionServiceMock = new Mock<ITransactionService>();
         transactionServiceMock
             .Setup(ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>())
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                )
             )
             .Returns(Task.CompletedTask);
 
@@ -591,7 +600,10 @@ public class AutomaticRuleTests
         // Assert
         transactionServiceMock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>()),
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                ),
             Times.AtLeastOnce
         );
     }

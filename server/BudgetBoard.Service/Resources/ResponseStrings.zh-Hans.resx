@@ -376,9 +376,6 @@
   <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
         <value>The batch update request contains duplicate transaction IDs.</value>
   </data>
-  <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
-        <value>您尝试向其添加交易的账户不存在。</value>
-  </data>
   <data name="TransactionDeleteNotFoundError" xml:space="preserve">
         <value>您尝试删除的交易不存在。</value>
   </data>
@@ -396,9 +393,6 @@
   </data>
   <data name="TransactionSplitNotFoundError" xml:space="preserve">
         <value>您尝试拆分的交易不存在。</value>
-  </data>
-  <data name="TransactionUpdateNotFoundError" xml:space="preserve">
-        <value>您尝试更新的交易不存在。</value>
   </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
         <value>检索用户数据时发生错误。</value>

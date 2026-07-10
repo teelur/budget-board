@@ -44,32 +44,20 @@ public interface ITransactionService
     /// <param name="year">Optional. The year to filter transactions by.</param>
     /// <param name="month">Optional. The month to filter transactions by.</param>
     /// <param name="getHidden">If true, includes hidden transactions in the response.</param>
-    /// <param name="guid">Optional. The unique identifier of a specific transaction to retrieve.</param>
     /// <returns>A collection of transaction details sorted by date in descending order.</returns>
     Task<IReadOnlyList<ITransactionResponse>> ReadTransactionsAsync(
         Guid userGuid,
         int? year,
         int? month,
-        bool getHidden,
-        Guid guid = default
+        bool getHidden
     );
 
     /// <summary>
     /// Updates an existing transaction.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="request">The transaction update details.</param>
-    Task UpdateTransactionAsync(Guid userGuid, ITransactionUpdateRequest request);
-
-    /// <summary>
-    /// Updates multiple transactions in a single operation.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="requests">The collection of transaction update details.</param>
-    Task UpdateTransactionBatchAsync(
-        Guid userGuid,
-        IEnumerable<ITransactionUpdateRequest> requests
-    );
+    /// <param name="requests">The list of transaction update details.</param>
+    Task UpdateTransactionsAsync(Guid userGuid, IEnumerable<ITransactionUpdateRequest> requests);
 
     /// <summary>
     /// Deletes (soft deletes) a transaction.

@@ -25,7 +25,10 @@ internal class AutomaticRuleTestHelpers
     {
         var mock = new Mock<ITransactionService>();
         mock.Setup(ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>())
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                )
             )
             .Returns(Task.CompletedTask);
         return mock;

@@ -5,11 +5,6 @@ namespace BudgetBoard.Service.Models;
 
 public class TransactionSource
 {
-    private TransactionSource(string value)
-    {
-        Value = value;
-    }
-
     public string Value { get; set; }
 
     public static TransactionSource Manual
@@ -23,6 +18,11 @@ public class TransactionSource
     public static TransactionSource LunchFlow
     {
         get { return new TransactionSource("LunchFlow"); }
+    }
+
+    private TransactionSource(string value)
+    {
+        Value = value;
     }
 }
 
@@ -40,71 +40,47 @@ public interface ITransactionCreateRequest
 
 public class TransactionCreateRequest : ITransactionCreateRequest
 {
-    public string? SyncID { get; set; }
-    public decimal Amount { get; set; }
-    public DateOnly Date { get; set; }
-    public string? Category { get; set; }
-    public string? Subcategory { get; set; }
-    public string? MerchantName { get; set; }
-    public string? Source { get; set; }
-    public Guid AccountID { get; set; }
-
-    [JsonConstructor]
-    public TransactionCreateRequest()
-    {
-        SyncID = null;
-        Amount = 0.0M;
-        Date = DateOnly.MinValue;
-        Category = null;
-        Subcategory = null;
-        MerchantName = null;
-        Source = string.Empty;
-        AccountID = Guid.NewGuid();
-    }
+    public string? SyncID { get; set; } = null;
+    public decimal Amount { get; set; } = 0.0M;
+    public DateOnly Date { get; set; } = DateOnly.MinValue;
+    public string? Category { get; set; } = null;
+    public string? Subcategory { get; set; } = null;
+    public string? MerchantName { get; set; } = null;
+    public string? Source { get; set; } = null;
+    public Guid AccountID { get; set; } = Guid.NewGuid();
 }
 
 public interface ITransactionUpdateRequest
 {
     Guid ID { get; }
-    decimal Amount { get; }
-    DateOnly Date { get; }
-    string? Category { get; }
-    string? Subcategory { get; }
-    string? MerchantName { get; }
-    DateTime? Deleted { get; }
+    decimal? Amount { get; }
+    DateOnly? Date { get; }
+    OptionalField<string?> Category { get; }
+    OptionalField<string?> Subcategory { get; }
+    OptionalField<string?> MerchantName { get; }
+    OptionalField<DateTime?> Deleted { get; }
 }
 
-public class TransactionUpdateRequest : ITransactionUpdateRequest
+public class TransactionUpdateRequest() : ITransactionUpdateRequest
 {
-    public Guid ID { get; set; }
-    public decimal Amount { get; set; }
-    public DateOnly Date { get; set; }
-    public string? Category { get; set; }
-    public string? Subcategory { get; set; }
-    public string? MerchantName { get; set; }
-    public DateTime? Deleted { get; set; }
-
-    [JsonConstructor]
-    public TransactionUpdateRequest()
-    {
-        ID = Guid.NewGuid();
-        Amount = 0.0M;
-        Date = DateOnly.MinValue;
-        Category = null;
-        Subcategory = null;
-        MerchantName = null;
-        Deleted = null;
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public decimal? Amount { get; set; } = 0.0M;
+    public DateOnly? Date { get; set; } = DateOnly.MinValue;
+    public OptionalField<string?> Category { get; set; } = new OptionalField<string?>();
+    public OptionalField<string?> Subcategory { get; set; } = new OptionalField<string?>();
+    public OptionalField<string?> MerchantName { get; set; } = new OptionalField<string?>();
+    public OptionalField<DateTime?> Deleted { get; set; } = new OptionalField<DateTime?>();
 
     public TransactionUpdateRequest(Transaction transaction)
+        : this()
     {
         ID = transaction.ID;
         Amount = transaction.Amount;
         Date = transaction.Date;
-        Category = transaction.Category;
-        Subcategory = transaction.Subcategory;
-        MerchantName = transaction.MerchantName;
-        Deleted = transaction.Deleted;
+        Category = new OptionalField<string?>(transaction.Category);
+        Subcategory = new OptionalField<string?>(transaction.Subcategory);
+        MerchantName = new OptionalField<string?>(transaction.MerchantName);
+        Deleted = new OptionalField<DateTime?>(transaction.Deleted);
     }
 }
 
@@ -118,51 +94,25 @@ public interface ITransactionSplitRequest
 
 public class TransactionSplitRequest : ITransactionSplitRequest
 {
-    public Guid ID { get; set; }
-    public decimal Amount { get; set; }
-    public string Category { get; set; }
-    public string Subcategory { get; set; }
-
-    [JsonConstructor]
-    public TransactionSplitRequest()
-    {
-        ID = Guid.NewGuid();
-        Amount = 0.0M;
-        Category = string.Empty;
-        Subcategory = string.Empty;
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public decimal Amount { get; set; } = 0.0M;
+    public string Category { get; set; } = string.Empty;
+    public string Subcategory { get; set; } = string.Empty;
 }
 
 public class TransactionImport
 {
-    public DateOnly? Date { get; set; }
-    public string? MerchantName { get; set; }
-    public string? Category { get; set; }
-    public decimal? Amount { get; set; }
-    public string Account { get; set; }
-
-    [JsonConstructor]
-    public TransactionImport()
-    {
-        Date = DateOnly.MinValue;
-        MerchantName = string.Empty;
-        Category = null;
-        Amount = 0.0M;
-        Account = string.Empty;
-    }
+    public DateOnly? Date { get; set; } = null;
+    public string? MerchantName { get; set; } = null;
+    public string? Category { get; set; } = null;
+    public decimal? Amount { get; set; } = null;
+    public string Account { get; set; } = string.Empty;
 }
 
 public class AccountNameToIDKeyValuePair
 {
-    public string AccountName { get; set; }
-    public Guid AccountID { get; set; }
-
-    [JsonConstructor]
-    public AccountNameToIDKeyValuePair()
-    {
-        AccountName = string.Empty;
-        AccountID = Guid.NewGuid();
-    }
+    public string AccountName { get; set; } = string.Empty;
+    public Guid AccountID { get; set; } = Guid.NewGuid();
 }
 
 public interface ITransactionImportRequest
@@ -173,15 +123,8 @@ public interface ITransactionImportRequest
 
 public class TransactionImportRequest : ITransactionImportRequest
 {
-    public IEnumerable<TransactionImport> Transactions { get; set; }
-    public IEnumerable<AccountNameToIDKeyValuePair> AccountNameToIDMap { get; set; }
-
-    [JsonConstructor]
-    public TransactionImportRequest()
-    {
-        Transactions = [];
-        AccountNameToIDMap = [];
-    }
+    public IEnumerable<TransactionImport> Transactions { get; set; } = [];
+    public IEnumerable<AccountNameToIDKeyValuePair> AccountNameToIDMap { get; set; } = [];
 }
 
 public interface ITransactionResponse
@@ -201,31 +144,17 @@ public interface ITransactionResponse
 
 public class TransactionResponse : ITransactionResponse
 {
-    public Guid ID { get; set; }
-    public string? SyncID { get; set; }
-    public decimal Amount { get; set; }
-    public DateOnly Date { get; set; }
-    public string? Category { get; set; }
-    public string? Subcategory { get; set; }
-    public string? MerchantName { get; set; }
-    public bool Pending { get; set; }
-    public DateTime? Deleted { get; set; }
-    public string Source { get; set; }
-    public Guid AccountID { get; set; }
-
-    [JsonConstructor]
-    public TransactionResponse()
-    {
-        ID = Guid.NewGuid();
-        SyncID = null;
-        Amount = 0.0M;
-        Date = DateOnly.MinValue;
-        Category = null;
-        Subcategory = null;
-        MerchantName = null;
-        Source = string.Empty;
-        AccountID = Guid.NewGuid();
-    }
+    public Guid ID { get; set; } = Guid.NewGuid();
+    public string? SyncID { get; set; } = null;
+    public decimal Amount { get; set; } = 0.0M;
+    public DateOnly Date { get; set; } = DateOnly.MinValue;
+    public string? Category { get; set; } = null;
+    public string? Subcategory { get; set; } = null;
+    public string? MerchantName { get; set; } = null;
+    public bool Pending { get; set; } = false;
+    public DateTime? Deleted { get; set; } = null;
+    public string Source { get; set; } = string.Empty;
+    public Guid AccountID { get; set; } = Guid.NewGuid();
 
     public TransactionResponse(Transaction transaction)
     {

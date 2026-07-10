@@ -139,9 +139,9 @@ internal static class AutomaticRuleActionHandler
         var updatedTransactions = 0;
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionAsync(
+            await transactionService.UpdateTransactionsAsync(
                 userGuid,
-                new TransactionUpdateRequest(transaction) { MerchantName = action.Value }
+                [new TransactionUpdateRequest(transaction) { MerchantName = action.Value }]
             );
 
             updatedTransactions++;
@@ -186,7 +186,7 @@ internal static class AutomaticRuleActionHandler
             var updateRequest = new TransactionUpdateRequest(transaction);
             (updateRequest.Category, updateRequest.Subcategory) =
                 TransactionCategoriesHelpers.GetFullCategory(newCategory, allCategories);
-            await transactionService.UpdateTransactionAsync(userGuid, updateRequest);
+            await transactionService.UpdateTransactionsAsync(userGuid, [updateRequest]);
 
             updatedTransactions++;
         }
@@ -211,9 +211,9 @@ internal static class AutomaticRuleActionHandler
         int updatedTransactions = 0;
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionAsync(
+            await transactionService.UpdateTransactionsAsync(
                 userGuid,
-                new TransactionUpdateRequest(transaction) { Amount = newAmount }
+                [new TransactionUpdateRequest(transaction) { Amount = newAmount }]
             );
 
             updatedTransactions++;
@@ -239,9 +239,9 @@ internal static class AutomaticRuleActionHandler
         int updatedTransactions = 0;
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionAsync(
+            await transactionService.UpdateTransactionsAsync(
                 userGuid,
-                new TransactionUpdateRequest(transaction) { Date = newDate }
+                [new TransactionUpdateRequest(transaction) { Date = newDate }]
             );
 
             updatedTransactions++;

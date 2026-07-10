@@ -418,8 +418,8 @@
     <data name="TransactionCategoryUpdateEmptyNameLog" xml:space="preserve">
         <value>Attempted to update a transaction category with an empty name.</value>
     </data>
-    <data name="TransactionCreateAccountNotFoundLog" xml:space="preserve">
-        <value>Attempted to create a transaction for an account that does not exist.</value>
+    <data name="TransactionAccountNotFoundLog" xml:space="preserve">
+        <value>Attempted to access a transaction for an account that does not exist.</value>
     </data>
     <data name="TransactionDeleteNotFoundLog" xml:space="preserve">
         <value>Attempted to delete a transaction that does not exist.</value>
@@ -438,9 +438,6 @@
     </data>
     <data name="TransactionSplitNotFoundLog" xml:space="preserve">
         <value>Attempted to split a transaction that does not exist.</value>
-    </data>
-    <data name="TransactionUpdateNotFoundLog" xml:space="preserve">
-        <value>Attempted to update a transaction that does not exist.</value>
     </data>
     <data name="UserDataRetrievalErrorLog" xml:space="preserve">
         <value>An error occurred while retrieving the user data: {0}</value>

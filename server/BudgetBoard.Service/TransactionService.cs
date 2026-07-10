@@ -26,14 +26,7 @@ public class TransactionService(
         AutomaticTransactionCategorizerHelper? autoCategorizer = null
     )
     {
-        var account = userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID);
-        if (account == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["TransactionCreateAccountNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["TransactionCreateAccountNotFoundError"]
-            );
-        }
+        var account = GetAccountByID(userData, request.AccountID);
 
         var newTransaction = new Transaction
         {
@@ -47,53 +40,7 @@ public class TransactionService(
             AccountID = request.AccountID,
             Account = account,
         };
-
-        if (
-            autoCategorizer is not null
-            && allCategories is not null
-            && newTransaction.MerchantName is not null
-            && newTransaction.MerchantName != string.Empty
-        )
-        {
-            var (PredictionCategory, PredictionProbability) = autoCategorizer.PredictCategory(
-                newTransaction
-            );
-
-            logger.LogInformation(
-                "{LogMessage}",
-                logLocalizer[
-                    "AutoCategorizerPredictionLog",
-                    PredictionCategory,
-                    PredictionProbability,
-                    newTransaction.MerchantName,
-                    newTransaction.Account.Name,
-                    newTransaction.Amount
-                ]
-            );
-
-            if (
-                PredictionProbability
-                >= (userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70) / 100f
-            )
-            {
-                (newTransaction.Category, newTransaction.Subcategory) =
-                    TransactionCategoriesHelpers.GetFullCategory(PredictionCategory, allCategories);
-            }
-            else
-            {
-                logger.LogInformation(
-                    "{LogMessage}",
-                    logLocalizer[
-                        "AutoCategorizerPredictionBelowThresholdLog",
-                        PredictionCategory,
-                        PredictionProbability,
-                        userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70,
-                        newTransaction.MerchantName,
-                        newTransaction.Amount
-                    ]
-                );
-            }
-        }
+        AutoCategorizeTransaction(userData, newTransaction, allCategories, autoCategorizer);
 
         userDataContext.Transactions.Add(newTransaction);
 
@@ -106,6 +53,7 @@ public class TransactionService(
         await userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task CreateTransactionAsync(
         Guid userGuid,
         ITransactionCreateRequest request,
@@ -122,15 +70,14 @@ public class TransactionService(
         Guid userGuid,
         int? year,
         int? month,
-        bool getHidden,
-        Guid guid = default
+        bool getHidden
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
         var transactions = userData
             .Accounts.SelectMany(t => t.Transactions)
-            .Where(t => getHidden || !(t.Account?.HideTransactions ?? false));
+            .Where(t => getHidden || t.Account!.HideTransactions is not true);
 
         if (year != null)
         {
@@ -141,20 +88,6 @@ public class TransactionService(
             transactions = transactions.Where(t => t.Date.Month == month);
         }
 
-        if (guid != default)
-        {
-            var transaction = transactions.FirstOrDefault(t => t.ID == guid);
-            if (transaction == null)
-            {
-                logger.LogError("{LogMessage}", logLocalizer["TransactionNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionNotFoundError"]
-                );
-            }
-
-            return [new TransactionResponse(transaction)];
-        }
-
         return transactions
             .OrderByDescending(t => t.Date)
             .Select(t => new TransactionResponse(t))
@@ -162,90 +95,40 @@ public class TransactionService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateTransactionAsync(
-        Guid userGuid,
-        ITransactionUpdateRequest editedTransaction
-    )
-    {
-        var userData = await GetCurrentUserAsync(userGuid);
-
-        var transaction = userData
-            .Accounts.SelectMany(t => t.Transactions)
-            .FirstOrDefault(t => t.ID == editedTransaction.ID);
-        if (transaction == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["TransactionUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["TransactionUpdateNotFoundError"]
-            );
-        }
-
-        var amountDifference = editedTransaction.Amount - transaction.Amount;
-
-        transaction.Amount = editedTransaction.Amount;
-        transaction.Date = editedTransaction.Date;
-        transaction.Category = editedTransaction.Category;
-        transaction.Subcategory = editedTransaction.Subcategory;
-        transaction.MerchantName = editedTransaction.MerchantName;
-
-        if (transaction.Account?.Source == AccountSource.Manual)
-        {
-            // Update all following balances to include the edited transaction.
-            var balancesAfterEdited = transaction
-                .Account.Balances.Where(b => b.Date >= transaction.Date)
-                .ToList();
-            foreach (var balance in balancesAfterEdited)
-            {
-                balance.Amount += amountDifference;
-            }
-        }
-
-        await userDataContext.SaveChangesAsync();
-    }
-
-    /// <inheritdoc />
-    public async Task UpdateTransactionBatchAsync(
+    public async Task UpdateTransactionsAsync(
         Guid userGuid,
         IEnumerable<ITransactionUpdateRequest> requests
     )
     {
-        var requestList = requests.ToList();
-        var duplicateIds = requestList
-            .GroupBy(r => r.ID)
-            .Where(g => g.Count() > 1)
-            .Select(g => g.Key)
-            .ToList();
-        if (duplicateIds.Count > 0)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["TransactionBatchUpdateDuplicateIdsLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["TransactionBatchUpdateDuplicateIdsError"]
-            );
-        }
-
         var userData = await GetCurrentUserAsync(userGuid);
-        var allTransactions = userData.Accounts.SelectMany(a => a.Transactions).ToList();
-
-        foreach (var editedTransaction in requestList)
+        foreach (var request in requests)
         {
-            var transaction = allTransactions.FirstOrDefault(t => t.ID == editedTransaction.ID);
-            if (transaction == null)
-            {
-                logger.LogError("{LogMessage}", logLocalizer["TransactionUpdateNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["TransactionUpdateNotFoundError"]
-                );
-            }
-
+            var transaction = GetTransactionByID(userData, request.ID);
             var originalAmount = transaction.Amount;
             var originalDate = transaction.Date;
-            var editedDate = editedTransaction.Date;
+            var finalAmount = request.Amount ?? originalAmount;
+            var finalDate = request.Date ?? originalDate;
 
-            transaction.Amount = editedTransaction.Amount;
-            transaction.Date = editedDate;
-            transaction.Category = editedTransaction.Category;
-            transaction.Subcategory = editedTransaction.Subcategory;
-            transaction.MerchantName = editedTransaction.MerchantName;
+            if (request.Amount.HasValue)
+            {
+                transaction.Amount = finalAmount;
+            }
+            if (request.Date.HasValue)
+            {
+                transaction.Date = finalDate;
+            }
+            if (request.Category.IsSpecified)
+            {
+                transaction.Category = request.Category.Value;
+            }
+            if (request.Subcategory.IsSpecified)
+            {
+                transaction.Subcategory = request.Subcategory.Value;
+            }
+            if (request.MerchantName.IsSpecified)
+            {
+                transaction.MerchantName = request.MerchantName.Value;
+            }
 
             if (transaction.Account?.Source == AccountSource.Manual)
             {
@@ -258,11 +141,11 @@ public class TransactionService(
                 }
 
                 var balancesAfterEdited = transaction
-                    .Account.Balances.Where(b => b.Date >= editedDate)
+                    .Account.Balances.Where(b => b.Date >= finalDate)
                     .ToList();
                 foreach (var balance in balancesAfterEdited)
                 {
-                    balance.Amount += editedTransaction.Amount;
+                    balance.Amount += finalAmount;
                 }
             }
         }
@@ -526,6 +409,88 @@ public class TransactionService(
                     .Include(u => u.UserSettings)
                     .Include(u => u.TransactionCategories)
         );
+    }
+
+    private Transaction GetTransactionByID(ApplicationUser userData, Guid transactionID)
+    {
+        var transaction = userData
+            .Accounts.SelectMany(a => a.Transactions)
+            .FirstOrDefault(t => t.ID == transactionID);
+        if (transaction == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["TransactionNotFoundError"]);
+        }
+        return transaction;
+    }
+
+    private Account GetAccountByID(ApplicationUser userData, Guid accountID)
+    {
+        var account = userData.Accounts.FirstOrDefault(a => a.ID == accountID);
+        if (account == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionAccountNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionAccountNotFoundError"]
+            );
+        }
+
+        return account;
+    }
+
+    private void AutoCategorizeTransaction(
+        ApplicationUser userData,
+        Transaction transaction,
+        IEnumerable<ITransactionCategory>? allCategories,
+        AutomaticTransactionCategorizerHelper? autoCategorizer
+    )
+    {
+        if (
+            autoCategorizer is not null
+            && allCategories is not null
+            && transaction.MerchantName is not null
+            && transaction.MerchantName != string.Empty
+        )
+        {
+            var (PredictionCategory, PredictionProbability) = autoCategorizer.PredictCategory(
+                transaction
+            );
+
+            logger.LogInformation(
+                "{LogMessage}",
+                logLocalizer[
+                    "AutoCategorizerPredictionLog",
+                    PredictionCategory,
+                    PredictionProbability,
+                    transaction.MerchantName,
+                    transaction.Account?.Name ?? "Unknown Account",
+                    transaction.Amount
+                ]
+            );
+
+            if (
+                PredictionProbability
+                >= (userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70) / 100f
+            )
+            {
+                (transaction.Category, transaction.Subcategory) =
+                    TransactionCategoriesHelpers.GetFullCategory(PredictionCategory, allCategories);
+            }
+            else
+            {
+                logger.LogInformation(
+                    "{LogMessage}",
+                    logLocalizer[
+                        "AutoCategorizerPredictionBelowThresholdLog",
+                        PredictionCategory,
+                        PredictionProbability,
+                        userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70,
+                        transaction.MerchantName,
+                        transaction.Amount
+                    ]
+                );
+            }
+        }
     }
 
     private void UpdateBalancesForNewTransaction(
