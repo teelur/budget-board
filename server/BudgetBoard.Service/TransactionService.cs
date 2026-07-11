@@ -290,16 +290,6 @@ public class TransactionService(
                 ?.AccountID;
             var account = GetAccountByID(userData, accountId ?? Guid.Empty);
 
-            string matchedCategory =
-                allCategories
-                    .FirstOrDefault(c =>
-                        c.Value.Equals(
-                            transaction.Category,
-                            StringComparison.InvariantCultureIgnoreCase
-                        )
-                    )
-                    ?.Value ?? string.Empty;
-
             var newTransaction = new TransactionCreateRequest
             {
                 SyncID = string.Empty,
@@ -310,8 +300,13 @@ public class TransactionService(
                 AccountID = account.ID,
             };
 
+            var matchedCategory = allCategories.FirstOrDefault(c =>
+                c.Value.Equals(transaction.Category, StringComparison.InvariantCultureIgnoreCase)
+            );
+            string coercedCategoryValue = matchedCategory?.Value ?? string.Empty;
+
             (newTransaction.Category, newTransaction.Subcategory) =
-                TransactionCategoriesHelpers.GetFullCategory(matchedCategory, allCategories);
+                TransactionCategoriesHelpers.GetFullCategory(coercedCategoryValue, allCategories);
 
             await CreateTransactionAsync(userData, newTransaction, true);
         }
