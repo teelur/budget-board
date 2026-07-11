@@ -14,17 +14,14 @@ import { areStringsEqual } from "~/helpers/utils";
 import ColumnsSelect, { ISelectedColumns } from "./ColumnsSelect/ColumnsSelect";
 import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
 import { notifications } from "@mantine/notifications";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { transactionsQueryKey } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
@@ -44,7 +41,8 @@ const ConfigureTransactions = (
   const { dayjs } = useLocale();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
-  const { request } = useAuth();
+  const transactionsQuery = useTransactionsQuery();
+  const accountsQuery = useAccountsQuery();
 
   // The raw CSV data imported from the user's file.
   const [csvData, setCsvData] = React.useState<CsvRow[]>(props.csvData);
@@ -102,24 +100,6 @@ const ConfigureTransactions = (
   const [duplicateTransactions, setDuplicateTransactions] = React.useState<
     Map<ITransactionImportTableData, ITransaction>
   >(new Map<ITransactionImportTableData, ITransaction>());
-
-  const transactionsQuery = useQuery({
-    queryKey: [transactionsQueryKey, { getHidden: false }],
-    queryFn: async (): Promise<ITransaction[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/transaction",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ITransaction[];
-      }
-
-      return [];
-    },
-  });
-
-  const accountsQuery = useAccountsQuery();
 
   const disableNextButton = () => {
     // Cannot proceed if there are no imported transactions.

@@ -1,5 +1,5 @@
 import { Flex, Skeleton, Stack, Text } from "@mantine/core";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -15,21 +15,18 @@ import {
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
-import { ITransaction } from "~/models/transaction";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
-import {
-  transactionsQueryKey,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
+import { widgetSettingsQueryKey } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 interface MetricWidgetProps {
   widgetId: string;
@@ -45,7 +42,7 @@ const MetricWidget = ({
   const { t } = useTranslation();
   const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
-  const { intlLocale } = useLocale();
+  const { intlLocale, dayjs } = useLocale();
   const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
 
   const widgetSettingsQuery = useQuery({
@@ -104,44 +101,16 @@ const MetricWidget = ({
     [parsedValueTokens, parsedLabelTokens],
   );
 
-  const transactionMonthQueries = useQueries({
-    queries:
-      requirements.needsTransactions && !requirements.needsAllTimeTransactions
-        ? requirements.transactionMonths.map((date) => ({
-            queryKey: [
-              "transactions",
-              { month: date.getMonth(), year: date.getFullYear() },
-            ],
-            queryFn: async (): Promise<ITransaction[]> => {
-              const res: AxiosResponse = await request({
-                url: "/api/transaction",
-                method: "GET",
-                params: {
-                  month: date.getMonth() + 1,
-                  year: date.getFullYear(),
-                },
-              });
-              if (res.status === 200) return res.data as ITransaction[];
-              return [];
-            },
-          }))
-        : [],
-    combine: (results) => ({
-      data: results.flatMap((r) => r.data ?? []),
-      isPending: results.length > 0 && results.some((r) => r.isPending),
-    }),
+  const transactionMonthQueries = useTransactionsQuery({
+    selectedDates: requirements.transactionMonths.map((date) => ({
+      month: dayjs(date).month() + 1,
+      year: dayjs(date).year(),
+    })),
+    enabled:
+      requirements.needsTransactions && !requirements.needsAllTimeTransactions,
   });
 
-  const allTimeTransactionsQuery = useQuery({
-    queryKey: [transactionsQueryKey, { allTime: true }],
-    queryFn: async (): Promise<ITransaction[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/transaction",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as ITransaction[];
-      return [];
-    },
+  const allTimeTransactionsQuery = useTransactionsQuery({
     enabled:
       requirements.needsTransactions && requirements.needsAllTimeTransactions,
   });
@@ -175,7 +144,7 @@ const MetricWidget = ({
     () => ({
       transactions: requirements.needsAllTimeTransactions
         ? (allTimeTransactionsQuery.data ?? [])
-        : transactionMonthQueries.data,
+        : (transactionMonthQueries.data ?? []),
       budgets: budgetQueries.data,
       goals: goalsQuery.data ?? [],
       accounts: accountsQuery.data ?? [],

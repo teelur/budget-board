@@ -10,8 +10,8 @@ import {
   Badge,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -21,14 +21,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import {
-  translateAxiosError,
-  accountsQueryKey,
-  balancesQueryKey,
-  institutionsQueryKey,
-  transactionsQueryKey,
-  userSettingsQueryKey,
-} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -39,6 +32,9 @@ import useIsMobile from "~/hooks/useIsMobile";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import { useUpdateTransactionsMutation } from "~/hooks/mutations/transactions/useUpdateTransactionsMutation";
+import { useDeleteTransactionsMutation } from "~/hooks/mutations/transactions/useDeleteTransactionsMutation";
 
 interface BulkActionBarProps {
   selectedIds: Set<string>;
@@ -59,6 +55,7 @@ const FIELDS = {
 const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const transactionsQuery = useTransactionsQuery();
 
   // Hold the bar element in state so the effect re-runs as soon as Mantine's
   // Transition renders it (which happens in a child render cycle, not the same
@@ -107,6 +104,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const accountsQuery = useAccountsQuery();
+  const updateTransactionsMutation = useUpdateTransactionsMutation();
+  const deleteTransactionsMutation = useDeleteTransactionsMutation();
 
   const [merchantValue, setMerchantValue] = React.useState("");
   const [categoryValue, setCategoryValue] = React.useState("");
@@ -141,115 +141,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     },
   });
 
-  const accountsQuery = useAccountsQuery();
-
-  const queryClient = useQueryClient();
-
-  const doBulkUpdate = useMutation({
-    mutationFn: async (requests: ITransactionUpdateRequest[]) => {
-      await request({
-        url: "/api/transaction/batch",
-        method: "PUT",
-        data: requests,
-      });
-    },
-    onMutate: async (requests: ITransactionUpdateRequest[]) => {
-      await queryClient.cancelQueries({ queryKey: [transactionsQueryKey] });
-      const previousTransactions: ITransaction[] =
-        queryClient.getQueryData([
-          transactionsQueryKey,
-          { getHidden: false },
-        ]) ?? [];
-      queryClient.setQueryData(
-        [transactionsQueryKey, { getHidden: false }],
-        (oldTransactions: ITransaction[]) =>
-          oldTransactions.map((t) => {
-            const req = requests.find((r) => r.id === t.id);
-            if (!req) {
-              return t;
-            }
-            return {
-              ...t,
-              amount: req.amount,
-              date: req.date,
-              category: req.category,
-              subcategory: req.subcategory,
-              merchantName: req.merchantName,
-            };
-          }),
-      );
-      return { previousTransactions };
-    },
-    onError: (error: AxiosError, _variables, context) => {
-      queryClient.setQueryData(
-        [transactionsQueryKey, { getHidden: false }],
-        context?.previousTransactions ?? [],
-      );
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [balancesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-    },
-    onSuccess: () => {
-      props.onClearSelection();
-      resetFields();
-    },
-  });
-
-  const doBulkDelete = useMutation({
-    mutationFn: async (ids: string[]) => {
-      await request({
-        url: "/api/transaction/batch",
-        method: "DELETE",
-        data: ids,
-      });
-    },
-    onMutate: async (ids: string[]) => {
-      await queryClient.cancelQueries({ queryKey: [transactionsQueryKey] });
-      const previousTransactions: ITransaction[] =
-        queryClient.getQueryData([
-          transactionsQueryKey,
-          { getHidden: false },
-        ]) ?? [];
-      queryClient.setQueryData(
-        [transactionsQueryKey, { getHidden: false }],
-        (oldTransactions: ITransaction[]) =>
-          oldTransactions.filter((t) => !ids.includes(t.id)),
-      );
-      return { previousTransactions };
-    },
-    onError: (error: AxiosError, _variables, context) => {
-      queryClient.setQueryData(
-        [transactionsQueryKey, { getHidden: false }],
-        context?.previousTransactions ?? [],
-      );
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [balancesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-    },
-    onSuccess: () => {
-      props.onClearSelection();
-      resetFields();
-    },
-  });
-
-  const allTransactions: ITransaction[] =
-    queryClient.getQueryData([transactionsQueryKey, { getHidden: false }]) ??
-    [];
-  const selectedTransactions = allTransactions.filter((t) =>
+  const selectedTransactions = (transactionsQuery.data ?? []).filter((t) =>
     props.selectedIds.has(t.id),
   );
   const singleSelected =
@@ -300,14 +192,24 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
           : t.subcategory,
       }),
     );
-    doBulkUpdate.mutate(requests);
+    updateTransactionsMutation.mutate(requests, {
+      onSuccess: () => {
+        props.onClearSelection();
+        resetFields();
+      },
+    });
   };
 
   const handleDeleteClick = () => {
     if (props.selectedIds.size > 1) {
       setShowDeleteConfirm(true);
     } else {
-      doBulkDelete.mutate(Array.from(props.selectedIds));
+      deleteTransactionsMutation.mutate(Array.from(props.selectedIds), {
+        onSuccess: () => {
+          props.onClearSelection();
+          resetFields();
+        },
+      });
     }
   };
 
@@ -337,7 +239,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     touched.has(FIELDS.amount) && typeof amountValue !== "number";
   const isApplyDisabled =
     touched.size === 0 || props.selectedIds.size === 0 || isAmountInvalid;
-  const isPending = doBulkUpdate.isPending || doBulkDelete.isPending;
 
   return (
     <Portal>
@@ -475,7 +376,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 <ActionIcon
                   color="var(--button-color-destructive)"
                   onClick={handleDeleteClick}
-                  loading={doBulkDelete.isPending}
+                  loading={deleteTransactionsMutation.isPending}
                   title={t("delete_transactions")}
                 >
                   <TrashIcon size="1rem" />
@@ -493,7 +394,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 <Button
                   size="compact-sm"
                   disabled={isApplyDisabled}
-                  loading={doBulkUpdate.isPending}
+                  loading={updateTransactionsMutation.isPending}
                   onClick={handleApply}
                 >
                   {t("apply_changes")}
@@ -512,9 +413,20 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 <Button
                   size="compact-sm"
                   color="var(--button-color-destructive)"
-                  loading={isPending}
+                  loading={
+                    updateTransactionsMutation.isPending ||
+                    deleteTransactionsMutation.isPending
+                  }
                   onClick={() => {
-                    doBulkDelete.mutate(Array.from(props.selectedIds));
+                    deleteTransactionsMutation.mutate(
+                      Array.from(props.selectedIds),
+                      {
+                        onSuccess: () => {
+                          props.onClearSelection();
+                          resetFields();
+                        },
+                      },
+                    );
                     setShowDeleteConfirm(false);
                   }}
                 >

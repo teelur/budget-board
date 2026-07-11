@@ -1,11 +1,7 @@
 import { Button, Stepper } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { FileDownIcon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , transactionsQueryKey} from "~/helpers/requests";
 import {
   IAccountNameToIDKeyValuePair,
   ITransactionImport,
@@ -20,12 +16,14 @@ import ImportCompleted from "./ImportCompleted/ImportCompleted";
 import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useImportTransactionsMutation } from "~/hooks/mutations/transactions/useImportTransactionsMutation";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [activeStep, setActiveStep] = React.useState(0);
 
   const { t } = useTranslation();
+  const importTransactionsMutation = useImportTransactionsMutation();
 
   // Load CSV Dialog Data
   const [headers, setHeaders] = React.useState<string[]>([]);
@@ -91,28 +89,6 @@ const ImportTransactionsModal = () => {
     setAccountNameToAccountIdMap(newMap);
   }, [importData]);
 
-  const { request } = useAuth();
-
-  const queryClient = useQueryClient();
-  const doImportMutation = useMutation({
-    mutationFn: async (importedTransactions: ITransactionImportRequest) =>
-      await request({
-        url: "/api/transaction/import",
-        method: "POST",
-        data: importedTransactions,
-      }),
-    onSuccess: async () => {
-      setActiveStep(3);
-      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
   const onSubmit = async (
     filteredImportedData: ITransactionImportTableData[],
   ) => {
@@ -140,7 +116,9 @@ const ImportTransactionsModal = () => {
       accountNameToIDMap: accountNameToAccountArray,
     };
 
-    doImportMutation.mutate(transactionImportRequest);
+    importTransactionsMutation.mutate(transactionImportRequest, {
+      onSuccess: () => setActiveStep(3),
+    });
   };
 
   const advanceToAccountMappingDialog = (
@@ -203,7 +181,7 @@ const ImportTransactionsModal = () => {
               setAccountNameToAccountIdMap={setAccountNameToAccountIdMap}
               goBackToPreviousDialog={() => setActiveStep(1)}
               submitImport={onSubmit}
-              isSubmitting={doImportMutation.isPending}
+              isSubmitting={importTransactionsMutation.isPending}
             />
           </Stepper.Step>
           <Stepper.Completed>

@@ -40,7 +40,12 @@ public class TransactionController(
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> Read(int? year, int? month, bool getHidden = false)
+    public async Task<IActionResult> Read(
+        int? year,
+        int? month,
+        bool includeHidden,
+        bool includeDeleted
+    )
     {
         return await HandleRequestAsync(async () =>
         {
@@ -52,7 +57,13 @@ public class TransactionController(
             }
 
             return Ok(
-                await transactionService.ReadTransactionsAsync(parsedUserId, year, month, getHidden)
+                await transactionService.ReadTransactionsAsync(
+                    parsedUserId,
+                    year,
+                    month,
+                    includeHidden,
+                    includeDeleted
+                )
             );
         });
     }

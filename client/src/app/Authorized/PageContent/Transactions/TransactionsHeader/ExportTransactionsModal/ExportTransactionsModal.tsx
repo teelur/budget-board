@@ -5,8 +5,6 @@ import { Button, Flex, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FileUpIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import Modal from "~/components/core/Modal/Modal";
 import FilterCard from "../FilterCard/FilterCard";
 import FieldSelectionCard from "./FieldSelectionCard/FieldSelectionCard";
@@ -14,12 +12,11 @@ import ColumnOrderCard from "./ColumnOrderCard/ColumnOrderCard";
 import useIsMobile from "~/hooks/useIsMobile";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { ITransaction, Filters } from "~/models/transaction";
 import { getFilteredTransactions } from "~/helpers/transactions";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { transactionsQueryKey } from "~/helpers/requests";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 const escapeCsvValue = (value: string): string =>
   `"${value.replace(/"/g, '""')}"`;
@@ -89,24 +86,8 @@ const ExportTransactionsModal = (): React.ReactNode => {
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const institutionsQuery = useInstitutionsQuery();
-  const { request } = useAuth();
   const isMobile = useIsMobile();
-
-  const transactionsQuery = useQuery({
-    queryKey: [transactionsQueryKey, { getHidden: false }],
-    queryFn: async (): Promise<ITransaction[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/transaction",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ITransaction[];
-      }
-
-      return [];
-    },
-  });
+  const transactionsQuery = useTransactionsQuery();
 
   const accountLookup = React.useMemo<Record<string, string>>(() => {
     if (!institutionsQuery.data) {

@@ -223,19 +223,6 @@ export const buildTimeToMonthlyTotalsMap = (
 };
 
 /**
- * Filters out transactions with the hiddenTransactionCategory.
- *
- * The function filters the transactions array, excluding those with the hiddenTransactionCategory.
- *
- * @param {ITransaction[]} transactions - Array of transaction objects.
- * @returns {ITransaction[]} The filtered array of transactions.
- */
-export const filterHiddenTransactions = (transactions: ITransaction[]) =>
-  getVisibleTransactions(transactions).filter(
-    (t) => !areStringsEqual(t.category ?? "", hiddenTransactionCategory),
-  );
-
-/**
  * Retrieves transactions for a specific month and year based on the provided date.
  *
  * The function filters the given transaction array, matching only those

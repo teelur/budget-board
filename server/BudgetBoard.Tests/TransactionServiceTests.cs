@@ -248,6 +248,7 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             null,
             null,
+            false,
             false
         );
 
@@ -292,6 +293,7 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             fakeDate.Year,
             null,
+            false,
             false
         );
 
@@ -342,6 +344,7 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             null,
             fakeDate.Month,
+            false,
             false
         );
 
@@ -379,7 +382,17 @@ public class TransactionServiceTests
 
         account.Transactions = transactions;
 
+        var secondAccount = accountFaker.Generate();
+        var transactionsForSecondAccount = transactionFaker.Generate(5);
+        transactionsForSecondAccount.ForEach(t =>
+            t.Category = TransactionCategoriesConstants.HideFromBudgetsCategory
+        );
+        transactionsForSecondAccount.ForEach(t => t.Subcategory = string.Empty);
+
+        secondAccount.Transactions = transactionsForSecondAccount;
+
         helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.Accounts.Add(secondAccount);
         helper.UserDataContext.SaveChanges();
 
         // Act
@@ -387,12 +400,19 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             null,
             null,
-            true
+            true,
+            false
         );
 
         // Assert
-        result.Should().HaveCount(5);
-        result.Should().BeEquivalentTo(transactions.Select(t => new TransactionResponse(t)));
+        result.Should().HaveCount(10);
+        result
+            .Should()
+            .BeEquivalentTo(
+                transactions
+                    .Select(t => new TransactionResponse(t))
+                    .Concat(transactionsForSecondAccount.Select(t => new TransactionResponse(t)))
+            );
     }
 
     [Fact]
@@ -419,7 +439,18 @@ public class TransactionServiceTests
         account.Transactions = transactions;
         account.HideTransactions = true;
 
+        var secondAccount = accountFaker.Generate();
+        var transactionsForSecondAccount = transactionFaker.Generate(5);
+        transactionsForSecondAccount.ForEach(t =>
+            t.Category = TransactionCategoriesConstants.HideFromBudgetsCategory
+        );
+        transactionsForSecondAccount.ForEach(t => t.Subcategory = string.Empty);
+
+        secondAccount.Transactions = transactionsForSecondAccount;
+        secondAccount.HideTransactions = false;
+
         helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.Accounts.Add(secondAccount);
         helper.UserDataContext.SaveChanges();
 
         // Act
@@ -427,45 +458,7 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             null,
             null,
-            false
-        );
-
-        // Assert
-        result.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task ReadTransactionsAsync_WhenAccountHasHideTransactions_ShouldNotReturnThoseTransactions()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var transactionService = new TransactionService(
-            Mock.Of<ILogger<ITransactionService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            Mock.Of<IAutomaticTransactionCategorizerService>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var accountFaker = new AccountFaker(helper.demoUser.Id);
-        var account = accountFaker.Generate();
-        account.HideTransactions = true;
-
-        var transactionFaker = new TransactionFaker([account.ID]);
-        var transactions = transactionFaker.Generate(5);
-
-        account.Transactions = transactions;
-
-        helper.UserDataContext.Accounts.Add(account);
-        helper.UserDataContext.SaveChanges();
-
-        // Act
-        var result = await transactionService.ReadTransactionsAsync(
-            helper.demoUser.Id,
-            null,
-            null,
+            false,
             false
         );
 

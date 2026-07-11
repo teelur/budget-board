@@ -82,14 +82,26 @@ public class TransactionService(
         Guid userGuid,
         int? year,
         int? month,
-        bool getHidden
+        bool includeHidden,
+        bool includeDeleted
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var transactions = userData
-            .Accounts.SelectMany(t => t.Transactions)
-            .Where(t => getHidden || t.Account!.HideTransactions is not true);
+        var transactions = userData.Accounts.SelectMany(t => t.Transactions);
+
+        if (!includeDeleted)
+        {
+            transactions = transactions.Where(t => t.Deleted == null);
+        }
+
+        if (!includeHidden)
+        {
+            transactions = transactions.Where(t =>
+                t.Account!.HideTransactions is false
+                && t.Category != TransactionCategoriesConstants.HideFromBudgetsCategory
+            );
+        }
 
         if (year != null)
         {

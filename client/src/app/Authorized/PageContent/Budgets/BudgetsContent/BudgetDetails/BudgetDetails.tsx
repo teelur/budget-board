@@ -1,15 +1,10 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { areStringsEqual } from "~/helpers/utils";
-import { ITransaction } from "~/models/transaction";
 import TransactionCards from "./TransactionCards/TransactionCards";
-import { filterHiddenTransactions } from "~/helpers/transactions";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Drawer from "~/components/core/Drawer/Drawer";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -18,8 +13,7 @@ import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { transactionsQueryKey } from "~/helpers/requests";
-
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -35,27 +29,9 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const { dayjs } = useLocale();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
-  const { request } = useAuth();
+  const transactionsQuery = useTransactionsQuery();
 
-  const transactionsQuery = useQuery({
-    queryKey: [transactionsQueryKey, { getHidden: false }],
-    queryFn: async (): Promise<ITransaction[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/transaction",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ITransaction[];
-      }
-
-      return [];
-    },
-  });
-
-  const transactionsForCategory = filterHiddenTransactions(
-    transactionsQuery.data ?? [],
-  )
+  const transactionsForCategory = (transactionsQuery.data ?? [])
     .filter((transaction) =>
       dayjs(transaction.date).isAfter(
         getDateFromMonthsAgo(
