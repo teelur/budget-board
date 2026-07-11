@@ -107,7 +107,7 @@ public class AutomaticRuleActionTests
         // Assert
         mock.Verify(
             ts =>
-                ts.DeleteTransactionBatchAsync(
+                ts.DeleteTransactionsAsync(
                     It.IsAny<Guid>(),
                     It.Is<IEnumerable<Guid>>(ids =>
                         ids.Contains(matching.ID)

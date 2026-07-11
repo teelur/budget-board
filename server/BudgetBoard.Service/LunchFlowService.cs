@@ -401,7 +401,7 @@ public class LunchFlowService(
                             Amount = transaction.Amount,
                             Date = DateOnly.Parse(transaction.Date),
                             MerchantName = transaction.Merchant,
-                            Source = TransactionSource.LunchFlow.Value,
+                            Source = TransactionSource.LunchFlow,
                         }
                     );
                 }

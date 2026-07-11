@@ -66,6 +66,64 @@ public class AutomaticTransactionCategorizerService(
         await userDataContext.SaveChangesAsync();
     }
 
+    public async Task AutoCategorizeTransactionAsync(Guid userGuid, Transaction transaction)
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+        var autoCategorizer =
+            await AutomaticTransactionCategorizerHelper.CreateAutoCategorizerAsync(
+                userDataContext,
+                userData
+            );
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+
+        if (
+            autoCategorizer is not null
+            && allCategories is not null
+            && transaction.MerchantName is not null
+            && transaction.MerchantName != string.Empty
+        )
+        {
+            var (PredictionCategory, PredictionProbability) = autoCategorizer.PredictCategory(
+                transaction
+            );
+
+            logger.LogInformation(
+                "{LogMessage}",
+                logLocalizer[
+                    "AutoCategorizerPredictionLog",
+                    PredictionCategory,
+                    PredictionProbability,
+                    transaction.MerchantName,
+                    transaction.Account?.Name ?? "Unknown Account",
+                    transaction.Amount
+                ]
+            );
+
+            if (
+                PredictionProbability
+                >= (userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70) / 100f
+            )
+            {
+                (transaction.Category, transaction.Subcategory) =
+                    TransactionCategoriesHelpers.GetFullCategory(PredictionCategory, allCategories);
+            }
+            else
+            {
+                logger.LogInformation(
+                    "{LogMessage}",
+                    logLocalizer[
+                        "AutoCategorizerPredictionBelowThresholdLog",
+                        PredictionCategory,
+                        PredictionProbability,
+                        userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70,
+                        transaction.MerchantName,
+                        transaction.Amount
+                    ]
+                );
+            }
+        }
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(

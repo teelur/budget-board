@@ -115,7 +115,7 @@ public class AccountService(
 
         if (deleteTransactions)
         {
-            await transactionService.DeleteTransactionBatchAsync(
+            await transactionService.DeleteTransactionsAsync(
                 userGuid,
                 account.Transactions.Select(t => t.ID),
                 true
@@ -172,7 +172,7 @@ public class AccountService(
 
         if (restoreTransactions)
         {
-            await transactionService.RestoreTransactionBatchAsync(
+            await transactionService.RestoreTransactionsAsync(
                 userGuid,
                 account.Transactions.Where(t => t.Deleted != null).Select(t => t.ID),
                 true

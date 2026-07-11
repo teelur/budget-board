@@ -65,12 +65,7 @@ public class DemoSeedServiceTests
         var mockTransactionService = new Mock<ITransactionService>();
         mockTransactionService
             .Setup(ts =>
-                ts.CreateTransactionAsync(
-                    It.IsAny<Guid>(),
-                    It.IsAny<ITransactionCreateRequest>(),
-                    It.IsAny<IEnumerable<ITransactionCategory>>(),
-                    It.IsAny<AutomaticTransactionCategorizerHelper>()
-                )
+                ts.CreateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionCreateRequest>())
             )
             .Returns(Task.CompletedTask);
 

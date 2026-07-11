@@ -12,29 +12,22 @@ public interface ITransactionService
     /// <summary>
     /// Creates a new transaction for the specified user.
     /// </summary>
-    /// <param name="userData">The user data.</param>
+    /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The transaction creation details.</param>
-    /// <param name="allCategories">List of allcategories for the user.</param>
-    /// <param name="autoCategorizer">The auto categorizer, if enabled and configured.</param>
-    Task CreateTransactionAsync(
-        ApplicationUser userData,
-        ITransactionCreateRequest request,
-        IEnumerable<ITransactionCategory>? allCategories = null,
-        AutomaticTransactionCategorizerHelper? autoCategorizer = null
-    );
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request);
 
     /// <summary>
     /// Creates a new transaction for the specified user.
     /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="userData">The user data.</param>
     /// <param name="request">The transaction creation details.</param>
-    /// <param name="allCategories">List of allcategories for the user.</param>
-    /// <param name="autoCategorizer">The auto categorizer, if enabled and configured.</param>
+    /// <param name="deferSave">Optional. If true, defers saving changes to the database.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     Task CreateTransactionAsync(
-        Guid userGuid,
+        ApplicationUser userData,
         ITransactionCreateRequest request,
-        IEnumerable<ITransactionCategory>? allCategories = null,
-        AutomaticTransactionCategorizerHelper? autoCategorizer = null
+        bool deferSave = false
     );
 
     /// <summary>
@@ -60,39 +53,24 @@ public interface ITransactionService
     Task UpdateTransactionsAsync(Guid userGuid, IEnumerable<ITransactionUpdateRequest> requests);
 
     /// <summary>
-    /// Deletes (soft deletes) a transaction.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="transactionID">The unique identifier of the transaction to delete.</param>
-    Task DeleteTransactionAsync(Guid userGuid, Guid transactionID);
-
-    /// <summary>
-    /// Deletes (soft deletes) multiple transactions in a single operation.
+    /// Deletes (soft deletes) transactions.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="transactionIDs">The collection of unique identifiers of the transactions to delete.</param>
-    /// <param name="deferSave">If true, defers saving changes to the database.</param>
-    Task DeleteTransactionBatchAsync(
+    /// <param name="deferSave">Optional. If true, defers saving changes to the database.</param>
+    Task DeleteTransactionsAsync(
         Guid userGuid,
         IEnumerable<Guid> transactionIDs,
         bool deferSave = false
     );
 
     /// <summary>
-    /// Restores a previously deleted transaction.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="transactionID">The unique identifier of the transaction to restore.</param>
-    Task RestoreTransactionAsync(Guid userGuid, Guid transactionID);
-
-    /// <summary>
-    /// Restores multiple previously deleted transactions in a single operation.
+    /// Restores previously deleted transactions.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="transactionIDs">The collection of unique identifiers of the transactions to restore.</param>
-    /// <param name="deferSave">If true, defers saving changes to the database.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task RestoreTransactionBatchAsync(
+    /// <param name="deferSave">Optional. If true, defers saving changes to the database.</param>
+    Task RestoreTransactionsAsync(
         Guid userGuid,
         IEnumerable<Guid> transactionIDs,
         bool deferSave = false

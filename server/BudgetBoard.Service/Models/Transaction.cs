@@ -1,30 +1,6 @@
-﻿using System.Text.Json.Serialization;
-using BudgetBoard.Database.Models;
+﻿using BudgetBoard.Database.Models;
 
 namespace BudgetBoard.Service.Models;
-
-public class TransactionSource
-{
-    public string Value { get; set; }
-
-    public static TransactionSource Manual
-    {
-        get { return new TransactionSource("Manual"); }
-    }
-    public static TransactionSource SimpleFin
-    {
-        get { return new TransactionSource("SimpleFin"); }
-    }
-    public static TransactionSource LunchFlow
-    {
-        get { return new TransactionSource("LunchFlow"); }
-    }
-
-    private TransactionSource(string value)
-    {
-        Value = value;
-    }
-}
 
 public interface ITransactionCreateRequest
 {
@@ -64,8 +40,8 @@ public interface ITransactionUpdateRequest
 public class TransactionUpdateRequest() : ITransactionUpdateRequest
 {
     public Guid ID { get; set; } = Guid.NewGuid();
-    public decimal? Amount { get; set; } = 0.0M;
-    public DateOnly? Date { get; set; } = DateOnly.MinValue;
+    public decimal? Amount { get; set; } = null;
+    public DateOnly? Date { get; set; } = null;
     public OptionalField<string?> Category { get; set; } = new OptionalField<string?>();
     public OptionalField<string?> Subcategory { get; set; } = new OptionalField<string?>();
     public OptionalField<string?> MerchantName { get; set; } = new OptionalField<string?>();

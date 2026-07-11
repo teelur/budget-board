@@ -24,7 +24,7 @@ internal static class AutomaticRuleActionHandler
             )
         )
         {
-            await transactionService.DeleteTransactionBatchAsync(
+            await transactionService.DeleteTransactionsAsync(
                 userGuid,
                 transactions.Select(t => t.ID)
             );

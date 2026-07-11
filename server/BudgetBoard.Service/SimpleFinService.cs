@@ -542,16 +542,6 @@ public class SimpleFinService(
         IEnumerable<ISimpleFinAccountData> accountsData
     )
     {
-        // Instantiate an autoCategorizer
-        var autoCategorizer =
-            await AutomaticTransactionCategorizerHelper.CreateAutoCategorizerAsync(
-                userDataContext,
-                userData
-            );
-
-        // Retrieve list of categories
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
-
         List<string> errors = [];
         foreach (var accountData in accountsData)
         {
@@ -598,9 +588,7 @@ public class SimpleFinService(
                 var transactionErrors = await SyncTransactionsAsync(
                     userData,
                     simpleFinAccount,
-                    accountData.Transactions,
-                    allCategories,
-                    autoCategorizer
+                    accountData.Transactions
                 );
                 errors.AddRange(transactionErrors);
 
@@ -633,9 +621,7 @@ public class SimpleFinService(
     private async Task<List<string>> SyncTransactionsAsync(
         ApplicationUser userData,
         SimpleFinAccount simpleFinAccount,
-        IEnumerable<ISimpleFinTransactionData> transactionsData,
-        IEnumerable<ITransactionCategory> allCategories,
-        AutomaticTransactionCategorizerHelper? autoCategorizer
+        IEnumerable<ISimpleFinTransactionData> transactionsData
     )
     {
         List<string> errors = [];
@@ -699,16 +685,11 @@ public class SimpleFinService(
                         : DateTime.UnixEpoch.AddSeconds(transactionData.Posted)
                 ),
                 MerchantName = transactionData.Description,
-                Source = TransactionSource.SimpleFin.Value,
+                Source = TransactionSource.SimpleFIN,
                 AccountID = userAccount.ID,
             };
 
-            await transactionService.CreateTransactionAsync(
-                userData,
-                newTransaction,
-                allCategories,
-                autoCategorizer
-            );
+            await transactionService.CreateTransactionAsync(userData, newTransaction);
         }
 
         return errors;

@@ -75,42 +75,15 @@ public class TransactionController(
         }
     }
 
-    [HttpGet("{guid}")]
-    [Authorize]
-    public async Task<IActionResult> Read(Guid guid)
-    {
-        try
-        {
-            return Ok(
-                await _transactionService.ReadTransactionsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    null,
-                    null,
-                    false,
-                    guid
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
-    }
-
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> Update([FromBody] TransactionUpdateRequest newTransaction)
     {
         try
         {
-            await _transactionService.UpdateTransactionAsync(
+            await _transactionService.UpdateTransactionsAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                newTransaction
+                [newTransaction]
             );
             return Ok();
         }
@@ -133,7 +106,7 @@ public class TransactionController(
     {
         try
         {
-            await _transactionService.UpdateTransactionBatchAsync(
+            await _transactionService.UpdateTransactionsAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
                 transactions
             );
@@ -156,9 +129,9 @@ public class TransactionController(
     {
         try
         {
-            await _transactionService.DeleteTransactionAsync(
+            await _transactionService.DeleteTransactionsAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
+                [guid]
             );
             return Ok();
         }
@@ -179,7 +152,7 @@ public class TransactionController(
     {
         try
         {
-            await _transactionService.DeleteTransactionBatchAsync(
+            await _transactionService.DeleteTransactionsAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
                 guids
             );
@@ -203,9 +176,9 @@ public class TransactionController(
     {
         try
         {
-            await _transactionService.RestoreTransactionAsync(
+            await _transactionService.RestoreTransactionsAsync(
                 new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
+                [guid]
             );
             return Ok();
         }
