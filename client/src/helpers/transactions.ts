@@ -2,7 +2,6 @@ import { Sorts } from "~/app/Authorized/PageContent/Transactions/TransactionsHea
 import { SortDirection } from "~/components/SortButton";
 import {
   Filters,
-  hiddenTransactionCategory,
   ITransaction,
   uncategorizedTransactionCategory,
 } from "~/models/transaction";

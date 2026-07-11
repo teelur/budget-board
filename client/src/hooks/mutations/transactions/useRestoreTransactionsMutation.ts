@@ -15,11 +15,11 @@ export const useRestoreTransactionMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (transactionIds: string[]) => {
       return await request({
         url: "/api/transaction/restore",
         method: "POST",
-        params: { transactionId: id },
+        params: { transactionIds },
       });
     },
     onSuccess: async () => {

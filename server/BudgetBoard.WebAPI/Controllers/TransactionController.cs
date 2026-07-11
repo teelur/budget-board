@@ -22,7 +22,7 @@ public class TransactionController(
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] TransactionCreateRequest transaction)
+    public async Task<IActionResult> Create([FromBody] TransactionCreateRequest newTransaction)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -33,7 +33,7 @@ public class TransactionController(
                 return Unauthorized();
             }
 
-            await transactionService.CreateTransactionAsync(parsedUserId, transaction);
+            await transactionService.CreateTransactionAsync(parsedUserId, newTransaction);
             return Ok();
         });
     }
@@ -71,7 +71,7 @@ public class TransactionController(
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> Update(
-        [FromBody] IEnumerable<TransactionUpdateRequest> newTransactions
+        [FromBody] IEnumerable<TransactionUpdateRequest> updatedTransactions
     )
     {
         return await HandleRequestAsync(async () =>
@@ -83,14 +83,14 @@ public class TransactionController(
                 return Unauthorized();
             }
 
-            await transactionService.UpdateTransactionsAsync(parsedUserId, newTransactions);
+            await transactionService.UpdateTransactionsAsync(parsedUserId, updatedTransactions);
             return Ok();
         });
     }
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(IEnumerable<Guid> guids)
+    public async Task<IActionResult> Delete(IEnumerable<Guid> transactionIds)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -101,7 +101,7 @@ public class TransactionController(
                 return Unauthorized();
             }
 
-            await transactionService.DeleteTransactionsAsync(parsedUserId, guids);
+            await transactionService.DeleteTransactionsAsync(parsedUserId, transactionIds);
             return Ok();
         });
     }
@@ -109,7 +109,7 @@ public class TransactionController(
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Restore(IEnumerable<Guid> guids)
+    public async Task<IActionResult> Restore(IEnumerable<Guid> transactionIds)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -120,7 +120,7 @@ public class TransactionController(
                 return Unauthorized();
             }
 
-            await transactionService.RestoreTransactionsAsync(parsedUserId, guids);
+            await transactionService.RestoreTransactionsAsync(parsedUserId, transactionIds);
             return Ok();
         });
     }
@@ -147,7 +147,9 @@ public class TransactionController(
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Import([FromBody] TransactionImportRequest importTransactions)
+    public async Task<IActionResult> Import(
+        [FromBody] TransactionImportRequest importedTransactions
+    )
     {
         return await HandleRequestAsync(async () =>
         {
@@ -158,7 +160,7 @@ public class TransactionController(
                 return Unauthorized();
             }
 
-            await transactionService.ImportTransactionsAsync(parsedUserId, importTransactions);
+            await transactionService.ImportTransactionsAsync(parsedUserId, importedTransactions);
             return Ok();
         });
     }

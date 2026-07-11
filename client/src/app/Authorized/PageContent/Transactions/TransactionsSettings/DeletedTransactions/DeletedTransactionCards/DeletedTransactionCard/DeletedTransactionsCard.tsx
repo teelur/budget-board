@@ -39,7 +39,7 @@ const DeletedTransactionsCard = (
           <ActionIcon
             h="100%"
             onClick={() =>
-              restoreTransactionMutation.mutate(props.deletedTransaction.id)
+              restoreTransactionMutation.mutate([props.deletedTransaction.id])
             }
           >
             <Undo2Icon size="1.2rem" />
