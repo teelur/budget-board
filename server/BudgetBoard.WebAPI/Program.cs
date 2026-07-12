@@ -184,11 +184,9 @@ var autoUpdateDb = builder.Configuration.GetValue<bool>("AUTO_UPDATE_DB");
 // Register the new provisioning service after Identity is configured
 builder.Services.AddScoped<IExternalUserProvisioningService, ExternalUserProvisioningService>();
 
-// Register OIDC token service if OIDC is enabled
-if (oidcEnabled)
-{
-    builder.Services.AddScoped<IOidcTokenService, OidcTokenService>();
-}
+// ApplicationUserController depends on this service even when OIDC is disabled.
+// OIDC settings are validated before the service exchanges a code.
+builder.Services.AddScoped<IOidcTokenService, OidcTokenService>();
 
 if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 {

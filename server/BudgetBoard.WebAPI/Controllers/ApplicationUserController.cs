@@ -90,6 +90,7 @@ public class ApplicationUserController(
     [HttpPost]
     [Route("[action]")]
     [Authorize]
+    [RequireOidcEnabled]
     public async Task<IActionResult> ConnectOidcLogin([FromBody] OidcCallbackRequest request)
     {
         try
@@ -169,6 +170,7 @@ public class ApplicationUserController(
     [HttpDelete]
     [Route("[action]")]
     [Authorize]
+    [RequireOidcEnabled]
     public async Task<IActionResult> DisconnectOidcLogin()
     {
         try
