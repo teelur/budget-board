@@ -20,10 +20,14 @@ public class TransactionService(
 ) : ITransactionService
 {
     /// <inheritdoc />
-    public async Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request)
+    public async Task CreateTransactionAsync(
+        Guid userGuid,
+        ITransactionCreateRequest request,
+        bool deferSave = false
+    )
     {
         var userData = await GetCurrentUserAsync(userGuid);
-        await CreateTransactionAsync(userData, request);
+        await CreateTransactionAsync(userData, request, deferSave);
     }
 
     /// <inheritdoc />
@@ -121,7 +125,8 @@ public class TransactionService(
     /// <inheritdoc />
     public async Task UpdateTransactionsAsync(
         Guid userGuid,
-        IEnumerable<ITransactionUpdateRequest> requests
+        IEnumerable<ITransactionUpdateRequest> requests,
+        bool deferSave = false
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
@@ -163,7 +168,10 @@ public class TransactionService(
             );
         }
 
-        await userDataContext.SaveChangesAsync();
+        if (!deferSave)
+        {
+            await userDataContext.SaveChangesAsync();
+        }
 
         void UpdateBalancesForEditedTransaction(
             Transaction transaction,
@@ -191,7 +199,8 @@ public class TransactionService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        foreach (var transactionId in transactionIds)
+        var uniqueTransactionIds = transactionIds.Distinct().ToList();
+        foreach (var transactionId in uniqueTransactionIds)
         {
             var transaction = GetTransactionByID(userData, transactionId);
 
@@ -220,7 +229,8 @@ public class TransactionService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        foreach (var transactionId in transactionIds)
+        var uniqueTransactionIds = transactionIds.Distinct().ToList();
+        foreach (var transactionId in uniqueTransactionIds)
         {
             var transaction = GetTransactionByID(userData, transactionId);
 
@@ -265,7 +275,8 @@ public class TransactionService(
                     ID = transaction.ID,
                     Amount = transaction.Amount - transactionSplitRequest.Amount,
                 },
-            }
+            },
+            true
         );
 
         await CreateTransactionAsync(
@@ -280,8 +291,11 @@ public class TransactionService(
                 MerchantName = transaction.MerchantName,
                 Source = transaction.Source,
                 AccountID = transaction.AccountID,
-            }
+            },
+            true
         );
+
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />

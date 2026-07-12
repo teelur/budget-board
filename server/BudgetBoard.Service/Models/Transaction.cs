@@ -23,7 +23,7 @@ public class TransactionCreateRequest : ITransactionCreateRequest
     public string? Subcategory { get; set; } = null;
     public string? MerchantName { get; set; } = null;
     public string? Source { get; set; } = null;
-    public Guid AccountID { get; set; } = Guid.NewGuid();
+    public Guid AccountID { get; set; } = Guid.Empty;
 }
 
 public interface ITransactionUpdateRequest
@@ -39,7 +39,7 @@ public interface ITransactionUpdateRequest
 
 public class TransactionUpdateRequest() : ITransactionUpdateRequest
 {
-    public Guid ID { get; set; } = Guid.NewGuid();
+    public Guid ID { get; set; } = Guid.Empty;
     public decimal? Amount { get; set; } = null;
     public DateOnly? Date { get; set; } = null;
     public OptionalField<string?> Category { get; set; } = new OptionalField<string?>();
@@ -70,7 +70,7 @@ public interface ITransactionSplitRequest
 
 public class TransactionSplitRequest : ITransactionSplitRequest
 {
-    public Guid ID { get; set; } = Guid.NewGuid();
+    public Guid ID { get; set; } = Guid.Empty;
     public decimal Amount { get; set; } = 0.0M;
     public string Category { get; set; } = string.Empty;
     public string Subcategory { get; set; } = string.Empty;
@@ -88,7 +88,7 @@ public class TransactionImport
 public class AccountNameToIDKeyValuePair
 {
     public string AccountName { get; set; } = string.Empty;
-    public Guid AccountID { get; set; } = Guid.NewGuid();
+    public Guid AccountID { get; set; } = Guid.Empty;
 }
 
 public interface ITransactionImportRequest
@@ -120,7 +120,7 @@ public interface ITransactionResponse
 
 public class TransactionResponse : ITransactionResponse
 {
-    public Guid ID { get; set; } = Guid.NewGuid();
+    public Guid ID { get; set; } = Guid.Empty;
     public string? SyncID { get; set; } = null;
     public decimal Amount { get; set; } = 0.0M;
     public DateOnly Date { get; set; } = DateOnly.MinValue;
@@ -130,7 +130,7 @@ public class TransactionResponse : ITransactionResponse
     public bool Pending { get; set; } = false;
     public DateTime? Deleted { get; set; } = null;
     public string Source { get; set; } = string.Empty;
-    public Guid AccountID { get; set; } = Guid.NewGuid();
+    public Guid AccountID { get; set; } = Guid.Empty;
 
     public TransactionResponse(Transaction transaction)
     {

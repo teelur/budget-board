@@ -23,7 +23,6 @@ const NetCashFlowTab = (): React.ReactNode => {
       year: dayjs(month).year(),
     })),
   });
-  ``;
 
   return (
     <Stack p={"0.5rem"}>

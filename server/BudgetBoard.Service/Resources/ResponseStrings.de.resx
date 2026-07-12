@@ -370,12 +370,6 @@
     <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
         <value>Die Erstellung der SimpleFIN-Organisation für das Konto {0} ist fehlgeschlagen.</value>
     </data>
-    <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
-        <value>Die Anfrage zur Massenlöschung enthält doppelte Transaktions-IDs.</value>
-    </data>
-    <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
-        <value>Die Anfrage zur Massenaktualisierung enthält doppelte Transaktions-IDs.</value>
-    </data>
     <data name="TransactionCategoryDuplicateNameError" xml:space="preserve">
         <value>A transaction category with this name already exists.</value>
     </data>
@@ -391,23 +385,11 @@
     <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
         <value>Transaction category cannot have the same name as its parent category.</value>
     </data>
-    <data name="TransactionDeleteNotFoundError" xml:space="preserve">
-        <value>Die Transaktion, die Sie löschen möchten, existiert nicht.</value>
-    </data>
-    <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
-        <value>Das Konto, zu dem Sie eine Transaktion hinzufügen möchten, existiert nicht.</value>
-    </data>
     <data name="TransactionNotFoundError" xml:space="preserve">
         <value>Die Transaktion, auf die Sie zugreifen möchten, existiert nicht.</value>
     </data>
-    <data name="TransactionRestoreNotFoundError" xml:space="preserve">
-        <value>Die Transaktion, die Sie wiederherstellen möchten, existiert nicht.</value>
-    </data>
     <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
         <value>Der geteilte Betrag muss geringer sein als der Transaktionsbetrag.</value>
-    </data>
-    <data name="TransactionSplitNotFoundError" xml:space="preserve">
-        <value>Die Transaktion, die Sie aufteilen möchten, existiert nicht.</value>
     </data>
     <data name="UserDataRetrievalError" xml:space="preserve">
         <value>Beim Abrufen der Benutzerdaten ist ein Fehler aufgetreten.</value>

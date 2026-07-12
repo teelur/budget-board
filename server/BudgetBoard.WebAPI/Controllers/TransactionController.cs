@@ -90,7 +90,7 @@ public class TransactionController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(IEnumerable<Guid> transactionIds)
+    public async Task<IActionResult> Delete([FromBody] IEnumerable<Guid> transactionIds)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -109,7 +109,7 @@ public class TransactionController(
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Restore(IEnumerable<Guid> transactionIds)
+    public async Task<IActionResult> Restore([FromBody] IEnumerable<Guid> transactionIds)
     {
         return await HandleRequestAsync(async () =>
         {

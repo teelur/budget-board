@@ -19,7 +19,7 @@ export const useRestoreTransactionMutation = () => {
       return await request({
         url: "/api/transaction/restore",
         method: "POST",
-        params: { transactionIds },
+        data: transactionIds,
       });
     },
     onSuccess: async () => {

@@ -14,8 +14,13 @@ public interface ITransactionService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The transaction creation details.</param>
+    /// <param name="deferSave">Optional. If true, defers saving changes to the database.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task CreateTransactionAsync(Guid userGuid, ITransactionCreateRequest request);
+    Task CreateTransactionAsync(
+        Guid userGuid,
+        ITransactionCreateRequest request,
+        bool deferSave = false
+    );
 
     /// <summary>
     /// Creates a new transaction for the specified user.
@@ -52,7 +57,12 @@ public interface ITransactionService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="requests">The list of transaction update details.</param>
-    Task UpdateTransactionsAsync(Guid userGuid, IEnumerable<ITransactionUpdateRequest> requests);
+    /// <param name="deferSave">Optional. If true, defers saving changes to the database.</param>
+    Task UpdateTransactionsAsync(
+        Guid userGuid,
+        IEnumerable<ITransactionUpdateRequest> requests,
+        bool deferSave = false
+    );
 
     /// <summary>
     /// Deletes (soft deletes) transactions.

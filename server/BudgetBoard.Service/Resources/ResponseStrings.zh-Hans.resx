@@ -370,29 +370,11 @@
   <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
         <value>Failed to create SimpleFIN organization for account {0}.</value>
   </data>
-  <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
-        <value>The batch delete request contains duplicate transaction IDs.</value>
-  </data>
-  <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
-        <value>The batch update request contains duplicate transaction IDs.</value>
-  </data>
-  <data name="TransactionDeleteNotFoundError" xml:space="preserve">
-        <value>您尝试删除的交易不存在。</value>
-  </data>
-  <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
-        <value>您尝试向其添加交易的账户不存在。</value>
-  </data>
   <data name="TransactionNotFoundError" xml:space="preserve">
         <value>您尝试访问的交易不存在。</value>
   </data>
-  <data name="TransactionRestoreNotFoundError" xml:space="preserve">
-        <value>您尝试恢复的交易不存在。</value>
-  </data>
   <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
         <value>拆分金额必须小于交易金额。</value>
-  </data>
-  <data name="TransactionSplitNotFoundError" xml:space="preserve">
-        <value>您尝试拆分的交易不存在。</value>
   </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
         <value>检索用户数据时发生错误。</value>
