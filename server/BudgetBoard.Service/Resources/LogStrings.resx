@@ -391,12 +391,6 @@
     <data name="SyncSimpleFinOrganizationCreationErrorLog" xml:space="preserve">
         <value>Failed to create SimpleFIN organization during sync for account {0}.</value>
     </data>
-    <data name="TransactionBatchDeleteDuplicateIdsLog" xml:space="preserve">
-        <value>Attempted a batch delete with duplicate transaction IDs.</value>
-    </data>
-    <data name="TransactionBatchUpdateDuplicateIdsLog" xml:space="preserve">
-        <value>Attempted a batch update with duplicate transaction IDs.</value>
-    </data>
     <data name="TransactionCategoryDuplicateNameLog" xml:space="preserve">
         <value>Attempted to save a transaction category with a duplicate name.</value>
     </data>
@@ -418,29 +412,14 @@
     <data name="TransactionCategoryUpdateEmptyNameLog" xml:space="preserve">
         <value>Attempted to update a transaction category with an empty name.</value>
     </data>
-    <data name="TransactionCreateAccountNotFoundLog" xml:space="preserve">
-        <value>Attempted to create a transaction for an account that does not exist.</value>
-    </data>
-    <data name="TransactionDeleteNotFoundLog" xml:space="preserve">
-        <value>Attempted to delete a transaction that does not exist.</value>
-    </data>
-    <data name="TransactionImportAccountNotFoundLog" xml:space="preserve">
-        <value>Attempted to import transactions for an account that does not exist.</value>
+    <data name="TransactionAccountNotFoundLog" xml:space="preserve">
+        <value>Attempted to process a transaction for an account that does not exist.</value>
     </data>
     <data name="TransactionNotFoundLog" xml:space="preserve">
         <value>Attempted to access a transaction that does not exist.</value>
     </data>
-    <data name="TransactionRestoreNotFoundLog" xml:space="preserve">
-        <value>Attempted to restore a transaction that does not exist.</value>
-    </data>
     <data name="TransactionSplitInvalidAmountLog" xml:space="preserve">
         <value>Attempt to split transaction with amount less than or equal to the split amount.</value>
-    </data>
-    <data name="TransactionSplitNotFoundLog" xml:space="preserve">
-        <value>Attempted to split a transaction that does not exist.</value>
-    </data>
-    <data name="TransactionUpdateNotFoundLog" xml:space="preserve">
-        <value>Attempted to update a transaction that does not exist.</value>
     </data>
     <data name="UserDataRetrievalErrorLog" xml:space="preserve">
         <value>An error occurred while retrieving the user data: {0}</value>

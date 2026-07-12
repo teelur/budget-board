@@ -1,14 +1,7 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import {
-  filterHiddenTransactions,
-  getRollingTotalSpendingForMonth,
-} from "~/helpers/transactions";
+import { getRollingTotalSpendingForMonth } from "~/helpers/transactions";
 import { Box, Group, Skeleton, Stack } from "@mantine/core";
-import { ITransaction } from "~/models/transaction";
-import { useQueries } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
@@ -19,46 +12,22 @@ import SplitCard, {
 import { LineChartIcon } from "lucide-react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 const SpendingTrendsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
-  const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
 
   const months = [
     dayjs().startOf("month").toDate(),
     dayjs().subtract(1, "month").startOf("month").toDate(),
   ];
-  const transactionsQueries = useQueries({
-    queries: months.map((date) => ({
-      queryKey: [
-        "transactions",
-        { month: date.getMonth(), year: date.getFullYear() },
-      ],
-      queryFn: async (): Promise<ITransaction[]> => {
-        const res: AxiosResponse = await request({
-          url: "/api/transaction",
-          method: "GET",
-          params: {
-            month: date.getMonth() + 1,
-            year: date.getFullYear(),
-          },
-        });
-
-        if (res.status === 200) {
-          return res.data as ITransaction[];
-        }
-
-        return [];
-      },
+  const transactionsQuery = useTransactionsQuery({
+    selectedDates: months.map((month) => ({
+      month: dayjs(month).month() + 1,
+      year: dayjs(month).year(),
     })),
-    combine: (results) => {
-      return {
-        data: results.map((result) => result.data ?? []).flat(),
-        isPending: results.some((result) => result.isPending),
-      };
-    },
   });
 
   const getSpendingComparison = (): number => {
@@ -69,18 +38,14 @@ const SpendingTrendsWidget = (): React.ReactNode => {
     const daysInLastMonth = dayjs(months[1]).daysInMonth();
 
     const thisMonthRollingTotal = getRollingTotalSpendingForMonth(
-      filterHiddenTransactions(
-        (transactionsQueries.data ?? []).filter(
-          (transaction) => dayjs(transaction.date).month() === thisMonthNum,
-        ),
+      (transactionsQuery.data ?? []).filter(
+        (transaction) => dayjs(transaction.date).month() === thisMonthNum,
       ),
       today,
     );
     const lastMonthRollingTotal = getRollingTotalSpendingForMonth(
-      filterHiddenTransactions(
-        (transactionsQueries.data ?? []).filter(
-          (transaction) => dayjs(transaction.date).month() === lastMonthNum,
-        ),
+      (transactionsQuery.data ?? []).filter(
+        (transaction) => dayjs(transaction.date).month() === lastMonthNum,
       ),
       daysInLastMonth,
     );
@@ -138,7 +103,7 @@ const SpendingTrendsWidget = (): React.ReactNode => {
       elevation={1}
     >
       <Stack gap={0} w="100%" p={"0.5rem"} style={{ flex: 1, minHeight: 0 }}>
-        {transactionsQueries.isPending ? (
+        {transactionsQuery.isPending ? (
           <Skeleton height="100%" radius="md" />
         ) : (
           <>
@@ -148,9 +113,7 @@ const SpendingTrendsWidget = (): React.ReactNode => {
             <Box style={{ flex: 1, minHeight: 0 }}>
               <SpendingChart
                 months={months}
-                transactions={filterHiddenTransactions(
-                  transactionsQueries.data ?? [],
-                )}
+                transactions={transactionsQuery.data ?? []}
                 includeYAxis={false}
               />
             </Box>

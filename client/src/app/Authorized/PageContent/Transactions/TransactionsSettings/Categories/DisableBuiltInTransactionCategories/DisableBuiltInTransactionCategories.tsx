@@ -1,11 +1,10 @@
 import { Button, Skeleton, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   transactionCategoriesQueryKey,
-  transactionsQueryKey,
   translateAxiosError,
   userSettingsQueryKey,
 } from "~/helpers/requests";
@@ -16,8 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { defaultGuid } from "~/models/applicationUser";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { ITransaction } from "~/models/transaction";
-import { AxiosResponse } from "axios";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -25,22 +23,7 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   const { allTransactionCategories, customTransactionCategories } =
     useTransactionCategories();
   const { disableBuiltInTransactionCategories } = useUserSettings();
-
-  const transactionsQuery = useQuery({
-    queryKey: [transactionsQueryKey, { getHidden: false }],
-    queryFn: async (): Promise<ITransaction[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/transaction",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ITransaction[];
-      }
-
-      return [];
-    },
-  });
+  const transactionsQuery = useTransactionsQuery();
 
   const queryClient = useQueryClient();
   const doUpdateUserSettings = useMutation({

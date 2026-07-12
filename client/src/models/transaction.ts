@@ -34,11 +34,11 @@ export interface ITransactionCreateRequest {
 
 export interface ITransactionUpdateRequest {
   id: string;
-  amount: number;
-  date: string;
-  category: string | null;
-  subcategory: string | null;
-  merchantName: string | null;
+  amount?: number;
+  date?: string;
+  category?: string | null;
+  subcategory?: string | null;
+  merchantName?: string | null;
 }
 
 export interface ITransactionSplitRequest {

@@ -18,206 +18,111 @@ public class TransactionController(
     ITransactionService transactionService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<TransactionController>(logger, logLocalizer, responseLocalizer)
 {
-    private readonly ILogger<TransactionController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly ITransactionService _transactionService = transactionService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] TransactionCreateRequest transaction)
+    public async Task<IActionResult> Create([FromBody] TransactionCreateRequest newTransaction)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _transactionService.CreateTransactionAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                transaction
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await transactionService.CreateTransactionAsync(parsedUserId, newTransaction);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> Read(int? year, int? month, bool getHidden = false)
+    public async Task<IActionResult> Read(
+        int? year,
+        int? month,
+        bool includeHidden,
+        bool includeDeleted
+    )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             return Ok(
-                await _transactionService.ReadTransactionsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
+                await transactionService.ReadTransactionsAsync(
+                    parsedUserId,
                     year,
                     month,
-                    getHidden
+                    includeHidden,
+                    includeDeleted
                 )
             );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
-    }
-
-    [HttpGet("{guid}")]
-    [Authorize]
-    public async Task<IActionResult> Read(Guid guid)
-    {
-        try
-        {
-            return Ok(
-                await _transactionService.ReadTransactionsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                    null,
-                    null,
-                    false,
-                    guid
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] TransactionUpdateRequest newTransaction)
-    {
-        try
-        {
-            await _transactionService.UpdateTransactionAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                newTransaction
-            );
-            return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
-    }
-
-    [HttpPut("batch")]
-    [Authorize]
-    public async Task<IActionResult> UpdateBatch(
-        [FromBody] IEnumerable<TransactionUpdateRequest> transactions
+    public async Task<IActionResult> Update(
+        [FromBody] IEnumerable<TransactionUpdateRequest> updatedTransactions
     )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _transactionService.UpdateTransactionBatchAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                transactions
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await transactionService.UpdateTransactionsAsync(parsedUserId, updatedTransactions);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid guid)
+    public async Task<IActionResult> Delete([FromBody] IEnumerable<Guid> transactionIds)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _transactionService.DeleteTransactionAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
-            return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
-    }
+            var userId = userManager.GetUserId(User);
 
-    [HttpDelete("batch")]
-    [Authorize]
-    public async Task<IActionResult> DeleteBatch([FromBody] IEnumerable<Guid> guids)
-    {
-        try
-        {
-            await _transactionService.DeleteTransactionBatchAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guids
-            );
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await transactionService.DeleteTransactionsAsync(parsedUserId, transactionIds);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Restore(Guid guid)
+    public async Task<IActionResult> Restore([FromBody] IEnumerable<Guid> transactionIds)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _transactionService.RestoreTransactionAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                guid
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await transactionService.RestoreTransactionsAsync(parsedUserId, transactionIds);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
@@ -225,46 +130,38 @@ public class TransactionController(
     [Route("[action]")]
     public async Task<IActionResult> Split([FromBody] TransactionSplitRequest splitTransaction)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _transactionService.SplitTransactionAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                splitTransaction
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await transactionService.SplitTransactionAsync(parsedUserId, splitTransaction);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Import([FromBody] TransactionImportRequest importTransaction)
+    public async Task<IActionResult> Import(
+        [FromBody] TransactionImportRequest importedTransactions
+    )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _transactionService.ImportTransactionsAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
-                importTransaction
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await transactionService.ImportTransactionsAsync(parsedUserId, importedTransactions);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

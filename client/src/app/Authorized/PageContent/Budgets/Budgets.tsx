@@ -1,24 +1,17 @@
 import { Stack } from "@mantine/core";
 import React from "react";
 import BudgetsToolbar from "./BudgetsToolbar/BudgetsToolbar";
-import {
-  buildTimeToMonthlyTotalsMap,
-  filterHiddenTransactions,
-} from "~/helpers/transactions";
-import { useQueries } from "@tanstack/react-query";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { AxiosResponse } from "axios";
-import { ITransaction } from "~/models/transaction";
+import { buildTimeToMonthlyTotalsMap } from "~/helpers/transactions";
 import BudgetsContent from "./BudgetsContent/BudgetsContent";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 const Budgets = (): React.ReactNode => {
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const { dayjs } = useLocale();
-  const { request } = useAuth();
 
   const [selectedDates, setSelectedDates] = React.useState<Date[]>([
     dayjs().startOf("month").toDate(),
@@ -29,42 +22,17 @@ const Budgets = (): React.ReactNode => {
     enabled: selectedDates.length > 0,
   });
 
-  const transactionsForMonthsQuery = useQueries({
-    queries: selectedDates.map((date: Date) => ({
-      queryKey: [
-        "transactions",
-        { month: date.getMonth(), year: date.getUTCFullYear() },
-      ],
-      queryFn: async (): Promise<ITransaction[]> => {
-        const res: AxiosResponse = await request({
-          url: "/api/transaction",
-          method: "GET",
-          params: { month: date.getMonth() + 1, year: date.getFullYear() },
-        });
-
-        if (res.status === 200) {
-          return res.data as ITransaction[];
-        }
-
-        return [];
-      },
+  const transactionsQuery = useTransactionsQuery({
+    selectedDates: selectedDates.map((month) => ({
+      month: dayjs(month).month() + 1,
+      year: dayjs(month).year(),
     })),
-    combine: (results) => {
-      return {
-        data: results.map((result) => result.data ?? []).flat(1),
-        isPending: results.some((result) => result.isPending),
-      };
-    },
   });
 
-  // We need to filter out the transactions labelled with 'Hide From Budgets'
-  const transactionsWithoutHidden = filterHiddenTransactions(
-    transactionsForMonthsQuery.data ?? [],
-  );
-
   const timeToMonthlyTotalsMap: Map<number, number> = React.useMemo(
-    () => buildTimeToMonthlyTotalsMap(selectedDates, transactionsWithoutHidden),
-    [selectedDates, transactionsWithoutHidden],
+    () =>
+      buildTimeToMonthlyTotalsMap(selectedDates, transactionsQuery.data ?? []),
+    [selectedDates, transactionsQuery.data],
   );
 
   return (
@@ -84,7 +52,7 @@ const Budgets = (): React.ReactNode => {
       <BudgetsContent
         budgets={budgetsQuery.data ?? []}
         categories={transactionCategories}
-        transactions={transactionsWithoutHidden}
+        transactions={transactionsQuery.data ?? []}
         selectedDate={
           selectedDates.length === 1 ? (selectedDates[0] ?? null) : null
         }

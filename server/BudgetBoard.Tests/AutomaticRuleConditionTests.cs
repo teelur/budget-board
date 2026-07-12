@@ -93,17 +93,17 @@ public class AutomaticRuleConditionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == first.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == first.ID)
                 ),
             expectFirstUpdate ? Times.Once() : Times.Never()
         );
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == second.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == second.ID)
                 ),
             expectSecondUpdate ? Times.Once() : Times.Never()
         );
@@ -235,17 +235,17 @@ public class AutomaticRuleConditionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == matching.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == matching.ID)
                 ),
             Times.Once
         );
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == other.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == other.ID)
                 ),
             Times.Never
         );
@@ -291,17 +291,17 @@ public class AutomaticRuleConditionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == matching.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == matching.ID)
                 ),
             Times.Once
         );
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == other.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == other.ID)
                 ),
             Times.Never
         );
@@ -347,17 +347,17 @@ public class AutomaticRuleConditionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == included.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == included.ID)
                 ),
             Times.Once
         );
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == excluded.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == excluded.ID)
                 ),
             Times.Never
         );
@@ -403,17 +403,17 @@ public class AutomaticRuleConditionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == included.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == included.ID)
                 ),
             Times.Once
         );
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == excluded.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == excluded.ID)
                 ),
             Times.Never
         );
@@ -523,17 +523,17 @@ public class AutomaticRuleConditionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == first.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == first.ID)
                 ),
             expectFirstUpdate ? Times.Once() : Times.Never()
         );
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == second.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == second.ID)
                 ),
             expectSecondUpdate ? Times.Once() : Times.Never()
         );
@@ -642,17 +642,17 @@ public class AutomaticRuleConditionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == first.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == first.ID)
                 ),
             expectFirstUpdate ? Times.Once() : Times.Never()
         );
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == second.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r => r.First().ID == second.ID)
                 ),
             expectSecondUpdate ? Times.Once() : Times.Never()
         );
@@ -745,7 +745,10 @@ public class AutomaticRuleConditionTests
         var transactionServiceMock = new Mock<ITransactionService>();
         transactionServiceMock
             .Setup(ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>())
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                )
             )
             .Returns(Task.CompletedTask);
 
@@ -794,17 +797,21 @@ public class AutomaticRuleConditionTests
         // Assert
         transactionServiceMock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == transactionA.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transactionA.ID
+                    )
                 ),
             Times.Once
         );
         transactionServiceMock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == transactionB.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transactionB.ID
+                    )
                 ),
             Times.Once
         );
@@ -819,7 +826,10 @@ public class AutomaticRuleConditionTests
         var transactionServiceMock = new Mock<ITransactionService>();
         transactionServiceMock
             .Setup(ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>())
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                )
             )
             .Returns(Task.CompletedTask);
 
@@ -870,18 +880,20 @@ public class AutomaticRuleConditionTests
         // Assert
         transactionServiceMock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r => r.ID == transactionC.ID)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transactionC.ID
+                    )
                 ),
             Times.Once
         );
         transactionServiceMock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r =>
-                        r.ID == transactionA.ID || r.ID == transactionB.ID
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transactionA.ID || r.First().ID == transactionB.ID
                     )
                 ),
             Times.Never

@@ -6,16 +6,14 @@ import {
   Popover as MantinePopover,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { SplitIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { translateAxiosError , transactionsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { ICategory } from "~/models/category";
-import { ITransactionSplitRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -23,6 +21,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useSplitTransactionMutation } from "~/hooks/mutations/transactions/useSplitTransactionMutation";
 
 interface SplitTransactionProps {
   id: string;
@@ -43,6 +42,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
   const { t } = useTranslation();
   const { thousandsSeparator, decimalSeparator } = useLocale();
   const { request } = useAuth();
+  const splitTransactionMutation = useSplitTransactionMutation();
 
   const userSettingsQuery = useQuery({
     queryKey: [userSettingsQueryKey],
@@ -57,29 +57,6 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
       }
 
       return undefined;
-    },
-  });
-
-  const queryClient = useQueryClient();
-  const doSplitTransaction = useMutation({
-    mutationFn: async (splitTransaction: ITransactionSplitRequest) =>
-      await request({
-        url: "/api/transaction/split",
-        method: "POST",
-        data: splitTransaction,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-      notifications.show({
-        message: t("transaction_split_successfully"),
-        color: "var(--button-color-confirm)",
-      });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
     },
   });
 
@@ -110,9 +87,9 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
           />
           <Button
             size="compact-sm"
-            loading={doSplitTransaction.isPending}
+            loading={splitTransactionMutation.isPending}
             onClick={() => {
-              doSplitTransaction.mutate({
+              splitTransactionMutation.mutate({
                 id: props.id,
                 amount:
                   amountField.getValue() === ""

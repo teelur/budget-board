@@ -1,15 +1,14 @@
 import { ActionIcon, Button, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { translateAxiosError , accountsQueryKey, balancesQueryKey, institutionsQueryKey, transactionsQueryKey, userSettingsQueryKey} from "~/helpers/requests";
+import { userSettingsQueryKey } from "~/helpers/requests";
 import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { IUserSettings } from "~/models/userSettings";
@@ -24,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useCreateTransactionMutation } from "~/hooks/mutations/transactions/useCreateTransactionMutation";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -39,6 +39,7 @@ const CreateTransactionModal = (): React.ReactNode => {
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const { request } = useAuth();
+  const createTransactionMutation = useCreateTransactionMutation();
 
   const dateField = useField<Date | null>({
     initialValue: dayjs().toDate(),
@@ -75,28 +76,6 @@ const CreateTransactionModal = (): React.ReactNode => {
     },
   });
 
-  const queryClient = useQueryClient();
-  const doCreateTransaction = useMutation({
-    mutationFn: async (newTransaction: ITransactionCreateRequest) =>
-      await request({
-        url: "/api/transaction",
-        method: "POST",
-        data: newTransaction,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [balancesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
-  });
-
   const onSubmit = () => {
     dateField.validate();
     accountIdsField.validate();
@@ -109,7 +88,7 @@ const CreateTransactionModal = (): React.ReactNode => {
       return;
     }
 
-    doCreateTransaction.mutate({
+    createTransactionMutation.mutate({
       date: dayjs(dateField.getValue()!).format("YYYY-MM-DD"),
       merchantName: merchantNameField.getValue(),
       category: getParentCategory(
@@ -183,7 +162,7 @@ const CreateTransactionModal = (): React.ReactNode => {
           <Button
             mt="0.25rem"
             onClick={onSubmit}
-            loading={doCreateTransaction.isPending}
+            loading={createTransactionMutation.isPending}
           >
             {t("submit")}
           </Button>

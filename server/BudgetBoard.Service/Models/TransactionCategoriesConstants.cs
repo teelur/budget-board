@@ -2,12 +2,14 @@
 
 public static class TransactionCategoriesConstants
 {
+    public const string HideFromBudgetsCategory = "Hide from Budgets";
+
     public static readonly IReadOnlyCollection<ITransactionCategory> SpecialTransactionCategories =
         new List<ITransactionCategory>(
             [
                 new TransactionCategoryBase
                 {
-                    Value = "Hide from Budgets",
+                    Value = HideFromBudgetsCategory,
                     Parent = "",
                     CategoryType = TransactionCategoryTypes.Expense,
                 },

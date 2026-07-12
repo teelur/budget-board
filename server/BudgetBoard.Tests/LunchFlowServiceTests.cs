@@ -996,7 +996,7 @@ public class LunchFlowServiceTests
             Amount = -50.25m,
             Date = DateOnly.Parse("2024-01-15"),
             MerchantName = "Test Store",
-            Source = TransactionSource.LunchFlow.Value,
+            Source = TransactionSource.LunchFlow,
         };
         helper.UserDataContext.Transactions.Add(existingTransaction);
 

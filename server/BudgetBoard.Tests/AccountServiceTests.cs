@@ -613,8 +613,7 @@ public class AccountServiceTests()
             .demoUser.Accounts.Single(a => a.ID == account.ID)
             .Transactions.Single(t => t.ID == transaction.ID);
         transactionServiceMock.Verify(
-            ts =>
-                ts.DeleteTransactionBatchAsync(helper.demoUser.Id, new[] { transaction.ID }, true),
+            ts => ts.DeleteTransactionsAsync(helper.demoUser.Id, new[] { transaction.ID }, true),
             Times.Once
         );
     }
@@ -902,8 +901,7 @@ public class AccountServiceTests()
         // Assert
         helper.demoUser.Accounts.Single(a => a.ID == account.ID).Deleted.Should().BeNull();
         transactionServiceMock.Verify(
-            ts =>
-                ts.RestoreTransactionBatchAsync(helper.demoUser.Id, new[] { transaction.ID }, true),
+            ts => ts.RestoreTransactionsAsync(helper.demoUser.Id, new[] { transaction.ID }, true),
             Times.Once
         );
     }

@@ -25,7 +25,10 @@ internal class AutomaticRuleTestHelpers
     {
         var mock = new Mock<ITransactionService>();
         mock.Setup(ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>())
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                )
             )
             .Returns(Task.CompletedTask);
         return mock;
@@ -34,7 +37,9 @@ internal class AutomaticRuleTestHelpers
     internal static Mock<ITransactionService> DeleteMock()
     {
         var mock = new Mock<ITransactionService>();
-        mock.Setup(ts => ts.DeleteTransactionAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+        mock.Setup(ts =>
+                ts.DeleteTransactionsAsync(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>())
+            )
             .Returns(Task.CompletedTask);
         return mock;
     }

@@ -1,12 +1,9 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   getTransactionsByCategory,
   getVisibleTransactions,
 } from "~/helpers/transactions";
 import { Group, Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
@@ -19,8 +16,7 @@ import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { transactionsQueryKey } from "~/helpers/requests";
-
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const itemsPerPage = 15;
@@ -30,24 +26,8 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
-  const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
-
-  const transactionsQuery = useQuery({
-    queryKey: [transactionsQueryKey, { getHidden: false }],
-    queryFn: async (): Promise<ITransaction[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/transaction",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ITransaction[];
-      }
-
-      return [];
-    },
-  });
+  const transactionsQuery = useTransactionsQuery();
 
   const sortedFilteredTransactions = React.useMemo(
     () =>

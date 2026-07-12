@@ -370,12 +370,6 @@
     <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
         <value>Échec de la création de l’organisation SimpleFIN pour le compte {0}.</value>
     </data>
-    <data name="TransactionBatchDeleteDuplicateIdsError" xml:space="preserve">
-        <value>The batch delete request contains duplicate transaction IDs.</value>
-    </data>
-    <data name="TransactionBatchUpdateDuplicateIdsError" xml:space="preserve">
-        <value>The batch update request contains duplicate transaction IDs.</value>
-    </data>
     <data name="TransactionCategoryDuplicateNameError" xml:space="preserve">
         <value>A transaction category with this name already exists.</value>
     </data>
@@ -391,29 +385,11 @@
     <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
         <value>Transaction category cannot have the same name as its parent category.</value>
     </data>
-    <data name="TransactionCreateAccountNotFoundError" xml:space="preserve">
-        <value>Le compte auquel vous essayez d’ajouter une transaction n’existe pas.</value>
-    </data>
-    <data name="TransactionDeleteNotFoundError" xml:space="preserve">
-        <value>La transaction que vous essayez de supprimer n’existe pas.</value>
-    </data>
-    <data name="TransactionImportAccountNotFoundError" xml:space="preserve">
-        <value>Le compte auquel vous essayez d’ajouter une transaction n’existe pas.</value>
-    </data>
     <data name="TransactionNotFoundError" xml:space="preserve">
         <value>La transaction à laquelle vous essayez d’accéder n’existe pas.</value>
     </data>
-    <data name="TransactionRestoreNotFoundError" xml:space="preserve">
-        <value>La transaction que vous essayez de restaurer n’existe pas.</value>
-    </data>
     <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
         <value>Le montant fractionné doit être inférieur au montant de la transaction.</value>
-    </data>
-    <data name="TransactionSplitNotFoundError" xml:space="preserve">
-        <value>La transaction que vous essayez de fractionner n’existe pas.</value>
-    </data>
-    <data name="TransactionUpdateNotFoundError" xml:space="preserve">
-        <value>La transaction que vous essayez de mettre à jour n’existe pas.</value>
     </data>
     <data name="UserDataRetrievalError" xml:space="preserve">
         <value>Une erreur s’est produite lors de la récupération des données utilisateur.</value>

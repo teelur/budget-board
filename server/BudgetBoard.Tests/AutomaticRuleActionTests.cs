@@ -50,7 +50,10 @@ public class AutomaticRuleActionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>()),
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                ),
             Times.Never
         );
     }
@@ -104,7 +107,7 @@ public class AutomaticRuleActionTests
         // Assert
         mock.Verify(
             ts =>
-                ts.DeleteTransactionBatchAsync(
+                ts.DeleteTransactionsAsync(
                     It.IsAny<Guid>(),
                     It.Is<IEnumerable<Guid>>(ids =>
                         ids.Contains(matching.ID)
@@ -162,10 +165,10 @@ public class AutomaticRuleActionTests
         // Assert
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r =>
-                        r.ID == transaction.ID && r.MerchantName == "New Name"
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID && r.First().MerchantName.Value == "New Name"
                     )
                 ),
             Times.Once
@@ -216,12 +219,12 @@ public class AutomaticRuleActionTests
         // Assert
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r =>
-                        r.ID == transaction.ID
-                        && r.Category == "Auto & Transport"
-                        && r.Subcategory == string.Empty
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID
+                        && r.First().Category.Value == "Auto & Transport"
+                        && r.First().Subcategory.Value == string.Empty
                     )
                 ),
             Times.Once
@@ -272,12 +275,12 @@ public class AutomaticRuleActionTests
         // Assert
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r =>
-                        r.ID == transaction.ID
-                        && r.Category == "Auto & Transport"
-                        && r.Subcategory == "Auto Insurance"
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID
+                        && r.First().Category.Value == "Auto & Transport"
+                        && r.First().Subcategory.Value == "Auto Insurance"
                     )
                 ),
             Times.Once
@@ -325,7 +328,12 @@ public class AutomaticRuleActionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>()),
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID
+                    )
+                ),
             Times.Never
         );
     }
@@ -371,10 +379,10 @@ public class AutomaticRuleActionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r =>
-                        r.ID == transaction.ID && r.Amount == 150.50m
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID && r.First().Amount == 150.50m
                     )
                 ),
             Times.Once
@@ -422,7 +430,12 @@ public class AutomaticRuleActionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>()),
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID
+                    )
+                ),
             Times.Never
         );
     }
@@ -468,10 +481,11 @@ public class AutomaticRuleActionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(
+                ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
-                    It.Is<ITransactionUpdateRequest>(r =>
-                        r.ID == transaction.ID && r.Date == new DateOnly(2024, 6, 15)
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID
+                        && r.First().Date == new DateOnly(2024, 6, 15)
                     )
                 ),
             Times.Once
@@ -519,7 +533,12 @@ public class AutomaticRuleActionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>()),
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID
+                    )
+                ),
             Times.Never
         );
     }
@@ -565,7 +584,12 @@ public class AutomaticRuleActionTests
 
         mock.Verify(
             ts =>
-                ts.UpdateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionUpdateRequest>()),
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
+                        r.First().ID == transaction.ID
+                    )
+                ),
             Times.Never
         );
     }

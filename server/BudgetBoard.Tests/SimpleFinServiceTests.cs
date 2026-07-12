@@ -1253,13 +1253,7 @@ public class SimpleFinServiceTests
         // Assert
         errors.Should().BeEmpty();
         transactionServiceMock.Verify(
-            s =>
-                s.CreateTransactionAsync(
-                    helper.demoUser,
-                    It.IsAny<ITransactionCreateRequest>(),
-                    It.IsAny<IEnumerable<ITransactionCategory>>(),
-                    null
-                ),
+            s => s.CreateTransactionAsync(helper.demoUser, It.IsAny<ITransactionCreateRequest>()),
             Times.Once
         );
         balanceServiceMock.Verify(
@@ -1430,9 +1424,7 @@ public class SimpleFinServiceTests
             s =>
                 s.CreateTransactionAsync(
                     It.IsAny<ApplicationUser>(),
-                    It.IsAny<ITransactionCreateRequest>(),
-                    null,
-                    null
+                    It.IsAny<ITransactionCreateRequest>()
                 ),
             Times.Never
         );
@@ -1549,9 +1541,7 @@ public class SimpleFinServiceTests
             s =>
                 s.CreateTransactionAsync(
                     It.IsAny<ApplicationUser>(),
-                    It.IsAny<ITransactionCreateRequest>(),
-                    null,
-                    null
+                    It.IsAny<ITransactionCreateRequest>()
                 ),
             Times.Never
         );
@@ -1772,9 +1762,7 @@ public class SimpleFinServiceTests
             s =>
                 s.CreateTransactionAsync(
                     It.Is<ApplicationUser>(u => u.Id == helper.demoUser.Id),
-                    It.IsAny<ITransactionCreateRequest>(),
-                    It.IsAny<IEnumerable<ITransactionCategory>>(),
-                    It.IsAny<AutomaticTransactionCategorizerHelper>()
+                    It.IsAny<ITransactionCreateRequest>()
                 ),
             Times.Exactly(2)
         );
@@ -1949,9 +1937,7 @@ public class SimpleFinServiceTests
             s =>
                 s.CreateTransactionAsync(
                     It.Is<ApplicationUser>(u => u.Id == helper.demoUser.Id),
-                    It.IsAny<ITransactionCreateRequest>(),
-                    It.IsAny<IEnumerable<ITransactionCategory>>(),
-                    It.IsAny<AutomaticTransactionCategorizerHelper>()
+                    It.IsAny<ITransactionCreateRequest>()
                 ),
             Times.Once
         );
