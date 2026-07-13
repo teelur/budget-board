@@ -1,424 +1,427 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-        <xsd:element name="root" msdata:IsDataSet="true">
-            <xsd:complexType>
-                <xsd:choice maxOccurs="unbounded">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
                     <xsd:element name="metadata">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" />
                             </xsd:sequence>
-                            <xsd:attribute name="name" use="required" type="xsd:string"/>
-                            <xsd:attribute name="type" type="xsd:string"/>
-                            <xsd:attribute name="mimetype" type="xsd:string"/>
-                            <xsd:attribute ref="xml:space"/>
+                            <xsd:attribute name="name" use="required" type="xsd:string" />
+                            <xsd:attribute name="type" type="xsd:string" />
+                            <xsd:attribute name="mimetype" type="xsd:string" />
+                            <xsd:attribute ref="xml:space" />
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="assembly">
                         <xsd:complexType>
-                            <xsd:attribute name="alias" type="xsd:string"/>
-                            <xsd:attribute name="name" type="xsd:string"/>
+                            <xsd:attribute name="alias" type="xsd:string" />
+                            <xsd:attribute name="name" type="xsd:string" />
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="data">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
-                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
                             </xsd:sequence>
-                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
-                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
-                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
-                            <xsd:attribute ref="xml:space"/>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+                            <xsd:attribute ref="xml:space" />
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="resheader">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                             </xsd:sequence>
-                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                            <xsd:attribute name="name" type="xsd:string" use="required" />
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:choice>
-            </xsd:complexType>
-        </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>2.0</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="AccountNotFoundError" xml:space="preserve">
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountNotFoundError" xml:space="preserve">
         <value>Le compte auquel vous tentez d’accéder n’existe pas.</value>
-    </data>
-    <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
+  </data>
+  <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
         <value>Le compte doit être supprimé avant de pouvoir être supprimé définitivement.</value>
-    </data>
-    <data name="AccountTypeDuplicateNameError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeDuplicateNameError" xml:space="preserve">
         <value>An account type with this name already exists.</value>
-    </data>
-    <data name="AccountTypeEmptyNameError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeEmptyNameError" xml:space="preserve">
         <value>The account type name cannot be empty.</value>
-    </data>
-    <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
         <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
-    </data>
-    <data name="AccountTypeNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeNotFoundError" xml:space="preserve">
         <value>Le type de compte auquel vous essayez d'accéder n'existe pas.</value>
-    </data>
-    <data name="AccountTypeParentNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeParentNotFoundError" xml:space="preserve">
         <value>The parent account type does not exist.</value>
-    </data>
-    <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
+  </data>
+  <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
         <value>The account type name cannot be the same as its parent.</value>
-    </data>
-    <data name="AssetNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AssetNotFoundError" xml:space="preserve">
         <value>La ressource que vous essayez d’accéder n’existe pas.</value>
-    </data>
-    <data name="AssetPermanentDeleteNotDeletedError" xml:space="preserve">
+  </data>
+  <data name="AssetPermanentDeleteNotDeletedError" xml:space="preserve">
         <value>The asset must be deleted before it can be permanently deleted.</value>
-    </data>
-    <data name="AssetTypeDuplicateNameError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeDuplicateNameError" xml:space="preserve">
         <value>An asset type with that name already exists.</value>
-    </data>
-    <data name="AssetTypeEmptyNameError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeEmptyNameError" xml:space="preserve">
         <value>The asset type name cannot be empty.</value>
-    </data>
-    <data name="AssetTypeNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeNotFoundError" xml:space="preserve">
         <value>The asset type you are trying to access does not exist.</value>
-    </data>
-    <data name="AssetTypeParentNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeParentNotFoundError" xml:space="preserve">
         <value>The parent asset type does not exist.</value>
-    </data>
-    <data name="AssetTypeSameNameAsParentError" xml:space="preserve">
+  </data>
+  <data name="AssetTypeSameNameAsParentError" xml:space="preserve">
         <value>The asset type name cannot be the same as its parent.</value>
-    </data>
-    <data name="AutoCategorizerNotTrained" xml:space="preserve">
+  </data>
+  <data name="AutoCategorizerNotTrained" xml:space="preserve">
         <value>Auto-Categorizer cannot be enabled before training.</value>
-    </data>
-    <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
+  </data>
+  <data name="AutoCategorizerTrainingNoTransactions" xml:space="preserve">
         <value>Aucune transaction dans la plage sélectionnée pour l'entraînement du catégoriseur automatique.</value>
-    </data>
-    <data name="AutomaticRuleCategoryDoesNotExistError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleCategoryDoesNotExistError" xml:space="preserve">
         <value>La catégorie '{0}' n’existe pas.</value>
-    </data>
-    <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
         <value>La catégorie '{0}' n’existe pas.</value>
-    </data>
-    <data name="AutomaticRuleInvalidAccountIdError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleInvalidAccountIdError" xml:space="preserve">
         <value>The account ID '{0}' is not a valid GUID.</value>
-    </data>
-    <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
         <value>Le montant '{0}' n’est pas un nombre décimal valide.</value>
-    </data>
-    <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
         <value>La date '{0}' n’est pas une date valide.</value>
-    </data>
-    <data name="AutomaticRuleInvalidRegexError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleInvalidRegexError" xml:space="preserve">
         <value>Le motif d’expression régulière '{0}' est invalide.</value>
-    </data>
-    <data name="AutomaticRuleNotFoundError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleNotFoundError" xml:space="preserve">
         <value>The automatic rule you are trying to access does not exist.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
         <value>Champ '{0}' non pris en charge dans l’action de règle.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedFieldError" xml:space="preserve">
         <value>Champ '{0}' non pris en charge dans la condition de règle.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorError" xml:space="preserve">
         <value>Opérateur '{0}' non pris en charge dans l’action de règle.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForAccountError" xml:space="preserve">
         <value>Unsupported operator '{0}' for Account field.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForAmountError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForAmountError" xml:space="preserve">
         <value>L’opérateur '{0}' n’est pas pris en charge pour le champ Montant.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForCategoryError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForCategoryError" xml:space="preserve">
         <value>L’opérateur '{0}' n’est pas pris en charge pour le champ Catégorie.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForDateError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForDateError" xml:space="preserve">
         <value>L’opérateur '{0}' n’est pas pris en charge pour le champ Date.</value>
-    </data>
-    <data name="AutomaticRuleUnsupportedOperatorForMerchantError" xml:space="preserve">
+  </data>
+  <data name="AutomaticRuleUnsupportedOperatorForMerchantError" xml:space="preserve">
         <value>L’opérateur '{0}' n’est pas pris en charge pour le champ Marchand.</value>
-    </data>
-    <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BalanceAccountCreateNotFoundError" xml:space="preserve">
         <value>Le compte auquel vous essayez d’ajouter un solde n’existe pas.</value>
-    </data>
-    <data name="BalanceAccountNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BalanceAccountNotFoundError" xml:space="preserve">
         <value>Le compte auquel vous tentez d’accéder n’existe pas.</value>
-    </data>
-    <data name="BalanceDuplicateDateError" xml:space="preserve">
+  </data>
+  <data name="BalanceDuplicateDateError" xml:space="preserve">
         <value>Une balance existe déjà pour ce compte à cette date.</value>
-    </data>
-    <data name="BalanceNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BalanceNotFoundError" xml:space="preserve">
         <value>The balance you are trying to access does not exist.</value>
-    </data>
-    <data name="BudgetCreateCategoryNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BudgetCreateCategoryNotFoundError" xml:space="preserve">
         <value>The category '{0}' does not exist.</value>
-    </data>
-    <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
+  </data>
+  <data name="BudgetCreateCompletedWithErrorsError" xml:space="preserve">
         <value>Création du budget terminée avec des erreurs : {0}</value>
-    </data>
-    <data name="BudgetCreateDuplicateError" xml:space="preserve">
+  </data>
+  <data name="BudgetCreateDuplicateError" xml:space="preserve">
         <value>Un budget avec la catégorie '{0}' et la date '{1}' existe déjà.</value>
-    </data>
-    <data name="BudgetNotFoundError" xml:space="preserve">
+  </data>
+  <data name="BudgetNotFoundError" xml:space="preserve">
         <value>The budget you are trying to access does not exist.</value>
-    </data>
-    <data name="BudgetUpdateParentLimitError" xml:space="preserve">
+  </data>
+  <data name="BudgetUpdateParentLimitError" xml:space="preserve">
         <value>Le budget parent ne peut pas être inférieur à la somme de ses sous-budgets.</value>
-    </data>
-    <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
+  </data>
+  <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
         <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
-    </data>
-    <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
+  </data>
+  <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
         <value>A LunchFlow account with this SyncID already exists.</value>
-    </data>
-    <data name="DuplicateOrganizationCreateError" xml:space="preserve">
+  </data>
+  <data name="DuplicateOrganizationCreateError" xml:space="preserve">
         <value>Une organisation avec ce domaine existe déjà.</value>
-    </data>
-    <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
+  </data>
+  <data name="EnableBuiltInAssetTypesConflictError" xml:space="preserve">
         <value>Built-in asset types cannot be re-enabled because one or more custom asset types share a name with a built-in type. Please rename or remove the conflicting custom types first.</value>
-    </data>
-    <data name="GoalBothDateAndContributionError" xml:space="preserve">
+  </data>
+  <data name="GoalBothDateAndContributionError" xml:space="preserve">
         <value>A goal cannot have both a target date and a monthly contribution.</value>
-    </data>
-    <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
+  </data>
+  <data name="GoalCompleteAlreadyCompletedError" xml:space="preserve">
         <value>L’objectif que vous essayez de terminer a déjà été terminé.</value>
-    </data>
-    <data name="GoalCreateInPastError" xml:space="preserve">
+  </data>
+  <data name="GoalCreateInPastError" xml:space="preserve">
         <value>Un objectif ne peut pas avoir une date cible dans le passé.</value>
-    </data>
-    <data name="GoalCreateInvalidAccountError" xml:space="preserve">
+  </data>
+  <data name="GoalCreateInvalidAccountError" xml:space="preserve">
         <value>Le compte que vous essayez d’utiliser n’existe pas.</value>
-    </data>
-    <data name="GoalCreateNoAccountsError" xml:space="preserve">
+  </data>
+  <data name="GoalCreateNoAccountsError" xml:space="preserve">
         <value>Un objectif doit être associé à au moins un compte.</value>
-    </data>
-    <data name="GoalMissingContributionOrDateError" xml:space="preserve">
+  </data>
+  <data name="GoalMissingContributionOrDateError" xml:space="preserve">
         <value>Un objectif doit avoir une contribution mensuelle ou une date cible.</value>
-    </data>
-    <data name="GoalNotFoundError" xml:space="preserve">
+  </data>
+  <data name="GoalNotFoundError" xml:space="preserve">
         <value>The goal you are trying to access does not exist.</value>
-    </data>
-    <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
+  </data>
+  <data name="GoalUpdateNoMonthlyContributionError" xml:space="preserve">
         <value>Un objectif doit avoir une contribution mensuelle supérieure à 0.</value>
-    </data>
-    <data name="GoalUpdatePastDateError" xml:space="preserve">
+  </data>
+  <data name="GoalUpdatePastDateError" xml:space="preserve">
         <value>La date cible de l’objectif ne peut pas être dans le passé.</value>
-    </data>
-    <data name="InstitutionDuplicateNameError" xml:space="preserve">
+  </data>
+  <data name="InstitutionDuplicateNameError" xml:space="preserve">
         <value>Un établissement portant ce nom existe déjà.</value>
-    </data>
-    <data name="InstitutionEmptyNameError" xml:space="preserve">
+  </data>
+  <data name="InstitutionEmptyNameError" xml:space="preserve">
         <value>Le nom de l’établissement ne peut pas être vide.</value>
-    </data>
-    <data name="InstitutionNotFoundError" xml:space="preserve">
+  </data>
+  <data name="InstitutionNotFoundError" xml:space="preserve">
         <value>L’établissement auquel vous essayez d’accéder n’existe pas.</value>
-    </data>
-    <data name="InvalidAccountSourceError" xml:space="preserve">
+  </data>
+  <data name="InvalidAccountSourceError" xml:space="preserve">
         <value>The account source is invalid.</value>
-    </data>
-    <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
+  </data>
+  <data name="InvalidAutoCategorizerMinimumProbabilityPercentageError" xml:space="preserve">
         <value>La probabilité minimale du système de catégorisation automatique doit être comprise entre 0 % et 100 %.</value>
-    </data>
-    <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
+  </data>
+  <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
         <value>Le seuil d’alerte du budget doit être compris entre 0 % et 100 %.</value>
-    </data>
-    <data name="InvalidConditionError" xml:space="preserve">
+  </data>
+  <data name="InvalidConditionError" xml:space="preserve">
         <value>Une ou plusieurs conditions de la règle automatique sont invalides.</value>
-    </data>
-    <data name="InvalidCurrencyCodeError" xml:space="preserve">
+  </data>
+  <data name="InvalidCurrencyCodeError" xml:space="preserve">
         <value>Le code de devise fourni est invalide.</value>
-    </data>
-    <data name="InvalidDateFormatError" xml:space="preserve">
+  </data>
+  <data name="InvalidDateFormatError" xml:space="preserve">
         <value>Le format de la date fourni est invalide.</value>
-    </data>
-    <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
+  </data>
+  <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
         <value>La période de rétroactivité de synchronisation forcée doit être comprise entre 0 et 12 mois.</value>
-    </data>
-    <data name="InvalidInstitutionIDError" xml:space="preserve">
+  </data>
+  <data name="InvalidInstitutionIDError" xml:space="preserve">
         <value>L’identifiant d’établissement fourni est invalide.</value>
-    </data>
-    <data name="InvalidLanguageCodeError" xml:space="preserve">
+  </data>
+  <data name="InvalidLanguageCodeError" xml:space="preserve">
         <value>Le code de langue fourni est invalide.</value>
-    </data>
-    <data name="InvalidLinkedAccountIDError" xml:space="preserve">
+  </data>
+  <data name="InvalidLinkedAccountIDError" xml:space="preserve">
         <value>L’identifiant de compte lié que vous avez fourni n’existe pas.</value>
-    </data>
-    <data name="InvalidOrganizationIDError" xml:space="preserve">
+  </data>
+  <data name="InvalidOrganizationIDError" xml:space="preserve">
         <value>L’identifiant d’organisation fourni est invalide.</value>
-    </data>
-    <data name="InvalidUserError" xml:space="preserve">
+  </data>
+  <data name="InvalidUserError" xml:space="preserve">
         <value>L’utilisateur fourni est invalide.</value>
-    </data>
-    <data name="LunchFlow" xml:space="preserve">
+  </data>
+  <data name="LunchFlow" xml:space="preserve">
         <value>LunchFlow</value>
-    </data>
-    <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowAccountDataRetrievalError" xml:space="preserve">
         <value>Impossible de récupérer les données du compte LunchFlow.</value>
-    </data>
-    <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowAccountNotFoundError" xml:space="preserve">
         <value>Le compte LunchFlow auquel vous essayez d'accéder n'existe pas.</value>
-    </data>
-    <data name="LunchFlowAccountSyncException" xml:space="preserve">
+  </data>
+  <data name="LunchFlowAccountSyncException" xml:space="preserve">
         <value>Une erreur inattendue s'est produite lors de la synchronisation du compte LunchFlow '{0}'.</value>
-    </data>
-    <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowApiKeyConfigurationError" xml:space="preserve">
         <value>Failed to configure LunchFlow API key. Status code: {0}</value>
-    </data>
-    <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowApiKeyMissingError" xml:space="preserve">
         <value>La clé API LunchFlow n'est pas configurée.</value>
-    </data>
-    <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowBalanceDataRetrievalError" xml:space="preserve">
         <value>Impossible de récupérer les données de solde du compte LunchFlow {0}.</value>
-    </data>
-    <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowLinkedAccountNotFoundForSyncError" xml:space="preserve">
         <value>Compte lié introuvable pour le compte LunchFlow {0}.</value>
-    </data>
-    <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="LunchFlowTransactionDataRetrievalError" xml:space="preserve">
         <value>Impossible de récupérer les données de transaction pour le compte LunchFlow {0}.</value>
-    </data>
-    <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
+  </data>
+  <data name="NetWorthWidgetCategoryNotFoundError" xml:space="preserve">
         <value>La catégorie du widget de valeur nette à laquelle vous essayez d’accéder n’existe pas.</value>
-    </data>
-    <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
+  </data>
+  <data name="NetWorthWidgetCategoryTargetLineDependsOnThisLineError" xml:space="preserve">
         <value>Impossible de créer une dépendance circulaire. La ligne cible dépend déjà de cette ligne.</value>
-    </data>
-    <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
+  </data>
+  <data name="NetWorthWidgetGroupNotFoundError" xml:space="preserve">
         <value>Le groupe du widget de valeur nette auquel vous essayez d’accéder n’existe pas.</value>
-    </data>
-    <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
+  </data>
+  <data name="NetWorthWidgetLineNotFoundError" xml:space="preserve">
         <value>La ligne du widget de valeur nette à laquelle vous essayez d’accéder n’existe pas.</value>
-    </data>
-    <data name="NoActionsCreateError" xml:space="preserve">
+  </data>
+  <data name="NoActionsCreateError" xml:space="preserve">
         <value>No actions were provided for the automatic rule.</value>
-    </data>
-    <data name="NoConditionsCreateError" xml:space="preserve">
+  </data>
+  <data name="NoConditionsCreateError" xml:space="preserve">
         <value>No conditions were provided for the automatic rule.</value>
-    </data>
-    <data name="NoOidcLoginFoundError" xml:space="preserve">
+  </data>
+  <data name="NoOidcLoginFoundError" xml:space="preserve">
         <value>Aucune connexion OIDC n’a été trouvée pour cet utilisateur.</value>
-    </data>
-    <data name="RemoveOidcFailedError" xml:space="preserve">
+  </data>
+  <data name="RemoveOidcFailedError" xml:space="preserve">
         <value>Échec de la suppression de la connexion OIDC.</value>
-    </data>
-    <data name="RemoveOidcNoPasswordError" xml:space="preserve">
+  </data>
+  <data name="RemoveOidcNoPasswordError" xml:space="preserve">
         <value>Impossible de supprimer la connexion OIDC. L’utilisateur doit d’abord définir un mot de passe local afin de conserver l’accès au compte.</value>
-    </data>
-    <data name="RuleRunSummary" xml:space="preserve">
+  </data>
+  <data name="RuleRunSummary" xml:space="preserve">
         <value>La règle a appliqué {0} mises à jour.</value>
-    </data>
-    <data name="SimpleFin" xml:space="preserve">
+  </data>
+  <data name="SimpleFin" xml:space="preserve">
         <value>SimpleFIN</value>
-    </data>
-    <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
         <value>Le compte SimpleFIN que vous essayez de mettre à jour n’existe pas.</value>
-    </data>
-    <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
         <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>
-    </data>
-    <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinAccountNotFoundForTransactionError" xml:space="preserve">
         <value>Aucun compte correspondant trouvé pour la transaction avec le SyncID '{0}'.</value>
-    </data>
-    <data name="SimpleFinAccountSyncException" xml:space="preserve">
+  </data>
+  <data name="SimpleFinAccountSyncException" xml:space="preserve">
         <value>An unexpected error occurred while syncing SimpleFIN account '{0}'.</value>
-    </data>
-    <data name="SimpleFinDataNotFoundError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDataNotFoundError" xml:space="preserve">
         <value>Données SimpleFIN introuvables.</value>
-    </data>
-    <data name="SimpleFinDataRequestError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDataRequestError" xml:space="preserve">
         <value>An error occurred while requesting SimpleFIN data.</value>
-    </data>
-    <data name="SimpleFinDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDataRetrievalError" xml:space="preserve">
         <value>Une erreur s’est produite lors de la récupération des données SimpleFIN.</value>
-    </data>
-    <data name="SimpleFinDecodeTokenError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDecodeTokenError" xml:space="preserve">
         <value>Une erreur s’est produite lors du décodage du jeton de configuration.</value>
-    </data>
-    <data name="SimpleFinDecodeTokenInvalidError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDecodeTokenInvalidError" xml:space="preserve">
         <value>Le jeton de configuration est invalide. Veuillez vérifier le jeton et réessayer.</value>
-    </data>
-    <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinDecodeTokenRequestError" xml:space="preserve">
         <value>Une erreur s’est produite lors de la connexion à SimpleFIN. Veuillez réessayer plus tard.</value>
-    </data>
-    <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinInvalidAccessTokenError" xml:space="preserve">
         <value>Le jeton d’accès fourni est invalide.</value>
-    </data>
-    <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
         <value>SimpleFIN access token is missing or empty.</value>
-    </data>
-    <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
         <value>L’organisation SimpleFIN que vous essayez de supprimer n’existe pas.</value>
-    </data>
-    <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
         <value>L’organisation SimpleFIN que vous essayez de mettre à jour n’existe pas.</value>
-    </data>
-    <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
+  </data>
+  <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
         <value>Échec de la création de l’organisation SimpleFIN pour le compte {0}.</value>
-    </data>
-    <data name="TransactionCategoryDuplicateNameError" xml:space="preserve">
+  </data>
+  <data name="TransactionCategoryDuplicateNameError" xml:space="preserve">
         <value>A transaction category with this name already exists.</value>
-    </data>
-    <data name="TransactionCategoryEmptyNameError" xml:space="preserve">
+  </data>
+  <data name="TransactionCategoryEmptyNameError" xml:space="preserve">
         <value>The transaction category name cannot be empty.</value>
-    </data>
-    <data name="TransactionCategoryNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionCategoryNotFoundError" xml:space="preserve">
         <value>The transaction category you are trying to access does not exist.</value>
-    </data>
-    <data name="TransactionCategoryParentNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionCategoryParentNotFoundError" xml:space="preserve">
         <value>The parent transaction category you are trying to use does not exist.</value>
-    </data>
-    <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
+  </data>
+  <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
         <value>Transaction category cannot have the same name as its parent category.</value>
-    </data>
-    <data name="TransactionNotFoundError" xml:space="preserve">
+  </data>
+  <data name="TransactionNotFoundError" xml:space="preserve">
         <value>La transaction à laquelle vous essayez d’accéder n’existe pas.</value>
-    </data>
-    <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
+  </data>
+  <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
         <value>Le montant fractionné doit être inférieur au montant de la transaction.</value>
-    </data>
-    <data name="UserDataRetrievalError" xml:space="preserve">
+  </data>
+  <data name="UserDataRetrievalError" xml:space="preserve">
         <value>Une erreur s’est produite lors de la récupération des données utilisateur.</value>
-    </data>
-    <data name="UserSettingsNotFoundError" xml:space="preserve">
+  </data>
+  <data name="UserSettingsNotFoundError" xml:space="preserve">
         <value>Les paramètres utilisateur auxquels vous essayez d’accéder n’existent pas.</value>
-    </data>
-    <data name="ValueAssetNotFoundError" xml:space="preserve">
+  </data>
+  <data name="ValueAssetNotFoundError" xml:space="preserve">
         <value>La ressource dont vous essayez d’accéder aux valeurs n’existe pas.</value>
-    </data>
-    <data name="ValueDeleteNotFoundError" xml:space="preserve">
+  </data>
+  <data name="ValueDeleteNotFoundError" xml:space="preserve">
         <value>La valeur que vous essayez de supprimer n’existe pas.</value>
-    </data>
-    <data name="ValueDuplicateDateError" xml:space="preserve">
+  </data>
+  <data name="ValueDuplicateDateError" xml:space="preserve">
         <value>Une valeur existe déjà pour cette date pour cet actif.</value>
-    </data>
-    <data name="ValueUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="ValueUpdateNotFoundError" xml:space="preserve">
         <value>La valeur que vous essayez de mettre à jour n'existe pas.</value>
-    </data>
-    <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
+  </data>
+  <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
         <value>Échec de la désérialisation de la configuration du widget.</value>
-    </data>
-    <data name="WidgetConfigurationNullError" xml:space="preserve">
+  </data>
+  <data name="WidgetConfigurationNullError" xml:space="preserve">
         <value>La configuration du widget est nulle ou vide.</value>
-    </data>
-    <data name="WidgetSettingsNotFoundError" xml:space="preserve">
+  </data>
+  <data name="WidgetSettingsNotFoundError" xml:space="preserve">
         <value>Les paramètres du widget auxquels vous essayez d’accéder n’existent pas.</value>
-    </data>
-    <data name="WidgetUpdateNotFoundError" xml:space="preserve">
+  </data>
+  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
         <value>Le widget que vous essayez de mettre à jour n’existe pas.</value>
-    </data>
+  </data>
+  <data name="TransactionAccountNotFoundError" xml:space="preserve">
+    <value>The account for this transaction does not exist.</value>
+  </data>
 </root>

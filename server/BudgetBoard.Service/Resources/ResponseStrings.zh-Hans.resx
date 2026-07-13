@@ -421,4 +421,7 @@
   <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
     <value>Transaction category cannot have the same name as its parent category.</value>
   </data>
+  <data name="TransactionAccountNotFoundError" xml:space="preserve">
+    <value>The account for this transaction does not exist.</value>
+  </data>
 </root>
