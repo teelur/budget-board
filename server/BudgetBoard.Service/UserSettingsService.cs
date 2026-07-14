@@ -64,295 +64,295 @@ public class UserSettingsService(
         void HandleCurrencyChange()
         {
             if (
-                !string.IsNullOrEmpty(request.Currency)
-                && !request.Currency.Equals(
+                string.IsNullOrEmpty(request.Currency)
+                || request.Currency.Equals(
                     userSettings.Currency,
                     StringComparison.CurrentCultureIgnoreCase
                 )
             )
             {
-                var isValidCurrency = LocalizationHelpers.CurrencyCodes.Contains(request.Currency);
-                if (!isValidCurrency)
-                {
-                    logger.LogError("{LogMessage}", logLocalizer["InvalidCurrencyCodeLog"]);
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["InvalidCurrencyCodeError"]
-                    );
-                }
-
-                userSettings.Currency = request.Currency;
+                return;
             }
+
+            var isValidCurrency = LocalizationHelpers.CurrencyCodes.Contains(request.Currency);
+            if (!isValidCurrency)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["InvalidCurrencyCodeLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidCurrencyCodeError"]
+                );
+            }
+
+            userSettings.Currency = request.Currency;
         }
 
         void HandleLanguageChange()
         {
             if (
-                !string.IsNullOrEmpty(request.Language)
-                && !request.Language.Equals(
+                string.IsNullOrEmpty(request.Language)
+                || request.Language.Equals(
                     userSettings.Language,
                     StringComparison.CurrentCultureIgnoreCase
                 )
             )
             {
-                var isValidLanguage = SupportedLanguages.AllUserLanguageOptions.Contains(
-                    request.Language.ToLower()
-                );
-                if (!isValidLanguage)
-                {
-                    logger.LogError("{LogMessage}", logLocalizer["InvalidLanguageCodeLog"]);
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["InvalidLanguageCodeError"]
-                    );
-                }
-
-                userSettings.Language = request.Language.ToLower();
+                return;
             }
+
+            var isValidLanguage = SupportedLanguages.AllUserLanguageOptions.Contains(
+                request.Language.ToLower()
+            );
+            if (!isValidLanguage)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["InvalidLanguageCodeLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidLanguageCodeError"]
+                );
+            }
+
+            userSettings.Language = request.Language.ToLower();
         }
 
         void HandleDateFormatChange()
         {
             if (
-                !string.IsNullOrEmpty(request.DateFormat)
-                && !request.DateFormat.Equals(
+                string.IsNullOrEmpty(request.DateFormat)
+                || request.DateFormat.Equals(
                     userSettings.DateFormat,
                     StringComparison.CurrentCultureIgnoreCase
                 )
             )
             {
-                var isValidDateFormat = LocalizationHelpers.IsValidDateFormat(request.DateFormat);
-                if (!isValidDateFormat)
-                {
-                    logger.LogError("{LogMessage}", logLocalizer["InvalidDateFormatLog"]);
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["InvalidDateFormatError"]
-                    );
-                }
-
-                userSettings.DateFormat = request.DateFormat;
+                return;
             }
+
+            var isValidDateFormat = LocalizationHelpers.IsValidDateFormat(request.DateFormat);
+            if (!isValidDateFormat)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["InvalidDateFormatLog"]);
+                throw new BudgetBoardServiceException(responseLocalizer["InvalidDateFormatError"]);
+            }
+
+            userSettings.DateFormat = request.DateFormat;
         }
 
         void HandleBudgetWarningThresholdChange()
         {
             if (
-                request.BudgetWarningThreshold.HasValue
-                && userSettings.BudgetWarningThreshold != request.BudgetWarningThreshold.Value
+                !request.BudgetWarningThreshold.HasValue
+                || userSettings.BudgetWarningThreshold == request.BudgetWarningThreshold.Value
             )
             {
-                if (
-                    request.BudgetWarningThreshold.Value < 0
-                    || request.BudgetWarningThreshold.Value > 100
-                )
-                {
-                    logger.LogError(
-                        "{LogMessage}",
-                        logLocalizer["InvalidBudgetWarningThresholdLog"]
-                    );
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["InvalidBudgetWarningThresholdError"]
-                    );
-                }
-
-                userSettings.BudgetWarningThreshold = request.BudgetWarningThreshold.Value;
+                return;
             }
+
+            if (
+                request.BudgetWarningThreshold.Value < 0
+                || request.BudgetWarningThreshold.Value > 100
+            )
+            {
+                logger.LogError("{LogMessage}", logLocalizer["InvalidBudgetWarningThresholdLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidBudgetWarningThresholdError"]
+                );
+            }
+
+            userSettings.BudgetWarningThreshold = request.BudgetWarningThreshold.Value;
         }
 
         void HandleForceSyncLookbackMonthsChange()
         {
             if (
-                request.ForceSyncLookbackMonths.HasValue
-                && userSettings.ForceSyncLookbackMonths != request.ForceSyncLookbackMonths.Value
+                !request.ForceSyncLookbackMonths.HasValue
+                || userSettings.ForceSyncLookbackMonths == request.ForceSyncLookbackMonths.Value
             )
             {
-                if (
-                    request.ForceSyncLookbackMonths.Value < 0
-                    || request.ForceSyncLookbackMonths.Value > 12
-                )
-                {
-                    logger.LogError(
-                        "{LogMessage}",
-                        logLocalizer["InvalidForceSyncLookbackMonthsLog"]
-                    );
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["InvalidForceSyncLookbackMonthsError"]
-                    );
-                }
-                userSettings.ForceSyncLookbackMonths = request.ForceSyncLookbackMonths.Value;
+                return;
             }
+
+            if (
+                request.ForceSyncLookbackMonths.Value < 0
+                || request.ForceSyncLookbackMonths.Value > 12
+            )
+            {
+                logger.LogError("{LogMessage}", logLocalizer["InvalidForceSyncLookbackMonthsLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidForceSyncLookbackMonthsError"]
+                );
+            }
+            userSettings.ForceSyncLookbackMonths = request.ForceSyncLookbackMonths.Value;
         }
 
         void HandleDisableBuiltInTransactionCategoriesChange()
         {
             if (
-                request.DisableBuiltInTransactionCategories.HasValue
-                && userSettings.DisableBuiltInTransactionCategories
-                    != request.DisableBuiltInTransactionCategories.Value
+                !request.DisableBuiltInTransactionCategories.HasValue
+                || userSettings.DisableBuiltInTransactionCategories
+                    == request.DisableBuiltInTransactionCategories.Value
             )
             {
-                userSettings.DisableBuiltInTransactionCategories = request
-                    .DisableBuiltInTransactionCategories
-                    .Value;
+                return;
             }
+
+            userSettings.DisableBuiltInTransactionCategories = request
+                .DisableBuiltInTransactionCategories
+                .Value;
         }
 
         void HandleDisableBuiltInAccountTypesChange()
         {
             if (
-                request.DisableBuiltInAccountTypes.HasValue
-                && userSettings.DisableBuiltInAccountTypes
-                    != request.DisableBuiltInAccountTypes.Value
+                !request.DisableBuiltInAccountTypes.HasValue
+                || userSettings.DisableBuiltInAccountTypes
+                    == request.DisableBuiltInAccountTypes.Value
             )
             {
-                var builtInTypeValues = AccountTypeConstants
-                    .DefaultAccountTypes.Select(at => at.Value.ToLower())
-                    .ToHashSet();
-                if (userSettings.DisableBuiltInAccountTypes)
-                {
-                    // Built-in types cannot be re-enabled if the user has custom account types that conflict with the built-in types.
-                    var hasConflictingCustomAccountTypes = userData.AccountTypes.Any(cat =>
-                        builtInTypeValues.Contains(cat.Value.ToLower())
-                    );
-                    if (hasConflictingCustomAccountTypes)
-                    {
-                        logger.LogError(
-                            "{LogMessage}",
-                            logLocalizer["EnableBuiltInAccountTypesConflictLog"]
-                        );
-                        throw new BudgetBoardServiceException(
-                            responseLocalizer["EnableBuiltInAccountTypesConflictError"]
-                        );
-                    }
-                }
-                else
-                {
-                    // Built-in types cannot be disabled if the user has any accounts that use built-in types
-                    // or custom account types that are children of built-in types
-                    var hasBuiltInAccountTypesInUse =
-                        userData.Accounts.Any(a =>
-                            a.Type != null && builtInTypeValues.Contains(a.Type)
-                        )
-                        || userData.AccountTypes.Any(cat =>
-                            !string.IsNullOrEmpty(cat.Parent)
-                            && builtInTypeValues.Contains(cat.Parent)
-                        );
-                    if (hasBuiltInAccountTypesInUse)
-                    {
-                        logger.LogError(
-                            "{LogMessage}",
-                            logLocalizer["DisableBuiltInAccountTypesInUseLog"]
-                        );
-                        throw new BudgetBoardServiceException(
-                            responseLocalizer["DisableBuiltInAccountTypesInUseError"]
-                        );
-                    }
-                }
-
-                userSettings.DisableBuiltInAccountTypes = request.DisableBuiltInAccountTypes.Value;
+                return;
             }
+
+            var builtInTypeValues = AccountTypeConstants
+                .DefaultAccountTypes.Select(at => at.Value.ToLower())
+                .ToHashSet();
+            if (request.DisableBuiltInAccountTypes.Value)
+            {
+                var accountUsesBuiltInType = userData.Accounts.Any(a =>
+                    builtInTypeValues.Contains(a.Type)
+                );
+                var customTypeHasBuiltInParent = userData.AccountTypes.Any(cat =>
+                    builtInTypeValues.Contains(cat.Parent)
+                );
+                if (accountUsesBuiltInType || customTypeHasBuiltInParent)
+                {
+                    logger.LogError(
+                        "{LogMessage}",
+                        logLocalizer["DisableBuiltInAccountTypesInUseLog"]
+                    );
+                    throw new BudgetBoardServiceException(
+                        responseLocalizer["DisableBuiltInAccountTypesInUseError"]
+                    );
+                }
+            }
+            else
+            {
+                var hasConflictingCustomAccountTypes = userData.AccountTypes.Any(cat =>
+                    builtInTypeValues.Contains(cat.Value.ToLower())
+                );
+                if (hasConflictingCustomAccountTypes)
+                {
+                    logger.LogError(
+                        "{LogMessage}",
+                        logLocalizer["EnableBuiltInAccountTypesConflictLog"]
+                    );
+                    throw new BudgetBoardServiceException(
+                        responseLocalizer["EnableBuiltInAccountTypesConflictError"]
+                    );
+                }
+            }
+
+            userSettings.DisableBuiltInAccountTypes = request.DisableBuiltInAccountTypes.Value;
         }
 
         void HandleDisableBuiltInAssetTypesChange()
         {
             if (
-                request.DisableBuiltInAssetTypes.HasValue
-                && userSettings.DisableBuiltInAssetTypes != request.DisableBuiltInAssetTypes.Value
+                !request.DisableBuiltInAssetTypes.HasValue
+                || userSettings.DisableBuiltInAssetTypes == request.DisableBuiltInAssetTypes.Value
             )
             {
-                var builtInTypeValues = AssetTypeConstants
-                    .DefaultAssetTypes.Select(at => at.Value.ToLower())
-                    .ToHashSet();
-                if (userSettings.DisableBuiltInAssetTypes)
-                {
-                    // Built-in types cannot be re-enabled if the user has custom asset types that conflict with the built-in types.
-                    var hasConflictingCustomAssetTypes = userData.AssetTypes.Any(at =>
-                        builtInTypeValues.Contains(at.Value.ToLower())
-                    );
-                    if (hasConflictingCustomAssetTypes)
-                    {
-                        logger.LogError(
-                            "{LogMessage}",
-                            logLocalizer["EnableBuiltInAssetTypesConflictLog"]
-                        );
-                        throw new BudgetBoardServiceException(
-                            responseLocalizer["EnableBuiltInAssetTypesConflictError"]
-                        );
-                    }
-                }
-                else
-                {
-                    // Built-in types cannot be disabled if the user has any assets that use built-in types
-                    // or custom asset types that are children of built-in types
-                    var hasBuiltInAssetTypesInUse =
-                        userData.Assets.Any(a =>
-                            a.Type != null && builtInTypeValues.Contains(a.Type.ToLower())
-                        )
-                        || userData.AssetTypes.Any(at =>
-                            !string.IsNullOrEmpty(at.Parent)
-                            && builtInTypeValues.Contains(at.Parent.ToLower())
-                        );
-                    if (hasBuiltInAssetTypesInUse)
-                    {
-                        logger.LogError(
-                            "{LogMessage}",
-                            logLocalizer["DisableBuiltInAssetTypesInUseLog"]
-                        );
-                        throw new BudgetBoardServiceException(
-                            responseLocalizer["DisableBuiltInAssetTypesInUseError"]
-                        );
-                    }
-                }
-
-                userSettings.DisableBuiltInAssetTypes = request.DisableBuiltInAssetTypes.Value;
+                return;
             }
+
+            var builtInTypeValues = AssetTypeConstants
+                .DefaultAssetTypes.Select(at => at.Value.ToLower())
+                .ToHashSet();
+            if (request.DisableBuiltInAssetTypes.Value)
+            {
+                var assetsUsesBuiltInType = userData.Assets.Any(a =>
+                    builtInTypeValues.Contains(a.Type.ToLower())
+                );
+                var customTypeHasBuiltInParent = userData.AssetTypes.Any(at =>
+                    builtInTypeValues.Contains(at.Parent.ToLower())
+                );
+                if (assetsUsesBuiltInType || customTypeHasBuiltInParent)
+                {
+                    logger.LogError(
+                        "{LogMessage}",
+                        logLocalizer["DisableBuiltInAssetTypesInUseLog"]
+                    );
+                    throw new BudgetBoardServiceException(
+                        responseLocalizer["DisableBuiltInAssetTypesInUseError"]
+                    );
+                }
+            }
+            else
+            {
+                // Built-in types cannot be re-enabled if the user has custom asset types that conflict with the built-in types.
+                var hasConflictingCustomAssetTypes = userData.AssetTypes.Any(at =>
+                    builtInTypeValues.Contains(at.Value.ToLower())
+                );
+                if (hasConflictingCustomAssetTypes)
+                {
+                    logger.LogError(
+                        "{LogMessage}",
+                        logLocalizer["EnableBuiltInAssetTypesConflictLog"]
+                    );
+                    throw new BudgetBoardServiceException(
+                        responseLocalizer["EnableBuiltInAssetTypesConflictError"]
+                    );
+                }
+            }
+
+            userSettings.DisableBuiltInAssetTypes = request.DisableBuiltInAssetTypes.Value;
         }
 
         void HandleEnableAutoCategorizerChange()
         {
             if (
-                request.EnableAutoCategorizer.HasValue
-                && userSettings.EnableAutoCategorizer != request.EnableAutoCategorizer.Value
+                !request.EnableAutoCategorizer.HasValue
+                || userSettings.EnableAutoCategorizer == request.EnableAutoCategorizer.Value
             )
             {
-                // We can only enable auto categorizer if we trained it
-                if (
-                    request.EnableAutoCategorizer.Value
-                    && userSettings.AutoCategorizerModelOID == null
-                )
-                {
-                    logger.LogError("{LogMessage}", logLocalizer["AutoCategorizerNotTrainedLog"]);
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["AutoCategorizerNotTrained"]
-                    );
-                }
-                userSettings.EnableAutoCategorizer = request.EnableAutoCategorizer.Value;
+                return;
             }
+
+            // We can only enable auto categorizer if we trained it
+            if (request.EnableAutoCategorizer.Value && userSettings.AutoCategorizerModelOID == null)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["AutoCategorizerNotTrainedLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AutoCategorizerNotTrained"]
+                );
+            }
+            userSettings.EnableAutoCategorizer = request.EnableAutoCategorizer.Value;
         }
 
         void HandleAutoCategorizerMinimumProbabilityPercentageChange()
         {
             if (
-                request.AutoCategorizerMinimumProbabilityPercentage.HasValue
-                && userSettings.AutoCategorizerMinimumProbabilityPercentage
-                    != request.AutoCategorizerMinimumProbabilityPercentage.Value
+                !request.AutoCategorizerMinimumProbabilityPercentage.HasValue
+                || userSettings.AutoCategorizerMinimumProbabilityPercentage
+                    == request.AutoCategorizerMinimumProbabilityPercentage.Value
             )
             {
-                if (
-                    request.AutoCategorizerMinimumProbabilityPercentage.Value < 0
-                    || request.AutoCategorizerMinimumProbabilityPercentage.Value > 100
-                )
-                {
-                    logger.LogError(
-                        "{LogMessage}",
-                        logLocalizer["InvalidAutoCategorizerMinimumProbabilityPercentageLog"]
-                    );
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["InvalidAutoCategorizerMinimumProbabilityPercentageError"]
-                    );
-                }
-                userSettings.AutoCategorizerMinimumProbabilityPercentage = request
-                    .AutoCategorizerMinimumProbabilityPercentage
-                    .Value;
+                return;
             }
+
+            if (
+                request.AutoCategorizerMinimumProbabilityPercentage.Value < 0
+                || request.AutoCategorizerMinimumProbabilityPercentage.Value > 100
+            )
+            {
+                logger.LogError(
+                    "{LogMessage}",
+                    logLocalizer["InvalidAutoCategorizerMinimumProbabilityPercentageLog"]
+                );
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidAutoCategorizerMinimumProbabilityPercentageError"]
+                );
+            }
+            userSettings.AutoCategorizerMinimumProbabilityPercentage = request
+                .AutoCategorizerMinimumProbabilityPercentage
+                .Value;
         }
     }
 

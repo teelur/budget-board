@@ -21,8 +21,9 @@ public class UserSettingsServiceTests
             f => f.PickRandom(LocalizationHelpers.CurrencyCodes)
         );
 
+    #region ReadUserSettingsAsync
     [Fact]
-    public async Task ReadUserSettingsAsync_ReturnsUserSettingsResponse_WhenUserExists()
+    public async Task ReadUserSettingsAsync_WhenValidData_ReturnsUserSettings()
     {
         // Arrange
         var helper = new TestHelper();
@@ -45,11 +46,11 @@ public class UserSettingsServiceTests
 
         // Assert
         result.Should().BeOfType<UserSettingsResponse>();
-        result.Currency.Should().Be(userSettings.Currency.ToString());
+        result.Should().BeEquivalentTo(new UserSettingsResponse(userSettings));
     }
 
     [Fact]
-    public async Task ReadUserSettingsAsync_WhenUserNotFound_ThrowsError()
+    public async Task ReadUserSettingsAsync_WhenUserNotFound_ThrowsInvalidUserError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -95,7 +96,9 @@ public class UserSettingsServiceTests
         result.Should().BeOfType<UserSettingsResponse>();
         result.Should().BeEquivalentTo(new UserSettingsResponse());
     }
+    #endregion
 
+    #region UpdateUserSettingsAsync
     [Fact]
     public async Task UpdateUserSettingsAsync_WhenValidData_UpdatesUserSettings()
     {
@@ -113,12 +116,18 @@ public class UserSettingsServiceTests
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
         helper.UserDataContext.SaveChanges();
 
-        var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
-        userSettingsUpdateRequest.Language = "en-US";
-        userSettingsUpdateRequest.DateFormat = "MM/DD/YYYY";
-        userSettingsUpdateRequest.DisableBuiltInTransactionCategories = true;
-        userSettingsUpdateRequest.BudgetWarningThreshold = 50;
-        userSettingsUpdateRequest.ForceSyncLookbackMonths = 6;
+        var userSettingsUpdateRequest = new UserSettingsUpdateRequest
+        {
+            Currency = "GBP",
+            Language = "en-US",
+            DateFormat = "MM/DD/YYYY",
+            BudgetWarningThreshold = 50,
+            ForceSyncLookbackMonths = 6,
+            DisableBuiltInTransactionCategories = true,
+            DisableBuiltInAccountTypes = false,
+            DisableBuiltInAssetTypes = false,
+            AutoCategorizerMinimumProbabilityPercentage = 80,
+        };
 
         // Act
         await userSettingsService.UpdateUserSettingsAsync(
@@ -128,23 +137,31 @@ public class UserSettingsServiceTests
 
         // Assert
         var settings = helper.demoUser.UserSettings;
-        settings.Should().NotBeNull();
-        settings!.Currency.Should().Be(userSettingsUpdateRequest.Currency);
+        settings.Currency.Should().Be(userSettingsUpdateRequest.Currency);
         settings.Language.Should().Be(userSettingsUpdateRequest.Language.ToLower());
         settings.DateFormat.Should().Be(userSettingsUpdateRequest.DateFormat);
-        settings
-            .DisableBuiltInTransactionCategories.Should()
-            .Be((bool)userSettingsUpdateRequest.DisableBuiltInTransactionCategories);
         settings
             .BudgetWarningThreshold.Should()
             .Be(userSettingsUpdateRequest.BudgetWarningThreshold);
         settings
             .ForceSyncLookbackMonths.Should()
             .Be(userSettingsUpdateRequest.ForceSyncLookbackMonths);
+        settings
+            .DisableBuiltInTransactionCategories.Should()
+            .Be((bool)userSettingsUpdateRequest.DisableBuiltInTransactionCategories);
+        settings
+            .DisableBuiltInAccountTypes.Should()
+            .Be((bool)userSettingsUpdateRequest.DisableBuiltInAccountTypes);
+        settings
+            .DisableBuiltInAssetTypes.Should()
+            .Be((bool)userSettingsUpdateRequest.DisableBuiltInAssetTypes);
+        settings
+            .AutoCategorizerMinimumProbabilityPercentage.Should()
+            .Be(userSettingsUpdateRequest.AutoCategorizerMinimumProbabilityPercentage);
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_WhenUserSettingsNotFound_ThrowsError()
+    public async Task UpdateUserSettingsAsync_WhenUserSettingsNotFound_ThrowsUserSettingsNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -174,7 +191,7 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_WhenInvalidCurrency_ThrowsError()
+    public async Task UpdateUserSettingsAsync_WhenInvalidCurrency_ThrowsInvalidCurrencyCodeError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -208,7 +225,37 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_WhenInvalidBudgetWarningThreshold_ThrowsError()
+    public async Task UpdateUserSettingsAsync_WhenCurrencySameAsCurrent_DoesNotUpdate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            Currency = "USD",
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { Currency = "USD" };
+
+        // Act — same value, should be a no-op (no error, no change)
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.Currency.Should().Be("USD");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_WhenInvalidLanguage_ThrowsInvalidLanguageCodeError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -225,7 +272,79 @@ public class UserSettingsServiceTests
         helper.UserDataContext.SaveChanges();
 
         var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
-        userSettingsUpdateRequest.BudgetWarningThreshold = 150;
+        userSettingsUpdateRequest.Language = "INVALID";
+
+        // Act
+        var updateUserSettingsAct = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(
+                helper.demoUser.Id,
+                userSettingsUpdateRequest
+            );
+
+        // Assert
+        await updateUserSettingsAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidLanguageCodeError");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_WhenInvalidDateFormat_ThrowsInvalidDateFormatError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
+        userSettingsUpdateRequest.DateFormat = "INVALID/FORMAT";
+
+        // Act
+        var updateUserSettingsAct = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(
+                helper.demoUser.Id,
+                userSettingsUpdateRequest
+            );
+
+        // Assert
+        await updateUserSettingsAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidDateFormatError");
+    }
+
+    [Theory]
+    [InlineData(-10)]
+    [InlineData(150)]
+    public async Task UpdateUserSettingsAsync_WhenInvalidBudgetWarningThreshold_ThrowsInvalidBudgetWarningThresholdError(
+        int invalidThreshold
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
+        userSettingsUpdateRequest.BudgetWarningThreshold = invalidThreshold;
 
         // Act
         var updateUserSettingsAct = async () =>
@@ -242,7 +361,7 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_WhenInvalidForceSyncLookbackMonths_ThrowsError()
+    public async Task UpdateUserSettingsAsync_WhenInvalidForceSyncLookbackMonths_ThrowsInvalidForceSyncLookbackMonthsError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -276,41 +395,7 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_WhenInvalidDateFormat_ThrowsError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
-        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
-        helper.UserDataContext.SaveChanges();
-
-        var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
-        userSettingsUpdateRequest.DateFormat = "INVALID/FORMAT";
-
-        // Act
-        var updateUserSettingsAct = async () =>
-            await userSettingsService.UpdateUserSettingsAsync(
-                helper.demoUser.Id,
-                userSettingsUpdateRequest
-            );
-
-        // Assert
-        await updateUserSettingsAct
-            .Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("InvalidDateFormatError");
-    }
-
-    [Fact]
-    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenAccountUsesBuiltInType_ThrowsError()
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenAccountUsesBuiltInType_ThrowsDisableBuiltInAccountTypesInUseError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -328,6 +413,7 @@ public class UserSettingsServiceTests
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
         account.Type = "checking"; // matches a built-in type value (stored lowercase in HashSet)
+
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
 
@@ -344,7 +430,7 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenCustomTypeHasBuiltInParent_ThrowsError()
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenCustomTypeHasBuiltInParent_ThrowsDisableBuiltInAccountTypesInUseError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -487,36 +573,6 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_WhenCurrencySameAsCurrent_DoesNotUpdate()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        helper.demoUser.UserSettings = new UserSettings
-        {
-            UserID = helper.demoUser.Id,
-            Currency = "USD",
-        };
-        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
-        helper.UserDataContext.SaveChanges();
-
-        var request = new UserSettingsUpdateRequest { Currency = "USD" };
-
-        // Act — same value, should be a no-op (no error, no change)
-        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
-
-        // Assert
-        helper.demoUser.UserSettings.Currency.Should().Be("USD");
-    }
-
-    [Fact]
     public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenAlreadyDisabledAndSameValueRequested_DoesNotThrow()
     {
         // Arrange — built-ins already disabled; user has a conflicting custom type name, but
@@ -591,4 +647,438 @@ public class UserSettingsServiceTests
         await act.Should().NotThrowAsync();
         helper.demoUser.UserSettings.DisableBuiltInAccountTypes.Should().BeFalse();
     }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAssetTypes_WhenNoChange_ShouldNotUpdate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAssetTypes = false,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAssetTypes = false };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.DisableBuiltInAssetTypes.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAssetTypes_WhenNoConflicts_Succeeds()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAssetTypes = true };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.DisableBuiltInAssetTypes.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuildInAssetTypes_WhenAssetUsesBuiltInType_ThrowsDisableBuiltInAssetTypesInUseError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAssetTypes = false,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var assetFaker = new AssetFaker(helper.demoUser.Id);
+        var asset = assetFaker.Generate();
+        asset.Type = AssetTypeConstants.DefaultAssetTypes.Shuffle().First().Value;
+
+        helper.UserDataContext.Assets.Add(asset);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAssetTypes = true };
+
+        // Act
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("DisableBuiltInAssetTypesInUseError");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAssetTypes_WhenConflictingCustomType_ThrowsDisableBuiltInAssetTypesInUseError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAssetTypes = false,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var assetTypeFaker = new AssetTypeFaker(helper.demoUser.Id);
+        var customAssetType = assetTypeFaker.Generate();
+        customAssetType.Parent = AssetTypeConstants
+            .DefaultAssetTypes.Shuffle()
+            .First(at => at.Parent == string.Empty)
+            .Value;
+        helper.UserDataContext.AssetTypes.Add(customAssetType);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAssetTypes = true };
+
+        // Act
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("DisableBuiltInAssetTypesInUseError");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_EnableBuildInAssetTypes_WhenConflictingCustomType_ThrowsEnableBuiltInAssetTypesConflictError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAssetTypes = true,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var assetTypeFaker = new AssetTypeFaker(helper.demoUser.Id);
+        var customAssetType = assetTypeFaker.Generate();
+        customAssetType.Value = AssetTypeConstants.DefaultAssetTypes.Shuffle().First().Value; // conflicts with a built-in type (case-insensitive check)
+        helper.UserDataContext.AssetTypes.Add(customAssetType);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAssetTypes = false };
+
+        // Act
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("EnableBuiltInAssetTypesConflictError");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_EnableBuiltInAssetTypes_WhenNoConflicts_Succeeds()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            DisableBuiltInAssetTypes = true,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInAssetTypes = false };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.DisableBuiltInAssetTypes.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_EnableAutoCategorizer_WhenNotSpecified_ShouldNotUpdate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            EnableAutoCategorizer = true,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { EnableAutoCategorizer = null };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.EnableAutoCategorizer.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_EnableAutoCategorizer_WhenSameValue_ShouldNotUpdate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            EnableAutoCategorizer = true,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { EnableAutoCategorizer = true };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.EnableAutoCategorizer.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_EnableAutoCategorizer_WhenDifferentValue_ShouldUpdate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            EnableAutoCategorizer = true,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { EnableAutoCategorizer = false };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.EnableAutoCategorizer.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_EnableAutoCategorizer_WhenNotTrained_ShouldThrowAutoCategorizerNotTrained()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            EnableAutoCategorizer = false,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { EnableAutoCategorizer = true };
+
+        // Act
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AutoCategorizerNotTrained");
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_ChangeAutoCategorizerMinimumProbabilityPercentage_WhenSameValue_ShouldNotUpdate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            AutoCategorizerMinimumProbabilityPercentage = 50,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest
+        {
+            AutoCategorizerMinimumProbabilityPercentage = 50,
+        };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.AutoCategorizerMinimumProbabilityPercentage.Should().Be(50);
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_ChangeAutoCategorizerMinimumProbabilityPercentage_WhenDifferentValue_ShouldUpdate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            AutoCategorizerMinimumProbabilityPercentage = 50,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest
+        {
+            AutoCategorizerMinimumProbabilityPercentage = 75,
+        };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.AutoCategorizerMinimumProbabilityPercentage.Should().Be(75);
+    }
+
+    [Theory]
+    [InlineData(-10)]
+    [InlineData(150)]
+    public async Task UpdateUserSettingsAsync_ChangeAutoCategorizerMinimumProbabilityPercentage_WhenInvalidValue_ShouldThrowInvalidAutoCategorizerMinimumProbabilityPercentageError(
+        int invalidValue
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            AutoCategorizerMinimumProbabilityPercentage = 50,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest
+        {
+            AutoCategorizerMinimumProbabilityPercentage = invalidValue,
+        };
+
+        // Act
+        var act = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidAutoCategorizerMinimumProbabilityPercentageError");
+    }
+    #endregion
 }
