@@ -1,15 +1,10 @@
 import { Group } from "@mantine/core";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface NetWorthItemProps {
   title: string;
@@ -19,23 +14,7 @@ interface NetWorthItemProps {
 
 const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
   const { intlLocale } = useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency } = useUserSettings();
 
   return (
     <Group
@@ -46,17 +25,15 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
       gap="0.25rem"
     >
       <PrimaryText fw={600}>{props.title}</PrimaryText>
-      {userSettingsQuery.isPending ? null : (
-        <StatusText amount={props.totalBalance}>
-          {convertNumberToCurrency(
-            props.totalBalance,
-            true,
-            userSettingsQuery.data?.currency ?? "USD",
-            SignDisplay.Auto,
-            intlLocale,
-          )}
-        </StatusText>
-      )}
+      <StatusText amount={props.totalBalance}>
+        {convertNumberToCurrency(
+          props.totalBalance,
+          true,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        )}
+      </StatusText>
     </Group>
   );
 };

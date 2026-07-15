@@ -1,12 +1,9 @@
 import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IInstitution, InstitutionIndexRequest } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AccountDetails from "./AccountDetails/AccountDetails";
 import { IAccountResponse } from "~/models/account";
@@ -34,23 +31,6 @@ const AccountsContent = (props: AccountsContentProps) => {
   const [sortedInstitutions, setSortedInstitutions] = React.useState<
     IInstitution[]
   >([]);
-
-  const { request } = useAuth();
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data;
-      }
-
-      return undefined;
-    },
-  });
 
   React.useEffect(() => {
     if (institutionQuery.data) {
@@ -88,7 +68,6 @@ const AccountsContent = (props: AccountsContentProps) => {
           isOpen={isDetailsOpen}
           close={closeDetails}
           account={selectedAccount}
-          currency={userSettingsQuery.data?.currency || "USD"}
         />
       )}
       {institutionQuery.isPending ? (
@@ -119,7 +98,6 @@ const AccountsContent = (props: AccountsContentProps) => {
             <InstitutionItem
               key={institution.id}
               institution={institution}
-              userCurrency={userSettingsQuery.data?.currency || "USD"}
               isSortable={props.isSortable}
               container={
                 document.getElementById("institutions-stack") as Element

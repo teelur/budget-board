@@ -13,7 +13,6 @@ import Card from "~/components/core/Card/Card";
 
 interface IAccountItemProps {
   account: IAccountResponse;
-  userCurrency: string;
   isSortable: boolean;
   container: Element;
   openDetails: (account: IAccountResponse | undefined) => void;
@@ -50,17 +49,9 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
           </Flex>
         )}
         {isSelected ? (
-          <EditableAccountItemContent
-            account={props.account}
-            userCurrency={props.userCurrency}
-            toggle={toggle}
-          />
+          <EditableAccountItemContent account={props.account} toggle={toggle} />
         ) : (
-          <AccountItemContent
-            account={props.account}
-            userCurrency={props.userCurrency}
-            toggle={toggle}
-          />
+          <AccountItemContent account={props.account} toggle={toggle} />
         )}
       </Group>
     </Card>

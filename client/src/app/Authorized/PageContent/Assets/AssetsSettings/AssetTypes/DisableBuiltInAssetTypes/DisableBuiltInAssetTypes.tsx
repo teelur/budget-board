@@ -1,13 +1,5 @@
 import { Button, Skeleton, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import {
-  assetTypesQueryKey,
-  translateAxiosError,
-  userSettingsQueryKey,
-} from "~/helpers/requests";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -16,33 +8,14 @@ import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { defaultGuid } from "~/models/applicationUser";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
+import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
 
 const DisableBuiltInAssetTypes = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const { allAssetTypes, customAssetTypes } = useAssetTypes();
   const { disableBuiltInAssetTypes } = useUserSettings();
   const assetsQuery = useAssetsQuery();
-
-  const queryClient = useQueryClient();
-  const doUpdateUserSettings = useMutation({
-    mutationFn: async (updatedUserSettings: IUserSettingsUpdateRequest) =>
-      await request({
-        url: "/api/userSettings",
-        method: "PUT",
-        data: updatedUserSettings,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const updateUserSettingsMutation = useUpdateUserSettingsMutation();
 
   if (assetsQuery.isPending) {
     return <Skeleton height={75} radius="md" />;
@@ -99,9 +72,9 @@ const DisableBuiltInAssetTypes = (): React.ReactNode => {
         variant="primary"
         size="xs"
         disabled={!disableBuiltInAssetTypes && !canDisable}
-        loading={doUpdateUserSettings.isPending}
+        loading={updateUserSettingsMutation.isPending}
         onClick={() => {
-          doUpdateUserSettings.mutate({
+          updateUserSettingsMutation.mutate({
             disableBuiltInAssetTypes: !disableBuiltInAssetTypes,
           } as IUserSettingsUpdateRequest);
         }}

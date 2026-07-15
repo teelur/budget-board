@@ -1,17 +1,12 @@
 import { ActionIcon, Button, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
-import { IUserSettings } from "~/models/userSettings";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Modal from "~/components/core/Modal/Modal";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
@@ -24,6 +19,7 @@ import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/Acco
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateTransactionMutation } from "~/hooks/mutations/transactions/useCreateTransactionMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -36,9 +32,9 @@ const CreateTransactionModal = (): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
-  const { request } = useAuth();
   const createTransactionMutation = useCreateTransactionMutation();
 
   const dateField = useField<Date | null>({
@@ -58,22 +54,6 @@ const CreateTransactionModal = (): React.ReactNode => {
     initialValue: [],
     validate: (value) =>
       value && value.length > 0 ? null : t("account_is_required"),
-  });
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
   });
 
   const onSubmit = () => {
@@ -146,7 +126,7 @@ const CreateTransactionModal = (): React.ReactNode => {
           <NumberInput
             label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
             placeholder={t("enter_amount")}
-            prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+            prefix={getCurrencySymbol(preferredCurrency)}
             decimalScale={2}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}

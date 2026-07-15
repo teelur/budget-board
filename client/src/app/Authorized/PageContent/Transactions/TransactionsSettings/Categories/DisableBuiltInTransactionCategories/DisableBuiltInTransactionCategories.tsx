@@ -1,13 +1,5 @@
 import { Button, Skeleton, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import {
-  transactionCategoriesQueryKey,
-  translateAxiosError,
-  userSettingsQueryKey,
-} from "~/helpers/requests";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -16,36 +8,15 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import { defaultGuid } from "~/models/applicationUser";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
 
 const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const { allTransactionCategories, customTransactionCategories } =
     useTransactionCategories();
   const { disableBuiltInTransactionCategories } = useUserSettings();
   const transactionsQuery = useTransactionsQuery();
-
-  const queryClient = useQueryClient();
-  const doUpdateUserSettings = useMutation({
-    mutationFn: async (updatedUserSettings: IUserSettingsUpdateRequest) =>
-      await request({
-        url: "/api/userSettings",
-        method: "PUT",
-        data: updatedUserSettings,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
-      await queryClient.invalidateQueries({
-        queryKey: [transactionCategoriesQueryKey],
-      });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const updateUserSettingsMutation = useUpdateUserSettingsMutation();
 
   if (transactionsQuery.isPending) {
     return <Skeleton height={75} radius="md" />;
@@ -112,9 +83,9 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
         variant="primary"
         size="xs"
         disabled={!disableBuiltInTransactionCategories && !canDisable}
-        loading={doUpdateUserSettings.isPending}
+        loading={updateUserSettingsMutation.isPending}
         onClick={() => {
-          doUpdateUserSettings.mutate({
+          updateUserSettingsMutation.mutate({
             disableBuiltInTransactionCategories:
               !disableBuiltInTransactionCategories,
           } as IUserSettingsUpdateRequest);

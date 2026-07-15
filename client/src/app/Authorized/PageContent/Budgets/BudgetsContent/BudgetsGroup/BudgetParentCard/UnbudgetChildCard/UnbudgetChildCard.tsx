@@ -2,18 +2,14 @@ import classes from "./UnbudgetChildCard.module.css";
 
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { CornerDownRight, PlusIcon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { roundAwayFromZero } from "~/helpers/utils";
-import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface UnbudgetChildCardProps {
   selectedDate: Date | null;
@@ -25,24 +21,8 @@ interface UnbudgetChildCardProps {
 
 const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
   const { intlLocale, dayjs } = useLocale();
-  const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
   const createBudgetMutation = useCreateBudgetMutation();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
 
   if (roundAwayFromZero(props.amount) === 0) {
     return null;
@@ -72,17 +52,15 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
             {props.category}
           </PrimaryText>
           <Group gap="0.5rem">
-            {userSettingsQuery.isPending ? null : (
-              <PrimaryText className={classes.text} elevation={1}>
-                {convertNumberToCurrency(
-                  props.amount * (props.isIncome ? 1 : -1),
-                  false,
-                  userSettingsQuery.data?.currency ?? "USD",
-                  SignDisplay.Auto,
-                  intlLocale,
-                )}
-              </PrimaryText>
-            )}
+            <PrimaryText className={classes.text} elevation={1}>
+              {convertNumberToCurrency(
+                props.amount * (props.isIncome ? 1 : -1),
+                false,
+                preferredCurrency,
+                SignDisplay.Auto,
+                intlLocale,
+              )}
+            </PrimaryText>
             {props.selectedDate && (
               <ActionIcon
                 size="sm"

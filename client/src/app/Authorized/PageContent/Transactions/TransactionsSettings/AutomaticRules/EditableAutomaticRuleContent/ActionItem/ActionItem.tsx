@@ -1,9 +1,6 @@
 import { ActionIcon, Group } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
@@ -12,7 +9,6 @@ import {
   IRuleParameterEdit,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
-import { IUserSettings } from "~/models/userSettings";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
@@ -22,8 +18,7 @@ import Select from "~/components/core/Select/Select/Select";
 import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 export interface ActionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -38,23 +33,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjsLocale, longDateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency } = useUserSettings();
 
   const getValueInput = (): React.ReactNode => {
     if (props.ruleParameter.field === "merchant") {
@@ -84,7 +63,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
               value: (typeof value === "number" ? value : 0).toString(),
             })
           }
-          prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+          prefix={getCurrencySymbol(preferredCurrency)}
           decimalScale={2}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}

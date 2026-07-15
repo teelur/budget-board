@@ -6,18 +6,13 @@ import {
   Stack,
   Table,
 } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ITransactionImportTableData } from "~/models/transaction";
-import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
@@ -25,28 +20,13 @@ interface TransactionsTableProps {
 }
 
 const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
-  const [page, setPage] = React.useState(1);
   const itemsPerPage = 10;
 
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
-  const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
 
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const [page, setPage] = React.useState(1);
 
   return (
     <Stack gap={0} justify="center">
@@ -93,15 +73,13 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                   <Table.Td>{row.merchantName}</Table.Td>
                   <Table.Td>{row.category}</Table.Td>
                   <Table.Td>
-                    {userSettingsQuery.isPending
-                      ? null
-                      : convertNumberToCurrency(
-                          row.amount ?? 0,
-                          true,
-                          userSettingsQuery.data?.currency ?? "USD",
-                          SignDisplay.Auto,
-                          intlLocale,
-                        )}
+                    {convertNumberToCurrency(
+                      row.amount ?? 0,
+                      true,
+                      preferredCurrency,
+                      SignDisplay.Auto,
+                      intlLocale,
+                    )}
                   </Table.Td>
                   <Table.Td>{row.account}</Table.Td>
                 </Table.Tr>

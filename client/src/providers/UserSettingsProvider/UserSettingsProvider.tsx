@@ -1,27 +1,40 @@
 import React from "react";
-import { useAuth } from "../AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import { useTranslation } from "react-i18next";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettingsQuery } from "~/hooks/queries/useUserSettingsQuery";
 
 export interface UserSettingsContextValue {
   preferredCurrency: string;
   preferredLanguage: string;
+  preferredDateFormat: string;
+  budgetWarningThreshold: number;
+  forceSyncLookbackMonths: number;
   disableBuiltInAccountTypes: boolean;
   disableBuiltInAssetTypes: boolean;
   disableBuiltInTransactionCategories: boolean;
+  enableAutoCategorizer: boolean;
+  autoCategorizerModelOID: number | null;
+  autoCategorizerLastTrained: Date | null;
+  autoCategorizerModelStartDate: Date | null;
+  autoCategorizerModelEndDate: Date | null;
+  autoCategorizerMinimumProbabilityPercentage: number;
 }
 
 export const UserSettingsContext =
   React.createContext<UserSettingsContextValue>({
     preferredCurrency: "USD",
     preferredLanguage: "default",
+    preferredDateFormat: "default",
+    budgetWarningThreshold: 0.8,
+    forceSyncLookbackMonths: 0,
     disableBuiltInAccountTypes: false,
     disableBuiltInAssetTypes: false,
     disableBuiltInTransactionCategories: false,
+    enableAutoCategorizer: false,
+    autoCategorizerModelOID: null,
+    autoCategorizerLastTrained: null,
+    autoCategorizerModelStartDate: null,
+    autoCategorizerModelEndDate: null,
+    autoCategorizerMinimumProbabilityPercentage: 0.8,
   });
 
 export const UserSettingsProvider = ({
@@ -30,23 +43,7 @@ export const UserSettingsProvider = ({
   children: React.ReactNode;
 }): React.ReactNode => {
   const { i18n } = useTranslation();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const userSettingsQuery = useUserSettingsQuery();
 
   React.useEffect(() => {
     if (userSettingsQuery.data?.language) {
@@ -64,12 +61,30 @@ export const UserSettingsProvider = ({
   const userSettingsValue: UserSettingsContextValue = {
     preferredCurrency: userSettingsQuery.data?.currency ?? "USD",
     preferredLanguage: userSettingsQuery.data?.language ?? "default",
+    preferredDateFormat: userSettingsQuery.data?.dateFormat ?? "default",
+    budgetWarningThreshold:
+      userSettingsQuery.data?.budgetWarningThreshold ?? 0.8,
     disableBuiltInAccountTypes:
       userSettingsQuery.data?.disableBuiltInAccountTypes ?? false,
     disableBuiltInAssetTypes:
       userSettingsQuery.data?.disableBuiltInAssetTypes ?? false,
+    forceSyncLookbackMonths:
+      userSettingsQuery.data?.forceSyncLookbackMonths ?? 0,
     disableBuiltInTransactionCategories:
       userSettingsQuery.data?.disableBuiltInTransactionCategories ?? false,
+    enableAutoCategorizer:
+      userSettingsQuery.data?.enableAutoCategorizer ?? false,
+    autoCategorizerModelOID:
+      userSettingsQuery.data?.autoCategorizerModelOID ?? null,
+    autoCategorizerLastTrained:
+      userSettingsQuery.data?.autoCategorizerLastTrained ?? null,
+    autoCategorizerModelStartDate:
+      userSettingsQuery.data?.autoCategorizerModelStartDate ?? null,
+    autoCategorizerModelEndDate:
+      userSettingsQuery.data?.autoCategorizerModelEndDate ?? null,
+    autoCategorizerMinimumProbabilityPercentage:
+      userSettingsQuery.data?.autoCategorizerMinimumProbabilityPercentage ??
+      0.8,
   };
 
   return (

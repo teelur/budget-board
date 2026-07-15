@@ -24,11 +24,6 @@ import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
 import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -41,6 +36,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -57,9 +53,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale, thousandsSeparator, decimalSeparator } =
     useLocale();
+  const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
-  const { request } = useAuth();
 
   const isIncome = areStringsEqual(props.categoryTree.value, "income");
   const limit =
@@ -88,22 +84,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       limit) *
       100,
   );
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
 
   const handleEdit = (newLimit?: number | string) => {
     if (newLimit === "") {
@@ -246,7 +226,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         amount: convertNumberToCurrency(
                           amount * (isIncome ? 1 : -1),
                           false,
-                          userSettingsQuery.data?.currency ?? "USD",
+                          preferredCurrency,
                           SignDisplay.Auto,
                           intlLocale,
                         ),
@@ -269,9 +249,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         min={childLimitsTotal}
                         max={999999}
                         step={1}
-                        prefix={getCurrencySymbol(
-                          userSettingsQuery.data?.currency,
-                        )}
+                        prefix={getCurrencySymbol(preferredCurrency)}
                         placeholder={t("enter_limit")}
                         size="xs"
                         styles={{
@@ -294,14 +272,14 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       amount: convertNumberToCurrency(
                         amount * (isIncome ? 1 : -1),
                         false,
-                        userSettingsQuery.data?.currency ?? "USD",
+                        preferredCurrency,
                         SignDisplay.Auto,
                         intlLocale,
                       ),
                       total: convertNumberToCurrency(
                         limit,
                         false,
-                        userSettingsQuery.data?.currency ?? "USD",
+                        preferredCurrency,
                         SignDisplay.Auto,
                         intlLocale,
                       ),
@@ -336,9 +314,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   amount={amount}
                   limit={limit}
                   type={isIncome ? ProgressType.Income : ProgressType.Expense}
-                  warningThreshold={
-                    userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                  }
+                  warningThreshold={budgetWarningThreshold}
                   elevation={1}
                 />
               </Flex>
@@ -348,7 +324,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   amount: convertNumberToCurrency(
                     roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
                     false,
-                    userSettingsQuery.data?.currency ?? "USD",
+                    preferredCurrency,
                     SignDisplay.Auto,
                     intlLocale,
                   ),
@@ -362,9 +338,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         ? StatusColorType.Income
                         : StatusColorType.Expense
                     }
-                    warningThreshold={
-                      userSettingsQuery.data?.budgetWarningThreshold ?? 80
-                    }
+                    warningThreshold={budgetWarningThreshold}
                     size="md"
                     key="amount"
                   />,

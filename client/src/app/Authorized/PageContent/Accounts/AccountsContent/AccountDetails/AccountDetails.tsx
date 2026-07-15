@@ -22,7 +22,6 @@ interface AccountDetailsProps {
   isOpen: boolean;
   close: () => void;
   account: IAccountResponse;
-  currency: string;
 }
 
 const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
@@ -84,10 +83,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                 <PrimaryHeading order={5}>{t("add_balance")}</PrimaryHeading>
               }
             >
-              <AddBalance
-                accountId={props.account.id}
-                currency={props.currency}
-              />
+              <AddBalance accountId={props.account.id} />
             </Accordion.Item>
             <Accordion.Item
               title={
@@ -150,10 +146,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                     <DimmedText size="sm">{t("no_balance_entries")}</DimmedText>
                   </Group>
                 ) : (
-                  <BalanceItems
-                    balances={sortedBalances}
-                    currency={props.currency}
-                  />
+                  <BalanceItems balances={sortedBalances} />
                 )}
               </Stack>
             </Accordion.Item>

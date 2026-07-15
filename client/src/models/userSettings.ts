@@ -1,4 +1,4 @@
-export interface IUserSettings {
+export interface IUserSettingsResponse {
   currency: string;
   language: string;
   dateFormat: string;

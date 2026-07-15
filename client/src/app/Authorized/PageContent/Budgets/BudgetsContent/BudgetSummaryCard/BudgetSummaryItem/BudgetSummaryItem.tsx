@@ -2,10 +2,6 @@ import { StatusColorType } from "~/helpers/budgets";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
@@ -13,8 +9,7 @@ import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBa
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -27,23 +22,7 @@ interface BudgetSummaryItemProps {
 
 const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const { intlLocale } = useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
 
   const percentComplete = Math.round(
     ((props.amount *
@@ -52,22 +31,20 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
       100,
   );
 
-  const currency = userSettingsQuery.data?.currency ?? "USD";
-  const warningThreshold = userSettingsQuery.data?.budgetWarningThreshold ?? 80;
   const signedAmount =
     props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
 
   const formattedAmount = convertNumberToCurrency(
     signedAmount,
     false,
-    currency,
+    preferredCurrency,
     SignDisplay.Auto,
     intlLocale,
   );
   const formattedTotal = convertNumberToCurrency(
     props.total ?? 0,
     false,
-    currency,
+    preferredCurrency,
     SignDisplay.Auto,
     intlLocale,
   );
@@ -76,7 +53,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     amount: props.amount,
     total: props.total ?? 0,
     type: props.budgetValueType,
-    warningThreshold,
+    warningThreshold: budgetWarningThreshold,
     size: "md" as const,
   };
 
@@ -121,7 +98,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
               ? ProgressType.Income
               : ProgressType.Expense
           }
-          warningThreshold={warningThreshold}
+          warningThreshold={budgetWarningThreshold}
           elevation={1}
         />
       )}

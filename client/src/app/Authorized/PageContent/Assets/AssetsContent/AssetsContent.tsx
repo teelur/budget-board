@@ -1,12 +1,9 @@
 import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { IAssetIndexRequest, IAssetResponse } from "~/models/asset";
 import AssetItem from "./AssetItem/AssetItem";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AssetDetails from "./AssetDetails/AssetDetails";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -27,26 +24,9 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
   >(undefined);
 
   const { t } = useTranslation();
-  const { request } = useAuth();
   const assetsQuery = useAssetsQuery();
 
   const [sortedAssets, setSortedAssets] = React.useState<IAssetResponse[]>([]);
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async () => {
-      const res = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data;
-      }
-
-      return undefined;
-    },
-  });
 
   React.useEffect(() => {
     if (assetsQuery.data) {
@@ -86,7 +66,6 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
         isOpen={isDetailsOpen}
         close={closeDetails}
         asset={selectedAsset}
-        userCurrency={userSettingsQuery.data?.currency || "USD"}
       />
       {assetsQuery.isPending ? (
         <>
@@ -117,7 +96,6 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
             <AssetItem
               key={asset.id}
               asset={asset}
-              userCurrency={userSettingsQuery.data?.currency || "USD"}
               isSortable={props.isSortable}
               container={document.getElementById("assets-stack") as Element}
               openDetails={function (asset: IAssetResponse | undefined): void {

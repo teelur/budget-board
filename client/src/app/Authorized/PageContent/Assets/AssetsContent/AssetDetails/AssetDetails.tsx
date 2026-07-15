@@ -19,12 +19,12 @@ import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AssetDetailsProps {
   isOpen: boolean;
   close: () => void;
   asset: IAssetResponse | undefined;
-  userCurrency: string;
 }
 
 const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
@@ -32,6 +32,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const { request } = useAuth();
 
   const valuesQuery = useQuery({
@@ -91,7 +92,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     price: convertNumberToCurrency(
                       props.asset.purchasePrice,
                       true,
-                      props.userCurrency,
+                      preferredCurrency,
                       SignDisplay.Auto,
                       intlLocale,
                     ),
@@ -116,7 +117,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     {convertNumberToCurrency(
                       props.asset.sellPrice - props.asset.purchasePrice,
                       true,
-                      props.userCurrency,
+                      preferredCurrency,
                       SignDisplay.Always,
                       intlLocale,
                     )}
@@ -133,7 +134,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                       price: convertNumberToCurrency(
                         props.asset.sellPrice,
                         true,
-                        props.userCurrency,
+                        preferredCurrency,
                         SignDisplay.Auto,
                         intlLocale,
                       ),
@@ -152,10 +153,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 <PrimaryHeading order={5}>{t("add_value")}</PrimaryHeading>
               }
             >
-              <AddValue
-                assetId={props.asset.id}
-                currency={props.userCurrency}
-              />
+              <AddValue assetId={props.asset.id} />
             </Accordion.Item>
             <Accordion.Item
               title={
@@ -214,10 +212,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     <DimmedText size="sm">{t("no_value_entries")}</DimmedText>
                   </Group>
                 ) : (
-                  <ValueItems
-                    values={sortedValues}
-                    userCurrency={props.userCurrency}
-                  />
+                  <ValueItems values={sortedValues} />
                 )}
               </Stack>
             </Accordion.Item>

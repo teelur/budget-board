@@ -9,10 +9,7 @@ import {
   LoadingOverlay,
   Stack,
 } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import {
   convertNumberToCurrency,
@@ -20,9 +17,7 @@ import {
   SignDisplay,
 } from "~/helpers/currency";
 import { IGoalResponse } from "~/models/goal";
-import { IUserSettings } from "~/models/userSettings";
 import { notifications } from "@mantine/notifications";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
@@ -41,6 +36,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCompleteGoalMutation } from "~/hooks/mutations/goals/useCompleteGoalMutation";
 import { useUpdateGoalMutation } from "~/hooks/mutations/goals/useUpdateGoalMutation";
 import { useDeleteGoalMutation } from "~/hooks/mutations/goals/useDeleteGoalMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -60,7 +56,7 @@ const EditableGoalCardContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
   const updateGoalMutation = useUpdateGoalMutation();
   const deleteGoalMutation = useDeleteGoalMutation();
   const completeGoalMutation = useCompleteGoalMutation();
@@ -78,22 +74,6 @@ const EditableGoalCardContent = (
     initialValue: dayjs(props.goal.completeDate).isValid()
       ? props.goal.completeDate
       : null,
-  });
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
   });
 
   return (
@@ -173,7 +153,7 @@ const EditableGoalCardContent = (
                         sumAccountsTotalBalance(props.goal.accounts) -
                           props.goal.initialAmount,
                         false,
-                        userSettingsQuery.data?.currency ?? "USD",
+                        preferredCurrency,
                         SignDisplay.Auto,
                         intlLocale,
                       ),
@@ -191,9 +171,7 @@ const EditableGoalCardContent = (
                     <NumberInput
                       maw={100}
                       min={0}
-                      prefix={getCurrencySymbol(
-                        userSettingsQuery.data?.currency,
-                      )}
+                      prefix={getCurrencySymbol(preferredCurrency)}
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
                       {...goalTargetAmountField.getInputProps()}
@@ -222,7 +200,7 @@ const EditableGoalCardContent = (
                       sumAccountsTotalBalance(props.goal.accounts) -
                         props.goal.initialAmount,
                       false,
-                      userSettingsQuery.data?.currency ?? "USD",
+                      preferredCurrency,
                       SignDisplay.Auto,
                       intlLocale,
                     ),
@@ -232,7 +210,7 @@ const EditableGoalCardContent = (
                         props.goal.initialAmount,
                       ),
                       false,
-                      userSettingsQuery.data?.currency ?? "USD",
+                      preferredCurrency,
                       SignDisplay.Auto,
                       intlLocale,
                     ),
@@ -266,7 +244,7 @@ const EditableGoalCardContent = (
                           sumAccountsTotalBalance(props.goal.accounts) -
                             props.goal.initialAmount,
                           false,
-                          userSettingsQuery.data?.currency ?? "USD",
+                          preferredCurrency,
                           SignDisplay.Auto,
                           intlLocale,
                         ),
@@ -328,7 +306,7 @@ const EditableGoalCardContent = (
                         sumAccountsTotalBalance(props.goal.accounts) -
                           props.goal.initialAmount,
                         false,
-                        userSettingsQuery.data?.currency ?? "USD",
+                        preferredCurrency,
                         SignDisplay.Auto,
                         intlLocale,
                       ),
@@ -349,9 +327,7 @@ const EditableGoalCardContent = (
                       size="sm"
                       maw={100}
                       min={0}
-                      prefix={getCurrencySymbol(
-                        userSettingsQuery.data?.currency,
-                      )}
+                      prefix={getCurrencySymbol(preferredCurrency)}
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
                       {...goalMonthlyContributionField.getInputProps()}
@@ -383,14 +359,14 @@ const EditableGoalCardContent = (
                     amount: convertNumberToCurrency(
                       props.goal.monthlyContributionProgress,
                       false,
-                      userSettingsQuery.data?.currency ?? "USD",
+                      preferredCurrency,
                       SignDisplay.Auto,
                       intlLocale,
                     ),
                     total: convertNumberToCurrency(
                       props.goal.monthlyContribution,
                       false,
-                      userSettingsQuery.data?.currency ?? "USD",
+                      preferredCurrency,
                       SignDisplay.Auto,
                       intlLocale,
                     ),

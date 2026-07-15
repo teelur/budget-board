@@ -7,11 +7,11 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateInstitutionMutation } from "~/hooks/mutations/institutions/useUpdateInstitutionMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IEditableInstitutionItemContentProps {
   institution: IInstitution;
   totalBalance: number;
-  userCurrency: string;
   toggle: () => void;
 }
 
@@ -23,6 +23,7 @@ const EditableInstitutionItemContent = (
   });
 
   const { intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const updateInstitutionMutation = useUpdateInstitutionMutation();
 
   return (
@@ -56,7 +57,7 @@ const EditableInstitutionItemContent = (
         {convertNumberToCurrency(
           props.totalBalance,
           true,
-          props.userCurrency,
+          preferredCurrency,
           SignDisplay.Auto,
           intlLocale,
         )}

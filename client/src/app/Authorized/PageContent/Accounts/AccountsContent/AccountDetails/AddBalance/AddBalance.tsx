@@ -8,10 +8,10 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useCreateBalanceMutation } from "~/hooks/mutations/balances/useCreateBalanceMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AddBalanceProps {
   accountId: string;
-  currency: string;
 }
 
 const AddBalance = (props: AddBalanceProps): React.ReactNode => {
@@ -23,6 +23,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const createBalanceMutation = useCreateBalanceMutation({
     accountId: props.accountId,
   });
@@ -46,7 +47,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
       <NumberInput
         {...amountField.getInputProps()}
         label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
-        prefix={getCurrencySymbol(props.currency)}
+        prefix={getCurrencySymbol(preferredCurrency)}
         decimalScale={2}
         decimalSeparator={decimalSeparator}
         thousandSeparator={thousandsSeparator}

@@ -11,10 +11,10 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { assetsQueryKey, valuesQueryKey } from "~/helpers/requests";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AddValueProps {
   assetId: string;
-  currency: string;
 }
 
 const AddValue = (props: AddValueProps): React.ReactNode => {
@@ -26,6 +26,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const { request } = useAuth();
 
   const amountField = useField<string | number>({
@@ -74,7 +75,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
       <NumberInput
         {...amountField.getInputProps()}
         label={<PrimaryText size="xs">{t("amount")}</PrimaryText>}
-        prefix={getCurrencySymbol(props.currency)}
+        prefix={getCurrencySymbol(preferredCurrency)}
         decimalScale={2}
         thousandSeparator={thousandsSeparator}
         decimalSeparator={decimalSeparator}

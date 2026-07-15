@@ -6,21 +6,17 @@ import {
   Stack,
   Table,
 } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import {
   ITransaction,
   ITransactionImportTableData,
 } from "~/models/transaction";
-import { IUserSettings } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -30,8 +26,14 @@ interface DuplicateTransactionTableProps {
 const DuplicateTransactionTable = (
   props: DuplicateTransactionTableProps,
 ): React.ReactNode => {
-  const [page, setPage] = React.useState(1);
   const itemsPerPage = 5;
+
+  const { t } = useTranslation();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+  const accountsQuery = useAccountsQuery();
+
+  const [page, setPage] = React.useState(1);
 
   const numberOfPages = Math.ceil(props.tableData.size / itemsPerPage);
 
@@ -40,28 +42,6 @@ const DuplicateTransactionTable = (
       setPage(numberOfPages);
     }
   }, [props.tableData]);
-
-  const { t } = useTranslation();
-  const { dayjs, dateFormat, intlLocale } = useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
-
-  const accountsQuery = useAccountsQuery();
 
   const accountIDToNameMap = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -130,15 +110,13 @@ const DuplicateTransactionTable = (
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.merchantName}</Table.Td>
                     <Table.Td>
-                      {userSettingsQuery.isPending
-                        ? null
-                        : convertNumberToCurrency(
-                            row.importedTransaction.amount ?? 0,
-                            true,
-                            userSettingsQuery.data?.currency ?? "USD",
-                            SignDisplay.Auto,
-                            intlLocale,
-                          )}
+                      {convertNumberToCurrency(
+                        row.importedTransaction.amount ?? 0,
+                        true,
+                        preferredCurrency,
+                        SignDisplay.Auto,
+                        intlLocale,
+                      )}
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.account}</Table.Td>
                   </Table.Tr>
@@ -153,15 +131,13 @@ const DuplicateTransactionTable = (
                     </Table.Td>
                     <Table.Td>{row.existingTransaction.merchantName}</Table.Td>
                     <Table.Td>
-                      {userSettingsQuery.isPending
-                        ? null
-                        : convertNumberToCurrency(
-                            row.existingTransaction.amount ?? 0,
-                            true,
-                            userSettingsQuery.data?.currency ?? "USD",
-                            SignDisplay.Auto,
-                            intlLocale,
-                          )}
+                      {convertNumberToCurrency(
+                        row.existingTransaction.amount ?? 0,
+                        true,
+                        preferredCurrency,
+                        SignDisplay.Auto,
+                        intlLocale,
+                      )}
                     </Table.Td>
                     <Table.Td>
                       {accountIDToNameMap.get(

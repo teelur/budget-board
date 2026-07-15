@@ -1,8 +1,6 @@
 import { ActionIcon, Box, Flex, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { ChevronLeftIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -10,69 +8,27 @@ import { useNavigate } from "react-router";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , userSettingsQueryKey} from "~/helpers/requests";
-import {
-  IUserSettings,
-  IUserSettingsUpdateRequest,
-} from "~/models/userSettings";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
 
 const BudgetsSettings = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
+  const { budgetWarningThreshold } = useUserSettings();
+  const updateUserSettingsMutation = useUpdateUserSettingsMutation();
   const navigate = useNavigate();
 
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
-
   const budgetWarningThresholdField = useField<number>({
-    initialValue: userSettingsQuery.data?.budgetWarningThreshold ?? 80,
+    initialValue: budgetWarningThreshold,
     validate: (value) =>
       value < 0 || value > 100
         ? t("budget_warning_threshold_invalid_message")
         : null,
   });
 
-  const queryClient = useQueryClient();
-  const doUpdateUserSettings = useMutation({
-    mutationFn: async (updatedUserSettings: IUserSettingsUpdateRequest) =>
-      await request({
-        url: "/api/userSettings",
-        method: "PUT",
-        data: updatedUserSettings,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
   React.useEffect(() => {
-    if (userSettingsQuery.data) {
-      budgetWarningThresholdField.setValue(
-        userSettingsQuery.data.budgetWarningThreshold,
-      );
-    }
-  }, [userSettingsQuery.data]);
+    budgetWarningThresholdField.setValue(budgetWarningThreshold);
+  }, [budgetWarningThreshold]);
 
   return (
     <Stack w="100%" p="0.5rem">
@@ -114,12 +70,12 @@ const BudgetsSettings = (): React.ReactNode => {
                   return;
                 }
 
-                doUpdateUserSettings.mutate({
+                updateUserSettingsMutation.mutate({
                   budgetWarningThreshold:
                     budgetWarningThresholdField.getValue(),
                 });
               }}
-              loading={doUpdateUserSettings.isPending}
+              loading={updateUserSettingsMutation.isPending}
             >
               <SendIcon size={20} />
             </ActionIcon>

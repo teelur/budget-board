@@ -6,15 +6,10 @@ import {
   Popover as MantinePopover,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { SplitIcon } from "lucide-react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { ICategory } from "~/models/category";
-import { IUserSettings } from "~/models/userSettings";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
@@ -22,6 +17,7 @@ import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useSplitTransactionMutation } from "~/hooks/mutations/transactions/useSplitTransactionMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface SplitTransactionProps {
   id: string;
@@ -41,24 +37,8 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { thousandsSeparator, decimalSeparator } = useLocale();
-  const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
   const splitTransactionMutation = useSplitTransactionMutation();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
 
   return (
     <Popover>
@@ -72,7 +52,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
           <NumberInput
             label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
             {...amountField.getInputProps()}
-            prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+            prefix={getCurrencySymbol(preferredCurrency)}
             decimalScale={2}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}

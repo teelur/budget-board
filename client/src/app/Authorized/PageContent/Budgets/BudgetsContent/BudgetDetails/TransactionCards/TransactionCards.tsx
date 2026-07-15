@@ -6,12 +6,6 @@ import TransactionCard from "~/components/core/Card/TransactionCard/TransactionC
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -19,26 +13,11 @@ interface TransactionCardsProps {
 }
 
 const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
+  const { t } = useTranslation();
+
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 5;
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
-
-  const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as IUserSettings;
-      return undefined;
-    },
-  });
-
-  const currency = userSettingsQuery.data?.currency ?? "USD";
 
   const paginatedItems: ITransaction[] = props.transactions.slice(
     (page - 1) * itemsPerPage,
@@ -78,7 +57,6 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
             transaction={transaction}
             categories={props.categories}
             elevation={2}
-            currency={currency}
             isSelected={selectedIds.has(transaction.id)}
             onToggleSelect={onToggleSelect}
           />

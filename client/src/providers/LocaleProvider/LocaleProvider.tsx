@@ -1,13 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import dayjs from "~/shared/dayjs";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "../AuthProvider/AuthProvider";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettingsQuery } from "~/hooks/queries/useUserSettingsQuery";
 
 const localeMap: Record<string, string> = {
   "en-us": "en",
@@ -47,23 +42,7 @@ export const LocaleProvider = ({
   children: React.ReactNode;
 }): React.ReactNode => {
   const { i18n } = useTranslation();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const userSettingsQuery = useUserSettingsQuery();
 
   const getLongDateFormat = (dateFormat: string): string => {
     // Extract separator and normalize format to determine pattern

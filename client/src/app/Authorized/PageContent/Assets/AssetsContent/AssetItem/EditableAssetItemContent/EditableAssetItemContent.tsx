@@ -27,10 +27,10 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { useUpdateAssetMutation } from "~/hooks/mutations/assets/useUpdateAssetMutation";
 import { useDeleteAssetsMutation } from "~/hooks/mutations/assets/useDeleteAssetsMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
-  userCurrency: string;
   toggle: () => void;
 }
 
@@ -47,6 +47,7 @@ const EditableAssetItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const { allAssetTypes } = useAssetTypes();
   const updateAssetMutation = useUpdateAssetMutation();
   const deleteAssetMutation = useDeleteAssetsMutation();
@@ -138,7 +139,7 @@ const EditableAssetItemContent = (
             {convertNumberToCurrency(
               props.asset.currentValue ?? 0,
               true,
-              props.userCurrency,
+              preferredCurrency,
               SignDisplay.Auto,
               intlLocale,
             )}
@@ -187,7 +188,7 @@ const EditableAssetItemContent = (
                 {...purchasePrice.getInputProps()}
                 placeholder={t("enter_price")}
                 maw={150}
-                prefix={getCurrencySymbol(props.userCurrency)}
+                prefix={getCurrencySymbol(preferredCurrency)}
                 thousandSeparator={thousandsSeparator}
                 decimalSeparator={decimalSeparator}
                 decimalScale={2}
@@ -233,7 +234,7 @@ const EditableAssetItemContent = (
                 {...sellPrice.getInputProps()}
                 placeholder={t("enter_price")}
                 maw={150}
-                prefix={getCurrencySymbol(props.userCurrency)}
+                prefix={getCurrencySymbol(preferredCurrency)}
                 thousandSeparator={thousandsSeparator}
                 decimalSeparator={decimalSeparator}
                 decimalScale={2}

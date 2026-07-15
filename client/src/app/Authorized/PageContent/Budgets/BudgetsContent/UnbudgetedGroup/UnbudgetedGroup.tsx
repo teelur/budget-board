@@ -8,17 +8,12 @@ import {
   ICategoryNode,
 } from "~/models/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -32,23 +27,7 @@ interface UnbudgetedGroupProps {
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const { t } = useTranslation();
   const { intlLocale } = useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency } = useUserSettings();
 
   const total =
     props.categoryTree.reduce((acc, category) => {
@@ -110,17 +89,15 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
         title={
           <Group justify="space-between" align="center" w="100%" pr="0.25rem">
             <PrimaryText size="lg">{t("unbudgeted")}</PrimaryText>
-            {userSettingsQuery.isPending ? null : (
-              <PrimaryText size="lg">
-                {convertNumberToCurrency(
-                  total,
-                  false,
-                  userSettingsQuery.data?.currency ?? "USD",
-                  SignDisplay.Auto,
-                  intlLocale,
-                )}
-              </PrimaryText>
-            )}
+            <PrimaryText size="lg">
+              {convertNumberToCurrency(
+                total,
+                false,
+                preferredCurrency,
+                SignDisplay.Auto,
+                intlLocale,
+              )}
+            </PrimaryText>
           </Group>
         }
       >
