@@ -705,7 +705,7 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_DisableBuildInAssetTypes_WhenAssetUsesBuiltInType_ThrowsDisableBuiltInAssetTypesInUseError()
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAssetTypes_WhenAssetUsesBuiltInType_ThrowsDisableBuiltInAssetTypesInUseError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -785,7 +785,7 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_EnableBuildInAssetTypes_WhenConflictingCustomType_ThrowsEnableBuiltInAssetTypesConflictError()
+    public async Task UpdateUserSettingsAsync_EnableBuiltInAssetTypes_WhenConflictingCustomType_ThrowsEnableBuiltInAssetTypesConflictError()
     {
         // Arrange
         var helper = new TestHelper();

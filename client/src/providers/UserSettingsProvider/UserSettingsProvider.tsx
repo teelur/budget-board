@@ -24,7 +24,7 @@ export const UserSettingsContext =
     preferredCurrency: "USD",
     preferredLanguage: "default",
     preferredDateFormat: "default",
-    budgetWarningThreshold: 0.8,
+    budgetWarningThreshold: 80,
     forceSyncLookbackMonths: 0,
     disableBuiltInAccountTypes: false,
     disableBuiltInAssetTypes: false,
@@ -34,7 +34,7 @@ export const UserSettingsContext =
     autoCategorizerLastTrained: null,
     autoCategorizerModelStartDate: null,
     autoCategorizerModelEndDate: null,
-    autoCategorizerMinimumProbabilityPercentage: 0.8,
+    autoCategorizerMinimumProbabilityPercentage: 70,
   });
 
 export const UserSettingsProvider = ({
@@ -63,7 +63,7 @@ export const UserSettingsProvider = ({
     preferredLanguage: userSettingsQuery.data?.language ?? "default",
     preferredDateFormat: userSettingsQuery.data?.dateFormat ?? "default",
     budgetWarningThreshold:
-      userSettingsQuery.data?.budgetWarningThreshold ?? 0.8,
+      userSettingsQuery.data?.budgetWarningThreshold ?? 80,
     disableBuiltInAccountTypes:
       userSettingsQuery.data?.disableBuiltInAccountTypes ?? false,
     disableBuiltInAssetTypes:
@@ -83,8 +83,7 @@ export const UserSettingsProvider = ({
     autoCategorizerModelEndDate:
       userSettingsQuery.data?.autoCategorizerModelEndDate ?? null,
     autoCategorizerMinimumProbabilityPercentage:
-      userSettingsQuery.data?.autoCategorizerMinimumProbabilityPercentage ??
-      0.8,
+      userSettingsQuery.data?.autoCategorizerMinimumProbabilityPercentage ?? 70,
   };
 
   return (

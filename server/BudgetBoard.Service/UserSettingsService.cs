@@ -100,7 +100,7 @@ public class UserSettingsService(
             }
 
             var isValidLanguage = SupportedLanguages.AllUserLanguageOptions.Contains(
-                request.Language.ToLower()
+                request.Language.ToLowerInvariant()
             );
             if (!isValidLanguage)
             {
@@ -110,7 +110,7 @@ public class UserSettingsService(
                 );
             }
 
-            userSettings.Language = request.Language.ToLower();
+            userSettings.Language = request.Language.ToLowerInvariant();
         }
 
         void HandleDateFormatChange()
@@ -211,15 +211,15 @@ public class UserSettingsService(
             }
 
             var builtInTypeValues = AccountTypeConstants
-                .DefaultAccountTypes.Select(at => at.Value.ToLower())
+                .DefaultAccountTypes.Select(at => at.Value.ToLowerInvariant())
                 .ToHashSet();
             if (request.DisableBuiltInAccountTypes.Value)
             {
                 var accountUsesBuiltInType = userData.Accounts.Any(a =>
-                    builtInTypeValues.Contains(a.Type)
+                    builtInTypeValues.Contains(a.Type.ToLowerInvariant())
                 );
                 var customTypeHasBuiltInParent = userData.AccountTypes.Any(cat =>
-                    builtInTypeValues.Contains(cat.Parent)
+                    builtInTypeValues.Contains(cat.Parent.ToLowerInvariant())
                 );
                 if (accountUsesBuiltInType || customTypeHasBuiltInParent)
                 {
@@ -235,7 +235,7 @@ public class UserSettingsService(
             else
             {
                 var hasConflictingCustomAccountTypes = userData.AccountTypes.Any(cat =>
-                    builtInTypeValues.Contains(cat.Value.ToLower())
+                    builtInTypeValues.Contains(cat.Value.ToLowerInvariant())
                 );
                 if (hasConflictingCustomAccountTypes)
                 {
@@ -263,15 +263,15 @@ public class UserSettingsService(
             }
 
             var builtInTypeValues = AssetTypeConstants
-                .DefaultAssetTypes.Select(at => at.Value.ToLower())
+                .DefaultAssetTypes.Select(at => at.Value.ToLowerInvariant())
                 .ToHashSet();
             if (request.DisableBuiltInAssetTypes.Value)
             {
                 var assetsUsesBuiltInType = userData.Assets.Any(a =>
-                    builtInTypeValues.Contains(a.Type.ToLower())
+                    builtInTypeValues.Contains(a.Type.ToLowerInvariant())
                 );
                 var customTypeHasBuiltInParent = userData.AssetTypes.Any(at =>
-                    builtInTypeValues.Contains(at.Parent.ToLower())
+                    builtInTypeValues.Contains(at.Parent.ToLowerInvariant())
                 );
                 if (assetsUsesBuiltInType || customTypeHasBuiltInParent)
                 {
@@ -288,7 +288,7 @@ public class UserSettingsService(
             {
                 // Built-in types cannot be re-enabled if the user has custom asset types that conflict with the built-in types.
                 var hasConflictingCustomAssetTypes = userData.AssetTypes.Any(at =>
-                    builtInTypeValues.Contains(at.Value.ToLower())
+                    builtInTypeValues.Contains(at.Value.ToLowerInvariant())
                 );
                 if (hasConflictingCustomAssetTypes)
                 {
