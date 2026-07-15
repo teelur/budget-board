@@ -2,23 +2,28 @@ import { Button, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , userSettingsQueryKey} from "~/helpers/requests";
+import { translateAxiosError, userSettingsQueryKey } from "~/helpers/requests";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import { ITrainAutoCategorizer as ITrainAutoCategorizerRequest } from "~/models/autoCategorizer";
-import { IUserSettings } from "~/models/userSettings";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 const TrainAutoCategorizerModal = (): React.ReactNode => {
-  const [opened, { open, close }] = useDisclosure(false);
-
   const { t } = useTranslation();
+  const {
+    autoCategorizerLastTrained,
+    autoCategorizerModelStartDate,
+    autoCategorizerModelEndDate,
+  } = useUserSettings();
+
+  const [opened, { open, close }] = useDisclosure(false);
 
   const startDateField = useField<Date | null>({
     initialValue: null,
@@ -28,23 +33,6 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
   });
 
   const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
-
   const queryClient = useQueryClient();
   const doTrainAutoCategorizer = useMutation({
     mutationFn: async (trainAutoCategorizer: ITrainAutoCategorizerRequest) =>
@@ -92,13 +80,11 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
         {t("train_auto_categorizer_description")}
       </DimmedText>
       <DimmedText size="xs">
-        {userSettingsQuery.data?.autoCategorizerLastTrained != null
+        {autoCategorizerLastTrained != null
           ? t("train_auto_categorizer_last_trained", {
-              lastTrained: userSettingsQuery.data?.autoCategorizerLastTrained,
-              trainDataStartDate:
-                userSettingsQuery.data?.autoCategorizerModelStartDate,
-              trainDataEndDate:
-                userSettingsQuery.data?.autoCategorizerModelEndDate,
+              lastTrained: autoCategorizerLastTrained,
+              trainDataStartDate: autoCategorizerModelStartDate,
+              trainDataEndDate: autoCategorizerModelEndDate,
             })
           : t("train_auto_categorizer_not_trained")}
       </DimmedText>

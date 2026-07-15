@@ -7,16 +7,11 @@ import {
 } from "~/helpers/charts";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { Group, Skeleton } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -32,23 +27,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency } = useUserSettings();
 
   const formatDateString = (date: Date) => dayjs(date).format("MMMM YYYY");
 
@@ -68,15 +47,13 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   );
 
   const chartValueFormatter = (value: number): string => {
-    return userSettingsQuery.isPending
-      ? ""
-      : convertNumberToCurrency(
-          value,
-          false,
-          userSettingsQuery.data?.currency ?? "USD",
-          SignDisplay.Auto,
-          intlLocale,
-        );
+    return convertNumberToCurrency(
+      value,
+      false,
+      preferredCurrency,
+      SignDisplay.Auto,
+      intlLocale,
+    );
   };
 
   if (props.isPending) {

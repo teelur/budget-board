@@ -1,5 +1,3 @@
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import {
   ActionIcon,
   LoadingOverlay,
@@ -9,11 +7,8 @@ import {
 } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { ICategory } from "~/models/category";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
-import { IUserSettings } from "~/models/userSettings";
 import { getCurrencySymbol } from "~/helpers/currency";
 import Popover from "~/components/core/Popover/Popover";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
@@ -21,6 +16,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AddBudgetProps {
   date: Date;
@@ -30,6 +26,7 @@ interface AddBudgetProps {
 const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { thousandsSeparator, decimalSeparator, dayjs } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const createBudgetMutation = useCreateBudgetMutation();
 
   const categoryField = useField<string>({
@@ -37,24 +34,6 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   });
   const limitField = useField<string | number>({
     initialValue: "",
-  });
-
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
   });
 
   return (
@@ -77,7 +56,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
               {...limitField.getInputProps()}
               placeholder={t("limit")}
               w="100%"
-              prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+              prefix={getCurrencySymbol(preferredCurrency)}
               min={0}
               decimalScale={2}
               thousandSeparator={thousandsSeparator}

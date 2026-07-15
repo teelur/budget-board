@@ -6,10 +6,6 @@ import { Group, Skeleton } from "@mantine/core";
 import { AccountTypeClassification, IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
@@ -18,8 +14,7 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { buildValueChartData } from "../ValueChart/helpers/valueChart";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface NetWorthChartData {
   date: DateString;
@@ -88,23 +83,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dateFormat, intlLocale } = useLocale();
   const { allAccountTypes } = useAccountTypes();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency } = useUserSettings();
 
   const chartSeries: CompositeChartSeries[] = [
     { name: "assets", label: t("assets"), color: "green.6", type: "bar" },
@@ -118,15 +97,13 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   ];
 
   const chartValueFormatter = (value: number): string => {
-    return userSettingsQuery.isPending
-      ? ""
-      : convertNumberToCurrency(
-          value,
-          false,
-          userSettingsQuery.data?.currency ?? "USD",
-          SignDisplay.Auto,
-          intlLocale,
-        );
+    return convertNumberToCurrency(
+      value,
+      false,
+      preferredCurrency,
+      SignDisplay.Auto,
+      intlLocale,
+    );
   };
 
   const liabilityAccountTypes = allAccountTypes

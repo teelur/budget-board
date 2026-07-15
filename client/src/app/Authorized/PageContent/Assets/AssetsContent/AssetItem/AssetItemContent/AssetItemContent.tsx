@@ -10,16 +10,17 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { getIsParentAssetType, getParentAssetType } from "~/helpers/assets";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AssetItemContentProps {
   asset: IAssetResponse;
-  userCurrency: string;
   toggle: () => void;
 }
 
 const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const { allAssetTypes } = useAssetTypes();
 
   const getAssetTypeDisplay = (): React.ReactNode => {
@@ -75,7 +76,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
           {convertNumberToCurrency(
             props.asset.currentValue ?? 0,
             true,
-            props.userCurrency,
+            preferredCurrency,
             SignDisplay.Auto,
             intlLocale,
           )}
@@ -93,7 +94,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
                 price: convertNumberToCurrency(
                   props.asset.purchasePrice ?? 0,
                   true,
-                  props.userCurrency,
+                  preferredCurrency,
                   SignDisplay.Auto,
                   intlLocale,
                 ),

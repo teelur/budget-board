@@ -6,11 +6,11 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IInstitution } from "~/models/institution";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IInstitutionItemContentProps {
   institution: IInstitution;
   totalBalance: number;
-  userCurrency: string;
   toggle: () => void;
 }
 
@@ -18,6 +18,8 @@ const InstitutionItemContent = (
   props: IInstitutionItemContentProps,
 ): React.ReactNode => {
   const { intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
@@ -37,7 +39,7 @@ const InstitutionItemContent = (
         {convertNumberToCurrency(
           props.totalBalance,
           true,
-          props.userCurrency,
+          preferredCurrency,
           SignDisplay.Auto,
           intlLocale,
         )}

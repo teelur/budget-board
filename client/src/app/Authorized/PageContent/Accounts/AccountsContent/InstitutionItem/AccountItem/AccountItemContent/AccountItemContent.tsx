@@ -12,16 +12,17 @@ import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IAccountItemContentProps {
   account: IAccountResponse;
-  userCurrency: string;
   toggle: () => void;
 }
 
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
 
   const getAccountSourceBadgeColor = (): string => {
@@ -106,7 +107,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           {convertNumberToCurrency(
             props.account.currentBalance,
             true,
-            props.userCurrency,
+            preferredCurrency,
             SignDisplay.Auto,
             intlLocale,
           )}

@@ -7,17 +7,12 @@ import {
   sortTransactions,
 } from "~/helpers/transactions";
 import { Group, Pagination, Skeleton, Stack } from "@mantine/core";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
-import { IUserSettings } from "~/models/userSettings";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { InfoIcon } from "lucide-react";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 interface TransactionCardsProps {
@@ -37,26 +32,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const { transactionFilters } = useTransactionFilters();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
-  const { request } = useAuth();
   const transactionsQuery = useTransactionsQuery();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
-
-  const currency = userSettingsQuery.data?.currency ?? "USD";
 
   const filteredTransactions = getFilteredTransactions(
     transactionsQuery.data ?? [],
@@ -100,7 +76,6 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                 transaction={transaction}
                 categories={transactionCategories}
                 elevation={1}
-                currency={currency}
                 isSelected={props.selectedIds.has(transaction.id)}
                 onToggleSelect={props.onToggleSelect}
               />

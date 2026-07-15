@@ -22,14 +22,26 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
-  userCurrency: string;
   toggle: () => void;
 }
 
 const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
+  const { t } = useTranslation();
+  const {
+    dayjs,
+    dateFormat,
+    intlLocale,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+  const { allAccountTypes } = useAccountTypes();
+  const updateAccountMutation = useUpdateAccountMutation();
+
   const accountNameField = useField<string>({
     initialValue: props.account.name,
     validateOnBlur: true,
@@ -58,18 +70,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const hideTransactionsField = useField<boolean>({
     initialValue: props.account.hideTransactions ?? false,
   });
-
-  const { t } = useTranslation();
-  const {
-    dayjs,
-    dateFormat,
-    intlLocale,
-    thousandsSeparator,
-    decimalSeparator,
-  } = useLocale();
-  const { allAccountTypes } = useAccountTypes();
-
-  const updateAccountMutation = useUpdateAccountMutation();
 
   const resetFormToServerValues = () => {
     accountNameField.setValue(props.account.name);
@@ -195,7 +195,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             {convertNumberToCurrency(
               props.account.currentBalance,
               true,
-              props.userCurrency,
+              preferredCurrency,
               SignDisplay.Auto,
               intlLocale,
             )}

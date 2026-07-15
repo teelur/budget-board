@@ -2,10 +2,6 @@ import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { BarChart } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { IUserSettings } from "~/models/userSettings";
-import { AxiosResponse } from "axios";
 import { DatesRangeValue } from "@mantine/dates";
 import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -14,8 +10,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { chartColors } from "~/helpers/charts";
 import { DateString } from "~/helpers/datetime";
 import { buildValueChartData, IItem, IValue } from "./helpers/valueChart";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 /**
  * Builds the series for the value chart.
@@ -42,36 +37,18 @@ interface ValueChartProps {
 const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency } = useUserSettings();
 
   const chartSeries = buildValueChartSeries(props.items);
 
   const chartValueFormatter = (value: number): string => {
-    return userSettingsQuery.isPending
-      ? ""
-      : convertNumberToCurrency(
-          value,
-          false,
-          userSettingsQuery.data?.currency ?? "USD",
-          SignDisplay.Auto,
-          intlLocale,
-        );
+    return convertNumberToCurrency(
+      value,
+      false,
+      preferredCurrency,
+      SignDisplay.Auto,
+      intlLocale,
+    );
   };
 
   const sortedChartValues = React.useMemo(() => {

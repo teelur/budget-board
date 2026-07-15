@@ -10,8 +10,6 @@ import {
   Badge,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -21,11 +19,8 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { IUserSettings } from "~/models/userSettings";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
@@ -35,6 +30,7 @@ import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { useUpdateTransactionsMutation } from "~/hooks/mutations/transactions/useUpdateTransactionsMutation";
 import { useDeleteTransactionsMutation } from "~/hooks/mutations/transactions/useDeleteTransactionsMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface BulkActionBarProps {
   selectedIds: Set<string>;
@@ -54,7 +50,18 @@ const FIELDS = {
 
 const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const { t } = useTranslation();
+  const {
+    dayjsLocale,
+    dayjs,
+    longDateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+  } = useLocale();
+  const { preferredCurrency } = useUserSettings();
   const isMobile = useIsMobile();
+  const accountsQuery = useAccountsQuery();
+  const updateTransactionsMutation = useUpdateTransactionsMutation();
+  const deleteTransactionsMutation = useDeleteTransactionsMutation();
   const transactionsQuery = useTransactionsQuery();
 
   // Hold the bar element in state so the effect re-runs as soon as Mantine's
@@ -96,18 +103,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     };
   }, []);
 
-  const { request } = useAuth();
-  const {
-    dayjsLocale,
-    dayjs,
-    longDateFormat,
-    thousandsSeparator,
-    decimalSeparator,
-  } = useLocale();
-  const accountsQuery = useAccountsQuery();
-  const updateTransactionsMutation = useUpdateTransactionsMutation();
-  const deleteTransactionsMutation = useDeleteTransactionsMutation();
-
   const [merchantValue, setMerchantValue] = React.useState("");
   const [categoryValue, setCategoryValue] = React.useState("");
   const [dateValue, setDateValue] = React.useState<Date | null>(null);
@@ -126,20 +121,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     setTouched(new Set());
     setShowDeleteConfirm(false);
   };
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-      return undefined;
-    },
-  });
 
   const selectedTransactions = (transactionsQuery.data ?? []).filter((t) =>
     props.selectedIds.has(t.id),
@@ -351,7 +332,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                     });
                   }
                 }}
-                prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+                prefix={getCurrencySymbol(preferredCurrency)}
                 thousandSeparator={thousandsSeparator}
                 decimalSeparator={decimalSeparator}
                 decimalScale={2}

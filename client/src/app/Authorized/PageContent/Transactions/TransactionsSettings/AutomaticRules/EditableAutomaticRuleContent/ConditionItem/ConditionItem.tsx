@@ -1,9 +1,6 @@
 import { ActionIcon, ComboboxItem, Group } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getDefaultValue } from "~/helpers/automaticRules";
 import { getCurrencySymbol } from "~/helpers/currency";
 import {
@@ -14,7 +11,6 @@ import {
   OperatorTypes,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
-import { IUserSettings } from "~/models/userSettings";
 import Card from "~/components/core/Card/Card";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
@@ -24,8 +20,7 @@ import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 export interface ConditionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -40,23 +35,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjsLocale, longDateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency } = useUserSettings();
 
   const getValueInput = (): React.ReactNode => {
     if (props.ruleParameter.field === "merchant") {
@@ -86,7 +65,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               value: (typeof value === "number" ? value : 0).toString(),
             })
           }
-          prefix={getCurrencySymbol(userSettingsQuery.data?.currency)}
+          prefix={getCurrencySymbol(preferredCurrency)}
           decimalScale={2}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}

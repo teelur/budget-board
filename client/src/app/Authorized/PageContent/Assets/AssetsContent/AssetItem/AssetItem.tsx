@@ -13,7 +13,6 @@ import Card from "~/components/core/Card/Card";
 
 interface AssetItemProps {
   asset: IAssetResponse;
-  userCurrency: string;
   isSortable: boolean;
   container: Element;
   openDetails: (asset: IAssetResponse | undefined) => void;
@@ -50,17 +49,9 @@ const AssetItem = (props: AssetItemProps): React.ReactNode => {
           </Flex>
         )}
         {isSelected ? (
-          <EditableAssetItemContent
-            asset={props.asset}
-            userCurrency={props.userCurrency}
-            toggle={toggle}
-          />
+          <EditableAssetItemContent asset={props.asset} toggle={toggle} />
         ) : (
-          <AssetItemContent
-            asset={props.asset}
-            userCurrency={props.userCurrency}
-            toggle={toggle}
-          />
+          <AssetItemContent asset={props.asset} toggle={toggle} />
         )}
       </Group>
     </Card>

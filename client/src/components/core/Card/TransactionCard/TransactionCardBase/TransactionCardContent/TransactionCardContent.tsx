@@ -10,18 +10,19 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;
   categories: ICategory[];
   elevation: number;
-  currency: string;
 }
 
 const TransactionCardContent = (
   props: TransactionCardContentProps,
 ): React.ReactNode => {
   const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
 
   const categoryValue =
     (props.transaction.subcategory ?? "").length > 0
@@ -62,7 +63,7 @@ const TransactionCardContent = (
             {convertNumberToCurrency(
               props.transaction.amount,
               true,
-              props.currency,
+              preferredCurrency,
               SignDisplay.Auto,
               intlLocale,
             )}

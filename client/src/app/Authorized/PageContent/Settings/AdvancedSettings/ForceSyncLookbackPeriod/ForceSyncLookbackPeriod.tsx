@@ -1,19 +1,12 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError , userSettingsQueryKey} from "~/helpers/requests";
-import {
-  IUserSettings,
-  IUserSettingsUpdateRequest,
-} from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
 
 const ForceSyncLookbackPeriod = (): React.ReactNode => {
   interface IForceSyncOverrideOption {
@@ -22,6 +15,8 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
   }
 
   const { t } = useTranslation();
+  const { forceSyncLookbackMonths } = useUserSettings();
+  const updateUserSettingsMutation = useUpdateUserSettingsMutation();
 
   const ForceSyncOverrideOptions: IForceSyncOverrideOption[] = [
     { value: 0, label: t("auto") },
@@ -39,58 +34,17 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
     { value: 12, label: t("12_months") },
   ];
 
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
-
   const forceSyncLookbackMonthsField = useField<number>({
-    initialValue: userSettingsQuery.data?.forceSyncLookbackMonths || 0,
+    initialValue: forceSyncLookbackMonths,
   });
 
   React.useEffect(() => {
-    if (userSettingsQuery.data?.forceSyncLookbackMonths !== undefined) {
-      forceSyncLookbackMonthsField.setValue(
-        userSettingsQuery.data.forceSyncLookbackMonths,
-      );
-    }
-  }, [userSettingsQuery.data]);
-
-  const queryClient = useQueryClient();
-  const doUpdateUserSettings = useMutation({
-    mutationFn: async (updatedUserSettings: IUserSettingsUpdateRequest) =>
-      await request({
-        url: "/api/userSettings",
-        method: "PUT",
-        data: updatedUserSettings,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+    forceSyncLookbackMonthsField.setValue(forceSyncLookbackMonths);
+  }, [forceSyncLookbackMonths]);
 
   return (
     <Stack gap="0.25rem">
-      <LoadingOverlay visible={doUpdateUserSettings.isPending} />
+      <LoadingOverlay visible={updateUserSettingsMutation.isPending} />
       <PrimaryText size="sm">{t("force_sync_lookback_period")}</PrimaryText>
       <DimmedText size="xs">
         {t("force_sync_lookback_period_description")}
@@ -106,7 +60,7 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
         value={forceSyncLookbackMonthsField.getValue().toString()}
         onChange={(value) => {
           const intValue = parseInt(value || "0", 10);
-          doUpdateUserSettings.mutate({
+          updateUserSettingsMutation.mutate({
             forceSyncLookbackMonths: intValue,
           });
         }}

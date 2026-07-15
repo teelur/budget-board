@@ -1,15 +1,11 @@
 import classes from "./GoalCardContent.module.css";
 
 import { ActionIcon, Badge, Flex, Group, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
-import { IUserSettings } from "~/models/userSettings";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -19,8 +15,7 @@ import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBa
 import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
-
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -31,23 +26,7 @@ interface GoalCardContentProps {
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
-  const { request } = useAuth();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
+  const { preferredCurrency } = useUserSettings();
 
   return (
     <Group style={{ containerType: "inline-size" }} wrap="nowrap">
@@ -84,7 +63,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   sumAccountsTotalBalance(props.goal.accounts) -
                     props.goal.initialAmount,
                   false,
-                  userSettingsQuery.data?.currency ?? "USD",
+                  preferredCurrency,
                   SignDisplay.Auto,
                   intlLocale,
                 ),
@@ -94,7 +73,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                     props.goal.initialAmount,
                   ),
                   false,
-                  userSettingsQuery.data?.currency ?? "USD",
+                  preferredCurrency,
                   SignDisplay.Auto,
                   intlLocale,
                 ),
@@ -137,14 +116,14 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                 amount: convertNumberToCurrency(
                   props.goal.monthlyContributionProgress,
                   false,
-                  userSettingsQuery.data?.currency ?? "USD",
+                  preferredCurrency,
                   SignDisplay.Auto,
                   intlLocale,
                 ),
                 total: convertNumberToCurrency(
                   props.goal.monthlyContribution,
                   false,
-                  userSettingsQuery.data?.currency ?? "USD",
+                  preferredCurrency,
                   SignDisplay.Auto,
                   intlLocale,
                 ),

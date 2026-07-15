@@ -14,40 +14,28 @@ namespace BudgetBoard.WebAPI.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class UserSettingsController(
-    ILogger<AccountController> logger,
+    ILogger<UserSettingsController> logger,
     UserManager<ApplicationUser> userManager,
     IUserSettingsService userSettingsService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<UserSettingsController>(logger, logLocalizer, responseLocalizer)
 {
-    private readonly ILogger<AccountController> _logger = logger;
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly IUserSettingsService _userSettingsService = userSettingsService;
-    private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
-    private readonly IStringLocalizer<ApiResponseStrings> _responseLocalizer = responseLocalizer;
-
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            return Ok(
-                await _userSettingsService.ReadUserSettingsAsync(
-                    new Guid(_userManager.GetUserId(User) ?? string.Empty)
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await userSettingsService.ReadUserSettingsAsync(parsedUserId));
+        });
     }
 
     [HttpPut]
@@ -56,10 +44,17 @@ public class UserSettingsController(
         [FromBody] UserSettingsUpdateRequest userSettingsUpdateRequest
     )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await _userSettingsService.UpdateUserSettingsAsync(
-                new Guid(_userManager.GetUserId(User) ?? string.Empty),
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await userSettingsService.UpdateUserSettingsAsync(
+                parsedUserId,
                 userSettingsUpdateRequest
             );
 
@@ -74,9 +69,9 @@ public class UserSettingsController(
                     var culture = new System.Globalization.CultureInfo(
                         userSettingsUpdateRequest.Language
                     );
-                    _logger.LogInformation(
+                    Logger.LogInformation(
                         "{LogMessage}",
-                        _logLocalizer[
+                        LogLocalizer[
                             "SettingCurrentLocaleLog",
                             $"{culture.Name} ({culture.DisplayName})"
                         ]
@@ -88,28 +83,19 @@ public class UserSettingsController(
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(
+                    Logger.LogError(
                         ex,
                         "{LogMessage}",
-                        _logLocalizer[
+                        LogLocalizer[
                             "SettingCurrentLocaleErrorLog",
                             userSettingsUpdateRequest.Language
                         ]
                     );
-                    return Helpers.BuildErrorResponse(_responseLocalizer["InvalidLanguageError"]);
+                    return Helpers.BuildErrorResponse(ResponseLocalizer["InvalidLanguageError"]);
                 }
             }
 
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{LogMessage}", _logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(_responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

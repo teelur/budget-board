@@ -1,21 +1,17 @@
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { PlusIcon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { userSettingsQueryKey } from "~/helpers/requests";
 import { ICategoryNode } from "~/models/category";
 import UnbudgetedChildCard from "./UnbudgetedChildCard/UnbudgetedChildCard";
 import { roundAwayFromZero } from "~/helpers/utils";
-import { IUserSettings } from "~/models/userSettings";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -27,24 +23,8 @@ interface UnbudgetedCardProps {
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { intlLocale, dayjs } = useLocale();
-  const { request } = useAuth();
+  const { preferredCurrency } = useUserSettings();
   const createBudgetMutation = useCreateBudgetMutation();
-
-  const userSettingsQuery = useQuery({
-    queryKey: [userSettingsQueryKey],
-    queryFn: async (): Promise<IUserSettings | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/userSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IUserSettings;
-      }
-
-      return undefined;
-    },
-  });
 
   if (
     roundAwayFromZero(
@@ -113,19 +93,17 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
               : props.categoryTree.value}
           </PrimaryText>
           <Group gap="sm">
-            {userSettingsQuery.isPending ? null : (
-              <PrimaryText size="1rem" fw={600}>
-                {convertNumberToCurrency(
-                  props.categoryToTransactionsTotalMap.get(
-                    props.categoryTree.value.toLocaleLowerCase(),
-                  ) ?? 0,
-                  false,
-                  userSettingsQuery.data?.currency ?? "USD",
-                  SignDisplay.Auto,
-                  intlLocale,
-                )}
-              </PrimaryText>
-            )}
+            <PrimaryText size="1rem" fw={600}>
+              {convertNumberToCurrency(
+                props.categoryToTransactionsTotalMap.get(
+                  props.categoryTree.value.toLocaleLowerCase(),
+                ) ?? 0,
+                false,
+                preferredCurrency,
+                SignDisplay.Auto,
+                intlLocale,
+              )}
+            </PrimaryText>
             {props.selectedDate && props.categoryTree.value.length !== 0 && (
               <ActionIcon
                 size="sm"

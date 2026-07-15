@@ -14,7 +14,6 @@ import SplitCard, {
 import { TagsIcon } from "lucide-react";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
@@ -26,7 +25,6 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
-  const { preferredCurrency } = useUserSettings();
   const transactionsQuery = useTransactionsQuery();
 
   const sortedFilteredTransactions = React.useMemo(
@@ -92,7 +90,6 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
               transaction={transaction}
               categories={transactionCategories}
               elevation={2}
-              currency={preferredCurrency}
               isSelected={selectedIds.has(transaction.id)}
               onToggleSelect={onToggleSelect}
             />

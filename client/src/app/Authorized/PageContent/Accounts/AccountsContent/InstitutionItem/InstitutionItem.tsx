@@ -18,7 +18,6 @@ import { useOrderAccountsMutation } from "~/hooks/mutations/accounts/useOrderAcc
 
 interface IInstitutionItemProps {
   institution: IInstitution;
-  userCurrency: string;
   isSortable: boolean;
   container: Element;
   openDetails: (account: IAccountResponse | undefined) => void;
@@ -112,14 +111,12 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
             <EditableInstitutionItemContent
               institution={props.institution}
               totalBalance={totalBalance}
-              userCurrency={props.userCurrency}
               toggle={toggle}
             />
           ) : (
             <InstitutionItemContent
               institution={props.institution}
               totalBalance={totalBalance}
-              userCurrency={props.userCurrency}
               toggle={toggle}
             />
           )}
@@ -141,7 +138,6 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
                 <AccountItem
                   key={account.id}
                   account={account}
-                  userCurrency={props.userCurrency}
                   isSortable={props.isSortable}
                   container={
                     document.getElementById(props.institution.id) as Element
