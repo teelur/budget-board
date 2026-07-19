@@ -196,7 +196,12 @@ internal static class AutomaticRuleConditionHandler
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
-        if (!allCategories.Any(c => c.Value.Equals(condition.Value)))
+        if (
+            !string.IsNullOrEmpty(condition.Value)
+            && !allCategories.Any(c =>
+                string.Equals(c.Value, condition.Value, StringComparison.CurrentCultureIgnoreCase)
+            )
+        )
         {
             throw new BudgetBoardServiceException(
                 responseLocalizer["AutomaticRuleCategoryDoesNotExistError", condition.Value]
@@ -212,7 +217,12 @@ internal static class AutomaticRuleConditionHandler
         {
             if (TransactionCategoriesHelpers.GetIsParentCategory(condition.Value, allCategories))
             {
-                return transactions.Where(t => (t.Category ?? "").Equals(condition.Value));
+                return transactions.Where(t =>
+                    (t.Category ?? "").Equals(
+                        condition.Value,
+                        StringComparison.CurrentCultureIgnoreCase
+                    )
+                );
             }
             else
             {
@@ -233,7 +243,12 @@ internal static class AutomaticRuleConditionHandler
         {
             if (TransactionCategoriesHelpers.GetIsParentCategory(condition.Value, allCategories))
             {
-                return transactions.Where(t => !(t.Category ?? "").Equals(condition.Value));
+                return transactions.Where(t =>
+                    !(t.Category ?? "").Equals(
+                        condition.Value,
+                        StringComparison.CurrentCultureIgnoreCase
+                    )
+                );
             }
             else
             {
