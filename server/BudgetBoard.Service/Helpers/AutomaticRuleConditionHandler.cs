@@ -197,8 +197,10 @@ internal static class AutomaticRuleConditionHandler
     )
     {
         if (
-            !allCategories.Any(c => c.Value.Equals(condition.Value))
-            && !string.IsNullOrEmpty(condition.Value)
+            !string.IsNullOrEmpty(condition.Value)
+            && !allCategories.Any(c =>
+                string.Equals(c.Value, condition.Value, StringComparison.CurrentCultureIgnoreCase)
+            )
         )
         {
             throw new BudgetBoardServiceException(
@@ -215,7 +217,12 @@ internal static class AutomaticRuleConditionHandler
         {
             if (TransactionCategoriesHelpers.GetIsParentCategory(condition.Value, allCategories))
             {
-                return transactions.Where(t => (t.Category ?? "").Equals(condition.Value));
+                return transactions.Where(t =>
+                    (t.Category ?? "").Equals(
+                        condition.Value,
+                        StringComparison.CurrentCultureIgnoreCase
+                    )
+                );
             }
             else
             {
@@ -236,7 +243,12 @@ internal static class AutomaticRuleConditionHandler
         {
             if (TransactionCategoriesHelpers.GetIsParentCategory(condition.Value, allCategories))
             {
-                return transactions.Where(t => !(t.Category ?? "").Equals(condition.Value));
+                return transactions.Where(t =>
+                    !(t.Category ?? "").Equals(
+                        condition.Value,
+                        StringComparison.CurrentCultureIgnoreCase
+                    )
+                );
             }
             else
             {
