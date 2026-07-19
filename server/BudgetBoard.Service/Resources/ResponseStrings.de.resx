@@ -400,14 +400,8 @@
   <data name="ValueAssetNotFoundError" xml:space="preserve">
         <value>Der Vermögenswert, auf dessen Werte Sie zugreifen möchten, existiert nicht.</value>
   </data>
-  <data name="ValueDeleteNotFoundError" xml:space="preserve">
-        <value>Der Wert, den Sie löschen möchten, existiert nicht.</value>
-  </data>
   <data name="ValueDuplicateDateError" xml:space="preserve">
         <value>Für diesen Vermögenswert liegt zu diesem Datum bereits ein Wert vor.</value>
-  </data>
-  <data name="ValueUpdateNotFoundError" xml:space="preserve">
-        <value>Der Wert, den Sie aktualisieren möchten, ist nicht vorhanden.</value>
   </data>
   <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
         <value>Die Deserialisierung der Widget-Konfiguration ist fehlgeschlagen.</value>

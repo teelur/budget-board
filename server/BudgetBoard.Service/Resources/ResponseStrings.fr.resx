@@ -400,14 +400,8 @@
   <data name="ValueAssetNotFoundError" xml:space="preserve">
         <value>La ressource dont vous essayez d’accéder aux valeurs n’existe pas.</value>
   </data>
-  <data name="ValueDeleteNotFoundError" xml:space="preserve">
-        <value>La valeur que vous essayez de supprimer n’existe pas.</value>
-  </data>
   <data name="ValueDuplicateDateError" xml:space="preserve">
         <value>Une valeur existe déjà pour cette date pour cet actif.</value>
-  </data>
-  <data name="ValueUpdateNotFoundError" xml:space="preserve">
-        <value>La valeur que vous essayez de mettre à jour n'existe pas.</value>
   </data>
   <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
         <value>Échec de la désérialisation de la configuration du widget.</value>

@@ -44,13 +44,13 @@ public class ValueResponse() : IValueResponse
 public interface IValueUpdateRequest
 {
     Guid ID { get; }
-    decimal Amount { get; }
-    DateOnly Date { get; }
+    decimal? Amount { get; }
+    DateOnly? Date { get; }
 }
 
 public class ValueUpdateRequest() : IValueUpdateRequest
 {
     public Guid ID { get; set; } = Guid.Empty;
-    public decimal Amount { get; set; } = 0;
-    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+    public decimal? Amount { get; set; } = null;
+    public DateOnly? Date { get; set; } = null;
 }
