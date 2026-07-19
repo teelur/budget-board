@@ -196,7 +196,10 @@ internal static class AutomaticRuleConditionHandler
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
-        if (!allCategories.Any(c => c.Value.Equals(condition.Value)))
+        if (
+            !allCategories.Any(c => c.Value.Equals(condition.Value))
+            && !string.IsNullOrEmpty(condition.Value)
+        )
         {
             throw new BudgetBoardServiceException(
                 responseLocalizer["AutomaticRuleCategoryDoesNotExistError", condition.Value]
