@@ -19,13 +19,11 @@ export const useCreateValueMutation = ({ assetId }: ICreateValueMutation) => {
 
   return useMutation({
     mutationFn: async (newValue: IValueCreateRequest) => {
-      const res = await request({
+      await request({
         url: `/api/value`,
         method: "POST",
         data: newValue,
       });
-
-      return res.data as IValueResponse;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });

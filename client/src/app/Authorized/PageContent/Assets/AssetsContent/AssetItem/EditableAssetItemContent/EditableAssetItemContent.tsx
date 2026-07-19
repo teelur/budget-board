@@ -179,8 +179,7 @@ const EditableAssetItemContent = (
                       ? dayjs(date).format("YYYY-MM-DD")
                       : null,
                   } as IAssetUpdateRequest);
-                  const { onChange } = purchaseDate.getInputProps();
-                  onChange(date);
+                  purchaseDate.getInputProps().onChange(date);
                 }}
                 elevation={1}
               />
@@ -225,8 +224,7 @@ const EditableAssetItemContent = (
                       ? dayjs(date).format("YYYY-MM-DD")
                       : null,
                   } as IAssetUpdateRequest);
-                  const { onChange } = sellDate.getInputProps();
-                  onChange(date);
+                  sellDate.getInputProps().onChange(date);
                 }}
                 elevation={1}
               />

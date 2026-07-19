@@ -58,14 +58,15 @@ const EditableValueItemContent = (
           flex="1 1 auto"
           locale={dayjsLocale}
           valueFormat={longDateFormat}
-          onChange={(date) =>
+          onChange={(date: string | null) => {
             updateValueMutation.mutate({
               id: props.value.id,
               date: dayjs(date).isValid()
                 ? dayjs(date).format("YYYY-MM-DD")
                 : undefined,
-            })
-          }
+            });
+            valueDateField.getInputProps().onChange(date);
+          }}
           elevation={2}
         />
         <NumberInput
@@ -76,12 +77,16 @@ const EditableValueItemContent = (
           decimalSeparator={decimalSeparator}
           decimalScale={2}
           fixedDecimalScale
-          onBlur={() =>
-            updateValueMutation.mutate({
-              id: props.value.id,
-              amount: Number(valueAmountField.getValue()),
-            })
-          }
+          onBlur={() => {
+            valueAmountField.getInputProps().onBlur();
+            const amount = Number(valueAmountField.getValue());
+            if (!isNaN(amount)) {
+              updateValueMutation.mutate({
+                id: props.value.id,
+                amount,
+              });
+            }
+          }}
           elevation={2}
         />
       </Stack>
