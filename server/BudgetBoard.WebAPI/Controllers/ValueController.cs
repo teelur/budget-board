@@ -39,7 +39,7 @@ public class ValueController(
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> Read(Guid assetId)
+    public async Task<IActionResult> Read([FromQuery] Guid assetId)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -74,7 +74,7 @@ public class ValueController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid valueId)
+    public async Task<IActionResult> Delete([FromQuery] Guid valueId)
     {
         return await HandleRequestAsync(async () =>
         {

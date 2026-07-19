@@ -101,7 +101,7 @@ const EditableValueItemContent = (
           h="100%"
           size="sm"
           bg="var(--button-color-destructive)"
-          onClick={() => deleteValueMutation.mutate()}
+          onClick={() => deleteValueMutation.mutate(props.value.id)}
         >
           <Trash2Icon size={16} />
         </ActionIcon>

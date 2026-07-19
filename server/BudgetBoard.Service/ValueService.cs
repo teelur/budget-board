@@ -58,7 +58,10 @@ public class ValueService(
         var value = GetValueById(userData, request.ID);
         var asset = GetAssetById(userData, value.AssetID);
 
-        if (request.Date.HasValue && asset.Values.Any(v => v.Date == request.Date.Value && v.ID != request.ID))
+        if (
+            request.Date.HasValue
+            && asset.Values.Any(v => v.Date == request.Date.Value && v.ID != request.ID)
+        )
         {
             logger.LogError("{LogMessage}", logLocalizer["ValueDuplicateDateLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["ValueDuplicateDateError"]);
@@ -80,15 +83,7 @@ public class ValueService(
     public async Task DeleteValueAsync(Guid userGuid, Guid valueGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
-        var value = userData
-            .Assets.SelectMany(a => a.Values)
-            .FirstOrDefault(v => v.ID == valueGuid);
-        if (value == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["ValueDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["ValueDeleteNotFoundError"]);
-        }
+        var value = GetValueById(userData, valueGuid);
 
         userDataContext.Values.Remove(value);
         await userDataContext.SaveChangesAsync();

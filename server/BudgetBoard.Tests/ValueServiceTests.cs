@@ -547,7 +547,7 @@ public class ValueServiceTests
     }
 
     [Fact]
-    public async Task DeleteValueAsync_WhenValueDoesNotExist_ShouldThrowException()
+    public async Task DeleteValueAsync_WhenValueDoesNotExist_ShouldThrowValueNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -565,7 +565,7 @@ public class ValueServiceTests
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("ValueDeleteNotFoundError");
+            .WithMessage("ValueNotFoundError");
     }
     #endregion
 }

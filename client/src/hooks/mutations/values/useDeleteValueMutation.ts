@@ -19,11 +19,11 @@ export const useDeleteValueMutation = ({
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async () =>
+    mutationFn: async (valueId: string) =>
       await request({
         url: `/api/value`,
         method: "DELETE",
-        params: { guid: assetId },
+        params: { valueId },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
