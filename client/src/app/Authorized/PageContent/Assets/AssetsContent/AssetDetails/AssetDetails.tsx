@@ -4,11 +4,6 @@ import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
 import AddValue from "./AddValue/AddValue";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { valuesQueryKey } from "~/helpers/requests";
-import { IValueResponse } from "~/models/value";
-import { AxiosResponse } from "axios";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import Drawer from "~/components/core/Drawer/Drawer";
@@ -20,6 +15,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -33,23 +29,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, longDateFormat, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
-  const { request } = useAuth();
-
-  const valuesQuery = useQuery({
-    queryKey: [valuesQueryKey, props.asset?.id],
-    queryFn: async (): Promise<IValueResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/value",
-        method: "GET",
-        params: { assetId: props.asset?.id },
-      });
-
-      if (res.status === 200) {
-        return res.data as IValueResponse[];
-      }
-
-      return [];
-    },
+  const valuesQuery = useValuesQuery({
+    assetIds: props.asset ? [props.asset.id] : [],
     enabled: !!props.asset?.id && props.isOpen,
   });
 

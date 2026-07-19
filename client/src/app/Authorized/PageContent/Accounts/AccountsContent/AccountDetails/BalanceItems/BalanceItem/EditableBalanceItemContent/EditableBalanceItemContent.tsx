@@ -65,8 +65,7 @@ const EditableBalanceItemContent = (
               id: props.balance.id,
               date: dayjs(date).format("YYYY-MM-DD"),
             });
-            const { onChange } = balanceDateField.getInputProps();
-            onChange(date);
+            balanceDateField.getInputProps().onChange(date);
           }}
           elevation={2}
         />

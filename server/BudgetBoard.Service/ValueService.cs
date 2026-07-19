@@ -13,28 +13,15 @@ namespace BudgetBoard.Service;
 public class ValueService(
     ILogger<IValueService> logger,
     UserDataContext userDataContext,
-    INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer
 ) : IValueService
 {
-    private readonly ILogger<IValueService> _logger = logger;
-    private readonly UserDataContext _userDataContext = userDataContext;
-    private readonly INowProvider _nowProvider = nowProvider;
-    private readonly IStringLocalizer<ResponseStrings> _responseLocalizer = responseLocalizer;
-    private readonly IStringLocalizer<LogStrings> _logLocalizer = logLocalizer;
-
     /// <inheritdoc />
     public async Task CreateValueAsync(Guid userGuid, IValueCreateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
-        var asset = userData.Assets.FirstOrDefault(a => a.ID == request.AssetID);
-        if (asset == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueAssetNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["ValueAssetNotFoundError"]);
-        }
+        var asset = GetAssetById(userData, request.AssetID);
 
         var existingValue = asset.Values.FirstOrDefault(v => v.Date == request.Date);
         if (existingValue != null)
@@ -49,90 +36,92 @@ public class ValueService(
                 Amount = request.Amount,
                 AssetID = request.AssetID,
             };
-            _userDataContext.Values.Add(newValue);
+            userDataContext.Values.Add(newValue);
         }
 
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<IValueResponse>> ReadValuesAsync(Guid userGuid, Guid assetId)
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
-        var asset = userData.Assets.FirstOrDefault(a => a.ID == assetId);
-        if (asset == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueAssetNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["ValueAssetNotFoundError"]);
-        }
+        var asset = GetAssetById(userData, assetId);
 
         return asset.Values.Select(v => new ValueResponse(v)).ToList();
     }
 
     /// <inheritdoc />
-    public async Task UpdateValueAsync(Guid userGuid, IValueUpdateRequest editedValue)
+    public async Task UpdateValueAsync(Guid userGuid, IValueUpdateRequest request)
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var value = GetValueById(userData, request.ID);
+        var asset = GetAssetById(userData, value.AssetID);
 
-        var value = userData
-            .Assets.SelectMany(a => a.Values)
-            .FirstOrDefault(v => v.ID == editedValue.ID);
-        if (value == null)
+        if (
+            request.Date.HasValue
+            && asset.Values.Any(v => v.Date == request.Date.Value && v.ID != request.ID)
+        )
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["ValueUpdateNotFoundError"]);
+            logger.LogError("{LogMessage}", logLocalizer["ValueDuplicateDateLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["ValueDuplicateDateError"]);
         }
 
-        var asset = userData.Assets.FirstOrDefault(a => a.ID == value.AssetID);
-        if (asset == null)
+        if (request.Amount.HasValue)
         {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueAssetNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["ValueAssetNotFoundError"]);
+            value.Amount = request.Amount.Value;
+        }
+        if (request.Date.HasValue)
+        {
+            value.Date = request.Date.Value;
         }
 
-        var duplicateValue = asset.Values.FirstOrDefault(v =>
-            v.Date == editedValue.Date && v.ID != editedValue.ID
-        );
-        if (duplicateValue != null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueDuplicateDateLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["ValueDuplicateDateError"]);
-        }
-
-        value.Amount = editedValue.Amount;
-        value.Date = editedValue.Date;
-
-        await _userDataContext.SaveChangesAsync();
+        await userDataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
     public async Task DeleteValueAsync(Guid userGuid, Guid valueGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var value = GetValueById(userData, valueGuid);
 
-        var value = userData
-            .Assets.SelectMany(a => a.Values)
-            .FirstOrDefault(v => v.ID == valueGuid);
-        if (value == null)
-        {
-            _logger.LogError("{LogMessage}", _logLocalizer["ValueDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(_responseLocalizer["ValueDeleteNotFoundError"]);
-        }
-
-        _userDataContext.Values.Remove(value);
-        await _userDataContext.SaveChangesAsync();
+        userDataContext.Values.Remove(value);
+        await userDataContext.SaveChangesAsync();
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
-            _userDataContext,
-            _logger,
-            _logLocalizer,
-            _responseLocalizer,
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
             id,
             users => users.Include(u => u.Assets).ThenInclude(a => a.Values)
         );
+    }
+
+    private Asset GetAssetById(ApplicationUser userData, Guid assetId)
+    {
+        var asset = userData.Assets.FirstOrDefault(a => a.ID == assetId);
+        if (asset == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["ValueAssetNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["ValueAssetNotFoundError"]);
+        }
+
+        return asset;
+    }
+
+    private Value GetValueById(ApplicationUser userData, Guid valueId)
+    {
+        var value = userData.Assets.SelectMany(a => a.Values).FirstOrDefault(v => v.ID == valueId);
+        if (value == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["ValueNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["ValueNotFoundError"]);
+        }
+
+        return value;
     }
 }
