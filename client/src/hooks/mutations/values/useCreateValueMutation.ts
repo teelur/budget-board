@@ -6,7 +6,7 @@ import {
   translateAxiosError,
   valuesQueryKey,
 } from "~/helpers/requests";
-import { IValueCreateRequest, IValueResponse } from "~/models/value";
+import { IValueCreateRequest } from "~/models/value";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface ICreateValueMutation {
