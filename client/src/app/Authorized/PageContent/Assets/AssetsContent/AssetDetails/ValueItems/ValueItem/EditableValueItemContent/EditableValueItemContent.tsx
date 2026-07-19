@@ -1,22 +1,14 @@
 import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { useDidUpdate } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { getCurrencySymbol } from "~/helpers/currency";
-import {
-  translateAxiosError,
-  assetsQueryKey,
-  valuesQueryKey,
-} from "~/helpers/requests";
-import { IValueResponse, IValueUpdateRequest } from "~/models/value";
+import { IValueResponse } from "~/models/value";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { useUpdateValueMutation } from "~/hooks/mutations/values/useUpdateValueMutation";
+import { useDeleteValueMutation } from "~/hooks/mutations/values/useDeleteValueMutation";
 
 interface EditableValueItemContentProps {
   value: IValueResponse;
@@ -27,7 +19,6 @@ interface EditableValueItemContentProps {
 const EditableValueItemContent = (
   props: EditableValueItemContentProps,
 ): React.ReactNode => {
-  const { request } = useAuth();
   const {
     dayjs,
     dayjsLocale,
@@ -35,6 +26,12 @@ const EditableValueItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const updateValueMutation = useUpdateValueMutation({
+    assetId: props.value.assetID,
+  });
+  const deleteValueMutation = useDeleteValueMutation({
+    assetId: props.value.assetID,
+  });
 
   const valueAmountField = useField<string | number | undefined>({
     initialValue: props.value.amount,
@@ -50,73 +47,10 @@ const EditableValueItemContent = (
     initialValue: dayjs(props.value.date).toDate(),
   });
 
-  const queryClient = useQueryClient();
-  const doUpdateValue = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/value`,
-        method: "PUT",
-        data: {
-          id: props.value.id,
-          amount: Number(valueAmountField.getValue()),
-          date: dayjs(valueDateField.getValue()).format("YYYY-MM-DD"),
-        } as IValueUpdateRequest,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [assetsQueryKey],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: [valuesQueryKey, props.value.assetID],
-      });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Value updated",
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
-  const doDeleteValue = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/value`,
-        method: "DELETE",
-        params: { guid: props.value.id },
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [assetsQueryKey],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: [valuesQueryKey, props.value.assetID],
-      });
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: "Value deleted",
-      });
-    },
-    onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      }),
-  });
-
-  useDidUpdate(() => {
-    doUpdateValue.mutate();
-  }, [valueDateField.getValue()]);
-
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
       <LoadingOverlay
-        visible={doUpdateValue.isPending || doDeleteValue.isPending}
+        visible={updateValueMutation.isPending || deleteValueMutation.isPending}
       />
       <Stack w="100%">
         <DateInput
@@ -124,6 +58,14 @@ const EditableValueItemContent = (
           flex="1 1 auto"
           locale={dayjsLocale}
           valueFormat={longDateFormat}
+          onChange={(date) =>
+            updateValueMutation.mutate({
+              id: props.value.id,
+              date: dayjs(date).isValid()
+                ? dayjs(date).format("YYYY-MM-DD")
+                : undefined,
+            })
+          }
           elevation={2}
         />
         <NumberInput
@@ -134,7 +76,12 @@ const EditableValueItemContent = (
           decimalSeparator={decimalSeparator}
           decimalScale={2}
           fixedDecimalScale
-          onBlur={() => doUpdateValue.mutate()}
+          onBlur={() =>
+            updateValueMutation.mutate({
+              id: props.value.id,
+              amount: Number(valueAmountField.getValue()),
+            })
+          }
           elevation={2}
         />
       </Stack>
@@ -154,7 +101,7 @@ const EditableValueItemContent = (
           h="100%"
           size="sm"
           bg="var(--button-color-destructive)"
-          onClick={() => doDeleteValue.mutate()}
+          onClick={() => deleteValueMutation.mutate()}
         >
           <Trash2Icon size={16} />
         </ActionIcon>

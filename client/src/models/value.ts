@@ -6,8 +6,8 @@ export interface IValueCreateRequest {
 
 export interface IValueUpdateRequest {
   id: string;
-  amount: number;
-  date: string;
+  amount?: number;
+  date?: string;
 }
 
 export interface IValueResponse {
