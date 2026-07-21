@@ -2,6 +2,7 @@ import { Divider, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import TextInput from "~/components/core/Input/TextInput/TextInput";
 import Select from "~/components/core/Select/Select/Select";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
@@ -20,6 +21,7 @@ interface ColumnsSelectProps {
   selectedColumns: ISelectedColumns;
   applySelectedColumns: (columns: ISelectedColumns) => void;
   isAmountSplit: boolean;
+  isSingleAccount: boolean;
 }
 
 const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
@@ -46,6 +48,15 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
   });
 
   const { t } = useTranslation();
+
+  const isInitialMount = React.useRef(true);
+  React.useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    accountColumnField.setValue(null);
+  }, [props.isSingleAccount]);
 
   React.useEffect(() => {
     props.applySelectedColumns({
@@ -118,13 +129,23 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
             elevation={0}
           />
         )}
-        <Select
-          label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
-          data={props.csvHeaders}
-          clearable
-          {...accountColumnField.getInputProps()}
-          elevation={0}
-        />
+        {props.isSingleAccount ? (
+          <TextInput
+            label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+            placeholder={t("account_name")}
+            {...accountColumnField.getInputProps()}
+            value={accountColumnField.getValue() ?? ""}
+            elevation={0}
+          />
+        ) : (
+          <Select
+            label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+            data={props.csvHeaders}
+            clearable
+            {...accountColumnField.getInputProps()}
+            elevation={0}
+          />
+        )}
       </Group>
     </Stack>
   );
