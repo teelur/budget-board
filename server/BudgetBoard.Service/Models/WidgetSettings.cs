@@ -1,4 +1,6 @@
-﻿namespace BudgetBoard.Service.Models;
+﻿using BudgetBoard.Database.Models;
+
+namespace BudgetBoard.Service.Models;
 
 public static class WidgetTypes
 {
@@ -54,7 +56,7 @@ public interface IWidgetResponse
     Guid UserID { get; }
 }
 
-public class WidgetResponse : IWidgetResponse
+public class WidgetResponse() : IWidgetResponse
 {
     public Guid ID { get; set; } = Guid.NewGuid();
     public string WidgetType { get; set; } = string.Empty;
@@ -66,6 +68,21 @@ public class WidgetResponse : IWidgetResponse
     public int SmH { get; set; } = 5;
     public string Configuration { get; set; } = string.Empty;
     public Guid UserID { get; set; } = Guid.Empty;
+
+    public WidgetResponse(WidgetSettings widgetSettings)
+        : this()
+    {
+        ID = widgetSettings.ID;
+        WidgetType = widgetSettings.WidgetType;
+        LgX = widgetSettings.LgX;
+        LgY = widgetSettings.LgY;
+        LgW = widgetSettings.LgW;
+        LgH = widgetSettings.LgH;
+        SmY = widgetSettings.SmY;
+        SmH = widgetSettings.SmH;
+        Configuration = widgetSettings.Configuration ?? string.Empty;
+        UserID = widgetSettings.UserID;
+    }
 }
 
 public interface IWidgetSettingsUpdateRequest
@@ -77,7 +94,7 @@ public interface IWidgetSettingsUpdateRequest
     int? LgH { get; }
     int? SmY { get; }
     int? SmH { get; }
-    System.Text.Json.JsonElement? Configuration { get; }
+    OptionalField<System.Text.Json.JsonElement?> Configuration { get; }
 }
 
 public class WidgetSettingsUpdateRequest : IWidgetSettingsUpdateRequest
@@ -89,7 +106,8 @@ public class WidgetSettingsUpdateRequest : IWidgetSettingsUpdateRequest
     public int? LgH { get; set; } = null;
     public int? SmY { get; set; } = null;
     public int? SmH { get; set; } = null;
-    public System.Text.Json.JsonElement? Configuration { get; set; } = null;
+    public OptionalField<System.Text.Json.JsonElement?> Configuration { get; set; } =
+        new OptionalField<System.Text.Json.JsonElement?>();
 }
 
 public interface IWidgetSettingsBatchUpdateRequest

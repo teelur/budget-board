@@ -26,19 +26,11 @@ public interface IWidgetSettingsService
     /// Updates existing widget settings for a user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="request">The widget settings update request.</param>
+    /// <param name="requests">The collection of widget settings update requests.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task UpdateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsUpdateRequest request);
-
-    /// <summary>
-    /// Updates grid positions for multiple widget instances in a single operation.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="requests">Collection of batch update requests containing new grid coordinates.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    Task BatchUpdateWidgetSettingsAsync(
+    Task UpdateWidgetSettingsAsync(
         Guid userGuid,
-        IEnumerable<IWidgetSettingsBatchUpdateRequest> requests
+        IEnumerable<IWidgetSettingsUpdateRequest> requests
     );
 
     /// <summary>
@@ -49,17 +41,9 @@ public interface IWidgetSettingsService
     Task DeleteWidgetSettingsAsync(Guid userGuid, Guid widgetGuid);
 
     /// <summary>
-    /// Resets the settings configuration for the specified widget to its default values for the given user.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user whose widget settings configuration will be reset.</param>
-    /// <param name="widgetGuid">The unique identifier of the widget whose settings configuration will be reset.</param>
-    /// <returns>A task that represents the asynchronous reset operation.</returns>
-    Task ResetWidgetSettingsConfiguration(Guid userGuid, Guid widgetGuid);
-
-    /// <summary>
     /// Resets the grid layout for small screens to match the large screen layout for all widgets of a given user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user whose small screen layout will be reset.</param>
     /// <returns>A task that represents the asynchronous reset operation.</returns>
-    Task ResetSmallScreenToLargeScreenLayout(Guid userGuid);
+    Task ResetSmallScreenToLargeScreenLayoutAsync(Guid userGuid);
 }

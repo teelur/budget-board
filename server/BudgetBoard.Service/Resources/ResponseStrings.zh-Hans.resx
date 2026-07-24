@@ -397,9 +397,6 @@
   <data name="WidgetSettingsNotFoundError" xml:space="preserve">
         <value>您尝试访问的小组件设置不存在。</value>
   </data>
-  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-        <value>您尝试更新的小组件不存在。</value>
-  </data>
   <data name="TransactionCategoryDuplicateNameError" xml:space="preserve">
     <value>A transaction category with this name already exists.</value>
   </data>

@@ -394,9 +394,6 @@
   <data name="WidgetSettingsNotFoundError" xml:space="preserve">
         <value>The widget settings you are trying to access do not exist.</value>
   </data>
-  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-        <value>The widget you are trying to update does not exist.</value>
-  </data>
   <data name="InstitutionEmptyNameError" xml:space="preserve">
     <value>The institution name cannot be empty.</value>
   </data>

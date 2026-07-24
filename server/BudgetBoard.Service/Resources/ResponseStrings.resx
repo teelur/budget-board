@@ -415,9 +415,6 @@
     <data name="WidgetConfigurationNullError" xml:space="preserve">
         <value>The widget configuration is null or empty.</value>
     </data>
-    <data name="WidgetSettingsNotFoundError" xml:space="preserve">
-        <value>The widget settings you are trying to access do not exist.</value>
-    </data>
     <data name="WidgetUpdateNotFoundError" xml:space="preserve">
         <value>The widget you are trying to update does not exist.</value>
     </data>
