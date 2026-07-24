@@ -27,6 +27,7 @@ import {
 import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 
 interface NetWorthCardSettingsProps {
   widgetId: string;
@@ -42,6 +43,7 @@ const NetWorthCardSettings = ({
   const { t } = useTranslation();
   const { request } = useAuth();
   const widgetSettingsQuery = useWidgetSettingsQuery();
+  const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
 
   const [isSortable, { toggle: toggleIsSortable }] = useDisclosure(false);
 
@@ -79,26 +81,6 @@ const NetWorthCardSettings = ({
       }),
     onSuccess: () => {
       setOnReorderCompleted((prev) => !prev);
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const doResetConfig = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/widgetSettings/resetConfiguration`,
-        method: "POST",
-        params: {
-          widgetGuid: widgetId,
-        },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({
@@ -173,8 +155,15 @@ const NetWorthCardSettings = ({
           </Button>
           <Button
             size="xs"
-            loading={doResetConfig.isPending}
-            onClick={() => doResetConfig.mutate()}
+            loading={updateWidgetSettingsMutation.isPending}
+            onClick={() =>
+              updateWidgetSettingsMutation.mutate([
+                {
+                  id: widgetId,
+                  configuration: null,
+                },
+              ])
+            }
           >
             {t("reset_to_default")}
           </Button>

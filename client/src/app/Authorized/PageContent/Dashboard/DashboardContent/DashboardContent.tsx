@@ -1,8 +1,5 @@
 import { Box, Flex, Group, Skeleton, Stack } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { InfoIcon } from "lucide-react";
 import React from "react";
 import {
@@ -15,12 +12,10 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import AccountsWidget from "~/components/ui/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/ui/widgets/NetWorthWidget/NetWorthWidget";
 import WidgetShell from "~/components/ui/widgets/shared/WidgetShell/WidgetShell";
-import { translateAxiosError } from "~/helpers/requests";
 import {
-  IWidgetSettingsBatchUpdateRequest,
   IWidgetSettingsResponse,
+  IWidgetSettingsUpdateRequest,
 } from "~/models/widgetSettings";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   GRID_BREAKPOINT,
   GRID_COLS,
@@ -31,6 +26,7 @@ import UncategorizedTransactionsWidget from "~/components/ui/widgets/Uncategoriz
 import MetricWidget from "~/components/ui/widgets/MetricWidget/MetricWidget";
 import { useTranslation } from "react-i18next";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 
 const SKELETON_COUNT = 4;
 const SM_PREVIEW_WIDTH = 500;
@@ -46,7 +42,7 @@ const DashboardContent = ({
 }: DashboardContentProps) => {
   const { t } = useTranslation();
   const widgetSettingsQuery = useWidgetSettingsQuery();
-  const { request } = useAuth();
+  const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
 
   const [settingsOpenId, setSettingsOpenId] = React.useState<string | null>(
     null,
@@ -82,21 +78,6 @@ const DashboardContent = ({
     [widgets],
   );
 
-  const doBatchUpdate = useMutation({
-    mutationFn: async (updates: IWidgetSettingsBatchUpdateRequest[]) =>
-      await request({
-        url: "/api/widgetSettings/batch",
-        method: "PUT",
-        data: updates,
-      }),
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
   const handleSave = React.useCallback(
     (layout: Layout) => {
       if (!isEditMode) return;
@@ -115,7 +96,7 @@ const DashboardContent = ({
 
       if (!hasChanged) return;
 
-      const updates: IWidgetSettingsBatchUpdateRequest[] =
+      const updates: IWidgetSettingsUpdateRequest[] =
         editTarget === "lg"
           ? layout.map((item) => ({
               id: item.i,
@@ -130,9 +111,15 @@ const DashboardContent = ({
               smH: item.h,
             }));
 
-      doBatchUpdate.mutate(updates);
+      updateWidgetSettingsMutation.mutate(updates);
     },
-    [isEditMode, editTarget, lgLayout, smLayout, doBatchUpdate.mutate],
+    [
+      isEditMode,
+      editTarget,
+      lgLayout,
+      smLayout,
+      updateWidgetSettingsMutation.mutate,
+    ],
   );
 
   const renderWidgetContent = (widget: IWidgetSettingsResponse) => {

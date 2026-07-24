@@ -9,20 +9,12 @@ import {
 } from "@mantine/core";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import Modal from "~/components/core/Modal/Modal";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import {
-  translateAxiosError,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -30,6 +22,7 @@ import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
@@ -50,11 +43,10 @@ const MetricWidgetSettings = ({
   onClose,
 }: MetricWidgetSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const { allTransactionCategories } = useTransactionCategories();
-  const queryClient = useQueryClient();
   const { dayjs } = useLocale();
   const widgetSettingsQuery = useWidgetSettingsQuery();
+  const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
 
   const titleField = useField({ initialValue: "" });
   const valueField = useField({ initialValue: "" });
@@ -148,59 +140,6 @@ const MetricWidgetSettings = ({
     widgetSettingsQuery.data,
     widgetId,
   ]);
-
-  const doSave = useMutation({
-    mutationFn: async ({
-      title,
-      value,
-      label,
-    }: {
-      title: string;
-      value: string;
-      label: string;
-    }) => {
-      const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
-      if (!widget) {
-        throw new Error(t("widget_not_found"));
-      }
-
-      return await request({
-        url: "/api/widgetSettings",
-        method: "PUT",
-        data: {
-          id: widget.id,
-          lgX: widget.lgX,
-          lgY: widget.lgY,
-          lgW: widget.lgW,
-          lgH: widget.lgH,
-          smY: widget.smY,
-          smH: widget.smH,
-          configuration: { title, value, label },
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError | Error) => {
-      const message =
-        error instanceof AxiosError
-          ? translateAxiosError(error)
-          : error.message;
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message,
-      });
-    },
-  });
-
-  const handleSave = () => {
-    doSave.mutate({
-      title: titleField.getValue(),
-      value: valueField.getValue(),
-      label: labelField.getValue(),
-    });
-  };
 
   return (
     <Modal
@@ -303,8 +242,19 @@ const MetricWidgetSettings = ({
           </Button>
           <Button
             flex={1}
-            onClick={handleSave}
-            loading={doSave.isPending}
+            onClick={() => {
+              updateWidgetSettingsMutation.mutate([
+                {
+                  id: widgetId,
+                  configuration: {
+                    title: titleField.getValue(),
+                    value: valueField.getValue(),
+                    label: labelField.getValue(),
+                  },
+                },
+              ]);
+            }}
+            loading={updateWidgetSettingsMutation.isPending}
             disabled={widgetSettingsQuery.isPending}
           >
             {t("save")}

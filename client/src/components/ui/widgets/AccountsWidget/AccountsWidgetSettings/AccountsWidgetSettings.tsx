@@ -8,15 +8,7 @@ import {
 } from "@mantine/core";
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
-import {
-  translateAxiosError,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
-import { notifications } from "@mantine/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
@@ -24,6 +16,7 @@ import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 
 interface AccountsWidgetSettingsProps {
   widgetId: string;
@@ -37,10 +30,9 @@ const AccountsWidgetSettings = ({
   onClose,
 }: AccountsWidgetSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
   const institutionQuery = useInstitutionsQuery();
   const widgetSettingsQuery = useWidgetSettingsQuery();
+  const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
 
   const [showAll, setShowAll] = React.useState(true);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
@@ -95,38 +87,6 @@ const AccountsWidgetSettings = ({
     widgetId,
   ]);
 
-  const doSave = useMutation({
-    mutationFn: async (accountIds: string[]) => {
-      const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
-      if (!widget) {
-        throw new Error("Widget not found");
-      }
-      return await request({
-        url: "/api/widgetSettings",
-        method: "PUT",
-        data: {
-          id: widget.id,
-          lgX: widget.lgX,
-          lgY: widget.lgY,
-          lgW: widget.lgW,
-          lgH: widget.lgH,
-          smY: widget.smY,
-          smH: widget.smH,
-          configuration: { accountIds },
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -137,10 +97,6 @@ const AccountsWidgetSettings = ({
       }
       return next;
     });
-  };
-
-  const handleSave = () => {
-    doSave.mutate(showAll ? [] : Array.from(selectedIds));
   };
 
   const isPending = widgetSettingsQuery.isPending || institutionQuery.isPending;
@@ -221,8 +177,17 @@ const AccountsWidgetSettings = ({
           </Button>
           <Button
             flex={1}
-            onClick={handleSave}
-            loading={doSave.isPending}
+            onClick={() => {
+              updateWidgetSettingsMutation.mutate([
+                {
+                  id: widgetId,
+                  configuration: {
+                    accountIds: showAll ? [] : Array.from(selectedIds),
+                  },
+                },
+              ]);
+            }}
+            loading={updateWidgetSettingsMutation.isPending}
             disabled={isPending}
           >
             {t("save")}

@@ -21,25 +21,15 @@ export interface IWidgetSettingsCreateRequest {
   smH: number | null;
 }
 
-export interface IWidgetSettingsBatchUpdateRequest {
+export interface IWidgetSettingsUpdateRequest {
   id: string;
-  lgX?: number | null;
-  lgY?: number | null;
-  lgW?: number | null;
-  lgH?: number | null;
-  smY?: number | null;
-  smH?: number | null;
-}
-
-export interface IWidgetSettingsUpdateRequest<T> {
-  id: string;
-  lgX: number;
-  lgY: number;
-  lgW: number;
-  lgH: number;
-  smY: number;
-  smH: number;
-  configuration: T;
+  lgX?: number;
+  lgY?: number;
+  lgW?: number;
+  lgH?: number;
+  smY?: number;
+  smH?: number;
+  configuration?: unknown | null;
 }
 
 export interface IAccountsWidgetConfiguration {
