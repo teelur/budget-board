@@ -9,15 +9,6 @@ public static class WidgetTypes
     public const string UncategorizedTransactions = "UncategorizedTransactions";
     public const string SpendingTrends = "SpendingTrends";
     public const string Metric = "Metric";
-
-    public static readonly IEnumerable<string> All =
-    [
-        Accounts,
-        NetWorth,
-        UncategorizedTransactions,
-        SpendingTrends,
-        Metric,
-    ];
 }
 
 public interface IWidgetSettingsCreateRequest
@@ -68,21 +59,6 @@ public class WidgetResponse() : IWidgetResponse
     public int SmH { get; set; } = 5;
     public string Configuration { get; set; } = string.Empty;
     public Guid UserID { get; set; } = Guid.Empty;
-
-    public WidgetResponse(WidgetSettings widgetSettings)
-        : this()
-    {
-        ID = widgetSettings.ID;
-        WidgetType = widgetSettings.WidgetType;
-        LgX = widgetSettings.LgX;
-        LgY = widgetSettings.LgY;
-        LgW = widgetSettings.LgW;
-        LgH = widgetSettings.LgH;
-        SmY = widgetSettings.SmY;
-        SmH = widgetSettings.SmH;
-        Configuration = widgetSettings.Configuration ?? string.Empty;
-        UserID = widgetSettings.UserID;
-    }
 }
 
 public interface IWidgetSettingsUpdateRequest
@@ -108,26 +84,4 @@ public class WidgetSettingsUpdateRequest : IWidgetSettingsUpdateRequest
     public int? SmH { get; set; } = null;
     public OptionalField<System.Text.Json.JsonElement?> Configuration { get; set; } =
         new OptionalField<System.Text.Json.JsonElement?>();
-}
-
-public interface IWidgetSettingsBatchUpdateRequest
-{
-    Guid ID { get; }
-    int? LgX { get; }
-    int? LgY { get; }
-    int? LgW { get; }
-    int? LgH { get; }
-    int? SmY { get; }
-    int? SmH { get; }
-}
-
-public class WidgetSettingsBatchUpdateRequest : IWidgetSettingsBatchUpdateRequest
-{
-    public Guid ID { get; set; } = Guid.NewGuid();
-    public int? LgX { get; set; } = null;
-    public int? LgY { get; set; } = null;
-    public int? LgW { get; set; } = null;
-    public int? LgH { get; set; } = null;
-    public int? SmY { get; set; } = null;
-    public int? SmH { get; set; } = null;
 }

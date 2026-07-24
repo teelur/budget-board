@@ -6,6 +6,8 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Models.Widgets.AccountsWidget;
+using BudgetBoard.Service.Models.Widgets.MetricWidget;
 using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
@@ -224,7 +226,24 @@ public class WidgetSettingsServiceTests
         var settings = await service.ReadWidgetSettingsAsync(helper.demoUser.Id);
 
         // Assert
-        settings.Single().Should().BeEquivalentTo(new WidgetResponse(existingSettings));
+        settings
+            .Single()
+            .Should()
+            .BeEquivalentTo(
+                new WidgetResponse
+                {
+                    ID = existingSettings.ID,
+                    WidgetType = existingSettings.WidgetType,
+                    LgX = existingSettings.LgX,
+                    LgY = existingSettings.LgY,
+                    LgW = existingSettings.LgW,
+                    LgH = existingSettings.LgH,
+                    SmY = existingSettings.SmY,
+                    SmH = existingSettings.SmH,
+                    Configuration = existingSettings.Configuration ?? string.Empty,
+                    UserID = existingSettings.UserID,
+                }
+            );
     }
 
     [Fact]
@@ -629,6 +648,225 @@ public class WidgetSettingsServiceTests
             await service.UpdateWidgetSettingsAsync(helper.demoUser.Id, [updateRequest]);
 
         // Assert
+        await action
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenAccountsConfigurationIsValid_ShouldSerializeConfiguration()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Accounts,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+        var configuration = new AccountsWidgetConfiguration
+        {
+            AccountIds = [Guid.NewGuid(), Guid.NewGuid()],
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [
+                new WidgetSettingsUpdateRequest
+                {
+                    ID = widget.ID,
+                    Configuration = JsonSerializer.SerializeToElement(configuration),
+                },
+            ]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(configuration));
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenMetricConfigurationIsValid_ShouldSerializeConfiguration()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Metric,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+        var configuration = new MetricWidgetConfiguration
+        {
+            Title = "Net Worth",
+            Value = "$1,000",
+            Label = "Current balance",
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [
+                new WidgetSettingsUpdateRequest
+                {
+                    ID = widget.ID,
+                    Configuration = JsonSerializer.SerializeToElement(configuration),
+                },
+            ]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(configuration));
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenWidgetHasNoTypedConfiguration_ShouldStoreRawJson()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.SpendingTrends,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+        var configuration = JsonSerializer.SerializeToElement(new { period = "month" });
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [new WidgetSettingsUpdateRequest { ID = widget.ID, Configuration = configuration }]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be(configuration.GetRawText());
+    }
+
+    [Theory]
+    [InlineData(WidgetTypes.Accounts)]
+    [InlineData(WidgetTypes.Metric)]
+    public async Task UpdateWidgetSettingsAsync_WhenTypedConfigurationIsInvalid_ShouldThrowWidgetConfigurationDeserializationError(
+        string widgetType
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = widgetType,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var action = async () =>
+            await service.UpdateWidgetSettingsAsync(
+                helper.demoUser.Id,
+                [
+                    new WidgetSettingsUpdateRequest
+                    {
+                        ID = widget.ID,
+                        Configuration = JsonSerializer.SerializeToElement("invalid configuration"),
+                    },
+                ]
+            );
+
+        // Act and Assert
+        await action
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+
+    [Theory]
+    [InlineData(WidgetTypes.NetWorth)]
+    [InlineData(WidgetTypes.Accounts)]
+    [InlineData(WidgetTypes.Metric)]
+    public async Task UpdateWidgetSettingsAsync_WhenTypedConfigurationIsJsonNull_ShouldThrowWidgetConfigurationDeserializationError(
+        string widgetType
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = widgetType,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var action = async () =>
+            await service.UpdateWidgetSettingsAsync(
+                helper.demoUser.Id,
+                [
+                    new WidgetSettingsUpdateRequest
+                    {
+                        ID = widget.ID,
+                        Configuration = JsonSerializer.SerializeToElement<object?>(null),
+                    },
+                ]
+            );
+
+        // Act and Assert
         await action
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
