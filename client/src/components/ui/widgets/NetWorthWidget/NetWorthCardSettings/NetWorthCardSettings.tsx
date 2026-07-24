@@ -7,23 +7,26 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NetWorthGroupItem from "./NetWorthGroupItem/NetWorthGroupItem";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   INetWorthWidgetGroupReorderRequest,
   INetWorthWidgetLineCreateRequest,
 } from "~/models/netWorthWidgetConfiguration";
 import { notifications } from "@mantine/notifications";
-import { AxiosError, AxiosResponse } from "axios";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
+import { AxiosError } from "axios";
+import {
+  translateAxiosError,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import {
   INetWorthWidgetGroup,
   INetWorthWidgetLine,
-  IWidgetSettingsResponse,
 } from "~/models/widgetSettings";
 import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 
 interface NetWorthCardSettingsProps {
   widgetId: string;
@@ -36,6 +39,10 @@ const NetWorthCardSettings = ({
   opened,
   onClose,
 }: NetWorthCardSettingsProps): React.ReactNode => {
+  const { t } = useTranslation();
+  const { request } = useAuth();
+  const widgetSettingsQuery = useWidgetSettingsQuery();
+
   const [isSortable, { toggle: toggleIsSortable }] = useDisclosure(false);
 
   const [sortedGroups, setSortedGroups] = React.useState<
@@ -43,25 +50,6 @@ const NetWorthCardSettings = ({
   >([]);
   const [onReorderCompleted, setOnReorderCompleted] =
     React.useState<boolean>(false);
-
-  const { t } = useTranslation();
-  const { request } = useAuth();
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-
-      return [];
-    },
-  });
 
   const queryClient = useQueryClient();
   const doCreateLine = useMutation({

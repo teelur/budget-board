@@ -9,9 +9,8 @@ import {
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import {
   translateAxiosError,
@@ -24,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 
 interface AccountsWidgetSettingsProps {
   widgetId: string;
@@ -40,24 +40,11 @@ const AccountsWidgetSettings = ({
   const { request } = useAuth();
   const queryClient = useQueryClient();
   const institutionQuery = useInstitutionsQuery();
+  const widgetSettingsQuery = useWidgetSettingsQuery();
 
   const [showAll, setShowAll] = React.useState(true);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [initialized, setInitialized] = React.useState(false);
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
 
   // Visible accounts (not deleted, not globally hidden)
   const visibleInstitutions = React.useMemo(

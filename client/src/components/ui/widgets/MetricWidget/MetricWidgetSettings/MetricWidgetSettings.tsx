@@ -10,8 +10,8 @@ import {
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
@@ -22,7 +22,6 @@ import {
   translateAxiosError,
   widgetSettingsQueryKey,
 } from "~/helpers/requests";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
@@ -30,6 +29,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
@@ -54,23 +54,12 @@ const MetricWidgetSettings = ({
   const { allTransactionCategories } = useTransactionCategories();
   const queryClient = useQueryClient();
   const { dayjs } = useLocale();
+  const widgetSettingsQuery = useWidgetSettingsQuery();
 
   const titleField = useField({ initialValue: "" });
   const valueField = useField({ initialValue: "" });
   const labelField = useField({ initialValue: "" });
   const [initialized, setInitialized] = React.useState(false);
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as IWidgetSettingsResponse[];
-      return [];
-    },
-  });
 
   const goalsQuery = useGoalsQuery({
     includeInterest: false,

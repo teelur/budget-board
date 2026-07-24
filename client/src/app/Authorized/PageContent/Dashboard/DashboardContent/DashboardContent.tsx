@@ -1,8 +1,8 @@
 import { Box, Flex, Group, Skeleton, Stack } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { InfoIcon } from "lucide-react";
 import React from "react";
 import {
@@ -15,7 +15,10 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import AccountsWidget from "~/components/ui/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/ui/widgets/NetWorthWidget/NetWorthWidget";
 import WidgetShell from "~/components/ui/widgets/shared/WidgetShell/WidgetShell";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
+import {
+  translateAxiosError,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
 import {
   IWidgetSettingsBatchUpdateRequest,
   IWidgetSettingsResponse,
@@ -30,6 +33,7 @@ import SpendingTrendsWidget from "../../../../../components/ui/widgets/SpendingT
 import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
 import MetricWidget from "~/components/ui/widgets/MetricWidget/MetricWidget";
 import { useTranslation } from "react-i18next";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 
 const SKELETON_COUNT = 4;
 const SM_PREVIEW_WIDTH = 500;
@@ -44,27 +48,16 @@ const DashboardContent = ({
   editTarget,
 }: DashboardContentProps) => {
   const { t } = useTranslation();
+  const widgetSettingsQuery = useWidgetSettingsQuery();
+  const { request } = useAuth();
+  const queryClient = useQueryClient();
+
   const [settingsOpenId, setSettingsOpenId] = React.useState<string | null>(
     null,
   );
 
   const { width, containerRef } = useContainerWidth({ initialWidth: 1280 });
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
 
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
   const widgets = React.useMemo(
     () => widgetSettingsQuery.data ?? [],
     [widgetSettingsQuery.data],

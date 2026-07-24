@@ -6,14 +6,15 @@ import { WIDGET_REGISTRY } from "~/shared/dashboardGrid";
 import WidgetPickerItem from "./WidgetPickerItem/WidgetPickerItem";
 import { notifications } from "@mantine/notifications";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { IWidgetSettingsCreateRequest } from "~/models/widgetSettings";
+import { AxiosError } from "axios";
 import {
-  IWidgetSettingsCreateRequest,
-  IWidgetSettingsResponse,
-} from "~/models/widgetSettings";
-import { AxiosError, AxiosResponse } from "axios";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
+  translateAxiosError,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 
 interface WidgetPickerProps {
   opened: boolean;
@@ -27,20 +28,7 @@ const WidgetPicker = ({
   const { t } = useTranslation();
   const { request } = useAuth();
   const queryClient = useQueryClient();
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
+  const widgetSettingsQuery = useWidgetSettingsQuery();
 
   const doAddWidget = useMutation({
     mutationFn: async (newWidget: IWidgetSettingsCreateRequest) =>

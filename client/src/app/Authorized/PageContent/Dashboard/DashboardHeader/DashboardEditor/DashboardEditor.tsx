@@ -1,14 +1,17 @@
 import { Button, Group, Stack, Popover as MantinePopover } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { PlusIcon, RotateCcwIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
+import {
+  translateAxiosError,
+  widgetSettingsQueryKey,
+} from "~/helpers/requests";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface DashboardEditorProps {
@@ -28,20 +31,7 @@ const DashboardEditor = ({
   const { t } = useTranslation();
   const { request } = useAuth();
   const queryClient = useQueryClient();
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
+  const widgetSettingsQuery = useWidgetSettingsQuery();
 
   const doResetMobileLayout = useMutation({
     mutationFn: async () =>
@@ -72,7 +62,9 @@ const DashboardEditor = ({
           }),
         ),
       );
-      await queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [widgetSettingsQueryKey],
+      });
     } catch {
       notifications.show({
         color: "var(--button-color-destructive)",
