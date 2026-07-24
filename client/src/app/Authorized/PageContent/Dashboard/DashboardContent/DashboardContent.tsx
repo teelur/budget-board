@@ -1,7 +1,7 @@
 import { Box, Flex, Group, Skeleton, Stack } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { InfoIcon } from "lucide-react";
 import React from "react";
@@ -15,10 +15,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import AccountsWidget from "~/components/ui/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/ui/widgets/NetWorthWidget/NetWorthWidget";
 import WidgetShell from "~/components/ui/widgets/shared/WidgetShell/WidgetShell";
-import {
-  translateAxiosError,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
+import { translateAxiosError } from "~/helpers/requests";
 import {
   IWidgetSettingsBatchUpdateRequest,
   IWidgetSettingsResponse,
@@ -50,7 +47,6 @@ const DashboardContent = ({
   const { t } = useTranslation();
   const widgetSettingsQuery = useWidgetSettingsQuery();
   const { request } = useAuth();
-  const queryClient = useQueryClient();
 
   const [settingsOpenId, setSettingsOpenId] = React.useState<string | null>(
     null,
@@ -93,24 +89,6 @@ const DashboardContent = ({
         method: "PUT",
         data: updates,
       }),
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const doRemoveWidget = useMutation({
-    mutationFn: async (widgetId: string) =>
-      await request({
-        url: "/api/widgetSettings",
-        method: "DELETE",
-        params: { widgetGuid: widgetId },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
     onError: (error: AxiosError) => {
       notifications.show({
         color: "var(--button-color-destructive)",
@@ -241,8 +219,8 @@ const DashboardContent = ({
                 style={{ height: "100%", overflow: "hidden" }}
               >
                 <WidgetShell
+                  widgetSettingsId={widget.id}
                   isEditMode={isEditMode}
-                  onRemove={() => doRemoveWidget.mutate(widget.id)}
                   onSettingsOpen={
                     widget.widgetType === "NetWorth" ||
                     widget.widgetType === "Accounts" ||
