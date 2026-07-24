@@ -2,11 +2,7 @@ import { Badge, Button, Group } from "@mantine/core";
 import { LayoutIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { notifications } from "@mantine/notifications";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useresetSmallScreenLayoutMutation";
 
 interface DashboardMobileHeaderProps {
   isEditMode: boolean;
@@ -18,25 +14,7 @@ const DashboardMobileHeader = ({
   setIsEditMode,
 }: DashboardMobileHeaderProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
-
-  const doResetMobileLayout = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/widgetSettings/resetSmallScreenLayout",
-        method: "POST",
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const resetSmallScreenLayoutMutation = useResetSmallScreenLayoutMutation();
 
   return (
     <Group justify="space-between" align="center">
@@ -49,8 +27,8 @@ const DashboardMobileHeader = ({
             <Button
               variant="subtle"
               size="xs"
-              loading={doResetMobileLayout.isPending}
-              onClick={() => doResetMobileLayout.mutate()}
+              loading={resetSmallScreenLayoutMutation.isPending}
+              onClick={() => resetSmallScreenLayoutMutation.mutate()}
             >
               {t("reset_to_desktop_order")}
             </Button>

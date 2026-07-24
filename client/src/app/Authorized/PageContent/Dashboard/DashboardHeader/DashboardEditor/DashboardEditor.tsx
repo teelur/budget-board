@@ -1,16 +1,13 @@
 import { Button, Group, Stack, Popover as MantinePopover } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 import { PlusIcon, RotateCcwIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import {
-  translateAxiosError,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
+import { widgetSettingsQueryKey } from "~/helpers/requests";
+import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useresetSmallScreenLayoutMutation";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
@@ -32,24 +29,9 @@ const DashboardEditor = ({
   const { request } = useAuth();
   const queryClient = useQueryClient();
   const widgetSettingsQuery = useWidgetSettingsQuery();
+  const resetSmallScreenLayoutMutation = useResetSmallScreenLayoutMutation();
 
-  const doResetMobileLayout = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/widgetSettings/resetSmallScreenLayout",
-        method: "POST",
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
+  // TODO: Fix this
   const handleResetToDefaults = async () => {
     setIsResetting(true);
     try {
@@ -58,7 +40,7 @@ const DashboardEditor = ({
           request({
             url: "/api/widgetSettings",
             method: "DELETE",
-            params: { widgetGuid: w.id },
+            params: { widgetSettingsId: w.id },
           }),
         ),
       );
@@ -86,8 +68,8 @@ const DashboardEditor = ({
         <Button
           size="xs"
           variant="subtle"
-          loading={doResetMobileLayout.isPending}
-          onClick={() => doResetMobileLayout.mutate()}
+          loading={resetSmallScreenLayoutMutation.isPending}
+          onClick={() => resetSmallScreenLayoutMutation.mutate()}
         >
           {t("reset_to_desktop_order")}
         </Button>
