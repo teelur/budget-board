@@ -116,4 +116,23 @@ public class WidgetSettingsController(
             return Ok();
         });
     }
+
+    [HttpPost]
+    [Authorize]
+    [Route("[action]")]
+    public async Task<IActionResult> ResetToDefault()
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await widgetSettingsService.ResetDashboardToDefaultAsync(parsedUserId);
+            return Ok();
+        });
+    }
 }

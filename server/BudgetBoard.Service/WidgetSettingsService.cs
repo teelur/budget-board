@@ -145,6 +145,29 @@ public class WidgetSettingsService(
         await userDataContext.SaveChangesAsync();
     }
 
+    public async Task ResetDashboardToDefaultAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+
+        userDataContext.WidgetSettings.RemoveRange(userData.WidgetSettings);
+
+        var defaultWidgets = WidgetSettingsHelpers.DefaultLayouts.Select(layout => new WidgetSettings
+        {
+            WidgetType = layout.WidgetType,
+            LgX = layout.LgX,
+            LgY = layout.LgY,
+            LgW = layout.LgW,
+            LgH = layout.LgH,
+            SmY = layout.SmY,
+            SmH = layout.SmH,
+            Configuration = GetDefaultConfiguration(layout.WidgetType),
+            UserID = userData.Id,
+        });
+
+        userDataContext.WidgetSettings.AddRange(defaultWidgets);
+        await userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(

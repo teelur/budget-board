@@ -912,6 +912,92 @@ public class WidgetSettingsServiceTests
     }
     #endregion
 
+    #region ResetDashboardToDefaultAsync
+    [Fact]
+    public async Task ResetDashboardToDefaultAsync_WhenNoWidgetsExist_ShouldCreateDefaultWidgets()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        // Act
+        await service.ResetDashboardToDefaultAsync(helper.demoUser.Id);
+
+        // Assert
+        var settings = helper
+            .UserDataContext.WidgetSettings.Where(ws => ws.UserID == helper.demoUser.Id)
+            .ToList();
+
+        settings.Should().HaveSameCount(WidgetSettingsHelpers.DefaultLayouts);
+        settings
+            .Select(ws => ws.WidgetType)
+            .Should()
+            .BeEquivalentTo(
+                WidgetSettingsHelpers.DefaultLayouts.Select(layout => layout.WidgetType)
+            );
+
+        foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
+        {
+            var setting = settings.Single(ws => ws.WidgetType == layout.WidgetType);
+            setting.LgX.Should().Be(layout.LgX);
+            setting.LgY.Should().Be(layout.LgY);
+            setting.LgW.Should().Be(layout.LgW);
+            setting.LgH.Should().Be(layout.LgH);
+            setting.SmY.Should().Be(layout.SmY);
+            setting.SmH.Should().Be(layout.SmH);
+        }
+    }
+
+    [Fact]
+    public async Task ResetDashboardToDefaultAsync_WhenWidgetsExist_ShouldReplaceWidgetsAndConfigurations()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        helper.UserDataContext.WidgetSettings.AddRange(
+            new WidgetSettings
+            {
+                WidgetType = WidgetTypes.NetWorth,
+                LgX = 99,
+                LgY = 99,
+                LgW = 1,
+                LgH = 1,
+                SmY = 99,
+                SmH = 1,
+                Configuration = "custom-net-worth",
+                UserID = helper.demoUser.Id,
+            },
+            new WidgetSettings
+            {
+                WidgetType = "Custom",
+                Configuration = "custom-widget",
+                UserID = helper.demoUser.Id,
+            }
+        );
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.ResetDashboardToDefaultAsync(helper.demoUser.Id);
+
+        // Assert
+        var settings = helper
+            .UserDataContext.WidgetSettings.Where(ws => ws.UserID == helper.demoUser.Id)
+            .ToList();
+
+        settings.Should().HaveSameCount(WidgetSettingsHelpers.DefaultLayouts);
+        settings.Should().NotContain(ws => ws.WidgetType == "Custom");
+        settings
+            .Single(ws => ws.WidgetType == WidgetTypes.NetWorth)
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration));
+        settings
+            .Single(ws => ws.WidgetType == WidgetTypes.Metric)
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration));
+    }
+    #endregion
+
     #region ResetSmallScreenToLargeScreenLayoutAsync
     [Fact]
     public async Task ResetSmallScreenToLargeScreenLayoutAsync_WhenWidgetsExist_ShouldAssignSmPositionsInLgYOrder()

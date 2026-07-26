@@ -46,4 +46,11 @@ public interface IWidgetSettingsService
     /// <param name="userGuid">The unique identifier of the user whose small screen layout will be reset.</param>
     /// <returns>A task that represents the asynchronous reset operation.</returns>
     Task ResetSmallScreenToLargeScreenLayoutAsync(Guid userGuid);
+
+    /// <summary>
+    /// Replaces all widget settings for a user with the default dashboard layout.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user whose dashboard will be reset.</param>
+    /// <returns>A task that represents the asynchronous reset operation.</returns>
+    Task ResetDashboardToDefaultAsync(Guid userGuid);
 }
