@@ -1,15 +1,12 @@
 import { Button, Group, Stack, Popover as MantinePopover } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
 import { PlusIcon, RotateCcwIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { widgetSettingsQueryKey } from "~/helpers/requests";
 import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useresetSmallScreenLayoutMutation";
+import { useResetToDefaultMutation } from "~/hooks/mutations/widgetSettings/useResetToDefaultMutation";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface DashboardEditorProps {
   onDone: () => void;
@@ -23,43 +20,15 @@ const DashboardEditor = ({
   editTarget,
 }: DashboardEditorProps): React.ReactNode => {
   const [isResetPopoverOpen, setIsResetPopoverOpen] = React.useState(false);
-  const [isResetting, setIsResetting] = React.useState(false);
 
   const { t } = useTranslation();
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
   const widgetSettingsQuery = useWidgetSettingsQuery();
   const resetSmallScreenLayoutMutation = useResetSmallScreenLayoutMutation();
-
-  // TODO: Fix this
-  const handleResetToDefaults = async () => {
-    setIsResetting(true);
-    try {
-      await Promise.all(
-        (widgetSettingsQuery.data ?? []).map((w) =>
-          request({
-            url: "/api/widgetSettings",
-            method: "DELETE",
-            params: { widgetSettingsId: w.id },
-          }),
-        ),
-      );
-      await queryClient.invalidateQueries({
-        queryKey: [widgetSettingsQueryKey],
-      });
-    } catch {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: t("error_loading_settings_message"),
-      });
-    } finally {
-      setIsResetting(false);
-    }
-  };
+  const resetToDefaultMutation = useResetToDefaultMutation();
 
   const handleConfirmReset = async () => {
     setIsResetPopoverOpen(false);
-    await handleResetToDefaults();
+    await resetToDefaultMutation.mutateAsync();
   };
 
   return (
@@ -94,7 +63,7 @@ const DashboardEditor = ({
             variant="subtle"
             leftSection={<RotateCcwIcon size={16} />}
             onClick={() => setIsResetPopoverOpen((opened) => !opened)}
-            loading={isResetting}
+            loading={resetToDefaultMutation.isPending}
           >
             {t("reset_dashboard")}
           </Button>
@@ -113,7 +82,7 @@ const DashboardEditor = ({
               <Button
                 size="xs"
                 color="var(--button-color-destructive)"
-                loading={isResetting}
+                loading={resetToDefaultMutation.isPending}
                 disabled={widgetSettingsQuery.isPending}
                 onClick={handleConfirmReset}
               >
