@@ -1,11 +1,7 @@
 import { Flex, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import { filterVisibleAccounts } from "~/helpers/accounts";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { filterVisibleAssets } from "~/helpers/assets";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
 import { useTranslation } from "react-i18next";
@@ -17,46 +13,27 @@ import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage"
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import NetWorthGroup from "./NetWorthGroup/NetWorthGroup";
 import Divider from "~/components/core/Divider/Divider";
-import { widgetSettingsQueryKey } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 interface NetWorthWidgetProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   settingsOpened?: boolean;
   onSettingsClose?: () => void;
 }
 
 const NetWorthWidget = ({
-  widgetId,
+  widget,
   settingsOpened,
   onSettingsClose,
 }: NetWorthWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const accountsQuery = useAccountsQuery();
   const assetsQuery = useAssetsQuery();
 
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
-
   const getNetWorthGroups = (): React.ReactNode => {
-    if (
-      widgetSettingsQuery.isPending ||
-      accountsQuery.isPending ||
-      assetsQuery.isPending
-    ) {
+    if (accountsQuery.isPending || assetsQuery.isPending) {
       return (
         <Flex p="0.5rem" h="100%" w="100%">
           <Skeleton height="100%" radius="md" />
@@ -64,22 +41,11 @@ const NetWorthWidget = ({
       );
     }
 
-    if (!widgetSettingsQuery.data || widgetSettingsQuery.data.length === 0) {
+    if (!widget.configuration || widget.configuration.trim() === "") {
       return <WidgetErrorMessage messageKey="no_configuration_data_found" />;
     }
 
-    const netWorthWidgetSettingsList = widgetSettingsQuery.data
-      .slice()
-      .filter((widget) => widget.id === widgetId);
-
-    if (netWorthWidgetSettingsList.length === 0) {
-      return <WidgetErrorMessage messageKey="error_loading_settings_message" />;
-    }
-
-    const configuration = parseNetWorthConfiguration(
-      netWorthWidgetSettingsList[0]!.configuration,
-    );
-
+    const configuration = parseNetWorthConfiguration(widget.configuration);
     if (!configuration) {
       return (
         <WidgetErrorMessage messageKey="error_loading_configuration_message" />
@@ -87,7 +53,6 @@ const NetWorthWidget = ({
     }
 
     const netWorthWidgetGroups = configuration.groups ?? [];
-
     if (!netWorthWidgetGroups || netWorthWidgetGroups.length === 0) {
       return (
         <WidgetErrorMessage messageKey="widget_no_items_configured_message" />
@@ -140,7 +105,7 @@ const NetWorthWidget = ({
       {getNetWorthGroups()}
       {settingsOpened !== undefined && onSettingsClose && (
         <NetWorthCardSettings
-          widgetId={widgetId}
+          widget={widget}
           opened={settingsOpened}
           onClose={onSettingsClose}
         />

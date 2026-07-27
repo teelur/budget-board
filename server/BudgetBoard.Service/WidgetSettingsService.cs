@@ -5,6 +5,7 @@ using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Models.Widgets.AccountsWidget;
+using BudgetBoard.Service.Models.Widgets.MetricWidget;
 using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
@@ -24,8 +25,7 @@ public class WidgetSettingsService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var defaultLayout = WidgetSettingsHelpers.GetDefaultWidgetLayout(request.WidgetType);
-
+        var defaultLayout = GetDefaultWidgetLayout(request.WidgetType);
         var newWidget = new WidgetSettings
         {
             WidgetType = request.WidgetType,
@@ -41,13 +41,17 @@ public class WidgetSettingsService(
 
         userDataContext.WidgetSettings.Add(newWidget);
         await userDataContext.SaveChangesAsync();
+
+        static DefaultWidgetLayout GetDefaultWidgetLayout(string widgetType) =>
+            WidgetSettingsHelpers.DefaultLayouts.FirstOrDefault(dl => dl.WidgetType == widgetType)
+            ?? WidgetSettingsHelpers.GenericDefaultLayout;
     }
 
     public async Task<IEnumerable<IWidgetResponse>> ReadWidgetSettingsAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = userData.WidgetSettings.Select(ws => new WidgetResponse
+        return userData.WidgetSettings.Select(ws => new WidgetResponse
         {
             ID = ws.ID,
             WidgetType = ws.WidgetType,
@@ -57,97 +61,75 @@ public class WidgetSettingsService(
             LgH = ws.LgH,
             SmY = ws.SmY,
             SmH = ws.SmH,
-            Configuration =
-                ws.Configuration ?? GetDefaultConfiguration(ws.WidgetType) ?? string.Empty,
+            Configuration = string.IsNullOrEmpty(ws.Configuration)
+                ? GetDefaultConfiguration(ws.WidgetType) ?? string.Empty
+                : ws.Configuration,
             UserID = ws.UserID,
         });
-
-        return widgetSettings;
     }
 
-    public async Task UpdateWidgetSettingsAsync(Guid userGuid, IWidgetSettingsUpdateRequest request)
-    {
-        var userData = await GetCurrentUserAsync(userGuid);
-        var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == request.ID);
-        if (widget == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["WidgetUpdateNotFoundError"]);
-        }
-
-        widget.LgX = request.LgX ?? widget.LgX;
-        widget.LgY = request.LgY ?? widget.LgY;
-        widget.LgW = request.LgW ?? widget.LgW;
-        widget.LgH = request.LgH ?? widget.LgH;
-        widget.SmY = request.SmY ?? widget.SmY;
-        widget.SmH = request.SmH ?? widget.SmH;
-        widget.Configuration = request.Configuration.HasValue
-            ? ValidateAndSerializeConfiguration(widget.WidgetType, request.Configuration.Value)
-            : widget.Configuration;
-
-        await userDataContext.SaveChangesAsync();
-    }
-
-    public async Task BatchUpdateWidgetSettingsAsync(
+    public async Task UpdateWidgetSettingsAsync(
         Guid userGuid,
-        IEnumerable<IWidgetSettingsBatchUpdateRequest> requests
+        IEnumerable<IWidgetSettingsUpdateRequest> requests
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        foreach (var req in requests)
+        foreach (var request in requests)
         {
-            var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == req.ID);
-            if (widget == null)
+            var widget = GetWidgetSettingsById(userData, request.ID);
+
+            if (request.LgX.HasValue)
             {
-                logger.LogError("{LogMessage}", logLocalizer["WidgetUpdateNotFoundLog"]);
-                throw new BudgetBoardServiceException(
-                    responseLocalizer["WidgetUpdateNotFoundError"]
-                );
+                widget.LgX = request.LgX.Value;
             }
-
-            widget.LgX = req.LgX ?? widget.LgX;
-            widget.LgY = req.LgY ?? widget.LgY;
-            widget.LgW = req.LgW ?? widget.LgW;
-            widget.LgH = req.LgH ?? widget.LgH;
-            widget.SmY = req.SmY ?? widget.SmY;
-            widget.SmH = req.SmH ?? widget.SmH;
+            if (request.LgY.HasValue)
+            {
+                widget.LgY = request.LgY.Value;
+            }
+            if (request.LgW.HasValue)
+            {
+                widget.LgW = request.LgW.Value;
+            }
+            if (request.LgH.HasValue)
+            {
+                widget.LgH = request.LgH.Value;
+            }
+            if (request.SmY.HasValue)
+            {
+                widget.SmY = request.SmY.Value;
+            }
+            if (request.SmH.HasValue)
+            {
+                widget.SmH = request.SmH.Value;
+            }
+            if (request.Configuration.IsSpecified)
+            {
+                widget.Configuration = request.Configuration.Value.HasValue
+                    ? ValidateAndSerializeConfiguration(
+                        widget.WidgetType,
+                        request.Configuration.Value.Value
+                    )
+                    : GetDefaultConfiguration(widget.WidgetType);
+            }
         }
 
         await userDataContext.SaveChangesAsync();
     }
 
-    public async Task DeleteWidgetSettingsAsync(Guid userGuid, Guid widgetGuid)
+    public async Task DeleteWidgetSettingsAsync(Guid userGuid, IEnumerable<Guid> widgetGuids)
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
-        var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == widgetGuid);
-        if (widget == null)
+        foreach (var widgetGuid in widgetGuids)
         {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["WidgetDeleteNotFoundError"]);
+            var widget = GetWidgetSettingsById(userData, widgetGuid);
+            userDataContext.WidgetSettings.Remove(widget);
         }
 
-        userDataContext.WidgetSettings.Remove(widget);
         await userDataContext.SaveChangesAsync();
     }
 
-    public async Task ResetWidgetSettingsConfiguration(Guid userGuid, Guid widgetGuid)
-    {
-        var userData = await GetCurrentUserAsync(userGuid);
-
-        var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == widgetGuid);
-        if (widget == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["WidgetDeleteNotFoundError"]);
-        }
-
-        widget.Configuration = GetDefaultConfiguration(widget.WidgetType);
-        await userDataContext.SaveChangesAsync();
-    }
-
-    public async Task ResetSmallScreenToLargeScreenLayout(Guid userGuid)
+    public async Task ResetSmallScreenToLargeScreenLayoutAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
@@ -166,6 +148,31 @@ public class WidgetSettingsService(
         await userDataContext.SaveChangesAsync();
     }
 
+    public async Task ResetDashboardToDefaultAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+
+        userDataContext.WidgetSettings.RemoveRange(userData.WidgetSettings);
+
+        var defaultWidgets = WidgetSettingsHelpers.DefaultLayouts.Select(
+            layout => new WidgetSettings
+            {
+                WidgetType = layout.WidgetType,
+                LgX = layout.LgX,
+                LgY = layout.LgY,
+                LgW = layout.LgW,
+                LgH = layout.LgH,
+                SmY = layout.SmY,
+                SmH = layout.SmH,
+                Configuration = GetDefaultConfiguration(layout.WidgetType),
+                UserID = userData.Id,
+            }
+        );
+
+        userDataContext.WidgetSettings.AddRange(defaultWidgets);
+        await userDataContext.SaveChangesAsync();
+    }
+
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
@@ -176,6 +183,18 @@ public class WidgetSettingsService(
             id,
             users => users.Include(u => u.WidgetSettings)
         );
+    }
+
+    private WidgetSettings GetWidgetSettingsById(ApplicationUser userData, Guid widgetId)
+    {
+        var widget = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == widgetId);
+        if (widget == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["WidgetSettingsNotFoundLog"]);
+            throw new BudgetBoardServiceException(responseLocalizer["WidgetSettingsNotFoundError"]);
+        }
+
+        return widget;
     }
 
     private string ValidateAndSerializeConfiguration(string widgetType, JsonElement configuration)
@@ -190,6 +209,10 @@ public class WidgetSettingsService(
                 ),
                 WidgetTypes.Accounts => JsonSerializer.Serialize(
                     JsonSerializer.Deserialize<AccountsWidgetConfiguration>(configuration)
+                        ?? throw new JsonException()
+                ),
+                WidgetTypes.Metric => JsonSerializer.Serialize(
+                    JsonSerializer.Deserialize<MetricWidgetConfiguration>(configuration)
                         ?? throw new JsonException()
                 ),
                 _ => configuration.GetRawText(),
@@ -213,12 +236,7 @@ public class WidgetSettingsService(
                 WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
             ),
             WidgetTypes.Metric => JsonSerializer.Serialize(
-                new
-                {
-                    title = "This Month's Spending",
-                    value = "@transactions.sum(this_month, type=expense)",
-                    label = "total expenses",
-                }
+                WidgetSettingsHelpers.DefaultMetricWidgetConfiguration
             ),
             _ => null,
         };

@@ -445,7 +445,4 @@
     <data name="WidgetSettingsNotFoundLog" xml:space="preserve">
         <value>Attempted to access widget settings for a widget that does not exist.</value>
     </data>
-    <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-        <value>Attempted to update a widget that does not exist.</value>
-    </data>
 </root>

@@ -1,6 +1,4 @@
 import { Flex, Skeleton, Stack, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import SplitCard, {
@@ -15,51 +13,37 @@ import {
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
-import { widgetSettingsQueryKey } from "~/helpers/requests";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 interface MetricWidgetProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   settingsOpened?: boolean;
   onSettingsClose?: () => void;
 }
 
 const MetricWidget = ({
-  widgetId,
+  widget,
   settingsOpened,
   onSettingsClose,
 }: MetricWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const { preferredCurrency } = useUserSettings();
   const { intlLocale, dayjs } = useLocale();
   const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as IWidgetSettingsResponse[];
-      return [];
-    },
-  });
+  const widgetSettingsQuery = useWidgetSettingsQuery();
 
   // The widget configuration is stored as a JSON string in the database.
   const { configTitle, configValue, configLabel } = React.useMemo(() => {
-    const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
     if (!widget?.configuration)
       return {
         configTitle: undefined,
@@ -85,7 +69,7 @@ const MetricWidget = ({
         configLabel: undefined,
       };
     }
-  }, [widgetSettingsQuery.data, widgetId]);
+  }, [widgetSettingsQuery.data, widget]);
 
   const parsedValueTokens = React.useMemo(
     () => parseTemplate(configValue ?? ""),
@@ -235,7 +219,7 @@ const MetricWidget = ({
       {renderContent()}
       {settingsOpened !== undefined && onSettingsClose && (
         <MetricWidgetSettings
-          widgetId={widgetId}
+          widget={widget}
           opened={settingsOpened}
           onClose={onSettingsClose}
         />

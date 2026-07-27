@@ -1,4 +1,5 @@
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Models.Widgets.MetricWidget;
 using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 
 namespace BudgetBoard.Service.Helpers;
@@ -67,6 +68,19 @@ public static class WidgetSettingsHelpers
             SmH: 6
         ),
     ];
+
+    /// <summary>
+    /// Generic default layout used when no specific layout is found for a widget.
+    /// </summary>
+    public static readonly DefaultWidgetLayout GenericDefaultLayout = new(
+        "generic",
+        LgX: 0,
+        LgY: 0,
+        LgW: 4,
+        LgH: 5,
+        SmY: 0,
+        SmH: 5
+    );
 
     /// <summary>
     /// Default configuration for the NetWorth widget.
@@ -253,7 +267,13 @@ public static class WidgetSettingsHelpers
         ],
     };
 
-    public static DefaultWidgetLayout GetDefaultWidgetLayout(string widgetType) =>
-        DefaultLayouts.FirstOrDefault(dl => dl.WidgetType == widgetType)
-        ?? new DefaultWidgetLayout(widgetType, 0, 0, 4, 5, 0, 5);
+    /// <summary>
+    /// The default configuration for a metric widget, representing this month's spending.
+    /// </summary>
+    public static readonly MetricWidgetConfiguration DefaultMetricWidgetConfiguration = new()
+    {
+        Title = "This Month's Spending",
+        Value = "@transactions.sum(this_month, type=expense)",
+        Label = "total expenses",
+    };
 }

@@ -1,20 +1,23 @@
 import { ActionIcon, Group } from "@mantine/core";
 import { Maximize2Icon, SettingsIcon, XIcon } from "lucide-react";
 import React from "react";
+import { useDeleteWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useDeleteWidgetSettingsMutation";
 
 interface WidgetShellProps {
+  widgetSettingsId: string;
   isEditMode: boolean;
-  onRemove: () => void;
   onSettingsOpen?: () => void;
   children: React.ReactNode;
 }
 
 const WidgetShell = ({
+  widgetSettingsId,
   isEditMode,
-  onRemove,
   onSettingsOpen,
   children,
 }: WidgetShellProps): React.ReactNode => {
+  const deleteWidgetSettingsMutation = useDeleteWidgetSettingsMutation();
+
   return (
     <div
       style={{
@@ -55,7 +58,7 @@ const WidgetShell = ({
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              onRemove();
+              deleteWidgetSettingsMutation.mutate([widgetSettingsId]);
             }}
             aria-label="Remove widget"
           >

@@ -8,56 +8,34 @@ import {
 } from "@mantine/core";
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
-import {
-  translateAxiosError,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
-import { notifications } from "@mantine/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
+import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 interface AccountsWidgetSettingsProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   opened: boolean;
   onClose: () => void;
 }
 
 const AccountsWidgetSettings = ({
-  widgetId,
+  widget,
   opened,
   onClose,
 }: AccountsWidgetSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
   const institutionQuery = useInstitutionsQuery();
+  const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
 
   const [showAll, setShowAll] = React.useState(true);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [initialized, setInitialized] = React.useState(false);
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
 
   // Visible accounts (not deleted, not globally hidden)
   const visibleInstitutions = React.useMemo(
@@ -75,20 +53,20 @@ const AccountsWidgetSettings = ({
     [institutionQuery.data],
   );
 
+  const handleClose = () => {
+    setShowAll(true);
+    setSelectedIds(new Set());
+    setInitialized(false);
+    onClose();
+  };
+
   // We need to initialize the checkbox state from the saved configuration
   // when the user has specific accounts selected
   React.useEffect(() => {
-    if (!opened) {
-      setInitialized(false);
-      setShowAll(true);
-      setSelectedIds(new Set());
-      return;
-    }
-    if (initialized || widgetSettingsQuery.isPending) {
+    if (!opened || initialized) {
       return;
     }
 
-    const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
     const config = parseAccountsConfiguration(widget?.configuration);
 
     if (config.accountIds.length > 0) {
@@ -99,46 +77,7 @@ const AccountsWidgetSettings = ({
       setSelectedIds(new Set());
     }
     setInitialized(true);
-  }, [
-    opened,
-    initialized,
-    widgetSettingsQuery.isPending,
-    widgetSettingsQuery.data,
-    institutionQuery.data,
-    widgetId,
-  ]);
-
-  const doSave = useMutation({
-    mutationFn: async (accountIds: string[]) => {
-      const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
-      if (!widget) {
-        throw new Error("Widget not found");
-      }
-      return await request({
-        url: "/api/widgetSettings",
-        method: "PUT",
-        data: {
-          id: widget.id,
-          lgX: widget.lgX,
-          lgY: widget.lgY,
-          lgW: widget.lgW,
-          lgH: widget.lgH,
-          smY: widget.smY,
-          smH: widget.smH,
-          configuration: { accountIds },
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  }, [opened, initialized, widget]);
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
@@ -152,14 +91,8 @@ const AccountsWidgetSettings = ({
     });
   };
 
-  const handleSave = () => {
-    doSave.mutate(showAll ? [] : Array.from(selectedIds));
-  };
-
-  const isPending = widgetSettingsQuery.isPending || institutionQuery.isPending;
-
   const getAccountsWidgetSettingsContent = () => {
-    if (isPending) {
+    if (institutionQuery.isPending) {
       return <Skeleton height={200} radius="lg" />;
     }
 
@@ -220,7 +153,7 @@ const AccountsWidgetSettings = ({
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       title={<PrimaryText size="md">{t("accounts_settings")}</PrimaryText>}
     >
       <Stack gap="0.5rem">
@@ -229,14 +162,22 @@ const AccountsWidgetSettings = ({
         </DimmedText>
         {getAccountsWidgetSettingsContent()}
         <Group w="100%" justify="flex-end" mt="xs" gap="0.5rem">
-          <Button flex={1} variant="default" onClick={onClose}>
+          <Button flex={1} variant="default" onClick={handleClose}>
             {t("cancel")}
           </Button>
           <Button
             flex={1}
-            onClick={handleSave}
-            loading={doSave.isPending}
-            disabled={isPending}
+            onClick={() => {
+              updateWidgetSettingsMutation.mutate([
+                {
+                  id: widget.id,
+                  configuration: {
+                    accountIds: showAll ? [] : Array.from(selectedIds),
+                  },
+                },
+              ]);
+            }}
+            loading={updateWidgetSettingsMutation.isPending}
           >
             {t("save")}
           </Button>

@@ -3,33 +3,25 @@ import {
   Code,
   Group,
   ScrollArea,
-  Skeleton,
   Stack,
   TextInput,
 } from "@mantine/core";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import Modal from "~/components/core/Modal/Modal";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import {
-  translateAxiosError,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
+import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
@@ -39,50 +31,34 @@ const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
 @accounts.balance(type=Checking)`;
 
 interface MetricWidgetSettingsProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   opened: boolean;
   onClose: () => void;
 }
 
 const MetricWidgetSettings = ({
-  widgetId,
+  widget,
   opened,
   onClose,
 }: MetricWidgetSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const { allTransactionCategories } = useTransactionCategories();
-  const queryClient = useQueryClient();
   const { dayjs } = useLocale();
-
-  const titleField = useField({ initialValue: "" });
-  const valueField = useField({ initialValue: "" });
-  const labelField = useField({ initialValue: "" });
-  const [initialized, setInitialized] = React.useState(false);
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) return res.data as IWidgetSettingsResponse[];
-      return [];
-    },
+  const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
+  const accountsQuery = useAccountsQuery({ enabled: opened });
+  const budgetsQuery = useBudgetsQuery({
+    months: [dayjs().startOf("month").toDate()],
+    enabled: opened,
   });
-
   const goalsQuery = useGoalsQuery({
     includeInterest: false,
     enabled: opened,
   });
 
-  const accountsQuery = useAccountsQuery({ enabled: opened });
-
-  const budgetsQuery = useBudgetsQuery({
-    months: [dayjs().startOf("month").toDate()],
-    enabled: opened,
-  });
+  const titleField = useField({ initialValue: "" });
+  const valueField = useField({ initialValue: "" });
+  const labelField = useField({ initialValue: "" });
+  const [initialized, setInitialized] = React.useState(false);
 
   const transactionCategories = React.useMemo(
     () =>
@@ -124,17 +100,19 @@ const MetricWidgetSettings = ({
     [accountsQuery.data],
   );
 
+  const handleClose = () => {
+    setInitialized(false);
+    titleField.reset();
+    valueField.reset();
+    labelField.reset();
+    onClose();
+  };
+
   React.useEffect(() => {
-    if (!opened) {
-      setInitialized(false);
-      titleField.reset();
-      valueField.reset();
-      labelField.reset();
+    if (!opened || initialized) {
       return;
     }
-    if (initialized || widgetSettingsQuery.isPending) return;
 
-    const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
     if (widget?.configuration) {
       try {
         const parsed = JSON.parse(widget.configuration) as {
@@ -152,71 +130,12 @@ const MetricWidgetSettings = ({
       }
     }
     setInitialized(true);
-  }, [
-    opened,
-    initialized,
-    widgetSettingsQuery.isPending,
-    widgetSettingsQuery.data,
-    widgetId,
-  ]);
-
-  const doSave = useMutation({
-    mutationFn: async ({
-      title,
-      value,
-      label,
-    }: {
-      title: string;
-      value: string;
-      label: string;
-    }) => {
-      const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
-      if (!widget) {
-        throw new Error(t("widget_not_found"));
-      }
-
-      return await request({
-        url: "/api/widgetSettings",
-        method: "PUT",
-        data: {
-          id: widget.id,
-          lgX: widget.lgX,
-          lgY: widget.lgY,
-          lgW: widget.lgW,
-          lgH: widget.lgH,
-          smY: widget.smY,
-          smH: widget.smH,
-          configuration: { title, value, label },
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError | Error) => {
-      const message =
-        error instanceof AxiosError
-          ? translateAxiosError(error)
-          : error.message;
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message,
-      });
-    },
-  });
-
-  const handleSave = () => {
-    doSave.mutate({
-      title: titleField.getValue(),
-      value: valueField.getValue(),
-      label: labelField.getValue(),
-    });
-  };
+  }, [opened, initialized, widget]);
 
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       title={
         <PrimaryHeading component="span" order={4}>
           {t("metric_widget_settings")}
@@ -226,52 +145,46 @@ const MetricWidgetSettings = ({
     >
       <Stack gap="0.75rem">
         <DimmedText size="sm">{t("metric_widget_settings_message")}</DimmedText>
-
-        {widgetSettingsQuery.isPending ? (
-          <Skeleton height={200} radius="md" />
-        ) : (
-          <Stack gap="0.75rem">
-            <TextInput
-              label={
-                <PrimaryText size="sm">
-                  {t("metric_widget_title_label")}
-                </PrimaryText>
-              }
-              placeholder={t("metric_widget_title_placeholder")}
-              {...titleField.getInputProps()}
-            />
-            <FormulaTextInput
-              label={
-                <PrimaryText size="sm">
-                  {t("metric_widget_value_label")}
-                </PrimaryText>
-              }
-              placeholder={t("metric_widget_value_placeholder")}
-              value={valueField.getValue()}
-              onChange={valueField.setValue}
-              transactionCategories={transactionCategories}
-              budgetCategories={budgetCategories}
-              goalNames={goalNames}
-              accountNames={accountNames}
-            />
-            <FormulaTextInput
-              label={
-                <PrimaryText size="sm">
-                  {t("metric_widget_label_label")}
-                </PrimaryText>
-              }
-              placeholder={t("metric_widget_label_placeholder")}
-              value={labelField.getValue()}
-              onChange={labelField.setValue}
-              transactionCategories={transactionCategories}
-              budgetCategories={budgetCategories}
-              goalNames={goalNames}
-              accountNames={accountNames}
-            />
-          </Stack>
-        )}
-
-        <Accordion elevation={0}>
+        <Stack gap="0.75rem">
+          <TextInput
+            label={
+              <PrimaryText size="sm">
+                {t("metric_widget_title_label")}
+              </PrimaryText>
+            }
+            placeholder={t("metric_widget_title_placeholder")}
+            {...titleField.getInputProps()}
+          />
+          <FormulaTextInput
+            label={
+              <PrimaryText size="sm">
+                {t("metric_widget_value_label")}
+              </PrimaryText>
+            }
+            placeholder={t("metric_widget_value_placeholder")}
+            value={valueField.getValue()}
+            onChange={valueField.setValue}
+            transactionCategories={transactionCategories}
+            budgetCategories={budgetCategories}
+            goalNames={goalNames}
+            accountNames={accountNames}
+          />
+          <FormulaTextInput
+            label={
+              <PrimaryText size="sm">
+                {t("metric_widget_label_label")}
+              </PrimaryText>
+            }
+            placeholder={t("metric_widget_label_placeholder")}
+            value={labelField.getValue()}
+            onChange={labelField.setValue}
+            transactionCategories={transactionCategories}
+            budgetCategories={budgetCategories}
+            goalNames={goalNames}
+            accountNames={accountNames}
+          />
+        </Stack>
+        <Accordion elevation={1}>
           <Accordion.Item
             defaultOpen={false}
             title={
@@ -309,14 +222,24 @@ const MetricWidgetSettings = ({
         </Accordion>
 
         <Group w="100%" justify="flex-end" mt="xs" gap="0.5rem">
-          <Button flex={1} variant="default" onClick={onClose}>
+          <Button flex={1} variant="default" onClick={handleClose}>
             {t("cancel")}
           </Button>
           <Button
             flex={1}
-            onClick={handleSave}
-            loading={doSave.isPending}
-            disabled={widgetSettingsQuery.isPending}
+            onClick={() => {
+              updateWidgetSettingsMutation.mutate([
+                {
+                  id: widget.id,
+                  configuration: {
+                    title: titleField.getValue(),
+                    value: valueField.getValue(),
+                    label: labelField.getValue(),
+                  },
+                },
+              ]);
+            }}
+            loading={updateWidgetSettingsMutation.isPending}
           >
             {t("save")}
           </Button>
