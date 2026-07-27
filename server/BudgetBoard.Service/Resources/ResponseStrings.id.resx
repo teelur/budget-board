@@ -418,4 +418,7 @@
   <data name="ValueNotFoundError" xml:space="preserve">
     <value>The value you are trying to access does not exist.</value>
   </data>
+  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
+    <value>The widget you are trying to update does not exist.</value>
+  </data>
 </root>
