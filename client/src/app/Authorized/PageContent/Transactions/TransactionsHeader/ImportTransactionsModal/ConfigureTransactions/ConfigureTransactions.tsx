@@ -86,6 +86,7 @@ const ConfigureTransactions = (
     includeExpensesColumn: false,
     expensesColumn: null,
     expensesColumnValue: null,
+    useSingleAccount: false,
     filterDuplicates: false,
     filterByOptions: {
       date: false,
@@ -108,9 +109,16 @@ const ConfigureTransactions = (
       return;
     }
 
-    // The account column is required to add transactions.
-    if (!columnsSelect.account) {
-      setAlertDetails(t("account_column_is_required_message"));
+    if (
+      columnsOptions.useSingleAccount
+        ? !columnsSelect.account?.trim()
+        : !columnsSelect.account
+    ) {
+      setAlertDetails(
+        columnsOptions.useSingleAccount
+          ? t("account_name_is_required_message")
+          : t("account_column_is_required_message"),
+      );
       return;
     }
 
@@ -154,6 +162,7 @@ const ConfigureTransactions = (
     importedTransactionsTableData,
     columnsSelect,
     columnsOptions.splitAmountColumn,
+    columnsOptions.useSingleAccount,
     columnsOptions.thousandsSeparator,
     columnsOptions.decimalSeparator,
   ]);
@@ -390,8 +399,9 @@ const ConfigureTransactions = (
           : null,
         category: columnsSelect.category ? row[columnsSelect.category] : null,
         amount: getImportedTransactionAmount(row),
-        account:
-          columnsSelect.account && row[columnsSelect.account] != null
+        account: columnsOptions.useSingleAccount
+          ? (columnsSelect.account?.trim() || null)
+          : columnsSelect.account && row[columnsSelect.account] != null
             ? String(row[columnsSelect.account])
             : null,
         type:
@@ -764,6 +774,7 @@ const ConfigureTransactions = (
           selectedColumns={columnsSelect}
           applySelectedColumns={applyColumnsSelect}
           isAmountSplit={columnsOptions.splitAmountColumn}
+          isSingleAccount={columnsOptions.useSingleAccount}
         />
       )}
       {props.csvHeaders.length > 0 && (
