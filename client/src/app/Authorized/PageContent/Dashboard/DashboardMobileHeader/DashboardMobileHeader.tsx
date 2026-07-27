@@ -2,7 +2,7 @@ import { Badge, Button, Group } from "@mantine/core";
 import { LayoutIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useresetSmallScreenLayoutMutation";
+import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useResetSmallScreenLayoutMutation";
 
 interface DashboardMobileHeaderProps {
   isEditMode: boolean;
