@@ -227,8 +227,8 @@ const MetricWidgetSettings = ({
           </Button>
           <Button
             flex={1}
-            onClick={async () => {
-              await updateWidgetSettingsMutation.mutateAsync([
+            onClick={() => {
+              updateWidgetSettingsMutation.mutate([
                 {
                   id: widget.id,
                   configuration: {

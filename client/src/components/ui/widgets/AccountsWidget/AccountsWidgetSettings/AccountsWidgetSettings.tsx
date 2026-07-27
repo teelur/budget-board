@@ -77,7 +77,7 @@ const AccountsWidgetSettings = ({
       setSelectedIds(new Set());
     }
     setInitialized(true);
-  }, [opened, initialized, widget, institutionQuery.data, widget]);
+  }, [opened, initialized, widget]);
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
