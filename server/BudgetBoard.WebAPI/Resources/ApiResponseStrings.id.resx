@@ -59,75 +59,75 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AccountLockedOutEmailBody" xml:space="preserve">
-        <value>&lt;h2&gt;Your Account Has Been Locked&lt;/h2&gt;
-&lt;p&gt;We've detected multiple failed login attempts on your account. For your security, your account has been temporarily locked.&lt;/p&gt;
-&lt;p&gt;Your account will be automatically unlocked after the lockout period expires.&lt;/p&gt;
-&lt;p&gt;If this was you, please try again later or use the 'Forgot Password' option to reset your credentials.&lt;/p&gt;</value>
+        <value>&lt;h2&gt;Akun Anda telah dikunci&lt;/h2&gt;
+&lt;p&gt;Kami mendeteksi adanya beberapa kesalahan percobaan masuk pada akun Anda. Untuk keamanan Anda, akun Anda telah dikunci untuk beberapa waktu.&lt;/p&gt;
+&lt;p&gt;Akun Anda akan otomatis dibuka setelah periode kunci kadaluarsa.&lt;/p&gt;
+&lt;p&gt;Jika ini adalah Anda, Tolong coba lagi lain kali atau gunakan opsi `Lupa Kata Sandi' untuk mereset kredensial Anda.&lt;/p&gt;</value>
   </data>
   <data name="AccountLockedOutEmailSubject" xml:space="preserve">
-        <value>Account Locked Due to Multiple Failed Login Attempts</value>
+        <value>Akun Dikunci Dikarenakan Beberapa Percobaan Masuk Gagal</value>
   </data>
   <data name="AuthCodeRequired" xml:space="preserve">
-        <value>The authorization code is required.</value>
+        <value>Kode authorisasi diperlukan</value>
   </data>
   <data name="AuthFailed" xml:space="preserve">
-        <value>Authentication failed.</value>
+        <value>Autentikasi gagal.</value>
   </data>
   <data name="DefaultWidgetSeedingFailedError" xml:space="preserve">
-        <value>Unable to initialize default dashboard widgets.</value>
+        <value>Tidak dapat menginisialisasi widget dashboard.</value>
   </data>
   <data name="DemoModeNotAllowed" xml:space="preserve">
-        <value>This action is not allowed in demo mode.</value>
+        <value>Aksi ini tidak diizinkan pada mode demo.</value>
   </data>
   <data name="EmailSenderConfigMissing" xml:space="preserve">
-        <value>Email sender configuration is missing. Please set EMAIL_SENDER.</value>
+        <value>Konfigurasi pengirim email tidak ditemukan. Silakan atur EMAIL_SENDER.</value>
   </data>
   <data name="EndpointNotFoundError" xml:space="preserve">
-        <value>Could not find the endpoint named '{0}'.</value>
+        <value>Tidak dapat menemukan endpoint bernama '{0}'.</value>
   </data>
   <data name="InvalidJsonType" xml:space="preserve">
-        <value>The provided JSON token type is invalid.</value>
+        <value>Tipe token JSON yang diberikan tidak valid.</value>
   </data>
   <data name="InvalidLanguageError" xml:space="preserve">
-        <value>The specified language '{0}' is not supported.</value>
+        <value>Bahasa spesifik '{0}' tidak didukung.</value>
   </data>
   <data name="LocalAccountProviderName" xml:space="preserve">
-        <value>Local Account</value>
+        <value>Akun Lokal</value>
   </data>
   <data name="LoginFailed" xml:space="preserve">
-        <value>Unable to complete login.</value>
+        <value>Tidak dapat menyelesaikan login.</value>
   </data>
   <data name="NoEmailConfirmationEndpointError" xml:space="preserve">
-        <value>No email confirmation endpoint was registered!</value>
+        <value>Tidak ada endpoint email konfirmasi yang terdaftar!</value>
   </data>
   <data name="RegistrationDisabledError" xml:space="preserve">
-        <value>Registration is disabled.</value>
+        <value>Pendaftaran dimatikan.</value>
   </data>
   <data name="SmtpHostConfigMissing" xml:space="preserve">
-        <value>SMTP host configuration is missing. Please set EMAIL_SMTP_HOST.</value>
+        <value>Konfigurasi SMTP host tidak tersedia. Silakan atur EMAIL_SMTP_HOST.</value>
   </data>
   <data name="UnexpectedServerError" xml:space="preserve">
-        <value>An unexpected error occurred.</value>
+        <value>Terjadi kesalahan yang tidak terduga.</value>
   </data>
   <data name="UserEmailRequiredError" xml:space="preserve">
-        <value>The user must have an email address.</value>
+        <value>Pengguna harus memiliki alamat email.</value>
   </data>
   <data name="UserIdNotFound" xml:space="preserve">
-        <value>The user ID was not found.</value>
+        <value>User ID tidak ditemukan.</value>
   </data>
   <data name="UserNotAuthenticated" xml:space="preserve">
-        <value>The user is not authenticated.</value>
+        <value>Pengguna tidak terautentikasi.</value>
   </data>
   <data name="UserNotFound" xml:space="preserve">
-        <value>The user was not found.</value>
+        <value>Pengguna tidak ditemukan.</value>
   </data>
   <data name="OidcEmailClaimMissingError" xml:space="preserve">
-    <value>The OIDC provider did not return an email claim required for account linking.</value>
+    <value>Provider OIDC tidak mengembalikan klaim email yang diperlukan untuk penautan akun.</value>
   </data>
   <data name="OidcEmailMismatchError" xml:space="preserve">
-    <value>The OIDC email does not match the currently signed-in account email.</value>
+    <value>Email OIDC tidak cocok dengan akun sekarang yang telah masuk.</value>
   </data>
   <data name="OidcExplicitLinkRequiredError" xml:space="preserve">
-    <value>An account with this email already exists. Sign in and link your OIDC account from account settings.</value>
+    <value>Akun dengan email ini telah ada. Masuk dan sambungkan OIDC akun anda dari Setelan Akun.</value>
   </data>
 </root>
