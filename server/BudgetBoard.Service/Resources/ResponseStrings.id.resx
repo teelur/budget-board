@@ -59,28 +59,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AccountNotFoundError" xml:space="preserve">
-        <value>The account you are trying to access does not exist.</value>
+        <value>Akun yang kamu coba akses tidak tersedia.</value>
   </data>
   <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
-        <value>The account must be deleted before it can be permanently deleted.</value>
+        <value>Akun harus dihapus sebelum bisa dihapus permanen.</value>
   </data>
   <data name="AccountTypeDuplicateNameError" xml:space="preserve">
-        <value>An account type with this name already exists.</value>
+        <value>Tipe akun dengan nama ini sudah ada.</value>
   </data>
   <data name="AccountTypeEmptyNameError" xml:space="preserve">
-        <value>The account type name cannot be empty.</value>
+        <value>Nama tipe akun tidak bisa kosong.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
-        <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
+        <value>Klasifikasi tipe akun yang diberikan tidak valid. Nilai yang valid adalah 'asset' dan 'liability'.</value>
   </data>
   <data name="AccountTypeNotFoundError" xml:space="preserve">
-        <value>The account type you are trying to access does not exist.</value>
+        <value>Tipe akun yang kamu coba akses tidak tersedia.</value>
   </data>
   <data name="AccountTypeParentNotFoundError" xml:space="preserve">
-        <value>The parent account type does not exist.</value>
+        <value>Tipe induk akun tidak tersedia.</value>
   </data>
   <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
-        <value>The account type name cannot be the same as its parent.</value>
+        <value>Nama tipe akun tidak boleh sama seperti induk.</value>
   </data>
   <data name="AssetNotFoundError" xml:space="preserve">
         <value>The asset you are trying to access does not exist.</value>
@@ -113,22 +113,22 @@
         <value>The category '{0}' does not exist.</value>
   </data>
   <data name="AutomaticRuleCategoryNotFoundError" xml:space="preserve">
-        <value>The category '{0}' does not exist.</value>
+        <value>Kategori '{0}' tidak tersedia.</value>
   </data>
   <data name="AutomaticRuleInvalidAccountIdError" xml:space="preserve">
-        <value>The account ID '{0}' is not a valid GUID.</value>
+        <value>ID akun '{0}' bukan GUID yang valid.</value>
   </data>
   <data name="AutomaticRuleInvalidAmountError" xml:space="preserve">
-        <value>The amount '{0}' is not a valid decimal number.</value>
+        <value>Jumlah '{0}' bukan merupakan angka desimal yang valid.</value>
   </data>
   <data name="AutomaticRuleInvalidDateError" xml:space="preserve">
-        <value>The date '{0}' is not a valid date.</value>
+        <value>Tanggal '{0}' bukan tanggal yang valid.</value>
   </data>
   <data name="AutomaticRuleInvalidRegexError" xml:space="preserve">
-        <value>The regex pattern '{0}' is invalid.</value>
+        <value>Pola regex '{0}' tidak valid.</value>
   </data>
   <data name="AutomaticRuleNotFoundError" xml:space="preserve">
-        <value>The automatic rule you are trying to access does not exist.</value>
+        <value>Peraturan otomatis yang Anda coba akses tidak tersedia.</value>
   </data>
   <data name="AutomaticRuleUnsupportedActionFieldError" xml:space="preserve">
         <value>Unsupported field '{0}' in rule action.</value>
@@ -158,7 +158,7 @@
         <value>The account you are trying to add a balance to does not exist.</value>
   </data>
   <data name="BalanceAccountNotFoundError" xml:space="preserve">
-        <value>The account you are trying to access does not exist.</value>
+        <value>Akun yang kamu coba akses tidak tersedia.</value>
   </data>
   <data name="BalanceDuplicateDateError" xml:space="preserve">
         <value>A balance already exists for this account on that date.</value>
@@ -374,45 +374,51 @@
         <value>A transaction category with this name already exists.</value>
   </data>
   <data name="TransactionCategoryEmptyNameError" xml:space="preserve">
-        <value>The transaction category name cannot be empty.</value>
+        <value>Nama kategori transaksi tidak boleh kosong.</value>
   </data>
   <data name="TransactionCategoryNotFoundError" xml:space="preserve">
-        <value>The transaction category you are trying to access does not exist.</value>
+        <value>Kategori transaksi yang kamu coba akses tidak tersedia.</value>
   </data>
   <data name="TransactionCategoryParentNotFoundError" xml:space="preserve">
-        <value>The parent transaction category you are trying to use does not exist.</value>
+        <value>Kategori induk transaksi yang ingin Anda gunakan tidak ditemukan.</value>
   </data>
   <data name="TransactionCategorySameNameAsParentError" xml:space="preserve">
-        <value>Transaction category cannot have the same name as its parent category.</value>
+        <value>Kategori transaksi tidak dapat memiliki nama yang sama seperti kategori induk.</value>
   </data>
   <data name="TransactionNotFoundError" xml:space="preserve">
-        <value>The transaction you are trying to access does not exist.</value>
+        <value>Transaksi yang anda coba akses tidak ditemukan.</value>
   </data>
   <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
-        <value>The split amount must be less than the transaction amount.</value>
+        <value>Nominal pemisahan tidak boleh melebihi total transaksi.</value>
   </data>
   <data name="UserDataRetrievalError" xml:space="preserve">
-        <value>An error occurred while retrieving user data.</value>
+        <value>Kesalahan terjadi ketika mengambil data pengguna.</value>
   </data>
   <data name="UserSettingsNotFoundError" xml:space="preserve">
-        <value>The user settings you are trying to access do not exist.</value>
+        <value>Pengaturan pengguna yang kamu coba akses tidak ditemukan.</value>
   </data>
   <data name="ValueAssetNotFoundError" xml:space="preserve">
-        <value>The asset you are trying to access values for does not exist.</value>
+        <value>Aset yang ingin Anda akses nilainya tidak ditemukan.</value>
   </data>
   <data name="ValueDuplicateDateError" xml:space="preserve">
-        <value>A value for this date already exists for this asset.</value>
+        <value>Nilai untuk tanggal ini sudah eksis untuk aset ini.</value>
   </data>
   <data name="WidgetConfigurationDeserializationError" xml:space="preserve">
-        <value>Failed to deserialize the widget configuration.</value>
+        <value>Gagal membaca data konfigurasi widget.</value>
   </data>
   <data name="WidgetConfigurationNullError" xml:space="preserve">
-        <value>The widget configuration is null or empty.</value>
+        <value>Konfigurasi widget kosong.</value>
   </data>
   <data name="WidgetSettingsNotFoundError" xml:space="preserve">
-        <value>The widget settings you are trying to access do not exist.</value>
+        <value>Pengaturan widget yang kamu coba akses tidak tersedia.</value>
   </data>
   <data name="TransactionAccountNotFoundError" xml:space="preserve">
-    <value>The account for this transaction does not exist.</value>
+    <value>Akun untuk transaksi ini tidak ditemukan.</value>
+  </data>
+  <data name="ValueNotFoundError" xml:space="preserve">
+    <value>Nilai yang ingin Anda akses tidak ditemukan.</value>
+  </data>
+  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
+    <value>Widget yang Anda coba perbarui tidak tersedia.</value>
   </data>
 </root>
