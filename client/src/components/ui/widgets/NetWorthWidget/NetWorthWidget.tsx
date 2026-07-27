@@ -15,30 +15,25 @@ import NetWorthGroup from "./NetWorthGroup/NetWorthGroup";
 import Divider from "~/components/core/Divider/Divider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
-import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 interface NetWorthWidgetProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   settingsOpened?: boolean;
   onSettingsClose?: () => void;
 }
 
 const NetWorthWidget = ({
-  widgetId,
+  widget,
   settingsOpened,
   onSettingsClose,
 }: NetWorthWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const accountsQuery = useAccountsQuery();
   const assetsQuery = useAssetsQuery();
-  const widgetSettingsQuery = useWidgetSettingsQuery();
 
   const getNetWorthGroups = (): React.ReactNode => {
-    if (
-      widgetSettingsQuery.isPending ||
-      accountsQuery.isPending ||
-      assetsQuery.isPending
-    ) {
+    if (accountsQuery.isPending || assetsQuery.isPending) {
       return (
         <Flex p="0.5rem" h="100%" w="100%">
           <Skeleton height="100%" radius="md" />
@@ -46,22 +41,11 @@ const NetWorthWidget = ({
       );
     }
 
-    if (!widgetSettingsQuery.data || widgetSettingsQuery.data.length === 0) {
+    if (!widget.configuration || widget.configuration.trim() === "") {
       return <WidgetErrorMessage messageKey="no_configuration_data_found" />;
     }
 
-    const netWorthWidgetSettingsList = widgetSettingsQuery.data
-      .slice()
-      .filter((widget) => widget.id === widgetId);
-
-    if (netWorthWidgetSettingsList.length === 0) {
-      return <WidgetErrorMessage messageKey="error_loading_settings_message" />;
-    }
-
-    const configuration = parseNetWorthConfiguration(
-      netWorthWidgetSettingsList[0]!.configuration,
-    );
-
+    const configuration = parseNetWorthConfiguration(widget.configuration);
     if (!configuration) {
       return (
         <WidgetErrorMessage messageKey="error_loading_configuration_message" />
@@ -69,7 +53,6 @@ const NetWorthWidget = ({
     }
 
     const netWorthWidgetGroups = configuration.groups ?? [];
-
     if (!netWorthWidgetGroups || netWorthWidgetGroups.length === 0) {
       return (
         <WidgetErrorMessage messageKey="widget_no_items_configured_message" />
@@ -122,7 +105,7 @@ const NetWorthWidget = ({
       {getNetWorthGroups()}
       {settingsOpened !== undefined && onSettingsClose && (
         <NetWorthCardSettings
-          widgetId={widgetId}
+          widget={widget}
           opened={settingsOpened}
           onClose={onSettingsClose}
         />

@@ -23,26 +23,25 @@ import { move } from "@dnd-kit/helpers";
 import {
   INetWorthWidgetGroup,
   INetWorthWidgetLine,
+  IWidgetSettingsResponse,
 } from "~/models/widgetSettings";
 import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
-import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 
 interface NetWorthCardSettingsProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   opened: boolean;
   onClose: () => void;
 }
 
 const NetWorthCardSettings = ({
-  widgetId,
+  widget,
   opened,
   onClose,
 }: NetWorthCardSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
   const { request } = useAuth();
-  const widgetSettingsQuery = useWidgetSettingsQuery();
   const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
 
   const [isSortable, { toggle: toggleIsSortable }] = useDisclosure(false);
@@ -91,28 +90,18 @@ const NetWorthCardSettings = ({
   });
 
   React.useEffect(() => {
-    if (widgetSettingsQuery.data) {
-      const foundWidget = widgetSettingsQuery.data.find(
-        (ws) => ws.id === widgetId,
+    const configuration = parseNetWorthConfiguration(widget.configuration);
+    if (configuration) {
+      setSortedGroups(
+        configuration.groups
+          ?.sort((a, b) => a.index - b.index)
+          .map((line, index) => ({
+            ...line,
+            index,
+          })) ?? [],
       );
-      if (foundWidget) {
-        const configuration = parseNetWorthConfiguration(
-          foundWidget.configuration,
-        );
-
-        if (configuration) {
-          setSortedGroups(
-            configuration.groups
-              ?.sort((a, b) => a.index - b.index)
-              .map((line, index) => ({
-                ...line,
-                index,
-              })) ?? [],
-          );
-        }
-      }
     }
-  }, [widgetSettingsQuery.data, widgetId]);
+  }, [widget]);
 
   const allLines = React.useMemo(() => {
     return sortedGroups.reduce<INetWorthWidgetLine[]>((acc, group) => {
@@ -125,7 +114,7 @@ const NetWorthCardSettings = ({
       const orderedGroups: string[] = sortedGroups.map((group) => group.id);
 
       doReorderGroups.mutate({
-        widgetSettingsId: widgetId,
+        widgetSettingsId: widget.id,
         orderedGroupIds: orderedGroups,
       });
     }
@@ -159,7 +148,7 @@ const NetWorthCardSettings = ({
             onClick={() =>
               updateWidgetSettingsMutation.mutate([
                 {
-                  id: widgetId,
+                  id: widget.id,
                   configuration: null,
                 },
               ])
@@ -190,7 +179,7 @@ const NetWorthCardSettings = ({
                     group={group}
                     isSortable={isSortable}
                     container={groupsStackRef.current as Element}
-                    settingsId={widgetId}
+                    settingsId={widget.id}
                     onReorder={onReorderCompleted}
                     allLines={allLines}
                   />
@@ -209,7 +198,7 @@ const NetWorthCardSettings = ({
                 group:
                   Math.max(...sortedGroups.map((group) => group.index)) + 1,
                 index: 0,
-                widgetSettingsId: widgetId,
+                widgetSettingsId: widget.id,
               } as INetWorthWidgetLineCreateRequest)
             }
           >

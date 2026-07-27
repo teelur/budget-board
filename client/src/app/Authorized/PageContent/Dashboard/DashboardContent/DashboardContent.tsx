@@ -110,7 +110,7 @@ const DashboardContent = ({
       case "Accounts":
         return (
           <AccountsWidget
-            widgetId={widget.id}
+            widget={widget}
             settingsOpened={settingsOpenId === widget.id}
             onSettingsClose={() => setSettingsOpenId(null)}
           />
@@ -118,7 +118,7 @@ const DashboardContent = ({
       case "NetWorth":
         return (
           <NetWorthWidget
-            widgetId={widget.id}
+            widget={widget}
             settingsOpened={settingsOpenId === widget.id}
             onSettingsClose={() => setSettingsOpenId(null)}
           />

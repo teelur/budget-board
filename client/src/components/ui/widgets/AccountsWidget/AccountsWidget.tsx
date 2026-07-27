@@ -14,15 +14,16 @@ import Divider from "~/components/core/Divider/Divider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 interface AccountsWidgetProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   settingsOpened?: boolean;
   onSettingsClose?: () => void;
 }
 
 const AccountsWidget = ({
-  widgetId,
+  widget,
   settingsOpened,
   onSettingsClose,
 }: AccountsWidgetProps): React.ReactNode => {
@@ -39,9 +40,8 @@ const AccountsWidget = ({
   );
 
   const widgetAccountIds = React.useMemo(() => {
-    const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
     return parseAccountsConfiguration(widget?.configuration).accountIds;
-  }, [widgetSettingsQuery.data, widgetId]);
+  }, [widget?.configuration]);
 
   const sortedFilteredInstitutionsForDisplay = React.useMemo(
     () =>
@@ -112,7 +112,7 @@ const AccountsWidget = ({
       {getAccountsContent()}
       {settingsOpened !== undefined && onSettingsClose && (
         <AccountsWidgetSettings
-          widgetId={widgetId}
+          widget={widget}
           opened={settingsOpened}
           onClose={onSettingsClose}
         />

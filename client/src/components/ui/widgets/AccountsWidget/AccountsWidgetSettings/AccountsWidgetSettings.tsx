@@ -15,23 +15,22 @@ import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
-import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 interface AccountsWidgetSettingsProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   opened: boolean;
   onClose: () => void;
 }
 
 const AccountsWidgetSettings = ({
-  widgetId,
+  widget,
   opened,
   onClose,
 }: AccountsWidgetSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
   const institutionQuery = useInstitutionsQuery();
-  const widgetSettingsQuery = useWidgetSettingsQuery();
   const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
 
   const [showAll, setShowAll] = React.useState(true);
@@ -54,20 +53,20 @@ const AccountsWidgetSettings = ({
     [institutionQuery.data],
   );
 
+  const handleClose = () => {
+    setShowAll(true);
+    setSelectedIds(new Set());
+    setInitialized(false);
+    onClose();
+  };
+
   // We need to initialize the checkbox state from the saved configuration
   // when the user has specific accounts selected
   React.useEffect(() => {
-    if (!opened) {
-      setInitialized(false);
-      setShowAll(true);
-      setSelectedIds(new Set());
-      return;
-    }
-    if (initialized || widgetSettingsQuery.isPending) {
+    if (!opened || initialized) {
       return;
     }
 
-    const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
     const config = parseAccountsConfiguration(widget?.configuration);
 
     if (config.accountIds.length > 0) {
@@ -78,14 +77,7 @@ const AccountsWidgetSettings = ({
       setSelectedIds(new Set());
     }
     setInitialized(true);
-  }, [
-    opened,
-    initialized,
-    widgetSettingsQuery.isPending,
-    widgetSettingsQuery.data,
-    institutionQuery.data,
-    widgetId,
-  ]);
+  }, [opened, initialized, widget, institutionQuery.data, widget]);
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
@@ -99,10 +91,8 @@ const AccountsWidgetSettings = ({
     });
   };
 
-  const isPending = widgetSettingsQuery.isPending || institutionQuery.isPending;
-
   const getAccountsWidgetSettingsContent = () => {
-    if (isPending) {
+    if (institutionQuery.isPending) {
       return <Skeleton height={200} radius="lg" />;
     }
 
@@ -163,7 +153,7 @@ const AccountsWidgetSettings = ({
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       title={<PrimaryText size="md">{t("accounts_settings")}</PrimaryText>}
     >
       <Stack gap="0.5rem">
@@ -172,7 +162,7 @@ const AccountsWidgetSettings = ({
         </DimmedText>
         {getAccountsWidgetSettingsContent()}
         <Group w="100%" justify="flex-end" mt="xs" gap="0.5rem">
-          <Button flex={1} variant="default" onClick={onClose}>
+          <Button flex={1} variant="default" onClick={handleClose}>
             {t("cancel")}
           </Button>
           <Button
@@ -180,7 +170,7 @@ const AccountsWidgetSettings = ({
             onClick={() => {
               updateWidgetSettingsMutation.mutate([
                 {
-                  id: widgetId,
+                  id: widget.id,
                   configuration: {
                     accountIds: showAll ? [] : Array.from(selectedIds),
                   },
@@ -188,7 +178,6 @@ const AccountsWidgetSettings = ({
               ]);
             }}
             loading={updateWidgetSettingsMutation.isPending}
-            disabled={isPending}
           >
             {t("save")}
           </Button>
