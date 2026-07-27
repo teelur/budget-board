@@ -38,6 +38,7 @@ export interface IColumnsOptions {
   expensesColumnValue: string | null;
   filterDuplicates: boolean;
   filterByOptions: IFilterByOptions;
+  useSingleAccount: boolean;
 }
 
 interface ColumnsOptionsProps {
@@ -77,6 +78,9 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
   });
   const filterDuplicatesField = useField<boolean>({
     initialValue: props.columnsOptions.filterDuplicates,
+  });
+  const useSingleAccountField = useField<boolean>({
+    initialValue: props.columnsOptions.useSingleAccount,
   });
 
   const filterByDateField = useField<boolean>({
@@ -119,6 +123,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
       expensesColumnValue: includeExpensesColumnField.getValue()
         ? expensesColumnValueField.getValue()
         : null,
+      useSingleAccount: useSingleAccountField.getValue(),
       filterDuplicates: filterDuplicatesField.getValue(),
       filterByOptions: filterDuplicatesField.getValue()
         ? {
@@ -142,6 +147,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
     decimalSeparatorField.getValue(),
     invertAmountField.getValue(),
     splitAmountField.getValue(),
+    useSingleAccountField.getValue(),
     expensesColumnValueField.getValue(),
     filterDuplicatesField.getValue(),
     filterByDateField.getValue(),
@@ -265,6 +271,16 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                 elevation={0}
               />
             </Group>
+            <Checkbox
+              checked={useSingleAccountField.getValue()}
+              onChange={(event) => {
+                useSingleAccountField.setValue(event.currentTarget.checked);
+              }}
+              label={
+                <PrimaryText size="sm">{t("use_single_account")}</PrimaryText>
+              }
+              elevation={0}
+            />
           </Stack>
         </Stack>
       </Group>
