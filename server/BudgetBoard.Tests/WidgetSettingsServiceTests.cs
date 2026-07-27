@@ -902,7 +902,7 @@ public class WidgetSettingsServiceTests
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await service.DeleteWidgetSettingsAsync(helper.demoUser.Id, existingSettings.ID);
+        await service.DeleteWidgetSettingsAsync(helper.demoUser.Id, [existingSettings.ID]);
 
         // Assert
         var settings = helper.UserDataContext.WidgetSettings.SingleOrDefault(ws =>

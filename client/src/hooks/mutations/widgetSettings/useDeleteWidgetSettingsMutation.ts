@@ -12,11 +12,11 @@ export const useDeleteWidgetSettingsMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (widgetSettingsId: string) =>
+    mutationFn: async (widgetSettingsIds: string[]) =>
       await request({
         url: "/api/widgetSettings",
         method: "DELETE",
-        params: { widgetSettingsId },
+        data: widgetSettingsIds,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });

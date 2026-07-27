@@ -1,9 +1,10 @@
 import { Button, Group, Stack, Popover as MantinePopover } from "@mantine/core";
-import { PlusIcon, RotateCcwIcon } from "lucide-react";
+import { PlusIcon, RotateCcwIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useDeleteWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useDeleteWidgetSettingsMutation";
 import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useresetSmallScreenLayoutMutation";
 import { useResetToDefaultMutation } from "~/hooks/mutations/widgetSettings/useResetToDefaultMutation";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
@@ -20,11 +21,13 @@ const DashboardEditor = ({
   editTarget,
 }: DashboardEditorProps): React.ReactNode => {
   const [isResetPopoverOpen, setIsResetPopoverOpen] = React.useState(false);
+  const [isClearPopoverOpen, setIsClearPopoverOpen] = React.useState(false);
 
   const { t } = useTranslation();
   const widgetSettingsQuery = useWidgetSettingsQuery();
   const resetSmallScreenLayoutMutation = useResetSmallScreenLayoutMutation();
   const resetToDefaultMutation = useResetToDefaultMutation();
+  const deleteWidgetSettingsMutation = useDeleteWidgetSettingsMutation();
 
   const handleConfirmReset = async () => {
     setIsResetPopoverOpen(false);
@@ -87,6 +90,51 @@ const DashboardEditor = ({
                 onClick={handleConfirmReset}
               >
                 {t("confirm_reset_to_defaults")}
+              </Button>
+            </Group>
+          </Stack>
+        </MantinePopover.Dropdown>
+      </Popover>
+      <Popover
+        opened={isClearPopoverOpen}
+        onChange={setIsClearPopoverOpen}
+        position="bottom-end"
+        withArrow
+      >
+        <MantinePopover.Target>
+          <Button
+            size="xs"
+            variant="subtle"
+            leftSection={<TrashIcon size={16} />}
+            onClick={() => setIsClearPopoverOpen((opened) => !opened)}
+            loading={deleteWidgetSettingsMutation.isPending}
+          >
+            {t("clear_dashboard")}
+          </Button>
+        </MantinePopover.Target>
+        <MantinePopover.Dropdown maw={350}>
+          <Stack gap={10}>
+            <PrimaryText size="xs">{t("clear_dashboard_warning")}</PrimaryText>
+            <Group gap="xs" justify="flex-end">
+              <Button
+                size="xs"
+                variant="subtle"
+                onClick={() => setIsClearPopoverOpen(false)}
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                size="xs"
+                color="var(--button-color-destructive)"
+                loading={deleteWidgetSettingsMutation.isPending}
+                disabled={widgetSettingsQuery.isPending}
+                onClick={() =>
+                  deleteWidgetSettingsMutation.mutate(
+                    widgetSettingsQuery.data?.map((ws) => ws.id) ?? [],
+                  )
+                }
+              >
+                {t("confirm_clear")}
               </Button>
             </Group>
           </Stack>

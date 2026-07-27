@@ -82,7 +82,7 @@ public class WidgetSettingsController(
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid widgetSettingsId)
+    public async Task<IActionResult> Delete([FromBody] IEnumerable<Guid> widgetSettingsIds)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -93,7 +93,7 @@ public class WidgetSettingsController(
                 return Unauthorized();
             }
 
-            await widgetSettingsService.DeleteWidgetSettingsAsync(parsedUserId, widgetSettingsId);
+            await widgetSettingsService.DeleteWidgetSettingsAsync(parsedUserId, widgetSettingsIds);
             return Ok();
         });
     }

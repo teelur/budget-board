@@ -37,8 +37,9 @@ public interface IWidgetSettingsService
     /// Deletes widget settings for a specific user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="widgetGuids">The collection of widget unique identifiers to be deleted.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task DeleteWidgetSettingsAsync(Guid userGuid, Guid widgetGuid);
+    Task DeleteWidgetSettingsAsync(Guid userGuid, IEnumerable<Guid> widgetGuids);
 
     /// <summary>
     /// Resets the grid layout for small screens to match the large screen layout for all widgets of a given user.

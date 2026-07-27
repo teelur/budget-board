@@ -58,7 +58,7 @@ const WidgetShell = ({
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              deleteWidgetSettingsMutation.mutate(widgetSettingsId);
+              deleteWidgetSettingsMutation.mutate([widgetSettingsId]);
             }}
             aria-label="Remove widget"
           >

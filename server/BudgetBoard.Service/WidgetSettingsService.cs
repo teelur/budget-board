@@ -117,12 +117,15 @@ public class WidgetSettingsService(
         await userDataContext.SaveChangesAsync();
     }
 
-    public async Task DeleteWidgetSettingsAsync(Guid userGuid, Guid widgetGuid)
+    public async Task DeleteWidgetSettingsAsync(Guid userGuid, IEnumerable<Guid> widgetGuids)
     {
         var userData = await GetCurrentUserAsync(userGuid);
-        var widget = GetWidgetSettingsById(userData, widgetGuid);
+        foreach (var widgetGuid in widgetGuids)
+        {
+            var widget = GetWidgetSettingsById(userData, widgetGuid);
+            userDataContext.WidgetSettings.Remove(widget);
+        }
 
-        userDataContext.WidgetSettings.Remove(widget);
         await userDataContext.SaveChangesAsync();
     }
 
@@ -151,18 +154,20 @@ public class WidgetSettingsService(
 
         userDataContext.WidgetSettings.RemoveRange(userData.WidgetSettings);
 
-        var defaultWidgets = WidgetSettingsHelpers.DefaultLayouts.Select(layout => new WidgetSettings
-        {
-            WidgetType = layout.WidgetType,
-            LgX = layout.LgX,
-            LgY = layout.LgY,
-            LgW = layout.LgW,
-            LgH = layout.LgH,
-            SmY = layout.SmY,
-            SmH = layout.SmH,
-            Configuration = GetDefaultConfiguration(layout.WidgetType),
-            UserID = userData.Id,
-        });
+        var defaultWidgets = WidgetSettingsHelpers.DefaultLayouts.Select(
+            layout => new WidgetSettings
+            {
+                WidgetType = layout.WidgetType,
+                LgX = layout.LgX,
+                LgY = layout.LgY,
+                LgW = layout.LgW,
+                LgH = layout.LgH,
+                SmY = layout.SmY,
+                SmH = layout.SmH,
+                Configuration = GetDefaultConfiguration(layout.WidgetType),
+                UserID = userData.Id,
+            }
+        );
 
         userDataContext.WidgetSettings.AddRange(defaultWidgets);
         await userDataContext.SaveChangesAsync();
