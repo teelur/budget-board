@@ -23,15 +23,16 @@ import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 interface MetricWidgetProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   settingsOpened?: boolean;
   onSettingsClose?: () => void;
 }
 
 const MetricWidget = ({
-  widgetId,
+  widget,
   settingsOpened,
   onSettingsClose,
 }: MetricWidgetProps): React.ReactNode => {
@@ -43,7 +44,6 @@ const MetricWidget = ({
 
   // The widget configuration is stored as a JSON string in the database.
   const { configTitle, configValue, configLabel } = React.useMemo(() => {
-    const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
     if (!widget?.configuration)
       return {
         configTitle: undefined,
@@ -69,7 +69,7 @@ const MetricWidget = ({
         configLabel: undefined,
       };
     }
-  }, [widgetSettingsQuery.data, widgetId]);
+  }, [widgetSettingsQuery.data, widget]);
 
   const parsedValueTokens = React.useMemo(
     () => parseTemplate(configValue ?? ""),
@@ -219,7 +219,7 @@ const MetricWidget = ({
       {renderContent()}
       {settingsOpened !== undefined && onSettingsClose && (
         <MetricWidgetSettings
-          widgetId={widgetId}
+          widget={widget}
           opened={settingsOpened}
           onClose={onSettingsClose}
         />

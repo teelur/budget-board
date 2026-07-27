@@ -43,84 +43,67 @@ const DashboardContent = ({
   const { t } = useTranslation();
   const widgetSettingsQuery = useWidgetSettingsQuery();
   const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
+  const { width, containerRef } = useContainerWidth({ initialWidth: 1280 });
 
   const [settingsOpenId, setSettingsOpenId] = React.useState<string | null>(
     null,
   );
 
-  const { width, containerRef } = useContainerWidth({ initialWidth: 1280 });
-
-  const widgets = React.useMemo(
-    () => widgetSettingsQuery.data ?? [],
-    [widgetSettingsQuery.data],
-  );
-
   const lgLayout = React.useMemo<LayoutItem[]>(
     () =>
-      widgets.map((w) => ({
+      (widgetSettingsQuery.data ?? []).map((w) => ({
         i: w.id,
         x: w.lgX,
         y: w.lgY,
         w: w.lgW,
         h: w.lgH,
       })),
-    [widgets],
+    [widgetSettingsQuery.data],
   );
   const smLayout = React.useMemo<LayoutItem[]>(
     () =>
-      widgets.map((w) => ({
+      (widgetSettingsQuery.data ?? []).map((w) => ({
         i: w.id,
         x: 0, // x is ignored for sm since cols=1
         y: w.smY,
         w: 1, // w is ignored for sm since cols=1
         h: w.smH,
       })),
-    [widgets],
+    [widgetSettingsQuery.data],
   );
 
-  const handleSave = React.useCallback(
-    (layout: Layout) => {
-      if (!isEditMode) return;
+  const handleSave = (layout: Layout) => {
+    const currentLayout = editTarget === "lg" ? lgLayout : smLayout;
+    const hasChanged = layout.some((item) => {
+      const current = currentLayout.find((c) => c.i === item.i);
+      if (!current) return true;
+      return editTarget === "lg"
+        ? current.x !== item.x ||
+            current.y !== item.y ||
+            current.w !== item.w ||
+            current.h !== item.h
+        : current.y !== item.y || current.h !== item.h;
+    });
 
-      const currentLayout = editTarget === "lg" ? lgLayout : smLayout;
-      const hasChanged = layout.some((item) => {
-        const current = currentLayout.find((c) => c.i === item.i);
-        if (!current) return true;
-        return editTarget === "lg"
-          ? current.x !== item.x ||
-              current.y !== item.y ||
-              current.w !== item.w ||
-              current.h !== item.h
-          : current.y !== item.y || current.h !== item.h;
-      });
+    if (!hasChanged) return;
 
-      if (!hasChanged) return;
+    const updates: IWidgetSettingsUpdateRequest[] =
+      editTarget === "lg"
+        ? layout.map((item) => ({
+            id: item.i,
+            lgX: item.x,
+            lgY: item.y,
+            lgW: item.w,
+            lgH: item.h,
+          }))
+        : layout.map((item) => ({
+            id: item.i,
+            smY: item.y,
+            smH: item.h,
+          }));
 
-      const updates: IWidgetSettingsUpdateRequest[] =
-        editTarget === "lg"
-          ? layout.map((item) => ({
-              id: item.i,
-              lgX: item.x,
-              lgY: item.y,
-              lgW: item.w,
-              lgH: item.h,
-            }))
-          : layout.map((item) => ({
-              id: item.i,
-              smY: item.y,
-              smH: item.h,
-            }));
-
-      updateWidgetSettingsMutation.mutate(updates);
-    },
-    [
-      isEditMode,
-      editTarget,
-      lgLayout,
-      smLayout,
-      updateWidgetSettingsMutation.mutate,
-    ],
-  );
+    updateWidgetSettingsMutation.mutate(updates);
+  };
 
   const renderWidgetContent = (widget: IWidgetSettingsResponse) => {
     switch (widget.widgetType) {
@@ -147,7 +130,7 @@ const DashboardContent = ({
       case "Metric":
         return (
           <MetricWidget
-            widgetId={widget.id}
+            widget={widget}
             settingsOpened={settingsOpenId === widget.id}
             onSettingsClose={() => setSettingsOpenId(null)}
           />
@@ -163,7 +146,9 @@ const DashboardContent = ({
     isEditMode && editTarget === "sm" && isDesktopViewport;
   const isMobileEditMode = isEditMode && !isDesktopViewport;
   const showEmptyMessage =
-    widgetSettingsQuery.isSuccess && !isEditMode && widgets.length === 0;
+    widgetSettingsQuery.isSuccess &&
+    !isEditMode &&
+    (widgetSettingsQuery.data ?? []).length === 0;
 
   return (
     <Flex ref={containerRef} w={"100%"} flex="1" justify="center">
@@ -200,7 +185,7 @@ const DashboardContent = ({
             margin={[12, 12]}
             containerPadding={isMobileEditMode ? [20, 0] : [0, 0]}
           >
-            {widgets.map((widget) => (
+            {(widgetSettingsQuery.data ?? []).map((widget) => (
               <div
                 key={widget.id}
                 style={{ height: "100%", overflow: "hidden" }}
