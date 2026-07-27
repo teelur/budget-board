@@ -1,4 +1,6 @@
-﻿namespace BudgetBoard.Service.Models;
+﻿using BudgetBoard.Database.Models;
+
+namespace BudgetBoard.Service.Models;
 
 public static class WidgetTypes
 {
@@ -7,15 +9,6 @@ public static class WidgetTypes
     public const string UncategorizedTransactions = "UncategorizedTransactions";
     public const string SpendingTrends = "SpendingTrends";
     public const string Metric = "Metric";
-
-    public static readonly IEnumerable<string> All =
-    [
-        Accounts,
-        NetWorth,
-        UncategorizedTransactions,
-        SpendingTrends,
-        Metric,
-    ];
 }
 
 public interface IWidgetSettingsCreateRequest
@@ -54,7 +47,7 @@ public interface IWidgetResponse
     Guid UserID { get; }
 }
 
-public class WidgetResponse : IWidgetResponse
+public class WidgetResponse() : IWidgetResponse
 {
     public Guid ID { get; set; } = Guid.NewGuid();
     public string WidgetType { get; set; } = string.Empty;
@@ -77,7 +70,7 @@ public interface IWidgetSettingsUpdateRequest
     int? LgH { get; }
     int? SmY { get; }
     int? SmH { get; }
-    System.Text.Json.JsonElement? Configuration { get; }
+    OptionalField<System.Text.Json.JsonElement?> Configuration { get; }
 }
 
 public class WidgetSettingsUpdateRequest : IWidgetSettingsUpdateRequest
@@ -89,27 +82,6 @@ public class WidgetSettingsUpdateRequest : IWidgetSettingsUpdateRequest
     public int? LgH { get; set; } = null;
     public int? SmY { get; set; } = null;
     public int? SmH { get; set; } = null;
-    public System.Text.Json.JsonElement? Configuration { get; set; } = null;
-}
-
-public interface IWidgetSettingsBatchUpdateRequest
-{
-    Guid ID { get; }
-    int? LgX { get; }
-    int? LgY { get; }
-    int? LgW { get; }
-    int? LgH { get; }
-    int? SmY { get; }
-    int? SmH { get; }
-}
-
-public class WidgetSettingsBatchUpdateRequest : IWidgetSettingsBatchUpdateRequest
-{
-    public Guid ID { get; set; } = Guid.NewGuid();
-    public int? LgX { get; set; } = null;
-    public int? LgY { get; set; } = null;
-    public int? LgW { get; set; } = null;
-    public int? LgH { get; set; } = null;
-    public int? SmY { get; set; } = null;
-    public int? SmH { get; set; } = null;
+    public OptionalField<System.Text.Json.JsonElement?> Configuration { get; set; } =
+        new OptionalField<System.Text.Json.JsonElement?>();
 }

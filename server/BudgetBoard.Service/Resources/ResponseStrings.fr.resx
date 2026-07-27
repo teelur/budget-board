@@ -412,9 +412,6 @@
   <data name="WidgetSettingsNotFoundError" xml:space="preserve">
         <value>Les paramètres du widget auxquels vous essayez d’accéder n’existent pas.</value>
   </data>
-  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-        <value>Le widget que vous essayez de mettre à jour n’existe pas.</value>
-  </data>
   <data name="TransactionAccountNotFoundError" xml:space="preserve">
     <value>The account for this transaction does not exist.</value>
   </data>

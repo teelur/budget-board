@@ -1,10 +1,13 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using Bogus;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Models.Widgets.AccountsWidget;
+using BudgetBoard.Service.Models.Widgets.MetricWidget;
 using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
@@ -17,14 +20,18 @@ namespace BudgetBoard.IntegrationTests;
 public class WidgetSettingsServiceTests
 {
     private static readonly string[] items = ["Checking", "Savings", "Credit Card", "Loan"];
-    private static readonly string expectedMetricConfiguration = JsonSerializer.Serialize(
-        new
-        {
-            title = "This Month's Spending",
-            value = "@transactions.sum(this_month, type=expense)",
-            label = "total expenses",
-        }
-    );
+    public static IEnumerable<object[]> DefaultWidgetConfigurations =>
+        [
+            [WidgetTypes.Accounts, JsonSerializer.Serialize(new { accountIds = new List<Guid>() })],
+            [
+                WidgetTypes.NetWorth,
+                JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration),
+            ],
+            [
+                WidgetTypes.Metric,
+                JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration),
+            ],
+        ];
 
     private static WidgetSettingsService CreateService(TestHelper helper) =>
         new(
@@ -34,6 +41,42 @@ public class WidgetSettingsServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
+    private static string NormalizeJsonWithoutIds(string configuration)
+    {
+        var root = JsonNode.Parse(configuration)!;
+        RemoveIds(root);
+        return root.ToJsonString();
+    }
+
+    private static void RemoveIds(JsonNode node)
+    {
+        if (node is JsonObject jsonObject)
+        {
+            foreach (var property in jsonObject.ToList())
+            {
+                if (string.Equals(property.Key, "id", StringComparison.OrdinalIgnoreCase))
+                {
+                    jsonObject.Remove(property.Key);
+                }
+                else if (property.Value is not null)
+                {
+                    RemoveIds(property.Value);
+                }
+            }
+        }
+        else if (node is JsonArray jsonArray)
+        {
+            foreach (var item in jsonArray)
+            {
+                if (item is not null)
+                {
+                    RemoveIds(item);
+                }
+            }
+        }
+    }
+
+    #region CreateWidgetSettingsAsync
     [Fact]
     public async Task CreateWidgetSettingsAsync_WhenValidData_ShouldCreateSettings()
     {
@@ -60,7 +103,7 @@ public class WidgetSettingsServiceTests
             ws.UserID == helper.demoUser.Id
         );
         settings.Should().NotBeNull();
-        settings!.WidgetType.Should().Be(WidgetTypes.NetWorth);
+        settings.WidgetType.Should().Be(WidgetTypes.NetWorth);
         settings.LgX.Should().Be(0);
         settings.LgY.Should().Be(5);
         settings.LgW.Should().Be(4);
@@ -94,9 +137,40 @@ public class WidgetSettingsServiceTests
         settings.LgH.Should().Be(6);
         settings.SmY.Should().Be(30);
         settings.SmH.Should().Be(6);
-        settings.Configuration.Should().Be(expectedMetricConfiguration);
+        settings
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration));
     }
 
+    [Fact]
+    public async Task CreateWidgetSettingsAsync_WhenDefaultLayoutNotFound_ShouldReturnGenericDefaultLayout()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        var request = new WidgetSettingsCreateRequest { WidgetType = "unknown" };
+
+        // Act
+        await service.CreateWidgetSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        var settings = helper.UserDataContext.WidgetSettings.SingleOrDefault(ws =>
+            ws.UserID == helper.demoUser.Id
+        );
+
+        settings.Should().NotBeNull();
+        settings!.WidgetType.Should().Be("unknown");
+        settings.LgX.Should().Be(0); // Generic default layout values
+        settings.LgY.Should().Be(0);
+        settings.LgW.Should().Be(4);
+        settings.LgH.Should().Be(5);
+        settings.SmY.Should().Be(0);
+        settings.SmH.Should().Be(5);
+    }
+    #endregion
+
+    #region ReadWidgetSettingsAsync
     [Fact]
     public async Task ReadWidgetSettingsAsync_WhenSettingsExist_ShouldReturnSettings()
     {
@@ -152,19 +226,24 @@ public class WidgetSettingsServiceTests
         var settings = await service.ReadWidgetSettingsAsync(helper.demoUser.Id);
 
         // Assert
-        settings.Should().NotBeNull();
-        settings.Count().Should().Be(1);
-        var setting = settings.First();
-        setting.ID.Should().Be(existingSettings.ID);
-        setting.WidgetType.Should().Be(WidgetTypes.NetWorth);
-        setting.LgX.Should().Be(0);
-        setting.LgY.Should().Be(5);
-        setting.LgW.Should().Be(4);
-        setting.LgH.Should().Be(5);
-        setting.SmY.Should().Be(5);
-        setting.SmH.Should().Be(5);
-        setting.Configuration.Should().Be(existingSettings.Configuration);
-        setting.UserID.Should().Be(helper.demoUser.Id);
+        settings
+            .Single()
+            .Should()
+            .BeEquivalentTo(
+                new WidgetResponse
+                {
+                    ID = existingSettings.ID,
+                    WidgetType = existingSettings.WidgetType,
+                    LgX = existingSettings.LgX,
+                    LgY = existingSettings.LgY,
+                    LgW = existingSettings.LgW,
+                    LgH = existingSettings.LgH,
+                    SmY = existingSettings.SmY,
+                    SmH = existingSettings.SmH,
+                    Configuration = existingSettings.Configuration ?? string.Empty,
+                    UserID = existingSettings.UserID,
+                }
+            );
     }
 
     [Fact]
@@ -182,6 +261,119 @@ public class WidgetSettingsServiceTests
         settings.Should().BeEmpty();
     }
 
+    [Theory]
+    [MemberData(nameof(DefaultWidgetConfigurations))]
+    public async Task ReadWidgetSettingsAsync_WhenConfigurationIsEmpty_ShouldReturnDefaultConfiguration(
+        string widgetType,
+        string expectedConfiguration
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        var existingWidget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = widgetType,
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
+            Configuration = string.Empty,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(existingWidget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var settings = await service.ReadWidgetSettingsAsync(helper.demoUser.Id);
+
+        // Assert
+        settings.Should().NotBeNull();
+        settings.Should().ContainSingle();
+        var setting = settings.Single();
+        setting.ID.Should().Be(existingWidget.ID);
+        setting.WidgetType.Should().Be(widgetType);
+        NormalizeJsonWithoutIds(setting.Configuration)
+            .Should()
+            .Be(NormalizeJsonWithoutIds(expectedConfiguration));
+        setting.UserID.Should().Be(helper.demoUser.Id);
+    }
+
+    [Fact]
+    public async Task ReadWidgetSettingsAsync_WhenConfigurationIsNull_ShouldReturnDefaultConfiguration()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var existingWidget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Metric,
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
+            Configuration = null,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(existingWidget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var settings = await service.ReadWidgetSettingsAsync(helper.demoUser.Id);
+
+        // Assert
+        settings.Should().ContainSingle();
+        NormalizeJsonWithoutIds(settings.Single().Configuration)
+            .Should()
+            .Be(
+                NormalizeJsonWithoutIds(
+                    JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration)
+                )
+            );
+    }
+
+    [Fact]
+    public async Task ReadWidgetSettingsAsync_WhenConfigurationIsEmptyAndNoDefaultExists_ShouldReturnEmptyConfiguration()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var existingWidget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = "unknown",
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
+            Configuration = string.Empty,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(existingWidget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var settings = await service.ReadWidgetSettingsAsync(helper.demoUser.Id);
+
+        // Assert
+        settings.Should().ContainSingle();
+        settings.Single().Configuration.Should().BeEmpty();
+    }
+    #endregion
+
+    #region UpdateWidgetSettingsAsync
     [Fact]
     public async Task UpdateWidgetSettingsAsync_WhenValidData_ShouldUpdateWidgetSettings()
     {
@@ -249,14 +441,14 @@ public class WidgetSettingsServiceTests
         };
 
         // Act
-        await service.UpdateWidgetSettingsAsync(helper.demoUser.Id, updateRequest);
+        await service.UpdateWidgetSettingsAsync(helper.demoUser.Id, [updateRequest]);
 
         // Assert
         var updated = helper.UserDataContext.WidgetSettings.SingleOrDefault(ws =>
             ws.ID == existingSettings.ID && ws.UserID == helper.demoUser.Id
         );
         updated.Should().NotBeNull();
-        updated!.LgX.Should().Be(4);
+        updated.LgX.Should().Be(4);
         updated.LgY.Should().Be(0);
         updated.LgW.Should().Be(8);
         updated.LgH.Should().Be(5);
@@ -266,7 +458,7 @@ public class WidgetSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateWidgetSettingsAsync_WhenWidgetDoesNotExist_ShouldThrowError()
+    public async Task UpdateWidgetSettingsAsync_WhenWidgetDoesNotExist_ShouldThrowWidgetSettingsNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -288,17 +480,17 @@ public class WidgetSettingsServiceTests
 
         // Act
         var action = async () =>
-            await service.UpdateWidgetSettingsAsync(helper.demoUser.Id, updateRequest);
+            await service.UpdateWidgetSettingsAsync(helper.demoUser.Id, [updateRequest]);
 
         // Assert
         await action
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("WidgetUpdateNotFoundError");
+            .WithMessage("WidgetSettingsNotFoundError");
     }
 
     [Fact]
-    public async Task BatchUpdateWidgetSettingsAsync_WhenValidData_ShouldUpdatePositions()
+    public async Task UpdateWidgetSettingsAsync_WhenMultipleValidData_ShouldUpdateValues()
     {
         // Arrange
         var helper = new TestHelper();
@@ -332,7 +524,7 @@ public class WidgetSettingsServiceTests
         helper.UserDataContext.WidgetSettings.AddRange(widget1, widget2);
         await helper.UserDataContext.SaveChangesAsync();
 
-        var batchRequests = new List<WidgetSettingsBatchUpdateRequest>
+        var batchRequests = new List<WidgetSettingsUpdateRequest>
         {
             new()
             {
@@ -357,7 +549,7 @@ public class WidgetSettingsServiceTests
         };
 
         // Act
-        await service.BatchUpdateWidgetSettingsAsync(helper.demoUser.Id, batchRequests);
+        await service.UpdateWidgetSettingsAsync(helper.demoUser.Id, batchRequests);
 
         // Assert
         var updated1 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget1.ID);
@@ -377,6 +569,312 @@ public class WidgetSettingsServiceTests
         updated2.SmH.Should().Be(6);
     }
 
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenMetricWidgetConfigurationNull_ShouldRestoreMetricDefaultMarkup()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        var metricWidget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Metric,
+            LgX = 9,
+            LgY = 0,
+            LgW = 3,
+            LgH = 8,
+            SmY = 0,
+            SmH = 6,
+            Configuration = JsonSerializer.Serialize(new { markup = "custom metric markup" }),
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(metricWidget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            new List<WidgetSettingsUpdateRequest>
+            {
+                new() { ID = metricWidget.ID, Configuration = null },
+            }
+        );
+
+        // Assert
+        var updated = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == metricWidget.ID);
+        updated
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration));
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenNetWorthConfigurationIsInvalid_ShouldThrowWidgetConfigurationDeserializationError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        var existingSettings = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.NetWorth,
+            LgX = 0,
+            LgY = 5,
+            LgW = 4,
+            LgH = 5,
+            SmY = 5,
+            SmH = 5,
+            Configuration = JsonSerializer.Serialize(
+                WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+            ),
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(existingSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var invalidConfig = "{ invalid json }";
+
+        var updateRequest = new WidgetSettingsUpdateRequest
+        {
+            ID = existingSettings.ID,
+            Configuration = JsonSerializer.SerializeToElement(invalidConfig),
+        };
+
+        // Act
+        var action = async () =>
+            await service.UpdateWidgetSettingsAsync(helper.demoUser.Id, [updateRequest]);
+
+        // Assert
+        await action
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenAccountsConfigurationIsValid_ShouldSerializeConfiguration()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Accounts,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+        var configuration = new AccountsWidgetConfiguration
+        {
+            AccountIds = [Guid.NewGuid(), Guid.NewGuid()],
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [
+                new WidgetSettingsUpdateRequest
+                {
+                    ID = widget.ID,
+                    Configuration = JsonSerializer.SerializeToElement(configuration),
+                },
+            ]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(configuration));
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenMetricConfigurationIsValid_ShouldSerializeConfiguration()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Metric,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+        var configuration = new MetricWidgetConfiguration
+        {
+            Title = "Net Worth",
+            Value = "$1,000",
+            Label = "Current balance",
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [
+                new WidgetSettingsUpdateRequest
+                {
+                    ID = widget.ID,
+                    Configuration = JsonSerializer.SerializeToElement(configuration),
+                },
+            ]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(configuration));
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenWidgetHasNoTypedConfiguration_ShouldStoreRawJson()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.SpendingTrends,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+        var configuration = JsonSerializer.SerializeToElement(new { period = "month" });
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [new WidgetSettingsUpdateRequest { ID = widget.ID, Configuration = configuration }]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be(configuration.GetRawText());
+    }
+
+    [Theory]
+    [InlineData(WidgetTypes.Accounts)]
+    [InlineData(WidgetTypes.Metric)]
+    public async Task UpdateWidgetSettingsAsync_WhenTypedConfigurationIsInvalid_ShouldThrowWidgetConfigurationDeserializationError(
+        string widgetType
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = widgetType,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var action = async () =>
+            await service.UpdateWidgetSettingsAsync(
+                helper.demoUser.Id,
+                [
+                    new WidgetSettingsUpdateRequest
+                    {
+                        ID = widget.ID,
+                        Configuration = JsonSerializer.SerializeToElement("invalid configuration"),
+                    },
+                ]
+            );
+
+        // Act and Assert
+        await action
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+
+    [Theory]
+    [InlineData(WidgetTypes.NetWorth)]
+    [InlineData(WidgetTypes.Accounts)]
+    [InlineData(WidgetTypes.Metric)]
+    public async Task UpdateWidgetSettingsAsync_WhenTypedConfigurationIsJsonNull_ShouldThrowWidgetConfigurationDeserializationError(
+        string widgetType
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = widgetType,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var action = async () =>
+            await service.UpdateWidgetSettingsAsync(
+                helper.demoUser.Id,
+                [
+                    new WidgetSettingsUpdateRequest
+                    {
+                        ID = widget.ID,
+                        Configuration = JsonSerializer.SerializeToElement<object?>(null),
+                    },
+                ]
+            );
+
+        // Act and Assert
+        await action
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+    #endregion
+
+    #region DeleteWidgetSettingsAsync
     [Fact]
     public async Task DeleteWidgetSettingsAsync_WhenValidData_ShouldDeleteWidgetSettings()
     {
@@ -404,7 +902,7 @@ public class WidgetSettingsServiceTests
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await service.DeleteWidgetSettingsAsync(helper.demoUser.Id, existingSettings.ID);
+        await service.DeleteWidgetSettingsAsync(helper.demoUser.Id, [existingSettings.ID]);
 
         // Assert
         var settings = helper.UserDataContext.WidgetSettings.SingleOrDefault(ws =>
@@ -412,61 +910,97 @@ public class WidgetSettingsServiceTests
         );
         settings.Should().BeNull();
     }
+    #endregion
 
+    #region ResetDashboardToDefaultAsync
     [Fact]
-    public async Task DeleteWidgetSettings_WhenWidgetSettingsDoesNotExist_ShouldThrowError()
+    public async Task ResetDashboardToDefaultAsync_WhenNoWidgetsExist_ShouldCreateDefaultWidgets()
     {
         // Arrange
         var helper = new TestHelper();
         var service = CreateService(helper);
 
-        var nonExistentWidgetId = Guid.NewGuid();
-
         // Act
-        var action = async () =>
-            await service.DeleteWidgetSettingsAsync(helper.demoUser.Id, nonExistentWidgetId);
+        await service.ResetDashboardToDefaultAsync(helper.demoUser.Id);
 
         // Assert
-        await action
+        var settings = helper
+            .UserDataContext.WidgetSettings.Where(ws => ws.UserID == helper.demoUser.Id)
+            .ToList();
+
+        settings.Should().HaveSameCount(WidgetSettingsHelpers.DefaultLayouts);
+        settings
+            .Select(ws => ws.WidgetType)
             .Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("WidgetDeleteNotFoundError");
+            .BeEquivalentTo(
+                WidgetSettingsHelpers.DefaultLayouts.Select(layout => layout.WidgetType)
+            );
+
+        foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
+        {
+            var setting = settings.Single(ws => ws.WidgetType == layout.WidgetType);
+            setting.LgX.Should().Be(layout.LgX);
+            setting.LgY.Should().Be(layout.LgY);
+            setting.LgW.Should().Be(layout.LgW);
+            setting.LgH.Should().Be(layout.LgH);
+            setting.SmY.Should().Be(layout.SmY);
+            setting.SmH.Should().Be(layout.SmH);
+        }
     }
 
     [Fact]
-    public async Task ResetWidgetSettingsConfiguration_WhenMetricWidget_ShouldRestoreMetricDefaultMarkup()
+    public async Task ResetDashboardToDefaultAsync_WhenWidgetsExist_ShouldReplaceWidgetsAndConfigurations()
     {
         // Arrange
         var helper = new TestHelper();
         var service = CreateService(helper);
 
-        var metricWidget = new WidgetSettings
-        {
-            ID = Guid.NewGuid(),
-            WidgetType = WidgetTypes.Metric,
-            LgX = 9,
-            LgY = 0,
-            LgW = 3,
-            LgH = 8,
-            SmY = 0,
-            SmH = 6,
-            Configuration = JsonSerializer.Serialize(new { markup = "custom metric markup" }),
-            UserID = helper.demoUser.Id,
-        };
-
-        helper.UserDataContext.WidgetSettings.Add(metricWidget);
+        helper.UserDataContext.WidgetSettings.AddRange(
+            new WidgetSettings
+            {
+                WidgetType = WidgetTypes.NetWorth,
+                LgX = 99,
+                LgY = 99,
+                LgW = 1,
+                LgH = 1,
+                SmY = 99,
+                SmH = 1,
+                Configuration = "custom-net-worth",
+                UserID = helper.demoUser.Id,
+            },
+            new WidgetSettings
+            {
+                WidgetType = "Custom",
+                Configuration = "custom-widget",
+                UserID = helper.demoUser.Id,
+            }
+        );
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await service.ResetWidgetSettingsConfiguration(helper.demoUser.Id, metricWidget.ID);
+        await service.ResetDashboardToDefaultAsync(helper.demoUser.Id);
 
         // Assert
-        var updated = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == metricWidget.ID);
-        updated.Configuration.Should().Be(expectedMetricConfiguration);
-    }
+        var settings = helper
+            .UserDataContext.WidgetSettings.Where(ws => ws.UserID == helper.demoUser.Id)
+            .ToList();
 
+        settings.Should().HaveSameCount(WidgetSettingsHelpers.DefaultLayouts);
+        settings.Should().NotContain(ws => ws.WidgetType == "Custom");
+        settings
+            .Single(ws => ws.WidgetType == WidgetTypes.NetWorth)
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration));
+        settings
+            .Single(ws => ws.WidgetType == WidgetTypes.Metric)
+            .Configuration.Should()
+            .Be(JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration));
+    }
+    #endregion
+
+    #region ResetSmallScreenToLargeScreenLayoutAsync
     [Fact]
-    public async Task ResetSmallScreenToLargeScreenLayout_WhenWidgetsExist_ShouldAssignSmPositionsInLgYOrder()
+    public async Task ResetSmallScreenToLargeScreenLayoutAsync_WhenWidgetsExist_ShouldAssignSmPositionsInLgYOrder()
     {
         // Arrange
         var helper = new TestHelper();
@@ -514,7 +1048,7 @@ public class WidgetSettingsServiceTests
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await service.ResetSmallScreenToLargeScreenLayout(helper.demoUser.Id);
+        await service.ResetSmallScreenToLargeScreenLayoutAsync(helper.demoUser.Id);
 
         // Assert — SmY should stack by cumulative SmH in ascending (LgY, LgX) order; SmH mirrors LgH
         var result1 = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget1.ID);
@@ -532,7 +1066,7 @@ public class WidgetSettingsServiceTests
     }
 
     [Fact]
-    public async Task ResetSmallScreenToLargeScreenLayout_WhenMultipleWidgetsShareSameLgY_ShouldOrderByLgXAndStackByHeight()
+    public async Task ResetSmallScreenToLargeScreenLayoutAsync_WhenMultipleWidgetsShareSameLgY_ShouldOrderByLgXAndStackByHeight()
     {
         // Arrange
         var helper = new TestHelper();
@@ -580,7 +1114,7 @@ public class WidgetSettingsServiceTests
         await helper.UserDataContext.SaveChangesAsync();
 
         // Act
-        await service.ResetSmallScreenToLargeScreenLayout(helper.demoUser.Id);
+        await service.ResetSmallScreenToLargeScreenLayoutAsync(helper.demoUser.Id);
 
         // Assert — widgets are ordered by (LgY, LgX) and stacked by cumulative SmH
         var resultA = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widgetA.ID);
@@ -596,4 +1130,5 @@ public class WidgetSettingsServiceTests
         resultC.SmY.Should().Be(resultB.SmY + resultB.SmH);
         resultC.SmH.Should().Be(widgetC.LgH);
     }
+    #endregion
 }

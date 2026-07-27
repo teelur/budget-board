@@ -412,9 +412,6 @@
   <data name="WidgetSettingsNotFoundError" xml:space="preserve">
         <value>Die Widget-Einstellungen, auf die Sie zugreifen möchten, existieren nicht.</value>
   </data>
-  <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-        <value>Das Widget, das Sie aktualisieren möchten, existiert nicht.</value>
-  </data>
   <data name="TransactionAccountNotFoundError" xml:space="preserve">
     <value>The account for this transaction does not exist.</value>
   </data>

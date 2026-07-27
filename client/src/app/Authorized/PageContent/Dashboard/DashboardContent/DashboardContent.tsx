@@ -1,8 +1,5 @@
 import { Box, Flex, Group, Skeleton, Stack } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
 import { InfoIcon } from "lucide-react";
 import React from "react";
 import {
@@ -15,12 +12,10 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import AccountsWidget from "~/components/ui/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/ui/widgets/NetWorthWidget/NetWorthWidget";
 import WidgetShell from "~/components/ui/widgets/shared/WidgetShell/WidgetShell";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import {
-  IWidgetSettingsBatchUpdateRequest,
   IWidgetSettingsResponse,
+  IWidgetSettingsUpdateRequest,
 } from "~/models/widgetSettings";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
   GRID_BREAKPOINT,
   GRID_COLS,
@@ -30,6 +25,8 @@ import SpendingTrendsWidget from "../../../../../components/ui/widgets/SpendingT
 import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
 import MetricWidget from "~/components/ui/widgets/MetricWidget/MetricWidget";
 import { useTranslation } from "react-i18next";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 
 const SKELETON_COUNT = 4;
 const SM_PREVIEW_WIDTH = 500;
@@ -44,132 +41,76 @@ const DashboardContent = ({
   editTarget,
 }: DashboardContentProps) => {
   const { t } = useTranslation();
+  const widgetSettingsQuery = useWidgetSettingsQuery();
+  const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
+  const { width, containerRef } = useContainerWidth({ initialWidth: 1280 });
+
   const [settingsOpenId, setSettingsOpenId] = React.useState<string | null>(
     null,
   );
 
-  const { width, containerRef } = useContainerWidth({ initialWidth: 1280 });
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
-  const widgets = React.useMemo(
-    () => widgetSettingsQuery.data ?? [],
-    [widgetSettingsQuery.data],
-  );
-
   const lgLayout = React.useMemo<LayoutItem[]>(
     () =>
-      widgets.map((w) => ({
+      (widgetSettingsQuery.data ?? []).map((w) => ({
         i: w.id,
         x: w.lgX,
         y: w.lgY,
         w: w.lgW,
         h: w.lgH,
       })),
-    [widgets],
+    [widgetSettingsQuery.data],
   );
   const smLayout = React.useMemo<LayoutItem[]>(
     () =>
-      widgets.map((w) => ({
+      (widgetSettingsQuery.data ?? []).map((w) => ({
         i: w.id,
         x: 0, // x is ignored for sm since cols=1
         y: w.smY,
         w: 1, // w is ignored for sm since cols=1
         h: w.smH,
       })),
-    [widgets],
+    [widgetSettingsQuery.data],
   );
 
-  const doBatchUpdate = useMutation({
-    mutationFn: async (updates: IWidgetSettingsBatchUpdateRequest[]) =>
-      await request({
-        url: "/api/widgetSettings/batch",
-        method: "PUT",
-        data: updates,
-      }),
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const handleSave = (layout: Layout) => {
+    const currentLayout = editTarget === "lg" ? lgLayout : smLayout;
+    const hasChanged = layout.some((item) => {
+      const current = currentLayout.find((c) => c.i === item.i);
+      if (!current) return true;
+      return editTarget === "lg"
+        ? current.x !== item.x ||
+            current.y !== item.y ||
+            current.w !== item.w ||
+            current.h !== item.h
+        : current.y !== item.y || current.h !== item.h;
+    });
 
-  const doRemoveWidget = useMutation({
-    mutationFn: async (widgetId: string) =>
-      await request({
-        url: "/api/widgetSettings",
-        method: "DELETE",
-        params: { widgetGuid: widgetId },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+    if (!hasChanged) return;
 
-  const handleSave = React.useCallback(
-    (layout: Layout) => {
-      if (!isEditMode) return;
+    const updates: IWidgetSettingsUpdateRequest[] =
+      editTarget === "lg"
+        ? layout.map((item) => ({
+            id: item.i,
+            lgX: item.x,
+            lgY: item.y,
+            lgW: item.w,
+            lgH: item.h,
+          }))
+        : layout.map((item) => ({
+            id: item.i,
+            smY: item.y,
+            smH: item.h,
+          }));
 
-      const currentLayout = editTarget === "lg" ? lgLayout : smLayout;
-      const hasChanged = layout.some((item) => {
-        const current = currentLayout.find((c) => c.i === item.i);
-        if (!current) return true;
-        return editTarget === "lg"
-          ? current.x !== item.x ||
-              current.y !== item.y ||
-              current.w !== item.w ||
-              current.h !== item.h
-          : current.y !== item.y || current.h !== item.h;
-      });
-
-      if (!hasChanged) return;
-
-      const updates: IWidgetSettingsBatchUpdateRequest[] =
-        editTarget === "lg"
-          ? layout.map((item) => ({
-              id: item.i,
-              lgX: item.x,
-              lgY: item.y,
-              lgW: item.w,
-              lgH: item.h,
-            }))
-          : layout.map((item) => ({
-              id: item.i,
-              smY: item.y,
-              smH: item.h,
-            }));
-
-      doBatchUpdate.mutate(updates);
-    },
-    [isEditMode, editTarget, lgLayout, smLayout, doBatchUpdate.mutate],
-  );
+    updateWidgetSettingsMutation.mutate(updates);
+  };
 
   const renderWidgetContent = (widget: IWidgetSettingsResponse) => {
     switch (widget.widgetType) {
       case "Accounts":
         return (
           <AccountsWidget
-            widgetId={widget.id}
+            widget={widget}
             settingsOpened={settingsOpenId === widget.id}
             onSettingsClose={() => setSettingsOpenId(null)}
           />
@@ -177,7 +118,7 @@ const DashboardContent = ({
       case "NetWorth":
         return (
           <NetWorthWidget
-            widgetId={widget.id}
+            widget={widget}
             settingsOpened={settingsOpenId === widget.id}
             onSettingsClose={() => setSettingsOpenId(null)}
           />
@@ -189,7 +130,7 @@ const DashboardContent = ({
       case "Metric":
         return (
           <MetricWidget
-            widgetId={widget.id}
+            widget={widget}
             settingsOpened={settingsOpenId === widget.id}
             onSettingsClose={() => setSettingsOpenId(null)}
           />
@@ -205,7 +146,9 @@ const DashboardContent = ({
     isEditMode && editTarget === "sm" && isDesktopViewport;
   const isMobileEditMode = isEditMode && !isDesktopViewport;
   const showEmptyMessage =
-    widgetSettingsQuery.isSuccess && !isEditMode && widgets.length === 0;
+    widgetSettingsQuery.isSuccess &&
+    !isEditMode &&
+    (widgetSettingsQuery.data ?? []).length === 0;
 
   return (
     <Flex ref={containerRef} w={"100%"} flex="1" justify="center">
@@ -242,14 +185,14 @@ const DashboardContent = ({
             margin={[12, 12]}
             containerPadding={isMobileEditMode ? [20, 0] : [0, 0]}
           >
-            {widgets.map((widget) => (
+            {(widgetSettingsQuery.data ?? []).map((widget) => (
               <div
                 key={widget.id}
                 style={{ height: "100%", overflow: "hidden" }}
               >
                 <WidgetShell
+                  widgetSettingsId={widget.id}
                   isEditMode={isEditMode}
-                  onRemove={() => doRemoveWidget.mutate(widget.id)}
                   onSettingsOpen={
                     widget.widgetType === "NetWorth" ||
                     widget.widgetType === "Accounts" ||

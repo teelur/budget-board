@@ -1,8 +1,5 @@
 import { Flex, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
 import { useTranslation } from "react-i18next";
@@ -10,43 +7,29 @@ import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
 import { LandmarkIcon } from "lucide-react";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import AccountsWidgetSettings from "./AccountsWidgetSettings/AccountsWidgetSettings";
 import WidgetErrorMessage from "~/components/ui/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
 import Divider from "~/components/core/Divider/Divider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { widgetSettingsQueryKey } from "~/helpers/requests";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 
 interface AccountsWidgetProps {
-  widgetId: string;
+  widget: IWidgetSettingsResponse;
   settingsOpened?: boolean;
   onSettingsClose?: () => void;
 }
 
 const AccountsWidget = ({
-  widgetId,
+  widget,
   settingsOpened,
   onSettingsClose,
 }: AccountsWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const institutionQuery = useInstitutionsQuery();
-  const { request } = useAuth();
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
+  const widgetSettingsQuery = useWidgetSettingsQuery();
 
   const sortedFilteredInstitutions = React.useMemo(
     () =>
@@ -57,9 +40,8 @@ const AccountsWidget = ({
   );
 
   const widgetAccountIds = React.useMemo(() => {
-    const widget = widgetSettingsQuery.data?.find((ws) => ws.id === widgetId);
     return parseAccountsConfiguration(widget?.configuration).accountIds;
-  }, [widgetSettingsQuery.data, widgetId]);
+  }, [widget?.configuration]);
 
   const sortedFilteredInstitutionsForDisplay = React.useMemo(
     () =>
@@ -130,7 +112,7 @@ const AccountsWidget = ({
       {getAccountsContent()}
       {settingsOpened !== undefined && onSettingsClose && (
         <AccountsWidgetSettings
-          widgetId={widgetId}
+          widget={widget}
           opened={settingsOpened}
           onClose={onSettingsClose}
         />

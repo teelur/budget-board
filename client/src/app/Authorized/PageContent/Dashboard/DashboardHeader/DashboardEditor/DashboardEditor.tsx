@@ -1,15 +1,13 @@
 import { Button, Group, Stack, Popover as MantinePopover } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
-import { PlusIcon, RotateCcwIcon } from "lucide-react";
+import { PlusIcon, RotateCcwIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
-import { IWidgetSettingsResponse } from "~/models/widgetSettings";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { useDeleteWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useDeleteWidgetSettingsMutation";
+import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useResetSmallScreenLayoutMutation";
+import { useResetToDefaultMutation } from "~/hooks/mutations/widgetSettings/useResetToDefaultMutation";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 
 interface DashboardEditorProps {
   onDone: () => void;
@@ -23,69 +21,17 @@ const DashboardEditor = ({
   editTarget,
 }: DashboardEditorProps): React.ReactNode => {
   const [isResetPopoverOpen, setIsResetPopoverOpen] = React.useState(false);
-  const [isResetting, setIsResetting] = React.useState(false);
+  const [isClearPopoverOpen, setIsClearPopoverOpen] = React.useState(false);
 
   const { t } = useTranslation();
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
-
-  const doResetMobileLayout = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/widgetSettings/resetSmallScreenLayout",
-        method: "POST",
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const handleResetToDefaults = async () => {
-    setIsResetting(true);
-    try {
-      await Promise.all(
-        (widgetSettingsQuery.data ?? []).map((w) =>
-          request({
-            url: "/api/widgetSettings",
-            method: "DELETE",
-            params: { widgetGuid: w.id },
-          }),
-        ),
-      );
-      await queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    } catch {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: t("error_loading_settings_message"),
-      });
-    } finally {
-      setIsResetting(false);
-    }
-  };
+  const widgetSettingsQuery = useWidgetSettingsQuery();
+  const resetSmallScreenLayoutMutation = useResetSmallScreenLayoutMutation();
+  const resetToDefaultMutation = useResetToDefaultMutation();
+  const deleteWidgetSettingsMutation = useDeleteWidgetSettingsMutation();
 
   const handleConfirmReset = async () => {
     setIsResetPopoverOpen(false);
-    await handleResetToDefaults();
+    await resetToDefaultMutation.mutateAsync();
   };
 
   return (
@@ -94,8 +40,8 @@ const DashboardEditor = ({
         <Button
           size="xs"
           variant="subtle"
-          loading={doResetMobileLayout.isPending}
-          onClick={() => doResetMobileLayout.mutate()}
+          loading={resetSmallScreenLayoutMutation.isPending}
+          onClick={() => resetSmallScreenLayoutMutation.mutate()}
         >
           {t("reset_to_desktop_order")}
         </Button>
@@ -120,7 +66,7 @@ const DashboardEditor = ({
             variant="subtle"
             leftSection={<RotateCcwIcon size={16} />}
             onClick={() => setIsResetPopoverOpen((opened) => !opened)}
-            loading={isResetting}
+            loading={resetToDefaultMutation.isPending}
           >
             {t("reset_dashboard")}
           </Button>
@@ -139,11 +85,56 @@ const DashboardEditor = ({
               <Button
                 size="xs"
                 color="var(--button-color-destructive)"
-                loading={isResetting}
+                loading={resetToDefaultMutation.isPending}
                 disabled={widgetSettingsQuery.isPending}
                 onClick={handleConfirmReset}
               >
                 {t("confirm_reset_to_defaults")}
+              </Button>
+            </Group>
+          </Stack>
+        </MantinePopover.Dropdown>
+      </Popover>
+      <Popover
+        opened={isClearPopoverOpen}
+        onChange={setIsClearPopoverOpen}
+        position="bottom-end"
+        withArrow
+      >
+        <MantinePopover.Target>
+          <Button
+            size="xs"
+            variant="subtle"
+            leftSection={<TrashIcon size={16} />}
+            onClick={() => setIsClearPopoverOpen((opened) => !opened)}
+            loading={deleteWidgetSettingsMutation.isPending}
+          >
+            {t("clear_dashboard")}
+          </Button>
+        </MantinePopover.Target>
+        <MantinePopover.Dropdown maw={350}>
+          <Stack gap={10}>
+            <PrimaryText size="xs">{t("clear_dashboard_warning")}</PrimaryText>
+            <Group gap="xs" justify="flex-end">
+              <Button
+                size="xs"
+                variant="subtle"
+                onClick={() => setIsClearPopoverOpen(false)}
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                size="xs"
+                color="var(--button-color-destructive)"
+                loading={deleteWidgetSettingsMutation.isPending}
+                disabled={widgetSettingsQuery.isPending}
+                onClick={() =>
+                  deleteWidgetSettingsMutation.mutate(
+                    widgetSettingsQuery.data?.map((ws) => ws.id) ?? [],
+                  )
+                }
+              >
+                {t("confirm_clear")}
               </Button>
             </Group>
           </Stack>

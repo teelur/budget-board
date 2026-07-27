@@ -5,15 +5,9 @@ import Drawer from "~/components/core/Drawer/Drawer";
 import { WIDGET_REGISTRY } from "~/shared/dashboardGrid";
 import WidgetPickerItem from "./WidgetPickerItem/WidgetPickerItem";
 import { notifications } from "@mantine/notifications";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  IWidgetSettingsCreateRequest,
-  IWidgetSettingsResponse,
-} from "~/models/widgetSettings";
-import { AxiosError, AxiosResponse } from "axios";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
+import { useCreateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useCreateWidgetSettingsMutation";
 
 interface WidgetPickerProps {
   opened: boolean;
@@ -25,40 +19,8 @@ const WidgetPicker = ({
   onClose,
 }: WidgetPickerProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
-
-  const widgetSettingsQuery = useQuery({
-    queryKey: [widgetSettingsQueryKey],
-    queryFn: async (): Promise<IWidgetSettingsResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/widgetSettings",
-        method: "GET",
-      });
-      if (res.status === 200) {
-        return res.data as IWidgetSettingsResponse[];
-      }
-      return [];
-    },
-  });
-
-  const doAddWidget = useMutation({
-    mutationFn: async (newWidget: IWidgetSettingsCreateRequest) =>
-      await request({
-        url: "/api/widgetSettings",
-        method: "POST",
-        data: newWidget,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const widgetSettingsQuery = useWidgetSettingsQuery();
+  const createWidgetSettingsMutation = useCreateWidgetSettingsMutation();
 
   const handleAddWidget = (widgetType: string) => {
     const entry = WIDGET_REGISTRY.find((r) => r.widgetType === widgetType);
@@ -76,7 +38,7 @@ const WidgetPicker = ({
       0,
     );
 
-    doAddWidget.mutate({
+    createWidgetSettingsMutation.mutate({
       widgetType,
       lgX: 0,
       lgY: 9999,
