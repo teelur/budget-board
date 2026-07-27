@@ -122,12 +122,12 @@
         <value>Der Benutzer wurde nicht gefunden.</value>
   </data>
   <data name="OidcEmailClaimMissingError" xml:space="preserve">
-    <value>The OIDC provider did not return an email claim required for account linking.</value>
+    <value>Der OIDC-Anbieter hat die für die Kontoverknüpfung erforderliche E-Mail-Bestätigung nicht zurückgesendet.</value>
   </data>
   <data name="OidcEmailMismatchError" xml:space="preserve">
-    <value>The OIDC email does not match the currently signed-in account email.</value>
+    <value>Die in der OIDC-E-Mail angegebene E-Mail-Adresse stimmt nicht mit der E-Mail-Adresse des derzeit angemeldeten Kontos überein.</value>
   </data>
   <data name="OidcExplicitLinkRequiredError" xml:space="preserve">
-    <value>An account with this email already exists. Sign in and link your OIDC account from account settings.</value>
+    <value>Ein Konto mit dieser E-Mail-Adresse existiert bereits. Melden Sie sich an und verknüpfen Sie Ihr OIDC-Konto in den Kontoeinstellungen.</value>
   </data>
 </root>
