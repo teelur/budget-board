@@ -13,11 +13,11 @@ export const useReorderNetWorthWidgetLineMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (reorderRequest: INetWorthWidgetLineReorderRequest) =>
+    mutationFn: async (reorderedLines: INetWorthWidgetLineReorderRequest) =>
       await request({
         url: `/api/netWorthWidgetLine/reorder`,
         method: "POST",
-        data: reorderRequest,
+        data: reorderedLines,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });

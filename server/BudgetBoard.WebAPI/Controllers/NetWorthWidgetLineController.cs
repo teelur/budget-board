@@ -21,7 +21,7 @@ public class NetWorthWidgetLineController(
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] NetWorthWidgetLineCreateRequest request)
+    public async Task<IActionResult> Create([FromBody] NetWorthWidgetLineCreateRequest newLine)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -32,14 +32,14 @@ public class NetWorthWidgetLineController(
                 return Unauthorized();
             }
 
-            await netWorthWidgetLineService.CreateNetWorthWidgetLineAsync(parsedUserId, request);
+            await netWorthWidgetLineService.CreateNetWorthWidgetLineAsync(parsedUserId, newLine);
             return Ok();
         });
     }
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] NetWorthWidgetLineUpdateRequest request)
+    public async Task<IActionResult> Update([FromBody] NetWorthWidgetLineUpdateRequest updatedLine)
     {
         return await HandleRequestAsync(async () =>
         {
@@ -50,7 +50,10 @@ public class NetWorthWidgetLineController(
                 return Unauthorized();
             }
 
-            await netWorthWidgetLineService.UpdateNetWorthWidgetLineAsync(parsedUserId, request);
+            await netWorthWidgetLineService.UpdateNetWorthWidgetLineAsync(
+                parsedUserId,
+                updatedLine
+            );
             return Ok();
         });
     }
@@ -80,7 +83,9 @@ public class NetWorthWidgetLineController(
     [HttpPost]
     [Authorize]
     [Route("[action]")]
-    public async Task<IActionResult> Reorder([FromBody] NetWorthWidgetLineReorderRequest request)
+    public async Task<IActionResult> Reorder(
+        [FromBody] NetWorthWidgetLineReorderRequest reorderedLines
+    )
     {
         return await HandleRequestAsync(async () =>
         {
@@ -91,7 +96,10 @@ public class NetWorthWidgetLineController(
                 return Unauthorized();
             }
 
-            await netWorthWidgetLineService.ReorderNetWorthWidgetLinesAsync(parsedUserId, request);
+            await netWorthWidgetLineService.ReorderNetWorthWidgetLinesAsync(
+                parsedUserId,
+                reorderedLines
+            );
             return Ok();
         });
     }
