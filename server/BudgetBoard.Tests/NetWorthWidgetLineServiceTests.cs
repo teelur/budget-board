@@ -15,6 +15,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class NetWorthWidgetLineServiceTests
 {
+    #region CreateNetWorthWidgetLineAsync
     [Fact]
     public async Task CreateNetWorthWidgetLineAsync_WhenValidData_ShouldCreateNewLine()
     {
@@ -119,7 +120,9 @@ public class NetWorthWidgetLineServiceTests
         newLine.Should().NotBeNull();
         newLine.Index.Should().Be(request.Index);
     }
+    #endregion
 
+    #region UpdateNetWorthWidgetLineAsync
     [Fact]
     public async Task UpdateNetWorthWidgetLineAsync_WhenValidData_ShouldUpdateLine()
     {
@@ -172,7 +175,7 @@ public class NetWorthWidgetLineServiceTests
     }
 
     [Fact]
-    public async Task UpdateNetWorthWidgetLineAsync_WhenLineDoesNotExist_ShouldThrowException()
+    public async Task UpdateNetWorthWidgetLineAsync_WhenLineDoesNotExist_ShouldThrowNetWorthWidgetLineNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -217,7 +220,7 @@ public class NetWorthWidgetLineServiceTests
     }
 
     [Fact]
-    public async Task UpdateNetWorthWidgetLineAsync_WhenMovingToAnotherGroup_ShouldMoveLine()
+    public async Task UpdateNetWorthWidgetLineAsync_WhenWidgetSettingsDoesNotExist_ShouldThrowWidgetSettingsNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -229,12 +232,43 @@ public class NetWorthWidgetLineServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>()
         );
 
-        var initialConfiguration = WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration;
-        var lineToUpdate = initialConfiguration.Groups.ElementAt(0).Lines.ElementAt(0);
+        var request = new NetWorthWidgetLineUpdateRequest
+        {
+            LineId = Guid.NewGuid(),
+            Name = "Updated Name",
+            WidgetSettingsId = Guid.NewGuid(),
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await netWorthWidgetLineService.UpdateNetWorthWidgetLineAsync(
+                helper.demoUser.Id,
+                request
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetSettingsNotFoundError");
+    }
+
+    [Fact]
+    public async Task UpdateNetWorthWidgetLineAsync_WhenConfigurationIsNull_ShouldThrowWidgetConfigurationNullError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetLineService = new NetWorthWidgetLineService(
+            Mock.Of<ILogger<INetWorthWidgetLineService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
         var widgetSettings = new WidgetSettings
         {
             WidgetType = "NetWorth",
-            Configuration = JsonSerializer.Serialize(initialConfiguration),
+            Configuration = null,
             UserID = helper.demoUser.Id,
         };
 
@@ -243,36 +277,112 @@ public class NetWorthWidgetLineServiceTests
 
         var request = new NetWorthWidgetLineUpdateRequest
         {
-            LineId = lineToUpdate.ID,
+            LineId = Guid.NewGuid(),
             Name = "Updated Name",
-            Group = 1,
             WidgetSettingsId = widgetSettings.ID,
         };
 
         // Act
-        await netWorthWidgetLineService.UpdateNetWorthWidgetLineAsync(helper.demoUser.Id, request);
+        Func<Task> act = async () =>
+            await netWorthWidgetLineService.UpdateNetWorthWidgetLineAsync(
+                helper.demoUser.Id,
+                request
+            );
 
         // Assert
-        var updatedWidgetSettings = helper.UserDataContext.WidgetSettings.First(ws =>
-            ws.ID == widgetSettings.ID
-        );
-        var updatedConfiguration = JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
-            updatedWidgetSettings.Configuration!
-        )!;
-        updatedConfiguration.Should().NotBeNull();
-
-        var oldGroupLine = updatedConfiguration
-            .Groups.ElementAt(0)
-            .Lines.SingleOrDefault(l => l.ID == request.LineId);
-        oldGroupLine.Should().BeNull();
-
-        var newGroupLine = updatedConfiguration
-            .Groups.ElementAt(1)
-            .Lines.SingleOrDefault(l => l.ID == request.LineId);
-        newGroupLine.Should().NotBeNull();
-        newGroupLine.Name.Should().Be(request.Name);
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationNullError");
     }
 
+    [Fact]
+    public async Task UpdateNetWorthWidgetLineAsync_WhenConfigurationIsInvalidJson_ShouldThrowWidgetConfigurationDeserializationError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetLineService = new NetWorthWidgetLineService(
+            Mock.Of<ILogger<INetWorthWidgetLineService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = "Invalid JSON",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var request = new NetWorthWidgetLineUpdateRequest
+        {
+            LineId = Guid.NewGuid(),
+            Name = "Updated Name",
+            WidgetSettingsId = widgetSettings.ID,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await netWorthWidgetLineService.UpdateNetWorthWidgetLineAsync(
+                helper.demoUser.Id,
+                request
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+
+    [Fact]
+    public async Task UpdateNetWorthWidgetLineAsync_WhenConfigurationIsJsonNull_ShouldThrowWidgetConfigurationDeserializationError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetLineService = new NetWorthWidgetLineService(
+            Mock.Of<ILogger<INetWorthWidgetLineService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = "null",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var request = new NetWorthWidgetLineUpdateRequest
+        {
+            LineId = Guid.NewGuid(),
+            Name = "Updated Name",
+            WidgetSettingsId = widgetSettings.ID,
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await netWorthWidgetLineService.UpdateNetWorthWidgetLineAsync(
+                helper.demoUser.Id,
+                request
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+    #endregion
+
+    #region DeleteNetWorthWidgetLineAsync
     [Fact]
     public async Task DeleteNetWorthWidgetLineAsync_WhenValidData_ShouldDeleteLine()
     {
@@ -321,7 +431,7 @@ public class NetWorthWidgetLineServiceTests
     }
 
     [Fact]
-    public async Task DeleteNetWorthWidgetLineAsync_WhenLineDoesNotExist_ShouldThrowError()
+    public async Task DeleteNetWorthWidgetLineAsync_WhenLineDoesNotExist_ShouldThrowNetWorthWidgetLineNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -360,7 +470,9 @@ public class NetWorthWidgetLineServiceTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("NetWorthWidgetLineNotFoundError");
     }
+    #endregion
 
+    #region ReorderNetWorthWidgetLinesAsync
     [Fact]
     public async Task ReorderNetWorthWidgetLinesAsync_WhenValidData_ShouldReorderLines()
     {
@@ -423,7 +535,7 @@ public class NetWorthWidgetLineServiceTests
     }
 
     [Fact]
-    public async Task ReorderNetWorthWidgetLinesAsync_WhenGroupNotFound_ShouldThrowError()
+    public async Task ReorderNetWorthWidgetLinesAsync_WhenGroupNotFound_ShouldThrowNetWorthWidgetGroupNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -468,7 +580,7 @@ public class NetWorthWidgetLineServiceTests
     }
 
     [Fact]
-    public async Task ReorderNetWorthWidgetLinesAsync_WhenLineIdsMismatch_ShouldThrowError()
+    public async Task ReorderNetWorthWidgetLinesAsync_WhenLineIdsMismatch_ShouldThrowNetWorthWidgetLineNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -510,4 +622,5 @@ public class NetWorthWidgetLineServiceTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("NetWorthWidgetLineNotFoundError");
     }
+    #endregion
 }

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
@@ -25,7 +26,7 @@ public class NetWorthWidgetLineService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = GetWidgetSettings(userData, request.WidgetSettingsId);
+        var widgetSettings = GetWidgetSettingsById(userData, request.WidgetSettingsId);
         var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
 
         var newLine = new NetWorthWidgetLine
@@ -57,49 +58,11 @@ public class NetWorthWidgetLineService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = GetWidgetSettings(userData, request.WidgetSettingsId);
+        var widgetSettings = GetWidgetSettingsById(userData, request.WidgetSettingsId);
         var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
-
-        NetWorthWidgetLine? line = null;
-        NetWorthWidgetGroup? currentGroup = null;
-
-        foreach (var group in configuration.Groups)
-        {
-            line = group.Lines.FirstOrDefault(l => l.ID == request.LineId);
-            if (line != null)
-            {
-                currentGroup = group;
-                break;
-            }
-        }
-
-        if (line == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetLineNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["NetWorthWidgetLineNotFoundError"]
-            );
-        }
+        var line = GetNetWorthWidgetLineById(request.LineId, configuration, out var group);
 
         line.Name = request.Name;
-
-        if (currentGroup!.Index != request.Group)
-        {
-            currentGroup.Lines = [.. currentGroup.Lines.Where(l => l.ID != request.LineId)];
-
-            var targetGroup = configuration.Groups.FirstOrDefault(g => g.Index == request.Group);
-            if (targetGroup == null)
-            {
-                targetGroup = new NetWorthWidgetGroup { Index = request.Group, Lines = [line] };
-                configuration.Groups = [.. configuration.Groups, targetGroup];
-            }
-            else
-            {
-                targetGroup.Lines = [.. targetGroup.Lines, line];
-            }
-
-            configuration.Groups = [.. configuration.Groups.Where(g => g.Lines.Any())];
-        }
 
         widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
         await userDataContext.SaveChangesAsync();
@@ -113,7 +76,7 @@ public class NetWorthWidgetLineService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = GetWidgetSettings(userData, widgetSettingsId);
+        var widgetSettings = GetWidgetSettingsById(userData, widgetSettingsId);
         var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
 
         if (!configuration.Groups.SelectMany(g => g.Lines).Any(l => l.ID == lineId))
@@ -142,16 +105,13 @@ public class NetWorthWidgetLineService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = GetWidgetSettings(userData, request.WidgetSettingsId);
+        var widgetSettings = GetWidgetSettingsById(userData, request.WidgetSettingsId);
         var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
-        var group = configuration.Groups.FirstOrDefault(g => g.ID == request.GroupId);
-        if (group == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetGroupNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["NetWorthWidgetGroupNotFoundError"]
-            );
-        }
+        var _ = GetNetWorthWidgetLineById(
+            request.OrderedLineIds.First(),
+            configuration,
+            out var group
+        );
 
         var lineDict = group.Lines.ToDictionary(l => l.ID, l => l);
         var reorderedLines = new List<NetWorthWidgetLine>();
@@ -178,29 +138,17 @@ public class NetWorthWidgetLineService(
 
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid guid)
     {
-        ApplicationUser? foundUser;
-        try
-        {
-            foundUser = await userDataContext
-                .ApplicationUsers.Include(u => u.WidgetSettings)
-                .FirstOrDefaultAsync(u => u.Id == guid);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["UserDataRetrievalError", ex.Message]);
-            throw new BudgetBoardServiceException(responseLocalizer["UserDataRetrievalError"]);
-        }
-
-        if (foundUser == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["InvalidUserError"]);
-            throw new BudgetBoardServiceException(responseLocalizer["InvalidUserError"]);
-        }
-
-        return foundUser;
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            guid,
+            users => users.Include(u => u.WidgetSettings)
+        );
     }
 
-    private WidgetSettings GetWidgetSettings(ApplicationUser userData, Guid guid)
+    private WidgetSettings GetWidgetSettingsById(ApplicationUser userData, Guid guid)
     {
         var widgetSettings = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == guid);
         if (widgetSettings == null)
@@ -209,6 +157,36 @@ public class NetWorthWidgetLineService(
             throw new BudgetBoardServiceException(responseLocalizer["WidgetSettingsNotFoundError"]);
         }
         return widgetSettings;
+    }
+
+    private NetWorthWidgetLine GetNetWorthWidgetLineById(
+        Guid netWorthWidgetLineId,
+        NetWorthWidgetConfiguration configuration,
+        out NetWorthWidgetGroup groupForLine
+    )
+    {
+        NetWorthWidgetLine? line = null;
+        NetWorthWidgetGroup? currentGroup = null;
+        foreach (var group in configuration.Groups)
+        {
+            line = group.Lines.FirstOrDefault(l => l.ID == netWorthWidgetLineId);
+            if (line != null)
+            {
+                currentGroup = group;
+                break;
+            }
+        }
+
+        if (line == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetLineNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["NetWorthWidgetLineNotFoundError"]
+            );
+        }
+
+        groupForLine = currentGroup!;
+        return line;
     }
 
     private NetWorthWidgetConfiguration GetNetWorthWidgetConfiguration(
@@ -223,16 +201,18 @@ public class NetWorthWidgetLineService(
             );
         }
 
-        var configuration = JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
-            widgetSettings.Configuration
-        );
-        if (configuration == null)
+        try
+        {
+            return JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
+                    widgetSettings.Configuration
+                ) ?? throw new JsonException();
+        }
+        catch (JsonException)
         {
             logger.LogError("{LogMessage}", logLocalizer["WidgetConfigurationDeserializationLog"]);
             throw new BudgetBoardServiceException(
                 responseLocalizer["WidgetConfigurationDeserializationError"]
             );
         }
-        return configuration;
     }
 }
