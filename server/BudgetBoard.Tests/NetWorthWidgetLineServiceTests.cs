@@ -15,6 +15,35 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class NetWorthWidgetLineServiceTests
 {
+    #region AcquireLockAsync
+    [Fact]
+    public async Task AcquireLockAsync_WhenSameWidgetSettingsIsLocked_ShouldWaitForPriorLockToBeReleased()
+    {
+        var widgetSettingsId = Guid.NewGuid();
+        var secondLockCompleted = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+
+        var firstLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(widgetSettingsId);
+
+        var secondLockTask = Task.Run(async () =>
+        {
+            var secondLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(
+                widgetSettingsId
+            );
+            secondLockCompleted.TrySetResult(true);
+            secondLock.Dispose();
+        });
+
+        await Task.Delay(100);
+        secondLockCompleted.Task.IsCompleted.Should().BeFalse();
+
+        firstLock.Dispose();
+        await secondLockCompleted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        await secondLockTask;
+    }
+    #endregion
+
     #region CreateNetWorthWidgetLineAsync
     [Fact]
     public async Task CreateNetWorthWidgetLineAsync_WhenValidData_ShouldCreateNewLine()

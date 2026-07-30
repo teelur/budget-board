@@ -25,6 +25,9 @@ public class NetWorthWidgetLineService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        using var configurationLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(
+            request.WidgetSettingsId
+        );
 
         var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
             userData,
@@ -68,6 +71,9 @@ public class NetWorthWidgetLineService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        using var configurationLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(
+            request.WidgetSettingsId
+        );
 
         var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
             userData,
@@ -97,6 +103,9 @@ public class NetWorthWidgetLineService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        using var configurationLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(
+            widgetSettingsId
+        );
 
         var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
             userData,
@@ -137,6 +146,9 @@ public class NetWorthWidgetLineService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        using var configurationLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(
+            request.WidgetSettingsId
+        );
 
         var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
             userData,
