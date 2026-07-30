@@ -23,7 +23,9 @@ public class NetWorthWidgetCategoryController(
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] NetWorthWidgetCategoryCreateRequest request)
+    public async Task<IActionResult> Create(
+        [FromBody] NetWorthWidgetCategoryCreateRequest newCategory
+    )
     {
         return await HandleRequestAsync(async () =>
         {
@@ -36,7 +38,7 @@ public class NetWorthWidgetCategoryController(
 
             await netWorthWidgetCategoryService.CreateNetWorthWidgetCategoryAsync(
                 parsedUserId,
-                request
+                newCategory
             );
             return Ok();
         });
@@ -44,7 +46,9 @@ public class NetWorthWidgetCategoryController(
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> Update([FromBody] NetWorthWidgetCategoryUpdateRequest request)
+    public async Task<IActionResult> Update(
+        [FromBody] NetWorthWidgetCategoryUpdateRequest updatedCategory
+    )
     {
         return await HandleRequestAsync(async () =>
         {
@@ -57,7 +61,7 @@ public class NetWorthWidgetCategoryController(
 
             await netWorthWidgetCategoryService.UpdateNetWorthWidgetCategoryAsync(
                 parsedUserId,
-                request
+                updatedCategory
             );
             return Ok();
         });

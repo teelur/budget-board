@@ -14,15 +14,7 @@ import { GripVertical, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useField } from "@mantine/form";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { INetWorthWidgetCategoryCreateRequest } from "~/models/netWorthWidgetConfiguration";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import {
-  translateAxiosError,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
@@ -32,6 +24,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useDeleteNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useDeleteNetWorthWidgetLineMutation";
 import { useUpdateNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useUpdateNetWorthWidgetLineMutation";
+import { useCreateNetWorthWidgetCategoryMutation } from "~/hooks/mutations/netWorthWidgetCategory/useCreateNetWorthWidgetCategoryMutation";
 
 export interface INetWorthLineItemProps {
   container: Element;
@@ -48,6 +41,8 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
     useUpdateNetWorthWidgetLineMutation();
   const deleteNetWorthWidgetLineMutation =
     useDeleteNetWorthWidgetLineMutation();
+  const createNetWorthWidgetCategoryMutation =
+    useCreateNetWorthWidgetCategoryMutation();
 
   const [isEditing, { toggle }] = useDisclosure(false);
   const nameField = useField<string>({ initialValue: props.line.name });
@@ -60,28 +55,6 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
       RestrictToVerticalAxis,
     ],
     collisionDetector: closestCorners,
-  });
-
-  const { request } = useAuth();
-
-  const queryClient = useQueryClient();
-
-  const doCreateCategory = useMutation({
-    mutationFn: async (categoryRequest: INetWorthWidgetCategoryCreateRequest) =>
-      await request({
-        url: `/api/netWorthWidgetCategory`,
-        method: "POST",
-        data: categoryRequest,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
   });
 
   return (
@@ -129,9 +102,9 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
 
             <ActionIcon
               size="sm"
-              loading={doCreateCategory.isPending}
+              loading={createNetWorthWidgetCategoryMutation.isPending}
               onClick={async () =>
-                await doCreateCategory.mutateAsync({
+                await createNetWorthWidgetCategoryMutation.mutateAsync({
                   lineId: props.line.id,
                   value: "",
                   type: "",
