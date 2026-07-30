@@ -19,76 +19,70 @@ public class NetWorthWidgetCategoryController(
     INetWorthWidgetCategoryService netWorthWidgetCategoryService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<NetWorthWidgetCategoryController>(logger, logLocalizer, responseLocalizer)
 {
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create([FromBody] NetWorthWidgetCategoryCreateRequest request)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await netWorthWidgetCategoryService.CreateNetWorthWidgetCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                parsedUserId,
                 request
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> Update([FromBody] NetWorthWidgetCategoryUpdateRequest request)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await netWorthWidgetCategoryService.UpdateNetWorthWidgetCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                parsedUserId,
                 request
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
     public async Task<IActionResult> Delete(Guid widgetSettingsId, Guid lineId, Guid categoryId)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await netWorthWidgetCategoryService.DeleteNetWorthWidgetCategoryAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                parsedUserId,
                 widgetSettingsId,
                 lineId,
                 categoryId
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

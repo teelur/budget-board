@@ -19,29 +19,27 @@ public class NetWorthWidgetGroupController(
     INetWorthWidgetGroupService netWorthWidgetGroupService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<NetWorthWidgetGroupController>(logger, logLocalizer, responseLocalizer)
 {
     [HttpPost]
     [Authorize]
     [Route("[action]")]
     public async Task<IActionResult> Reorder([FromBody] NetWorthWidgetGroupReorderRequest request)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await netWorthWidgetGroupService.ReorderNetWorthWidgetGroupsAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                parsedUserId,
                 request
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }
