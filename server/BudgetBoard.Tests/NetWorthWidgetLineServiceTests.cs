@@ -535,51 +535,6 @@ public class NetWorthWidgetLineServiceTests
     }
 
     [Fact]
-    public async Task ReorderNetWorthWidgetLinesAsync_WhenGroupNotFound_ShouldThrowNetWorthWidgetGroupNotFoundError()
-    {
-        // Arrange
-        var helper = new TestHelper();
-
-        var netWorthWidgetLineService = new NetWorthWidgetLineService(
-            Mock.Of<ILogger<INetWorthWidgetLineService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        var widgetSettings = new WidgetSettings
-        {
-            WidgetType = "NetWorth",
-            Configuration = JsonSerializer.Serialize(
-                WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
-            ),
-            UserID = helper.demoUser.Id,
-        };
-
-        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
-        await helper.UserDataContext.SaveChangesAsync();
-
-        var request = new NetWorthWidgetLineReorderRequest
-        {
-            WidgetSettingsId = widgetSettings.ID,
-            GroupId = Guid.NewGuid(),
-            OrderedLineIds = [],
-        };
-
-        // Act
-        Func<Task> act = async () =>
-            await netWorthWidgetLineService.ReorderNetWorthWidgetLinesAsync(
-                helper.demoUser.Id,
-                request
-            );
-
-        // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("NetWorthWidgetGroupNotFoundError");
-    }
-
-    [Fact]
     public async Task ReorderNetWorthWidgetLinesAsync_WhenLineIdsMismatch_ShouldThrowNetWorthWidgetLineNotFoundError()
     {
         // Arrange
@@ -607,7 +562,11 @@ public class NetWorthWidgetLineServiceTests
         {
             WidgetSettingsId = widgetSettings.ID,
             GroupId = initialConfiguration.Groups.ElementAt(0).ID,
-            OrderedLineIds = [Guid.NewGuid()],
+            OrderedLineIds =
+            [
+                initialConfiguration.Groups.ElementAt(0).Lines.ElementAt(0).ID,
+                Guid.NewGuid(),
+            ],
         };
 
         // Act

@@ -26,8 +26,19 @@ public class NetWorthWidgetLineService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = GetWidgetSettingsById(userData, request.WidgetSettingsId);
-        var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
+        var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
+            userData,
+            request.WidgetSettingsId,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
+        var configuration = NetWorthWidgetSettingsHelpers.GetNetWorthWidgetConfiguration(
+            widgetSettings,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
 
         var newLine = new NetWorthWidgetLine
         {
@@ -58,8 +69,19 @@ public class NetWorthWidgetLineService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = GetWidgetSettingsById(userData, request.WidgetSettingsId);
-        var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
+        var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
+            userData,
+            request.WidgetSettingsId,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
+        var configuration = NetWorthWidgetSettingsHelpers.GetNetWorthWidgetConfiguration(
+            widgetSettings,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
         var line = GetNetWorthWidgetLineById(request.LineId, configuration, out var group);
 
         line.Name = request.Name;
@@ -76,8 +98,19 @@ public class NetWorthWidgetLineService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = GetWidgetSettingsById(userData, widgetSettingsId);
-        var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
+        var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
+            userData,
+            widgetSettingsId,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
+        var configuration = NetWorthWidgetSettingsHelpers.GetNetWorthWidgetConfiguration(
+            widgetSettings,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
 
         if (!configuration.Groups.SelectMany(g => g.Lines).Any(l => l.ID == lineId))
         {
@@ -105,10 +138,21 @@ public class NetWorthWidgetLineService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
 
-        var widgetSettings = GetWidgetSettingsById(userData, request.WidgetSettingsId);
-        var configuration = GetNetWorthWidgetConfiguration(widgetSettings);
+        var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
+            userData,
+            request.WidgetSettingsId,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
+        var configuration = NetWorthWidgetSettingsHelpers.GetNetWorthWidgetConfiguration(
+            widgetSettings,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
         var _ = GetNetWorthWidgetLineById(
-            request.OrderedLineIds.First(),
+            request.OrderedLineIds.FirstOrDefault(),
             configuration,
             out var group
         );
@@ -148,17 +192,6 @@ public class NetWorthWidgetLineService(
         );
     }
 
-    private WidgetSettings GetWidgetSettingsById(ApplicationUser userData, Guid guid)
-    {
-        var widgetSettings = userData.WidgetSettings.FirstOrDefault(ws => ws.ID == guid);
-        if (widgetSettings == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetSettingsNotFoundLog"]);
-            throw new BudgetBoardServiceException(responseLocalizer["WidgetSettingsNotFoundError"]);
-        }
-        return widgetSettings;
-    }
-
     private NetWorthWidgetLine GetNetWorthWidgetLineById(
         Guid netWorthWidgetLineId,
         NetWorthWidgetConfiguration configuration,
@@ -187,32 +220,5 @@ public class NetWorthWidgetLineService(
 
         groupForLine = currentGroup!;
         return line;
-    }
-
-    private NetWorthWidgetConfiguration GetNetWorthWidgetConfiguration(
-        WidgetSettings widgetSettings
-    )
-    {
-        if (string.IsNullOrEmpty(widgetSettings.Configuration))
-        {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetConfigurationNullLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["WidgetConfigurationNullError"]
-            );
-        }
-
-        try
-        {
-            return JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
-                    widgetSettings.Configuration
-                ) ?? throw new JsonException();
-        }
-        catch (JsonException)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["WidgetConfigurationDeserializationLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["WidgetConfigurationDeserializationError"]
-            );
-        }
     }
 }
