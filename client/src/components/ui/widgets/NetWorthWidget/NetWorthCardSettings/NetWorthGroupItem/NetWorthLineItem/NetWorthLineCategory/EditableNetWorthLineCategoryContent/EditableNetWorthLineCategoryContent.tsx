@@ -1,17 +1,15 @@
 import { ActionIcon, Flex, Group } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { ChevronRightIcon, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import Select from "~/components/core/Select/Select/Select";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import { areStringsEqual } from "~/helpers/utils";
 import { getSubtypeOptions, NET_WORTH_CATEGORY_TYPES } from "~/helpers/widgets";
+import { useDeleteNetWorthWidgetCategoryMutation } from "~/hooks/mutations/netWorthWidgetCategory/useDeleteNetWorthWidgetCategoryMutation";
+import { useUpdateNetWorthWidgetCategoryMutation } from "~/hooks/mutations/netWorthWidgetCategory/useUpdateNetWorthWidgetCategoryMutation";
 import { INetWorthWidgetCategoryUpdateRequest } from "~/models/netWorthWidgetConfiguration";
 import {
   INetWorthWidgetCategory,
@@ -19,7 +17,6 @@ import {
 } from "~/models/widgetSettings";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface EditableNetWorthLineCategoryContentProps {
   category: INetWorthWidgetCategory;
@@ -45,50 +42,12 @@ const EditableNetWorthLineCategoryContent = (
   });
 
   const { t } = useTranslation();
-  const { request } = useAuth();
   const { allAccountTypes } = useAccountTypes();
   const { allAssetTypes } = useAssetTypes();
-
-  const queryClient = useQueryClient();
-  const doUpdateCategory = useMutation({
-    mutationFn: async (updatedCategory: INetWorthWidgetCategoryUpdateRequest) =>
-      await request({
-        url: `/api/netWorthWidgetCategory`,
-        method: "PUT",
-        data: updatedCategory,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const doDeleteCategory = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: `/api/netWorthWidgetCategory`,
-        method: "DELETE",
-        params: {
-          categoryId: props.category.id,
-          lineId: props.lineId,
-          widgetSettingsId: props.settingsId,
-        },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const updateNetWorthWidgetCategoryMutation =
+    useUpdateNetWorthWidgetCategoryMutation();
+  const deleteNetWorthWidgetCategoryMutation =
+    useDeleteNetWorthWidgetCategoryMutation();
 
   const type = typeField.getValue();
   const subtype = subtypeField.getValue();
@@ -125,7 +84,7 @@ const EditableNetWorthLineCategoryContent = (
 
   useDidUpdate(() => {
     if (type && subtype && isValueValid(type, subtype, value ?? "")) {
-      doUpdateCategory.mutate({
+      updateNetWorthWidgetCategoryMutation.mutate({
         id: props.category.id,
         type,
         subtype,
@@ -280,8 +239,14 @@ const EditableNetWorthLineCategoryContent = (
             color="var(--button-color-destructive)"
             h="100%"
             size="md"
-            loading={doDeleteCategory.isPending}
-            onClick={async () => await doDeleteCategory.mutateAsync()}
+            loading={deleteNetWorthWidgetCategoryMutation.isPending}
+            onClick={async () =>
+              await deleteNetWorthWidgetCategoryMutation.mutateAsync({
+                categoryId: props.category.id,
+                lineId: props.lineId,
+                widgetSettingsId: props.settingsId,
+              })
+            }
           >
             <TrashIcon size={16} />
           </ActionIcon>

@@ -64,3 +64,4 @@ Temporary Items
 
 # Other
 .config/dotnet-tools.json
+server/Library/**

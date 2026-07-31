@@ -13,11 +13,6 @@ import {
   Stack,
 } from "@mantine/core";
 import { GripVertical, PlusIcon } from "lucide-react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
 import {
   INetWorthWidgetLineCreateRequest,
   INetWorthWidgetLineReorderRequest,
@@ -30,61 +25,28 @@ import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import { closestCorners } from "@dnd-kit/collision";
+import { useCreateNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useCreateNetWorthWidgetLineMutation";
+import { useReorderNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useReorderNetWorthWidgetLineMutation";
 
 export interface NetWorthGroupItemProps {
   group: INetWorthWidgetGroup;
   isSortable: boolean;
   container: Element;
   settingsId: string;
-  onReorder: boolean;
   allLines: INetWorthWidgetLine[];
 }
 
 const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
+  const createNetWorthWidgetLineMutation =
+    useCreateNetWorthWidgetLineMutation();
+  const reorderNetWorthWidgetLineMutation =
+    useReorderNetWorthWidgetLineMutation();
+
   const [sortedLineItems, setSortedLineItems] = React.useState<
     INetWorthWidgetLine[]
   >([]);
 
   const linesStackRef = React.useRef<HTMLDivElement>(null);
-
-  const { request } = useAuth();
-
-  const queryClient = useQueryClient();
-  const doCreateLine = useMutation({
-    mutationFn: async (newLine: INetWorthWidgetLineCreateRequest) =>
-      await request({
-        url: `/api/netWorthWidgetLine`,
-        method: "POST",
-        data: newLine,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const doReorderLines = useMutation({
-    mutationFn: async (reorderRequest: INetWorthWidgetLineReorderRequest) =>
-      await request({
-        url: `/api/netWorthWidgetLine/reorder`,
-        method: "POST",
-        data: reorderRequest,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
 
   React.useEffect(() => {
     setSortedLineItems(
@@ -94,7 +56,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
         .map((line, index) => ({
           ...line,
           index,
-        }))
+        })),
     );
   }, [props.group.lines]);
 
@@ -102,13 +64,13 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
     if (!props.isSortable) {
       const orderedLines: string[] = sortedLineItems.map((line) => line.id);
 
-      doReorderLines.mutate({
+      reorderNetWorthWidgetLineMutation.mutate({
         widgetSettingsId: props.settingsId,
         groupId: props.group.id,
         orderedLineIds: orderedLines,
       } as INetWorthWidgetLineReorderRequest);
     }
-  }, [props.onReorder]);
+  }, [props.isSortable]);
 
   const { ref, handleRef } = useSortable({
     id: props.group.id,
@@ -122,7 +84,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
 
   return (
     <Card ref={props.isSortable ? ref : undefined} elevation={0}>
-      <LoadingOverlay visible={doReorderLines.isPending} />
+      <LoadingOverlay visible={reorderNetWorthWidgetLineMutation.isPending} />
       <Group gap="0.5rem">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
@@ -135,9 +97,9 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
           <Group justify="flex-end">
             <ActionIcon
               size="sm"
-              loading={doCreateLine.isPending}
+              loading={createNetWorthWidgetLineMutation.isPending}
               onClick={async () =>
-                await doCreateLine.mutateAsync({
+                await createNetWorthWidgetLineMutation.mutateAsync({
                   name: "",
                   group: props.group.index,
                   index: props.group.lines.length,
@@ -154,7 +116,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
                 (line, index) => ({
                   ...line,
                   index,
-                })
+                }),
               );
 
               setSortedLineItems(updatedList);

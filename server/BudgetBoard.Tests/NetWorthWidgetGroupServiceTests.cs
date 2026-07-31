@@ -14,6 +14,7 @@ namespace BudgetBoard.IntegrationTests;
 
 public class NetWorthWidgetGroupServiceTests
 {
+    #region ReorderNetWorthWidgetGroupsAsync
     [Fact]
     public async Task ReorderNetWorthWidgetGroupsAsync_WhenValidData_ShouldReorderGroups()
     {
@@ -73,7 +74,7 @@ public class NetWorthWidgetGroupServiceTests
     }
 
     [Fact]
-    public async Task ReorderNetWorthWidgetGroupsAsync_WhenInvalidGroupId_ShouldThrowException()
+    public async Task ReorderNetWorthWidgetGroupsAsync_WhenInvalidGroupId_ShouldThrowNetWorthWidgetGroupNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -121,4 +122,5 @@ public class NetWorthWidgetGroupServiceTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("NetWorthWidgetGroupNotFoundError");
     }
+    #endregion
 }

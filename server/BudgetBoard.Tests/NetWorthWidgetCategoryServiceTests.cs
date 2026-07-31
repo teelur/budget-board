@@ -15,6 +15,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class NetWorthWidgetCategoryServiceTests
 {
+    #region CreateNetWorthWidgetCategoryAsync
     [Fact]
     public async Task CreateNetWorthWidgetCategoryAsync_WhenValidData_ShouldCreateCategory()
     {
@@ -82,7 +83,7 @@ public class NetWorthWidgetCategoryServiceTests
     }
 
     [Fact]
-    public async Task CreateNetWorthWidgetCategoryAsync_WhenLineDoesntExist_ShouldThrowError()
+    public async Task CreateNetWorthWidgetCategoryAsync_WhenLineDoesntExist_ShouldThrowNetWorthWidgetLineNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -127,7 +128,7 @@ public class NetWorthWidgetCategoryServiceTests
     }
 
     [Fact]
-    public async Task CreateNetWorthWidgetCategoryAsync_WhenWidgetSettingsDontExist_ShouldThrowError()
+    public async Task CreateNetWorthWidgetCategoryAsync_WhenWidgetSettingsDontExist_ShouldThrowWidgetSettingsNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -162,7 +163,7 @@ public class NetWorthWidgetCategoryServiceTests
     }
 
     [Fact]
-    public async Task CreateNetWorthWidgetCategoryAsync_WhenUserDoesntExist_ShouldThrowError()
+    public async Task CreateNetWorthWidgetCategoryAsync_WhenUserDoesntExist_ShouldThrowInvalidUserError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -192,6 +193,143 @@ public class NetWorthWidgetCategoryServiceTests
             .WithMessage("InvalidUserError");
     }
 
+    [Fact]
+    public async Task CreateNetWorthWidgetCategoryAsync_WhenConfigurationIsNull_ShouldThrowWidgetConfigurationNullError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetCategoryService = new NetWorthWidgetCategoryService(
+            Mock.Of<ILogger<INetWorthWidgetCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = null,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var request = new NetWorthWidgetCategoryCreateRequest
+        {
+            Value = "Test Value",
+            Type = "Asset",
+            Subtype = "Cash",
+            LineId = Guid.NewGuid(),
+            WidgetSettingsId = widgetSettings.ID,
+        };
+
+        // Act
+        var act = async () =>
+            await netWorthWidgetCategoryService.CreateNetWorthWidgetCategoryAsync(
+                helper.demoUser.Id,
+                request
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationNullError");
+    }
+
+    [Fact]
+    public async Task CreateNetWorthWidgetCategoryAsync_WhenConfigurationIsInvalidJson_ShouldThrowWidgetConfigurationDeserializationError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetCategoryService = new NetWorthWidgetCategoryService(
+            Mock.Of<ILogger<INetWorthWidgetCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = "Invalid JSON",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var request = new NetWorthWidgetCategoryCreateRequest
+        {
+            Value = "Test Value",
+            Type = "Asset",
+            Subtype = "Cash",
+            LineId = Guid.NewGuid(),
+            WidgetSettingsId = widgetSettings.ID,
+        };
+
+        // Act
+        var act = async () =>
+            await netWorthWidgetCategoryService.CreateNetWorthWidgetCategoryAsync(
+                helper.demoUser.Id,
+                request
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+
+    [Fact]
+    public async Task CreateNetWorthWidgetCategoryAsync_WhenConfigurationIsJsonNull_ShouldThrowWidgetConfigurationDeserializationError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetCategoryService = new NetWorthWidgetCategoryService(
+            Mock.Of<ILogger<INetWorthWidgetCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = "null",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var request = new NetWorthWidgetCategoryCreateRequest
+        {
+            Value = "Test Value",
+            Type = "Asset",
+            Subtype = "Cash",
+            LineId = Guid.NewGuid(),
+            WidgetSettingsId = widgetSettings.ID,
+        };
+
+        // Act
+        var act = async () =>
+            await netWorthWidgetCategoryService.CreateNetWorthWidgetCategoryAsync(
+                helper.demoUser.Id,
+                request
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+    #endregion
+
+    #region UpdateNetWorthWidgetCategoryAsync
     [Fact]
     public async Task UpdateNetWorthWidgetCategoryAsync_WhenValidData_ShouldUpdateCategory()
     {
@@ -271,7 +409,75 @@ public class NetWorthWidgetCategoryServiceTests
     }
 
     [Fact]
-    public async Task UpdateNetWorthWidgetCategoryAsync_WhenCategoryDoesntExist_ShouldThrowError()
+    public async Task UpdateNetWorthWidgetCategoryAsync_WhenLineNameValueIsValid_ShouldUpdateCategory()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetCategoryService = new NetWorthWidgetCategoryService(
+            Mock.Of<ILogger<INetWorthWidgetCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = JsonSerializer.Serialize(
+                WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+            ),
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var configuration = JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
+            helper.demoUser.WidgetSettings.First().Configuration!
+        )!;
+
+        var line = configuration
+            .Groups.SelectMany(g => g.Lines)
+            .Single(l => l.Name == "Investments");
+        var targetLine = configuration.Groups.SelectMany(g => g.Lines).First(l => l.ID != line.ID);
+        var category = line.Categories.First();
+
+        var request = new NetWorthWidgetCategoryUpdateRequest
+        {
+            Id = category.ID,
+            Value = targetLine.Name,
+            Type = "Line",
+            Subtype = "Name",
+            LineId = line.ID,
+            WidgetSettingsId = widgetSettings.ID,
+        };
+
+        // Act
+        await netWorthWidgetCategoryService.UpdateNetWorthWidgetCategoryAsync(
+            helper.demoUser.Id,
+            request
+        );
+
+        // Assert
+        var updatedWidgetSettings = helper.UserDataContext.WidgetSettings.First(ws =>
+            ws.ID == widgetSettings.ID
+        );
+        var updatedConfiguration = JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
+            updatedWidgetSettings.Configuration!
+        )!;
+        var updatedCategory = updatedConfiguration
+            .Groups.SelectMany(g => g.Lines)
+            .SelectMany(l => l.Categories)
+            .First(c => c.ID == category.ID);
+
+        updatedCategory.Type.Should().Be("Line");
+        updatedCategory.Subtype.Should().Be("Name");
+        updatedCategory.Value.Should().Be(targetLine.Name);
+    }
+
+    [Fact]
+    public async Task UpdateNetWorthWidgetCategoryAsync_WhenCategoryDoesntExist_ShouldThrowNetWorthWidgetCategoryNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -326,7 +532,62 @@ public class NetWorthWidgetCategoryServiceTests
     }
 
     [Fact]
-    public async Task UpdateNetWorthWidgetCategoryAsync_WhenLineNameValueDependsOnThisLine_ShouldThrowError()
+    public async Task UpdateNetWorthWidgetCategoryAsync_WhenLineNameDoesNotExist_ShouldThrowNetWorthWidgetLineNotFoundError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetCategoryService = new NetWorthWidgetCategoryService(
+            Mock.Of<ILogger<INetWorthWidgetCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = JsonSerializer.Serialize(
+                WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+            ),
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var configuration = JsonSerializer.Deserialize<NetWorthWidgetConfiguration>(
+            helper.demoUser.WidgetSettings.First().Configuration!
+        )!;
+        var line = configuration
+            .Groups.SelectMany(g => g.Lines)
+            .Single(l => l.Name == "Investments");
+
+        var request = new NetWorthWidgetCategoryUpdateRequest
+        {
+            Id = line.Categories.First().ID,
+            Value = "Updated Value",
+            Type = "Line",
+            Subtype = "Name",
+            LineId = line.ID,
+            WidgetSettingsId = widgetSettings.ID,
+        };
+
+        // Act
+        var act = async () =>
+            await netWorthWidgetCategoryService.UpdateNetWorthWidgetCategoryAsync(
+                helper.demoUser.Id,
+                request
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("NetWorthWidgetLineNotFoundError");
+    }
+
+    [Fact]
+    public async Task UpdateNetWorthWidgetCategoryAsync_WhenLineNameValueDependsOnThisLine_ShouldThrowNetWorthWidgetCategoryTargetLineDependsOnThisLineError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -380,6 +641,124 @@ public class NetWorthWidgetCategoryServiceTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("NetWorthWidgetCategoryTargetLineDependsOnThisLineError");
+    }
+    #endregion
+
+    #region DeleteNetWorthWidgetCategoryAsync
+    [Fact]
+    public async Task DeleteNetWorthWidgetCategoryAsync_WhenLineDoesNotExist_ShouldThrowNetWorthWidgetLineNotFoundError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetCategoryService = new NetWorthWidgetCategoryService(
+            Mock.Of<ILogger<INetWorthWidgetCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = JsonSerializer.Serialize(
+                WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration
+            ),
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var act = async () =>
+            await netWorthWidgetCategoryService.DeleteNetWorthWidgetCategoryAsync(
+                helper.demoUser.Id,
+                widgetSettings.ID,
+                Guid.NewGuid(),
+                Guid.NewGuid()
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("NetWorthWidgetLineNotFoundError");
+    }
+
+    [Fact]
+    public async Task DeleteNetWorthWidgetCategoryAsync_WhenConfigurationIsNull_ShouldThrowWidgetConfigurationNullError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetCategoryService = new NetWorthWidgetCategoryService(
+            Mock.Of<ILogger<INetWorthWidgetCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = null,
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var act = async () =>
+            await netWorthWidgetCategoryService.DeleteNetWorthWidgetCategoryAsync(
+                helper.demoUser.Id,
+                widgetSettings.ID,
+                Guid.NewGuid(),
+                Guid.NewGuid()
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationNullError");
+    }
+
+    [Fact]
+    public async Task DeleteNetWorthWidgetCategoryAsync_WhenConfigurationIsInvalidJson_ShouldThrowWidgetConfigurationDeserializationError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetCategoryService = new NetWorthWidgetCategoryService(
+            Mock.Of<ILogger<INetWorthWidgetCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = "Invalid JSON",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var act = async () =>
+            await netWorthWidgetCategoryService.DeleteNetWorthWidgetCategoryAsync(
+                helper.demoUser.Id,
+                widgetSettings.ID,
+                Guid.NewGuid(),
+                Guid.NewGuid()
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
     }
 
     [Fact]
@@ -446,4 +825,5 @@ public class NetWorthWidgetCategoryServiceTests
             .FirstOrDefault(c => c.ID == newCategory.ID);
         deletedCategory.Should().BeNull();
     }
+    #endregion
 }
