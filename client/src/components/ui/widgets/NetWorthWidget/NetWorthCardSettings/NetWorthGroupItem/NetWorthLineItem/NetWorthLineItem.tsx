@@ -14,15 +14,7 @@ import { GripVertical, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useField } from "@mantine/form";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  INetWorthWidgetCategoryCreateRequest,
-  INetWorthWidgetLineUpdateRequest,
-} from "~/models/netWorthWidgetConfiguration";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import { translateAxiosError , widgetSettingsQueryKey} from "~/helpers/requests";
+import { INetWorthWidgetCategoryCreateRequest } from "~/models/netWorthWidgetConfiguration";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
@@ -30,6 +22,9 @@ import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import { closestCorners } from "@dnd-kit/collision";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useDeleteNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useDeleteNetWorthWidgetLineMutation";
+import { useUpdateNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useUpdateNetWorthWidgetLineMutation";
+import { useCreateNetWorthWidgetCategoryMutation } from "~/hooks/mutations/netWorthWidgetCategory/useCreateNetWorthWidgetCategoryMutation";
 
 export interface INetWorthLineItemProps {
   container: Element;
@@ -41,6 +36,14 @@ export interface INetWorthLineItemProps {
 }
 
 const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
+  const { t } = useTranslation();
+  const updateNetWorthWidgetLineMutation =
+    useUpdateNetWorthWidgetLineMutation();
+  const deleteNetWorthWidgetLineMutation =
+    useDeleteNetWorthWidgetLineMutation();
+  const createNetWorthWidgetCategoryMutation =
+    useCreateNetWorthWidgetCategoryMutation();
+
   const [isEditing, { toggle }] = useDisclosure(false);
   const nameField = useField<string>({ initialValue: props.line.name });
 
@@ -54,71 +57,9 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
     collisionDetector: closestCorners,
   });
 
-  const { t } = useTranslation();
-
-  const { request } = useAuth();
-
-  const queryClient = useQueryClient();
-  const doUpdateLine = useMutation({
-    mutationFn: async (updatedLine: INetWorthWidgetLineUpdateRequest) =>
-      await request({
-        url: `/api/netWorthWidgetLine`,
-        method: "PUT",
-        data: updatedLine,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const doDeleteLine = useMutation({
-    mutationFn: async (id: string) =>
-      await request({
-        url: `/api/netWorthWidgetLine`,
-        method: "DELETE",
-        params: {
-          lineId: id,
-          widgetSettingsId: props.settingsId,
-        },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const doCreateCategory = useMutation({
-    mutationFn: async (categoryRequest: INetWorthWidgetCategoryCreateRequest) =>
-      await request({
-        url: `/api/netWorthWidgetCategory`,
-        method: "POST",
-        data: categoryRequest,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
   return (
     <Card ref={props.isSortable ? ref : undefined} elevation={1}>
-      <LoadingOverlay visible={doUpdateLine.isPending} />
+      <LoadingOverlay visible={updateNetWorthWidgetLineMutation.isPending} />
       <Group gap="0.5rem">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
@@ -136,11 +77,9 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                   {...nameField.getInputProps()}
                   onBlur={async () => {
                     if (nameField.getValue() !== props.line.name) {
-                      await doUpdateLine.mutateAsync({
+                      await updateNetWorthWidgetLineMutation.mutateAsync({
                         lineId: props.line.id,
                         name: nameField.getValue(),
-                        group: props.groupIndex,
-                        index: props.line.index,
                         widgetSettingsId: props.settingsId,
                       });
                     }
@@ -163,9 +102,9 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
 
             <ActionIcon
               size="sm"
-              loading={doCreateCategory.isPending}
+              loading={createNetWorthWidgetCategoryMutation.isPending}
               onClick={async () =>
-                await doCreateCategory.mutateAsync({
+                await createNetWorthWidgetCategoryMutation.mutateAsync({
                   lineId: props.line.id,
                   value: "",
                   type: "",
@@ -201,9 +140,12 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
               color="var(--button-color-destructive)"
               h="100%"
               size="md"
-              loading={doDeleteLine.isPending}
+              loading={deleteNetWorthWidgetLineMutation.isPending}
               onClick={async () =>
-                await doDeleteLine.mutateAsync(props.line.id)
+                await deleteNetWorthWidgetLineMutation.mutateAsync({
+                  lineId: props.line.id,
+                  widgetSettingsId: props.settingsId,
+                })
               }
             >
               <TrashIcon size={16} />

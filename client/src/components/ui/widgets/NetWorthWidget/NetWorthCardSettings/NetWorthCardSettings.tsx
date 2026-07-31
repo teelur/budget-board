@@ -6,18 +6,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NetWorthGroupItem from "./NetWorthGroupItem/NetWorthGroupItem";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  INetWorthWidgetGroupReorderRequest,
-  INetWorthWidgetLineCreateRequest,
-} from "~/models/netWorthWidgetConfiguration";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import {
-  translateAxiosError,
-  widgetSettingsQueryKey,
-} from "~/helpers/requests";
+import { INetWorthWidgetLineCreateRequest } from "~/models/netWorthWidgetConfiguration";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import {
@@ -28,6 +17,8 @@ import {
 import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
+import { useCreateNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useCreateNetWorthWidgetLineMutation";
+import { useReorderNetWorthWidgetGroupMutation } from "~/hooks/mutations/netWorthWidgetGroup/useReorderNetWorthWidgetGroupMutation";
 
 interface NetWorthCardSettingsProps {
   widget: IWidgetSettingsResponse;
@@ -41,53 +32,17 @@ const NetWorthCardSettings = ({
   onClose,
 }: NetWorthCardSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
+  const createNetWorthWidgetLineMutation =
+    useCreateNetWorthWidgetLineMutation();
+  const reorderNetWorthWidgetGroupMutation =
+    useReorderNetWorthWidgetGroupMutation();
 
   const [isSortable, { toggle: toggleIsSortable }] = useDisclosure(false);
 
   const [sortedGroups, setSortedGroups] = React.useState<
     INetWorthWidgetGroup[]
   >([]);
-  const [onReorderCompleted, setOnReorderCompleted] =
-    React.useState<boolean>(false);
-
-  const queryClient = useQueryClient();
-  const doCreateLine = useMutation({
-    mutationFn: async (newLine: INetWorthWidgetLineCreateRequest) =>
-      await request({
-        url: `/api/netWorthWidgetLine`,
-        method: "POST",
-        data: newLine,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [widgetSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-
-  const doReorderGroups = useMutation({
-    mutationFn: async (reorderRequest: INetWorthWidgetGroupReorderRequest) =>
-      await request({
-        url: `/api/netWorthWidgetGroup/reorder`,
-        method: "POST",
-        data: reorderRequest,
-      }),
-    onSuccess: () => {
-      setOnReorderCompleted((prev) => !prev);
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
 
   React.useEffect(() => {
     const configuration = parseNetWorthConfiguration(widget.configuration);
@@ -113,7 +68,7 @@ const NetWorthCardSettings = ({
     if (!isSortable) {
       const orderedGroups: string[] = sortedGroups.map((group) => group.id);
 
-      doReorderGroups.mutate({
+      reorderNetWorthWidgetGroupMutation.mutate({
         widgetSettingsId: widget.id,
         orderedGroupIds: orderedGroups,
       });
@@ -180,7 +135,6 @@ const NetWorthCardSettings = ({
                     isSortable={isSortable}
                     container={groupsStackRef.current as Element}
                     settingsId={widget.id}
-                    onReorder={onReorderCompleted}
                     allLines={allLines}
                   />
                 ))
@@ -191,9 +145,9 @@ const NetWorthCardSettings = ({
           </DragDropProvider>
           <ActionIcon
             w="100%"
-            loading={doCreateLine.isPending}
+            loading={createNetWorthWidgetLineMutation.isPending}
             onClick={() =>
-              doCreateLine.mutate({
+              createNetWorthWidgetLineMutation.mutate({
                 name: "",
                 group:
                   Math.max(...sortedGroups.map((group) => group.index)) + 1,
