@@ -57,7 +57,6 @@
   "auto_categorizer": "Pengategori otomatis",
   "auto_categorizer_minimum_probability": "Probabilitas Minimum Pengategori Otomatis",
   "auto_categorizer_minimum_probability_description": "Atur batas minimum keyakinan (0%-100%) agar sistem bisa membuat kategori otomatis. Semakin tinggi nilainya, semakin tinggi pula kepastian data yang dibutuhkan.",
-  "portuguese_brazilian": "Portugis (Brasil)",
   "uncategorized_transactions": "Transaksi Belum Dikategorikan",
   "unknown_account": "Akun Tidak Diketahui",
   "unknown_institution": "Institusi Tidak Diketahui",
