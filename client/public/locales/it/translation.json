@@ -72,8 +72,6 @@
   "budget_amount_fraction_editable_total_styled": "<0>{{quantità}}</0> <1>di</1>",
   "budget_copy_failed_message": "Si è verificato un errore durante la copia del budget del mese precedente.",
   "budget_details": "Dettagli del budget",
-  "hide_sensitive_values": "Nascondi valori sensibili",
-  "show_sensitive_values": "Mostra valori sensibili",
   "transactions": "Transazioni",
   "transactions_settings": "Impostazioni transazioni",
   "trends": "Tendenze",

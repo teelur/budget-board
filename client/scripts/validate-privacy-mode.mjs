@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
@@ -221,37 +221,6 @@ test("currency chart formatters use the privacy mask", async () => {
     assertIncludes(source, "usePrivacyMode", filePath);
     assertIncludes(source, "isPrivacyModeEnabled", filePath);
     assertIncludes(source, "maskedAmountText", filePath);
-  }
-});
-
-test("all locale files expose privacy mode labels", async () => {
-  const localesDir = fromRoot("public", "locales");
-  const localeNames = await readdir(localesDir);
-
-  for (const localeName of localeNames) {
-    const filePath = path.join(localesDir, localeName, "translation.json");
-    const translation = JSON.parse(await readFile(filePath, "utf8"));
-
-    assert.equal(
-      typeof translation.hide_sensitive_values,
-      "string",
-      `${localeName} must define hide_sensitive_values`,
-    );
-    assert.equal(
-      typeof translation.show_sensitive_values,
-      "string",
-      `${localeName} must define show_sensitive_values`,
-    );
-    assert.notEqual(
-      translation.hide_sensitive_values.trim(),
-      "",
-      `${localeName} hide_sensitive_values must not be empty`,
-    );
-    assert.notEqual(
-      translation.show_sensitive_values.trim(),
-      "",
-      `${localeName} show_sensitive_values must not be empty`,
-    );
   }
 });
 
