@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
@@ -41,6 +42,24 @@ public class NetWorthWidgetLineServiceTests
         firstLock.Dispose();
         await secondLockCompleted.Task.WaitAsync(TimeSpan.FromSeconds(2));
         await secondLockTask;
+    }
+
+    [Fact]
+    public async Task AcquireLockAsync_WhenLockIsReleased_ShouldRemoveEntryFromDictionary()
+    {
+        var widgetSettingsId = Guid.NewGuid();
+        var firstLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(widgetSettingsId);
+
+        firstLock.Dispose();
+
+        var locksField = typeof(NetWorthWidgetConfigurationLock).GetField(
+            "Locks",
+            BindingFlags.NonPublic | BindingFlags.Static
+        );
+        var locks = locksField!.GetValue(null) as System.Collections.IDictionary;
+
+        locks.Should().NotBeNull();
+        locks!.Contains(widgetSettingsId).Should().BeFalse();
     }
     #endregion
 

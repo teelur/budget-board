@@ -25,16 +25,15 @@ public class NetWorthWidgetGroupService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
-        using var configurationLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(
-            request.WidgetSettingsId
-        );
-
         var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
             userData,
             request.WidgetSettingsId,
             logger,
             logLocalizer,
             responseLocalizer
+        );
+        using var configurationLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(
+            request.WidgetSettingsId
         );
         var configuration = NetWorthWidgetSettingsHelpers.GetNetWorthWidgetConfiguration(
             widgetSettings,
