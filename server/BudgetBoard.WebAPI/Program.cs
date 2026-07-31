@@ -8,6 +8,7 @@ using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Jobs;
 using BudgetBoard.WebAPI.Services;
 using BudgetBoard.WebAPI.Utils;
+using BudgetBoard.WebAPI.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -118,21 +119,7 @@ if (oidcEnabled)
 
 // Configure Identity with cookie authentication
 // Same configuration whether OIDC is enabled or not since frontend handles OIDC flow
-builder
-    .Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-    })
-    .AddCookie(
-        IdentityConstants.ApplicationScheme,
-        options =>
-        {
-            options.ExpireTimeSpan = TimeSpan.FromDays(30);
-            options.SlidingExpiration = true;
-        }
-    );
+builder.Services.AddBudgetBoardAuthentication();
 builder.Services.AddAuthorization();
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
