@@ -159,10 +159,12 @@ public class NetWorthWidgetLineService(
             logLocalizer,
             responseLocalizer
         );
-        var _ = GetNetWorthWidgetLineById(
-            request.OrderedLineIds.FirstOrDefault(),
+        var group = NetWorthWidgetSettingsHelpers.GetNetWorthWidgetGroupById(
             configuration,
-            out var group
+            request.GroupId,
+            logger,
+            logLocalizer,
+            responseLocalizer
         );
 
         var lineDict = group.Lines.ToDictionary(l => l.ID, l => l);

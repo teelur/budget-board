@@ -583,6 +583,50 @@ public class NetWorthWidgetLineServiceTests
     }
 
     [Fact]
+    public async Task ReorderNetWorthWidgetLinesAsync_WhenGroupIdDoesNotExist_ShouldThrowNetWorthWidgetGroupNotFoundError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var netWorthWidgetLineService = new NetWorthWidgetLineService(
+            Mock.Of<ILogger<INetWorthWidgetLineService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var initialConfiguration = WidgetSettingsHelpers.DefaultNetWorthWidgetConfiguration;
+        var widgetSettings = new WidgetSettings
+        {
+            WidgetType = "NetWorth",
+            Configuration = JsonSerializer.Serialize(initialConfiguration),
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widgetSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var request = new NetWorthWidgetLineReorderRequest
+        {
+            WidgetSettingsId = widgetSettings.ID,
+            GroupId = Guid.NewGuid(),
+            OrderedLineIds = [.. initialConfiguration.Groups.ElementAt(0).Lines.Select(l => l.ID)],
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await netWorthWidgetLineService.ReorderNetWorthWidgetLinesAsync(
+                helper.demoUser.Id,
+                request
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("NetWorthWidgetGroupNotFoundError");
+    }
+
+    [Fact]
     public async Task ReorderNetWorthWidgetLinesAsync_WhenLineIdsMismatch_ShouldThrowNetWorthWidgetLineNotFoundError()
     {
         // Arrange

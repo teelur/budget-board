@@ -57,6 +57,25 @@ public static class NetWorthWidgetSettingsHelpers
         return widgetSettings;
     }
 
+    public static NetWorthWidgetGroup GetNetWorthWidgetGroupById(
+        NetWorthWidgetConfiguration configuration,
+        Guid groupId,
+        ILogger logger,
+        IStringLocalizer<LogStrings> logLocalizer,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
+    {
+        var group = configuration.Groups.FirstOrDefault(g => g.ID == groupId);
+        if (group == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["NetWorthWidgetGroupNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["NetWorthWidgetGroupNotFoundError"]
+            );
+        }
+        return group;
+    }
+
     public static NetWorthWidgetLine GetNetWorthWidgetLineById(
         NetWorthWidgetConfiguration configuration,
         Guid lineId,
