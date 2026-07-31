@@ -8,6 +8,7 @@ const localeMap: Record<string, string> = {
   "en-us": "en",
   de: "de",
   fr: "fr",
+  "pt-br": "pt-br",
   "zh-hans": "zh-cn",
   id: "id",
   it: "it",
