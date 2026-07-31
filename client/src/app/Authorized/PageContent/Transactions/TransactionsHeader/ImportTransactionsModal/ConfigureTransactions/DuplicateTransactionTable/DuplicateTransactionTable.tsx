@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import {
   ITransaction,
   ITransactionImportTableData,
@@ -16,7 +16,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -29,8 +28,7 @@ const DuplicateTransactionTable = (
   const itemsPerPage = 5;
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs, dateFormat } = useLocale();
   const accountsQuery = useAccountsQuery();
 
   const [page, setPage] = React.useState(1);
@@ -110,13 +108,9 @@ const DuplicateTransactionTable = (
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.merchantName}</Table.Td>
                     <Table.Td>
-                      {convertNumberToCurrency(
-                        row.importedTransaction.amount ?? 0,
-                        true,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
-                      )}
+                      <SensitiveAmount
+                        amount={row.importedTransaction.amount ?? 0}
+                      />
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.account}</Table.Td>
                   </Table.Tr>
@@ -131,13 +125,9 @@ const DuplicateTransactionTable = (
                     </Table.Td>
                     <Table.Td>{row.existingTransaction.merchantName}</Table.Td>
                     <Table.Td>
-                      {convertNumberToCurrency(
-                        row.existingTransaction.amount ?? 0,
-                        true,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
-                      )}
+                      <SensitiveAmount
+                        amount={row.existingTransaction.amount ?? 0}
+                      />
                     </Table.Td>
                     <Table.Td>
                       {accountIDToNameMap.get(

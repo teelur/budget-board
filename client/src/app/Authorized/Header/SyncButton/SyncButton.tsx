@@ -1,7 +1,8 @@
-import { Button } from "@mantine/core";
+import { ActionIcon, Button, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse, AxiosError } from "axios";
+import { CloudSyncIcon } from "lucide-react";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import {
@@ -17,7 +18,11 @@ import {
 import { useTranslation } from "react-i18next";
 import { SyncError } from "~/models/sync";
 
-const SyncButton = (): React.ReactNode => {
+interface SyncButtonProps {
+  compact?: boolean;
+}
+
+const SyncButton = ({ compact = false }: SyncButtonProps): React.ReactNode => {
   const { t } = useTranslation();
 
   const { request } = useAuth();
@@ -60,12 +65,30 @@ const SyncButton = (): React.ReactNode => {
     },
   });
 
+  const syncLabel = t("sync");
+
+  if (compact) {
+    return (
+      <Tooltip label={syncLabel}>
+        <ActionIcon
+          aria-label={syncLabel}
+          loading={doSyncMutation.isPending}
+          onClick={() => doSyncMutation.mutate()}
+          size="lg"
+          variant="subtle"
+        >
+          <CloudSyncIcon size={20} />
+        </ActionIcon>
+      </Tooltip>
+    );
+  }
+
   return (
     <Button
       onClick={() => doSyncMutation.mutate()}
       loading={doSyncMutation.isPending}
     >
-      {t("sync")}
+      {syncLabel}
     </Button>
   );
 };

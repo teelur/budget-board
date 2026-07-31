@@ -16,6 +16,9 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { maskedAmountText } from "~/helpers/privacy";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -29,6 +32,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, longDateFormat, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const valuesQuery = useValuesQuery({
     assetIds: props.asset ? [props.asset.id] : [],
     enabled: !!props.asset?.id && props.isOpen,
@@ -40,6 +44,20 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const valuesForChart = sortedValues.filter((value) =>
     dayjs(value.date).isAfter(dayjs().subtract(chartLookbackMonths, "months")),
   );
+
+  const formatSensitiveAmount = (
+    amount: number,
+    signDisplay = SignDisplay.Auto,
+  ): string =>
+    isPrivacyModeEnabled
+      ? maskedAmountText
+      : convertNumberToCurrency(
+          amount,
+          true,
+          preferredCurrency,
+          signDisplay,
+          intlLocale,
+        );
 
   return (
     <Drawer
@@ -70,13 +88,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     date: dayjs(props.asset.purchaseDate).format(
                       longDateFormat,
                     ),
-                    price: convertNumberToCurrency(
-                      props.asset.purchasePrice,
-                      true,
-                      preferredCurrency,
-                      SignDisplay.Auto,
-                      intlLocale,
-                    ),
+                    price: formatSensitiveAmount(props.asset.purchasePrice),
                   }}
                   components={[
                     <DimmedText size="xs" key="purchased-label" />,
@@ -95,13 +107,10 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     amount={props.asset.sellPrice - props.asset.purchasePrice}
                     size="xs"
                   >
-                    {convertNumberToCurrency(
-                      props.asset.sellPrice - props.asset.purchasePrice,
-                      true,
-                      preferredCurrency,
-                      SignDisplay.Always,
-                      intlLocale,
-                    )}
+                    <SensitiveAmount
+                      amount={props.asset.sellPrice - props.asset.purchasePrice}
+                      signDisplay={SignDisplay.Always}
+                    />
                   </StatusText>
                 </Stack>
               )}
@@ -112,13 +121,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     i18nKey="sold_on_for_styled"
                     values={{
                       date: dayjs(props.asset.sellDate).format(longDateFormat),
-                      price: convertNumberToCurrency(
-                        props.asset.sellPrice,
-                        true,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
-                      ),
+                      price: formatSensitiveAmount(props.asset.sellPrice),
                     }}
                     components={[
                       <DimmedText size="xs" key="sold-label" />,

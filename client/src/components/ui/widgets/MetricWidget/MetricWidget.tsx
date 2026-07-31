@@ -9,12 +9,15 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import {
   buildDataRequirements,
+  hasCurrencyMetric,
   parseTemplate,
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
+import { maskedAmountText } from "~/helpers/privacy";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
@@ -38,6 +41,7 @@ const MetricWidget = ({
 }: MetricWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { intlLocale, dayjs } = useLocale();
   const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
   const widgetSettingsQuery = useWidgetSettingsQuery();
@@ -155,17 +159,35 @@ const MetricWidget = ({
 
   const valueText = React.useMemo(() => {
     if (configValue && !isPending) {
+      if (isPrivacyModeEnabled && hasCurrencyMetric(parsedValueTokens)) {
+        return maskedAmountText;
+      }
       return resolveTemplate(parsedValueTokens, metricDataContext);
     }
     return null;
-  }, [configValue, isPending, parsedValueTokens, metricDataContext]);
+  }, [
+    configValue,
+    isPending,
+    isPrivacyModeEnabled,
+    parsedValueTokens,
+    metricDataContext,
+  ]);
 
   const labelText = React.useMemo(() => {
     if (configLabel && !isPending) {
+      if (isPrivacyModeEnabled && hasCurrencyMetric(parsedLabelTokens)) {
+        return maskedAmountText;
+      }
       return resolveTemplate(parsedLabelTokens, metricDataContext);
     }
     return null;
-  }, [configLabel, isPending, parsedLabelTokens, metricDataContext]);
+  }, [
+    configLabel,
+    isPending,
+    isPrivacyModeEnabled,
+    parsedLabelTokens,
+    metricDataContext,
+  ]);
 
   const renderContent = () => {
     if (isPending) {

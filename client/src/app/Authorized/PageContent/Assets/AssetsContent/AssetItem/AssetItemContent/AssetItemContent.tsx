@@ -2,6 +2,7 @@ import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import React from "react";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { IAssetResponse } from "~/models/asset";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -11,6 +12,8 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { getIsParentAssetType, getParentAssetType } from "~/helpers/assets";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { maskedAmountText } from "~/helpers/privacy";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface AssetItemContentProps {
   asset: IAssetResponse;
@@ -21,6 +24,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { allAssetTypes } = useAssetTypes();
 
   const getAssetTypeDisplay = (): React.ReactNode => {
@@ -73,13 +77,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
           )}
         </Group>
         <StatusText amount={props.asset.currentValue ?? 0} size="md">
-          {convertNumberToCurrency(
-            props.asset.currentValue ?? 0,
-            true,
-            preferredCurrency,
-            SignDisplay.Auto,
-            intlLocale,
-          )}
+          <SensitiveAmount amount={props.asset.currentValue ?? 0} />
         </StatusText>
       </Group>
       <Group justify="space-between" align="center">
@@ -91,13 +89,15 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             <DimmedText size="sm">
               {t("purchased_on_for", {
                 date: dayjs(props.asset.purchaseDate).format(dateFormat),
-                price: convertNumberToCurrency(
-                  props.asset.purchasePrice ?? 0,
-                  true,
-                  preferredCurrency,
-                  SignDisplay.Auto,
-                  intlLocale,
-                ),
+                price: isPrivacyModeEnabled
+                  ? maskedAmountText
+                  : convertNumberToCurrency(
+                      props.asset.purchasePrice ?? 0,
+                      true,
+                      preferredCurrency,
+                      SignDisplay.Auto,
+                      intlLocale,
+                    ),
               })}
             </DimmedText>
           ) : (

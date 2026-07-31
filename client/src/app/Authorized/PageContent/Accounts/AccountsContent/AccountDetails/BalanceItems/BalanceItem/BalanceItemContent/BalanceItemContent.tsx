@@ -3,8 +3,10 @@ import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { IBalanceResponse } from "~/models/balance";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface BalanceItemContentProps {
   balance: IBalanceResponse;
@@ -16,6 +18,7 @@ const BalanceItemContent = (
   props: BalanceItemContentProps,
 ): React.ReactNode => {
   const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   return (
     <Group justify="space-between" align="center">
@@ -35,13 +38,15 @@ const BalanceItemContent = (
         </ActionIcon>
       </Group>
       <StatusText amount={props.balance.amount} size="md">
-        {convertNumberToCurrency(
-          props.balance.amount,
-          true,
-          props.userCurrency,
-          SignDisplay.Auto,
-          intlLocale,
-        )}
+        {isPrivacyModeEnabled
+          ? maskedAmountText
+          : convertNumberToCurrency(
+              props.balance.amount,
+              true,
+              props.userCurrency,
+              SignDisplay.Auto,
+              intlLocale,
+            )}
       </StatusText>
     </Group>
   );

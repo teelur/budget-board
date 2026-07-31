@@ -1,4 +1,5 @@
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { getTransactionsForMonth } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
@@ -10,6 +11,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface ChartDatum {
   month: string;
@@ -30,6 +32,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const sortedMonths = props.months.sort(
     (a, b) =>
@@ -78,6 +81,10 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   ];
 
   const chartValueFormatter = (value: number): string => {
+    if (isPrivacyModeEnabled) {
+      return maskedAmountText;
+    }
+
     return convertNumberToCurrency(
       value,
       false,

@@ -3,11 +3,13 @@ import { BarChart } from "@mantine/charts";
 import React from "react";
 import { buildMonthlySpendingChartData } from "~/helpers/charts";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { Group, Skeleton, Stack } from "@mantine/core";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -26,6 +28,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   const { t } = useTranslation();
   const { intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const chartData = React.useMemo(
     () =>
@@ -79,6 +82,24 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
     );
   }
 
+  const chartValueFormatter = (value: number | null | undefined): string => {
+    if (value == null) {
+      return "";
+    }
+
+    if (isPrivacyModeEnabled) {
+      return maskedAmountText;
+    }
+
+    return convertNumberToCurrency(
+      value,
+      false,
+      preferredCurrency,
+      SignDisplay.Auto,
+      intlLocale,
+    );
+  };
+
   return (
     <Stack gap="1rem">
       <Group justify="space-between" align="center">
@@ -86,13 +107,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
           {props.invertData ? t("average_spending") : t("average_income")}
         </DimmedText>
         <DimmedText size="sm">
-          {convertNumberToCurrency(
-            average,
-            false,
-            preferredCurrency,
-            SignDisplay.Auto,
-            intlLocale,
-          )}
+          {chartValueFormatter(average)}
         </DimmedText>
       </Group>
       <BarChart
@@ -107,17 +122,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
         ]}
         data={chartData}
         dataKey="month"
-        valueFormatter={(value) =>
-          value == null
-            ? ""
-            : convertNumberToCurrency(
-                value,
-                false,
-                preferredCurrency,
-                SignDisplay.Auto,
-                intlLocale,
-              )
-        }
+        valueFormatter={chartValueFormatter}
         referenceLines={[
           {
             y: average,

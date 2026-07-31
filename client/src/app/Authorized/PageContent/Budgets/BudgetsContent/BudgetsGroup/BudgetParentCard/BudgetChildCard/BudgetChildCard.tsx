@@ -5,6 +5,7 @@ import {
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import React from "react";
 import { useField } from "@mantine/form";
@@ -24,6 +25,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface BudgetChildCardProps {
   id: string;
@@ -41,6 +43,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { intlLocale, thousandsSeparator, decimalSeparator } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
@@ -65,6 +68,16 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const percentComplete = roundAwayFromZero(
     ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100,
   );
+  const formatSensitiveAmount = (amount: number): string =>
+    isPrivacyModeEnabled
+      ? maskedAmountText
+      : convertNumberToCurrency(
+          amount,
+          false,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        );
 
   return (
     <Group wrap="nowrap">
@@ -116,20 +129,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                     <Trans
                       i18nKey="budget_amount_fraction_editable_total_styled"
                       values={{
-                        amount: convertNumberToCurrency(
+                        amount: formatSensitiveAmount(
                           props.amount * (props.isIncome ? 1 : -1),
-                          false,
-                          preferredCurrency,
-                          SignDisplay.Auto,
-                          intlLocale,
                         ),
-                        total: convertNumberToCurrency(
-                          props.limit,
-                          false,
-                          preferredCurrency,
-                          SignDisplay.Auto,
-                          intlLocale,
-                        ),
+                        total: formatSensitiveAmount(props.limit),
                       }}
                       components={[
                         <PrimaryText
@@ -170,20 +173,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   <Trans
                     i18nKey="budget_amount_fraction_styled"
                     values={{
-                      amount: convertNumberToCurrency(
+                      amount: formatSensitiveAmount(
                         props.amount * (props.isIncome ? 1 : -1),
-                        false,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
                       ),
-                      total: convertNumberToCurrency(
-                        props.limit,
-                        false,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
-                      ),
+                      total: formatSensitiveAmount(props.limit),
                     }}
                     components={[
                       <PrimaryText
@@ -224,14 +217,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               <Trans
                 i18nKey="budget_left_styled"
                 values={{
-                  amount: convertNumberToCurrency(
+                  amount: formatSensitiveAmount(
                     roundAwayFromZero(
                       props.limit - props.amount * (props.isIncome ? 1 : -1),
                     ),
-                    false,
-                    preferredCurrency,
-                    SignDisplay.Auto,
-                    intlLocale,
                   ),
                 }}
                 components={[

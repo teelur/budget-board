@@ -1,6 +1,7 @@
 import { Flex, Group } from "@mantine/core";
 import React from "react";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import Card from "~/components/core/Card/Card";
@@ -9,6 +10,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface CompletedGoalCardProps {
   goal: IGoalResponse;
@@ -17,6 +19,7 @@ interface CompletedGoalCardProps {
 const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
   const { dayjs, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   return (
     <Card elevation={2}>
@@ -36,16 +39,18 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
             <Trans
               i18nKey="goal_completed_total_styled"
               values={{
-                amount: convertNumberToCurrency(
-                  getGoalTargetAmount(
-                    props.goal.amount,
-                    props.goal.initialAmount,
-                  ),
-                  true,
-                  preferredCurrency,
-                  SignDisplay.Auto,
-                  intlLocale,
-                ),
+                amount: isPrivacyModeEnabled
+                  ? maskedAmountText
+                  : convertNumberToCurrency(
+                      getGoalTargetAmount(
+                        props.goal.amount,
+                        props.goal.initialAmount,
+                      ),
+                      true,
+                      preferredCurrency,
+                      SignDisplay.Auto,
+                      intlLocale,
+                    ),
               }}
               components={[
                 <DimmedText size="sm" key="label" />,

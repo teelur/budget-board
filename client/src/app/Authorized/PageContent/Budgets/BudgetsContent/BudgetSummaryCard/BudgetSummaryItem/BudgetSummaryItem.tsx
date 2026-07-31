@@ -1,5 +1,6 @@
 import { StatusColorType } from "~/helpers/budgets";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -10,6 +11,7 @@ import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -23,6 +25,7 @@ interface BudgetSummaryItemProps {
 const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const { intlLocale } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const percentComplete = Math.round(
     ((props.amount *
@@ -34,20 +37,19 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const signedAmount =
     props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
 
-  const formattedAmount = convertNumberToCurrency(
-    signedAmount,
-    false,
-    preferredCurrency,
-    SignDisplay.Auto,
-    intlLocale,
-  );
-  const formattedTotal = convertNumberToCurrency(
-    props.total ?? 0,
-    false,
-    preferredCurrency,
-    SignDisplay.Auto,
-    intlLocale,
-  );
+  const formatSensitiveAmount = (amount: number): string =>
+    isPrivacyModeEnabled
+      ? maskedAmountText
+      : convertNumberToCurrency(
+          amount,
+          false,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        );
+
+  const formattedAmount = formatSensitiveAmount(signedAmount);
+  const formattedTotal = formatSensitiveAmount(props.total ?? 0);
 
   const statusTextProps = {
     amount: props.amount,

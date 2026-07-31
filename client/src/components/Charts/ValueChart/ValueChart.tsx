@@ -1,4 +1,5 @@
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { BarChart } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
 import React from "react";
@@ -11,6 +12,7 @@ import { chartColors } from "~/helpers/charts";
 import { DateString } from "~/helpers/datetime";
 import { buildValueChartData, IItem, IValue } from "./helpers/valueChart";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 /**
  * Builds the series for the value chart.
@@ -38,10 +40,15 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const chartSeries = buildValueChartSeries(props.items);
 
   const chartValueFormatter = (value: number): string => {
+    if (isPrivacyModeEnabled) {
+      return maskedAmountText;
+    }
+
     return convertNumberToCurrency(
       value,
       false,

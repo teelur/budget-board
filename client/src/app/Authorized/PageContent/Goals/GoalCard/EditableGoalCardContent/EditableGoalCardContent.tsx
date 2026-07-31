@@ -16,6 +16,7 @@ import {
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { IGoalResponse } from "~/models/goal";
 import { notifications } from "@mantine/notifications";
 import { PencilIcon, TrashIcon } from "lucide-react";
@@ -37,6 +38,7 @@ import { useCompleteGoalMutation } from "~/hooks/mutations/goals/useCompleteGoal
 import { useUpdateGoalMutation } from "~/hooks/mutations/goals/useUpdateGoalMutation";
 import { useDeleteGoalMutation } from "~/hooks/mutations/goals/useDeleteGoalMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -57,6 +59,7 @@ const EditableGoalCardContent = (
     decimalSeparator,
   } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateGoalMutation = useUpdateGoalMutation();
   const deleteGoalMutation = useDeleteGoalMutation();
   const completeGoalMutation = useCompleteGoalMutation();
@@ -75,6 +78,17 @@ const EditableGoalCardContent = (
       ? props.goal.completeDate
       : null,
   });
+
+  const formatSensitiveAmount = (amount: number): string =>
+    isPrivacyModeEnabled
+      ? maskedAmountText
+      : convertNumberToCurrency(
+          amount,
+          false,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        );
 
   return (
     <>
@@ -149,13 +163,9 @@ const EditableGoalCardContent = (
                   <Trans
                     i18nKey="budget_amount_fraction_editable_total_styled"
                     values={{
-                      amount: convertNumberToCurrency(
+                      amount: formatSensitiveAmount(
                         sumAccountsTotalBalance(props.goal.accounts) -
                           props.goal.initialAmount,
-                        false,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
                       ),
                     }}
                     components={[
@@ -196,23 +206,15 @@ const EditableGoalCardContent = (
                 <Trans
                   i18nKey="budget_amount_fraction_styled"
                   values={{
-                    amount: convertNumberToCurrency(
+                    amount: formatSensitiveAmount(
                       sumAccountsTotalBalance(props.goal.accounts) -
                         props.goal.initialAmount,
-                      false,
-                      preferredCurrency,
-                      SignDisplay.Auto,
-                      intlLocale,
                     ),
-                    total: convertNumberToCurrency(
+                    total: formatSensitiveAmount(
                       getGoalTargetAmount(
                         props.goal.amount,
                         props.goal.initialAmount,
                       ),
-                      false,
-                      preferredCurrency,
-                      SignDisplay.Auto,
-                      intlLocale,
                     ),
                   }}
                   components={[
@@ -240,13 +242,9 @@ const EditableGoalCardContent = (
                     <Trans
                       i18nKey="budget_projected_editable_styled"
                       values={{
-                        amount: convertNumberToCurrency(
+                        amount: formatSensitiveAmount(
                           sumAccountsTotalBalance(props.goal.accounts) -
                             props.goal.initialAmount,
-                          false,
-                          preferredCurrency,
-                          SignDisplay.Auto,
-                          intlLocale,
                         ),
                       }}
                       components={[<DimmedText size="sm" key="label" />]}
@@ -302,13 +300,9 @@ const EditableGoalCardContent = (
                   <Trans
                     i18nKey="budget_monthly_amount_fraction_editable_styled"
                     values={{
-                      amount: convertNumberToCurrency(
+                      amount: formatSensitiveAmount(
                         sumAccountsTotalBalance(props.goal.accounts) -
                           props.goal.initialAmount,
-                        false,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
                       ),
                     }}
                     components={[
@@ -356,19 +350,11 @@ const EditableGoalCardContent = (
                 <Trans
                   i18nKey="budget_monthly_amount_fraction_styled"
                   values={{
-                    amount: convertNumberToCurrency(
+                    amount: formatSensitiveAmount(
                       props.goal.monthlyContributionProgress,
-                      false,
-                      preferredCurrency,
-                      SignDisplay.Auto,
-                      intlLocale,
                     ),
-                    total: convertNumberToCurrency(
+                    total: formatSensitiveAmount(
                       props.goal.monthlyContribution,
-                      false,
-                      preferredCurrency,
-                      SignDisplay.Auto,
-                      intlLocale,
                     ),
                   }}
                   components={[

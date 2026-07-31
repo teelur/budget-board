@@ -174,6 +174,7 @@
   "hidden": "已隐藏",
   "hidden_transactions": "已隐藏的转账",
   "hide_account": "隐藏账户",
+  "hide_sensitive_values": "隐藏敏感值",
   "hide_transactions": "隐藏转账",
   "i_want_to_set_a_goal_to": "我想设置一个目标来…",
   "if": "如果",
@@ -184,5 +185,6 @@
   "include_interest": "包括利息",
   "income": "收入",
   "income_trends": "收入趋势",
-  "preferred_language_description": "翻译可能不准确或不完整。如果您发现任何问题，请考虑在 <0>Weblate</0> 上协助更正。"
+  "preferred_language_description": "翻译可能不准确或不完整。如果您发现任何问题，请考虑在 <0>Weblate</0> 上协助更正。",
+  "show_sensitive_values": "显示敏感值"
 }

@@ -15,6 +15,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import {
   accountsQueryKey,
   institutionsQueryKey,
@@ -27,6 +28,7 @@ import { AccountSource } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface ISimpleFinAccountCardProps {
   simpleFinAccount: ISimpleFinAccountResponse;
@@ -50,6 +52,7 @@ const SimpleFinAccountCard = (
 
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale, dayjsLocale } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { request } = useAuth();
 
   const accountsQuery = useAccountsQuery();
@@ -278,13 +281,15 @@ const SimpleFinAccountCard = (
               </ActionIcon>
             </Group>
             <StatusText size="sm" amount={props.simpleFinAccount.balance}>
-              {convertNumberToCurrency(
-                props.simpleFinAccount.balance,
-                true,
-                accountCurrency,
-                SignDisplay.Auto,
-                intlLocale,
-              )}
+              {isPrivacyModeEnabled
+                ? maskedAmountText
+                : convertNumberToCurrency(
+                    props.simpleFinAccount.balance,
+                    true,
+                    accountCurrency,
+                    SignDisplay.Auto,
+                    intlLocale,
+                  )}
             </StatusText>
           </Group>
           <Group justify="space-between" align="center">

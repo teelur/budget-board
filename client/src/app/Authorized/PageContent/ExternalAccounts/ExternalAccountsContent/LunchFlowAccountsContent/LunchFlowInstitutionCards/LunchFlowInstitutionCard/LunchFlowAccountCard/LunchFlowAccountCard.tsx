@@ -15,6 +15,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import {
   accountsQueryKey,
   institutionsQueryKey,
@@ -26,6 +27,7 @@ import { AccountSource } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface ILunchFlowAccountCardProps {
   lunchFlowAccount: ILunchFlowAccountResponse;
@@ -49,6 +51,7 @@ const LunchFlowAccountCard = (
 
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale, dayjsLocale } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { request } = useAuth();
 
   const accountsQuery = useAccountsQuery();
@@ -266,13 +269,15 @@ const LunchFlowAccountCard = (
               </ActionIcon>
             </Group>
             <StatusText size="sm" amount={props.lunchFlowAccount.balance}>
-              {convertNumberToCurrency(
-                props.lunchFlowAccount.balance,
-                true,
-                accountCurrency,
-                SignDisplay.Auto,
-                intlLocale,
-              )}
+              {isPrivacyModeEnabled
+                ? maskedAmountText
+                : convertNumberToCurrency(
+                    props.lunchFlowAccount.balance,
+                    true,
+                    accountCurrency,
+                    SignDisplay.Auto,
+                    intlLocale,
+                  )}
             </StatusText>
           </Group>
           <Group justify="space-between" align="center">

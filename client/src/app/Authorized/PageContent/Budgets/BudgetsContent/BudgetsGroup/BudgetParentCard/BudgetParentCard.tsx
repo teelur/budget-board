@@ -5,6 +5,7 @@ import {
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import {
   ActionIcon,
   Button,
@@ -37,6 +38,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -54,6 +56,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { dayjs, intlLocale, thousandsSeparator, decimalSeparator } =
     useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
@@ -84,6 +87,16 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       limit) *
       100,
   );
+  const formatSensitiveAmount = (value: number): string =>
+    isPrivacyModeEnabled
+      ? maskedAmountText
+      : convertNumberToCurrency(
+          value,
+          false,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        );
 
   const handleEdit = (newLimit?: number | string) => {
     if (newLimit === "") {
@@ -223,12 +236,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     <Trans
                       i18nKey="budget_amount_fraction_editable_total_styled"
                       values={{
-                        amount: convertNumberToCurrency(
+                        amount: formatSensitiveAmount(
                           amount * (isIncome ? 1 : -1),
-                          false,
-                          preferredCurrency,
-                          SignDisplay.Auto,
-                          intlLocale,
                         ),
                       }}
                       components={[
@@ -269,20 +278,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   <Trans
                     i18nKey="budget_amount_fraction_styled"
                     values={{
-                      amount: convertNumberToCurrency(
+                      amount: formatSensitiveAmount(
                         amount * (isIncome ? 1 : -1),
-                        false,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
                       ),
-                      total: convertNumberToCurrency(
-                        limit,
-                        false,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
-                      ),
+                      total: formatSensitiveAmount(limit),
                     }}
                     components={[
                       <PrimaryText
@@ -321,12 +320,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               <Trans
                 i18nKey="budget_left_styled"
                 values={{
-                  amount: convertNumberToCurrency(
+                  amount: formatSensitiveAmount(
                     roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
-                    false,
-                    preferredCurrency,
-                    SignDisplay.Auto,
-                    intlLocale,
                   ),
                 }}
                 components={[

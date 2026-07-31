@@ -13,8 +13,10 @@ import {
 } from "@mantine/core";
 import { ICategory } from "~/models/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
@@ -98,6 +100,7 @@ const SpendingCategoriesChart = (
   const { t } = useTranslation();
   const { intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const theme = useMantineTheme();
 
   const { innerChartData, outerChartData } = React.useMemo(() => {
@@ -245,13 +248,15 @@ const SpendingCategoriesChart = (
   const outerRadius = showSubcategories ? (isNarrow ? 75 : 93) : undefined;
 
   const formatValue = (value: number) =>
-    convertNumberToCurrency(
-      value,
-      true,
-      preferredCurrency,
-      SignDisplay.Auto,
-      intlLocale,
-    );
+    isPrivacyModeEnabled
+      ? maskedAmountText
+      : convertNumberToCurrency(
+          value,
+          true,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        );
 
   return (
     <Stack w="100%" gap="xs">

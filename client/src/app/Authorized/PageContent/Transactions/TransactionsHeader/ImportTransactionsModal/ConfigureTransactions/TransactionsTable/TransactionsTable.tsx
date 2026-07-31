@@ -8,11 +8,10 @@ import {
 } from "@mantine/core";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
@@ -23,8 +22,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const itemsPerPage = 10;
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs, dateFormat } = useLocale();
 
   const [page, setPage] = React.useState(1);
 
@@ -73,13 +71,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                   <Table.Td>{row.merchantName}</Table.Td>
                   <Table.Td>{row.category}</Table.Td>
                   <Table.Td>
-                    {convertNumberToCurrency(
-                      row.amount ?? 0,
-                      true,
-                      preferredCurrency,
-                      SignDisplay.Auto,
-                      intlLocale,
-                    )}
+                    <SensitiveAmount amount={row.amount ?? 0} />
                   </Table.Td>
                   <Table.Td>{row.account}</Table.Td>
                 </Table.Tr>

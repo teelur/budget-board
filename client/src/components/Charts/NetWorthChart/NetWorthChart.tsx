@@ -1,5 +1,6 @@
 import { filterBalancesByDateRange } from "~/helpers/balances";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { DateString, getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
@@ -15,6 +16,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { buildValueChartData } from "../ValueChart/helpers/valueChart";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface NetWorthChartData {
   date: DateString;
@@ -84,6 +86,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { dateFormat, intlLocale } = useLocale();
   const { allAccountTypes } = useAccountTypes();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const chartSeries: CompositeChartSeries[] = [
     { name: "assets", label: t("assets"), color: "green.6", type: "bar" },
@@ -97,6 +100,10 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   ];
 
   const chartValueFormatter = (value: number): string => {
+    if (isPrivacyModeEnabled) {
+      return maskedAmountText;
+    }
+
     return convertNumberToCurrency(
       value,
       false,

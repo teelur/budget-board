@@ -4,6 +4,7 @@ import { ActionIcon, Badge, Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import { PencilIcon } from "lucide-react";
@@ -16,6 +17,7 @@ import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -27,6 +29,18 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
+
+  const formatSensitiveAmount = (amount: number): string =>
+    isPrivacyModeEnabled
+      ? maskedAmountText
+      : convertNumberToCurrency(
+          amount,
+          false,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        );
 
   return (
     <Group style={{ containerType: "inline-size" }} wrap="nowrap">
@@ -59,23 +73,15 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             <Trans
               i18nKey="budget_amount_fraction_styled"
               values={{
-                amount: convertNumberToCurrency(
+                amount: formatSensitiveAmount(
                   sumAccountsTotalBalance(props.goal.accounts) -
                     props.goal.initialAmount,
-                  false,
-                  preferredCurrency,
-                  SignDisplay.Auto,
-                  intlLocale,
                 ),
-                total: convertNumberToCurrency(
+                total: formatSensitiveAmount(
                   getGoalTargetAmount(
                     props.goal.amount,
                     props.goal.initialAmount,
                   ),
-                  false,
-                  preferredCurrency,
-                  SignDisplay.Auto,
-                  intlLocale,
                 ),
               }}
               components={[
@@ -113,19 +119,11 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
             <Trans
               i18nKey="budget_monthly_amount_fraction_styled"
               values={{
-                amount: convertNumberToCurrency(
+                amount: formatSensitiveAmount(
                   props.goal.monthlyContributionProgress,
-                  false,
-                  preferredCurrency,
-                  SignDisplay.Auto,
-                  intlLocale,
                 ),
-                total: convertNumberToCurrency(
+                total: formatSensitiveAmount(
                   props.goal.monthlyContribution,
-                  false,
-                  preferredCurrency,
-                  SignDisplay.Auto,
-                  intlLocale,
                 ),
               }}
               components={[

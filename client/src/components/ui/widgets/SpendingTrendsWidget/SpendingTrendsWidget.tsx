@@ -1,5 +1,6 @@
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { maskedAmountText } from "~/helpers/privacy";
 import { getRollingTotalSpendingForMonth } from "~/helpers/transactions";
 import { Box, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
@@ -13,11 +14,13 @@ import { LineChartIcon } from "lucide-react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 const SpendingTrendsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const months = [
     dayjs().startOf("month").toDate(),
@@ -70,13 +73,15 @@ const SpendingTrendsWidget = (): React.ReactNode => {
     const spendingComparisonNumber =
       Math.round((getSpendingComparison() + Number.EPSILON) * 100) / 100;
 
-    const amount = convertNumberToCurrency(
-      Math.abs(spendingComparisonNumber),
-      true,
-      preferredCurrency,
-      SignDisplay.Auto,
-      intlLocale,
-    );
+    const amount = isPrivacyModeEnabled
+      ? maskedAmountText
+      : convertNumberToCurrency(
+          Math.abs(spendingComparisonNumber),
+          true,
+          preferredCurrency,
+          SignDisplay.Auto,
+          intlLocale,
+        );
 
     if (spendingComparisonNumber < 0) {
       return t("spending_trends_less_than_last_month", { amount });
