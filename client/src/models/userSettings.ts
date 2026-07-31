@@ -42,6 +42,7 @@ export const Languages: LanguageItem[] = [
   { value: "en-us", label: "english_us" },
   { value: "de", label: "german" },
   { value: "fr", label: "french" },
+  { value: "pt-br", label: "portuguese_brazilian" },
   { value: "zh-hans", label: "chinese_simplified" },
   { value: "id", label: "indonesian" },
   { value: "it", label: "italian" },

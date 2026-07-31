@@ -25,13 +25,23 @@ public static class SupportedLanguages
     public const string EnglishUnitedStates = "en-us";
     public const string German = "de";
     public const string French = "fr";
+    public const string BrazilianPortuguese = "pt-br";
     public const string ChineseSimplified = "zh-hans";
     public const string Indonesian = "id";
     public const string Italian = "it";
     public const string Russian = "ru";
 
     public static List<string> SupportedCultureNames { get; } =
-    [EnglishUnitedStates, German, French, ChineseSimplified, Indonesian, Italian, Russian];
+    [
+        EnglishUnitedStates,
+        German,
+        French,
+        BrazilianPortuguese,
+        ChineseSimplified,
+        Indonesian,
+        Italian,
+        Russian,
+    ];
 
     public static List<string> AllUserLanguageOptions { get; } =
     [SystemDefault, .. SupportedCultureNames];

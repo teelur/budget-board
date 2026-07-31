@@ -289,6 +289,35 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
+    public async Task UpdateUserSettingsAsync_WhenBrazilianPortugueseLanguage_UpdatesUserSettings()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = new UserSettingsService(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var userSettingsUpdateRequest = new UserSettingsUpdateRequest { Language = "pt-BR" };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(
+            helper.demoUser.Id,
+            userSettingsUpdateRequest
+        );
+
+        // Assert
+        helper.demoUser.UserSettings.Language.Should().Be("pt-br");
+    }
+
+    [Fact]
     public async Task UpdateUserSettingsAsync_WhenInvalidDateFormat_ThrowsInvalidDateFormatError()
     {
         // Arrange
