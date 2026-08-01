@@ -41,6 +41,17 @@ function assertOrder(source, expectedOrder, filePath) {
   });
 }
 
+function assertNotIncludes(source, unexpected, filePath) {
+  assert.ok(
+    !source.includes(unexpected),
+    `${filePath} must not include ${unexpected}`,
+  );
+}
+
+function assertJsonKey(source, key, filePath) {
+  assertIncludes(source, `"${key}"`, filePath);
+}
+
 const vite = await createServer({
   root: rootDir,
   configFile: fromRoot("vite.config.ts"),
@@ -149,12 +160,12 @@ test("privacy mode provider wraps the authorized app tree", async () => {
   );
 });
 
-test("metric widget masks currency value and label templates only while private", async () => {
+test("metric widget uses shared formatting for currency templates", async () => {
   const source = await readSource(
     "src/components/ui/widgets/MetricWidget/MetricWidget.tsx",
   );
 
-  assertIncludes(source, "usePrivacyMode", "MetricWidget.tsx");
+  assertIncludes(source, "useSensitiveAmountFormatter", "MetricWidget.tsx");
   assertIncludes(
     source,
     "hasCurrencyMetric(parsedValueTokens)",
@@ -165,24 +176,33 @@ test("metric widget masks currency value and label templates only while private"
     "hasCurrencyMetric(parsedLabelTokens)",
     "MetricWidget.tsx",
   );
-  assertIncludes(source, "return maskedAmountText;", "MetricWidget.tsx");
+  assertIncludes(source, "formatSensitiveAmount", "MetricWidget.tsx");
+  assertNotIncludes(source, "return maskedAmountText;", "MetricWidget.tsx");
 });
 
-test("sensitive amount masks before formatting currency values", async () => {
-  const source = await readSource(
+test("sensitive amount formatting is shared by string and jsx callers", async () => {
+  const helperSource = await readSource("src/helpers/privacy.ts");
+  const componentSource = await readSource(
     "src/components/core/Text/SensitiveAmount/SensitiveAmount.tsx",
   );
 
-  assertIncludes(source, "usePrivacyMode", "SensitiveAmount.tsx");
-  assertIncludes(source, "return maskedAmountText;", "SensitiveAmount.tsx");
-  assertIncludes(source, "convertNumberToCurrency", "SensitiveAmount.tsx");
-  assertOrder(
-    source,
-    [
-      "if (isPrivacyModeEnabled)",
-      "return maskedAmountText;",
-      "return convertNumberToCurrency",
-    ],
+  assertIncludes(helperSource, "formatSensitiveAmount", "privacy.ts");
+  assertIncludes(helperSource, "isPrivacyModeEnabled", "privacy.ts");
+  assertIncludes(helperSource, "return maskedAmountText;", "privacy.ts");
+  assertIncludes(helperSource, "convertNumberToCurrency", "privacy.ts");
+  assertIncludes(
+    componentSource,
+    "useSensitiveAmountFormatter",
+    "SensitiveAmount.tsx",
+  );
+  assertIncludes(
+    componentSource,
+    "return formatAmount(amount, includeCents, signDisplay, currency);",
+    "SensitiveAmount.tsx",
+  );
+  assertIncludes(
+    componentSource,
+    "currency ?? preferredCurrency",
     "SensitiveAmount.tsx",
   );
 });
@@ -206,7 +226,40 @@ test("privacy button and compact sync controls remain reachable in the header", 
   assertIncludes(syncButton, "aria-label={syncLabel}", "SyncButton.tsx");
 });
 
-test("currency chart formatters use the privacy mask", async () => {
+test("privacy button uses current-state labels from English source strings", async () => {
+  const button = await readSource(
+    "src/app/Authorized/Header/PrivacyModeButton/PrivacyModeButton.tsx",
+  );
+  const enUs = await readSource("public/locales/en-us/translation.json");
+
+  assertIncludes(button, "sensitive_values_hidden", "PrivacyModeButton.tsx");
+  assertIncludes(button, "sensitive_values_visible", "PrivacyModeButton.tsx");
+  assertNotIncludes(button, "show_sensitive_values", "PrivacyModeButton.tsx");
+  assertNotIncludes(button, "hide_sensitive_values", "PrivacyModeButton.tsx");
+  assertJsonKey(enUs, "sensitive_values_hidden", "en-us/translation.json");
+  assertJsonKey(enUs, "sensitive_values_visible", "en-us/translation.json");
+});
+
+test("status text hides status color while privacy mode is enabled", async () => {
+  const source = await readSource(
+    "src/components/core/Text/StatusText/StatusText.tsx",
+  );
+
+  assertIncludes(source, "usePrivacyMode", "StatusText.tsx");
+  assertIncludes(source, "isPrivacyModeEnabled", "StatusText.tsx");
+  assertIncludes(
+    source,
+    "var(--base-color-text-primary)",
+    "StatusText.tsx",
+  );
+  assertOrder(
+    source,
+    ["isPrivacyModeEnabled", "getStatusColor"],
+    "StatusText.tsx",
+  );
+});
+
+test("currency chart formatters use the shared sensitive amount formatter", async () => {
   const chartFiles = [
     "src/components/Charts/MonthlySpendingChart/MonthlySpendingChart.tsx",
     "src/components/Charts/NetCashFlowChart/NetCashFlowChart.tsx",
@@ -218,9 +271,29 @@ test("currency chart formatters use the privacy mask", async () => {
 
   for (const filePath of chartFiles) {
     const source = await readSource(filePath);
-    assertIncludes(source, "usePrivacyMode", filePath);
-    assertIncludes(source, "isPrivacyModeEnabled", filePath);
-    assertIncludes(source, "maskedAmountText", filePath);
+    assertIncludes(source, "useSensitiveAmountFormatter", filePath);
+    assertIncludes(source, "formatSensitiveAmount", filePath);
+    assertNotIncludes(source, "isPrivacyModeEnabled", filePath);
+    assertNotIncludes(source, "maskedAmountText", filePath);
+  }
+});
+
+test("string interpolation callers use the shared sensitive amount formatter", async () => {
+  const stringCallers = [
+    "src/components/ui/widgets/SpendingTrendsWidget/SpendingTrendsWidget.tsx",
+    "src/app/Authorized/PageContent/Goals/GoalCard/GoalCardContent/GoalCardContent.tsx",
+    "src/app/Authorized/PageContent/Goals/GoalCard/EditableGoalCardContent/EditableGoalCardContent.tsx",
+    "src/app/Authorized/PageContent/Goals/CompletedGoalsAccordion/CompletedGoalCard/CompletedGoalCard.tsx",
+    "src/app/Authorized/PageContent/Budgets/BudgetsContent/BudgetSummaryCard/BudgetSummaryItem/BudgetSummaryItem.tsx",
+    "src/app/Authorized/PageContent/Budgets/BudgetsContent/BudgetsGroup/BudgetParentCard/BudgetParentCard.tsx",
+    "src/app/Authorized/PageContent/Budgets/BudgetsContent/BudgetsGroup/BudgetParentCard/BudgetChildCard/BudgetChildCard.tsx",
+    "src/app/Authorized/PageContent/Assets/AssetsContent/AssetDetails/AssetDetails.tsx",
+  ];
+
+  for (const filePath of stringCallers) {
+    const source = await readSource(filePath);
+    assertIncludes(source, "useSensitiveAmountFormatter", filePath);
+    assertNotIncludes(source, "maskedAmountText", filePath);
   }
 });
 
