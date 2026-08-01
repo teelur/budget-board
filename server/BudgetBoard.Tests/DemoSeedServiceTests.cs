@@ -17,8 +17,84 @@ public class DemoSeedServiceTests
     private static readonly Guid DemoUserId = new("00000000-0000-0000-0000-000000000001");
     private const string DemoEmail = "demo@example.com";
 
-    private static Mock<UserManager<ApplicationUser>> CreateMockUserManager(TestHelper helper)
+    #region ResetAndSeedAsync
+    [Fact]
+    public async Task ResetAndSeedAsync_WhenCalled_DeletesAllExistingUsers()
     {
+        // Arrange
+        var helper = new TestHelper();
+        var mockUserManager = CreateMockUserManager(helper);
+        var service = CreateService(helper, mockUserManager);
+
+        // Act
+        await service.ResetAndSeedAsync();
+
+        // Assert — the seeded demoUser from TestHelper should be gone; only the new demo user remains
+        helper.UserDataContext.Users.Should().HaveCount(1);
+        helper.UserDataContext.Users.Single().Email.Should().Be(DemoEmail);
+    }
+
+    [Fact]
+    public async Task ResetAndSeedAsync_WhenDeleteUserFails_ShouldReturnErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var mockUserManager = CreateMockUserManager(helper);
+        mockUserManager
+            .Setup(um => um.DeleteAsync(It.IsAny<ApplicationUser>()))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Test error" }));
+        var service = CreateService(helper, mockUserManager);
+
+        // Act
+        var errors = await service.ResetAndSeedAsync();
+
+        // Assert
+        errors.Count().Should().Be(1);
+        errors.Should().Contain("Test error");
+    }
+
+    [Fact]
+    public async Task ResetAndSeedAsync_WhenCalled_CreatesDemoUserWithFixedId()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var mockUserManager = CreateMockUserManager(helper);
+        var service = CreateService(helper, mockUserManager);
+
+        // Act
+        await service.ResetAndSeedAsync();
+
+        // Assert
+        var demoUser = helper.UserDataContext.Users.Single();
+        demoUser.Id.Should().Be(DemoUserId);
+        demoUser.Email.Should().Be(DemoEmail);
+        demoUser.EmailConfirmed.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ResetAndSeedAsync_WhenCreateUserFails_ShouldReturnErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var mockUserManager = CreateMockUserManager(helper);
+        mockUserManager
+            .Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Test error" }));
+        var service = CreateService(helper, mockUserManager);
+
+        // Act
+        var errors = await service.ResetAndSeedAsync();
+
+        // Assert
+        errors.Count().Should().Be(1);
+        errors.Should().Contain("Test error");
+    }
+
+    [Fact]
+    public async Task ResetAndSeedAsync_WhenCreateUserFails_DoesNotSeedData()
+    {
+        // Arrange
+        var helper = new TestHelper();
         var store = new Mock<IUserStore<ApplicationUser>>();
         var mockUserManager = new Mock<UserManager<ApplicationUser>>(
             store.Object,
@@ -45,80 +121,16 @@ public class DemoSeedServiceTests
 
         mockUserManager
             .Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-            .Callback<ApplicationUser, string>(
-                (user, _) =>
-                {
-                    helper.UserDataContext.Users.Add(user);
-                    helper.UserDataContext.SaveChanges();
-                }
-            )
-            .ReturnsAsync(IdentityResult.Success);
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Test error" }));
 
-        return mockUserManager;
-    }
-
-    private static DemoSeedService CreateService(
-        TestHelper helper,
-        Mock<UserManager<ApplicationUser>> mockUserManager
-    )
-    {
-        var mockTransactionService = new Mock<ITransactionService>();
-        mockTransactionService
-            .Setup(ts =>
-                ts.CreateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionCreateRequest>())
-            )
-            .Returns(Task.CompletedTask);
-
-        var widgetSettingsService = new WidgetSettingsService(
-            Mock.Of<ILogger<IWidgetSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
-
-        return new DemoSeedService(
-            Mock.Of<ILogger<DemoSeedService>>(),
-            helper.UserDataContext,
-            Mock.Of<INowProvider>(),
-            mockUserManager.Object,
-            TestHelper.CreateMockLocalizer<LogStrings>(),
-            mockTransactionService.Object,
-            widgetSettingsService
-        );
-    }
-
-    [Fact]
-    public async Task ResetAndSeedAsync_WhenCalled_DeletesAllExistingUsers()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var mockUserManager = CreateMockUserManager(helper);
         var service = CreateService(helper, mockUserManager);
 
         // Act
         await service.ResetAndSeedAsync();
 
-        // Assert — the seeded demoUser from TestHelper should be gone; only the new demo user remains
-        helper.UserDataContext.Users.Should().HaveCount(1);
-        helper.UserDataContext.Users.Single().Email.Should().Be(DemoEmail);
-    }
-
-    [Fact]
-    public async Task ResetAndSeedAsync_WhenCalled_CreatesDemoUserWithFixedId()
-    {
-        // Arrange
-        var helper = new TestHelper();
-        var mockUserManager = CreateMockUserManager(helper);
-        var service = CreateService(helper, mockUserManager);
-
-        // Act
-        await service.ResetAndSeedAsync();
-
-        // Assert
-        var demoUser = helper.UserDataContext.Users.Single();
-        demoUser.Id.Should().Be(DemoUserId);
-        demoUser.Email.Should().Be(DemoEmail);
-        demoUser.EmailConfirmed.Should().BeTrue();
+        // Assert — no accounts or institutions should have been seeded
+        helper.UserDataContext.Accounts.Should().BeEmpty();
+        helper.UserDataContext.Institutions.Should().BeEmpty();
     }
 
     [Fact]
@@ -285,12 +297,10 @@ public class DemoSeedServiceTests
             .Should()
             .HaveCount(1);
     }
+    #endregion
 
-    [Fact]
-    public async Task ResetAndSeedAsync_WhenCreateUserFails_DoesNotSeedData()
+    private static Mock<UserManager<ApplicationUser>> CreateMockUserManager(TestHelper helper)
     {
-        // Arrange
-        var helper = new TestHelper();
         var store = new Mock<IUserStore<ApplicationUser>>();
         var mockUserManager = new Mock<UserManager<ApplicationUser>>(
             store.Object,
@@ -317,15 +327,45 @@ public class DemoSeedServiceTests
 
         mockUserManager
             .Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Test error" }));
+            .Callback<ApplicationUser, string>(
+                (user, _) =>
+                {
+                    helper.UserDataContext.Users.Add(user);
+                    helper.UserDataContext.SaveChanges();
+                }
+            )
+            .ReturnsAsync(IdentityResult.Success);
 
-        var service = CreateService(helper, mockUserManager);
+        return mockUserManager;
+    }
 
-        // Act
-        await service.ResetAndSeedAsync();
+    private static DemoSeedService CreateService(
+        TestHelper helper,
+        Mock<UserManager<ApplicationUser>> mockUserManager
+    )
+    {
+        var mockTransactionService = new Mock<ITransactionService>();
+        mockTransactionService
+            .Setup(ts =>
+                ts.CreateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionCreateRequest>())
+            )
+            .Returns(Task.CompletedTask);
 
-        // Assert — no accounts or institutions should have been seeded
-        helper.UserDataContext.Accounts.Should().BeEmpty();
-        helper.UserDataContext.Institutions.Should().BeEmpty();
+        var widgetSettingsService = new WidgetSettingsService(
+            Mock.Of<ILogger<IWidgetSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        return new DemoSeedService(
+            Mock.Of<ILogger<DemoSeedService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            mockUserManager.Object,
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            mockTransactionService.Object,
+            widgetSettingsService
+        );
     }
 }

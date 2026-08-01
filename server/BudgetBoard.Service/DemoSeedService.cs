@@ -58,52 +58,45 @@ public class DemoSeedService(
     ];
 
     /// <inheritdoc />
-    public async Task ResetAndSeedAsync()
+    public async Task<List<string>> ResetAndSeedAsync()
     {
+        List<string> errors = [];
+
         logger.LogInformation("{LogMessage}", logLocalizer["DemoResetDeletingUsersLog"].Value);
-        await DeleteAllUsersAsync();
+        errors.AddRange(await DeleteAllUsersAsync());
 
         logger.LogInformation("{LogMessage}", logLocalizer["DemoResetSeedingLog"].Value);
-        await SeedDemoUserAsync();
+        errors.AddRange(await SeedDemoUserAsync());
 
         logger.LogInformation("{LogMessage}", logLocalizer["DemoResetCompleteLog"].Value);
+
+        return errors;
     }
 
-    /// <summary>
-    /// Deletes all users and their corresponding data.
-    /// </summary>
-    /// <remarks>
-    /// Deleting users will automatically delete all related institutions, accounts, transactions, budgets, etc.
-    /// </remarks>
-    /// <returns>
-    /// A task that represents the asynchronous operation.
-    /// </returns>
-    private async Task DeleteAllUsersAsync()
+    private async Task<List<string>> DeleteAllUsersAsync()
     {
+        List<string> errors = [];
         var users = userManager.Users.ToList();
         foreach (var user in users)
         {
             var result = await userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                errors = [.. result.Errors.Select(e => e.Description)];
                 logger.LogError(
                     logLocalizer["DemoResetDeleteUserFailedLog"].Value,
                     user.Email,
-                    errors
+                    string.Join(", ", errors)
                 );
             }
         }
+        return errors;
     }
 
-    /// <summary>
-    /// Seeds a single demo user and populates it with institutions, accounts, transactions, budgets, and widget settings.
-    /// </summary>
-    /// <returns>
-    /// A task that represents the asynchronous operation.
-    /// </returns>
-    private async Task SeedDemoUserAsync()
+    private async Task<List<string>> SeedDemoUserAsync()
     {
+        List<string> errors = [];
+
         // I'm just going to hardcode these values, since it's extremely unlikely anyone would want to override this.
         var demoEmail = "demo@example.com";
         var demoPassword = "demo";
@@ -120,23 +113,18 @@ public class DemoSeedService(
         var createResult = await userManager.CreateAsync(user, demoPassword);
         if (!createResult.Succeeded)
         {
-            var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
-            logger.LogError(logLocalizer["DemoResetCreateUserFailedLog"].Value, errors);
-            return;
+            errors = [.. createResult.Errors.Select(e => e.Description)];
+            logger.LogError(
+                logLocalizer["DemoResetCreateUserFailedLog"].Value,
+                string.Join(", ", errors)
+            );
+            return errors;
         }
 
         await SeedUserDataAsync(user);
+        return errors;
     }
 
-    /// <summary>
-    /// Seeds institutions, accounts, transactions, budgets, and widget settings for the provided user.
-    /// </summary>
-    /// <param name="user">
-    /// The user for whom to seed institutions, accounts, transactions, budgets, and widget settings.
-    /// </param>
-    /// <returns>
-    /// A task that represents the asynchronous operation.
-    /// </returns>
     private async Task SeedUserDataAsync(ApplicationUser user)
     {
         var rng = new Random();
@@ -207,12 +195,6 @@ public class DemoSeedService(
         await userDataContext.SaveChangesAsync();
     }
 
-    /// <summary>
-    /// Seeds institutions and accounts for the provided user.
-    /// </summary>
-    /// <param name="user">
-    /// The user for whom to seed institutions and accounts.
-    /// </param>
     private void SeedUserAccounts(ApplicationUser user)
     {
         var greenfieldBank = new Institution
@@ -270,9 +252,6 @@ public class DemoSeedService(
         userDataContext.Accounts.AddRange(checking, savings, creditCard, investment);
     }
 
-    /// <summary>
-    /// Generates transactions for a single account over 6 months. Balances are managed automatically by the transaction service.
-    /// </summary>
     private async Task SeedAccountDataAsync(
         Guid userId,
         Guid accountId,
@@ -421,9 +400,6 @@ public class DemoSeedService(
         }
     }
 
-    /// <summary>
-    /// Seeds a home asset with 6 months of value history for the provided user.
-    /// </summary>
     private void SeedAssetData(ApplicationUser user)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -457,9 +433,6 @@ public class DemoSeedService(
         userDataContext.Assets.Add(home);
     }
 
-    /// <summary>
-    /// Seeds an emergency fund goal linked to the provided account.
-    /// </summary>
     private void SeedGoalData(ApplicationUser user, Guid savingsAccountId)
     {
         var savingsAccount = userDataContext.Accounts.First(a => a.ID == savingsAccountId);
@@ -478,12 +451,6 @@ public class DemoSeedService(
         );
     }
 
-    /// <summary>
-    /// Seeds budget limits for the provided user for the past 3 months.
-    /// </summary>
-    /// <param name="user">
-    /// The user for whom to seed budget data.
-    /// </param>
     private void SeedBudgetData(ApplicationUser user)
     {
         var today = DateTime.UtcNow;
@@ -518,12 +485,6 @@ public class DemoSeedService(
         }
     }
 
-    /// <summary>
-    /// Seeds default widget settings for the provided user.
-    /// </summary>
-    /// <param name="user">
-    /// The user for whom to seed widget settings.
-    /// </param>
     private async Task SeedWidgetSettingsDataAsync(ApplicationUser user)
     {
         foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)

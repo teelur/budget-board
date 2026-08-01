@@ -9,5 +9,6 @@ public interface IDemoSeedService
     /// <summary>
     /// Deletes all existing users, then creates a fresh demo user with realistic seed data.
     /// </summary>
-    Task ResetAndSeedAsync();
+    /// <returns>A list of error messages encountered during the reset and seed process, if any.</returns>
+    Task<List<string>> ResetAndSeedAsync();
 }
