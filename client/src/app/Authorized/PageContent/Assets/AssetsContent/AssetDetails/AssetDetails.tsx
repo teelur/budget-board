@@ -1,6 +1,6 @@
 import { Button, Group, Skeleton, Stack } from "@mantine/core";
 import { MoveRightIcon } from "lucide-react";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { SignDisplay } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
 import AddValue from "./AddValue/AddValue";
 import React from "react";
@@ -14,11 +14,10 @@ import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import { maskedAmountText } from "~/helpers/privacy";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import SensitiveAmount, {
+  useSensitiveAmountFormatter,
+} from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -30,9 +29,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const { dayjs, longDateFormat } = useLocale();
+  const formatAmount = useSensitiveAmountFormatter();
   const valuesQuery = useValuesQuery({
     assetIds: props.asset ? [props.asset.id] : [],
     enabled: !!props.asset?.id && props.isOpen,
@@ -49,15 +47,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
     amount: number,
     signDisplay = SignDisplay.Auto,
   ): string =>
-    isPrivacyModeEnabled
-      ? maskedAmountText
-      : convertNumberToCurrency(
-          amount,
-          true,
-          preferredCurrency,
-          signDisplay,
-          intlLocale,
-        );
+    formatAmount(amount, true, signDisplay);
 
   return (
     <Drawer

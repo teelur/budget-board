@@ -1,6 +1,5 @@
 import { filterBalancesByDateRange } from "~/helpers/balances";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
+import { SignDisplay } from "~/helpers/currency";
 import { DateString, getDateFromMonthsAgo } from "~/helpers/datetime";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
@@ -10,13 +9,12 @@ import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { buildValueChartData } from "../ValueChart/helpers/valueChart";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface NetWorthChartData {
   date: DateString;
@@ -83,10 +81,9 @@ interface NetWorthChartProps {
 
 const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dateFormat, intlLocale } = useLocale();
+  const { dateFormat } = useLocale();
   const { allAccountTypes } = useAccountTypes();
-  const { preferredCurrency } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const formatSensitiveAmount = useSensitiveAmountFormatter();
 
   const chartSeries: CompositeChartSeries[] = [
     { name: "assets", label: t("assets"), color: "green.6", type: "bar" },
@@ -100,16 +97,10 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   ];
 
   const chartValueFormatter = (value: number): string => {
-    if (isPrivacyModeEnabled) {
-      return maskedAmountText;
-    }
-
-    return convertNumberToCurrency(
+    return formatSensitiveAmount(
       value,
       false,
-      preferredCurrency,
       SignDisplay.Auto,
-      intlLocale,
     );
   };
 

@@ -5,15 +5,13 @@ import {
   buildTransactionChartData,
   buildTransactionChartSeries,
 } from "~/helpers/charts";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
+import { SignDisplay } from "~/helpers/currency";
 import { Group, Skeleton } from "@mantine/core";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -28,9 +26,8 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
 
   const { t } = useTranslation();
-  const { dayjs, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const { dayjs } = useLocale();
+  const formatSensitiveAmount = useSensitiveAmountFormatter();
 
   const formatDateString = (date: Date) => dayjs(date).format("MMMM YYYY");
 
@@ -50,16 +47,10 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   );
 
   const chartValueFormatter = (value: number): string => {
-    if (isPrivacyModeEnabled) {
-      return maskedAmountText;
-    }
-
-    return convertNumberToCurrency(
+    return formatSensitiveAmount(
       value,
       false,
-      preferredCurrency,
       SignDisplay.Auto,
-      intlLocale,
     );
   };
 

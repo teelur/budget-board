@@ -12,11 +12,9 @@ import {
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import {
-  convertNumberToCurrency,
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
 import { IGoalResponse } from "~/models/goal";
 import { notifications } from "@mantine/notifications";
 import { PencilIcon, TrashIcon } from "lucide-react";
@@ -26,6 +24,7 @@ import { getGoalTargetAmount } from "~/helpers/goals";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
@@ -38,7 +37,6 @@ import { useCompleteGoalMutation } from "~/hooks/mutations/goals/useCompleteGoal
 import { useUpdateGoalMutation } from "~/hooks/mutations/goals/useUpdateGoalMutation";
 import { useDeleteGoalMutation } from "~/hooks/mutations/goals/useDeleteGoalMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -59,7 +57,9 @@ const EditableGoalCardContent = (
     decimalSeparator,
   } = useLocale();
   const { preferredCurrency } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const formatAmount = useSensitiveAmountFormatter();
+  const formatSensitiveAmount = (amount: number): string =>
+    formatAmount(amount, false, SignDisplay.Auto);
   const updateGoalMutation = useUpdateGoalMutation();
   const deleteGoalMutation = useDeleteGoalMutation();
   const completeGoalMutation = useCompleteGoalMutation();
@@ -78,17 +78,6 @@ const EditableGoalCardContent = (
       ? props.goal.completeDate
       : null,
   });
-
-  const formatSensitiveAmount = (amount: number): string =>
-    isPrivacyModeEnabled
-      ? maskedAmountText
-      : convertNumberToCurrency(
-          amount,
-          false,
-          preferredCurrency,
-          SignDisplay.Auto,
-          intlLocale,
-        );
 
   return (
     <>

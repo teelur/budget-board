@@ -2,14 +2,12 @@ import { ITransaction } from "~/models/transaction";
 import { BarChart } from "@mantine/charts";
 import React from "react";
 import { buildMonthlySpendingChartData } from "~/helpers/charts";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
+import { SignDisplay } from "~/helpers/currency";
 import { Group, Skeleton, Stack } from "@mantine/core";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -26,9 +24,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   );
 
   const { t } = useTranslation();
-  const { intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const formatSensitiveAmount = useSensitiveAmountFormatter();
 
   const chartData = React.useMemo(
     () =>
@@ -87,16 +83,10 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
       return "";
     }
 
-    if (isPrivacyModeEnabled) {
-      return maskedAmountText;
-    }
-
-    return convertNumberToCurrency(
+    return formatSensitiveAmount(
       value,
       false,
-      preferredCurrency,
       SignDisplay.Auto,
-      intlLocale,
     );
   };
 

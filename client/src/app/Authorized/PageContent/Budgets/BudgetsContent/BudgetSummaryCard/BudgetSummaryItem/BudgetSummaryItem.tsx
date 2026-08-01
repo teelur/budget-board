@@ -1,17 +1,15 @@
 import { StatusColorType } from "~/helpers/budgets";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
+import { SignDisplay } from "~/helpers/currency";
 import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -23,9 +21,10 @@ interface BudgetSummaryItemProps {
 }
 
 const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
-  const { intlLocale } = useLocale();
-  const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const { budgetWarningThreshold } = useUserSettings();
+  const formatAmount = useSensitiveAmountFormatter();
+  const formatSensitiveAmount = (amount: number): string =>
+    formatAmount(amount, false, SignDisplay.Auto);
 
   const percentComplete = Math.round(
     ((props.amount *
@@ -36,17 +35,6 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
 
   const signedAmount =
     props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
-
-  const formatSensitiveAmount = (amount: number): string =>
-    isPrivacyModeEnabled
-      ? maskedAmountText
-      : convertNumberToCurrency(
-          amount,
-          false,
-          preferredCurrency,
-          SignDisplay.Auto,
-          intlLocale,
-        );
 
   const formattedAmount = formatSensitiveAmount(signedAmount);
   const formattedTotal = formatSensitiveAmount(props.total ?? 0);

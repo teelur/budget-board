@@ -1,11 +1,9 @@
 import classes from "./BudgetParentCard.module.css";
 
 import {
-  convertNumberToCurrency,
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
 import {
   ActionIcon,
   Button,
@@ -28,6 +26,7 @@ import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Popover from "~/components/core/Popover/Popover";
@@ -38,7 +37,6 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -53,10 +51,11 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const [isSelected, { toggle, close }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { dayjs, intlLocale, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const { dayjs, thousandsSeparator, decimalSeparator } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const formatAmount = useSensitiveAmountFormatter();
+  const formatSensitiveAmount = (amount: number): string =>
+    formatAmount(amount, false, SignDisplay.Auto);
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
@@ -87,17 +86,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       limit) *
       100,
   );
-  const formatSensitiveAmount = (value: number): string =>
-    isPrivacyModeEnabled
-      ? maskedAmountText
-      : convertNumberToCurrency(
-          value,
-          false,
-          preferredCurrency,
-          SignDisplay.Auto,
-          intlLocale,
-        );
-
   const handleEdit = (newLimit?: number | string) => {
     if (newLimit === "") {
       return;

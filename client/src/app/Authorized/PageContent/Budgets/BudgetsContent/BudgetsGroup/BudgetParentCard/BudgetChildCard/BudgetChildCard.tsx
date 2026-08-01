@@ -1,11 +1,9 @@
 import classes from "./BudgetChildCard.module.css";
 
 import {
-  convertNumberToCurrency,
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
 import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import React from "react";
 import { useField } from "@mantine/form";
@@ -16,6 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
@@ -25,7 +24,6 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface BudgetChildCardProps {
   id: string;
@@ -41,9 +39,11 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { intlLocale, thousandsSeparator, decimalSeparator } = useLocale();
+  const { thousandsSeparator, decimalSeparator } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const formatAmount = useSensitiveAmountFormatter();
+  const formatSensitiveAmount = (amount: number): string =>
+    formatAmount(amount, false, SignDisplay.Auto);
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
@@ -68,17 +68,6 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const percentComplete = roundAwayFromZero(
     ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100,
   );
-  const formatSensitiveAmount = (amount: number): string =>
-    isPrivacyModeEnabled
-      ? maskedAmountText
-      : convertNumberToCurrency(
-          amount,
-          false,
-          preferredCurrency,
-          SignDisplay.Auto,
-          intlLocale,
-        );
-
   return (
     <Group wrap="nowrap">
       <CornerDownRight />

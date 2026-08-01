@@ -3,21 +3,19 @@ import classes from "./GoalCardContent.module.css";
 import { ActionIcon, Badge, Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
+import { SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -27,20 +25,10 @@ interface GoalCardContentProps {
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
-
+  const { dayjs } = useLocale();
+  const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
-    isPrivacyModeEnabled
-      ? maskedAmountText
-      : convertNumberToCurrency(
-          amount,
-          false,
-          preferredCurrency,
-          SignDisplay.Auto,
-          intlLocale,
-        );
+    formatAmount(amount, false, SignDisplay.Auto);
 
   return (
     <Group style={{ containerType: "inline-size" }} wrap="nowrap">

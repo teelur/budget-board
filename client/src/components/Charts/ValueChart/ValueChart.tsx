@@ -1,18 +1,16 @@
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { maskedAmountText } from "~/helpers/privacy";
+import { SignDisplay } from "~/helpers/currency";
 import { BarChart } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
 import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { chartColors } from "~/helpers/charts";
 import { DateString } from "~/helpers/datetime";
 import { buildValueChartData, IItem, IValue } from "./helpers/valueChart";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 /**
  * Builds the series for the value chart.
@@ -38,23 +36,16 @@ interface ValueChartProps {
 
 const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const { dayjs, dateFormat } = useLocale();
+  const formatSensitiveAmount = useSensitiveAmountFormatter();
 
   const chartSeries = buildValueChartSeries(props.items);
 
   const chartValueFormatter = (value: number): string => {
-    if (isPrivacyModeEnabled) {
-      return maskedAmountText;
-    }
-
-    return convertNumberToCurrency(
+    return formatSensitiveAmount(
       value,
       false,
-      preferredCurrency,
       SignDisplay.Auto,
-      intlLocale,
     );
   };
 
