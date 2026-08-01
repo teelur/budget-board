@@ -1,4 +1,6 @@
-﻿using BudgetBoard.Service;
+﻿using BudgetBoard.Database.Models;
+using BudgetBoard.IntegrationTests.Fakers;
+using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
@@ -12,6 +14,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class SyncServiceTests
 {
+    #region SyncAsync
     [Fact]
     public async Task SyncAsync_WhenCalled_ShouldUpdateLastSync()
     {
@@ -70,6 +73,88 @@ public class SyncServiceTests
                 It.Is<IApplicationUserUpdateRequest>(req => req.LastSync == fixedNow)
             )
         );
+    }
+
+    [Fact]
+    public async Task SyncAsync_WhenUnlinkedAccountsExist_ShouldSetManualSourceForUnlinkedAccounts()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(10);
+        accounts.ForEach(a => a.SimpleFinAccount = null);
+        accounts.ForEach(a => a.LunchFlowAccount = null);
+        accounts.ForEach(a => a.Source = AccountSource.SimpleFIN);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        var syncService = new SyncService(
+            Mock.Of<ILogger<ISyncService>>(),
+            helper.UserDataContext,
+            Mock.Of<ISimpleFinService>(),
+            Mock.Of<ILunchFlowService>(),
+            Mock.Of<IGoalService>(),
+            Mock.Of<IApplicationUserService>(),
+            Mock.Of<IAutomaticRuleService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        await syncService.SyncAsync(helper.demoUser.Id);
+
+        // Assert
+        var updatedUserData = await helper.UserDataContext.Users.FindAsync(helper.demoUser.Id);
+        updatedUserData!
+            .Accounts.Where(a => accounts.Select(x => x.ID).Contains(a.ID))
+            .Should()
+            .OnlyContain(a => a.Source == AccountSource.Manual);
+    }
+
+    [Fact]
+    public async Task SyncAsync_WhenEitherSimpleFinAccountOrLunchFlowAccountConfigured_ShouldNotUpdateAccountSource()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var accounts = accountFaker.Generate(10);
+        accounts.ForEach(a =>
+            a.SimpleFinAccount = new SimpleFinAccount() { UserID = helper.demoUser.Id }
+        );
+        accounts.ForEach(a =>
+            a.LunchFlowAccount = new LunchFlowAccount() { UserID = helper.demoUser.Id }
+        );
+        accounts.ForEach(a => a.Source = AccountSource.SimpleFIN);
+
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        var syncService = new SyncService(
+            Mock.Of<ILogger<ISyncService>>(),
+            helper.UserDataContext,
+            Mock.Of<ISimpleFinService>(),
+            Mock.Of<ILunchFlowService>(),
+            Mock.Of<IGoalService>(),
+            Mock.Of<IApplicationUserService>(),
+            Mock.Of<IAutomaticRuleService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        await syncService.SyncAsync(helper.demoUser.Id);
+
+        // Assert
+        var updatedUserData = await helper.UserDataContext.Users.FindAsync(helper.demoUser.Id);
+        updatedUserData!
+            .Accounts.Where(a => accounts.Select(x => x.ID).Contains(a.ID))
+            .Should()
+            .OnlyContain(a => a.Source == AccountSource.SimpleFIN);
     }
 
     [Fact]
@@ -434,7 +519,7 @@ public class SyncServiceTests
     }
 
     [Fact]
-    public async Task SyncAsync_InvalidUserId_ThrowsException()
+    public async Task SyncAsync_InvalidUserId_ThrowsInvalidUserError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -1024,4 +1109,5 @@ public class SyncServiceTests
             Times.Once
         );
     }
+    #endregion
 }
