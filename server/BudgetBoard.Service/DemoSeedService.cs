@@ -82,7 +82,7 @@ public class DemoSeedService(
             var result = await userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
-                errors = [.. result.Errors.Select(e => e.Description)];
+                errors.AddRange(result.Errors.Select(e => e.Description));
                 logger.LogError(
                     logLocalizer["DemoResetDeleteUserFailedLog"].Value,
                     user.Email,
