@@ -13,8 +13,8 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import {
   accountsQueryKey,
   institutionsQueryKey,
@@ -48,7 +48,7 @@ const LunchFlowAccountCard = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, intlLocale, dayjsLocale } = useLocale();
+  const { dayjs, dateFormat, dayjsLocale } = useLocale();
   const { request } = useAuth();
 
   const accountsQuery = useAccountsQuery();
@@ -266,13 +266,10 @@ const LunchFlowAccountCard = (
               </ActionIcon>
             </Group>
             <StatusText size="sm" amount={props.lunchFlowAccount.balance}>
-              {convertNumberToCurrency(
-                props.lunchFlowAccount.balance,
-                true,
-                accountCurrency,
-                SignDisplay.Auto,
-                intlLocale,
-              )}
+              <SensitiveAmount
+                amount={props.lunchFlowAccount.balance}
+                currency={accountCurrency}
+              />
             </StatusText>
           </Group>
           <Group justify="space-between" align="center">

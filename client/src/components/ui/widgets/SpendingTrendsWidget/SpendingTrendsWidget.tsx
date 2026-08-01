@@ -1,8 +1,9 @@
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { SignDisplay } from "~/helpers/currency";
 import { getRollingTotalSpendingForMonth } from "~/helpers/transactions";
 import { Box, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -10,14 +11,13 @@ import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
 import { LineChartIcon } from "lucide-react";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 const SpendingTrendsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs } = useLocale();
+  const formatSensitiveAmount = useSensitiveAmountFormatter();
 
   const months = [
     dayjs().startOf("month").toDate(),
@@ -70,12 +70,10 @@ const SpendingTrendsWidget = (): React.ReactNode => {
     const spendingComparisonNumber =
       Math.round((getSpendingComparison() + Number.EPSILON) * 100) / 100;
 
-    const amount = convertNumberToCurrency(
+    const amount = formatSensitiveAmount(
       Math.abs(spendingComparisonNumber),
       true,
-      preferredCurrency,
       SignDisplay.Auto,
-      intlLocale,
     );
 
     if (spendingComparisonNumber < 0) {

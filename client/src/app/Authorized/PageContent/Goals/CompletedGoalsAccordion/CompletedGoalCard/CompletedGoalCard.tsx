@@ -1,22 +1,22 @@
 import { Flex, Group } from "@mantine/core";
 import React from "react";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface CompletedGoalCardProps {
   goal: IGoalResponse;
 }
 
 const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
-  const { dayjs, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs } = useLocale();
+  const formatSensitiveAmount = useSensitiveAmountFormatter();
 
   return (
     <Card elevation={2}>
@@ -36,15 +36,13 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
             <Trans
               i18nKey="goal_completed_total_styled"
               values={{
-                amount: convertNumberToCurrency(
+                amount: formatSensitiveAmount(
                   getGoalTargetAmount(
                     props.goal.amount,
                     props.goal.initialAmount,
                   ),
                   true,
-                  preferredCurrency,
                   SignDisplay.Auto,
-                  intlLocale,
                 ),
               }}
               components={[

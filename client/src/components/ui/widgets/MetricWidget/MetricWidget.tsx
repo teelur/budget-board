@@ -9,12 +9,15 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import {
   buildDataRequirements,
+  hasCurrencyMetric,
   parseTemplate,
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
+import { formatSensitiveText } from "~/helpers/privacy";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
 import classes from "./MetricWidget.module.css";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
@@ -39,6 +42,7 @@ const MetricWidget = ({
   const { t } = useTranslation();
   const { preferredCurrency } = useUserSettings();
   const { intlLocale, dayjs } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
   const widgetSettingsQuery = useWidgetSettingsQuery();
 
@@ -155,17 +159,43 @@ const MetricWidget = ({
 
   const valueText = React.useMemo(() => {
     if (configValue && !isPending) {
-      return resolveTemplate(parsedValueTokens, metricDataContext);
+      const resolvedValue = resolveTemplate(
+        parsedValueTokens,
+        metricDataContext,
+      );
+      if (hasCurrencyMetric(parsedValueTokens)) {
+        return formatSensitiveText(resolvedValue, isPrivacyModeEnabled);
+      }
+      return resolvedValue;
     }
     return null;
-  }, [configValue, isPending, parsedValueTokens, metricDataContext]);
+  }, [
+    configValue,
+    isPending,
+    isPrivacyModeEnabled,
+    parsedValueTokens,
+    metricDataContext,
+  ]);
 
   const labelText = React.useMemo(() => {
     if (configLabel && !isPending) {
-      return resolveTemplate(parsedLabelTokens, metricDataContext);
+      const resolvedLabel = resolveTemplate(
+        parsedLabelTokens,
+        metricDataContext,
+      );
+      if (hasCurrencyMetric(parsedLabelTokens)) {
+        return formatSensitiveText(resolvedLabel, isPrivacyModeEnabled);
+      }
+      return resolvedLabel;
     }
     return null;
-  }, [configLabel, isPending, parsedLabelTokens, metricDataContext]);
+  }, [
+    configLabel,
+    isPending,
+    isPrivacyModeEnabled,
+    parsedLabelTokens,
+    metricDataContext,
+  ]);
 
   const renderContent = () => {
     if (isPending) {

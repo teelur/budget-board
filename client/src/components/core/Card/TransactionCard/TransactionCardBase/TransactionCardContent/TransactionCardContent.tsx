@@ -5,12 +5,11 @@ import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import { getFormattedCategoryValue } from "~/helpers/category";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;
@@ -21,8 +20,7 @@ interface TransactionCardContentProps {
 const TransactionCardContent = (
   props: TransactionCardContentProps,
 ): React.ReactNode => {
-  const { dayjs, longDateFormat, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs, longDateFormat } = useLocale();
 
   const categoryValue =
     (props.transaction.subcategory ?? "").length > 0
@@ -60,13 +58,7 @@ const TransactionCardContent = (
         </Flex>
         <Flex className={classes.amountContainer}>
           <StatusText amount={props.transaction.amount} size="md">
-            {convertNumberToCurrency(
-              props.transaction.amount,
-              true,
-              preferredCurrency,
-              SignDisplay.Auto,
-              intlLocale,
-            )}
+            <SensitiveAmount amount={props.transaction.amount} />
           </StatusText>
         </Flex>
       </Flex>

@@ -1,4 +1,3 @@
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { PlusIcon } from "lucide-react";
 import React from "react";
@@ -8,10 +7,10 @@ import { roundAwayFromZero } from "~/helpers/utils";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -22,8 +21,7 @@ interface UnbudgetedCardProps {
 
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { intlLocale, dayjs } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs } = useLocale();
   const createBudgetMutation = useCreateBudgetMutation();
 
   if (
@@ -94,15 +92,14 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
           </PrimaryText>
           <Group gap="sm">
             <PrimaryText size="1rem" fw={600}>
-              {convertNumberToCurrency(
-                props.categoryToTransactionsTotalMap.get(
-                  props.categoryTree.value.toLocaleLowerCase(),
-                ) ?? 0,
-                false,
-                preferredCurrency,
-                SignDisplay.Auto,
-                intlLocale,
-              )}
+              <SensitiveAmount
+                amount={
+                  props.categoryToTransactionsTotalMap.get(
+                    props.categoryTree.value.toLocaleLowerCase(),
+                  ) ?? 0
+                }
+                includeCents={false}
+              />
             </PrimaryText>
             {props.selectedDate && props.categoryTree.value.length !== 0 && (
               <ActionIcon
