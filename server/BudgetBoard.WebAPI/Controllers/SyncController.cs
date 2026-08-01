@@ -8,7 +8,7 @@ using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Controllers;
 
-[Route("api/[controller]/[action]")]
+[Route("api/[controller]")]
 [ApiController]
 public class SyncController(
     ILogger<SyncController> logger,
