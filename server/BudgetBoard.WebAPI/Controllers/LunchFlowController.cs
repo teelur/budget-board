@@ -16,32 +16,10 @@ public class LunchFlowController(
     ILogger<LunchFlowController> logger,
     UserManager<ApplicationUser> userManager,
     ILunchFlowService lunchFlowService,
-    ISyncService syncService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ControllerBase
 {
-    [HttpGet]
-    [Authorize]
-    public async Task<IActionResult> Sync()
-    {
-        try
-        {
-            return Ok(
-                await syncService.SyncAsync(new Guid(userManager.GetUserId(User) ?? string.Empty))
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
-    }
-
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> UpdateApiKey(string apiKey)
