@@ -14,7 +14,7 @@ import {
   resolveTemplate,
   MetricDataContext,
 } from "~/helpers/metricWidget";
-import { maskedAmountText } from "~/helpers/privacy";
+import { formatSensitiveText } from "~/helpers/privacy";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -41,8 +41,8 @@ const MetricWidget = ({
 }: MetricWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { preferredCurrency } = useUserSettings();
-  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { intlLocale, dayjs } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
   const widgetSettingsQuery = useWidgetSettingsQuery();
 
@@ -159,10 +159,14 @@ const MetricWidget = ({
 
   const valueText = React.useMemo(() => {
     if (configValue && !isPending) {
-      if (isPrivacyModeEnabled && hasCurrencyMetric(parsedValueTokens)) {
-        return maskedAmountText;
+      const resolvedValue = resolveTemplate(
+        parsedValueTokens,
+        metricDataContext,
+      );
+      if (hasCurrencyMetric(parsedValueTokens)) {
+        return formatSensitiveText(resolvedValue, isPrivacyModeEnabled);
       }
-      return resolveTemplate(parsedValueTokens, metricDataContext);
+      return resolvedValue;
     }
     return null;
   }, [
@@ -175,10 +179,14 @@ const MetricWidget = ({
 
   const labelText = React.useMemo(() => {
     if (configLabel && !isPending) {
-      if (isPrivacyModeEnabled && hasCurrencyMetric(parsedLabelTokens)) {
-        return maskedAmountText;
+      const resolvedLabel = resolveTemplate(
+        parsedLabelTokens,
+        metricDataContext,
+      );
+      if (hasCurrencyMetric(parsedLabelTokens)) {
+        return formatSensitiveText(resolvedLabel, isPrivacyModeEnabled);
       }
-      return resolveTemplate(parsedLabelTokens, metricDataContext);
+      return resolvedLabel;
     }
     return null;
   }, [

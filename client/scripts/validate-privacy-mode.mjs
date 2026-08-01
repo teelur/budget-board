@@ -160,12 +160,12 @@ test("privacy mode provider wraps the authorized app tree", async () => {
   );
 });
 
-test("metric widget uses shared formatting for currency templates", async () => {
+test("metric widget uses shared masking for currency templates", async () => {
   const source = await readSource(
     "src/components/ui/widgets/MetricWidget/MetricWidget.tsx",
   );
 
-  assertIncludes(source, "useSensitiveAmountFormatter", "MetricWidget.tsx");
+  assertIncludes(source, "formatSensitiveText", "MetricWidget.tsx");
   assertIncludes(
     source,
     "hasCurrencyMetric(parsedValueTokens)",
@@ -176,7 +176,6 @@ test("metric widget uses shared formatting for currency templates", async () => 
     "hasCurrencyMetric(parsedLabelTokens)",
     "MetricWidget.tsx",
   );
-  assertIncludes(source, "formatSensitiveAmount", "MetricWidget.tsx");
   assertNotIncludes(source, "return maskedAmountText;", "MetricWidget.tsx");
 });
 
@@ -187,6 +186,7 @@ test("sensitive amount formatting is shared by string and jsx callers", async ()
   );
 
   assertIncludes(helperSource, "formatSensitiveAmount", "privacy.ts");
+  assertIncludes(helperSource, "formatSensitiveText", "privacy.ts");
   assertIncludes(helperSource, "isPrivacyModeEnabled", "privacy.ts");
   assertIncludes(helperSource, "return maskedAmountText;", "privacy.ts");
   assertIncludes(helperSource, "convertNumberToCurrency", "privacy.ts");
