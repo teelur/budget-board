@@ -9,10 +9,10 @@ import {
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
@@ -22,7 +22,6 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -34,11 +33,9 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const {
     dayjs,
     dateFormat,
-    intlLocale,
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
   const updateAccountMutation = useUpdateAccountMutation();
 
@@ -192,13 +189,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             </Group>
           </Group>
           <StatusText amount={props.account.currentBalance} size="md">
-            {convertNumberToCurrency(
-              props.account.currentBalance,
-              true,
-              preferredCurrency,
-              SignDisplay.Auto,
-              intlLocale,
-            )}
+            <SensitiveAmount amount={props.account.currentBalance} />
           </StatusText>
         </Group>
         <Group justify="space-between" align="center">

@@ -2,11 +2,9 @@ import { ActionIcon, Group } from "@mantine/core";
 import { PencilIcon } from "lucide-react";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IInstitution } from "~/models/institution";
-import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IInstitutionItemContentProps {
   institution: IInstitution;
@@ -17,9 +15,6 @@ interface IInstitutionItemContentProps {
 const InstitutionItemContent = (
   props: IInstitutionItemContentProps,
 ): React.ReactNode => {
-  const { intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
-
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
@@ -36,13 +31,7 @@ const InstitutionItemContent = (
         </ActionIcon>
       </Group>
       <StatusText amount={props.totalBalance} size="md">
-        {convertNumberToCurrency(
-          props.totalBalance,
-          true,
-          preferredCurrency,
-          SignDisplay.Auto,
-          intlLocale,
-        )}
+        <SensitiveAmount amount={props.totalBalance} />
       </StatusText>
     </Group>
   );

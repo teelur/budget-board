@@ -1,7 +1,6 @@
 import classes from "./BudgetChildCard.module.css";
 
 import {
-  convertNumberToCurrency,
   getCurrencySymbol,
   SignDisplay,
 } from "~/helpers/currency";
@@ -15,6 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
@@ -39,8 +39,11 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { intlLocale, thousandsSeparator, decimalSeparator } = useLocale();
+  const { thousandsSeparator, decimalSeparator } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const formatAmount = useSensitiveAmountFormatter();
+  const formatSensitiveAmount = (amount: number): string =>
+    formatAmount(amount, false, SignDisplay.Auto);
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
@@ -65,7 +68,6 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const percentComplete = roundAwayFromZero(
     ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100,
   );
-
   return (
     <Group wrap="nowrap">
       <CornerDownRight />
@@ -116,20 +118,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                     <Trans
                       i18nKey="budget_amount_fraction_editable_total_styled"
                       values={{
-                        amount: convertNumberToCurrency(
+                        amount: formatSensitiveAmount(
                           props.amount * (props.isIncome ? 1 : -1),
-                          false,
-                          preferredCurrency,
-                          SignDisplay.Auto,
-                          intlLocale,
                         ),
-                        total: convertNumberToCurrency(
-                          props.limit,
-                          false,
-                          preferredCurrency,
-                          SignDisplay.Auto,
-                          intlLocale,
-                        ),
+                        total: formatSensitiveAmount(props.limit),
                       }}
                       components={[
                         <PrimaryText
@@ -170,20 +162,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   <Trans
                     i18nKey="budget_amount_fraction_styled"
                     values={{
-                      amount: convertNumberToCurrency(
+                      amount: formatSensitiveAmount(
                         props.amount * (props.isIncome ? 1 : -1),
-                        false,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
                       ),
-                      total: convertNumberToCurrency(
-                        props.limit,
-                        false,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
-                      ),
+                      total: formatSensitiveAmount(props.limit),
                     }}
                     components={[
                       <PrimaryText
@@ -224,14 +206,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               <Trans
                 i18nKey="budget_left_styled"
                 values={{
-                  amount: convertNumberToCurrency(
+                  amount: formatSensitiveAmount(
                     roundAwayFromZero(
                       props.limit - props.amount * (props.isIncome ? 1 : -1),
                     ),
-                    false,
-                    preferredCurrency,
-                    SignDisplay.Auto,
-                    intlLocale,
                   ),
                 }}
                 components={[

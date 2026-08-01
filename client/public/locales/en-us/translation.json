@@ -472,6 +472,8 @@
   "sell_date": "Sell Date",
   "sell_price": "Sell Price",
   "separator": "Separator",
+  "sensitive_values_hidden": "Sensitive values hidden",
+  "sensitive_values_visible": "Sensitive values visible",
   "set": "Set",
   "set_access_token": "Set Access Token",
   "set_api_key": "Set API Key",

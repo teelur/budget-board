@@ -1,15 +1,14 @@
 import classes from "./UnbudgetChildCard.module.css";
 
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
 import { CornerDownRight, PlusIcon } from "lucide-react";
 import React from "react";
 import { roundAwayFromZero } from "~/helpers/utils";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface UnbudgetChildCardProps {
   selectedDate: Date | null;
@@ -20,8 +19,7 @@ interface UnbudgetChildCardProps {
 }
 
 const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
-  const { intlLocale, dayjs } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs } = useLocale();
   const createBudgetMutation = useCreateBudgetMutation();
 
   if (roundAwayFromZero(props.amount) === 0) {
@@ -53,13 +51,10 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
           </PrimaryText>
           <Group gap="0.5rem">
             <PrimaryText className={classes.text} elevation={1}>
-              {convertNumberToCurrency(
-                props.amount * (props.isIncome ? 1 : -1),
-                false,
-                preferredCurrency,
-                SignDisplay.Auto,
-                intlLocale,
-              )}
+              <SensitiveAmount
+                amount={props.amount * (props.isIncome ? 1 : -1)}
+                includeCents={false}
+              />
             </PrimaryText>
             {props.selectedDate && (
               <ActionIcon

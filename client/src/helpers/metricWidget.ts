@@ -239,6 +239,12 @@ function getMetricFormat(token: ExpressionToken): MetricFormat {
   return DEFAULT_METRIC_FORMATS[`${token.source}.${token.metric}`] ?? "number";
 }
 
+export function hasCurrencyMetric(tokens: MetricToken[]): boolean {
+  return getAllExpressionTokens(tokens).some(
+    (token) => getMetricFormat(token) === "currency",
+  );
+}
+
 function resolveTransactions(
   metric: string,
   period: string,

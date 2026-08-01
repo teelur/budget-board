@@ -1,13 +1,11 @@
 import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { PencilIcon } from "lucide-react";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
-import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateInstitutionMutation } from "~/hooks/mutations/institutions/useUpdateInstitutionMutation";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IEditableInstitutionItemContentProps {
   institution: IInstitution;
@@ -22,8 +20,6 @@ const EditableInstitutionItemContent = (
     initialValue: props.institution.name,
   });
 
-  const { intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
   const updateInstitutionMutation = useUpdateInstitutionMutation();
 
   return (
@@ -54,13 +50,7 @@ const EditableInstitutionItemContent = (
         </ActionIcon>
       </Group>
       <StatusText amount={props.totalBalance} size="md">
-        {convertNumberToCurrency(
-          props.totalBalance,
-          true,
-          preferredCurrency,
-          SignDisplay.Auto,
-          intlLocale,
-        )}
+        <SensitiveAmount amount={props.totalBalance} />
       </StatusText>
     </Group>
   );
