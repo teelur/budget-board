@@ -25,7 +25,7 @@ interface GoalCardContentProps {
 
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
     formatAmount(amount, false, SignDisplay.Auto);

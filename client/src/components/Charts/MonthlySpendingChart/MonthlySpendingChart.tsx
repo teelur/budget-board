@@ -7,7 +7,6 @@ import { Group, Skeleton, Stack } from "@mantine/core";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
