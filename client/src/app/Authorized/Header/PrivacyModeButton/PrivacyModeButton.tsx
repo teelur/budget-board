@@ -9,10 +9,10 @@ const PrivacyModeButton = (): React.ReactNode => {
   const { isPrivacyModeEnabled, togglePrivacyMode } = usePrivacyMode();
 
   const labelKey = isPrivacyModeEnabled
-    ? "show_sensitive_values"
-    : "hide_sensitive_values";
+    ? "sensitive_values_hidden"
+    : "sensitive_values_visible";
   const label = t(labelKey);
-  const Icon = isPrivacyModeEnabled ? EyeIcon : EyeOffIcon;
+  const Icon = isPrivacyModeEnabled ? EyeOffIcon : EyeIcon;
 
   return (
     <Tooltip label={label}>
