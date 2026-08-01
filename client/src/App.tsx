@@ -40,6 +40,7 @@ import {
 } from "./shared/colors";
 import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
 import { LocaleProvider } from "./providers/LocaleProvider/LocaleProvider";
+import { PrivacyModeProvider } from "./providers/PrivacyModeProvider/PrivacyModeProvider";
 
 // Your theme configuration is merged with default theme
 const theme = createTheme({
@@ -226,7 +227,9 @@ function App() {
                   <AuthorizedRoute>
                     <UserSettingsProvider>
                       <LocaleProvider>
-                        <Authorized />
+                        <PrivacyModeProvider>
+                          <Authorized />
+                        </PrivacyModeProvider>
                       </LocaleProvider>
                     </UserSettingsProvider>
                   </AuthorizedRoute>

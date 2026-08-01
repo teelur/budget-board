@@ -1,15 +1,14 @@
 import classes from "./AccountItem.module.css";
 
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { Group, Stack } from "@mantine/core";
 import { IAccountResponse } from "~/models/account";
 import React from "react";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
+import SensitiveAmount from "../core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "../core/Text/StatusText/StatusText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AccountItemProps {
   account: IAccountResponse;
@@ -18,8 +17,7 @@ interface AccountItemProps {
 
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs, dateFormat } = useLocale();
 
   return (
     <Group
@@ -46,13 +44,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
           className={classes.amount}
           amount={props.account.currentBalance}
         >
-          {convertNumberToCurrency(
-            props.account.currentBalance,
-            true,
-            preferredCurrency,
-            SignDisplay.Auto,
-            intlLocale,
-          )}
+          <SensitiveAmount amount={props.account.currentBalance} />
         </StatusText>
       </Stack>
     </Group>
