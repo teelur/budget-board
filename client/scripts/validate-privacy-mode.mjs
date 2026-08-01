@@ -254,7 +254,7 @@ test("status text hides status color while privacy mode is enabled", async () =>
   );
   assertOrder(
     source,
-    ["isPrivacyModeEnabled", "getStatusColor"],
+    ["const color = isPrivacyModeEnabled", "getStatusColor("],
     "StatusText.tsx",
   );
 });
