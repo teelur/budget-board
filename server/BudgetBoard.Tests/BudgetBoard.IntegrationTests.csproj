@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BudgetBoard.Database\BudgetBoard.Database.csproj" />
     <ProjectReference Include="..\BudgetBoard.Service\BudgetBoard.Service.csproj" />
+    <ProjectReference Include="..\BudgetBoard.WebAPI\BudgetBoard.WebAPI.csproj" />
   </ItemGroup>
 
 </Project>
