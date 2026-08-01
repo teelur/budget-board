@@ -1,6 +1,6 @@
 import { Button, Group, Skeleton, Stack } from "@mantine/core";
 import { MoveRightIcon } from "lucide-react";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
+import { SignDisplay } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
 import AddValue from "./AddValue/AddValue";
 import React from "react";
@@ -14,8 +14,10 @@ import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
+import SensitiveAmount, {
+  useSensitiveAmountFormatter,
+} from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -27,8 +29,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat, intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs, longDateFormat } = useLocale();
+  const formatAmount = useSensitiveAmountFormatter();
   const valuesQuery = useValuesQuery({
     assetIds: props.asset ? [props.asset.id] : [],
     enabled: !!props.asset?.id && props.isOpen,
@@ -40,6 +42,12 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const valuesForChart = sortedValues.filter((value) =>
     dayjs(value.date).isAfter(dayjs().subtract(chartLookbackMonths, "months")),
   );
+
+  const formatSensitiveAmount = (
+    amount: number,
+    signDisplay = SignDisplay.Auto,
+  ): string =>
+    formatAmount(amount, true, signDisplay);
 
   return (
     <Drawer
@@ -70,13 +78,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     date: dayjs(props.asset.purchaseDate).format(
                       longDateFormat,
                     ),
-                    price: convertNumberToCurrency(
-                      props.asset.purchasePrice,
-                      true,
-                      preferredCurrency,
-                      SignDisplay.Auto,
-                      intlLocale,
-                    ),
+                    price: formatSensitiveAmount(props.asset.purchasePrice),
                   }}
                   components={[
                     <DimmedText size="xs" key="purchased-label" />,
@@ -95,13 +97,10 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     amount={props.asset.sellPrice - props.asset.purchasePrice}
                     size="xs"
                   >
-                    {convertNumberToCurrency(
-                      props.asset.sellPrice - props.asset.purchasePrice,
-                      true,
-                      preferredCurrency,
-                      SignDisplay.Always,
-                      intlLocale,
-                    )}
+                    <SensitiveAmount
+                      amount={props.asset.sellPrice - props.asset.purchasePrice}
+                      signDisplay={SignDisplay.Always}
+                    />
                   </StatusText>
                 </Stack>
               )}
@@ -112,13 +111,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     i18nKey="sold_on_for_styled"
                     values={{
                       date: dayjs(props.asset.sellDate).format(longDateFormat),
-                      price: convertNumberToCurrency(
-                        props.asset.sellPrice,
-                        true,
-                        preferredCurrency,
-                        SignDisplay.Auto,
-                        intlLocale,
-                      ),
+                      price: formatSensitiveAmount(props.asset.sellPrice),
                     }}
                     components={[
                       <DimmedText size="xs" key="sold-label" />,

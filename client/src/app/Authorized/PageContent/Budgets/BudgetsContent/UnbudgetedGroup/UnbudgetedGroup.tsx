@@ -7,13 +7,11 @@ import {
   ICategory,
   ICategoryNode,
 } from "~/models/category";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
-import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -26,8 +24,6 @@ interface UnbudgetedGroupProps {
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
 
   const total =
     props.categoryTree.reduce((acc, category) => {
@@ -90,13 +86,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
           <Group justify="space-between" align="center" w="100%" pr="0.25rem">
             <PrimaryText size="lg">{t("unbudgeted")}</PrimaryText>
             <PrimaryText size="lg">
-              {convertNumberToCurrency(
-                total,
-                false,
-                preferredCurrency,
-                SignDisplay.Auto,
-                intlLocale,
-              )}
+              <SensitiveAmount amount={total} includeCents={false} />
             </PrimaryText>
           </Group>
         }

@@ -9,12 +9,9 @@ import {
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
-import {
-  convertNumberToCurrency,
-  getCurrencySymbol,
-  SignDisplay,
-} from "~/helpers/currency";
+import { getCurrencySymbol } from "~/helpers/currency";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
@@ -41,7 +38,6 @@ const EditableAssetItemContent = (
   const {
     dayjs,
     dayjsLocale,
-    intlLocale,
     dateFormat,
     longDateFormat,
     thousandsSeparator,
@@ -136,13 +132,7 @@ const EditableAssetItemContent = (
             </Button>
           </Group>
           <StatusText size="md" amount={props.asset.currentValue}>
-            {convertNumberToCurrency(
-              props.asset.currentValue ?? 0,
-              true,
-              preferredCurrency,
-              SignDisplay.Auto,
-              intlLocale,
-            )}
+            <SensitiveAmount amount={props.asset.currentValue ?? 0} />
           </StatusText>
         </Group>
         <Group justify="space-between" align="flex-end">

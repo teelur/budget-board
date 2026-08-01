@@ -1,5 +1,6 @@
 import { hiddenTransactionCategory, ITransaction } from "~/models/transaction";
 import React from "react";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import {
   buildSpendingCategoryChartData,
   buildSpendingSubcategoryChartData,
@@ -12,9 +13,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { ICategory } from "~/models/category";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
-import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { SignDisplay } from "~/helpers/currency";
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
@@ -96,8 +95,7 @@ const SpendingCategoriesChart = (
   const showSubcategories = props.showSubcategories ?? true;
 
   const { t } = useTranslation();
-  const { intlLocale } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const formatSensitiveAmount = useSensitiveAmountFormatter();
   const theme = useMantineTheme();
 
   const { innerChartData, outerChartData } = React.useMemo(() => {
@@ -245,13 +243,7 @@ const SpendingCategoriesChart = (
   const outerRadius = showSubcategories ? (isNarrow ? 75 : 93) : undefined;
 
   const formatValue = (value: number) =>
-    convertNumberToCurrency(
-      value,
-      true,
-      preferredCurrency,
-      SignDisplay.Auto,
-      intlLocale,
-    );
+    formatSensitiveAmount(value, true, SignDisplay.Auto);
 
   return (
     <Stack w="100%" gap="xs">

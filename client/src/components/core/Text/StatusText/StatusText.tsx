@@ -4,6 +4,7 @@ import {
   StatusColorType as StatusColorType,
   getStatusColor,
 } from "~/helpers/budgets";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface StatusTextProps extends TextProps {
   amount: number;
@@ -21,14 +22,19 @@ const StatusText = ({
   children,
   ...props
 }: StatusTextProps) => {
-  return (
-    <Text
-      c={getStatusColor(
+  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const color = isPrivacyModeEnabled
+    ? "var(--base-color-text-primary)"
+    : getStatusColor(
         amount,
         total ?? 0,
         type ?? StatusColorType.Total,
         warningThreshold ?? 110,
-      )}
+      );
+
+  return (
+    <Text
+      c={color}
       fw={props.fw ?? 600}
       {...props}
     >
