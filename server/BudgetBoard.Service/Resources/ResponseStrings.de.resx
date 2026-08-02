@@ -419,6 +419,6 @@
     <value>Der Wert, auf den Sie zugreifen möchten, existiert nicht.</value>
   </data>
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-    <value>The widget you are trying to update does not exist.</value>
+    <value>Das Widget, das Sie aktualisieren möchten, existiert nicht.</value>
   </data>
 </root>
