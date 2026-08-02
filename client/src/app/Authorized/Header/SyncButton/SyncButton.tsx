@@ -20,7 +20,7 @@ const SyncButton = ({ compact = false }: SyncButtonProps): React.ReactNode => {
         <ActionIcon
           aria-label={syncLabel}
           loading={syncMutation.isPending}
-          onClick={async () => await syncMutation.mutateAsync()}
+          onClick={() => syncMutation.mutateAsync()}
           size="lg"
           variant="subtle"
         >
@@ -32,7 +32,7 @@ const SyncButton = ({ compact = false }: SyncButtonProps): React.ReactNode => {
 
   return (
     <Button
-      onClick={async () => await syncMutation.mutateAsync()}
+      onClick={() => syncMutation.mutateAsync()}
       loading={syncMutation.isPending}
     >
       {syncLabel}
