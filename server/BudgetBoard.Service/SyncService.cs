@@ -34,17 +34,25 @@ public class SyncService(
 
         if (!string.IsNullOrEmpty(userData.SimpleFinAccessToken))
         {
+            var simpleFinRefreshErrors =
+                (await simpleFinService.RefreshAccountsAsync(userGuid)) ?? Array.Empty<string>();
             errors.AddRange(
-                (await simpleFinService.RefreshAccountsAsync(userGuid)).Select(e => new SyncError
+                simpleFinRefreshErrors.Select(e => new SyncError
                 {
                     Source = responseLocalizer["SimpleFin"],
                     Message = e,
                 })
             );
+
+            var simpleFinSyncErrors =
+                (await simpleFinService.SyncTransactionHistoryAsync(userGuid))
+                ?? Array.Empty<string>();
             errors.AddRange(
-                (await simpleFinService.SyncTransactionHistoryAsync(userGuid)).Select(
-                    e => new SyncError { Source = responseLocalizer["SimpleFin"], Message = e }
-                )
+                simpleFinSyncErrors.Select(e => new SyncError
+                {
+                    Source = responseLocalizer["SimpleFin"],
+                    Message = e,
+                })
             );
         }
         else
@@ -54,17 +62,25 @@ public class SyncService(
 
         if (!string.IsNullOrEmpty(userData.LunchFlowApiKey))
         {
+            var lunchFlowRefreshErrors =
+                (await lunchFlowService.RefreshAccountsAsync(userGuid)) ?? Array.Empty<string>();
             errors.AddRange(
-                (await lunchFlowService.RefreshAccountsAsync(userGuid)).Select(e => new SyncError
+                lunchFlowRefreshErrors.Select(e => new SyncError
                 {
                     Source = responseLocalizer["LunchFlow"],
                     Message = e,
                 })
             );
+
+            var lunchFlowSyncErrors =
+                (await lunchFlowService.SyncTransactionHistoryAsync(userGuid))
+                ?? Array.Empty<string>();
             errors.AddRange(
-                (await lunchFlowService.SyncTransactionHistoryAsync(userGuid)).Select(
-                    e => new SyncError { Source = responseLocalizer["LunchFlow"], Message = e }
-                )
+                lunchFlowSyncErrors.Select(e => new SyncError
+                {
+                    Source = responseLocalizer["LunchFlow"],
+                    Message = e,
+                })
             );
         }
         else
