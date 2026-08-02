@@ -37,15 +37,13 @@ export const useSyncMutation = () => {
         queryKey: [lunchFlowAccountQueryKey],
       });
       if ((data.data?.length ?? 0) > 0) {
-        {
-          data.data.map((error: SyncError) =>
-            notifications.show({
-              color: "var(--button-color-destructive)",
-              title: t("syncErrorFromSource", { source: error.source }),
-              message: error.message,
-            }),
-          );
-        }
+        data.data.map((error: SyncError) =>
+          notifications.show({
+            color: "var(--button-color-destructive)",
+            title: t("syncErrorFromSource", { source: error.source }),
+            message: error.message,
+          }),
+        );
       }
     },
     onError: (error: AxiosError) => {
