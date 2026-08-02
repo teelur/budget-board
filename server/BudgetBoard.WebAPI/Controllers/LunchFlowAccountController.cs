@@ -1,7 +1,5 @@
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
-using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,29 +16,23 @@ public class LunchFlowAccountController(
     ILunchFlowAccountService lunchFlowAccountService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<LunchFlowAccountController>(logger, logLocalizer, responseLocalizer)
 {
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            return Ok(
-                await lunchFlowAccountService.ReadLunchFlowAccountsAsync(
-                    new Guid(userManager.GetUserId(User) ?? string.Empty)
-                )
-            );
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await lunchFlowAccountService.ReadLunchFlowAccountsAsync(parsedUserId));
+        });
     }
 
     [HttpPut]
@@ -51,24 +43,22 @@ public class LunchFlowAccountController(
         Guid? linkedAccountGuid
     )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await lunchFlowAccountService.UpdateLinkedAccountAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                parsedUserId,
                 lunchFlowAccountGuid,
                 linkedAccountGuid
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPut]
@@ -79,10 +69,17 @@ public class LunchFlowAccountController(
         string? syncStartDate
     )
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await lunchFlowAccountService.UpdateLunchFlowAccountSyncStartDateAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                parsedUserId,
                 lunchFlowAccountGuid,
                 syncStartDate != null
                     ? DateOnly.ParseExact(
@@ -93,38 +90,27 @@ public class LunchFlowAccountController(
                     : null
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpDelete]
     [Authorize]
     public async Task<IActionResult> Delete(Guid lunchFlowAccountGuid)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
             await lunchFlowAccountService.DeleteLunchFlowAccountAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
+                parsedUserId,
                 lunchFlowAccountGuid
             );
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }
