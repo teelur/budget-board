@@ -37,7 +37,7 @@ export const useSyncMutation = () => {
         queryKey: [lunchFlowAccountQueryKey],
       });
       if ((data.data?.length ?? 0) > 0) {
-        data.data.map((error: SyncError) =>
+        data.data?.forEach((error: SyncError) =>
           notifications.show({
             color: "var(--button-color-destructive)",
             title: t("syncErrorFromSource", { source: error.source }),
