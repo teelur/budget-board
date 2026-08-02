@@ -115,7 +115,7 @@ public class SyncServiceTests
     }
 
     [Fact]
-    public async Task SyncAsync_WhenEitherSimpleFinAccountOrLunchFlowAccountConfigured_ShouldNotUpdateAccountSource()
+    public async Task SyncAsync_WhenSimpleFinAndLunchFlowAccountsConfigured_ShouldNotUpdateAccountSource()
     {
         // Arrange
         var helper = new TestHelper();
