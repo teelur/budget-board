@@ -1,51 +1,16 @@
 import { Badge, Button, Group, Skeleton, Stack } from "@mantine/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { AxiosError } from "axios";
-import { notifications } from "@mantine/notifications";
-import {
-  accountsQueryKey,
-  applicationUserQueryKey,
-  institutionsQueryKey,
-  lunchFlowAccountQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
 import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
+import { useRemoveApiKeyMutation } from "~/hooks/mutations/lunchFlow/useRemoveApiKeyMutation";
 
 const LunchFlowAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
   const applicationUserQuery = useApplicationUserQuery();
-
-  const queryClient = useQueryClient();
-  const doRemoveApiKey = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/lunchFlow/removeApiKey",
-        method: "POST",
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [applicationUserQueryKey],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: [lunchFlowAccountQueryKey],
-      });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const removeApiKeyMutation = useRemoveApiKeyMutation();
 
   const getContent = () => {
     if (applicationUserQuery.isPending) {
@@ -72,11 +37,11 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
           <Button
             bg="var(--button-color-destructive)"
             size="xs"
-            loading={doRemoveApiKey.isPending}
+            loading={removeApiKeyMutation.isPending}
             disabled={
-              doRemoveApiKey.isPending || applicationUserQuery.isPending
+              removeApiKeyMutation.isPending || applicationUserQuery.isPending
             }
-            onClick={() => doRemoveApiKey.mutate()}
+            onClick={() => removeApiKeyMutation.mutate()}
           >
             {t("remove_lunchflow")}
           </Button>

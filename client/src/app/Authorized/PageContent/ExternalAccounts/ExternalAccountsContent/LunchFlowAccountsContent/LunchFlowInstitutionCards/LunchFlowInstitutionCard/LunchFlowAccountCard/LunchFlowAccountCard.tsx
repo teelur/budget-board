@@ -2,9 +2,6 @@ import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -15,16 +12,13 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import {
-  accountsQueryKey,
-  institutionsQueryKey,
-  lunchFlowAccountQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
+import { useDeleteLunchFlowAccountMutation } from "~/hooks/mutations/lunchFlowAccount/useDeleteLunchFlowAccountMutation";
+import { useUpdateLinkedAccountMutation } from "~/hooks/mutations/lunchFlowAccount/useUpdateLinkedAccountMutation";
+import { useUpdateSyncStartDateMutation } from "~/hooks/mutations/lunchFlowAccount/useUpdateSyncStartDateMutation";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useLunchFlowAccountsQuery } from "~/hooks/queries/useLunchFlowAccountsQuery";
 import { AccountSource } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface ILunchFlowAccountCardProps {
@@ -49,100 +43,11 @@ const LunchFlowAccountCard = (
 
   const { t } = useTranslation();
   const { dayjs, dateFormat, dayjsLocale } = useLocale();
-  const { request } = useAuth();
-
   const accountsQuery = useAccountsQuery();
-
-  const lunchFlowAccountsQuery = useQuery({
-    queryKey: [lunchFlowAccountQueryKey],
-    queryFn: async (): Promise<ILunchFlowAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/lunchFlowAccount",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ILunchFlowAccountResponse[];
-      }
-
-      return [];
-    },
-  });
-
-  const queryClient = useQueryClient();
-  const doUpdateLinkedAccount = useMutation({
-    mutationFn: async (updateLinkedAccountRequest: {
-      lunchFlowAccountGuid: string;
-      linkedAccountGuid: string | null;
-    }) =>
-      await request({
-        url: "/api/lunchFlowAccount/updateLinkedAccount",
-        method: "PUT",
-        params: {
-          lunchFlowAccountGuid: updateLinkedAccountRequest.lunchFlowAccountGuid,
-          linkedAccountGuid: updateLinkedAccountRequest.linkedAccountGuid,
-        },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-  const doUpdateSyncStartDate = useMutation({
-    mutationFn: async (updateSyncStartDateRequest: {
-      lunchFlowAccountGuid: string;
-      syncStartDate: Date | null;
-    }) =>
-      await request({
-        url: "/api/lunchFlowAccount/updateSyncStartDate",
-        method: "PUT",
-        params: {
-          lunchFlowAccountGuid: updateSyncStartDateRequest.lunchFlowAccountGuid,
-          syncStartDate: dayjs(
-            updateSyncStartDateRequest.syncStartDate,
-          ).isValid()
-            ? dayjs(updateSyncStartDateRequest.syncStartDate).format(
-                "YYYY-MM-DD",
-              )
-            : null,
-        },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-  const doDeleteLunchFlowAccount = useMutation({
-    mutationFn: async (lunchFlowAccountGuid: string) =>
-      await request({
-        url: "/api/lunchFlowAccount",
-        method: "DELETE",
-        params: { lunchFlowAccountGuid },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [lunchFlowAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const updateLinkedAccountMutation = useUpdateLinkedAccountMutation();
+  const updateSyncStartDateMutation = useUpdateSyncStartDateMutation();
+  const deleteLunchFlowAccountMutation = useDeleteLunchFlowAccountMutation();
+  const lunchFlowAccountsQuery = useLunchFlowAccountsQuery();
 
   const getAccountNameForId = (accountId: string): string => {
     const account = accountsQuery.data?.find(
@@ -244,9 +149,9 @@ const LunchFlowAccountCard = (
     <Card elevation={2}>
       <LoadingOverlay
         visible={
-          doUpdateLinkedAccount.isPending ||
-          doUpdateSyncStartDate.isPending ||
-          doDeleteLunchFlowAccount.isPending
+          updateLinkedAccountMutation.isPending ||
+          updateSyncStartDateMutation.isPending ||
+          deleteLunchFlowAccountMutation.isPending
         }
       />
       <Group w={"100%"} gap={"0.5rem"}>
@@ -285,7 +190,7 @@ const LunchFlowAccountCard = (
                     data={selectableAccounts}
                     value={props.lunchFlowAccount.linkedAccountId}
                     onChange={(value) => {
-                      doUpdateLinkedAccount.mutate({
+                      updateLinkedAccountMutation.mutate({
                         lunchFlowAccountGuid: props.lunchFlowAccount.id,
                         linkedAccountGuid: value,
                       });
@@ -328,7 +233,7 @@ const LunchFlowAccountCard = (
                     {...syncStartDateField.getInputProps()}
                     onChange={(value) => {
                       syncStartDateField.setValue(value);
-                      doUpdateSyncStartDate.mutate({
+                      updateSyncStartDateMutation.mutate({
                         lunchFlowAccountGuid: props.lunchFlowAccount.id,
                         syncStartDate: dayjs(value).isValid()
                           ? dayjs(value).toDate()
@@ -390,7 +295,7 @@ const LunchFlowAccountCard = (
               size="sm"
               color="var(--button-color-destructive)"
               onClick={() =>
-                doDeleteLunchFlowAccount.mutate(props.lunchFlowAccount.id)
+                deleteLunchFlowAccountMutation.mutate(props.lunchFlowAccount.id)
               }
             >
               <Trash2Icon size={16} />

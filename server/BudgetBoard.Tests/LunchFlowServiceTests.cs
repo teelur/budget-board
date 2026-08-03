@@ -14,6 +14,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class LunchFlowServiceTests
 {
+    #region ConfigureApiKeyAsync
     [Fact]
     public async Task ConfigureApiKeyAsync_WhenCalledWithValidApiKey_ShouldUpdateApiKey()
     {
@@ -224,7 +225,9 @@ public class LunchFlowServiceTests
             .Should()
             .ThrowAsync<BudgetBoardServiceException>();
     }
+    #endregion
 
+    #region RemoveApiKeyAsync
     [Fact]
     public async Task RemoveApiKeyAsync_WhenCalled_ShouldRemoveApiKeyAndCleanupData()
     {
@@ -323,6 +326,127 @@ public class LunchFlowServiceTests
             .ThrowAsync<BudgetBoardServiceException>();
     }
 
+    [Fact]
+    public async Task RemoveApiKeyAsync_WhenAccountLinkedToLunchFlowAccount_ShouldUnlinkAndSetSourceToManual()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        helper.demoUser.LunchFlowApiKey = "existing-api-key";
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        account.Source = AccountSource.LunchFlow;
+        helper.UserDataContext.Accounts.Add(account);
+
+        var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
+        var lunchFlowAccount = lunchFlowAccountFaker.Generate();
+        lunchFlowAccount.LinkedAccountId = account.ID;
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+
+        await helper.UserDataContext.SaveChangesAsync();
+
+        using var httpClient = new HttpClient();
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var accountServiceMock = new Mock<IAccountService>();
+        var lunchFlowAccountServiceMock = new Mock<ILunchFlowAccountService>();
+
+        var lunchFlowService = new LunchFlowService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ILunchFlowService>>(),
+            Mock.Of<INowProvider>(),
+            accountServiceMock.Object,
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            lunchFlowAccountServiceMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        await lunchFlowService.RemoveApiKeyAsync(helper.demoUser.Id);
+
+        // Assert
+        helper.UserDataContext.Users.Single().LunchFlowApiKey.Should().BeEmpty();
+        accountServiceMock.Verify(
+            _ =>
+                _.UpdateAccountAsync(
+                    helper.demoUser.Id,
+                    It.Is<IAccountUpdateRequest>(req =>
+                        req.ID == account.ID && req.Source.Value == AccountSource.Manual
+                    )
+                ),
+            Times.Once
+        );
+        lunchFlowAccountServiceMock.Verify(
+            _ => _.DeleteLunchFlowAccountAsync(helper.demoUser.Id, lunchFlowAccount.ID),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task RemoveApiKeyAsync_WhenLinkedAccountIdIsNull_ShouldOnlyDeleteLunchFlowAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        helper.demoUser.LunchFlowApiKey = "existing-api-key";
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var account = accountFaker.Generate();
+        helper.UserDataContext.Accounts.Add(account);
+
+        var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
+        var lunchFlowAccount = lunchFlowAccountFaker.Generate();
+        lunchFlowAccount.LinkedAccountId = null;
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+
+        await helper.UserDataContext.SaveChangesAsync();
+
+        using var httpClient = new HttpClient();
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var accountServiceMock = new Mock<IAccountService>();
+        var lunchFlowAccountServiceMock = new Mock<ILunchFlowAccountService>();
+
+        var lunchFlowService = new LunchFlowService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ILunchFlowService>>(),
+            Mock.Of<INowProvider>(),
+            accountServiceMock.Object,
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            lunchFlowAccountServiceMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        await lunchFlowService.RemoveApiKeyAsync(helper.demoUser.Id);
+
+        // Assert
+        helper.UserDataContext.Users.Single().LunchFlowApiKey.Should().BeEmpty();
+        accountServiceMock.Verify(
+            _ => _.UpdateAccountAsync(It.IsAny<Guid>(), It.IsAny<IAccountUpdateRequest>()),
+            Times.Never
+        );
+        lunchFlowAccountServiceMock.Verify(
+            _ => _.DeleteLunchFlowAccountAsync(helper.demoUser.Id, lunchFlowAccount.ID),
+            Times.Once
+        );
+    }
+    #endregion
+
+    #region RefreshAccountsAsync
     [Fact]
     public async Task RefreshAccountsAsync_WhenCalledWithValidData_ShouldRefreshAccounts()
     {
@@ -770,6 +894,116 @@ public class LunchFlowServiceTests
     }
 
     [Fact]
+    public async Task RefreshAccountsAsync_WhenOneAccountBalanceFails_ShouldContinueRefreshingRemainingAccounts()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        helper.demoUser.LunchFlowApiKey = "valid-api-key";
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var accountsResponse =
+            @"{
+                ""accounts"": [
+                    {
+                        ""id"": ""bad-account-id"",
+                        ""name"": ""Broken Account"",
+                        ""institution_name"": ""Test Bank"",
+                        ""institution_logo"": ""https://example.com/logo.png"",
+                        ""provider"": ""test_provider"",
+                        ""currency"": ""USD"",
+                        ""status"": ""active""
+                    },
+                    {
+                        ""id"": ""good-account-id"",
+                        ""name"": ""Healthy Account"",
+                        ""institution_name"": ""Test Bank"",
+                        ""institution_logo"": ""https://example.com/logo.png"",
+                        ""provider"": ""test_provider"",
+                        ""currency"": ""USD"",
+                        ""status"": ""active""
+                    }
+                ],
+                ""total"": 2
+            }";
+
+        var goodBalanceResponse =
+            @"{
+                ""balance"": {
+                    ""amount"": 2000.00,
+                    ""currency"": ""USD""
+                }
+            }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                (HttpRequestMessage request, CancellationToken token) =>
+                {
+                    var url = request.RequestUri!.ToString();
+                    if (url.Contains("/bad-account-id/balance"))
+                    {
+                        return new HttpResponseMessage
+                        {
+                            StatusCode = System.Net.HttpStatusCode.OK,
+                            Content = new StringContent(@"{ ""balance"": null }"),
+                        };
+                    }
+
+                    return new HttpResponseMessage
+                    {
+                        StatusCode = System.Net.HttpStatusCode.OK,
+                        Content = new StringContent(
+                            url.Contains("/balance") ? goodBalanceResponse : accountsResponse
+                        ),
+                    };
+                }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var lunchFlowAccountServiceMock = new Mock<ILunchFlowAccountService>();
+        var lunchFlowService = new LunchFlowService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ILunchFlowService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<IBalanceService>(),
+            lunchFlowAccountServiceMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        var errors = await lunchFlowService.RefreshAccountsAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().ContainSingle(e => e.Contains("LunchFlowBalanceDataRetrievalError"));
+        lunchFlowAccountServiceMock.Verify(
+            _ =>
+                _.CreateLunchFlowAccountAsync(
+                    helper.demoUser.Id,
+                    It.Is<ILunchFlowAccountCreateRequest>(req => req.SyncID == "good-account-id")
+                ),
+            Times.Once
+        );
+    }
+    #endregion
+
+    #region SyncTransactionHistoryAsync
+    [Fact]
     public async Task SyncTransactionHistoryAsync_WhenCalledWithValidData_ShouldSyncTransactionsAndBalances()
     {
         // Arrange
@@ -1104,11 +1338,331 @@ public class LunchFlowServiceTests
     }
 
     [Fact]
+    public async Task SyncTransactionHistoryAsync_WhenExistingTransactionsDoNotMatch_ShouldCreateNewTransaction()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        helper.demoUser.LunchFlowApiKey = "valid-api-key";
+
+        var unrelatedAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.AddRange(unrelatedAccount, account);
+
+        helper.UserDataContext.Transactions.AddRange(
+            new Transaction
+            {
+                ID = Guid.NewGuid(),
+                SyncID = "existing-transaction",
+                AccountID = account.ID,
+                Amount = -10m,
+                Date = DateOnly.Parse("2024-01-15"),
+                MerchantName = "Existing Transaction",
+                Source = TransactionSource.LunchFlow,
+            },
+            new Transaction
+            {
+                ID = Guid.NewGuid(),
+                SyncID = null,
+                AccountID = account.ID,
+                Amount = -20m,
+                Date = DateOnly.Parse("2024-01-14"),
+                MerchantName = "Manual Transaction",
+                Source = TransactionSource.Manual,
+            }
+        );
+
+        var lunchFlowAccount = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccount.LinkedAccountId = account.ID;
+        lunchFlowAccount.SyncID = "account-id";
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var transactionsResponse =
+            @"{
+                ""transactions"": [
+                    {
+                        ""id"": ""new-transaction"",
+                        ""account_id"": ""account-id"",
+                        ""amount"": -30.00,
+                        ""currency"": ""USD"",
+                        ""date"": ""2024-01-16"",
+                        ""merchant"": ""New Transaction"",
+                        ""description"": ""Purchase"",
+                        ""is_pending"": false
+                    }
+                ],
+                ""total"": 1
+            }";
+
+        var balanceResponse =
+            @"{
+                ""balance"": {
+                    ""amount"": 1500.50,
+                    ""currency"": ""USD""
+                }
+            }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                (HttpRequestMessage request, CancellationToken token) =>
+                    new HttpResponseMessage
+                    {
+                        StatusCode = System.Net.HttpStatusCode.OK,
+                        Content = new StringContent(
+                            request.RequestUri!.ToString().Contains("/transactions")
+                                ? transactionsResponse
+                                : balanceResponse
+                        ),
+                    }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var transactionServiceMock = new Mock<ITransactionService>();
+        var lunchFlowService = new LunchFlowService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ILunchFlowService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            transactionServiceMock.Object,
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ILunchFlowAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        var errors = await lunchFlowService.SyncTransactionHistoryAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().BeEmpty();
+        transactionServiceMock.Verify(
+            _ =>
+                _.CreateTransactionAsync(
+                    helper.demoUser.Id,
+                    It.Is<ITransactionCreateRequest>(req => req.SyncID == "new-transaction")
+                ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task SyncTransactionHistoryAsync_WhenSyncStartDateIsSet_ShouldSkipTransactionsBeforeStartDate()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        helper.demoUser.LunchFlowApiKey = "valid-api-key";
+
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.Add(account);
+
+        var lunchFlowAccount = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccount.LinkedAccountId = account.ID;
+        lunchFlowAccount.SyncStartDate = DateOnly.Parse("2024-01-15");
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var transactionsResponse =
+            @"{
+                ""transactions"": [
+                    {
+                        ""id"": ""txn-before-start"",
+                        ""account_id"": ""account-id"",
+                        ""amount"": -10.00,
+                        ""currency"": ""USD"",
+                        ""date"": ""2024-01-14"",
+                        ""merchant"": ""Before Start"",
+                        ""description"": ""Ignored"",
+                        ""is_pending"": false
+                    },
+                    {
+                        ""id"": ""txn-on-start"",
+                        ""account_id"": ""account-id"",
+                        ""amount"": -25.00,
+                        ""currency"": ""USD"",
+                        ""date"": ""2024-01-15"",
+                        ""merchant"": ""On Start"",
+                        ""description"": ""Included"",
+                        ""is_pending"": false
+                    }
+                ],
+                ""total"": 2
+            }";
+
+        var balanceResponse =
+            @"{
+                ""balance"": {
+                    ""amount"": 1500.50,
+                    ""currency"": ""USD""
+                }
+            }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                (HttpRequestMessage request, CancellationToken token) =>
+                    new HttpResponseMessage
+                    {
+                        StatusCode = System.Net.HttpStatusCode.OK,
+                        Content = new StringContent(
+                            request.RequestUri!.ToString().Contains("/transactions")
+                                ? transactionsResponse
+                                : balanceResponse
+                        ),
+                    }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var transactionServiceMock = new Mock<ITransactionService>();
+        var lunchFlowService = new LunchFlowService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ILunchFlowService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            transactionServiceMock.Object,
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ILunchFlowAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        var errors = await lunchFlowService.SyncTransactionHistoryAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().BeEmpty();
+        transactionServiceMock.Verify(
+            _ =>
+                _.CreateTransactionAsync(
+                    helper.demoUser.Id,
+                    It.Is<ITransactionCreateRequest>(req => req.SyncID == "txn-on-start")
+                ),
+            Times.Once
+        );
+        transactionServiceMock.Verify(
+            _ =>
+                _.CreateTransactionAsync(
+                    helper.demoUser.Id,
+                    It.Is<ITransactionCreateRequest>(req => req.SyncID == "txn-before-start")
+                ),
+            Times.Never
+        );
+    }
+
+    [Fact]
+    public async Task SyncTransactionHistoryAsync_WhenTransactionPayloadIsInvalid_ShouldReturnRetrievalError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        helper.demoUser.LunchFlowApiKey = "valid-api-key";
+
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.Add(account);
+
+        var lunchFlowAccount = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccount.LinkedAccountId = account.ID;
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var balanceResponse =
+            @"{
+                ""balance"": {
+                    ""amount"": 1500.50,
+                    ""currency"": ""USD""
+                }
+            }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                (HttpRequestMessage request, CancellationToken token) =>
+                    new HttpResponseMessage
+                    {
+                        StatusCode = System.Net.HttpStatusCode.OK,
+                        Content = new StringContent(
+                            request.RequestUri!.ToString().Contains("/transactions")
+                                ? "{ this is not valid json"
+                                : balanceResponse
+                        ),
+                    }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var transactionServiceMock = new Mock<ITransactionService>();
+        var lunchFlowService = new LunchFlowService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ILunchFlowService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            transactionServiceMock.Object,
+            Mock.Of<IBalanceService>(),
+            Mock.Of<ILunchFlowAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        var errors = await lunchFlowService.SyncTransactionHistoryAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().ContainSingle(e => e.Contains("LunchFlowTransactionDataRetrievalError"));
+        transactionServiceMock.Verify(
+            _ => _.CreateTransactionAsync(It.IsAny<Guid>(), It.IsAny<ITransactionCreateRequest>()),
+            Times.Never
+        );
+    }
+
+    [Fact]
     public async Task SyncTransactionHistoryAsync_WhenLinkedAccountNotFound_ShouldReturnErrors()
     {
         // Arrange
         var helper = new TestHelper();
         helper.demoUser.LunchFlowApiKey = "valid-api-key";
+
+        var unrelatedAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.Add(unrelatedAccount);
 
         var lunchFlowAccountFaker = new LunchFlowAccountFaker(helper.demoUser.Id);
         var lunchFlowAccount = lunchFlowAccountFaker.Generate();
@@ -1195,6 +1749,178 @@ public class LunchFlowServiceTests
 
         // Assert
         errors.Should().NotBeEmpty();
+        errors.Should().Contain(e => e.Contains("AccountNotFoundError"));
+    }
+
+    [Fact]
+    public async Task SyncTransactionHistoryAsync_WhenBalancePayloadIsMissing_ShouldReturnRetrievalErrors()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        helper.demoUser.LunchFlowApiKey = "valid-api-key";
+
+        var accountOne = new AccountFaker(helper.demoUser.Id).Generate();
+        var accountTwo = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.AddRange(accountOne, accountTwo);
+
+        var lunchFlowAccountOne = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccountOne.LinkedAccountId = accountOne.ID;
+        lunchFlowAccountOne.SyncID = "invalid-balance";
+        var lunchFlowAccountTwo = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccountTwo.LinkedAccountId = accountTwo.ID;
+        lunchFlowAccountTwo.SyncID = "null-balance";
+        helper.UserDataContext.LunchFlowAccounts.AddRange(lunchFlowAccountOne, lunchFlowAccountTwo);
+
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var transactionsResponse = @"{ ""transactions"": [], ""total"": 0 }";
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                (HttpRequestMessage request, CancellationToken token) =>
+                {
+                    var url = request.RequestUri!.ToString();
+                    if (url.Contains("/transactions"))
+                    {
+                        return new HttpResponseMessage
+                        {
+                            StatusCode = System.Net.HttpStatusCode.OK,
+                            Content = new StringContent(transactionsResponse),
+                        };
+                    }
+
+                    return new HttpResponseMessage
+                    {
+                        StatusCode = System.Net.HttpStatusCode.OK,
+                        Content = new StringContent(
+                            url.Contains("/invalid-balance/balance")
+                                ? "{ this is not valid json"
+                                : @"{ ""balance"": null }"
+                        ),
+                    };
+                }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var balanceServiceMock = new Mock<IBalanceService>();
+        var lunchFlowService = new LunchFlowService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ILunchFlowService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            balanceServiceMock.Object,
+            Mock.Of<ILunchFlowAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        var errors = await lunchFlowService.SyncTransactionHistoryAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().HaveCount(2);
+        errors.Should().OnlyContain(e => e.Contains("LunchFlowBalanceDataRetrievalError"));
+        balanceServiceMock.Verify(
+            _ => _.CreateBalancesAsync(It.IsAny<Guid>(), It.IsAny<IBalanceCreateRequest>()),
+            Times.Never
+        );
+    }
+
+    [Fact]
+    public async Task SyncTransactionHistoryAsync_WhenBalanceServiceThrows_ShouldReturnSyncError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        helper.demoUser.LunchFlowApiKey = "valid-api-key";
+
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.Add(account);
+
+        var lunchFlowAccount = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccount.LinkedAccountId = account.ID;
+        lunchFlowAccount.SyncID = "throws-balance";
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var transactionsResponse = @"{ ""transactions"": [], ""total"": 0 }";
+        var balanceResponse =
+            @"{
+                ""balance"": {
+                    ""amount"": 1500.50,
+                    ""currency"": ""USD""
+                }
+            }";
+
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(
+                (HttpRequestMessage request, CancellationToken token) =>
+                    new HttpResponseMessage
+                    {
+                        StatusCode = System.Net.HttpStatusCode.OK,
+                        Content = new StringContent(
+                            request.RequestUri!.ToString().Contains("/transactions")
+                                ? transactionsResponse
+                                : balanceResponse
+                        ),
+                    }
+            );
+
+        using var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(string.Empty))
+            .Returns(httpClient)
+            .Verifiable();
+
+        var balanceServiceMock = new Mock<IBalanceService>();
+        balanceServiceMock
+            .Setup(_ => _.CreateBalancesAsync(It.IsAny<Guid>(), It.IsAny<IBalanceCreateRequest>()))
+            .ThrowsAsync(new InvalidOperationException("Balance persistence failed"));
+
+        var lunchFlowService = new LunchFlowService(
+            httpClientFactoryMock.Object,
+            helper.UserDataContext,
+            Mock.Of<ILogger<ILunchFlowService>>(),
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAccountService>(),
+            Mock.Of<ITransactionService>(),
+            balanceServiceMock.Object,
+            Mock.Of<ILunchFlowAccountService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        // Act
+        var errors = await lunchFlowService.SyncTransactionHistoryAsync(helper.demoUser.Id);
+
+        // Assert
+        errors.Should().ContainSingle(e => e.Contains("LunchFlowAccountSyncException"));
+        balanceServiceMock.Verify(
+            _ => _.CreateBalancesAsync(helper.demoUser.Id, It.IsAny<IBalanceCreateRequest>()),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -1352,4 +2078,5 @@ public class LunchFlowServiceTests
         errors.Should().NotBeEmpty();
         errors.Should().Contain(e => e.Contains("LunchFlowAccountSyncException"));
     }
+    #endregion
 }
