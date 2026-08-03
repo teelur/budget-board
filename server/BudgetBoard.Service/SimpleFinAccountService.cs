@@ -106,7 +106,8 @@ public class SimpleFinAccountService(
         var userData = await GetCurrentUserAsync(userGuid);
         var simpleFinAccount = GetSimpleFinAccountById(userData, simpleFinAccountGuid);
 
-        if (linkedAccountGuid != null && !userData.Accounts.Any(a => a.ID == linkedAccountGuid))
+        var linkedAccountExists = userData.Accounts.Any(a => a.ID == linkedAccountGuid);
+        if (linkedAccountGuid.HasValue && !linkedAccountExists)
         {
             logger.LogError("{LogMessage}", logLocalizer["InvalidSimpleFinLinkedAccountIDLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["InvalidLinkedAccountIDError"]);
@@ -125,8 +126,8 @@ public class SimpleFinAccountService(
 
         if (linkedAccountGuid is Guid newLinkedAccountId)
         {
-            var linkedAccount = userData.Accounts.FirstOrDefault(a => a.ID == newLinkedAccountId);
-            linkedAccount?.Source = AccountSource.SimpleFIN;
+            var linkedAccount = userData.Accounts.Single(a => a.ID == newLinkedAccountId);
+            linkedAccount.Source = AccountSource.SimpleFIN;
         }
 
         await userDataContext.SaveChangesAsync();
