@@ -60,7 +60,6 @@ public class LunchFlowAccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
         return userData.LunchFlowAccounts.Select(a => new LunchFlowAccountResponse(a)).ToList();
     }
 
@@ -71,22 +70,14 @@ public class LunchFlowAccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
-        var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a => a.ID == request.ID);
-        if (lunchFlowAccount == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["LunchFlowAccountNotFoundError"]
-            );
-        }
+        var lunchFlowAccount = GetLunchFlowAccountById(userData, request.ID);
 
         lunchFlowAccount.Name = request.Name;
-        lunchFlowAccount.Status = request.Status ?? string.Empty;
         lunchFlowAccount.InstitutionName = request.InstitutionName;
         lunchFlowAccount.InstitutionLogo = request.InstitutionLogo;
         lunchFlowAccount.Provider = request.Provider;
         lunchFlowAccount.Currency = request.Currency ?? string.Empty;
+        lunchFlowAccount.Status = request.Status ?? string.Empty;
         lunchFlowAccount.Balance = request.Balance;
         lunchFlowAccount.BalanceDate = (int)
             new DateTimeOffset(request.BalanceDate).ToUnixTimeSeconds();
@@ -99,20 +90,12 @@ public class LunchFlowAccountService(
     public async Task DeleteLunchFlowAccountAsync(Guid userGuid, Guid accountGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var lunchFlowAccount = GetLunchFlowAccountById(userData, accountGuid);
 
-        var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a => a.ID == accountGuid);
-        if (lunchFlowAccount == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["LunchFlowAccountNotFoundError"]
-            );
-        }
-
-        if (lunchFlowAccount.LinkedAccountId != null)
+        if (lunchFlowAccount.LinkedAccountId.HasValue)
         {
             var linkedAccount = userData.Accounts.FirstOrDefault(a =>
-                a.ID == lunchFlowAccount.LinkedAccountId
+                a.ID == lunchFlowAccount.LinkedAccountId.Value
             );
             linkedAccount?.Source = AccountSource.Manual;
         }
@@ -129,29 +112,21 @@ public class LunchFlowAccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var lunchFlowAccount = GetLunchFlowAccountById(userData, lunchFlowAccountGuid);
 
-        var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a =>
-            a.ID == lunchFlowAccountGuid
-        );
-        if (lunchFlowAccount == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["LunchFlowAccountNotFoundError"]
-            );
-        }
-
-        if (linkedAccountGuid != null && !userData.Accounts.Any(a => a.ID == linkedAccountGuid))
+        if (
+            linkedAccountGuid is Guid targetAccountGuid
+            && !userData.Accounts.Any(a => a.ID == targetAccountGuid)
+        )
         {
             logger.LogError("{LogMessage}", logLocalizer["InvalidLunchFlowLinkedAccountIDLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["InvalidLinkedAccountIDError"]);
         }
 
-        var oldAccountLinkedId = lunchFlowAccount.LinkedAccountId;
-        if (oldAccountLinkedId != null)
+        if (lunchFlowAccount.LinkedAccountId.HasValue)
         {
             var oldLinkedAccount = userData.Accounts.FirstOrDefault(a =>
-                a.ID == oldAccountLinkedId
+                a.ID == lunchFlowAccount.LinkedAccountId.Value
             );
             oldLinkedAccount?.Source = AccountSource.Manual;
         }
@@ -159,9 +134,13 @@ public class LunchFlowAccountService(
         lunchFlowAccount.LinkedAccountId = linkedAccountGuid;
         lunchFlowAccount.LastSync = null;
 
-        var linkedAccount = userData.Accounts.FirstOrDefault(a => a.ID == linkedAccountGuid);
-        linkedAccount?.Source =
-            linkedAccountGuid != null ? AccountSource.LunchFlow : AccountSource.Manual;
+        if (linkedAccountGuid.HasValue)
+        {
+            var linkedAccount = userData.Accounts.FirstOrDefault(a =>
+                a.ID == linkedAccountGuid.Value
+            );
+            linkedAccount?.Source = AccountSource.LunchFlow;
+        }
 
         await userDataContext.SaveChangesAsync();
     }
@@ -173,17 +152,7 @@ public class LunchFlowAccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
-        var lunchFlowAccount = userData.LunchFlowAccounts.FirstOrDefault(a =>
-            a.ID == lunchFlowAccountGuid
-        );
-        if (lunchFlowAccount == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["LunchFlowAccountNotFoundError"]
-            );
-        }
+        var lunchFlowAccount = GetLunchFlowAccountById(userData, lunchFlowAccountGuid);
 
         lunchFlowAccount.SyncStartDate = syncStartDate;
 
@@ -200,5 +169,18 @@ public class LunchFlowAccountService(
             id,
             users => users.Include(u => u.LunchFlowAccounts).Include(u => u.Accounts)
         );
+    }
+
+    private LunchFlowAccount GetLunchFlowAccountById(ApplicationUser user, Guid accountGuid)
+    {
+        var lunchFlowAccount = user.LunchFlowAccounts.FirstOrDefault(a => a.ID == accountGuid);
+        if (lunchFlowAccount == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["LunchFlowAccountNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["LunchFlowAccountNotFoundError"]
+            );
+        }
+        return lunchFlowAccount;
     }
 }

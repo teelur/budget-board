@@ -13,6 +13,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class LunchFlowAccountServiceTests()
 {
+    #region CreateLunchFlowAccountAsync
     [Fact]
     public async Task CreateLunchFlowAccountAsync_WhenValidData_ShouldCreateAccount()
     {
@@ -32,8 +33,8 @@ public class LunchFlowAccountServiceTests()
             InstitutionName = "Test Bank",
             InstitutionLogo = "https://example.com/logo.png",
             Provider = "test_provider",
-            Currency = "USD",
-            Status = "active",
+            Currency = null,
+            Status = null,
             Balance = 1000.00m,
             BalanceDate = (int)new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
             LastSync = DateTime.UtcNow,
@@ -52,9 +53,18 @@ public class LunchFlowAccountServiceTests()
         );
 
         createdAccount.Should().NotBeNull();
-        createdAccount
-            .Should()
-            .BeEquivalentTo(createRequest, options => options.ExcludingMissingMembers());
+        createdAccount.Name.Should().Be(createRequest.Name);
+        createdAccount.SyncID.Should().Be(createRequest.SyncID);
+        createdAccount.InstitutionName.Should().Be(createRequest.InstitutionName);
+        createdAccount.InstitutionLogo.Should().Be(createRequest.InstitutionLogo);
+        createdAccount.Provider.Should().Be(createRequest.Provider);
+        createdAccount.Currency.Should().Be(string.Empty);
+        createdAccount.Status.Should().Be(string.Empty);
+        createdAccount.Balance.Should().Be(createRequest.Balance);
+        createdAccount.BalanceDate.Should().Be(createRequest.BalanceDate);
+        createdAccount.LastSync.Should().Be(createRequest.LastSync);
+        createdAccount.LinkedAccountId.Should().Be(createRequest.LinkedAccountId);
+        createdAccount.UserID.Should().Be(helper.demoUser.Id);
     }
 
     [Fact]
@@ -138,7 +148,9 @@ public class LunchFlowAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidUserError");
     }
+    #endregion
 
+    #region ReadLunchFlowAccountsAsync
     [Fact]
     public async Task ReadLunchFlowAccountsAsync_WhenValidData_ShouldReturnAccounts()
     {
@@ -185,7 +197,9 @@ public class LunchFlowAccountServiceTests()
         // Assert
         accounts.Should().BeEmpty();
     }
+    #endregion
 
+    #region UpdateLunchFlowAccountAsync
     [Fact]
     public async Task UpdateLunchFlowAccountAsync_WhenValidData_ShouldUpdateAccount()
     {
@@ -211,8 +225,8 @@ public class LunchFlowAccountServiceTests()
             InstitutionName = "Updated Bank",
             InstitutionLogo = "https://example.com/updated-logo.png",
             Provider = "updated_provider",
-            Currency = "EUR",
-            Status = "inactive",
+            Currency = null,
+            Status = null,
             Balance = 2000.00m,
             BalanceDate = DateTime.UtcNow.AddDays(-1),
             LastSync = DateTime.UtcNow,
@@ -234,13 +248,13 @@ public class LunchFlowAccountServiceTests()
         updatedAccount.InstitutionName.Should().Be(updateRequest.InstitutionName);
         updatedAccount.InstitutionLogo.Should().Be(updateRequest.InstitutionLogo);
         updatedAccount.Provider.Should().Be(updateRequest.Provider);
-        updatedAccount.Currency.Should().Be(updateRequest.Currency);
-        updatedAccount.Status.Should().Be(updateRequest.Status);
+        updatedAccount.Currency.Should().Be(string.Empty);
+        updatedAccount.Status.Should().Be(string.Empty);
         updatedAccount.Balance.Should().Be(updateRequest.Balance);
     }
 
     [Fact]
-    public async Task UpdateLunchFlowAccountAsync_WhenAccountNotFound_ShouldThrowException()
+    public async Task UpdateLunchFlowAccountAsync_WhenAccountNotFound_ShouldThrowLunchFlowAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -259,7 +273,6 @@ public class LunchFlowAccountServiceTests()
             InstitutionLogo = "https://example.com/logo.png",
             Provider = "test_provider",
             Currency = "USD",
-            Status = "active",
             Balance = 1000.00m,
             BalanceDate = DateTime.UtcNow,
         };
@@ -276,9 +289,11 @@ public class LunchFlowAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("LunchFlowAccountNotFoundError");
     }
+    #endregion
 
+    #region DeleteLunchFlowAccountAsync
     [Fact]
-    public async Task DeleteLunchFlowAccountAsync_WhenValidData_ShouldDeleteAccount()
+    public async Task DeleteLunchFlowAccountAsync_WhenAccountIsNotLinked_ShouldDeleteAccount()
     {
         // Arrange
         var helper = new TestHelper();
@@ -339,10 +354,47 @@ public class LunchFlowAccountServiceTests()
             a.ID == linkedAccount.ID
         );
         updatedLinkedAccount.Source.Should().Be(AccountSource.Manual);
+        helper
+            .UserDataContext.LunchFlowAccounts.Any(a => a.ID == lunchFlowAccount.ID)
+            .Should()
+            .BeFalse();
     }
 
     [Fact]
-    public async Task DeleteLunchFlowAccountAsync_WhenAccountNotFound_ShouldThrowException()
+    public async Task DeleteLunchFlowAccountAsync_WhenLinkedAccountDoesNotExist_ShouldDeleteAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var lunchFlowAccountService = new LunchFlowAccountService(
+            Mock.Of<ILogger<ILunchFlowAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var unrelatedAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        var lunchFlowAccount = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccount.LinkedAccountId = Guid.NewGuid();
+
+        helper.UserDataContext.Accounts.Add(unrelatedAccount);
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await lunchFlowAccountService.DeleteLunchFlowAccountAsync(
+            helper.demoUser.Id,
+            lunchFlowAccount.ID
+        );
+
+        // Assert
+        helper
+            .UserDataContext.LunchFlowAccounts.Any(a => a.ID == lunchFlowAccount.ID)
+            .Should()
+            .BeFalse();
+    }
+
+    [Fact]
+    public async Task DeleteLunchFlowAccountAsync_WhenAccountNotFound_ShouldThrowLunchFlowAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -365,7 +417,9 @@ public class LunchFlowAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("LunchFlowAccountNotFoundError");
     }
+    #endregion
 
+    #region UpdateLinkedAccountAsync
     [Fact]
     public async Task UpdateLinkedAccountAsync_WhenLinkingValidAccount_ShouldUpdateLinkedAccount()
     {
@@ -453,11 +507,11 @@ public class LunchFlowAccountServiceTests()
         updatedLunchFlowAccount!.LinkedAccountId.Should().BeNull();
         updatedLunchFlowAccount.LastSync.Should().BeNull();
         updatedAccount.Should().NotBeNull();
-        updatedAccount!.Source.Should().Be(AccountSource.Manual);
+        updatedAccount.Source.Should().Be(AccountSource.Manual);
     }
 
     [Fact]
-    public async Task UpdateLinkedAccountAsync_WhenLunchFlowAccountNotFound_ShouldThrowException()
+    public async Task UpdateLinkedAccountAsync_WhenLunchFlowAccountNotFound_ShouldThrowLunchFlowAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -489,7 +543,7 @@ public class LunchFlowAccountServiceTests()
     }
 
     [Fact]
-    public async Task UpdateLinkedAccountAsync_WhenLinkedAccountNotFound_ShouldThrowException()
+    public async Task UpdateLinkedAccountAsync_WhenLinkedAccountNotFound_ShouldThrowInvalidLinkedAccountIDError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -569,12 +623,54 @@ public class LunchFlowAccountServiceTests()
         updatedLunchFlowAccount.LastSync.Should().BeNull();
 
         updatedOldAccount.Should().NotBeNull();
-        updatedOldAccount!.Source.Should().Be(AccountSource.Manual);
+        updatedOldAccount.Source.Should().Be(AccountSource.Manual);
 
         updatedNewAccount.Should().NotBeNull();
-        updatedNewAccount!.Source.Should().Be(AccountSource.LunchFlow);
+        updatedNewAccount.Source.Should().Be(AccountSource.LunchFlow);
     }
 
+    [Fact]
+    public async Task UpdateLinkedAccountAsync_WhenOldLinkedAccountDoesNotExist_ShouldLinkNewAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var lunchFlowAccountService = new LunchFlowAccountService(
+            Mock.Of<ILogger<ILunchFlowAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var newAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        newAccount.Source = AccountSource.Manual;
+
+        var lunchFlowAccount = new LunchFlowAccountFaker(helper.demoUser.Id).Generate();
+        lunchFlowAccount.LinkedAccountId = Guid.NewGuid();
+
+        helper.UserDataContext.Accounts.Add(newAccount);
+        helper.UserDataContext.LunchFlowAccounts.Add(lunchFlowAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await lunchFlowAccountService.UpdateLinkedAccountAsync(
+            helper.demoUser.Id,
+            lunchFlowAccount.ID,
+            newAccount.ID
+        );
+
+        // Assert
+        var updatedLunchFlowAccount = helper.UserDataContext.LunchFlowAccounts.First(a =>
+            a.ID == lunchFlowAccount.ID
+        );
+        var updatedNewAccount = helper.UserDataContext.Accounts.First(a => a.ID == newAccount.ID);
+
+        updatedLunchFlowAccount.LinkedAccountId.Should().Be(newAccount.ID);
+        updatedLunchFlowAccount.LastSync.Should().BeNull();
+        updatedNewAccount.Source.Should().Be(AccountSource.LunchFlow);
+    }
+    #endregion
+
+    #region UpdateLunchFlowAccountSyncStartDateAsync
     [Fact]
     public async Task UpdateLunchFlowAccountSyncStartDateAsync_WhenValidData_ShouldUpdateSyncStartDate()
     {
@@ -671,4 +767,5 @@ public class LunchFlowAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("LunchFlowAccountNotFoundError");
     }
+    #endregion
 }

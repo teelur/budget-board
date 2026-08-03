@@ -189,8 +189,7 @@ public class LunchFlowService(
 
         try
         {
-            return JsonSerializer.Deserialize<LunchFlowAccountsData>(jsonString, s_readOptions)
-                ?? null;
+            return JsonSerializer.Deserialize<LunchFlowAccountsData>(jsonString, s_readOptions);
         }
         catch (JsonException jex)
         {
@@ -299,8 +298,7 @@ public class LunchFlowService(
 
         try
         {
-            return JsonSerializer.Deserialize<LunchFlowTransactionsData>(jsonString, s_readOptions)
-                ?? null;
+            return JsonSerializer.Deserialize<LunchFlowTransactionsData>(jsonString, s_readOptions);
         }
         catch (JsonException jex)
         {
@@ -353,7 +351,7 @@ public class LunchFlowService(
                 }
 
                 var userAccount = userData.Accounts.FirstOrDefault(a =>
-                    a.ID == lunchFlowAccount.LinkedAccountId
+                    a.ID == lunchFlowAccount.LinkedAccountId!.Value
                 );
                 if (userAccount == null)
                 {
@@ -449,8 +447,7 @@ public class LunchFlowService(
 
         try
         {
-            return JsonSerializer.Deserialize<LunchFlowBalancesData>(jsonString, s_readOptions)
-                ?? null;
+            return JsonSerializer.Deserialize<LunchFlowBalancesData>(jsonString, s_readOptions);
         }
         catch (JsonException jex)
         {

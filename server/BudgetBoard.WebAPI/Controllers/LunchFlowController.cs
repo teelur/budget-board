@@ -1,7 +1,5 @@
 ﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
-using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,50 +16,41 @@ public class LunchFlowController(
     ILunchFlowService lunchFlowService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<LunchFlowController>(logger, logLocalizer, responseLocalizer)
 {
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> UpdateApiKey(string apiKey)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await lunchFlowService.ConfigureApiKeyAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                apiKey
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await lunchFlowService.ConfigureApiKeyAsync(parsedUserId, apiKey);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> RemoveApiKey()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await lunchFlowService.RemoveApiKeyAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty)
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await lunchFlowService.RemoveApiKeyAsync(parsedUserId);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }
