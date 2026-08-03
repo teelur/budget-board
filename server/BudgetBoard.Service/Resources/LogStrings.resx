@@ -373,11 +373,8 @@
     <data name="SimpleFinMissingAccessTokenLog" xml:space="preserve">
         <value>SimpleFIN access token is missing or empty.</value>
     </data>
-    <data name="SimpleFinOrganizationDeleteNotFoundLog" xml:space="preserve">
-        <value>Attempted to delete a SimpleFIN organization that does not exist.</value>
-    </data>
-    <data name="SimpleFinOrganizationUpdateNotFoundLog" xml:space="preserve">
-        <value>Attempted to update a SimpleFIN organization that does not exist.</value>
+    <data name="SimpleFinOrganizationNotFoundLog" xml:space="preserve">
+        <value>Attempted to access a SimpleFIN organization that does not exist.</value>
     </data>
     <data name="SimpleFinSyncingTransactionsLog" xml:space="preserve">
         <value>Syncing transactions from {0} (Unix time {1})</value>

@@ -361,12 +361,6 @@
   <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
         <value>Der SimpleFIN-Zugriffstoken fehlt oder ist leer.</value>
   </data>
-  <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
-        <value>Die SimpleFIN-Organisation, die Sie löschen möchten, existiert nicht.</value>
-  </data>
-  <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
-        <value>Die SimpleFIN-Organisation, die Sie aktualisieren möchten, existiert nicht.</value>
-  </data>
   <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
         <value>Die Erstellung der SimpleFIN-Organisation für das Konto {0} ist fehlgeschlagen.</value>
   </data>

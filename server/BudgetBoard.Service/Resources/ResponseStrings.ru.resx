@@ -358,12 +358,6 @@
   <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
         <value>SimpleFIN access token is missing or empty.</value>
   </data>
-  <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
-        <value>The SimpleFIN organization you are trying to delete does not exist.</value>
-  </data>
-  <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
-        <value>The SimpleFIN organization you are trying to update does not exist.</value>
-  </data>
   <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
         <value>Failed to create SimpleFIN organization for account {0}.</value>
   </data>
