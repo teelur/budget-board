@@ -325,8 +325,8 @@
     <data name="SimpleFin" xml:space="preserve">
         <value>SimpleFIN</value>
     </data>
-    <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
-        <value>The SimpleFIN account you are trying to update does not exist.</value>
+    <data name="SimpleFinAccountNotFoundError" xml:space="preserve">
+        <value>The SimpleFIN account you are trying to access does not exist.</value>
     </data>
     <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
         <value>SimpleFIN account with SyncID '{0}' not found in cache. Skipping account sync.</value>

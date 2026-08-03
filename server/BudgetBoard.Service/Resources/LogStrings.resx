@@ -331,8 +331,8 @@
     <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
         <value>SimpleFIN account {0} is deleted. Skipping.</value>
     </data>
-    <data name="SimpleFinAccountIDUpdateNotFoundLog" xml:space="preserve">
-        <value>Attempted to update a SimpleFIN account that does not exist.</value>
+    <data name="SimpleFinAccountIDNotFoundLog" xml:space="preserve">
+        <value>Attempted to access a SimpleFIN account that does not exist.</value>
     </data>
     <data name="SimpleFinAccountNotFoundForSyncLog" xml:space="preserve">
         <value>SimpleFIN account with SyncID {0} not found in cache. Skipping account sync.</value>
