@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import {
   accountsQueryKey,
-  applicationUserQueryKey,
   institutionsQueryKey,
   lunchFlowAccountQueryKey,
   translateAxiosError,
@@ -32,7 +31,7 @@ export const useUpdateLinkedAccountMutation = () => {
       queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
       queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError) => {
       notifications.show({
         color: "var(--button-color-destructive)",
         message: translateAxiosError(error),
