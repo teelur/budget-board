@@ -2,23 +2,22 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import {
-  accountsQueryKey,
   applicationUserQueryKey,
-  institutionsQueryKey,
   lunchFlowAccountQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-export const useRemoveApiKeyMutation = () => {
+export const useUpdateApiKeyMutation = () => {
   const queryClient = useQueryClient();
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async () =>
+    mutationFn: async (apiKey: string) =>
       await request({
-        url: "/api/lunchFlow/removeApiKey",
-        method: "POST",
+        url: "/api/lunchflow/updateApiKey",
+        method: "PUT",
+        params: { apiKey },
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -27,8 +26,6 @@ export const useRemoveApiKeyMutation = () => {
       await queryClient.invalidateQueries({
         queryKey: [lunchFlowAccountQueryKey],
       });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
     },
     onError: (error: AxiosError) => {
       notifications.show({

@@ -6,7 +6,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
-import { useUpdateApiKeyMutation } from "~/hooks/mutations/lunchFlow/useRemoveApiKeyMutation";
+import { useUpdateApiKeyMutation } from "~/hooks/mutations/lunchFlow/useUpdateApiKeyMutation";
 
 const LinkLunchFlow = (): React.ReactNode => {
   const { t } = useTranslation();

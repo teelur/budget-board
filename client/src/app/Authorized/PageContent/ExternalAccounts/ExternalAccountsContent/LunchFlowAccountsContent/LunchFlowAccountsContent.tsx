@@ -5,7 +5,7 @@ import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
 import LunchFlowInstitutionCards from "./LunchFlowInstitutionCards/LunchFlowInstitutionCards";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
-import { useRemoveApiKeyMutation } from "~/hooks/mutations/lunchFlowAccount/useRemoveApiKeyMutation";
+import { useRemoveApiKeyMutation } from "~/hooks/mutations/lunchFlow/useRemoveApiKeyMutation";
 
 const LunchFlowAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
