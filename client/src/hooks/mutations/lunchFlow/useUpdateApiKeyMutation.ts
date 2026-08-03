@@ -15,7 +15,7 @@ export const useUpdateApiKeyMutation = () => {
   return useMutation({
     mutationFn: async (apiKey: string) =>
       await request({
-        url: "/api/lunchflow/updateApiKey",
+        url: "/api/lunchFlow/updateApiKey",
         method: "PUT",
         params: { apiKey },
       }),
