@@ -54,7 +54,6 @@ public class SimpleFinOrganizationService(
     > ReadSimpleFinOrganizationsAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
         return userData
             .SimpleFinOrganizations.Select(o => new SimpleFinOrganizationResponse(o))
             .ToList();
@@ -67,17 +66,7 @@ public class SimpleFinOrganizationService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
-        var organizationToUpdate = userData.SimpleFinOrganizations.SingleOrDefault(a =>
-            a.ID == request.ID
-        );
-        if (organizationToUpdate == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinOrganizationUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["SimpleFinOrganizationUpdateNotFoundError"]
-            );
-        }
+        var organizationToUpdate = GetSimpleFinOrganizationById(userData, request.ID);
 
         organizationToUpdate.Name = request.Name;
         organizationToUpdate.Domain = request.Domain;
@@ -92,17 +81,7 @@ public class SimpleFinOrganizationService(
     public async Task DeleteSimpleFinOrganizationAsync(Guid userGuid, Guid organizationGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
-        var organizationToDelete = userData.SimpleFinOrganizations.SingleOrDefault(o =>
-            o.ID == organizationGuid
-        );
-        if (organizationToDelete == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinOrganizationDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["SimpleFinOrganizationDeleteNotFoundError"]
-            );
-        }
+        var organizationToDelete = GetSimpleFinOrganizationById(userData, organizationGuid);
 
         userDataContext.SimpleFinOrganizations.Remove(organizationToDelete);
         await userDataContext.SaveChangesAsync();
@@ -118,5 +97,24 @@ public class SimpleFinOrganizationService(
             id,
             users => users.Include(u => u.SimpleFinOrganizations).ThenInclude(i => i.Accounts)
         );
+    }
+
+    private SimpleFinOrganization GetSimpleFinOrganizationById(
+        ApplicationUser userData,
+        Guid organizationGuid
+    )
+    {
+        var organization = userData.SimpleFinOrganizations.SingleOrDefault(o =>
+            o.ID == organizationGuid
+        );
+        if (organization == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["SimpleFinOrganizationNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinOrganizationNotFoundError"]
+            );
+        }
+
+        return organization;
     }
 }

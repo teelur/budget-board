@@ -14,6 +14,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class SimpleFinAccountServiceTests()
 {
+    #region CreateSimpleFinAccountAsync
     [Fact]
     public async Task CreateSimpleFinAccountAsync_WhenValidData_ShouldCreateAccount()
     {
@@ -60,7 +61,7 @@ public class SimpleFinAccountServiceTests()
     }
 
     [Fact]
-    public async Task CreateSimpleFinAccountAsync_WhenInvalidOrganizationId_ShouldThrowException()
+    public async Task CreateSimpleFinAccountAsync_WhenInvalidOrganizationId_ShouldThrowInvalidOrganizationIDError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -93,7 +94,9 @@ public class SimpleFinAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidOrganizationIDError");
     }
+    #endregion
 
+    #region ReadSimpleFinAccountsAsync
     [Fact]
     public async Task ReadSimpleFinAccountsAsync_WhenValidData_ShouldReturnAccounts()
     {
@@ -125,9 +128,11 @@ public class SimpleFinAccountServiceTests()
         accounts.Should().ContainEquivalentOf(new SimpleFinAccountResponse(account1));
         accounts.Should().ContainEquivalentOf(new SimpleFinAccountResponse(account2));
     }
+    #endregion
 
+    #region UpdateSimpleFinAccountAsync
     [Fact]
-    public async Task UpdateAccountAsync_WhenValidData_ShouldUpdateAccount()
+    public async Task UpdateSimpleFinAccountAsync_WhenValidData_ShouldUpdateAccount()
     {
         // Arrange
         var helper = new TestHelper();
@@ -182,7 +187,7 @@ public class SimpleFinAccountServiceTests()
     }
 
     [Fact]
-    public async Task UpdateAccountAsync_WhenAccountNotFound_ShouldThrowException()
+    public async Task UpdateSimpleFinAccountAsync_WhenAccountNotFound_ShouldThrowSimpleFinAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -212,11 +217,13 @@ public class SimpleFinAccountServiceTests()
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("SimpleFinAccountIDUpdateNotFoundError");
+            .WithMessage("SimpleFinAccountNotFoundError");
     }
+    #endregion
 
+    #region DeleteSimpleFinAccountAsync
     [Fact]
-    public async Task DeleteAccountAsync_WhenValidData_ShouldDeleteAccount()
+    public async Task DeleteSimpleFinAccountAsync_WhenValidData_ShouldDeleteAccount()
     {
         // Arrange
         var helper = new TestHelper();
@@ -249,7 +256,7 @@ public class SimpleFinAccountServiceTests()
     }
 
     [Fact]
-    public async Task DeleteAccountAsync_WhenLinkedAccountExists_ShouldResetLinkedAccountSourceToManual()
+    public async Task DeleteSimpleFinAccountAsync_WhenLinkedAccountExists_ShouldResetLinkedAccountSourceToManual()
     {
         // Arrange
         var helper = new TestHelper();
@@ -286,7 +293,39 @@ public class SimpleFinAccountServiceTests()
     }
 
     [Fact]
-    public async Task DeleteAccountAsync_WhenAccountNotFound_ShouldThrowException()
+    public async Task DeleteSimpleFinAccountAsync_WhenLinkedAccountDoesNotExist_ShouldDeleteAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organization = new SimpleFinOrganizationFaker(helper.demoUser.Id).Generate();
+        var unrelatedAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        var account = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID).Generate();
+        account.LinkedAccountId = Guid.NewGuid();
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.Accounts.Add(unrelatedAccount);
+        helper.UserDataContext.SimpleFinAccounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await simpleFinAccountService.DeleteSimpleFinAccountAsync(helper.demoUser.Id, account.ID);
+
+        // Assert
+        helper
+            .UserDataContext.SimpleFinAccounts.FirstOrDefault(a => a.ID == account.ID)
+            .Should()
+            .BeNull();
+    }
+
+    [Fact]
+    public async Task DeleteSimpleFinAccountAsync_WhenAccountNotFound_ShouldThrowSimpleFinAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -307,9 +346,11 @@ public class SimpleFinAccountServiceTests()
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("SimpleFinAccountIDDeleteNotFoundError");
+            .WithMessage("SimpleFinAccountNotFoundError");
     }
+    #endregion
 
+    #region UpdateLinkedAccountAsync
     [Fact]
     public async Task UpdateLinkedAccountAsync_WhenValidData_ShouldUpdateLinkedAccount()
     {
@@ -355,7 +396,145 @@ public class SimpleFinAccountServiceTests()
     }
 
     [Fact]
-    public async Task UpdateLinkedAccountAsync_WhenAccountNotFound_ShouldThrowException()
+    public async Task UpdateLinkedAccountAsync_WhenUnlinkingAccount_ShouldClearLinkedAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organization = new SimpleFinOrganizationFaker(helper.demoUser.Id).Generate();
+        var linkedAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        linkedAccount.Source = AccountSource.SimpleFIN;
+        var simpleFinAccount = new SimpleFinAccountFaker(
+            helper.demoUser.Id,
+            organization.ID
+        ).Generate();
+        simpleFinAccount.LinkedAccountId = linkedAccount.ID;
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.Accounts.Add(linkedAccount);
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await simpleFinAccountService.UpdateLinkedAccountAsync(
+            helper.demoUser.Id,
+            simpleFinAccount.ID,
+            null
+        );
+
+        // Assert
+        var updatedSimpleFinAccount = helper.UserDataContext.SimpleFinAccounts.First(a =>
+            a.ID == simpleFinAccount.ID
+        );
+        var updatedLinkedAccount = helper.UserDataContext.Accounts.First(a =>
+            a.ID == linkedAccount.ID
+        );
+
+        updatedSimpleFinAccount.LinkedAccountId.Should().BeNull();
+        updatedSimpleFinAccount.LastSync.Should().BeNull();
+        updatedLinkedAccount.Source.Should().Be(AccountSource.Manual);
+    }
+
+    [Fact]
+    public async Task UpdateLinkedAccountAsync_WhenRelinkingToNewAccount_ShouldUpdateBothAccounts()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organization = new SimpleFinOrganizationFaker(helper.demoUser.Id).Generate();
+        var oldAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        oldAccount.Source = AccountSource.SimpleFIN;
+        var newAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        newAccount.Source = AccountSource.Manual;
+        var simpleFinAccount = new SimpleFinAccountFaker(
+            helper.demoUser.Id,
+            organization.ID
+        ).Generate();
+        simpleFinAccount.LinkedAccountId = oldAccount.ID;
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.Accounts.AddRange(oldAccount, newAccount);
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await simpleFinAccountService.UpdateLinkedAccountAsync(
+            helper.demoUser.Id,
+            simpleFinAccount.ID,
+            newAccount.ID
+        );
+
+        // Assert
+        var updatedSimpleFinAccount = helper.UserDataContext.SimpleFinAccounts.First(a =>
+            a.ID == simpleFinAccount.ID
+        );
+        var updatedOldAccount = helper.UserDataContext.Accounts.First(a => a.ID == oldAccount.ID);
+        var updatedNewAccount = helper.UserDataContext.Accounts.First(a => a.ID == newAccount.ID);
+
+        updatedSimpleFinAccount.LinkedAccountId.Should().Be(newAccount.ID);
+        updatedSimpleFinAccount.LastSync.Should().BeNull();
+        updatedOldAccount.Source.Should().Be(AccountSource.Manual);
+        updatedNewAccount.Source.Should().Be(AccountSource.SimpleFIN);
+    }
+
+    [Fact]
+    public async Task UpdateLinkedAccountAsync_WhenOldLinkedAccountDoesNotExist_ShouldLinkNewAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var simpleFinAccountService = new SimpleFinAccountService(
+            Mock.Of<ILogger<ISimpleFinAccountService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var organization = new SimpleFinOrganizationFaker(helper.demoUser.Id).Generate();
+        var newAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        newAccount.Source = AccountSource.Manual;
+        var simpleFinAccount = new SimpleFinAccountFaker(
+            helper.demoUser.Id,
+            organization.ID
+        ).Generate();
+        simpleFinAccount.LinkedAccountId = Guid.NewGuid();
+
+        helper.UserDataContext.SimpleFinOrganizations.Add(organization);
+        helper.UserDataContext.Accounts.Add(newAccount);
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await simpleFinAccountService.UpdateLinkedAccountAsync(
+            helper.demoUser.Id,
+            simpleFinAccount.ID,
+            newAccount.ID
+        );
+
+        // Assert
+        var updatedSimpleFinAccount = helper.UserDataContext.SimpleFinAccounts.First(a =>
+            a.ID == simpleFinAccount.ID
+        );
+        var updatedNewAccount = helper.UserDataContext.Accounts.First(a => a.ID == newAccount.ID);
+
+        updatedSimpleFinAccount.LinkedAccountId.Should().Be(newAccount.ID);
+        updatedSimpleFinAccount.LastSync.Should().BeNull();
+        updatedNewAccount.Source.Should().Be(AccountSource.SimpleFIN);
+    }
+
+    [Fact]
+    public async Task UpdateLinkedAccountAsync_WhenAccountNotFound_ShouldThrowSimpleFinAccountNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -379,11 +558,11 @@ public class SimpleFinAccountServiceTests()
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("SimpleFinAccountUpdateNotFoundError");
+            .WithMessage("SimpleFinAccountNotFoundError");
     }
 
     [Fact]
-    public async Task UpdateLinkedAccountAsync_LinkedAccountIdIsNotValid_ShouldThrowException()
+    public async Task UpdateLinkedAccountAsync_LinkedAccountIdIsNotValid_ShouldThrowInvalidLinkedAccountIDError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -397,11 +576,17 @@ public class SimpleFinAccountServiceTests()
         var organizationFaker = new SimpleFinOrganizationFaker(helper.demoUser.Id);
         var organization = organizationFaker.Generate();
 
-        var accountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
-        var account = accountFaker.Generate();
+        var simpleFinAccountFaker = new SimpleFinAccountFaker(helper.demoUser.Id, organization.ID);
+        var simpleFinAccount = simpleFinAccountFaker.Generate();
 
         helper.UserDataContext.SimpleFinOrganizations.Add(organization);
-        helper.UserDataContext.SimpleFinAccounts.Add(account);
+        helper.UserDataContext.SimpleFinAccounts.Add(simpleFinAccount);
+
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var linkedAccount = accountFaker.Generate();
+        linkedAccount.Source = AccountSource.SimpleFIN;
+
+        helper.UserDataContext.Accounts.Add(linkedAccount);
         await helper.UserDataContext.SaveChangesAsync();
 
         var invalidLinkedAccountId = Guid.NewGuid();
@@ -410,7 +595,7 @@ public class SimpleFinAccountServiceTests()
         Func<Task> act = async () =>
             await simpleFinAccountService.UpdateLinkedAccountAsync(
                 helper.demoUser.Id,
-                account.ID,
+                simpleFinAccount.ID,
                 invalidLinkedAccountId
             );
 
@@ -419,7 +604,9 @@ public class SimpleFinAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidLinkedAccountIDError");
     }
+    #endregion
 
+    #region UpdateSimpleFinAccountSyncStartDateAsync
     [Fact]
     public async Task UpdateSimpleFinAccountSyncStartDateAsync_WhenValidData_ShouldUpdateSyncStartDate()
     {
@@ -524,4 +711,5 @@ public class SimpleFinAccountServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("SimpleFinAccountUpdateNotFoundError");
     }
+    #endregion
 }

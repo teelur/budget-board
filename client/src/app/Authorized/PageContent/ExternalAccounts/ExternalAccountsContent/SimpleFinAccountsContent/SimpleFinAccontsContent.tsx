@@ -1,56 +1,16 @@
 import { Badge, Button, Group, Skeleton, Stack } from "@mantine/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { AxiosError } from "axios";
 import SimpleFinOrganizationCards from "./SimpleFinOrganizationCards/SimpleFinOrganizationCards";
-import { notifications } from "@mantine/notifications";
-import {
-  accountsQueryKey,
-  applicationUserQueryKey,
-  institutionsQueryKey,
-  simpleFinAccountQueryKey,
-  simpleFinOrganizationQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
 import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
+import { useRemoveAccessTokenMutation } from "~/hooks/mutations/simpleFin/useRemoveAccessTokenMutation";
 
 const SimpleFinAccountsContent = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { request } = useAuth();
-
   const applicationUserQuery = useApplicationUserQuery();
-
-  const queryClient = useQueryClient();
-  const doRemoveAccessToken = useMutation({
-    mutationFn: async () =>
-      await request({
-        url: "/api/simplefin/removeAccessToken",
-        method: "POST",
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [applicationUserQueryKey],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: [simpleFinOrganizationQueryKey],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: [simpleFinAccountQueryKey],
-      });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const removeAccessTokenMutation = useRemoveAccessTokenMutation();
 
   const getContent = () => {
     if (applicationUserQuery.isPending) {
@@ -77,11 +37,12 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
           <Button
             bg="var(--button-color-destructive)"
             size="xs"
-            loading={doRemoveAccessToken.isPending}
+            loading={removeAccessTokenMutation.isPending}
             disabled={
-              doRemoveAccessToken.isPending || applicationUserQuery.isPending
+              removeAccessTokenMutation.isPending ||
+              applicationUserQuery.isPending
             }
-            onClick={() => doRemoveAccessToken.mutate()}
+            onClick={() => removeAccessTokenMutation.mutate()}
           >
             {t("remove_simplefin")}
           </Button>

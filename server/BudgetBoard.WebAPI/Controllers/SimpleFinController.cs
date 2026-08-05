@@ -1,7 +1,5 @@
 ﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
-using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,50 +16,41 @@ public class SimpleFinController(
     ISimpleFinService simpleFinService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+) : ApiControllerBase<SimpleFinController>(logger, logLocalizer, responseLocalizer)
 {
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> UpdateAccessToken(string setupToken)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await simpleFinService.ConfigureAccessTokenAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty),
-                setupToken
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await simpleFinService.ConfigureAccessTokenAsync(parsedUserId, setupToken);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> RemoveAccessToken()
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await simpleFinService.RemoveAccessTokenAsync(
-                new Guid(userManager.GetUserId(User) ?? string.Empty)
-            );
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await simpleFinService.RemoveAccessTokenAsync(parsedUserId);
             return Ok();
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+        });
     }
 }

@@ -56,7 +56,6 @@ public class SimpleFinAccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
-
         return userData
             .SimpleFinOrganizations.SelectMany(o => o.Accounts)
             .Select(a => new SimpleFinAccountResponse(a))
@@ -70,24 +69,14 @@ public class SimpleFinAccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var simpleFinAccount = GetSimpleFinAccountById(userData, request.ID);
 
-        var accountToUpdate = userData
-            .SimpleFinOrganizations.SelectMany(o => o.Accounts)
-            .SingleOrDefault(a => a.ID == request.ID);
-        if (accountToUpdate == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountIDUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["SimpleFinAccountIDUpdateNotFoundError"]
-            );
-        }
-
-        accountToUpdate.Name = request.Name;
-        accountToUpdate.Currency = request.Currency;
-        accountToUpdate.Balance = request.Balance;
-        accountToUpdate.BalanceDate = (int)
+        simpleFinAccount.Name = request.Name;
+        simpleFinAccount.Currency = request.Currency;
+        simpleFinAccount.Balance = request.Balance;
+        simpleFinAccount.BalanceDate = (int)
             new DateTimeOffset(request.BalanceDate).ToUnixTimeSeconds();
-        accountToUpdate.LastSync = request.LastSync;
+        simpleFinAccount.LastSync = request.LastSync;
 
         await userDataContext.SaveChangesAsync();
     }
@@ -96,27 +85,15 @@ public class SimpleFinAccountService(
     public async Task DeleteSimpleFinAccountAsync(Guid userGuid, Guid accountGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var simpleFinAccount = GetSimpleFinAccountById(userData, accountGuid);
 
-        var accountToDelete = userData
-            .SimpleFinOrganizations.SelectMany(o => o.Accounts)
-            .SingleOrDefault(a => a.ID == accountGuid);
-        if (accountToDelete == null)
+        if (simpleFinAccount.LinkedAccountId is Guid linkedAccountId)
         {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountIDDeleteNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["SimpleFinAccountIDDeleteNotFoundError"]
-            );
-        }
-
-        if (accountToDelete.LinkedAccountId != null)
-        {
-            var linkedAccount = userData.Accounts.FirstOrDefault(a =>
-                a.ID == accountToDelete.LinkedAccountId
-            );
+            var linkedAccount = userData.Accounts.FirstOrDefault(a => a.ID == linkedAccountId);
             linkedAccount?.Source = AccountSource.Manual;
         }
 
-        userDataContext.SimpleFinAccounts.Remove(accountToDelete);
+        userDataContext.SimpleFinAccounts.Remove(simpleFinAccount);
         await userDataContext.SaveChangesAsync();
     }
 
@@ -127,26 +104,16 @@ public class SimpleFinAccountService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var simpleFinAccount = GetSimpleFinAccountById(userData, simpleFinAccountGuid);
 
-        var accountToUpdate = userData.SimpleFinAccounts.SingleOrDefault(o =>
-            o.ID == simpleFinAccountGuid
-        );
-        if (accountToUpdate == null)
-        {
-            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountUpdateNotFoundLog"]);
-            throw new BudgetBoardServiceException(
-                responseLocalizer["SimpleFinAccountUpdateNotFoundError"]
-            );
-        }
-
-        if (linkedAccountGuid != null && !userData.Accounts.Any(a => a.ID == linkedAccountGuid))
+        var linkedAccountExists = userData.Accounts.Any(a => a.ID == linkedAccountGuid);
+        if (linkedAccountGuid.HasValue && !linkedAccountExists)
         {
             logger.LogError("{LogMessage}", logLocalizer["InvalidSimpleFinLinkedAccountIDLog"]);
             throw new BudgetBoardServiceException(responseLocalizer["InvalidLinkedAccountIDError"]);
         }
 
-        var oldAccountLinkedId = accountToUpdate.LinkedAccountId;
-        if (oldAccountLinkedId != null)
+        if (simpleFinAccount.LinkedAccountId is Guid oldAccountLinkedId)
         {
             var oldLinkedAccount = userData.Accounts.FirstOrDefault(a =>
                 a.ID == oldAccountLinkedId
@@ -154,12 +121,14 @@ public class SimpleFinAccountService(
             oldLinkedAccount?.Source = AccountSource.Manual;
         }
 
-        accountToUpdate.LinkedAccountId = linkedAccountGuid;
-        accountToUpdate.LastSync = null;
+        simpleFinAccount.LinkedAccountId = linkedAccountGuid;
+        simpleFinAccount.LastSync = null;
 
-        var linkedAccount = userData.Accounts.FirstOrDefault(a => a.ID == linkedAccountGuid);
-        linkedAccount?.Source =
-            linkedAccountGuid != null ? AccountSource.SimpleFIN : AccountSource.Manual;
+        if (linkedAccountGuid is Guid newLinkedAccountId)
+        {
+            var linkedAccount = userData.Accounts.Single(a => a.ID == newLinkedAccountId);
+            linkedAccount.Source = AccountSource.SimpleFIN;
+        }
 
         await userDataContext.SaveChangesAsync();
     }
@@ -202,5 +171,21 @@ public class SimpleFinAccountService(
                     .ThenInclude(i => i.Accounts)
                     .Include(u => u.Accounts)
         );
+    }
+
+    private SimpleFinAccount GetSimpleFinAccountById(ApplicationUser userData, Guid accountGuid)
+    {
+        var account = userData
+            .SimpleFinOrganizations.SelectMany(o => o.Accounts)
+            .SingleOrDefault(a => a.ID == accountGuid);
+        if (account == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["SimpleFinAccountIDNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinAccountNotFoundError"]
+            );
+        }
+
+        return account;
     }
 }
