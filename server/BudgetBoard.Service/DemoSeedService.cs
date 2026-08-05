@@ -378,7 +378,8 @@ public class DemoSeedService(
                 );
                 for (int i = 0; i < transactionCount; i++)
                 {
-                    var transactionDate = GenerateRandomDate(rng, firstDay, endDay);
+                    var maxDayOffset = endDay.DayNumber - firstDay.DayNumber;
+                    var transactionDate = GenerateRandomDateAfter(rng, firstDay, maxDayOffset);
                     var template = expensePool[rng.Next(expensePool.Length)];
                     var amount = -GenerateRandomDecimal(rng, template.Min, template.Max);
 
@@ -511,11 +512,6 @@ public class DemoSeedService(
         return Math.Round(min + (decimal)(rng.NextDouble() * range), 2);
     }
 
-    private static DateOnly GenerateRandomDate(Random rng, DateOnly from, DateOnly to)
-    {
-        var range = to.DayNumber - from.DayNumber;
-        if (range <= 0)
-            return from;
-        return from.AddDays(rng.Next(0, range + 1));
-    }
+    private static DateOnly GenerateRandomDateAfter(Random rng, DateOnly from, int maxDayOffset) =>
+        from.AddDays(rng.Next(0, maxDayOffset + 1));
 }
