@@ -2,9 +2,6 @@ import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -15,17 +12,13 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
-import {
-  accountsQueryKey,
-  institutionsQueryKey,
-  simpleFinAccountQueryKey,
-  simpleFinOrganizationQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
+import { useDeleteSimpleFinAccountMutation } from "~/hooks/mutations/simpleFinAccounts/useDeleteSimpleFinAccountMutation";
+import { useUpdateLinkedAccountMutation } from "~/hooks/mutations/simpleFinAccounts/useUpdateLinkedAccountMutation";
+import { useUpdateSyncStartDateMutation } from "~/hooks/mutations/simpleFinAccounts/useUpdateSyncStartDateMutation";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useSimpleFinAccountsQuery } from "~/hooks/queries/useSimpleFinAccountsQuery";
 import { AccountSource } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface ISimpleFinAccountCardProps {
@@ -50,111 +43,11 @@ const SimpleFinAccountCard = (
 
   const { t } = useTranslation();
   const { dayjs, dateFormat, dayjsLocale } = useLocale();
-  const { request } = useAuth();
-
   const accountsQuery = useAccountsQuery();
-
-  const simpleFinAccountsQuery = useQuery({
-    queryKey: [simpleFinAccountQueryKey],
-    queryFn: async (): Promise<ISimpleFinAccountResponse[]> => {
-      const res: AxiosResponse = await request({
-        url: "/api/simpleFinAccount",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as ISimpleFinAccountResponse[];
-      }
-
-      return [];
-    },
-  });
-
-  const queryClient = useQueryClient();
-  const doUpdateLinkedAccount = useMutation({
-    mutationFn: async (updateLinkedAccountRequest: {
-      simpleFinAccountGuid: string;
-      linkedAccountGuid: string | null;
-    }) =>
-      await request({
-        url: "/api/simpleFinAccount/updateLinkedAccount",
-        method: "PUT",
-        params: {
-          simpleFinAccountGuid: updateLinkedAccountRequest.simpleFinAccountGuid,
-          linkedAccountGuid: updateLinkedAccountRequest.linkedAccountGuid,
-        },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [simpleFinOrganizationQueryKey],
-      });
-      queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
-      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-  const doUpdateSyncStartDate = useMutation({
-    mutationFn: async (updateSyncStartDateRequest: {
-      simpleFinAccountGuid: string;
-      syncStartDate: Date | null;
-    }) =>
-      await request({
-        url: "/api/simpleFinAccount/updateSyncStartDate",
-        method: "PUT",
-        params: {
-          simpleFinAccountGuid: updateSyncStartDateRequest.simpleFinAccountGuid,
-          syncStartDate: dayjs(
-            updateSyncStartDateRequest.syncStartDate,
-          ).isValid()
-            ? dayjs(updateSyncStartDateRequest.syncStartDate).format(
-                "YYYY-MM-DD",
-              )
-            : null,
-        },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
-      queryClient.invalidateQueries({
-        queryKey: [simpleFinOrganizationQueryKey],
-      });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
-  const doDeleteSimpleFinAccount = useMutation({
-    mutationFn: async (simpleFinAccountGuid: string) =>
-      await request({
-        url: "/api/simpleFinAccount",
-        method: "DELETE",
-        params: {
-          simpleFinAccountGuid,
-        },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [simpleFinAccountQueryKey] });
-      queryClient.invalidateQueries({
-        queryKey: [simpleFinOrganizationQueryKey],
-      });
-      queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-      queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    },
-  });
+  const updateLinkedAccountMutation = useUpdateLinkedAccountMutation();
+  const updateSyncStartDateMutation = useUpdateSyncStartDateMutation();
+  const deleteSimpleFinAccountMutation = useDeleteSimpleFinAccountMutation();
+  const simpleFinAccountsQuery = useSimpleFinAccountsQuery();
 
   const getAccountNameForId = (accountId: string): string => {
     const account = accountsQuery.data?.find(
@@ -256,9 +149,9 @@ const SimpleFinAccountCard = (
     <Card elevation={2}>
       <LoadingOverlay
         visible={
-          doUpdateLinkedAccount.isPending ||
-          doUpdateSyncStartDate.isPending ||
-          doDeleteSimpleFinAccount.isPending
+          updateLinkedAccountMutation.isPending ||
+          updateSyncStartDateMutation.isPending ||
+          deleteSimpleFinAccountMutation.isPending
         }
       />
       <Group w={"100%"} gap={"0.5rem"}>
@@ -297,7 +190,7 @@ const SimpleFinAccountCard = (
                     data={selectableAccounts}
                     value={props.simpleFinAccount.linkedAccountId}
                     onChange={(value) => {
-                      doUpdateLinkedAccount.mutate({
+                      updateLinkedAccountMutation.mutate({
                         simpleFinAccountGuid: props.simpleFinAccount.id,
                         linkedAccountGuid: value,
                       });
@@ -340,7 +233,7 @@ const SimpleFinAccountCard = (
                     {...syncStartDateField.getInputProps()}
                     onChange={(value) => {
                       syncStartDateField.setValue(value);
-                      doUpdateSyncStartDate.mutate({
+                      updateSyncStartDateMutation.mutate({
                         simpleFinAccountGuid: props.simpleFinAccount.id,
                         syncStartDate: dayjs(value).isValid()
                           ? dayjs(value).toDate()
@@ -402,7 +295,7 @@ const SimpleFinAccountCard = (
               size="sm"
               color="var(--button-color-destructive)"
               onClick={() =>
-                doDeleteSimpleFinAccount.mutate(props.simpleFinAccount.id)
+                deleteSimpleFinAccountMutation.mutate(props.simpleFinAccount.id)
               }
             >
               <Trash2Icon size={16} />

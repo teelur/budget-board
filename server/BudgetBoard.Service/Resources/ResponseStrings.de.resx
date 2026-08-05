@@ -325,9 +325,6 @@
   <data name="SimpleFin" xml:space="preserve">
         <value>SimpleFIN</value>
   </data>
-  <data name="SimpleFinAccountIDUpdateNotFoundError" xml:space="preserve">
-        <value>Das SimpleFIN-Konto, das Sie aktualisieren möchten, existiert nicht.</value>
-  </data>
   <data name="SimpleFinAccountNotFoundForSyncError" xml:space="preserve">
         <value>SimpleFIN-Konto mit SyncID '{0}' nicht im Cache gefunden. Kontosynchronisierung wird übersprungen.</value>
   </data>
@@ -360,12 +357,6 @@
   </data>
   <data name="SimpleFinMissingAccessTokenError" xml:space="preserve">
         <value>Der SimpleFIN-Zugriffstoken fehlt oder ist leer.</value>
-  </data>
-  <data name="SimpleFinOrganizationDeleteNotFoundError" xml:space="preserve">
-        <value>Die SimpleFIN-Organisation, die Sie löschen möchten, existiert nicht.</value>
-  </data>
-  <data name="SimpleFinOrganizationUpdateNotFoundError" xml:space="preserve">
-        <value>Die SimpleFIN-Organisation, die Sie aktualisieren möchten, existiert nicht.</value>
   </data>
   <data name="SyncSimpleFinOrganizationCreationError" xml:space="preserve">
         <value>Die Erstellung der SimpleFIN-Organisation für das Konto {0} ist fehlgeschlagen.</value>

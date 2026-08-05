@@ -13,6 +13,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class SimpleFinOrganizationServiceTests()
 {
+    #region CreateSimpleFinOrganizationAsync
     [Fact]
     public async Task CreateSimpleFinOrganizationAsync_WhenValidData_ShouldCreateOrganization()
     {
@@ -47,14 +48,14 @@ public class SimpleFinOrganizationServiceTests()
             );
 
         createdOrganization.Should().NotBeNull();
-        createdOrganization!.Name.Should().Be(request.Name);
+        createdOrganization.Name.Should().Be(request.Name);
         createdOrganization.SimpleFinUrl.Should().Be(request.SimpleFinUrl);
         createdOrganization.Url.Should().Be(request.Url);
         createdOrganization.SyncID.Should().Be(request.SyncID);
     }
 
     [Fact]
-    public async Task CreateSimpleFinOrganizationAsync_WhenDuplicateDomain_ShouldThrowException()
+    public async Task CreateSimpleFinOrganizationAsync_WhenDuplicateDomain_ShouldThrowDuplicateOrganizationCreateError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -99,7 +100,9 @@ public class SimpleFinOrganizationServiceTests()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("DuplicateOrganizationCreateError");
     }
+    #endregion
 
+    #region ReadSimpleFinOrganizationsAsync
     [Fact]
     public async Task ReadSimpleFinOrganizationsAsync_WhenValidData_ShouldReturnOrganizations()
     {
@@ -145,7 +148,9 @@ public class SimpleFinOrganizationServiceTests()
         organizations.Should().ContainSingle(o => o.Domain == organization1.Domain);
         organizations.Should().ContainSingle(o => o.Domain == organization2.Domain);
     }
+    #endregion
 
+    #region UpdateSimpleFinOrganizationAsync
     [Fact]
     public async Task UpdateSimpleFinOrganizationAsync_WhenValidData_ShouldUpdateOrganization()
     {
@@ -202,7 +207,7 @@ public class SimpleFinOrganizationServiceTests()
     }
 
     [Fact]
-    public async Task UpdateSimpleFinOrganizationAsync_WhenOrganizationNotFound_ShouldThrowException()
+    public async Task UpdateSimpleFinOrganizationAsync_WhenOrganizationNotFound_ShouldThrowSimpleFinOrganizationNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -233,9 +238,11 @@ public class SimpleFinOrganizationServiceTests()
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("SimpleFinOrganizationUpdateNotFoundError");
+            .WithMessage("SimpleFinOrganizationNotFoundError");
     }
+    #endregion
 
+    #region DeleteSimpleFinOrganizationAsync
     [Fact]
     public async Task DeleteSimpleFinOrganizationAsync_WhenValidData_ShouldDeleteOrganization()
     {
@@ -277,7 +284,7 @@ public class SimpleFinOrganizationServiceTests()
     }
 
     [Fact]
-    public async Task DeleteSimpleFinOrganizationAsync_WhenOrganizationNotFound_ShouldThrowException()
+    public async Task DeleteSimpleFinOrganizationAsync_WhenOrganizationNotFound_ShouldThrowSimpleFinOrganizationNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
@@ -300,6 +307,7 @@ public class SimpleFinOrganizationServiceTests()
         // Assert
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("SimpleFinOrganizationDeleteNotFoundError");
+            .WithMessage("SimpleFinOrganizationNotFoundError");
     }
+    #endregion
 }

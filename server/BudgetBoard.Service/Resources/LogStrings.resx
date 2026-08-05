@@ -331,8 +331,8 @@
     <data name="SimpleFinAccountDeletedSkipLog" xml:space="preserve">
         <value>SimpleFIN account {0} is deleted. Skipping.</value>
     </data>
-    <data name="SimpleFinAccountIDUpdateNotFoundLog" xml:space="preserve">
-        <value>Attempted to update a SimpleFIN account that does not exist.</value>
+    <data name="SimpleFinAccountIDNotFoundLog" xml:space="preserve">
+        <value>Attempted to access a SimpleFIN account that does not exist.</value>
     </data>
     <data name="SimpleFinAccountNotFoundForSyncLog" xml:space="preserve">
         <value>SimpleFIN account with SyncID {0} not found in cache. Skipping account sync.</value>
@@ -373,11 +373,8 @@
     <data name="SimpleFinMissingAccessTokenLog" xml:space="preserve">
         <value>SimpleFIN access token is missing or empty.</value>
     </data>
-    <data name="SimpleFinOrganizationDeleteNotFoundLog" xml:space="preserve">
-        <value>Attempted to delete a SimpleFIN organization that does not exist.</value>
-    </data>
-    <data name="SimpleFinOrganizationUpdateNotFoundLog" xml:space="preserve">
-        <value>Attempted to update a SimpleFIN organization that does not exist.</value>
+    <data name="SimpleFinOrganizationNotFoundLog" xml:space="preserve">
+        <value>Attempted to access a SimpleFIN organization that does not exist.</value>
     </data>
     <data name="SimpleFinSyncingTransactionsLog" xml:space="preserve">
         <value>Syncing transactions from {0} (Unix time {1})</value>

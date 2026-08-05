@@ -100,15 +100,19 @@ public class SimpleFinService(
         {
             return [bbex.Message];
         }
-        catch (Exception ex)
-        {
-            logger.LogError(
-                ex,
-                "{LogMessage}",
-                logLocalizer["SimpleFinDataRetrievalErrorLog", ex.Message]
-            );
-            return [responseLocalizer["SimpleFinDataRetrievalError"]];
-        }
+    }
+
+    /// <inheritdoc />
+    public async Task RemoveAccessTokenAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+
+        userData.SimpleFinAccessToken = string.Empty;
+
+        userDataContext.Update(userData);
+        await userDataContext.SaveChangesAsync();
+
+        await RemoveSimpleFinDataAsync(userGuid);
     }
 
     /// <inheritdoc />
@@ -121,9 +125,7 @@ public class SimpleFinService(
         // Deleted accounts do not get updated during sync.
         long earliestBalanceTimestamp = GetOldestLastSyncTimestamp(
             userData.SimpleFinAccounts.Where(a =>
-                a.LinkedAccountId != null
-                && userData.Accounts.SingleOrDefault(ua => ua.ID == a.LinkedAccountId)?.Deleted
-                    == null
+                a.LinkedAccountId != null && IsActiveLinkedAccount(userData, a)
             )
         );
 
@@ -175,19 +177,6 @@ public class SimpleFinService(
             );
             return [responseLocalizer["SimpleFinDataRetrievalError"]];
         }
-    }
-
-    /// <inheritdoc />
-    public async Task RemoveAccessTokenAsync(Guid userGuid)
-    {
-        var userData = await GetCurrentUserAsync(userGuid);
-
-        userData.SimpleFinAccessToken = string.Empty;
-
-        userDataContext.Update(userData);
-        await userDataContext.SaveChangesAsync();
-
-        await RemoveSimpleFinDataAsync(userGuid);
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
@@ -256,12 +245,22 @@ public class SimpleFinService(
     private async Task<bool> IsAccessTokenValid(string accessToken) =>
         (await QuerySimpleFinAccountDataAsync(accessToken, null, true)).IsSuccessStatusCode;
 
-    private static SimpleFinData GetUrlCredentials(string accessToken)
+    private SimpleFinData GetUrlCredentials(string accessToken)
     {
         try
         {
             string[] url = accessToken.Split("//");
             string[] data = url.Last().Split("@");
+            if (
+                url.Length != 2
+                || data.Length != 2
+                || string.IsNullOrWhiteSpace(data.First())
+                || string.IsNullOrWhiteSpace(data.Last())
+            )
+            {
+                throw new FormatException();
+            }
+
             var auth = data.First();
             var baseUrl = url.First() + "//" + data.Last();
 
@@ -269,7 +268,9 @@ public class SimpleFinService(
         }
         catch (Exception)
         {
-            throw new BudgetBoardServiceException("SimpleFinAccessTokenParseError");
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinAccessTokenParseError"]
+            );
         }
     }
 
@@ -296,6 +297,17 @@ public class SimpleFinService(
         }
 
         return oldestLastSyncTimestamp;
+    }
+
+    internal static bool IsActiveLinkedAccount(
+        ApplicationUser userData,
+        SimpleFinAccount simpleFinAccount
+    )
+    {
+        var linkedAccount = userData.Accounts.SingleOrDefault(ua =>
+            ua.ID == simpleFinAccount.LinkedAccountId.GetValueOrDefault()
+        );
+        return linkedAccount is null || !linkedAccount.Deleted.HasValue;
     }
 
     private long GetSyncStartDate(int forceSyncLookbackMonths, long earliestBalanceTimestamp)
@@ -339,8 +351,7 @@ public class SimpleFinService(
 
         try
         {
-            return JsonSerializer.Deserialize<SimpleFinAccountsData>(jsonString, s_readOptions)
-                ?? null;
+            return JsonSerializer.Deserialize<SimpleFinAccountsData>(jsonString, s_readOptions);
         }
         catch (JsonException jex)
         {
