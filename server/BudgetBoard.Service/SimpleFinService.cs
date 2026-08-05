@@ -245,7 +245,7 @@ public class SimpleFinService(
     private async Task<bool> IsAccessTokenValid(string accessToken) =>
         (await QuerySimpleFinAccountDataAsync(accessToken, null, true)).IsSuccessStatusCode;
 
-    private static SimpleFinData GetUrlCredentials(string accessToken)
+    private SimpleFinData GetUrlCredentials(string accessToken)
     {
         try
         {
@@ -268,7 +268,9 @@ public class SimpleFinService(
         }
         catch (Exception)
         {
-            throw new BudgetBoardServiceException("SimpleFinAccessTokenParseError");
+            throw new BudgetBoardServiceException(
+                responseLocalizer["SimpleFinAccessTokenParseError"]
+            );
         }
     }
 
