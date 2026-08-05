@@ -2079,93 +2079,6 @@ public class SimpleFinServiceTests
     }
 
     [Fact]
-    public void SyncTransactionHistoryAsync_WhenLinkedAccountIdHasNoMatchingAccount_ShouldIncludeItInSyncWindow()
-    {
-        // Arrange
-        var predicateType = typeof(SimpleFinService).GetNestedType(
-            "<>c__DisplayClass19_0",
-            System.Reflection.BindingFlags.NonPublic
-        );
-        var predicate = Activator.CreateInstance(predicateType!, nonPublic: true)!;
-        var userDataField = predicateType!
-            .GetFields(
-                System.Reflection.BindingFlags.Static
-                    | System.Reflection.BindingFlags.Instance
-                    | System.Reflection.BindingFlags.Public
-                    | System.Reflection.BindingFlags.NonPublic
-            )
-            .Single(field => field.FieldType == typeof(ApplicationUser));
-        userDataField!.SetValue(predicate, new ApplicationUser { Accounts = [] });
-        var predicateMethod = predicateType.GetMethod(
-            "<SyncTransactionHistoryAsync>b__0",
-            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
-        );
-        var simpleFinAccount = new SimpleFinAccount
-        {
-            LinkedAccountId = Guid.NewGuid(),
-            UserID = Guid.NewGuid(),
-        };
-
-        // Act
-        var result = (bool)predicateMethod!.Invoke(predicate, [simpleFinAccount])!;
-        userDataField.SetValue(
-            predicate,
-            new ApplicationUser
-            {
-                Accounts =
-                [
-                    new Account
-                    {
-                        ID = simpleFinAccount.LinkedAccountId.Value,
-                        InstitutionID = Guid.NewGuid(),
-                        UserID = Guid.NewGuid(),
-                        Deleted = DateTime.UtcNow,
-                    },
-                ],
-            }
-        );
-        var deletedResult = (bool)predicateMethod.Invoke(predicate, [simpleFinAccount])!;
-        userDataField.SetValue(
-            predicate,
-            new ApplicationUser
-            {
-                Accounts =
-                [
-                    new Account
-                    {
-                        ID = simpleFinAccount.LinkedAccountId.Value,
-                        InstitutionID = Guid.NewGuid(),
-                        UserID = Guid.NewGuid(),
-                    },
-                ],
-            }
-        );
-        var activeResult = (bool)predicateMethod.Invoke(predicate, [simpleFinAccount])!;
-        userDataField.SetValue(
-            predicate,
-            new ApplicationUser
-            {
-                Accounts =
-                [
-                    new Account
-                    {
-                        ID = Guid.NewGuid(),
-                        InstitutionID = Guid.NewGuid(),
-                        UserID = Guid.NewGuid(),
-                    },
-                ],
-            }
-        );
-        var unrelatedResult = (bool)predicateMethod.Invoke(predicate, [simpleFinAccount])!;
-
-        // Assert
-        result.Should().BeTrue();
-        deletedResult.Should().BeFalse();
-        activeResult.Should().BeTrue();
-        unrelatedResult.Should().BeTrue();
-    }
-
-    [Fact]
     public async Task SyncTransactionsAsync_WhenAccountNavigationIsMissing_ShouldReturnTransactionError()
     {
         // Arrange
@@ -3245,6 +3158,69 @@ public class SimpleFinServiceTests
         errors.Should().Contain(e => e.Contains("SimpleFinAccountSyncException"));
     }
     #endregion
+
+    [Theory]
+    [InlineData(LinkedAccountState.Missing, true)]
+    [InlineData(LinkedAccountState.Deleted, false)]
+    [InlineData(LinkedAccountState.Active, true)]
+    [InlineData(LinkedAccountState.Unrelated, true)]
+    public void IsActiveLinkedAccount_WhenEvaluatingLinkedAccountStates_ShouldReturnExpectedResult(
+        LinkedAccountState accountState,
+        bool expectedResult
+    )
+    {
+        // Arrange
+        var linkedAccountId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var simpleFinAccount = new SimpleFinAccount
+        {
+            LinkedAccountId = linkedAccountId,
+            UserID = userId,
+        };
+        Account? linkedAccount = accountState switch
+        {
+            LinkedAccountState.Missing => null,
+            LinkedAccountState.Deleted => new Account
+            {
+                ID = linkedAccountId,
+                InstitutionID = Guid.NewGuid(),
+                UserID = userId,
+                Deleted = DateTime.UtcNow,
+            },
+            LinkedAccountState.Active => new Account
+            {
+                ID = linkedAccountId,
+                InstitutionID = Guid.NewGuid(),
+                UserID = userId,
+            },
+            LinkedAccountState.Unrelated => new Account
+            {
+                ID = Guid.NewGuid(),
+                InstitutionID = Guid.NewGuid(),
+                UserID = userId,
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(accountState), accountState, null),
+        };
+        var userData = new ApplicationUser { Accounts = [] };
+        if (linkedAccount is not null)
+        {
+            userData.Accounts.Add(linkedAccount);
+        }
+
+        // Act
+        var result = SimpleFinService.IsActiveLinkedAccount(userData, simpleFinAccount);
+
+        // Assert
+        result.Should().Be(expectedResult);
+    }
+
+    public enum LinkedAccountState
+    {
+        Missing,
+        Deleted,
+        Active,
+        Unrelated,
+    }
 
     private static SimpleFinService CreateSimpleFinService(
         TestHelper helper,

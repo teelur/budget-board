@@ -299,7 +299,7 @@ public class SimpleFinService(
         return oldestLastSyncTimestamp;
     }
 
-    private static bool IsActiveLinkedAccount(
+    internal static bool IsActiveLinkedAccount(
         ApplicationUser userData,
         SimpleFinAccount simpleFinAccount
     )
