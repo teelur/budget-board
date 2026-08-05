@@ -13,8 +13,6 @@ public class SimpleFinData : ISimpleFinData
     public string Auth { get; init; } = string.Empty;
     public string BaseUrl { get; init; } = string.Empty;
 
-    public SimpleFinData() { }
-
     public SimpleFinData(string auth, string baseUrl)
     {
         Auth = auth;
