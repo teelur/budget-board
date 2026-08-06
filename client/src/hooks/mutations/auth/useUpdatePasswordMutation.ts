@@ -33,6 +33,11 @@ export const useUpdatePasswordMutation = () => {
       await queryClient.invalidateQueries({
         queryKey: [applicationUserQueryKey],
       });
+
+      notifications.show({
+        color: "var(--button-color-confirm)",
+        message: t("password_updated_successfully"),
+      });
     },
     onError: (error: AxiosError) => {
       if (error?.response?.data) {
