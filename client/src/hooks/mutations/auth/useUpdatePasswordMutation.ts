@@ -43,13 +43,18 @@ export const useUpdatePasswordMutation = () => {
       if (error?.response?.data) {
         const errorData = error.response.data as ValidationError;
         if (
-          error.status === 400 &&
+          error.response?.status === 400 &&
           errorData.title === "One or more validation errors occurred."
         ) {
           notifications.show({
             title: t("one_or_more_validation_errors_occurred"),
             color: "var(--button-color-destructive)",
             message: Object.values(errorData.errors).join("\n"),
+          });
+        } else {
+          notifications.show({
+            color: "var(--button-color-destructive)",
+            message: translateAxiosError(error),
           });
         }
       } else {

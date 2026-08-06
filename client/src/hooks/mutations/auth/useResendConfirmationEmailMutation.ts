@@ -5,11 +5,6 @@ import { translateAxiosError } from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useTranslation } from "react-i18next";
 
-export type UpdatePasswordData = {
-  oldPassword?: string;
-  newPassword: string;
-};
-
 export const useResendConfirmationEmailMutation = () => {
   const { request } = useAuth();
   const { t } = useTranslation();

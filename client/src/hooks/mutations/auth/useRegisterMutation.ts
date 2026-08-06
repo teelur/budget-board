@@ -38,7 +38,7 @@ export const useRegisterMutation = () => {
     onError: (error: AxiosError) => {
       if (
         error?.response?.data &&
-        error.status === 400 &&
+        error.response?.status === 400 &&
         (error.response.data as ValidationError).title ===
           "One or more validation errors occurred."
       ) {
