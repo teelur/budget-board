@@ -13,32 +13,37 @@ namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TrainAutoCategorizerController(
-    ILogger<TrainAutoCategorizerController> logger,
+public class AutomaticTransactionCategorizerController(
+    ILogger<AutomaticTransactionCategorizerController> logger,
     UserManager<ApplicationUser> userManager,
     IAutomaticTransactionCategorizerService automaticTransactionCategorizerService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-) : ControllerBase
+)
+    : ApiControllerBase<AutomaticTransactionCategorizerController>(
+        logger,
+        logLocalizer,
+        responseLocalizer
+    )
 {
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Train([FromBody] TrainAutoCategorizerRequest trainRequest)
     {
-        try
+        return await HandleRequestAsync(async () =>
         {
-            await automaticTransactionCategorizerService.TrainCategorizerAsync(new Guid(userManager.GetUserId(User) ?? string.Empty), trainRequest);
-        }
-        catch (BudgetBoardServiceException bbex)
-        {
-            return Helpers.BuildErrorResponse(bbex.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{LogMessage}", logLocalizer["UnexpectedErrorLog"]);
-            return Helpers.BuildErrorResponse(responseLocalizer["UnexpectedServerError"]);
-        }
+            var userId = userManager.GetUserId(User);
 
-        return Ok();
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await automaticTransactionCategorizerService.TrainCategorizerAsync(
+                parsedUserId,
+                trainRequest
+            );
+            return Ok();
+        });
     }
 }
