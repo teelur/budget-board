@@ -8,16 +8,8 @@ import {
   Skeleton,
 } from "@mantine/core";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTwoFactorAuthenticationQuery } from "~/hooks/queries/useTwoFactorAuthenticationQuery";
 import { notifications } from "@mantine/notifications";
-import {
-  applicationUserQueryKey,
-  translateAxiosError,
-  twoFactorAuthQueryKey,
-  ValidationError,
-} from "~/helpers/requests";
-import { AxiosError, AxiosResponse } from "axios";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
 import { useDisclosure } from "@mantine/hooks";
@@ -27,29 +19,17 @@ import PinInput from "~/components/core/Input/PinInput/PinInput";
 import Code from "~/components/core/Code/Code";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-
-type TwoFactorAuthResponse = {
-  sharedKey: string;
-  recoveryCodesLeft: number;
-  recoveryCodes: string[] | null;
-  isTwoFactorEnabled: boolean;
-  isMachineRemembered: boolean;
-};
-
-type TwoFactorAuthRequest = {
-  enable?: boolean;
-  twoFactorCode?: string;
-  resetSharedKey: boolean;
-  resetRecoveryCodes: boolean;
-  forgetMachine: boolean;
-};
+import { useSetTwoFactorAuthenticationMutation } from "~/hooks/mutations/auth/useSetTwoFactorAuthenticationMutation";
+import { TwoFactorAuthRequest } from "~/models/twoFactorAuth";
 
 const TwoFactorAuth = (): React.ReactNode => {
   const [recoveryCodes, setRecoveryCodes] = React.useState<string[]>([]);
   const [showAuthenticatorSetup, { toggle }] = useDisclosure();
 
   const { t } = useTranslation();
-  const { request } = useAuth();
+  const twoFactorAuthQuery = useTwoFactorAuthenticationQuery();
+  const setTwoFactorAuthenticationMutation =
+    useSetTwoFactorAuthenticationMutation();
 
   const validationCodeField = useField<string>({
     initialValue: "",
@@ -61,79 +41,12 @@ const TwoFactorAuth = (): React.ReactNode => {
     },
   });
 
-  const twoFactorAuthQuery = useQuery({
-    queryKey: [twoFactorAuthQueryKey],
-    queryFn: async (): Promise<TwoFactorAuthResponse | undefined> => {
-      const res: AxiosResponse = await request({
-        url: "/api/manage/2fa",
-        method: "GET",
-      });
-
-      if (res.status === 200) {
-        return res.data as TwoFactorAuthResponse;
-      }
-
-      return undefined;
-    },
-  });
-
-  const queryClient = useQueryClient();
-  const doSetTwoFactorAuth = useMutation({
-    mutationFn: async (twoFactorAuthData: TwoFactorAuthRequest) =>
-      await request({
-        url: "/api/manage/2fa",
-        method: "POST",
-        data: { ...twoFactorAuthData },
-      }),
-    onSuccess: async (res: AxiosResponse) => {
-      await queryClient.invalidateQueries({
-        queryKey: [applicationUserQueryKey],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: [twoFactorAuthQueryKey],
-      });
-
-      const data = res.data as TwoFactorAuthResponse;
-      if (!data) {
-        notifications.show({
-          color: "var(--button-color-destructive)",
-          message: t("no_data_returned_from_server"),
-        });
-        return;
-      }
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("two_factor_auth_successfully_updated"),
-      });
-
-      if (data.recoveryCodes) {
-        setRecoveryCodes(data.recoveryCodes);
-      } else {
-        setRecoveryCodes([]);
-      }
-    },
-    onError: (error: AxiosError) => {
-      if (error?.response?.data) {
-        const errorData = error.response.data as ValidationError;
-        if (
-          error.status === 400 &&
-          errorData.title === "One or more validation errors occurred."
-        ) {
-          notifications.show({
-            title: t("one_or_more_validation_errors_occurred"),
-            color: "var(--button-color-destructive)",
-            message: Object.values(errorData.errors).join("\n"),
-          });
-        }
-      } else {
-        notifications.show({
-          color: "var(--button-color-destructive)",
-          message: translateAxiosError(error),
-        });
-      }
-    },
-  });
+  const setTwoFactorAuth = (twoFactorAuthData: TwoFactorAuthRequest): void => {
+    setTwoFactorAuthenticationMutation.mutate({
+      twoFactorAuthData,
+      setRecoveryCodes,
+    });
+  };
 
   const formatKey = (key: string): string => {
     // Format the shared key into groups of 4 characters
@@ -187,12 +100,12 @@ const TwoFactorAuth = (): React.ReactNode => {
               variant="filled"
               bg="var(--button-color-destructive)"
               onClick={() =>
-                doSetTwoFactorAuth.mutate({
+                setTwoFactorAuth({
                   enable: false,
                   resetSharedKey: true,
                   resetRecoveryCodes: true,
                   forgetMachine: true,
-                } as TwoFactorAuthRequest)
+                })
               }
             >
               {t("disable")}
@@ -200,11 +113,11 @@ const TwoFactorAuth = (): React.ReactNode => {
             <Button
               variant="outline"
               onClick={() =>
-                doSetTwoFactorAuth.mutate({
+                setTwoFactorAuth({
                   resetSharedKey: false,
                   resetRecoveryCodes: true,
                   forgetMachine: false,
-                } as TwoFactorAuthRequest)
+                })
               }
             >
               {t("generate_new_recovery_codes")}
@@ -268,13 +181,13 @@ const TwoFactorAuth = (): React.ReactNode => {
           </Stack>
           <Button
             onClick={() =>
-              doSetTwoFactorAuth.mutate({
+              setTwoFactorAuth({
                 enable: true,
                 twoFactorCode: validationCodeField.getValue(),
                 resetSharedKey: false,
                 resetRecoveryCodes: true,
                 forgetMachine: true,
-              } as TwoFactorAuthRequest)
+              })
             }
           >
             {t("enable")}
@@ -292,7 +205,7 @@ const TwoFactorAuth = (): React.ReactNode => {
 
   return (
     <Card elevation={1}>
-      <LoadingOverlay visible={doSetTwoFactorAuth.isPending} />
+      <LoadingOverlay visible={setTwoFactorAuthenticationMutation.isPending} />
       <Stack gap="1rem">
         <Group gap="1rem">
           <PrimaryText size="lg">{t("two_factor_authentication")}</PrimaryText>

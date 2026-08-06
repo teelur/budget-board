@@ -11,6 +11,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PinInput from "~/components/core/Input/PinInput/PinInput";
 import { useTranslation } from "react-i18next";
 import { LoginCardState } from "../Welcome";
+import { useLoginMutation } from "~/hooks/mutations/auth/useLoginMutation";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -20,71 +21,64 @@ interface LoginProps {
 }
 
 const LoginWith2fa = (props: LoginProps): React.ReactNode => {
-  const [loading, setLoading] = React.useState(false);
-
   const { t } = useTranslation();
 
   const authenticationCodeField = useField<string>({
     initialValue: "",
   });
 
-  const { request, setIsUserAuthenticated } = useAuth();
-
+  const { setIsUserAuthenticated } = useAuth();
   const queryClient = useQueryClient();
+  const loginMutation = useLoginMutation();
 
-  const submitUserLogin = async (): Promise<void> => {
-    setLoading(true);
-
+  const submitUserLogin = (): void => {
     if (!authenticationCodeField.getValue()) {
       notifications.show({
         color: "var(--button-color-destructive)",
         message: t("enter_authentication_code_message"),
       });
-      setLoading(false);
       return;
     }
 
-    request({
-      url: "/api/login",
-      method: "POST",
-      data: {
+    const authenticationCode = authenticationCodeField.getValue();
+
+    loginMutation.mutate(
+      {
         email: props.userEmail,
         password: props.userPassword,
-        twoFactorCode: authenticationCodeField.getValue(),
-      },
-      params: {
         rememberMe: props.rememberMe,
+        twoFactorCode: authenticationCode,
       },
-    })
-      .then(() => {
-        setIsUserAuthenticated(true);
-      })
-      .catch((error: AxiosError) => {
-        // These error response values are specific to ASP.NET Identity,
-        // so will do the error translation here.
-        if ((error.response?.data as any)?.detail === "Failed") {
-          notifications.show({
-            color: "var(--button-color-destructive)",
-            message: t("login_failed_message"),
-          });
-        } else {
-          notifications.show({
-            color: "var(--button-color-destructive)",
-            message: translateAxiosError(error),
-          });
-        }
-      })
-      .finally(() => {
-        // Invalidate all old queries, so we refetch for new user.
-        queryClient.invalidateQueries();
-        setLoading(false);
-      });
+      {
+        onSuccess: () => {
+          setIsUserAuthenticated(true);
+        },
+        onError: (error) => {
+          const axiosError = error as AxiosError;
+
+          if ((axiosError.response?.data as any)?.detail === "Failed") {
+            notifications.show({
+              color: "var(--button-color-destructive)",
+              message: t("login_failed_message"),
+            });
+          } else {
+            notifications.show({
+              color: "var(--button-color-destructive)",
+              message: translateAxiosError(axiosError),
+            });
+          }
+        },
+        onSettled: async () => {
+          await queryClient.invalidateQueries();
+        },
+      },
+    );
   };
 
   return (
     <Stack gap="md" align="center" w="100%" p="1rem">
       <LoadingOverlay
-        visible={loading}
+        visible={loginMutation.isPending}
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
