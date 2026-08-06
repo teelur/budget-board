@@ -1,9 +1,6 @@
 // Based on output by ML.NET Model Builder.
-using BudgetBoard.Database.Data;
+using BudgetBoard.Database.Interfaces;
 using BudgetBoard.Database.Models;
-using BudgetBoard.Service.Resources;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms;
@@ -63,28 +60,40 @@ public class AutomaticTransactionCategorizerHelper(byte[] mlNetModel)
         ModelInput modelInput = new()
         {
             MerchantName = transaction.MerchantName!,
-            Account = transaction.Account!.Name,
+            Account = transaction.Account?.Name ?? string.Empty,
             Amount = (float)transaction.Amount,
         };
 
         var prediction = _predictEngine.Predict(modelInput);
 
+        return (
+            GetPredictionCategory(prediction.PredictedLabel),
+            CalculatePredictionProbability(prediction.Score)
+        );
+    }
+
+    internal static float CalculatePredictionProbability(float[]? scores)
+    {
         // Convert raw scores to probabilities using softmax
-        float probability = 0f;
-        if (prediction.Score != null && prediction.Score.Length > 0)
+        if (scores is not null && scores.Length > 0)
         {
-            float maxScore = prediction.Score.Max();
-            float[] expScores = prediction.Score.Select(s => MathF.Exp(s - maxScore)).ToArray();
+            float maxScore = scores.Max();
+            float[] expScores = scores.Select(s => MathF.Exp(s - maxScore)).ToArray();
             float sumExp = expScores.Sum();
             float[] probabilities = [.. expScores.Select(e => e / sumExp)];
-            probability = probabilities.Max();
+            return probabilities.Max();
         }
 
-        return (prediction.PredictedLabel ?? string.Empty, probability);
+        return 0f;
+    }
+
+    internal static string GetPredictionCategory(string? predictedLabel)
+    {
+        return predictedLabel ?? string.Empty;
     }
 
     internal static async Task<AutomaticTransactionCategorizerHelper?> CreateAutoCategorizerAsync(
-        UserDataContext userDataContext,
+        ILargeObjectStore largeObjectStore,
         ApplicationUser userData
     )
     {
@@ -98,8 +107,8 @@ public class AutomaticTransactionCategorizerHelper(byte[] mlNetModel)
         )
         {
             // Load the Large Object from the database
-            var autoCategorizerTrainingModel = await userDataContext.ReadLargeObjectAsync(
-                (uint)userData.UserSettings.AutoCategorizerModelOID
+            var autoCategorizerTrainingModel = await largeObjectStore.ReadLargeObjectAsync(
+                userData.UserSettings.AutoCategorizerModelOID.Value
             );
             if (autoCategorizerTrainingModel is not null && autoCategorizerTrainingModel.Length > 0)
             {

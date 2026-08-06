@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace BudgetBoard.IntegrationTests;
+namespace BudgetBoard.IntegrationTests.Helpers;
 
 [Collection("IntegrationTests")]
 public class UserDataServiceHelperTests
