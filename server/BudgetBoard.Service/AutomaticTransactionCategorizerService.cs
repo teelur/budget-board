@@ -1,4 +1,5 @@
 ﻿using BudgetBoard.Database.Data;
+using BudgetBoard.Database.Interfaces;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
@@ -13,6 +14,7 @@ namespace BudgetBoard.Service;
 public class AutomaticTransactionCategorizerService(
     ILogger<IAutomaticTransactionCategorizerService> logger,
     UserDataContext userDataContext,
+    ILargeObjectStore largeObjectStore,
     INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer
@@ -29,20 +31,25 @@ public class AutomaticTransactionCategorizerService(
             throw new BudgetBoardServiceException(responseLocalizer["UserSettingsNotFoundError"]);
         }
 
+        // Training data needs to be non-deleted and have a merchant name and be categorized
         var trainingTransactions = userData
-            .Accounts.Where(a => a.Deleted is null) // Filter out deleted accounts
+            .Accounts.Where(a => a.Deleted is null)
             .Select(a => a.Transactions)
             .SelectMany(c => c)
             .Where(t =>
-                t.Deleted is null && t.Category is not null && !t.Category.Equals(string.Empty)
-            ); // Filter out deleted transactions or those without category
-        if (request.StartDate is not null)
+                t.Deleted is null
+                && t.Category is not null
+                && !string.IsNullOrEmpty(t.Category)
+                && t.MerchantName is not null
+                && !string.IsNullOrEmpty(t.MerchantName)
+            );
+        if (request.StartDate is DateOnly startDate)
         {
-            trainingTransactions = trainingTransactions.Where(t => t.Date >= request.StartDate);
+            trainingTransactions = trainingTransactions.Where(t => t.Date >= startDate);
         }
-        if (request.EndDate is not null)
+        if (request.EndDate is DateOnly endDate)
         {
-            trainingTransactions = trainingTransactions.Where(t => t.Date <= request.EndDate);
+            trainingTransactions = trainingTransactions.Where(t => t.Date <= endDate);
         }
 
         if (!trainingTransactions.Any())
@@ -56,7 +63,7 @@ public class AutomaticTransactionCategorizerService(
 
         // The ML model is serialized and stored as a large object in the database. If the user already has a model, it will be overwritten.
         long objectId = userSettings.AutoCategorizerModelOID ?? 0;
-        objectId = await userDataContext.WriteLargeObjectAsync(objectId, mlModel);
+        objectId = await largeObjectStore.WriteLargeObjectAsync(objectId, mlModel);
 
         userSettings.AutoCategorizerModelOID = objectId;
         userSettings.AutoCategorizerLastTrained = DateOnly.FromDateTime(nowProvider.Now);
@@ -71,14 +78,13 @@ public class AutomaticTransactionCategorizerService(
         var userData = await GetCurrentUserAsync(userGuid);
         var autoCategorizer =
             await AutomaticTransactionCategorizerHelper.CreateAutoCategorizerAsync(
-                userDataContext,
+                largeObjectStore,
                 userData
             );
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
         if (
             autoCategorizer is not null
-            && allCategories is not null
             && transaction.MerchantName is not null
             && transaction.MerchantName != string.Empty
         )
@@ -99,10 +105,10 @@ public class AutomaticTransactionCategorizerService(
                 ]
             );
 
-            if (
-                PredictionProbability
-                >= (userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70) / 100f
-            )
+            var minimumProbabilityPercentage = userData
+                .UserSettings!
+                .AutoCategorizerMinimumProbabilityPercentage;
+            if (PredictionProbability >= minimumProbabilityPercentage / 100f)
             {
                 (transaction.Category, transaction.Subcategory) =
                     TransactionCategoriesHelpers.GetFullCategory(PredictionCategory, allCategories);
@@ -115,7 +121,7 @@ public class AutomaticTransactionCategorizerService(
                         "AutoCategorizerPredictionBelowThresholdLog",
                         PredictionCategory,
                         PredictionProbability,
-                        userData.UserSettings?.AutoCategorizerMinimumProbabilityPercentage ?? 70,
+                        minimumProbabilityPercentage,
                         transaction.MerchantName,
                         transaction.Amount
                     ]
