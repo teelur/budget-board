@@ -376,9 +376,9 @@ public class DemoSeedService(
                     (int)(expenseFrequencyPerMonth * 0.7),
                     (int)(expenseFrequencyPerMonth * 1.3) + 1
                 );
+                var maxDayOffset = endDay.DayNumber - firstDay.DayNumber;
                 for (int i = 0; i < transactionCount; i++)
                 {
-                    var maxDayOffset = endDay.DayNumber - firstDay.DayNumber;
                     var transactionDate = GenerateRandomDateAfter(rng, firstDay, maxDayOffset);
                     var template = expensePool[rng.Next(expensePool.Length)];
                     var amount = -GenerateRandomDecimal(rng, template.Min, template.Max);

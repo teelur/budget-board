@@ -275,6 +275,24 @@ public class AutomaticTransactionCategorizerTests
     }
 
     [Fact]
+    public async Task CreateAutoCategorizerAsync_PassesFullModelObjectIdToStore()
+    {
+        const long modelObjectId = (long)uint.MaxValue + 1;
+        var user = CreateUser(modelObjectId: modelObjectId);
+        var store = new Mock<ILargeObjectStore>();
+        store
+            .Setup(largeObjectStore => largeObjectStore.ReadLargeObjectAsync(modelObjectId))
+            .ReturnsAsync((byte[]?)null);
+
+        await AutomaticTransactionCategorizerHelper.CreateAutoCategorizerAsync(store.Object, user);
+
+        store.Verify(
+            largeObjectStore => largeObjectStore.ReadLargeObjectAsync(modelObjectId),
+            Times.Once
+        );
+    }
+
+    [Fact]
     public async Task CreateAutoCategorizerAsync_WhenModelBytesAreEmpty_ReturnsNull()
     {
         var user = CreateUser();

@@ -108,7 +108,7 @@ public class AutomaticTransactionCategorizerHelper(byte[] mlNetModel)
         {
             // Load the Large Object from the database
             var autoCategorizerTrainingModel = await largeObjectStore.ReadLargeObjectAsync(
-                (uint)userData.UserSettings.AutoCategorizerModelOID
+                userData.UserSettings.AutoCategorizerModelOID.Value
             );
             if (autoCategorizerTrainingModel is not null && autoCategorizerTrainingModel.Length > 0)
             {
