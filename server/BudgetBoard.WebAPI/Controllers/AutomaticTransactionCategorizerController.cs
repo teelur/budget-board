@@ -28,6 +28,7 @@ public class AutomaticTransactionCategorizerController(
 {
     [HttpPost]
     [Authorize]
+    [Route("[action]")]
     public async Task<IActionResult> Train([FromBody] TrainAutoCategorizerRequest trainRequest)
     {
         return await HandleRequestAsync(async () =>
