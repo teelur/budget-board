@@ -1,4 +1,5 @@
-﻿using BudgetBoard.Database.Models;
+﻿using BudgetBoard.Database.Interfaces;
+using BudgetBoard.Database.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,8 @@ namespace BudgetBoard.Database.Data;
 /// Represents the Entity Framework Core database context for user-related data and entities in the budgeting application.
 /// </summary>
 public class UserDataContext(DbContextOptions<UserDataContext> options)
-    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
+    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options),
+        ILargeObjectStore
 {
     // Constants needed for handling Postgres Large Objects
     // https://github.com/postgres/postgres/blob/master/src/include/libpq/libpq-fs.h
@@ -269,7 +271,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     }
 
     // https://www.postgresql.org/docs/current/lo-interfaces.html
-    public async Task<byte[]> ReadLargeObjectAsync(long objectId)
+    public async Task<byte[]?> ReadLargeObjectAsync(long objectId)
     {
         var conn = (NpgsqlConnection)Database.GetDbConnection();
 

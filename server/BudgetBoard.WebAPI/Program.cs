@@ -1,14 +1,15 @@
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Helpers;
+using BudgetBoard.Database.Interfaces;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Extensions;
 using BudgetBoard.WebAPI.Jobs;
 using BudgetBoard.WebAPI.Services;
 using BudgetBoard.WebAPI.Utils;
-using BudgetBoard.WebAPI.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -78,6 +79,7 @@ System.Diagnostics.Debug.WriteLine("Connection string: " + connectionString);
 builder.Services.AddDbContext<UserDataContext>(o =>
     o.UseNpgsql(connectionString).AddInterceptors(new StringSanitizationInterceptor())
 );
+builder.Services.AddScoped<ILargeObjectStore>(sp => sp.GetRequiredService<UserDataContext>());
 
 builder.Services.AddLocalization();
 

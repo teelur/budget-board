@@ -2,18 +2,14 @@ import { Button, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import React from "react";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError, userSettingsQueryKey } from "~/helpers/requests";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
-import { ITrainAutoCategorizer as ITrainAutoCategorizerRequest } from "~/models/autoCategorizer";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useTrainAutomaticTransactionCategorizerMutation } from "~/hooks/mutations/automaticTransactionCategorizer/useTrainAutomaticTransactionCategorizerMutation";
 
 const TrainAutoCategorizerModal = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -22,6 +18,8 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
     autoCategorizerModelStartDate,
     autoCategorizerModelEndDate,
   } = useUserSettings();
+  const trainAutomaticTransactionCategorizerMutation =
+    useTrainAutomaticTransactionCategorizerMutation();
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -30,30 +28,6 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
   });
   const endDateField = useField<Date | null>({
     initialValue: null,
-  });
-
-  const { request } = useAuth();
-  const queryClient = useQueryClient();
-  const doTrainAutoCategorizer = useMutation({
-    mutationFn: async (trainAutoCategorizer: ITrainAutoCategorizerRequest) =>
-      await request({
-        url: "/api/trainAutoCategorizer",
-        method: "POST",
-        data: trainAutoCategorizer,
-      }),
-    onSuccess: async () => {
-      notifications.show({
-        message: t("train_auto_categorizer_success"),
-      });
-      close();
-      await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
-    },
-    onError: (error: AxiosError) => {
-      notifications.show({
-        message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
-      });
-    },
   });
 
   const onSubmit = () => {
@@ -67,10 +41,19 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
       return;
     }
 
-    doTrainAutoCategorizer.mutate({
-      startDate: startDateField.getValue(),
-      endDate: endDateField.getValue(),
-    } as ITrainAutoCategorizerRequest);
+    trainAutomaticTransactionCategorizerMutation.mutate(
+      {
+        startDate: startDateField.getValue() ?? undefined,
+        endDate: endDateField.getValue() ?? undefined,
+      },
+      {
+        onSuccess: () => {
+          startDateField.reset();
+          endDateField.reset();
+          close();
+        },
+      },
+    );
   };
 
   return (
@@ -117,7 +100,7 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
           <Button
             mt="0.25rem"
             onClick={onSubmit}
-            loading={doTrainAutoCategorizer.isPending}
+            loading={trainAutomaticTransactionCategorizerMutation.isPending}
           >
             {t("submit")}
           </Button>
