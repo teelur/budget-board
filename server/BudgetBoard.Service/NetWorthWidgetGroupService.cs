@@ -42,7 +42,8 @@ public class NetWorthWidgetGroupService(
             responseLocalizer
         );
 
-        var newGroup = new NetWorthWidgetGroup { Index = configuration.Groups.Count(), Lines = [] };
+        var newGroupIndex = configuration.Groups.Any() ? configuration.Groups.Max(g => g.Index) + 1 : 0;
+        var newGroup = new NetWorthWidgetGroup { Index = newGroupIndex, Lines = [] };
 
         configuration.Groups = [.. configuration.Groups, newGroup];
         widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
