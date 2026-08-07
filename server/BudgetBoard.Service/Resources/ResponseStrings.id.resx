@@ -412,4 +412,13 @@
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
     <value>Widget yang Anda coba perbarui tidak tersedia.</value>
   </data>
+  <data name="SimpleFinAccountNotFoundError" xml:space="preserve">
+    <value>The SimpleFIN account you are trying to access does not exist.</value>
+  </data>
+  <data name="SimpleFinOrganizationNotFoundError" xml:space="preserve">
+    <value>The SimpleFIN organization you are trying to access does not exist.</value>
+  </data>
+  <data name="SimpleFinAccessTokenParseError" xml:space="preserve">
+    <value>The provided SimpleFIN access token is invalid or malformed.</value>
+  </data>
 </root>

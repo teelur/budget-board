@@ -20,6 +20,7 @@
   "account_is_required": "Un compte est nécessaire.",
   "account_mapping": "Cartographie des comptes",
   "account_name": "Nom du compte",
+  "account_name_is_required_message": "Le nom d'utilisateur est requis",
   "account_trends": "Tendances du compte",
   "account_type": "Type de compte",
   "account_type_name": "Nom du type de compte",
