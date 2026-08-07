@@ -2,23 +2,19 @@ import { Stack, Button, LoadingOverlay } from "@mantine/core";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { notifications } from "@mantine/notifications";
-import { translateAxiosError, ValidationError } from "~/helpers/requests";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
-import { RegisterResponse } from "~/models/auth";
+import { useRegisterMutation } from "~/hooks/mutations/auth/useRegisterMutation";
 
 interface RegisterProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
 }
 
 const Register = (props: RegisterProps): React.ReactNode => {
-  const [loading, setLoading] = React.useState(false);
-
   const { t } = useTranslation();
+  const registerMutation = useRegisterMutation();
 
   const emailField = useField<string>({
     initialValue: "",
@@ -41,70 +37,10 @@ const Register = (props: RegisterProps): React.ReactNode => {
       value !== passwordField.getValue() ? t("passwords_do_not_match") : null,
   });
 
-  const { request } = useAuth();
-
-  const registerUser = async (): Promise<void> => {
-    setLoading(true);
-
-    emailField.validate();
-    passwordField.validate();
-    confirmPasswordField.validate();
-
-    if (emailField.error || passwordField.error || confirmPasswordField.error) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await request({
-        url: "/api/register",
-        method: "POST",
-        data: {
-          email: emailField.getValue(),
-          password: passwordField.getValue(),
-        },
-      });
-
-      props.setLoginCardState(LoginCardState.Login);
-
-      const accountCreatedMessage = `${t("account_created_message")}${
-        (response.data as RegisterResponse).emailConfirmationRequired
-          ? t("account_created_check_your_email_message")
-          : ""
-      }`;
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: accountCreatedMessage,
-      });
-    } catch (error: any) {
-      if (
-        error?.response?.data &&
-        error.status === 400 &&
-        (error.response.data as ValidationError).title ===
-          "One or more validation errors occurred."
-      ) {
-        notifications.show({
-          title: t("validation_errors_occurred_message"),
-          color: "var(--button-color-destructive)",
-          message: Object.values(
-            (error.response.data as ValidationError).errors,
-          ).join("\n"),
-        });
-      } else {
-        notifications.show({
-          color: "var(--button-color-destructive)",
-          message: translateAxiosError(error),
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Stack gap="0.75rem" align="center" p="1rem">
       <LoadingOverlay
-        visible={loading}
+        visible={registerMutation.isPending}
         zIndex={1000}
         overlayProps={{ blur: 2 }}
       />
@@ -127,7 +63,35 @@ const Register = (props: RegisterProps): React.ReactNode => {
           {...confirmPasswordField.getInputProps()}
           elevation={1}
         />
-        <Button variant="filled" fullWidth onClick={registerUser}>
+        <Button
+          variant="filled"
+          fullWidth
+          onClick={() => {
+            emailField.validate();
+            passwordField.validate();
+            confirmPasswordField.validate();
+
+            if (
+              emailField.error ||
+              passwordField.error ||
+              confirmPasswordField.error
+            ) {
+              return;
+            }
+
+            registerMutation.mutate(
+              {
+                email: emailField.getValue(),
+                password: passwordField.getValue(),
+              },
+              {
+                onSuccess: () => {
+                  props.setLoginCardState(LoginCardState.Login);
+                },
+              },
+            );
+          }}
+        >
           {t("register")}
         </Button>
       </Stack>

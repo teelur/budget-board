@@ -12,7 +12,7 @@ import React from "react";
 import { LoginCardState } from "../Welcome";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { notifications } from "@mantine/notifications";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
@@ -22,6 +22,9 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
 import { OidcAuthFlows } from "~/models/oidc";
+import { useLoginMutation } from "~/hooks/mutations/auth/useLoginMutation";
+import { useResendConfirmationEmailMutation } from "~/hooks/mutations/auth/useResendConfirmationEmailMutation";
+import { useForgotPasswordMutation } from "~/hooks/mutations/auth/useForgotPasswordMutation";
 
 interface LoginProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -32,12 +35,12 @@ interface LoginProps {
 }
 
 const Login = (props: LoginProps): React.ReactNode => {
-  const [loading, setLoading] = React.useState(false);
-
   const { t } = useTranslation();
-  const { request, setIsUserAuthenticated, startOidcLogin, oidcLoading } =
-    useAuth();
+  const { setIsUserAuthenticated, startOidcLogin, oidcLoading } = useAuth();
   const queryClient = useQueryClient();
+  const loginMutation = useLoginMutation();
+  const resendConfirmationEmailMutation = useResendConfirmationEmailMutation();
+  const forgotPasswordMutation = useForgotPasswordMutation();
 
   const { envVariables } = getProjectEnvVariables();
 
@@ -59,141 +62,86 @@ const Login = (props: LoginProps): React.ReactNode => {
     ),
   });
 
-  const doResendVerificationEmail = (): void => {
-    request({
-      url: "/api/resendConfirmationEmail",
-      method: "POST",
-      data: {
-        email: emailField.getValue(),
-      },
-    })
-      .then(() => {
-        notifications.show({
-          color: "var(--button-color-confirm)",
-          message: t("verification_email_resent_message"),
-        });
-      })
-      .catch(() => {
-        notifications.show({
-          color: "var(--button-color-destructive)",
-          message: t("verification_email_resent_error_message"),
-        });
-      });
-  };
-
-  const doLogin = async (): Promise<void> => {
-    setLoading(true);
-
+  const doLogin = (): void => {
     emailField.validate();
     passwordField.validate();
 
     if (emailField.error || passwordField.error) {
-      setLoading(false);
       return;
     }
 
-    request({
-      url: "/api/login",
-      method: "POST",
-      data: {
-        email: emailField.getValue(),
-        password: passwordField.getValue(),
-      },
-      params: {
+    const email = emailField.getValue();
+    const password = passwordField.getValue();
+
+    loginMutation.mutate(
+      {
+        email,
+        password,
         rememberMe: props.rememberMe,
       },
-    })
-      .then((res: AxiosResponse) => {
-        if (res.data === "RequiresTwoFactor") {
-          props.setLoginCardState(LoginCardState.LoginWith2fa);
-          props.setUserEmail(emailField.getValue());
-          props.setUserPassword(passwordField.getValue());
-          return;
-        }
+      {
+        onSuccess: (response) => {
+          if (response.data === "RequiresTwoFactor") {
+            props.setLoginCardState(LoginCardState.LoginWith2fa);
+            props.setUserEmail(email);
+            props.setUserPassword(password);
+            return;
+          }
 
-        setIsUserAuthenticated(true);
-      })
-      .catch((error: AxiosError) => {
-        // These error response values are specific to ASP.NET Identity,
-        // so will do the error translation here.
-        if ((error.response?.data as any)?.detail === "EmailNotVerifiedError") {
-          notifications.show({
-            color: "var(--button-color-destructive)",
-            message: (
-              <Group gap="1rem" wrap="nowrap">
-                <div>{t("login_account_not_verified_message")}</div>
-                <Button
-                  size="xs"
-                  miw="fit-content"
-                  onClick={doResendVerificationEmail}
-                >
-                  {t("resend")}
-                </Button>
-              </Group>
-            ),
-            autoClose: 10000,
-          });
-        } else if (
-          (error.response?.data as any)?.detail ===
-          "InvalidEmailOrPasswordError"
-        ) {
-          notifications.show({
-            color: "var(--button-color-destructive)",
-            message: t("login_failed_message"),
-          });
-        } else {
-          notifications.show({
-            color: "var(--button-color-destructive)",
-            message: translateAxiosError(error),
-          });
-        }
-      })
-      .finally(() => {
-        queryClient.invalidateQueries();
-        setLoading(false);
-      });
-  };
-
-  const submitPasswordReset = (email: string): void => {
-    if (email) {
-      setLoading(true);
-      request({
-        url: "/api/forgotPassword",
-        method: "POST",
-        data: {
-          email,
+          setIsUserAuthenticated(true);
         },
-      })
-        .then(() => {
-          props.setLoginCardState(LoginCardState.ResetPassword);
-          props.setUserEmail(email);
+        onError: (error) => {
+          const axiosError = error as AxiosError;
 
-          notifications.show({
-            color: "var(--button-color-confirm)",
-            message: t("reset_password_request_message"),
-          });
-        })
-        .catch(() => {
-          notifications.show({
-            color: "var(--button-color-destructive)",
-            message: t("reset_password_generic_error_message"),
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: t("reset_password_missing_email_message"),
-      });
-    }
+          if (
+            (axiosError.response?.data as any)?.detail ===
+            "EmailNotVerifiedError"
+          ) {
+            notifications.show({
+              color: "var(--button-color-destructive)",
+              message: (
+                <Group gap="1rem" wrap="nowrap">
+                  <div>{t("login_account_not_verified_message")}</div>
+                  <Button
+                    size="xs"
+                    miw="fit-content"
+                    loading={resendConfirmationEmailMutation.isPending}
+                    onClick={() =>
+                      resendConfirmationEmailMutation.mutate(email)
+                    }
+                  >
+                    {t("resend")}
+                  </Button>
+                </Group>
+              ),
+              autoClose: 10000,
+            });
+          } else if (
+            (axiosError.response?.data as any)?.detail ===
+            "InvalidEmailOrPasswordError"
+          ) {
+            notifications.show({
+              color: "var(--button-color-destructive)",
+              message: t("login_failed_message"),
+            });
+          } else {
+            notifications.show({
+              color: "var(--button-color-destructive)",
+              message: translateAxiosError(axiosError),
+            });
+          }
+        },
+        onSettled: async () => {
+          await queryClient.invalidateQueries();
+        },
+      },
+    );
   };
 
   return (
     <Stack gap={0} align="center" w="100%">
       <LoadingOverlay
-        visible={loading}
+        visible={forgotPasswordMutation.isPending || loginMutation.isPending}
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
@@ -231,7 +179,21 @@ const Login = (props: LoginProps): React.ReactNode => {
               size="xs"
               variant="subtle"
               fw={600}
-              onClick={submitPasswordReset.bind(null, emailField.getValue())}
+              onClick={() => {
+                if (emailField.getValue()) {
+                  forgotPasswordMutation.mutate(emailField.getValue(), {
+                    onSuccess: () => {
+                      props.setLoginCardState(LoginCardState.ResetPassword);
+                      props.setUserEmail(emailField.getValue());
+                    },
+                  });
+                } else {
+                  notifications.show({
+                    color: "var(--button-color-destructive)",
+                    message: t("reset_password_missing_email_message"),
+                  });
+                }
+              }}
             >
               {t("reset_password")}
             </Button>
