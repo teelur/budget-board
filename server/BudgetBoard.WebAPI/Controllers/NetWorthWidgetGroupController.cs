@@ -23,6 +23,24 @@ public class NetWorthWidgetGroupController(
 {
     [HttpPost]
     [Authorize]
+    public async Task<IActionResult> Create([FromBody] NetWorthWidgetGroupCreateRequest newGroup)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await netWorthWidgetGroupService.CreateNetWorthWidgetGroupAsync(parsedUserId, newGroup);
+            return Ok();
+        });
+    }
+
+    [HttpPost]
+    [Authorize]
     [Route("[action]")]
     public async Task<IActionResult> Reorder([FromBody] NetWorthWidgetGroupReorderRequest request)
     {
