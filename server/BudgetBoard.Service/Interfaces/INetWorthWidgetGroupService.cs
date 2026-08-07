@@ -8,6 +8,17 @@ namespace BudgetBoard.Service.Interfaces;
 public interface INetWorthWidgetGroupService
 {
     /// <summary>
+    /// Creates a new group in the net worth widget configuration.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="request">The net worth widget group creation details.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public Task CreateNetWorthWidgetGroupAsync(
+        Guid userGuid,
+        INetWorthWidgetGroupCreateRequest request
+    );
+
+    /// <summary>
     /// Reorders net worth widget groups for a user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user who owns the widget groups.</param>

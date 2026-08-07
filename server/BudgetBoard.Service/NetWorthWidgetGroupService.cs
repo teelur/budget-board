@@ -19,6 +19,36 @@ public class NetWorthWidgetGroupService(
     IStringLocalizer<LogStrings> logLocalizer
 ) : INetWorthWidgetGroupService
 {
+    public async Task CreateNetWorthWidgetGroupAsync(
+        Guid userGuid,
+        INetWorthWidgetGroupCreateRequest request
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+        var widgetSettings = NetWorthWidgetSettingsHelpers.GetWidgetSettingsById(
+            userData,
+            request.WidgetSettingsId,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
+        using var configurationLock = await NetWorthWidgetConfigurationLock.AcquireLockAsync(
+            request.WidgetSettingsId
+        );
+        var configuration = NetWorthWidgetSettingsHelpers.GetNetWorthWidgetConfiguration(
+            widgetSettings,
+            logger,
+            logLocalizer,
+            responseLocalizer
+        );
+
+        var newGroup = new NetWorthWidgetGroup { Index = configuration.Groups.Count(), Lines = [] };
+
+        configuration.Groups = [.. configuration.Groups, newGroup];
+        widgetSettings.Configuration = JsonSerializer.Serialize(configuration);
+        await userDataContext.SaveChangesAsync();
+    }
+
     public async Task ReorderNetWorthWidgetGroupsAsync(
         Guid userGuid,
         INetWorthWidgetGroupReorderRequest request

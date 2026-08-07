@@ -7,6 +7,16 @@ public class NetWorthWidgetGroup
     public IEnumerable<NetWorthWidgetLine> Lines { get; set; } = [];
 }
 
+public interface INetWorthWidgetGroupCreateRequest
+{
+    Guid WidgetSettingsId { get; }
+}
+
+public class NetWorthWidgetGroupCreateRequest : INetWorthWidgetGroupCreateRequest
+{
+    public Guid WidgetSettingsId { get; set; } = Guid.Empty;
+}
+
 public interface INetWorthWidgetGroupReorderRequest
 {
     Guid WidgetSettingsId { get; }
