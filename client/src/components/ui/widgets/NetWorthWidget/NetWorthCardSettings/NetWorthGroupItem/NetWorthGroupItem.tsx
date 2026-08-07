@@ -27,6 +27,8 @@ import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import { closestCorners } from "@dnd-kit/collision";
 import { useCreateNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useCreateNetWorthWidgetLineMutation";
 import { useReorderNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useReorderNetWorthWidgetLineMutation";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useTranslation } from "react-i18next";
 
 export interface NetWorthGroupItemProps {
   group: INetWorthWidgetGroup;
@@ -37,6 +39,7 @@ export interface NetWorthGroupItemProps {
 }
 
 const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
+  const { t } = useTranslation();
   const createNetWorthWidgetLineMutation =
     useCreateNetWorthWidgetLineMutation();
   const reorderNetWorthWidgetLineMutation =
@@ -123,17 +126,23 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
             }}
           >
             <Stack ref={linesStackRef} gap="0.25rem">
-              {sortedLineItems.map((line) => (
-                <NetWorthLineItem
-                  key={line.id}
-                  container={linesStackRef.current as Element}
-                  line={line}
-                  groupIndex={props.group.index}
-                  lines={props.allLines}
-                  settingsId={props.settingsId}
-                  isSortable={props.isSortable}
-                />
-              ))}
+              {sortedLineItems.length > 0 ? (
+                sortedLineItems.map((line) => (
+                  <NetWorthLineItem
+                    key={line.id}
+                    container={linesStackRef.current as Element}
+                    line={line}
+                    groupIndex={props.group.index}
+                    lines={props.allLines}
+                    settingsId={props.settingsId}
+                    isSortable={props.isSortable}
+                  />
+                ))
+              ) : (
+                <DimmedText size="sm" ta="center">
+                  {t("no_lines_found")}
+                </DimmedText>
+              )}
             </Stack>
           </DragDropProvider>
         </Stack>

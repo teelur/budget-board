@@ -6,7 +6,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NetWorthGroupItem from "./NetWorthGroupItem/NetWorthGroupItem";
 import React from "react";
-import { INetWorthWidgetLineCreateRequest } from "~/models/netWorthWidgetConfiguration";
+import { INetWorthWidgetGroupCreateRequest } from "~/models/netWorthWidgetConfiguration";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import {
@@ -17,8 +17,8 @@ import {
 import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
-import { useCreateNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useCreateNetWorthWidgetLineMutation";
 import { useReorderNetWorthWidgetGroupMutation } from "~/hooks/mutations/netWorthWidgetGroup/useReorderNetWorthWidgetGroupMutation";
+import { useCreateNetWorthWidgetGroupMutation } from "~/hooks/mutations/netWorthWidgetGroup/useCreateNetWorthWidgetGroupMutation";
 
 interface NetWorthCardSettingsProps {
   widget: IWidgetSettingsResponse;
@@ -33,8 +33,8 @@ const NetWorthCardSettings = ({
 }: NetWorthCardSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
   const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
-  const createNetWorthWidgetLineMutation =
-    useCreateNetWorthWidgetLineMutation();
+  const createNetWorthWidgetGroupMutation =
+    useCreateNetWorthWidgetGroupMutation();
   const reorderNetWorthWidgetGroupMutation =
     useReorderNetWorthWidgetGroupMutation();
 
@@ -139,21 +139,19 @@ const NetWorthCardSettings = ({
                   />
                 ))
               ) : (
-                <DimmedText size="sm">{t("no_lines_found")}</DimmedText>
+                <DimmedText size="sm" ta="center">
+                  {t("no_groups_found")}
+                </DimmedText>
               )}
             </Stack>
           </DragDropProvider>
           <ActionIcon
             w="100%"
-            loading={createNetWorthWidgetLineMutation.isPending}
+            loading={createNetWorthWidgetGroupMutation.isPending}
             onClick={() =>
-              createNetWorthWidgetLineMutation.mutate({
-                name: "",
-                group:
-                  Math.max(...sortedGroups.map((group) => group.index)) + 1,
-                index: 0,
+              createNetWorthWidgetGroupMutation.mutate({
                 widgetSettingsId: widget.id,
-              } as INetWorthWidgetLineCreateRequest)
+              } as INetWorthWidgetGroupCreateRequest)
             }
           >
             <PlusIcon />

@@ -34,6 +34,10 @@ export interface INetWorthWidgetLineReorderRequest {
   orderedLineIds: string[];
 }
 
+export interface INetWorthWidgetGroupCreateRequest {
+  widgetSettingsId: string;
+}
+
 export interface INetWorthWidgetGroupReorderRequest {
   widgetSettingsId: string;
   orderedGroupIds: string[];
