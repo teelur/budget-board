@@ -14,13 +14,9 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import NavbarLink from "./NavbarLink/NavbarLink";
-import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { AxiosError } from "axios";
-import { translateAxiosError } from "~/helpers/requests";
-import { notifications } from "@mantine/notifications";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router";
+import { useLogoutMutation } from "~/hooks/mutations/auth/useLogoutMutation";
 
 interface NavbarProps {
   isNavbarOpen: boolean;
@@ -32,6 +28,7 @@ const Navbar = (props: NavbarProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const logoutMutation = useLogoutMutation();
 
   const sidebarItems = [
     {
@@ -72,28 +69,6 @@ const Navbar = (props: NavbarProps) => {
       label: t("trends"),
     },
   ];
-
-  const { request, setIsUserAuthenticated } = useAuth();
-
-  const queryClient = useQueryClient();
-  const Logout = (): void => {
-    request({
-      url: "/api/logout",
-      method: "POST",
-      data: {},
-    })
-      .then(() => {
-        queryClient.removeQueries();
-        localStorage.setItem("isAuthenticated", "false");
-        setIsUserAuthenticated(false);
-      })
-      .catch((error: AxiosError) => {
-        notifications.show({
-          color: "var(--button-color-destructive)",
-          message: translateAxiosError(error),
-        });
-      });
-  };
 
   const links = sidebarItems.map((link) => (
     <NavbarLink
@@ -145,7 +120,7 @@ const Navbar = (props: NavbarProps) => {
           <NavbarLink
             icon={<LogOutIcon color="var(--base-color-text-primary)" />}
             label={t("logout")}
-            onClick={Logout}
+            onClick={() => logoutMutation.mutate()}
           />
         </Stack>
       </Stack>
