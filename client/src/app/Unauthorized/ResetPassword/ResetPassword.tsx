@@ -2,13 +2,11 @@ import { Stack, Button, LoadingOverlay } from "@mantine/core";
 import { hasLength, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
-import { useAuth } from "~/providers/AuthProvider/AuthProvider";
-import { translateAxiosError } from "~/helpers/requests";
-import { notifications } from "@mantine/notifications";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
+import { useResetPasswordMutation } from "~/hooks/mutations/auth/useResetPasswordMutation";
 
 interface ResetPasswordProps {
   setLoginCardState: React.Dispatch<React.SetStateAction<LoginCardState>>;
@@ -16,9 +14,8 @@ interface ResetPasswordProps {
 }
 
 const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
-  const [loading, setLoading] = React.useState(false);
-
   const { t } = useTranslation();
+  const resetPasswordMutation = useResetPasswordMutation();
 
   const resetCodeField = useField<string>({
     initialValue: "",
@@ -41,55 +38,10 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
       value !== passwordField.getValue() ? t("passwords_do_not_match") : null,
   });
 
-  const { request } = useAuth();
-
-  const updatePassword = async (): Promise<void> => {
-    setLoading(true);
-
-    resetCodeField.validate();
-    passwordField.validate();
-    confirmPasswordField.validate();
-
-    if (
-      resetCodeField.error ||
-      passwordField.error ||
-      confirmPasswordField.error
-    ) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      await request({
-        url: "/api/resetPassword",
-        method: "POST",
-        data: {
-          email: props.email,
-          resetCode: resetCodeField.getValue(),
-          newPassword: passwordField.getValue(),
-        },
-      });
-
-      props.setLoginCardState(LoginCardState.Login);
-
-      notifications.show({
-        color: "var(--button-color-confirm)",
-        message: t("reset_password_success_message"),
-      });
-    } catch (error: any) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: translateAxiosError(error),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Stack gap="0.75rem" align="center" p="1rem">
       <LoadingOverlay
-        visible={loading}
+        visible={resetPasswordMutation.isPending}
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
@@ -112,7 +64,36 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
           {...confirmPasswordField.getInputProps()}
           elevation={1}
         />
-        <Button variant="filled" fullWidth onClick={updatePassword}>
+        <Button
+          variant="filled"
+          fullWidth
+          onClick={() => {
+            resetCodeField.validate();
+            passwordField.validate();
+            confirmPasswordField.validate();
+
+            if (
+              resetCodeField.error ||
+              passwordField.error ||
+              confirmPasswordField.error
+            ) {
+              return;
+            }
+
+            resetPasswordMutation.mutate(
+              {
+                email: props.email,
+                resetCode: resetCodeField.getValue(),
+                newPassword: passwordField.getValue(),
+              },
+              {
+                onSuccess: () => {
+                  props.setLoginCardState(LoginCardState.Login);
+                },
+              },
+            );
+          }}
+        >
           {t("reset_password")}
         </Button>
       </Stack>

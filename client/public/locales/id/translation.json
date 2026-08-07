@@ -26,7 +26,6 @@
   "account_types": "Tipe Akun",
   "account_types_query_error": "Gagal mengambil data tipe aset Anda.",
   "accounts": "Akun",
-  "accounts_query_error": "Gagal menampilkan akun Anda.",
   "accounts_settings": "Setelan Akun",
   "accounts_settings_widget_message": "Pilih akun untuk ditampilkan pada widget ini.",
   "accounts_widget_description": "Lihat akun dan institusi yang terhubung.",
@@ -66,7 +65,6 @@
   "validation_code_is_required": "Kode Validasi Diperlukan.",
   "validation_errors_occurred_message": "Satu atau lebih kesalahan validasi terjadi. Tolong cek input anda dan coba lagi.",
   "values": "Nilai",
-  "verification_email_resent_error_message": "Ada kesalahan saat mengirimkan verifikasi email.",
   "verification_email_resent_message": "Email Verifikasi terkirim ulang.",
   "view_and_restore_deleted_accounts": "Lihat dan pulihkan akun yang terhapus.",
   "view_and_restore_deleted_assets": "Lihat dan pulihkan aset yang terhapus.",
@@ -74,6 +72,5 @@
   "welcome_to": "Selamat datang di",
   "widget_already_added": "Telah ditambahkan",
   "widget_no_items_configured_message": "Tidak ada item yang terkonfigurasi untuk widget ini.",
-  "widget_not_found": "Widget tidak ditemukan!",
   "yyyy_mm_dd": "TTTT{{separator}}BB{{separator}}HH"
 }
