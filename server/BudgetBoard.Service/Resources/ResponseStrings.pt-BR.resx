@@ -59,28 +59,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AccountNotFoundError" xml:space="preserve">
-    <value>The account you are trying to access does not exist.</value>
+    <value>A conta que você está tentando acessar não existe.</value>
   </data>
   <data name="AccountPermanentDeleteNotDeletedError" xml:space="preserve">
-    <value>The account must be deleted before it can be permanently deleted.</value>
+    <value>A conta deve ser excluída antes de poder ser excluída permanentemente.</value>
   </data>
   <data name="AccountTypeDuplicateNameError" xml:space="preserve">
-    <value>An account type with this name already exists.</value>
+    <value>Já existe um tipo de conta com esse nome.</value>
   </data>
   <data name="AccountTypeEmptyNameError" xml:space="preserve">
-    <value>The account type name cannot be empty.</value>
+    <value>O nome do tipo de conta não pode estar vazio.</value>
   </data>
   <data name="AccountTypeInvalidClassificationError" xml:space="preserve">
-    <value>The provided account type classification is invalid. Valid values are 'asset' and 'liability'.</value>
+    <value>A classificação do tipo de conta fornecida é inválida. Os valores válidos são 'asset' e 'liability'.</value>
   </data>
   <data name="AccountTypeNotFoundError" xml:space="preserve">
-    <value>The account type you are trying to access does not exist.</value>
+    <value>O tipo de conta que você está tentando acessar não existe.</value>
   </data>
   <data name="AccountTypeParentNotFoundError" xml:space="preserve">
-    <value>The parent account type does not exist.</value>
+    <value>O tipo de conta pai não existe.</value>
   </data>
   <data name="AccountTypeSameNameAsParentError" xml:space="preserve">
-    <value>The account type name cannot be the same as its parent.</value>
+    <value>O nome do tipo de conta não pode ser igual ao do seu pai.</value>
   </data>
   <data name="AssetNotFoundError" xml:space="preserve">
     <value>The asset you are trying to access does not exist.</value>
