@@ -51,6 +51,11 @@ public class Transaction
     public required string Source { get; set; }
 
     /// <summary>
+    /// Additional notes or description for the transaction.
+    /// </summary>
+    public string Notes { get; set; } = string.Empty;
+
+    /// <summary>
     /// Identifier for the account associated with the transaction.
     /// </summary>
     public required Guid AccountID { get; set; }
