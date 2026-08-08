@@ -35,6 +35,7 @@ public interface ITransactionUpdateRequest
     OptionalField<string?> Subcategory { get; }
     OptionalField<string?> MerchantName { get; }
     OptionalField<DateTime?> Deleted { get; }
+    string? Notes { get; }
 }
 
 public class TransactionUpdateRequest() : ITransactionUpdateRequest
@@ -46,6 +47,7 @@ public class TransactionUpdateRequest() : ITransactionUpdateRequest
     public OptionalField<string?> Subcategory { get; set; } = new OptionalField<string?>();
     public OptionalField<string?> MerchantName { get; set; } = new OptionalField<string?>();
     public OptionalField<DateTime?> Deleted { get; set; } = new OptionalField<DateTime?>();
+    public string? Notes { get; set; } = null;
 
     public TransactionUpdateRequest(Transaction transaction)
         : this()
@@ -57,6 +59,7 @@ public class TransactionUpdateRequest() : ITransactionUpdateRequest
         Subcategory = new OptionalField<string?>(transaction.Subcategory);
         MerchantName = new OptionalField<string?>(transaction.MerchantName);
         Deleted = new OptionalField<DateTime?>(transaction.Deleted);
+        Notes = transaction.Notes;
     }
 }
 
@@ -114,6 +117,7 @@ public interface ITransactionResponse
     string? MerchantName { get; }
     bool Pending { get; }
     DateTime? Deleted { get; }
+    string Notes { get; }
     string Source { get; }
     Guid AccountID { get; }
 }
@@ -129,6 +133,7 @@ public class TransactionResponse : ITransactionResponse
     public string? MerchantName { get; set; } = null;
     public bool Pending { get; set; } = false;
     public DateTime? Deleted { get; set; } = null;
+    public string Notes { get; set; } = string.Empty;
     public string Source { get; set; } = string.Empty;
     public Guid AccountID { get; set; } = Guid.Empty;
 
@@ -142,6 +147,7 @@ public class TransactionResponse : ITransactionResponse
         Subcategory = transaction.Subcategory;
         MerchantName = transaction.MerchantName;
         Deleted = transaction.Deleted;
+        Notes = transaction.Notes;
         Source = transaction.Source;
         AccountID = transaction.AccountID;
     }

@@ -158,6 +158,10 @@ public class TransactionService(
             {
                 transaction.MerchantName = request.MerchantName.Value;
             }
+            if (request.Notes is not null)
+            {
+                transaction.Notes = request.Notes;
+            }
 
             UpdateBalancesForEditedTransaction(
                 transaction,
