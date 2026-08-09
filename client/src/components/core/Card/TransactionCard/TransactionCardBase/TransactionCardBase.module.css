@@ -2,6 +2,19 @@
   transition: background-color 0.2s ease;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: 0.5rem;
+}
+
+.contentWrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .card[data-selection-mode]:hover {
   background-color: color-mix(
     in srgb,
@@ -18,4 +31,18 @@
 .selectionGroup:hover .checkboxWrapper,
 .selectionGroup[data-selected="true"] .checkboxWrapper {
   opacity: 1;
+}
+
+.selectionGroup {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chevron {
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
 }
