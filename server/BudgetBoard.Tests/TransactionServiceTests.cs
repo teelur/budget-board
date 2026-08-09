@@ -28,7 +28,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -73,7 +74,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var transaction = new TransactionCreateRequest
@@ -108,7 +110,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -153,7 +156,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -227,7 +231,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -274,7 +279,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -325,7 +331,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -371,7 +378,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -427,7 +435,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -480,7 +489,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -502,6 +512,7 @@ public class TransactionServiceTests
             Category = "newCategory",
             Subcategory = "newSubcategory",
             MerchantName = "newMerchantName",
+            Notes = "newNotes",
         };
 
         // Act
@@ -517,6 +528,7 @@ public class TransactionServiceTests
         updatedTransaction.Category.Should().Be(editedTransaction.Category.Value);
         updatedTransaction.Subcategory.Should().Be(editedTransaction.Subcategory.Value);
         updatedTransaction.MerchantName.Should().Be(editedTransaction.MerchantName.Value);
+        updatedTransaction.Notes.Should().Be(editedTransaction.Notes);
     }
 
     [Fact]
@@ -531,7 +543,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -575,6 +588,67 @@ public class TransactionServiceTests
     }
 
     [Fact]
+    public async Task UpdateTransactionsAsync_ShouldApplyAddAndRemoveOperations()
+    {
+        var helper = new TestHelper();
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+        var tagService = CreateTagService(helper);
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAutomaticTransactionCategorizerService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            tagService
+        );
+
+        await CreateTransactionWithTagsAsync(
+            helper,
+            transactionService,
+            tagService,
+            account,
+            10,
+            new DateOnly(2026, 8, 1),
+            ["Keep", "Remove"]
+        );
+        await CreateTransactionWithTagsAsync(
+            helper,
+            transactionService,
+            tagService,
+            account,
+            20,
+            new DateOnly(2026, 8, 2),
+            ["Keep"]
+        );
+
+        var transaction = helper.UserDataContext.Transactions.First();
+        await transactionService.UpdateTransactionsAsync(
+            helper.demoUser.Id,
+            [
+                new TransactionUpdateRequest
+                {
+                    ID = transaction.ID,
+                    AddTags = ["Added"],
+                    RemoveTags = [" remove "],
+                },
+            ]
+        );
+
+        var updatedLinks = helper
+            .UserDataContext.TransactionTags.Where(link => link.TransactionID == transaction.ID)
+            .Select(link => helper.UserDataContext.Tags.Single(tag => tag.ID == link.TagID).Value)
+            .ToList();
+        updatedLinks.Should().BeEquivalentTo(["Keep", "Added"]);
+        helper
+            .UserDataContext.Tags.Select(tag => tag.Value)
+            .Should()
+            .BeEquivalentTo(["Keep", "Added"]);
+    }
+
+    [Fact]
     public async Task UpdateTransactionsAsync_WhenTransactionDoesNotExist_ShouldThrowTransactionNotFoundError()
     {
         // Arrange
@@ -586,7 +660,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var editedTransaction = new TransactionUpdateRequest
@@ -629,7 +704,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -710,7 +786,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -784,7 +861,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var account = new AccountFaker(helper.demoUser.Id).Generate();
@@ -851,7 +929,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var account = new AccountFaker(helper.demoUser.Id).Generate();
@@ -911,7 +990,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -962,7 +1042,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1008,7 +1089,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1055,7 +1137,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         // Act
@@ -1085,7 +1168,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1149,7 +1233,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1212,7 +1297,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1253,7 +1339,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         // Act
@@ -1283,7 +1370,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1324,6 +1412,41 @@ public class TransactionServiceTests
             .Deleted.Should()
             .BeNull();
     }
+
+    [Fact]
+    public async Task RestoreTransactionsAsync_ShouldNotRestoreDetachedTags()
+    {
+        var helper = new TestHelper();
+        var tagService = CreateTagService(helper);
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAutomaticTransactionCategorizerService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            tagService
+        );
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var transaction = await CreateTransactionWithTagsAsync(
+            helper,
+            transactionService,
+            tagService,
+            account,
+            10,
+            new DateOnly(2026, 8, 1),
+            ["Detached"]
+        );
+
+        await transactionService.DeleteTransactionsAsync(helper.demoUser.Id, [transaction.ID]);
+        await transactionService.RestoreTransactionsAsync(helper.demoUser.Id, [transaction.ID]);
+
+        helper.UserDataContext.TransactionTags.Should().BeEmpty();
+        helper.UserDataContext.Tags.Should().BeEmpty();
+    }
     #endregion
 
     #region SplitTransactionAsync
@@ -1339,7 +1462,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1397,7 +1521,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var splitTransactionRequest = new TransactionSplitRequest
@@ -1438,7 +1563,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1489,7 +1615,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1549,7 +1676,8 @@ public class TransactionServiceTests
             nowProviderMock.Object,
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1602,7 +1730,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1653,7 +1782,8 @@ public class TransactionServiceTests
             Mock.Of<INowProvider>(),
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1688,4 +1818,35 @@ public class TransactionServiceTests
             .WithMessage("TransactionAccountNotFoundError");
     }
     #endregion
+
+    private static async Task<Transaction> CreateTransactionWithTagsAsync(
+        TestHelper helper,
+        TransactionService transactionService,
+        ITagService tagService,
+        Account account,
+        decimal amount,
+        DateOnly date,
+        IEnumerable<string> tags
+    )
+    {
+        await transactionService.CreateTransactionAsync(
+            helper.demoUser,
+            new TransactionCreateRequest
+            {
+                Amount = amount,
+                Date = date,
+                AccountID = account.ID,
+            }
+        );
+
+        var transaction = helper.UserDataContext.Transactions.Single(t =>
+            t.AccountID == account.ID && t.Amount == amount && t.Date == date
+        );
+        await tagService.ApplyTagChangesAsync(helper.demoUser.Id, transaction, tags, null);
+        await helper.UserDataContext.SaveChangesAsync();
+        return transaction;
+    }
+
+    private static ITagService CreateTagService(TestHelper helper) =>
+        new TagService(helper.UserDataContext, TestHelper.CreateMockLocalizer<ResponseStrings>());
 }

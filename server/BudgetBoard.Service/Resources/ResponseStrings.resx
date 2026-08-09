@@ -391,6 +391,15 @@
     <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
         <value>The split amount must be less than the transaction amount.</value>
     </data>
+    <data name="TagAddRemoveOverlapError" xml:space="preserve">
+        <value>A tag cannot be added and removed in the same request.</value>
+    </data>
+    <data name="TagValueEmptyError" xml:space="preserve">
+        <value>Tag values cannot be empty.</value>
+    </data>
+    <data name="TagValueTooLongError" xml:space="preserve">
+        <value>Tag values cannot exceed 50 characters.</value>
+    </data>
     <data name="UserDataRetrievalError" xml:space="preserve">
         <value>An error occurred while retrieving user data.</value>
     </data>

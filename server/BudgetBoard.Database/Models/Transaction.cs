@@ -64,4 +64,6 @@ public class Transaction
     /// Reference to the associated account.
     /// </summary>
     public Account? Account { get; set; } = null;
+
+    public ICollection<TransactionTag> TransactionTags { get; set; } = [];
 }
