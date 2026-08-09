@@ -14,7 +14,6 @@ import TransactionCard from "~/components/core/Card/TransactionCard/TransactionC
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { InfoIcon } from "lucide-react";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
-import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface TransactionCardsProps {
   sort: Sorts;
@@ -34,7 +33,6 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const transactionsQuery = useTransactionsQuery();
-  const accountsQuery = useAccountsQuery();
 
   const filteredTransactions = getFilteredTransactions(
     transactionsQuery.data ?? [],
@@ -78,11 +76,6 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                 transaction={transaction}
                 categories={transactionCategories}
                 elevation={1}
-                accountName={
-                  accountsQuery.data?.find(
-                    (account) => account.id === transaction.accountID,
-                  )?.name
-                }
                 isSelected={props.selectedIds.has(transaction.id)}
                 onToggleSelect={props.onToggleSelect}
               />

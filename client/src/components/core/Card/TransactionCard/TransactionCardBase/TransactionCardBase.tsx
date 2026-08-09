@@ -17,7 +17,6 @@ export interface TransactionCardBaseProps extends CardProps {
   elevation?: number;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
-  accountName?: string;
 }
 
 const TransactionCardBase = ({
@@ -26,7 +25,6 @@ const TransactionCardBase = ({
   elevation,
   isSelected,
   onToggleSelect,
-  accountName,
   ...cardProps
 }: TransactionCardBaseProps): React.ReactNode => {
   const { t } = useTranslation();
@@ -113,7 +111,6 @@ const TransactionCardBase = ({
       <Collapse id={detailsId} expanded={isDetailsOpen}>
         <TransactionCardDetails
           transaction={transaction}
-          accountName={accountName}
           elevation={elevation ?? 0}
         />
       </Collapse>

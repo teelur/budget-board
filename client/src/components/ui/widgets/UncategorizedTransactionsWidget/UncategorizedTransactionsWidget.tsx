@@ -16,7 +16,6 @@ import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
-import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const itemsPerPage = 15;
@@ -27,7 +26,6 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const transactionsQuery = useTransactionsQuery();
-  const accountsQuery = useAccountsQuery();
 
   const sortedFilteredTransactions = React.useMemo(
     () =>
@@ -92,11 +90,6 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
               transaction={transaction}
               categories={transactionCategories}
               elevation={2}
-              accountName={
-                accountsQuery.data?.find(
-                  (account) => account.id === transaction.accountID,
-                )?.name
-              }
               isSelected={selectedIds.has(transaction.id)}
               onToggleSelect={onToggleSelect}
             />

@@ -8,7 +8,6 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface TransactionCardDetailsProps {
   transaction: ITransaction;
-  accountName?: string;
   elevation: number;
 }
 
@@ -20,7 +19,6 @@ const borderColorByElevation: Record<number, string> = {
 
 const TransactionCardDetails = ({
   transaction,
-  accountName,
   elevation,
 }: TransactionCardDetailsProps): React.ReactNode => {
   const { t } = useTranslation();
@@ -39,7 +37,7 @@ const TransactionCardDetails = ({
           {t("account")}
         </DimmedText>
         <PrimaryText size="sm" elevation={elevation} className={classes.value}>
-          {accountName?.trim() || t("unknown_account")}
+          {transaction.accountName.trim() || t("unknown_account")}
         </PrimaryText>
       </div>
       <div className={classes.detailItem}>

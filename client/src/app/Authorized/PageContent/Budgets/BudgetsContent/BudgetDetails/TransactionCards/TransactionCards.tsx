@@ -6,7 +6,6 @@ import TransactionCard from "~/components/core/Card/TransactionCard/TransactionC
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
-import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -15,7 +14,6 @@ interface TransactionCardsProps {
 
 const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const { t } = useTranslation();
-  const accountsQuery = useAccountsQuery();
 
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 5;
@@ -59,11 +57,6 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
             transaction={transaction}
             categories={props.categories}
             elevation={2}
-            accountName={
-              accountsQuery.data?.find(
-                (account) => account.id === transaction.accountID,
-              )?.name
-            }
             isSelected={selectedIds.has(transaction.id)}
             onToggleSelect={onToggleSelect}
           />

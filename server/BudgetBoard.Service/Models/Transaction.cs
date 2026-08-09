@@ -118,6 +118,7 @@ public interface ITransactionResponse
     bool Pending { get; }
     DateTime? Deleted { get; }
     string Notes { get; }
+    string AccountName { get; }
     string Source { get; }
     Guid AccountID { get; }
 }
@@ -134,6 +135,7 @@ public class TransactionResponse : ITransactionResponse
     public bool Pending { get; set; } = false;
     public DateTime? Deleted { get; set; } = null;
     public string Notes { get; set; } = string.Empty;
+    public string AccountName { get; set; } = string.Empty;
     public string Source { get; set; } = string.Empty;
     public Guid AccountID { get; set; } = Guid.Empty;
 
@@ -148,6 +150,7 @@ public class TransactionResponse : ITransactionResponse
         MerchantName = transaction.MerchantName;
         Deleted = transaction.Deleted;
         Notes = transaction.Notes;
+        AccountName = transaction.Account?.Name ?? string.Empty;
         Source = transaction.Source;
         AccountID = transaction.AccountID;
     }
