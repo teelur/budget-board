@@ -39,7 +39,7 @@ export interface ITransactionUpdateRequest {
   category?: string | null;
   subcategory?: string | null;
   merchantName?: string | null;
-  notes?: string | null;
+  notes?: string;
 }
 
 export interface ITransactionSplitRequest {
@@ -60,6 +60,7 @@ export interface ITransaction {
   pending: boolean;
   deleted: Date | null;
   notes: string;
+  accountName: string;
   source: string;
   accountID: string;
 }
