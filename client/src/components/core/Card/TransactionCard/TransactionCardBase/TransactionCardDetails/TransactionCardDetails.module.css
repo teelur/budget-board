@@ -1,0 +1,24 @@
+.details {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr);
+  gap: 0.5rem 1rem;
+  min-width: 0;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.25rem 0.25rem;
+  border-top: 1px solid;
+}
+
+.detailItem {
+  min-width: 0;
+}
+
+.value {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+@container (max-width: 400px) {
+  .details {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

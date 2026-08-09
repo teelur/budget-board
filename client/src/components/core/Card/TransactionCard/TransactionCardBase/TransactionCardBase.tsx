@@ -4,9 +4,12 @@ import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import TransactionCardContent from "./TransactionCardContent/TransactionCardContent";
+import TransactionCardDetails from "./TransactionCardDetails/TransactionCardDetails";
 import Card, { CardProps } from "../../Card";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
-import { Group } from "@mantine/core";
+import { ActionIcon, Collapse, Group } from "@mantine/core";
+import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export interface TransactionCardBaseProps extends CardProps {
   transaction: ITransaction;
@@ -24,7 +27,45 @@ const TransactionCardBase = ({
   onToggleSelect,
   ...cardProps
 }: TransactionCardBaseProps): React.ReactNode => {
+  const { t } = useTranslation();
+  const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const selectionMode = onToggleSelect !== undefined;
+  const detailsId = React.useId();
+  const detailsLabel = t(
+    isDetailsOpen
+      ? "collapse_transaction_details"
+      : "expand_transaction_details",
+  );
+
+  const transactionContent = (
+    <div className={classes.contentWrapper}>
+      <TransactionCardContent
+        transaction={transaction}
+        categories={categories}
+        elevation={elevation ?? 0}
+      />
+    </div>
+  );
+
+  const detailsToggle = (
+    <ActionIcon
+      variant="subtle"
+      size="sm"
+      aria-label={detailsLabel}
+      title={detailsLabel}
+      aria-expanded={isDetailsOpen}
+      aria-controls={detailsId}
+      onClick={(event) => {
+        event.stopPropagation();
+        setIsDetailsOpen((prev) => !prev);
+      }}
+    >
+      <ChevronDown
+        size="1rem"
+        className={`${classes.chevron}${isDetailsOpen ? ` ${classes.chevronOpen}` : ""}`}
+      />
+    </ActionIcon>
+  );
 
   return (
     <Card
@@ -40,35 +81,39 @@ const TransactionCardBase = ({
       data-selection-mode={selectionMode ? "true" : undefined}
     >
       {selectionMode ? (
-        <Group
-          className={classes.selectionGroup}
-          data-selected={isSelected ? "true" : "false"}
-          wrap="nowrap"
-          gap="0.5rem"
-          align="center"
-        >
-          <div className={classes.checkboxWrapper}>
-            <Checkbox
-              size="xs"
-              checked={isSelected ?? false}
-              onChange={() => onToggleSelect!(transaction.id)}
-              onClick={(e) => e.stopPropagation()}
-              elevation={elevation ?? 0}
-            />
-          </div>
-          <TransactionCardContent
-            transaction={transaction}
-            categories={categories}
-            elevation={elevation ?? 0}
-          />
-        </Group>
+        <div className={classes.header}>
+          <Group
+            className={classes.selectionGroup}
+            data-selected={isSelected ? "true" : "false"}
+            wrap="nowrap"
+            gap="0.5rem"
+            align="center"
+          >
+            <div className={classes.checkboxWrapper}>
+              <Checkbox
+                size="xs"
+                checked={isSelected ?? false}
+                onChange={() => onToggleSelect!(transaction.id)}
+                onClick={(event) => event.stopPropagation()}
+                elevation={elevation ?? 0}
+              />
+            </div>
+            {transactionContent}
+          </Group>
+          {detailsToggle}
+        </div>
       ) : (
-        <TransactionCardContent
+        <div className={classes.header}>
+          {transactionContent}
+          {detailsToggle}
+        </div>
+      )}
+      <Collapse id={detailsId} expanded={isDetailsOpen}>
+        <TransactionCardDetails
           transaction={transaction}
-          categories={categories}
           elevation={elevation ?? 0}
         />
-      )}
+      </Collapse>
     </Card>
   );
 };
