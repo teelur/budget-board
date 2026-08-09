@@ -15,6 +15,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import Textarea from "~/components/core/Input/Textarea/Textarea";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
@@ -46,6 +47,7 @@ const FIELDS = {
   merchant: "merchant",
   category: "category",
   amount: "amount",
+  notes: "notes",
 } as const;
 
 const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
@@ -107,6 +109,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const [categoryValue, setCategoryValue] = React.useState("");
   const [dateValue, setDateValue] = React.useState<Date | null>(null);
   const [amountValue, setAmountValue] = React.useState<number | string>("");
+  const [notesValue, setNotesValue] = React.useState("");
   const [touched, setTouched] = React.useState<Set<string>>(new Set());
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
@@ -118,6 +121,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     setCategoryValue("");
     setDateValue(null);
     setAmountValue("");
+    setNotesValue("");
     setTouched(new Set());
     setShowDeleteConfirm(false);
   };
@@ -146,6 +150,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
       setMerchantValue(singleSelected.merchantName ?? "");
       setCategoryValue(categoryVal);
       setAmountValue(singleSelected.amount);
+      setNotesValue(singleSelected.notes ?? "");
       setTouched(new Set(Object.values(FIELDS)));
     } else {
       resetFields();
@@ -171,6 +176,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
             ? ""
             : categoryValue
           : t.subcategory,
+        notes: touched.has(FIELDS.notes) ? notesValue : t.notes,
       }),
     );
     updateTransactionsMutation.mutate(requests, {
@@ -338,6 +344,21 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 decimalScale={2}
                 fixedDecimalScale
                 w={140}
+                elevation={1}
+              />
+              <Textarea
+                label={<PrimaryText size="xs">{t("notes")}</PrimaryText>}
+                value={notesValue}
+                onChange={(e) => {
+                  setNotesValue(e.currentTarget.value);
+                  touch(FIELDS.notes);
+                }}
+                placeholder={t("enter_notes")}
+                autosize
+                minRows={1}
+                maxRows={3}
+                miw={220}
+                style={{ flex: "1 1 220px" }}
                 elevation={1}
               />
 
