@@ -79,6 +79,17 @@
   }
 }
 
+.tagsInput {
+  flex: 3;
+  max-width: 380px;
+
+  @container (max-width: 660px) {
+    width: 100%;
+    max-width: none;
+    flex: none;
+  }
+}
+
 .clearButton {
   max-width: 120px;
   margin-top: 0;

@@ -74,6 +74,7 @@ export interface IFilters {
   dateRange: [Date | null, Date | null];
   merchantName: string;
   amountRange: [number | null, number | null];
+  tags: string[];
 }
 
 export class Filters implements IFilters {
@@ -82,6 +83,7 @@ export class Filters implements IFilters {
   dateRange: [Date | null, Date | null] = [null, null];
   merchantName: string = "";
   amountRange: [number | null, number | null] = [null, null];
+  tags: string[] = [];
 
   constructor(filter?: Filters) {
     if (filter) {
@@ -90,6 +92,7 @@ export class Filters implements IFilters {
       this.dateRange = filter.dateRange;
       this.merchantName = filter.merchantName;
       this.amountRange = filter.amountRange;
+      this.tags = filter.tags;
     }
   }
 
@@ -102,7 +105,11 @@ export class Filters implements IFilters {
       this.dateRange[1]?.getTime() === other.dateRange[1]?.getTime() &&
       this.merchantName === other.merchantName &&
       this.amountRange[0] === other.amountRange[0] &&
-      this.amountRange[1] === other.amountRange[1]
+      this.amountRange[1] === other.amountRange[1] &&
+      JSON.stringify(
+        this.tags.map((tag) => tag.trim().toUpperCase()).sort(),
+      ) ===
+        JSON.stringify(other.tags.map((tag) => tag.trim().toUpperCase()).sort())
     );
   }
 }
