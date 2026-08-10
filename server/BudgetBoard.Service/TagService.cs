@@ -31,10 +31,15 @@ public class TagService(
             throw new BudgetBoardServiceException(responseLocalizer["TagAddRemoveOverlapError"]);
         }
 
-        var currentLinks = await userDataContext
-            .TransactionTags.Where(link => link.TransactionID == transaction.ID)
-            .Include(link => link.Tag)
-            .ToListAsync();
+        var transactionTagsEntry = userDataContext
+            .Entry(transaction)
+            .Collection(currentTransaction => currentTransaction.TransactionTags);
+        var currentLinks = transactionTagsEntry.IsLoaded
+            ? [.. transaction.TransactionTags]
+            : await userDataContext
+                .TransactionTags.Where(link => link.TransactionID == transaction.ID)
+                .Include(link => link.Tag)
+                .ToListAsync();
 
         var unsavedLinks = transaction.TransactionTags.Where(link =>
             userDataContext.Entry(link).State != EntityState.Deleted
