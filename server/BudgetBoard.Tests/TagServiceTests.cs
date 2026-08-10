@@ -15,7 +15,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class TagServiceTests
 {
-    #region CreatetransactionAsync
+    #region CreateTransactionAsync
     [Fact]
     public async Task CreateTransactionAsync_ShouldNormalizeAndReuseTags()
     {
