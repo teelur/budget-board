@@ -46,6 +46,32 @@ internal static class AutomaticRuleActionHandler
                 responseLocalizer
             );
         }
+        if (
+            AutomaticRuleActionValidator.IsTagOperator(action.Operator)
+            && action.Field.Equals(
+                AutomaticRuleConstants.TransactionFields.Tags,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return await ApplyTagAction(
+                action,
+                transactions,
+                transactionService,
+                userGuid,
+                responseLocalizer
+            );
+        }
+        if (AutomaticRuleActionValidator.IsTagOperator(action.Operator))
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer[
+                    "AutomaticRuleInvalidActionCombinationError",
+                    action.Field,
+                    action.Operator
+                ]
+            );
+        }
 
         throw new BudgetBoardServiceException(
             responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
@@ -90,6 +116,15 @@ internal static class AutomaticRuleActionHandler
                 userGuid,
                 responseLocalizer
             );
+        }
+        else if (
+            action.Field.Equals(
+                AutomaticRuleConstants.TransactionFields.Note,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return await ApplySetActionForNote(action, transactions, transactionService, userGuid);
         }
         else if (
             action.Field.Equals(
@@ -149,6 +184,26 @@ internal static class AutomaticRuleActionHandler
         return updatedTransactions;
     }
 
+    private static async Task<int> ApplySetActionForNote(
+        IRuleParameterRequest action,
+        IEnumerable<Transaction> transactions,
+        ITransactionService transactionService,
+        Guid userGuid
+    )
+    {
+        int updatedTransactions = 0;
+        foreach (var transaction in transactions)
+        {
+            await transactionService.UpdateTransactionsAsync(
+                userGuid,
+                [new TransactionUpdateRequest(transaction) { Notes = action.Value }]
+            );
+
+            updatedTransactions++;
+        }
+        return updatedTransactions;
+    }
+
     private static async Task<int> ApplySetActionForCategory(
         IRuleParameterRequest action,
         IEnumerable<Transaction> transactions,
@@ -201,21 +256,70 @@ internal static class AutomaticRuleActionHandler
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
-        if (!decimal.TryParse(action.Value, out var newAmount))
-        {
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AutomaticRuleInvalidAmountError", action.Value]
-            );
-        }
+        var expression = AutomaticRuleActionValidator.ParseAmountExpression(
+            action,
+            responseLocalizer
+        );
 
         int updatedTransactions = 0;
         foreach (var transaction in transactions)
         {
+            decimal newAmount;
+            try
+            {
+                newAmount = expression.Evaluate(transaction.Amount);
+            }
+            catch (DivideByZeroException)
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AutomaticRuleDivisionByZeroError"]
+                );
+            }
+            catch (OverflowException)
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AutomaticRuleArithmeticOverflowError"]
+                );
+            }
+
             await transactionService.UpdateTransactionsAsync(
                 userGuid,
                 [new TransactionUpdateRequest(transaction) { Amount = newAmount }]
             );
 
+            updatedTransactions++;
+        }
+        return updatedTransactions;
+    }
+
+    private static async Task<int> ApplyTagAction(
+        IRuleParameterRequest action,
+        IEnumerable<Transaction> transactions,
+        ITransactionService transactionService,
+        Guid userGuid,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
+    {
+        var tags = AutomaticRuleActionValidator.ParseTags(action, responseLocalizer);
+        int updatedTransactions = 0;
+        foreach (var transaction in transactions)
+        {
+            var updateRequest = new TransactionUpdateRequest(transaction);
+            if (
+                action.Operator.Equals(
+                    AutomaticRuleConstants.ActionOperators.Add,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
+            {
+                updateRequest.AddTags = tags;
+            }
+            else
+            {
+                updateRequest.RemoveTags = tags;
+            }
+
+            await transactionService.UpdateTransactionsAsync(userGuid, [updateRequest]);
             updatedTransactions++;
         }
         return updatedTransactions;

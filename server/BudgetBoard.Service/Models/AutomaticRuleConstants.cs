@@ -9,6 +9,8 @@ public class AutomaticRuleConstants
         public const string Merchant = "merchant";
         public const string Category = "category";
         public const string Account = "account";
+        public const string Note = "note";
+        public const string Tags = "tags";
         public static readonly IEnumerable<string> AllFields =
         [
             Amount,
@@ -55,6 +57,8 @@ public class AutomaticRuleConstants
     {
         public static readonly string Set = "set";
         public static readonly string Delete = "delete";
-        public static readonly IEnumerable<string> AllOperators = [Set, Delete];
+        public static readonly string Add = "add";
+        public static readonly string Remove = "remove";
+        public static readonly IEnumerable<string> AllOperators = [Set, Delete, Add, Remove];
     }
 }
