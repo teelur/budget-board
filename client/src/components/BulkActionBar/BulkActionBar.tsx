@@ -20,9 +20,11 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
+import { getTagChanges, getUniqueTags } from "~/helpers/tags";
 import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
+import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
@@ -48,6 +50,7 @@ const FIELDS = {
   category: "category",
   amount: "amount",
   notes: "notes",
+  tags: "tags",
 } as const;
 
 const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
@@ -110,6 +113,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const [dateValue, setDateValue] = React.useState<Date | null>(null);
   const [amountValue, setAmountValue] = React.useState<number | string>("");
   const [notesValue, setNotesValue] = React.useState("");
+  const [tagsValue, setTagsValue] = React.useState<string[]>([]);
   const [touched, setTouched] = React.useState<Set<string>>(new Set());
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
@@ -122,6 +126,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     setDateValue(null);
     setAmountValue("");
     setNotesValue("");
+    setTagsValue([]);
     setTouched(new Set());
     setShowDeleteConfirm(false);
   };
@@ -151,7 +156,8 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
       setCategoryValue(categoryVal);
       setAmountValue(singleSelected.amount);
       setNotesValue(singleSelected.notes ?? "");
-      setTouched(new Set(Object.values(FIELDS)));
+      setTagsValue(getUniqueTags(singleSelected.tags ?? []));
+      setTouched(new Set());
     } else {
       resetFields();
     }
@@ -159,26 +165,41 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
 
   const handleApply = () => {
     const requests: ITransactionUpdateRequest[] = selectedTransactions.map(
-      (t) => ({
-        id: t.id,
-        amount: touched.has(FIELDS.amount) ? (amountValue as number) : t.amount,
-        date: touched.has(FIELDS.date)
-          ? dayjs(dateValue!).format("YYYY-MM-DD")
-          : t.date,
-        merchantName: touched.has(FIELDS.merchant)
-          ? merchantValue
-          : t.merchantName,
-        category: touched.has(FIELDS.category)
-          ? getParentCategory(categoryValue, props.categories)
-          : t.category,
-        subcategory: touched.has(FIELDS.category)
-          ? getIsParentCategory(categoryValue, props.categories)
+      (transaction) => {
+        const request: ITransactionUpdateRequest = { id: transaction.id };
+
+        if (touched.has(FIELDS.amount) && typeof amountValue === "number") {
+          request.amount = amountValue;
+        }
+        if (touched.has(FIELDS.date) && dateValue) {
+          request.date = dayjs(dateValue).format("YYYY-MM-DD");
+        }
+        if (touched.has(FIELDS.merchant)) {
+          request.merchantName = merchantValue;
+        }
+        if (touched.has(FIELDS.category)) {
+          request.category = getParentCategory(categoryValue, props.categories);
+          request.subcategory = getIsParentCategory(
+            categoryValue,
+            props.categories,
+          )
             ? ""
-            : categoryValue
-          : t.subcategory,
-        notes: touched.has(FIELDS.notes) ? notesValue : t.notes,
-      }),
+            : categoryValue;
+        }
+        if (touched.has(FIELDS.notes)) {
+          request.notes = notesValue;
+        }
+        if (touched.has(FIELDS.tags)) {
+          Object.assign(
+            request,
+            getTagChanges(transaction.tags ?? [], tagsValue),
+          );
+        }
+
+        return request;
+      },
     );
+
     updateTransactionsMutation.mutate(requests, {
       onSuccess: () => {
         props.onClearSelection();
@@ -357,6 +378,25 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 autosize
                 minRows={1}
                 maxRows={3}
+                miw={220}
+                style={{ flex: "1 1 220px" }}
+                elevation={1}
+              />
+              <TransactionTagsInput
+                label={<PrimaryText size="xs">{t("tags")}</PrimaryText>}
+                placeholder={t("add_or_select_tags")}
+                value={tagsValue}
+                existingTags={selectedTransactions.flatMap(
+                  (transaction) => transaction.tags ?? [],
+                )}
+                onChange={(value) => {
+                  setTagsValue(value);
+                  touch(FIELDS.tags);
+                }}
+                disabled={
+                  updateTransactionsMutation.isPending ||
+                  deleteTransactionsMutation.isPending
+                }
                 miw={220}
                 style={{ flex: "1 1 220px" }}
                 elevation={1}

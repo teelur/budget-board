@@ -2,6 +2,7 @@ import classes from "./TransactionCardDetails.module.css";
 
 import { ITransaction } from "~/models/transaction";
 import React from "react";
+import { Badge, Group } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -40,13 +41,35 @@ const TransactionCardDetails = ({
           {transaction.accountName.trim() || t("unknown_account")}
         </PrimaryText>
       </div>
-      <div className={classes.detailItem}>
+      <div className={`${classes.detailItem} ${classes.notesDetail}`}>
         <DimmedText size="xs" elevation={elevation}>
           {t("notes")}
         </DimmedText>
         <PrimaryText size="sm" elevation={elevation} className={classes.value}>
           {notes || t("no_notes")}
         </PrimaryText>
+      </div>
+      <div className={`${classes.detailItem} ${classes.tagsDetail}`}>
+        <DimmedText size="xs" elevation={elevation}>
+          {t("tags")}
+        </DimmedText>
+        {transaction.tags?.length ? (
+          <Group className={classes.tags} gap="0.25rem">
+            {transaction.tags.map((tag) => (
+              <Badge key={tag} size="sm" variant="light">
+                {tag}
+              </Badge>
+            ))}
+          </Group>
+        ) : (
+          <PrimaryText
+            size="sm"
+            elevation={elevation}
+            className={classes.value}
+          >
+            {t("no_tags")}
+          </PrimaryText>
+        )}
       </div>
     </div>
   );

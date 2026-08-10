@@ -5,6 +5,7 @@ import {
   accountsQueryKey,
   balancesQueryKey,
   institutionsQueryKey,
+  tagSuggestionsQueryKey,
   transactionsQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
@@ -24,6 +25,9 @@ export const useSplitTransactionMutation = () => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [tagSuggestionsQueryKey],
+      });
       await queryClient.invalidateQueries({ queryKey: [balancesQueryKey] });
       await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
       await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });

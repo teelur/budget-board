@@ -23,6 +23,8 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<Account> Accounts { get; set; }
     public DbSet<AccountType> AccountTypes { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+    public DbSet<TransactionTag> TransactionTags { get; set; }
     public DbSet<Budget> Budgets { get; set; }
     public DbSet<Goal> Goals { get; set; }
     public DbSet<Balance> Balances { get; set; }
@@ -61,6 +63,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
             u.HasMany(e => e.TransactionCategories)
                 .WithOne(e => e.User)
                 .HasForeignKey(e => e.UserID);
+            u.HasMany(e => e.Tags).WithOne(e => e.User).HasForeignKey(e => e.UserID).IsRequired();
 
             u.HasOne(e => e.UserSettings)
                 .WithOne(e => e.User)
@@ -98,6 +101,28 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         modelBuilder.Entity<AccountType>().ToTable("AccountType");
 
         modelBuilder.Entity<Transaction>().ToTable("Transaction");
+
+        modelBuilder.Entity<Tag>(t =>
+        {
+            t.Property(e => e.Value).HasMaxLength(Tag.MaxValueLength).IsRequired();
+            t.Property(e => e.NormalizedValue).HasMaxLength(Tag.MaxValueLength).IsRequired();
+            t.HasIndex(e => new { e.UserID, e.NormalizedValue }).IsUnique();
+            t.ToTable("Tag");
+        });
+
+        modelBuilder.Entity<TransactionTag>(t =>
+        {
+            t.HasKey(e => new { e.TransactionID, e.TagID });
+            t.HasOne(e => e.Transaction)
+                .WithMany(e => e.TransactionTags)
+                .HasForeignKey(e => e.TransactionID)
+                .OnDelete(DeleteBehavior.Cascade);
+            t.HasOne(e => e.Tag)
+                .WithMany(e => e.TransactionTags)
+                .HasForeignKey(e => e.TagID)
+                .OnDelete(DeleteBehavior.Cascade);
+            t.ToTable("TransactionTag");
+        });
 
         modelBuilder.Entity<Budget>().ToTable("Budget");
 

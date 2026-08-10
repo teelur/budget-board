@@ -45,6 +45,8 @@ public class ApplicationUser : IdentityUser<Guid>
     /// </summary>
     public ICollection<Category> TransactionCategories { get; set; } = [];
 
+    public ICollection<Tag> Tags { get; set; } = [];
+
     /// <summary>
     /// Collection of account types defined by the user.
     /// </summary>

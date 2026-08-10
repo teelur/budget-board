@@ -16,7 +16,8 @@ public class TransactionService(
     INowProvider nowProvider,
     IAutomaticTransactionCategorizerService automaticTransactionCategorizerService,
     IStringLocalizer<ResponseStrings> responseLocalizer,
-    IStringLocalizer<LogStrings> logLocalizer
+    IStringLocalizer<LogStrings> logLocalizer,
+    ITagService tagService
 ) : ITransactionService
 {
     /// <inheritdoc />
@@ -130,6 +131,7 @@ public class TransactionService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var removedTagIds = new HashSet<Guid>();
         foreach (var request in requests)
         {
             var transaction = GetTransactionByID(userData, request.ID);
@@ -163,6 +165,18 @@ public class TransactionService(
                 transaction.Notes = request.Notes;
             }
 
+            if (request.AddTags is not null || request.RemoveTags is not null)
+            {
+                removedTagIds.UnionWith(
+                    await tagService.ApplyTagChangesAsync(
+                        userData.Id,
+                        transaction,
+                        request.AddTags,
+                        request.RemoveTags
+                    )
+                );
+            }
+
             UpdateBalancesForEditedTransaction(
                 transaction,
                 originalAmount,
@@ -171,6 +185,8 @@ public class TransactionService(
                 finalDate
             );
         }
+
+        await tagService.DeleteOrphanedTagsAsync(userData.Id, removedTagIds);
 
         if (!deferSave)
         {
@@ -202,6 +218,7 @@ public class TransactionService(
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
+        var removedTagIds = new HashSet<Guid>();
 
         var uniqueTransactionIds = transactionIds.Distinct().ToList();
         foreach (var transactionId in uniqueTransactionIds)
@@ -211,12 +228,15 @@ public class TransactionService(
             transaction.Deleted = nowProvider.UtcNow;
             transaction.Category = null;
             transaction.Subcategory = null;
+            removedTagIds.UnionWith(await tagService.RemoveAllTagsAsync(transaction));
 
             if (transaction.Account!.Source == AccountSource.Manual)
             {
                 SubtractAmountFromBalances(transaction, transaction.Amount, transaction.Date);
             }
         }
+
+        await tagService.DeleteOrphanedTagsAsync(userData.Id, removedTagIds);
 
         if (!deferSave)
         {
@@ -356,6 +376,8 @@ public class TransactionService(
                 users
                     .Include(u => u.Accounts)
                     .ThenInclude(a => a.Transactions)
+                    .ThenInclude(t => t.TransactionTags)
+                    .ThenInclude(transactionTag => transactionTag.Tag)
                     .Include(u => u.Accounts)
                     .ThenInclude(a => a.Balances)
                     .Include(u => u.UserSettings)

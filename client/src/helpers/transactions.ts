@@ -9,6 +9,7 @@ import { areStringsEqual } from "./utils";
 import { getIsParentCategory } from "./category";
 import dayjs from "~/shared/dayjs";
 import { ICategory } from "~/models/category";
+import { normalizeTag } from "./tags";
 
 /**
  * Sorts an array of transactions using the specified field and direction.
@@ -112,7 +113,7 @@ export const getVisibleTransactions = (
   transactions.filter((t: ITransaction) => t.deleted === null);
 
 /**
- * Filters transactions based on accounts, categories, date range, merchant name, and amount range.
+ * Filters transactions based on accounts, categories, date range, merchant name, amount range, and tags.
  *
  * The function starts by excluding deleted transactions. It then applies:
  * - Account filters (if any are selected).
@@ -120,9 +121,10 @@ export const getVisibleTransactions = (
  * - Date range filters (if dates are specified).
  * - Merchant name filter (if specified).
  * - Amount range filters (if specified).
+ * - Tag filters (matches any selected tag case-insensitively).
  *
  * @param {ITransaction[]} transactions - Array of transaction objects.
- * @param {Filters} filters - Object containing account, category, date range, merchant name, and amount range filters.
+ * @param {Filters} filters - Object containing account, category, date range, merchant name, amount range, and tag filters.
  * @param {ICategory[]} transactionCategories - Array of all categories, used to check for parent categories.
  * @returns {ITransaction[]} The filtered array of transactions.
  */
@@ -177,6 +179,12 @@ export const getFilteredTransactions = (
   if (filters.amountRange[1] !== null) {
     filteredTransactions = filteredTransactions.filter(
       (t) => t.amount <= filters.amountRange[1]!,
+    );
+  }
+  if (filters.tags.length > 0) {
+    const filterTags = new Set(filters.tags.map(normalizeTag));
+    filteredTransactions = filteredTransactions.filter((transaction) =>
+      (transaction.tags ?? []).some((tag) => filterTags.has(normalizeTag(tag))),
     );
   }
   return filteredTransactions;

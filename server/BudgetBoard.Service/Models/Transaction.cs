@@ -36,6 +36,8 @@ public interface ITransactionUpdateRequest
     OptionalField<string?> MerchantName { get; }
     OptionalField<DateTime?> Deleted { get; }
     string? Notes { get; }
+    IEnumerable<string>? AddTags { get; }
+    IEnumerable<string>? RemoveTags { get; }
 }
 
 public class TransactionUpdateRequest() : ITransactionUpdateRequest
@@ -48,6 +50,8 @@ public class TransactionUpdateRequest() : ITransactionUpdateRequest
     public OptionalField<string?> MerchantName { get; set; } = new OptionalField<string?>();
     public OptionalField<DateTime?> Deleted { get; set; } = new OptionalField<DateTime?>();
     public string? Notes { get; set; } = null;
+    public IEnumerable<string>? AddTags { get; set; } = null;
+    public IEnumerable<string>? RemoveTags { get; set; } = null;
 
     public TransactionUpdateRequest(Transaction transaction)
         : this()
@@ -60,6 +64,8 @@ public class TransactionUpdateRequest() : ITransactionUpdateRequest
         MerchantName = new OptionalField<string?>(transaction.MerchantName);
         Deleted = new OptionalField<DateTime?>(transaction.Deleted);
         Notes = transaction.Notes;
+        AddTags = null;
+        RemoveTags = null;
     }
 }
 
@@ -121,6 +127,7 @@ public interface ITransactionResponse
     string AccountName { get; }
     string Source { get; }
     Guid AccountID { get; }
+    IReadOnlyList<string> Tags { get; }
 }
 
 public class TransactionResponse : ITransactionResponse
@@ -138,6 +145,7 @@ public class TransactionResponse : ITransactionResponse
     public string AccountName { get; set; } = string.Empty;
     public string Source { get; set; } = string.Empty;
     public Guid AccountID { get; set; } = Guid.Empty;
+    public IReadOnlyList<string> Tags { get; set; } = [];
 
     public TransactionResponse(Transaction transaction)
     {
@@ -153,5 +161,10 @@ public class TransactionResponse : ITransactionResponse
         AccountName = transaction.Account?.Name ?? string.Empty;
         Source = transaction.Source;
         AccountID = transaction.AccountID;
+        Tags = transaction
+            .TransactionTags.Where(transactionTag => transactionTag.Tag != null)
+            .Select(transactionTag => transactionTag.Tag!.Value)
+            .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 }
