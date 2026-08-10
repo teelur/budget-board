@@ -421,4 +421,13 @@
   <data name="SimpleFinAccessTokenParseError" xml:space="preserve">
     <value>The provided SimpleFIN access token is invalid or malformed.</value>
   </data>
+  <data name="TagAddRemoveOverlapError" xml:space="preserve">
+    <value>A tag cannot be added and removed in the same request.</value>
+  </data>
+  <data name="TagValueEmptyError" xml:space="preserve">
+    <value>Tag values cannot be empty.</value>
+  </data>
+  <data name="TagValueTooLongError" xml:space="preserve">
+    <value>Tag values cannot exceed 50 characters.</value>
+  </data>
 </root>
