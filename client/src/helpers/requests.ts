@@ -14,6 +14,7 @@ export const lunchFlowAccountQueryKey: string = "lunchFlowAccounts";
 export const simpleFinOrganizationQueryKey: string = "simpleFinOrganizations";
 export const simpleFinAccountQueryKey: string = "simpleFinAccounts";
 export const transactionCategoriesQueryKey: string = "transactionCategories";
+export const tagSuggestionsQueryKey: string = "tagSuggestions";
 export const transactionsQueryKey: string = "transactions";
 export const twoFactorAuthQueryKey: string = "twoFactorAuth";
 export const userSettingsQueryKey: string = "userSettings";
