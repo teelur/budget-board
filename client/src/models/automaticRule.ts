@@ -121,9 +121,9 @@ export const FieldToOperatorType = new Map<string, OperatorTypes>([
 
 export const ActionOperators: Operator[] = [
   { label: "set", value: "set", type: [] },
-  { label: "delete_transaction", value: "delete", type: [] },
   { label: "add_tags", value: "add", type: [] },
   { label: "remove_tags", value: "remove", type: [] },
+  { label: "delete_transaction", value: "delete", type: [] },
 ];
 
 export const getActionOperators = (field: string): Operator[] => {
@@ -135,7 +135,8 @@ export const getActionOperators = (field: string): Operator[] => {
         : ["set"];
 
   return ActionOperators.filter(
-    (operator) => operator.value === "delete" || fieldSpecific.includes(operator.value),
+    (operator) =>
+      operator.value === "delete" || fieldSpecific.includes(operator.value),
   );
 };
 
