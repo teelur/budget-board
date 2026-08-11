@@ -430,4 +430,19 @@
   <data name="TagValueTooLongError" xml:space="preserve">
     <value>Tag values cannot exceed 50 characters.</value>
   </data>
+  <data name="AutomaticRuleInvalidAmountExpressionError" xml:space="preserve">
+    <value>The amount expression '{0}' is invalid.</value>
+  </data>
+  <data name="AutomaticRuleInvalidActionCombinationError" xml:space="preserve">
+    <value>The action '{1}' cannot be used with the field '{0}'.</value>
+  </data>
+  <data name="AutomaticRuleDivisionByZeroError" xml:space="preserve">
+    <value>An amount cannot be divided by zero.</value>
+  </data>
+  <data name="AutomaticRuleArithmeticOverflowError" xml:space="preserve">
+    <value>The arithmetic operation produced an amount outside the supported range.</value>
+  </data>
+  <data name="AutomaticRuleInvalidTagsError" xml:space="preserve">
+    <value>Tags must be provided as a non-empty JSON array of strings.</value>
+  </data>
 </root>
