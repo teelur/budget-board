@@ -46,6 +46,32 @@ internal static class AutomaticRuleActionHandler
                 responseLocalizer
             );
         }
+        if (
+            AutomaticRuleActionValidator.IsTagOperator(action.Operator)
+            && action.Field.Equals(
+                AutomaticRuleConstants.TransactionFields.Tags,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return await ApplyTagAction(
+                action,
+                transactions,
+                transactionService,
+                userGuid,
+                responseLocalizer
+            );
+        }
+        if (AutomaticRuleActionValidator.IsTagOperator(action.Operator))
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer[
+                    "AutomaticRuleInvalidActionCombinationError",
+                    action.Field,
+                    action.Operator
+                ]
+            );
+        }
 
         throw new BudgetBoardServiceException(
             responseLocalizer["AutomaticRuleUnsupportedOperatorError", action.Operator]
@@ -93,6 +119,15 @@ internal static class AutomaticRuleActionHandler
         }
         else if (
             action.Field.Equals(
+                AutomaticRuleConstants.TransactionFields.Note,
+                StringComparison.CurrentCultureIgnoreCase
+            )
+        )
+        {
+            return await ApplySetActionForNote(action, transactions, transactionService, userGuid);
+        }
+        else if (
+            action.Field.Equals(
                 AutomaticRuleConstants.TransactionFields.Amount,
                 StringComparison.CurrentCultureIgnoreCase
             )
@@ -136,17 +171,41 @@ internal static class AutomaticRuleActionHandler
         Guid userGuid
     )
     {
-        var updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionsAsync(
-                userGuid,
-                [new TransactionUpdateRequest(transaction) { MerchantName = action.Value }]
+            updateRequests.Add(
+                new TransactionUpdateRequest(transaction) { MerchantName = action.Value }
             );
-
-            updatedTransactions++;
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
+    }
+
+    private static async Task<int> ApplySetActionForNote(
+        IRuleParameterRequest action,
+        IEnumerable<Transaction> transactions,
+        ITransactionService transactionService,
+        Guid userGuid
+    )
+    {
+        var updateRequests = new List<ITransactionUpdateRequest>();
+        foreach (var transaction in transactions)
+        {
+            updateRequests.Add(new TransactionUpdateRequest(transaction) { Notes = action.Value });
+        }
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 
     private static async Task<int> ApplySetActionForCategory(
@@ -180,17 +239,21 @@ internal static class AutomaticRuleActionHandler
             }
         }
 
-        int updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
             var updateRequest = new TransactionUpdateRequest(transaction);
             (updateRequest.Category, updateRequest.Subcategory) =
                 TransactionCategoriesHelpers.GetFullCategory(newCategory, allCategories);
-            await transactionService.UpdateTransactionsAsync(userGuid, [updateRequest]);
-
-            updatedTransactions++;
+            updateRequests.Add(updateRequest);
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 
     private static async Task<int> ApplySetActionForAmount(
@@ -201,24 +264,79 @@ internal static class AutomaticRuleActionHandler
         IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
-        if (!decimal.TryParse(action.Value, out var newAmount))
-        {
-            throw new BudgetBoardServiceException(
-                responseLocalizer["AutomaticRuleInvalidAmountError", action.Value]
-            );
-        }
+        var expression = AutomaticRuleActionValidator.ParseAmountExpression(
+            action,
+            responseLocalizer
+        );
 
-        int updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionsAsync(
-                userGuid,
-                [new TransactionUpdateRequest(transaction) { Amount = newAmount }]
-            );
+            decimal newAmount;
+            try
+            {
+                newAmount = expression.Evaluate(transaction.Amount);
+            }
+            catch (DivideByZeroException)
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AutomaticRuleDivisionByZeroError"]
+                );
+            }
+            catch (OverflowException)
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["AutomaticRuleArithmeticOverflowError"]
+                );
+            }
 
-            updatedTransactions++;
+            updateRequests.Add(new TransactionUpdateRequest(transaction) { Amount = newAmount });
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
+    }
+
+    private static async Task<int> ApplyTagAction(
+        IRuleParameterRequest action,
+        IEnumerable<Transaction> transactions,
+        ITransactionService transactionService,
+        Guid userGuid,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
+    {
+        var tags = AutomaticRuleActionValidator.ParseTags(action, responseLocalizer);
+        var updateRequests = new List<ITransactionUpdateRequest>();
+        foreach (var transaction in transactions)
+        {
+            var updateRequest = new TransactionUpdateRequest(transaction);
+            if (
+                action.Operator.Equals(
+                    AutomaticRuleConstants.ActionOperators.Add,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
+            {
+                updateRequest.AddTags = tags;
+            }
+            else
+            {
+                updateRequest.RemoveTags = tags;
+            }
+
+            updateRequests.Add(updateRequest);
+        }
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 
     private static async Task<int> ApplySetActionForDate(
@@ -236,16 +354,17 @@ internal static class AutomaticRuleActionHandler
             );
         }
 
-        int updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionsAsync(
-                userGuid,
-                [new TransactionUpdateRequest(transaction) { Date = newDate }]
-            );
-
-            updatedTransactions++;
+            updateRequests.Add(new TransactionUpdateRequest(transaction) { Date = newDate });
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 }

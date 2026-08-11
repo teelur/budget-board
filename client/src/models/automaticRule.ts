@@ -32,6 +32,7 @@ export interface IAutomaticRuleResponse {
 }
 
 export interface IRuleParameterUpdateRequest {
+  id?: string;
   field: string;
   operator: string;
   value: string;
@@ -77,6 +78,16 @@ export const TransactionFields: TransactionField[] = [
     value: "account",
     appliesTo: TransactionFieldScope.CONDITION,
   },
+  {
+    label: "note",
+    value: "note",
+    appliesTo: TransactionFieldScope.ACTION,
+  },
+  {
+    label: "tags",
+    value: "tags",
+    appliesTo: TransactionFieldScope.ACTION,
+  },
 ];
 
 export const ConditionTransactionFields: ComboboxItem[] =
@@ -110,8 +121,24 @@ export const FieldToOperatorType = new Map<string, OperatorTypes>([
 
 export const ActionOperators: Operator[] = [
   { label: "set", value: "set", type: [] },
+  { label: "add_tags", value: "add", type: [] },
+  { label: "remove_tags", value: "remove", type: [] },
   { label: "delete_transaction", value: "delete", type: [] },
 ];
+
+export const getActionOperators = (field: string): Operator[] => {
+  const fieldSpecific =
+    field === "tags"
+      ? ["add", "remove"]
+      : field === "note" || field === "amount"
+        ? ["set"]
+        : ["set"];
+
+  return ActionOperators.filter(
+    (operator) =>
+      operator.value === "delete" || fieldSpecific.includes(operator.value),
+  );
+};
 
 export interface Operator {
   label: string;
