@@ -171,17 +171,20 @@ internal static class AutomaticRuleActionHandler
         Guid userGuid
     )
     {
-        var updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionsAsync(
-                userGuid,
-                [new TransactionUpdateRequest(transaction) { MerchantName = action.Value }]
+            updateRequests.Add(
+                new TransactionUpdateRequest(transaction) { MerchantName = action.Value }
             );
-
-            updatedTransactions++;
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 
     private static async Task<int> ApplySetActionForNote(
@@ -191,17 +194,18 @@ internal static class AutomaticRuleActionHandler
         Guid userGuid
     )
     {
-        int updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionsAsync(
-                userGuid,
-                [new TransactionUpdateRequest(transaction) { Notes = action.Value }]
-            );
-
-            updatedTransactions++;
+            updateRequests.Add(new TransactionUpdateRequest(transaction) { Notes = action.Value });
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 
     private static async Task<int> ApplySetActionForCategory(
@@ -235,17 +239,21 @@ internal static class AutomaticRuleActionHandler
             }
         }
 
-        int updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
             var updateRequest = new TransactionUpdateRequest(transaction);
             (updateRequest.Category, updateRequest.Subcategory) =
                 TransactionCategoriesHelpers.GetFullCategory(newCategory, allCategories);
-            await transactionService.UpdateTransactionsAsync(userGuid, [updateRequest]);
-
-            updatedTransactions++;
+            updateRequests.Add(updateRequest);
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 
     private static async Task<int> ApplySetActionForAmount(
@@ -261,7 +269,7 @@ internal static class AutomaticRuleActionHandler
             responseLocalizer
         );
 
-        int updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
             decimal newAmount;
@@ -282,14 +290,15 @@ internal static class AutomaticRuleActionHandler
                 );
             }
 
-            await transactionService.UpdateTransactionsAsync(
-                userGuid,
-                [new TransactionUpdateRequest(transaction) { Amount = newAmount }]
-            );
-
-            updatedTransactions++;
+            updateRequests.Add(new TransactionUpdateRequest(transaction) { Amount = newAmount });
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 
     private static async Task<int> ApplyTagAction(
@@ -301,7 +310,7 @@ internal static class AutomaticRuleActionHandler
     )
     {
         var tags = AutomaticRuleActionValidator.ParseTags(action, responseLocalizer);
-        int updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
             var updateRequest = new TransactionUpdateRequest(transaction);
@@ -319,10 +328,15 @@ internal static class AutomaticRuleActionHandler
                 updateRequest.RemoveTags = tags;
             }
 
-            await transactionService.UpdateTransactionsAsync(userGuid, [updateRequest]);
-            updatedTransactions++;
+            updateRequests.Add(updateRequest);
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 
     private static async Task<int> ApplySetActionForDate(
@@ -340,16 +354,17 @@ internal static class AutomaticRuleActionHandler
             );
         }
 
-        int updatedTransactions = 0;
+        var updateRequests = new List<ITransactionUpdateRequest>();
         foreach (var transaction in transactions)
         {
-            await transactionService.UpdateTransactionsAsync(
-                userGuid,
-                [new TransactionUpdateRequest(transaction) { Date = newDate }]
-            );
-
-            updatedTransactions++;
+            updateRequests.Add(new TransactionUpdateRequest(transaction) { Date = newDate });
         }
-        return updatedTransactions;
+
+        if (updateRequests.Count > 0)
+        {
+            await transactionService.UpdateTransactionsAsync(userGuid, updateRequests);
+        }
+
+        return updateRequests.Count;
     }
 }

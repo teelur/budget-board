@@ -1,7 +1,9 @@
 ﻿using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.IntegrationTests.Helpers;
+using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Moq;
 
@@ -451,6 +453,87 @@ public class AutomaticRuleActionTests
                     )
                 ),
             Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task Handler_AmountExpression_UpdatesAllTransactionsInOneBatch()
+    {
+        var transactions = new TransactionFaker([Guid.NewGuid()]).Generate(2);
+        transactions[0].Amount = 100m;
+        transactions[1].Amount = 200m;
+        var updateRequests = new List<ITransactionUpdateRequest>();
+        var mock = new Mock<ITransactionService>();
+        mock.Setup(ts =>
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                )
+            )
+            .Callback<Guid, IEnumerable<ITransactionUpdateRequest>, bool>(
+                (_, requests, _) => updateRequests.AddRange(requests)
+            )
+            .Returns(Task.CompletedTask);
+
+        var updatedCount = await AutomaticRuleActionHandler.ApplyActionToTransactions(
+            new RuleParameterCreateRequest
+            {
+                Field = AutomaticRuleConstants.TransactionFields.Amount,
+                Operator = AutomaticRuleConstants.ActionOperators.Set,
+                Value = "amount + 50",
+            },
+            transactions,
+            [],
+            mock.Object,
+            Guid.NewGuid(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>()
+        );
+
+        updatedCount.Should().Be(2);
+        updateRequests.Select(request => request.Amount).Should().Equal(150m, 250m);
+        mock.Verify(
+            ts =>
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task Handler_AmountExpression_LaterOverflow_DoesNotUpdateEarlierTransactions()
+    {
+        var transactions = new TransactionFaker([Guid.NewGuid()]).Generate(2);
+        transactions[0].Amount = 100m;
+        transactions[1].Amount = decimal.MaxValue;
+        var mock = AutomaticRuleTestHelpers.UpdateMock();
+
+        var act = () =>
+            AutomaticRuleActionHandler.ApplyActionToTransactions(
+                new RuleParameterCreateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Amount,
+                    Operator = AutomaticRuleConstants.ActionOperators.Set,
+                    Value = "amount * 2",
+                },
+                transactions,
+                [],
+                mock.Object,
+                Guid.NewGuid(),
+                TestHelper.CreateMockLocalizer<ResponseStrings>()
+            );
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AutomaticRuleArithmeticOverflowError");
+        mock.Verify(
+            ts =>
+                ts.UpdateTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<ITransactionUpdateRequest>>()
+                ),
+            Times.Never
         );
     }
 
