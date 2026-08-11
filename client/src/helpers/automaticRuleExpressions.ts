@@ -5,7 +5,7 @@ type AmountExpressionToken =
   | { kind: "leftParen" }
   | { kind: "rightParen" };
 
-const numericLiteralPattern = /^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
+const numericLiteralPattern = /^\d+(?:\.\d*)?$/;
 
 const tokenize = (expression: string): AmountExpressionToken[] | null => {
   const tokens: AmountExpressionToken[] = [];
