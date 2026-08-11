@@ -126,16 +126,18 @@ export const ActionOperators: Operator[] = [
   { label: "remove_tags", value: "remove", type: [] },
 ];
 
-export const getActionOperators = (field: string): Operator[] =>
-  field === "tags"
-    ? ActionOperators.filter((operator) =>
-        ["add", "remove"].includes(operator.value),
-      )
-    : field === "note" || field === "amount"
-      ? ActionOperators.filter((operator) => operator.value === "set")
-      : ActionOperators.filter((operator) =>
-          ["set", "delete"].includes(operator.value),
-        );
+export const getActionOperators = (field: string): Operator[] => {
+  const fieldSpecific =
+    field === "tags"
+      ? ["add", "remove"]
+      : field === "note" || field === "amount"
+        ? ["set"]
+        : ["set"];
+
+  return ActionOperators.filter(
+    (operator) => operator.value === "delete" || fieldSpecific.includes(operator.value),
+  );
+};
 
 export interface Operator {
   label: string;
