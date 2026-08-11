@@ -67,7 +67,7 @@ const tokenize = (expression: string): AmountExpressionToken[] | null => {
       continue;
     }
 
-    if (expression.startsWith("amount", index)) {
+    if (expression.slice(index, index + "amount".length).toLowerCase() === "amount") {
       tokens.push({ kind: "amount" });
       index += "amount".length;
       continue;
