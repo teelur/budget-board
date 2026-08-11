@@ -800,17 +800,9 @@ public class AutomaticRuleConditionTests
                 ts.UpdateTransactionsAsync(
                     It.IsAny<Guid>(),
                     It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
-                        r.First().ID == transactionA.ID
-                    )
-                ),
-            Times.Once
-        );
-        transactionServiceMock.Verify(
-            ts =>
-                ts.UpdateTransactionsAsync(
-                    It.IsAny<Guid>(),
-                    It.Is<IEnumerable<ITransactionUpdateRequest>>(r =>
-                        r.First().ID == transactionB.ID
+                        r.Count() == 2
+                        && r.Any(request => request.ID == transactionA.ID)
+                        && r.Any(request => request.ID == transactionB.ID)
                     )
                 ),
             Times.Once

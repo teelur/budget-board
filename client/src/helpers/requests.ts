@@ -28,6 +28,40 @@ export interface ValidationError {
   errors: object;
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const collectMessages = (value: unknown, messages: string[]): void => {
+  if (typeof value === "string" && value.trim().length > 0) {
+    messages.push(value.trim());
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectMessages(item, messages));
+    return;
+  }
+
+  if (isRecord(value)) {
+    Object.values(value).forEach((item) => collectMessages(item, messages));
+  }
+};
+
+const translateStructuredError = (data: unknown): string | undefined => {
+  if (!isRecord(data)) {
+    return undefined;
+  }
+
+  const messages: string[] = [];
+  [data.title, data.detail, data.message].forEach((value) =>
+    collectMessages(value, messages),
+  );
+  collectMessages(data.errors, messages);
+
+  const uniqueMessages = [...new Set(messages)];
+  return uniqueMessages.length > 0 ? uniqueMessages.join(" ") : undefined;
+};
+
 /**
  * Translates an Axios error object into a human-readable error message.
  *
@@ -45,7 +79,11 @@ export const translateAxiosError = (error: AxiosError): string => {
       // that falls out of the range of 2xx
       return error.response.data;
     }
-    return "An error occurred with an unexpected response format.";
+
+    return (
+      translateStructuredError(error.response.data) ??
+      "An error occurred with an unexpected response format."
+    );
   } else if (error.request) {
     // The request was made but no response was received
     return "No response received from the server.";

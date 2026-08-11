@@ -35,6 +35,8 @@ public class AutomaticRuleService(
             throw new BudgetBoardServiceException(responseLocalizer["NoActionsCreateError"]);
         }
 
+        AutomaticRuleActionValidator.Validate(request.Actions, responseLocalizer);
+
         var newRuleId = Guid.NewGuid();
         var newRule = new AutomaticRule
         {
@@ -78,6 +80,11 @@ public class AutomaticRuleService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
         var existingRule = GetAutomaticRuleById(userData, request.ID);
+
+        if (request.Actions.Count > 0)
+        {
+            AutomaticRuleActionValidator.Validate(request.Actions, responseLocalizer);
+        }
 
         if (request.Conditions.Count > 0)
         {
@@ -133,6 +140,8 @@ public class AutomaticRuleService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+
+        AutomaticRuleActionValidator.Validate(request.Actions, responseLocalizer);
 
         int updatedCount = await RunAutomaticRule(userData, request, allCategories);
         logger.LogInformation("{LogMessage}", logLocalizer["RuleAppliedActionsLog", updatedCount]);

@@ -149,6 +149,160 @@ public class AutomaticRuleTests
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("NoActionsCreateError");
     }
+
+    [Fact]
+    public async Task CreateAutomaticRuleAsync_InvalidTagAction_DoesNotPersistRule()
+    {
+        var helper = new TestHelper();
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+        var rule = new AutomaticRuleCreateRequest
+        {
+            Conditions =
+            [
+                new RuleParameterCreateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Merchant,
+                    Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
+                    Value = "Test Merchant",
+                },
+            ],
+            Actions =
+            [
+                new RuleParameterCreateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Tags,
+                    Operator = AutomaticRuleConstants.ActionOperators.Add,
+                    Value = "work,important",
+                },
+            ],
+        };
+
+        Func<Task> act = async () =>
+            await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AutomaticRuleInvalidTagsError");
+        helper.UserDataContext.AutomaticRules.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task CreateAutomaticRuleAsync_NewActions_RoundTripThroughRuleResponse()
+    {
+        var helper = new TestHelper();
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+        var actions = new[]
+        {
+            new RuleParameterCreateRequest
+            {
+                Field = AutomaticRuleConstants.TransactionFields.Amount,
+                Operator = AutomaticRuleConstants.ActionOperators.Set,
+                Value = "amount + 1.25",
+            },
+            new RuleParameterCreateRequest
+            {
+                Field = AutomaticRuleConstants.TransactionFields.Note,
+                Operator = AutomaticRuleConstants.ActionOperators.Set,
+                Value = "Added by a rule",
+            },
+            new RuleParameterCreateRequest
+            {
+                Field = AutomaticRuleConstants.TransactionFields.Tags,
+                Operator = AutomaticRuleConstants.ActionOperators.Add,
+                Value = "[\"rule\", \"review\"]",
+            },
+        };
+        var rule = new AutomaticRuleCreateRequest
+        {
+            Conditions =
+            [
+                new RuleParameterCreateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Merchant,
+                    Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
+                    Value = "Test Merchant",
+                },
+            ],
+            Actions = actions,
+        };
+
+        await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
+
+        var response = (
+            await automaticRuleService.ReadAutomaticRulesAsync(helper.demoUser.Id)
+        ).Single();
+        response
+            .Actions.Select(action => new
+            {
+                action.Field,
+                action.Operator,
+                action.Value,
+            })
+            .Should()
+            .BeEquivalentTo(
+                actions.Select(action => new
+                {
+                    action.Field,
+                    action.Operator,
+                    action.Value,
+                }),
+                options => options.WithStrictOrdering()
+            );
+    }
+
+    [Fact]
+    public async Task CreateAutomaticRuleAsync_InvalidAmountExpression_DoesNotPersistRule()
+    {
+        var helper = new TestHelper();
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+        var rule = new AutomaticRuleCreateRequest
+        {
+            Conditions =
+            [
+                new RuleParameterCreateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Merchant,
+                    Operator = AutomaticRuleConstants.ConditionalOperators.EqualsString,
+                    Value = "Test Merchant",
+                },
+            ],
+            Actions =
+            [
+                new RuleParameterCreateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Amount,
+                    Operator = AutomaticRuleConstants.ActionOperators.Set,
+                    Value = "amount +",
+                },
+            ],
+        };
+
+        Func<Task> act = async () =>
+            await automaticRuleService.CreateAutomaticRuleAsync(helper.demoUser.Id, rule);
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AutomaticRuleInvalidAmountExpressionError*");
+        helper.UserDataContext.AutomaticRules.Should().BeEmpty();
+    }
     #endregion
 
     #region ReadAutomaticRulesAsync
@@ -392,6 +546,115 @@ public class AutomaticRuleTests
         // Assert
         var updatedRuleFromDb = helper.demoUser.AutomaticRules.First(r => r.ID == createdRuleId);
         updatedRuleFromDb.Actions.Should().HaveCount(demoRule.Actions.Count); // Should remain unchanged
+    }
+
+    [Fact]
+    public async Task UpdateAutomaticRuleAsync_InvalidTagAction_PreservesExistingActions()
+    {
+        var helper = new TestHelper();
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+        var demoRule = new AutomaticRuleFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.AutomaticRules.Add(demoRule);
+        helper.UserDataContext.SaveChanges();
+        var originalActions = demoRule
+            .Actions.Select(action => new
+            {
+                action.Field,
+                action.Operator,
+                action.Value,
+            })
+            .ToList();
+
+        var updatedRule = new AutomaticRuleUpdateRequest
+        {
+            ID = demoRule.ID,
+            Actions =
+            [
+                new RuleParameterUpdateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Tags,
+                    Operator = AutomaticRuleConstants.ActionOperators.Add,
+                    Value = "not-json",
+                },
+            ],
+        };
+
+        Func<Task> act = async () =>
+            await automaticRuleService.UpdateAutomaticRuleAsync(helper.demoUser.Id, updatedRule);
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AutomaticRuleInvalidTagsError");
+        var persistedRule = helper.UserDataContext.AutomaticRules.Single();
+        persistedRule
+            .Actions.Select(action => new
+            {
+                action.Field,
+                action.Operator,
+                action.Value,
+            })
+            .Should()
+            .BeEquivalentTo(originalActions, options => options.WithStrictOrdering());
+    }
+
+    [Fact]
+    public async Task UpdateAutomaticRuleAsync_InvalidAmountExpression_PreservesExistingActions()
+    {
+        var helper = new TestHelper();
+        var automaticRuleService = new AutomaticRuleService(
+            Mock.Of<ILogger<IAutomaticRuleService>>(),
+            helper.UserDataContext,
+            Mock.Of<ITransactionService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+        var demoRule = new AutomaticRuleFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.AutomaticRules.Add(demoRule);
+        helper.UserDataContext.SaveChanges();
+        var originalActions = demoRule
+            .Actions.Select(action => new
+            {
+                action.Field,
+                action.Operator,
+                action.Value,
+            })
+            .ToList();
+        var updatedRule = new AutomaticRuleUpdateRequest
+        {
+            ID = demoRule.ID,
+            Actions =
+            [
+                new RuleParameterUpdateRequest
+                {
+                    Field = AutomaticRuleConstants.TransactionFields.Amount,
+                    Operator = AutomaticRuleConstants.ActionOperators.Set,
+                    Value = "amount +",
+                },
+            ],
+        };
+
+        Func<Task> act = async () =>
+            await automaticRuleService.UpdateAutomaticRuleAsync(helper.demoUser.Id, updatedRule);
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("AutomaticRuleInvalidAmountExpressionError*");
+        helper
+            .UserDataContext.AutomaticRules.Single()
+            .Actions.Select(action => new
+            {
+                action.Field,
+                action.Operator,
+                action.Value,
+            })
+            .Should()
+            .BeEquivalentTo(originalActions, options => options.WithStrictOrdering());
     }
     #endregion
 

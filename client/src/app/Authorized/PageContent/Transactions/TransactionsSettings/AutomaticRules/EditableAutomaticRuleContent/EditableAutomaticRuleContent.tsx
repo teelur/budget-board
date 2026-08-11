@@ -2,14 +2,13 @@ import { ActionIcon, Group, Stack } from "@mantine/core";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import {
-  ActionTransactionFields,
-  ActionOperators,
   ConditionTransactionFields,
   FieldToOperatorType,
   IRuleParameterEdit,
   Operators,
   OperatorTypes,
 } from "~/models/automaticRule";
+import { getDefaultAction } from "~/helpers/automaticRules";
 import ActionItem from "./ActionItem/ActionItem";
 import ConditionItem from "./ConditionItem/ConditionItem";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -58,15 +57,7 @@ const EditableAutomaticRuleContent = (
   };
 
   const addNewAction = () => {
-    props.setActionItems((prev) => [
-      ...prev,
-      {
-        field: ActionTransactionFields.at(0)!.value,
-        operator: ActionOperators.at(0)!.value,
-        value: "",
-        type: "",
-      },
-    ]);
+    props.setActionItems((prev) => [...prev, getDefaultAction()]);
   };
 
   const removeAction = (index: number) => {
