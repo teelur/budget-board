@@ -1,13 +1,14 @@
 import { Button, Group, Stack } from "@mantine/core";
 import React from "react";
+import { notifications } from "@mantine/notifications";
 import {
-  ActionOperators,
   FieldToOperatorType,
   IRuleParameterEdit,
   Operators,
   OperatorTypes,
   TransactionFields,
 } from "~/models/automaticRule";
+import { getDefaultAction, hasEmptyTagAction } from "~/helpers/automaticRules";
 
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { useTranslation } from "react-i18next";
@@ -36,16 +37,24 @@ const AddAutomaticRule = (): React.ReactNode => {
   ]);
 
   const [actionItems, setActionItems] = React.useState<IRuleParameterEdit[]>([
-    {
-      field: defaultField,
-      operator: ActionOperators.at(0)!.value,
-      value: "",
-    },
+    getDefaultAction(),
   ]);
 
   const { t } = useTranslation();
   const createAutomaticRuleMutation = useCreateAutomaticRuleMutation();
   const runAutomaticRuleMutation = useRunAutomaticRuleMutation();
+
+  const hasValidActions = (): boolean => {
+    if (!hasEmptyTagAction(actionItems)) {
+      return true;
+    }
+
+    notifications.show({
+      message: t("at_least_one_tag_required"),
+      color: "var(--button-color-destructive)",
+    });
+    return false;
+  };
 
   return (
     <Stack gap="0.5rem">
@@ -60,7 +69,11 @@ const AddAutomaticRule = (): React.ReactNode => {
           flex="1 1 auto"
           loading={createAutomaticRuleMutation.isPending}
           onClick={() => {
-            createAutomaticRuleMutation.mutate({
+            if (!hasValidActions()) {
+              return;
+            }
+
+            const newAutomaticRule = {
               conditions: conditionItems.map((item) => ({
                 field: item.field,
                 operator: item.operator,
@@ -71,37 +84,28 @@ const AddAutomaticRule = (): React.ReactNode => {
                 operator: item.operator,
                 value: item.value,
               })),
-            });
+            };
 
-            // Reset to default
-            setConditionItems([
-              {
-                field: defaultField,
-                operator:
-                  Operators.filter((op) =>
-                    op.type.includes(
-                      FieldToOperatorType.get(defaultField) ??
-                        OperatorTypes.STRING,
-                    ),
-                  )
-                    .map((op) => op.value)
-                    .at(0) ?? "",
-                value: "",
+            createAutomaticRuleMutation.mutate(newAutomaticRule, {
+              onSuccess: () => {
+                setConditionItems([
+                  {
+                    field: defaultField,
+                    operator:
+                      Operators.filter((op) =>
+                        op.type.includes(
+                          FieldToOperatorType.get(defaultField) ??
+                            OperatorTypes.STRING,
+                        ),
+                      )
+                        .map((op) => op.value)
+                        .at(0) ?? "",
+                    value: "",
+                  },
+                ]);
+                setActionItems([getDefaultAction()]);
               },
-            ]);
-            setActionItems([
-              {
-                field: defaultField,
-                operator:
-                  Operators.find((op) =>
-                    op.type.includes(
-                      FieldToOperatorType.get(defaultField) ??
-                        OperatorTypes.STRING,
-                    ),
-                  )?.value ?? "",
-                value: "",
-              },
-            ]);
+            });
           }}
         >
           {t("add_rule")}
@@ -111,6 +115,10 @@ const AddAutomaticRule = (): React.ReactNode => {
           flex="1 1 auto"
           loading={runAutomaticRuleMutation.isPending}
           onClick={() => {
+            if (!hasValidActions()) {
+              return;
+            }
+
             runAutomaticRuleMutation.mutate({
               conditions: conditionItems.map((item) => ({
                 field: item.field,

@@ -2,7 +2,10 @@ import { Badge, Group } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { getFormattedValue } from "~/helpers/automaticRules";
+import {
+  deserializeActionTags,
+  getFormattedValue,
+} from "~/helpers/automaticRules";
 import {
   ActionTransactionFields,
   ActionOperators,
@@ -25,7 +28,12 @@ const ActionItem = (props: ActionItemProps) => {
     dayjs(dateStr).format(dateFormat);
 
   const getCardContent = (): React.ReactNode => {
-    if (props.action.operator === "set") {
+    if (props.action.operator !== "delete") {
+      const tagValues =
+        props.action.field === "tags"
+          ? deserializeActionTags(props.action.value)
+          : [];
+
       return (
         <>
           <Badge bg="var(--accent-color-purple)" size="sm">
@@ -36,16 +44,26 @@ const ActionItem = (props: ActionItemProps) => {
             )}
           </Badge>
           <PrimaryText size="sm">{t("to")}</PrimaryText>
-          <Badge size="sm">
-            {getFormattedValue(
-              props.action.field,
-              props.action.value,
-              props.currency,
-              props.categories,
-              formatDate,
-              intlLocale,
-            )}
-          </Badge>
+          {tagValues.length > 0 ? (
+            <Group gap="0.25rem">
+              {tagValues.map((tag) => (
+                <Badge key={tag} size="sm">
+                  {tag}
+                </Badge>
+              ))}
+            </Group>
+          ) : (
+            <Badge size="sm">
+              {getFormattedValue(
+                props.action.field,
+                props.action.value,
+                props.currency,
+                props.categories,
+                formatDate,
+                intlLocale,
+              )}
+            </Badge>
+          )}
         </>
       );
     }

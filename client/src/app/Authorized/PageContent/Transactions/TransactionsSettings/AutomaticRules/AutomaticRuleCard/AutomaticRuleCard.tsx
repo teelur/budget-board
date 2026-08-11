@@ -1,4 +1,5 @@
 import { ActionIcon, Button, Group, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { PencilIcon, PlayIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import {
@@ -17,6 +18,7 @@ import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useDeleteAutomaticRuleMutation } from "~/hooks/mutations/automaticRules/useDeleteAutomaticRuleMutation";
 import { useUpdateAutomaticRuleMutation } from "~/hooks/mutations/automaticRules/useUpdateAutomaticRuleMutation";
 import { useRunAutomaticRuleMutation } from "~/hooks/mutations/automaticRules/useRunAutomaticRuleMutation";
+import { hasEmptyTagAction } from "~/helpers/automaticRules";
 
 interface AutomaticRuleCardProps {
   rule: IAutomaticRuleResponse;
@@ -41,6 +43,18 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   const updateAutomaticRuleMutation = useUpdateAutomaticRuleMutation();
   const runAutomaticRuleMutation = useRunAutomaticRuleMutation();
 
+  const hasValidActions = (): boolean => {
+    if (!hasEmptyTagAction(actionItems)) {
+      return true;
+    }
+
+    notifications.show({
+      message: t("at_least_one_tag_required"),
+      color: "var(--button-color-destructive)",
+    });
+    return false;
+  };
+
   if (isSelected) {
     return (
       <Card elevation={0}>
@@ -55,27 +69,25 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
             <Button
               flex="1 1 auto"
               onClick={() => {
+                if (!hasValidActions()) {
+                  return;
+                }
+
                 updateAutomaticRuleMutation.mutate(
                   {
                     id: props.rule.id,
-                    conditions: conditionItems.map(
-                      (item) =>
-                        ({
-                          id: item.id ?? "",
-                          value: item.value,
-                          field: item.field,
-                          operator: item.operator,
-                        }) as IRuleParameterEdit,
-                    ),
-                    actions: actionItems.map(
-                      (item) =>
-                        ({
-                          id: item.id ?? "",
-                          value: item.value,
-                          field: item.field,
-                          operator: item.operator,
-                        }) as IRuleParameterEdit,
-                    ),
+                    conditions: conditionItems.map((item) => ({
+                      id: item.id ?? "",
+                      value: item.value,
+                      field: item.field,
+                      operator: item.operator,
+                    })),
+                    actions: actionItems.map((item) => ({
+                      id: item.id ?? "",
+                      value: item.value,
+                      field: item.field,
+                      operator: item.operator,
+                    })),
                   },
                   {
                     onSuccess: () => {
@@ -137,6 +149,10 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
           <ActionIcon
             variant="outline"
             onClick={() => {
+              if (!hasValidActions()) {
+                return;
+              }
+
               runAutomaticRuleMutation.mutate({
                 conditions: conditionItems.map((item) => ({
                   field: item.field,
