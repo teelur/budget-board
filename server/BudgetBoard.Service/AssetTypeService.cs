@@ -112,6 +112,30 @@ public class AssetTypeService(
     }
 
     /// <inheritdoc />
+    public async Task ClearBuiltInAssetTypeReferencesAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+
+        foreach (var assetType in AssetTypeConstants.DefaultAssetTypes)
+        {
+            UpdateAssetsUsingType(userData.Assets, assetType.Value, string.Empty);
+
+            foreach (var customAssetType in userData.AssetTypes)
+            {
+                if (
+                    customAssetType.Parent.Equals(
+                        assetType.Value,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+                {
+                    customAssetType.Parent = string.Empty;
+                }
+            }
+        }
+    }
+
+    /// <inheritdoc />
     public async Task DeleteAssetTypeAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
@@ -256,7 +280,7 @@ public class AssetTypeService(
     {
         foreach (var asset in assets)
         {
-            if (asset.Type.Equals(oldType, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(asset.Type, oldType, StringComparison.OrdinalIgnoreCase))
             {
                 asset.Type = newType;
             }

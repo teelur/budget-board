@@ -706,6 +706,49 @@ public class AssetTypeServiceTests
     }
     #endregion
 
+    [Fact]
+    public async Task ClearBuiltInAssetTypeReferencesAsync_WhenAssetsUseBuiltInTypes_ClearsMatchingFields()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var assetTypeService = new AssetTypeService(
+            Mock.Of<ILogger<IAssetTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var builtInParent = AssetTypeConstants
+            .DefaultAssetTypes.First(assetType => string.IsNullOrEmpty(assetType.Parent))
+            .Value;
+        var builtInChild = AssetTypeConstants
+            .DefaultAssetTypes.First(assetType => !string.IsNullOrEmpty(assetType.Parent))
+            .Value;
+
+        var builtInAsset = new AssetFaker(helper.demoUser.Id).Generate();
+        builtInAsset.Type = builtInChild.ToUpperInvariant();
+        var customAsset = new AssetFaker(helper.demoUser.Id).Generate();
+        customAsset.Type = "Custom Asset Type";
+        var customAssetType = new AssetTypeFaker(helper.demoUser.Id).Generate();
+        customAssetType.Parent = builtInParent.ToLowerInvariant();
+        var unrelatedAssetType = new AssetTypeFaker(helper.demoUser.Id).Generate();
+        unrelatedAssetType.Parent = "Custom Parent";
+
+        helper.UserDataContext.Assets.AddRange(builtInAsset, customAsset);
+        helper.UserDataContext.AssetTypes.AddRange(customAssetType, unrelatedAssetType);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await assetTypeService.ClearBuiltInAssetTypeReferencesAsync(helper.demoUser.Id);
+
+        // Assert
+        builtInAsset.Type.Should().BeEmpty();
+        customAsset.Type.Should().Be("Custom Asset Type");
+        customAssetType.Parent.Should().BeEmpty();
+        unrelatedAssetType.Parent.Should().Be("Custom Parent");
+    }
+
     #region DeleteAssetTypeAsync
     [Fact]
     public async Task DeleteAssetTypeAsync_WhenCalledWithValidData_ShouldDeleteAssetType()
