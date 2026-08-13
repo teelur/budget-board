@@ -109,7 +109,7 @@ const SpendingCategoriesChart = (
     () =>
       props.transactions.filter(
         (tx) =>
-          areStringsEqual(tx.category, hiddenTransactionCategory) ||
+          !areStringsEqual(tx.category, hiddenTransactionCategory) &&
           areStringsEqual(
             getCategoryType(tx.category ?? ""),
             CategoryTypes.Expense,
