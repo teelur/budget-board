@@ -9,6 +9,7 @@ import {
   MetricDataRequirements,
   MetricToken,
 } from "~/models/metricWidget";
+import { CategoryTypes } from "~/models/category";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { filterVisibleAccounts, getAccountsOfTypes } from "~/helpers/accounts";
@@ -153,7 +154,9 @@ function isInPeriod(isoDateStr: string, period: string): boolean {
     : isoDateStr;
 
   const d = dayjs(normalizedDateStr);
-  if (!d.isValid()) return false;
+  if (!d.isValid()) {
+    return false;
+  }
 
   const now = dayjs();
 
@@ -195,6 +198,7 @@ export interface MetricDataContext {
   goals: IGoalResponse[];
   accounts: IAccountResponse[];
   accountTypes: IAccountType[];
+  getCategoryType: (category: string) => string;
   preferredCurrency: string;
   intlLocale: string;
 }
@@ -251,17 +255,21 @@ function resolveTransactions(
   params: Record<string, string>,
   ctx: MetricDataContext,
 ): number {
-  const type = params["type"] ?? "all";
-  const category = params["category"];
+  const type = params.type ?? "all";
+  const category = params.category;
 
   let txs = getVisibleTransactions(ctx.transactions).filter((t) =>
     isInPeriod(t.date, period),
   );
 
   if (type === "expense") {
-    txs = txs.filter((t) => !areStringsEqual(t.category ?? "", "Income"));
+    txs = txs.filter(
+      (t) => ctx.getCategoryType(t.category ?? "") !== CategoryTypes.Income,
+    );
   } else if (type === "income") {
-    txs = txs.filter((t) => areStringsEqual(t.category ?? "", "Income"));
+    txs = txs.filter(
+      (t) => ctx.getCategoryType(t.category ?? "") === CategoryTypes.Income,
+    );
   }
 
   if (category) {
@@ -280,7 +288,9 @@ function resolveTransactions(
     case "count":
       return txs.length;
     case "avg": {
-      if (txs.length === 0) return 0;
+      if (txs.length === 0) {
+        return 0;
+      }
       const avg = txs.reduce((n, t) => n + t.amount, 0) / txs.length;
       return type === "expense" ? Math.abs(avg) : avg;
     }
@@ -295,17 +305,21 @@ function resolveBudgets(
   params: Record<string, string>,
   ctx: MetricDataContext,
 ): number {
-  const category = params["category"];
-  if (!category) return 0;
+  const category = params.category;
+  if (!category) {
+    return 0;
+  }
 
-  let budgets = ctx.budgets
+  const budgets = ctx.budgets
     .filter((b) => isInPeriod(dayjs(b.month).format("YYYY-MM-DD"), period))
     .filter((b) => areStringsEqual(b.category, category));
 
   const total = budgets.reduce((n, b) => n + b.limit, 0);
-  if (metric === "total") return total;
+  if (metric === "total") {
+    return total;
+  }
 
-  let txs = getVisibleTransactions(ctx.transactions)
+  const txs = getVisibleTransactions(ctx.transactions)
     .filter((t) => isInPeriod(t.date, period))
     .filter(
       (t) =>
@@ -332,11 +346,15 @@ function resolveGoals(
   params: Record<string, string>,
   ctx: MetricDataContext,
 ): number {
-  const name = params["name"];
-  if (!name) return 0;
+  const name = params.name;
+  if (!name) {
+    return 0;
+  }
 
   const goal = ctx.goals.find((g) => areStringsEqual(g.name, name));
-  if (!goal) return 0;
+  if (!goal) {
+    return 0;
+  }
 
   switch (metric) {
     case "percent_complete":
@@ -360,11 +378,13 @@ function resolveAccounts(
   params: Record<string, string>,
   ctx: MetricDataContext,
 ): number {
-  if (metric !== "balance") return 0;
+  if (metric !== "balance") {
+    return 0;
+  }
 
   const visible = filterVisibleAccounts(ctx.accounts);
-  const typeName = params["type"];
-  const accountName = params["name"];
+  const typeName = params.type;
+  const accountName = params.name;
 
   if (typeName) {
     const matching = getAccountsOfTypes(visible, [typeName], ctx.accountTypes);
@@ -421,7 +441,9 @@ export function resolveTemplate(
 ): string {
   return tokens
     .map((token) => {
-      if (token.type === "literal") return token.text;
+      if (token.type === "literal") {
+        return token.text;
+      }
       return resolveExpression(token, ctx);
     })
     .join("");
@@ -464,7 +486,9 @@ export function buildDataRequirements(
 
   const transactionMonthsMap = new Map<string, Date>();
   transactionPeriods.forEach((period) => {
-    if (period === "all_time") return;
+    if (period === "all_time") {
+      return;
+    }
     getMonthsForPeriod(period).forEach((d) => {
       transactionMonthsMap.set(`${d.getFullYear()}-${d.getMonth()}`, d);
     });
@@ -472,7 +496,9 @@ export function buildDataRequirements(
 
   const budgetMonthsMap = new Map<string, Date>();
   budgetPeriods.forEach((period) => {
-    if (period === "all_time") return;
+    if (period === "all_time") {
+      return;
+    }
     getMonthsForPeriod(period).forEach((d) => {
       budgetMonthsMap.set(`${d.getFullYear()}-${d.getMonth()}`, d);
     });

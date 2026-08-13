@@ -1,12 +1,7 @@
 import { Group, Stack } from "@mantine/core";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
-import {
-  CategoryNode,
-  CategoryTypes,
-  ICategory,
-  ICategoryNode,
-} from "~/models/category";
+import { CategoryNode, CategoryTypes, ICategoryNode } from "~/models/category";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -16,7 +11,6 @@ import { useTranslation } from "react-i18next";
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
   categoryToTransactionsTotalMap: Map<string, number>;
-  categories: ICategory[];
   selectedDate: Date | null;
   openDetails: (category: string, month: Date | null) => void;
   showUncategorized?: boolean;

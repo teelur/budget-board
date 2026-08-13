@@ -10,6 +10,8 @@ import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmo
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { CategoryTypes } from "~/models/category";
 
 interface ChartDatum {
   month: string;
@@ -29,6 +31,7 @@ interface NetCashFlowChartProps {
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs } = useLocale();
+  const { getCategoryType } = useTransactionCategories();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
 
   const sortedMonths = props.months.sort(
@@ -47,7 +50,10 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
 
       const incomeTotal = transactionsForMonth.reduce(
         (acc: number, curr: ITransaction) =>
-          areStringsEqual(curr.category ?? "", "Income")
+          areStringsEqual(
+            getCategoryType(curr.category ?? ""),
+            CategoryTypes.Income,
+          )
             ? acc + curr.amount
             : acc,
         0,
@@ -55,7 +61,10 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
 
       const spendingTotal = transactionsForMonth.reduce(
         (acc: number, curr: ITransaction) =>
-          !areStringsEqual(curr.category ?? "", "Income")
+          areStringsEqual(
+            getCategoryType(curr.category ?? ""),
+            CategoryTypes.Expense,
+          )
             ? acc + curr.amount
             : acc,
         0,
@@ -78,11 +87,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   ];
 
   const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(
-      value,
-      false,
-      SignDisplay.Auto,
-    );
+    return formatSensitiveAmount(value, false, SignDisplay.Auto);
   };
 
   if (props.isPending) {

@@ -4,7 +4,6 @@ import { Button, Group, Stack, ActionIcon } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import AddBudget from "./AddBudget/AddBudget";
-import { ICategory } from "~/models/category";
 import { IBudgetCreateRequest } from "~/models/budget";
 import { notifications } from "@mantine/notifications";
 import { useTranslation } from "react-i18next";
@@ -15,7 +14,6 @@ import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudg
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 
 interface BudgetsToolbarProps {
-  categories: ICategory[];
   selectedDates: Date[];
   setSelectedDates: React.Dispatch<React.SetStateAction<Date[]>>;
   timeToMonthlyTotalsMap: Map<number, number>;
@@ -116,10 +114,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
             </Button>
           )}
           {props.selectedDates.length === 1 && (
-            <AddBudget
-              date={props.selectedDates[0]!}
-              categories={props.categories}
-            />
+            <AddBudget date={props.selectedDates[0]!} />
           )}
           <ActionIcon
             variant="subtle"

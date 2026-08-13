@@ -3,14 +3,11 @@ import React from "react";
 import BudgetsToolbar from "./BudgetsToolbar/BudgetsToolbar";
 import { buildTimeToMonthlyTotalsMap } from "~/helpers/transactions";
 import BudgetsContent from "./BudgetsContent/BudgetsContent";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 const Budgets = (): React.ReactNode => {
-  const { allTransactionCategories: transactionCategories } =
-    useTransactionCategories();
   const { dayjs } = useLocale();
 
   const [selectedDates, setSelectedDates] = React.useState<Date[]>([
@@ -38,7 +35,6 @@ const Budgets = (): React.ReactNode => {
   return (
     <Stack w="100%" maw={1400}>
       <BudgetsToolbar
-        categories={transactionCategories}
         selectedDates={selectedDates}
         setSelectedDates={setSelectedDates}
         timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
@@ -50,8 +46,7 @@ const Budgets = (): React.ReactNode => {
         isPending={budgetsQuery.isPending}
       />
       <BudgetsContent
-        budgets={budgetsQuery.data ?? []}
-        categories={transactionCategories}
+        budgets={budgetsQuery.data}
         transactions={transactionsQuery.data ?? []}
         selectedDate={
           selectedDates.length === 1 ? (selectedDates[0] ?? null) : null

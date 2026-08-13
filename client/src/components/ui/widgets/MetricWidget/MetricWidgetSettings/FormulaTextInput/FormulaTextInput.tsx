@@ -98,7 +98,9 @@ interface ActiveFormulaMatch {
 }
 
 function parseFormulaStage(partial: string): FormulaStage | null {
-  if (!partial.startsWith("@")) return null;
+  if (!partial.startsWith("@")) {
+    return null;
+  }
 
   const afterAt = partial.slice(1);
   const dotIdx = afterAt.indexOf(".");
@@ -151,7 +153,9 @@ function getFormulaSuggestions(
   stage: FormulaStage | null,
   sourceParamValues: Record<string, Record<string, string[]>>,
 ): FormulaSuggestion[] {
-  if (!stage) return [];
+  if (!stage) {
+    return [];
+  }
 
   switch (stage.kind) {
     case "source":
@@ -277,10 +281,14 @@ function getActiveFormulaMatch(
   value: string,
   cursorPosition: number | null,
 ): ActiveFormulaMatch | null {
-  if (cursorPosition === null) return null;
+  if (cursorPosition === null) {
+    return null;
+  }
 
   const start = value.lastIndexOf("@", Math.max(cursorPosition - 1, 0));
-  if (start === -1) return null;
+  if (start === -1) {
+    return null;
+  }
 
   const closingBraceIndex = value.indexOf("}", start);
   if (closingBraceIndex !== -1 && closingBraceIndex < cursorPosition) {
@@ -336,7 +344,9 @@ const FormulaTextInput = ({
   );
 
   const filteredSuggestions = React.useMemo((): FormulaSuggestion[] => {
-    if (!activeFormula) return [];
+    if (!activeFormula) {
+      return [];
+    }
     const stage = parseFormulaStage(activeFormula.query);
     return getFormulaSuggestions(stage, sourceParamValues);
   }, [activeFormula, sourceParamValues]);
@@ -376,7 +386,9 @@ const FormulaTextInput = ({
         inputRef.current?.selectionStart ?? value.length,
       ) ?? activeFormula;
 
-    if (!match) return;
+    if (!match) {
+      return;
+    }
 
     const nextValue =
       value.slice(0, match.start) + suggestion + value.slice(match.end);
