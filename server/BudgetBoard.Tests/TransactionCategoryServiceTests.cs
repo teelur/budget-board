@@ -963,6 +963,10 @@ public class TransactionCategoryServiceTests
         var builtInSubcategory = TransactionCategoriesConstants
             .DefaultTransactionCategories.First(category => !string.IsNullOrEmpty(category.Parent))
             .Value;
+        var customCategory = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+        customCategory.Parent = builtInCategory.ToLowerInvariant();
+        var unrelatedCategory = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+        unrelatedCategory.Parent = "Custom Parent";
 
         var categoryTransaction = transactionFaker.Generate();
         categoryTransaction.Category = builtInCategory.ToUpperInvariant();
@@ -977,6 +981,7 @@ public class TransactionCategoryServiceTests
         customTransaction.Subcategory = "Custom Subcategory";
 
         helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.TransactionCategories.AddRange(customCategory, unrelatedCategory);
         helper.UserDataContext.Transactions.AddRange(
             categoryTransaction,
             subcategoryTransaction,
@@ -996,6 +1001,8 @@ public class TransactionCategoryServiceTests
         subcategoryTransaction.Subcategory.Should().BeNull();
         customTransaction.Category.Should().Be("Custom Category");
         customTransaction.Subcategory.Should().Be("Custom Subcategory");
+        customCategory.Parent.Should().BeEmpty();
+        unrelatedCategory.Parent.Should().Be("Custom Parent");
     }
 
     #region DeleteTransactionCategoryAsync

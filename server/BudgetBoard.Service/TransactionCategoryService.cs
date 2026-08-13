@@ -151,10 +151,24 @@ public class TransactionCategoryService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
         var transactions = userData.Accounts.SelectMany(a => a.Transactions);
+        var builtInCategoryValues = new HashSet<string>(
+            TransactionCategoriesConstants.DefaultTransactionCategories.Select(category =>
+                category.Value
+            ),
+            StringComparer.OrdinalIgnoreCase
+        );
 
-        foreach (var category in TransactionCategoriesConstants.DefaultTransactionCategories)
+        foreach (var category in builtInCategoryValues)
         {
-            UpdateTransactionsUsingCategory(category.Value, null, transactions, true);
+            UpdateTransactionsUsingCategory(category, null, transactions, true);
+        }
+
+        foreach (var category in userData.TransactionCategories)
+        {
+            if (builtInCategoryValues.Contains(category.Parent))
+            {
+                category.Parent = string.Empty;
+            }
         }
     }
 
