@@ -39,29 +39,26 @@ const BudgetsContent = (props: BudgetsContentProps) => {
 
   const categoryTree = buildCategoriesTree(allTransactionCategories);
 
+  const incomeBudgets = props.budgets.filter((budget) =>
+    areStringsEqual(getCategoryType(budget.category), CategoryTypes.Income),
+  );
   const incomeCategoryTree = categoryTree.filter(
     (category) =>
       areStringsEqual(category.categoryType, CategoryTypes.Income) &&
       props.budgets.some((budget) =>
-        areStringsEqual(getCategoryType(budget.category), CategoryTypes.Income),
+        areStringsEqual(budget.category, category.value),
       ),
   );
-  const incomeBudgets = props.budgets.filter((budget) =>
-    areStringsEqual(getCategoryType(budget.category), CategoryTypes.Income),
-  );
 
+  const expenseBudgets = props.budgets.filter((budget) =>
+    areStringsEqual(getCategoryType(budget.category), CategoryTypes.Expense),
+  );
   const expenseCategoryTree = categoryTree.filter(
     (category) =>
       areStringsEqual(category.categoryType, CategoryTypes.Expense) &&
       props.budgets.some((budget) =>
-        areStringsEqual(
-          getCategoryType(budget.category),
-          CategoryTypes.Expense,
-        ),
+        areStringsEqual(budget.category, category.value),
       ),
-  );
-  const expenseBudgets = props.budgets.filter((budget) =>
-    areStringsEqual(getCategoryType(budget.category), CategoryTypes.Expense),
   );
 
   const unbudgetedCategoryTree = categoryTree.filter(
