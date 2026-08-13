@@ -887,6 +887,49 @@ public class AccountTypeServiceTests
     }
     #endregion
 
+    [Fact]
+    public async Task ClearBuiltInAccountTypeReferencesAsync_WhenAccountsUseBuiltInTypes_ClearsMatchingFields()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var accountTypeService = new AccountTypeService(
+            Mock.Of<ILogger<IAccountTypeService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var builtInParent = AccountTypeConstants
+            .DefaultAccountTypes.First(accountType => string.IsNullOrEmpty(accountType.Parent))
+            .Value;
+        var builtInChild = AccountTypeConstants
+            .DefaultAccountTypes.First(accountType => !string.IsNullOrEmpty(accountType.Parent))
+            .Value;
+
+        var builtInAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        builtInAccount.Type = builtInChild.ToUpperInvariant();
+        var customAccount = new AccountFaker(helper.demoUser.Id).Generate();
+        customAccount.Type = "Custom Account Type";
+        var customAccountType = new AccountTypeFaker(helper.demoUser.Id).Generate();
+        customAccountType.Parent = builtInParent.ToLowerInvariant();
+        var unrelatedAccountType = new AccountTypeFaker(helper.demoUser.Id).Generate();
+        unrelatedAccountType.Parent = "Custom Parent";
+
+        helper.UserDataContext.Accounts.AddRange(builtInAccount, customAccount);
+        helper.UserDataContext.AccountTypes.AddRange(customAccountType, unrelatedAccountType);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountTypeService.ClearBuiltInAccountTypeReferencesAsync(helper.demoUser.Id);
+
+        // Assert
+        builtInAccount.Type.Should().BeEmpty();
+        customAccount.Type.Should().Be("Custom Account Type");
+        customAccountType.Parent.Should().BeEmpty();
+        unrelatedAccountType.Parent.Should().Be("Custom Parent");
+    }
+
     #region DeleteAccountTypeAsync
     [Fact]
     public async Task DeleteAccountTypeAsync_WhenCalledWithValidData_ShouldDeleteAccountType()

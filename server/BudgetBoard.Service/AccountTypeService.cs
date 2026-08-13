@@ -164,6 +164,30 @@ public class AccountTypeService(
     }
 
     /// <inheritdoc />
+    public async Task ClearBuiltInAccountTypeReferencesAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+
+        foreach (var accountType in AccountTypeConstants.DefaultAccountTypes)
+        {
+            UpdateAccountsUsingType(userData.Accounts, accountType.Value, string.Empty);
+
+            foreach (var customAccountType in userData.AccountTypes)
+            {
+                if (
+                    customAccountType.Parent.Equals(
+                        accountType.Value,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+                {
+                    customAccountType.Parent = string.Empty;
+                }
+            }
+        }
+    }
+
+    /// <inheritdoc />
     public async Task DeleteAccountTypeAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
@@ -343,7 +367,7 @@ public class AccountTypeService(
     {
         foreach (var account in accounts)
         {
-            if (account.Type.Equals(oldType, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(account.Type, oldType, StringComparison.OrdinalIgnoreCase))
             {
                 account.Type = newType;
             }

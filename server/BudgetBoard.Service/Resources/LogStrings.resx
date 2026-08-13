@@ -163,9 +163,6 @@
     <data name="DemoResetSeedingLog" xml:space="preserve">
         <value>Demo reset: seeding fresh demo data…</value>
     </data>
-    <data name="DisableBuiltInAssetTypesInUseLog" xml:space="preserve">
-        <value>Attempted to disable built-in asset types but they are currently in use.</value>
-    </data>
     <data name="DuplicateLunchFlowAccountLog" xml:space="preserve">
         <value>Attempted to create a LunchFlow account with a duplicate SyncID.</value>
     </data>

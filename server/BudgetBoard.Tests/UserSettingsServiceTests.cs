@@ -21,6 +21,32 @@ public class UserSettingsServiceTests
             f => f.PickRandom(LocalizationHelpers.CurrencyCodes)
         );
 
+    private static UserSettingsService CreateUserSettingsService(TestHelper helper) =>
+        new(
+            Mock.Of<ILogger<IUserSettingsService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            new TransactionCategoryService(
+                Mock.Of<ILogger<ITransactionCategoryService>>(),
+                helper.UserDataContext,
+                TestHelper.CreateMockLocalizer<ResponseStrings>(),
+                TestHelper.CreateMockLocalizer<LogStrings>()
+            ),
+            new AccountTypeService(
+                Mock.Of<ILogger<IAccountTypeService>>(),
+                helper.UserDataContext,
+                TestHelper.CreateMockLocalizer<ResponseStrings>(),
+                TestHelper.CreateMockLocalizer<LogStrings>()
+            ),
+            new AssetTypeService(
+                Mock.Of<ILogger<IAssetTypeService>>(),
+                helper.UserDataContext,
+                TestHelper.CreateMockLocalizer<ResponseStrings>(),
+                TestHelper.CreateMockLocalizer<LogStrings>()
+            )
+        );
+
     #region ReadUserSettingsAsync
     [Fact]
     public async Task ReadUserSettingsAsync_WhenValidData_ReturnsUserSettings()
@@ -28,12 +54,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         var userSettingsFaker = new UserSettingsFaker(helper.demoUser.Id);
         var userSettings = userSettingsFaker.Generate();
@@ -55,12 +76,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         // Act
         var readUserSettingsAct = async () =>
@@ -79,12 +95,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = null;
         helper.UserDataContext.SaveChanges();
@@ -105,12 +116,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -161,17 +167,68 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
+    public async Task UpdateUserSettingsAsync_DisableBuiltInTransactionCategories_WhenTransactionsUseBuiltInCategories_ClearsMatchingFields()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = CreateUserSettingsService(helper);
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var builtInCategory = TransactionCategoriesConstants
+            .DefaultTransactionCategories.First(tc => string.IsNullOrEmpty(tc.Parent))
+            .Value;
+        var builtInSubcategory = TransactionCategoriesConstants
+            .DefaultTransactionCategories.First(tc => !string.IsNullOrEmpty(tc.Parent))
+            .Value;
+
+        var categoryTransaction = transactionFaker.Generate();
+        categoryTransaction.Category = builtInCategory.ToUpperInvariant();
+        categoryTransaction.Subcategory = "Custom Subcategory";
+
+        var subcategoryTransaction = transactionFaker.Generate();
+        subcategoryTransaction.Category = "Custom Category";
+        subcategoryTransaction.Subcategory = builtInSubcategory.ToLowerInvariant();
+        subcategoryTransaction.Deleted = DateTime.UtcNow;
+
+        var customTransaction = transactionFaker.Generate();
+        customTransaction.Category = "Custom Category";
+        customTransaction.Subcategory = "Custom Subcategory";
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.Transactions.AddRange(
+            categoryTransaction,
+            subcategoryTransaction,
+            customTransaction
+        );
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DisableBuiltInTransactionCategories = true };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        categoryTransaction.Category.Should().BeNull();
+        categoryTransaction.Subcategory.Should().BeNull();
+        subcategoryTransaction.Category.Should().BeNull();
+        subcategoryTransaction.Subcategory.Should().BeNull();
+        customTransaction.Category.Should().Be("Custom Category");
+        customTransaction.Subcategory.Should().Be("Custom Subcategory");
+        helper.demoUser.UserSettings.DisableBuiltInTransactionCategories.Should().BeTrue();
+    }
+
+    [Fact]
     public async Task UpdateUserSettingsAsync_WhenUserSettingsNotFound_ThrowsUserSettingsNotFoundError()
     {
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         var userSettingsUpdateRequest = _userSettingsUpdateRequestFaker.Generate();
         helper.demoUser.UserSettings = null;
@@ -196,12 +253,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -230,12 +282,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -260,12 +307,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -294,12 +336,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -323,12 +360,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -361,12 +393,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -395,12 +422,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -424,24 +446,20 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenAccountUsesBuiltInType_ThrowsDisableBuiltInAccountTypesInUseError()
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenAccountUsesBuiltInType_ClearsAccountType()
     {
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var account = accountFaker.Generate();
-        account.Type = "checking"; // matches a built-in type value (stored lowercase in HashSet)
+        account.Type = "CHECKING";
+        account.Deleted = DateTime.UtcNow;
 
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
@@ -449,47 +467,38 @@ public class UserSettingsServiceTests
         var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = true };
 
         // Act
-        var act = async () =>
-            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("DisableBuiltInAccountTypesInUseError");
+        account.Type.Should().BeEmpty();
+        helper.demoUser.UserSettings.DisableBuiltInAccountTypes.Should().BeTrue();
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenCustomTypeHasBuiltInParent_ThrowsDisableBuiltInAccountTypesInUseError()
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAccountTypes_WhenCustomTypeHasBuiltInParent_ClearsParent()
     {
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
 
         var accountTypeFaker = new AccountTypeFaker(helper.demoUser.Id);
         var customAccountType = accountTypeFaker.Generate();
-        customAccountType.Parent = "depository"; // matches a built-in type value (stored lowercase in HashSet)
+        customAccountType.Parent = "DEPOSITORY";
         helper.UserDataContext.AccountTypes.Add(customAccountType);
         helper.UserDataContext.SaveChanges();
 
         var request = new UserSettingsUpdateRequest { DisableBuiltInAccountTypes = true };
 
         // Act
-        var act = async () =>
-            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("DisableBuiltInAccountTypesInUseError");
+        customAccountType.Parent.Should().BeEmpty();
+        helper.demoUser.UserSettings.DisableBuiltInAccountTypes.Should().BeTrue();
     }
 
     [Fact]
@@ -498,12 +507,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -534,12 +538,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -572,12 +571,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -608,12 +602,7 @@ public class UserSettingsServiceTests
         // since the requested value equals the current value, validation is skipped entirely.
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -646,12 +635,7 @@ public class UserSettingsServiceTests
         // since the requested value equals the current value, validation is skipped entirely.
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -683,12 +667,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -713,12 +692,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
         helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
@@ -734,17 +708,12 @@ public class UserSettingsServiceTests
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_DisableBuiltInAssetTypes_WhenAssetUsesBuiltInType_ThrowsDisableBuiltInAssetTypesInUseError()
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAssetTypes_WhenAssetUsesBuiltInType_ClearsAssetType()
     {
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -755,7 +724,11 @@ public class UserSettingsServiceTests
 
         var assetFaker = new AssetFaker(helper.demoUser.Id);
         var asset = assetFaker.Generate();
-        asset.Type = AssetTypeConstants.DefaultAssetTypes.Shuffle().First().Value;
+        asset.Type = AssetTypeConstants
+            .DefaultAssetTypes.Shuffle()
+            .First()
+            .Value.ToUpperInvariant();
+        asset.Deleted = DateTime.UtcNow;
 
         helper.UserDataContext.Assets.Add(asset);
         helper.UserDataContext.SaveChanges();
@@ -763,27 +736,20 @@ public class UserSettingsServiceTests
         var request = new UserSettingsUpdateRequest { DisableBuiltInAssetTypes = true };
 
         // Act
-        var act = async () =>
-            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("DisableBuiltInAssetTypesInUseError");
+        asset.Type.Should().BeEmpty();
+        helper.demoUser.UserSettings.DisableBuiltInAssetTypes.Should().BeTrue();
     }
 
     [Fact]
-    public async Task UpdateUserSettingsAsync_DisableBuiltInAssetTypes_WhenConflictingCustomType_ThrowsDisableBuiltInAssetTypesInUseError()
+    public async Task UpdateUserSettingsAsync_DisableBuiltInAssetTypes_WhenCustomTypeHasBuiltInParent_ClearsParent()
     {
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -804,13 +770,11 @@ public class UserSettingsServiceTests
         var request = new UserSettingsUpdateRequest { DisableBuiltInAssetTypes = true };
 
         // Act
-        var act = async () =>
-            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
 
         // Assert
-        await act.Should()
-            .ThrowAsync<BudgetBoardServiceException>()
-            .WithMessage("DisableBuiltInAssetTypesInUseError");
+        customAssetType.Parent.Should().BeEmpty();
+        helper.demoUser.UserSettings.DisableBuiltInAssetTypes.Should().BeTrue();
     }
 
     [Fact]
@@ -819,12 +783,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -857,12 +816,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -887,12 +841,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -917,12 +866,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -947,12 +891,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -977,12 +916,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -1010,12 +944,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -1043,12 +972,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
@@ -1080,12 +1004,7 @@ public class UserSettingsServiceTests
         // Arrange
         var helper = new TestHelper();
 
-        var userSettingsService = new UserSettingsService(
-            Mock.Of<ILogger<IUserSettingsService>>(),
-            helper.UserDataContext,
-            TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
-        );
+        var userSettingsService = CreateUserSettingsService(helper);
 
         helper.demoUser.UserSettings = new UserSettings
         {
