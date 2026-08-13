@@ -53,11 +53,11 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
     (c) => c.parent !== "" && builtInCategoryValues.has(c.parent.toLowerCase()),
   );
 
-  const hasConflicts =
-    transactionsUsingBuiltIn.length === 0 &&
-    customCategoriesWithBuiltInParent.length === 0;
+  const hasBlockingReferences =
+    transactionsUsingBuiltIn.length > 0 ||
+    customCategoriesWithBuiltInParent.length > 0;
   const shouldConfirmDisable =
-    !disableBuiltInTransactionCategories && !hasConflicts;
+    !disableBuiltInTransactionCategories && hasBlockingReferences;
 
   const blockingReasons: string[] = [];
   if (transactionsUsingBuiltIn.length > 0) {
@@ -107,7 +107,7 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
       <DimmedText size="xs">
         {t("disable_built_in_transaction_categories_description")}
       </DimmedText>
-      {!hasConflicts &&
+      {hasBlockingReferences &&
         blockingReasons.map((reason, i) => (
           <PrimaryText key={i} size="xs">
             {reason}
