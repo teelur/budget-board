@@ -1,4 +1,8 @@
-import { hiddenTransactionCategory, ITransaction } from "~/models/transaction";
+import {
+  hiddenTransactionCategory,
+  ITransaction,
+  uncategorizedTransactionCategory,
+} from "~/models/transaction";
 import React from "react";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import {
@@ -12,19 +16,18 @@ import {
   Stack,
   useMantineTheme,
 } from "@mantine/core";
-import { ICategory } from "~/models/category";
 import { SignDisplay } from "~/helpers/currency";
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
-import { uncategorizedTransactionCategory } from "~/models/transaction";
 import SpendingCategoriesTooltip from "./SpendingCategoriesTooltip/SpendingCategoriesTooltip";
-import { areStringsEqual } from "~/helpers/utils";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { areStringsEqual } from "~/helpers/utils";
+import { CategoryTypes } from "~/models/category";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
-  categories: ICategory[];
   isPending?: boolean;
   showSubcategories?: boolean;
 }
@@ -72,7 +75,9 @@ function spreadLabelGroups(labels: LabelEntry[]): Map<number, LabelEntry> {
           changed = true;
         }
       }
-      if (!changed) break;
+      if (!changed) {
+        break;
+      }
     }
   };
 
@@ -95,20 +100,35 @@ const SpendingCategoriesChart = (
   const showSubcategories = props.showSubcategories ?? true;
 
   const { t } = useTranslation();
+  const { allTransactionCategories, getCategoryType } =
+    useTransactionCategories();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
   const theme = useMantineTheme();
+
+  const filteredTransactions = React.useMemo(
+    () =>
+      props.transactions.filter(
+        (tx) =>
+          !areStringsEqual(tx.category, hiddenTransactionCategory) &&
+          areStringsEqual(
+            getCategoryType(tx.category ?? ""),
+            CategoryTypes.Expense,
+          ),
+      ),
+    [props.transactions, getCategoryType],
+  );
 
   const { innerChartData, outerChartData } = React.useMemo(() => {
     const translateName = (name: string) =>
       name === uncategorizedTransactionCategory ? t("uncategorized") : name;
 
     const rawInner = buildSpendingCategoryChartData(
-      props.transactions,
-      props.categories,
+      filteredTransactions,
+      allTransactionCategories,
     );
     const rawOuter = buildSpendingSubcategoryChartData(
-      props.transactions,
-      props.categories,
+      filteredTransactions,
+      allTransactionCategories,
       rawInner,
     );
 
@@ -126,28 +146,25 @@ const SpendingCategoriesChart = (
     }));
 
     return { innerChartData: inner, outerChartData: outer };
-  }, [props.transactions, props.categories, theme, t]);
+  }, [filteredTransactions, allTransactionCategories, theme, t]);
 
   const totalSpending = React.useMemo(
-    () =>
-      props.transactions
-        .filter(
-          (tx) =>
-            !areStringsEqual(tx.category ?? "", "Income") &&
-            !areStringsEqual(tx.category ?? "", hiddenTransactionCategory),
-        )
-        .reduce((sum, tx) => sum + tx.amount * -1, 0),
-    [props.transactions],
+    () => filteredTransactions.reduce((sum, tx) => sum + tx.amount * -1, 0),
+    [filteredTransactions],
   );
 
   // Pre-compute collision-detected label positions from chart geometry.
   // recharts Pie (startAngle=0, clockWise=true): midAngle = (cumPercent + percent/2) * 360
   const labelPositions = React.useMemo<Map<number, LabelEntry> | null>(() => {
-    if (isNarrow || chartWidth <= 0) return null;
+    if (isNarrow || chartWidth <= 0) {
+      return null;
+    }
 
     const data = showSubcategories ? outerChartData : innerChartData;
     const total = data.reduce((s, e) => s + e.value, 0);
-    if (total === 0) return null;
+    if (total === 0) {
+      return null;
+    }
 
     const or = 140; // outerRadius of the labeled ring in wide mode
     const cx = chartWidth / 2;
@@ -161,7 +178,9 @@ const SpendingCategoriesChart = (
       const midAngle = (cumPercent + percent / 2) * 360;
       cumPercent += percent;
 
-      if (percent < LABEL_MIN_PERCENT) return;
+      if (percent < LABEL_MIN_PERCENT) {
+        return;
+      }
 
       const angle = -midAngle * LABEL_RADIAN;
       const cos = Math.cos(angle);
@@ -193,7 +212,9 @@ const SpendingCategoriesChart = (
   const renderLabelFromMap = React.useCallback(
     (sectorProps: any) => {
       const pos = labelPositions?.get(sectorProps.index);
-      if (!pos) return null;
+      if (!pos) {
+        return null;
+      }
       return (
         <g>
           <path

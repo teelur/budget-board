@@ -1,7 +1,7 @@
 import { Group, Stack } from "@mantine/core";
 import { IBudget } from "~/models/budget";
 import React from "react";
-import { ICategory, ICategoryNode } from "~/models/category";
+import { ICategoryNode } from "~/models/category";
 import {
   buildCategoryToBudgetsMap,
   buildCategoryToLimitsMap,
@@ -15,7 +15,6 @@ interface BudgetsGroupProps {
   budgets: IBudget[];
   categoryToTransactionsTotalMap: Map<string, number>;
   categoryTree: ICategoryNode[];
-  categories: ICategory[];
   selectedDate: Date | null;
   openDetails: (category: string, month: Date | null) => void;
 }

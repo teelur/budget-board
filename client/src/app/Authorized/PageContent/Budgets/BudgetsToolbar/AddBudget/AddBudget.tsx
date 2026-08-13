@@ -6,7 +6,6 @@ import {
   Group,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { ICategory } from "~/models/category";
 import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
@@ -17,16 +16,17 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface AddBudgetProps {
   date: Date;
-  categories: ICategory[];
 }
 
 const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { thousandsSeparator, decimalSeparator, dayjs } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { allTransactionCategories } = useTransactionCategories();
   const createBudgetMutation = useCreateBudgetMutation();
 
   const categoryField = useField<string>({
@@ -49,7 +49,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
           <Stack gap="0.5rem">
             <CategorySelect
               {...categoryField.getInputProps()}
-              categories={props.categories}
+              categories={allTransactionCategories}
               elevation={1}
             />
             <NumberInput
