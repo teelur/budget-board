@@ -29,6 +29,13 @@ public interface IAccountTypeService
     Task UpdateAccountTypeAsync(Guid userGuid, IAccountTypeUpdateRequest request);
 
     /// <summary>
+    /// Clears built-in type references from the user's accounts and custom account types.
+    /// This only changes the current EF unit of work; the caller owns SaveChangesAsync.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    Task ClearBuiltInAccountTypeReferencesAsync(Guid userGuid);
+
+    /// <summary>
     /// Deletes an account type.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>

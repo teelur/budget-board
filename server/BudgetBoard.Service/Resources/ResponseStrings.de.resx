@@ -181,9 +181,6 @@
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
         <value>Das übergeordnete Budget darf nicht kleiner sein als die Summe seiner untergeordneten Budgets.</value>
   </data>
-  <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
-        <value>Vordefinierte Vermögensarten können nicht deaktiviert werden, da sie derzeit von bestehenden Vermögenswerten oder benutzerdefinierten Vermögensarten verwendet werden.</value>
-  </data>
   <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
         <value>Ein LunchFlow-Konto mit dieser SyncID existiert bereits.</value>
   </data>

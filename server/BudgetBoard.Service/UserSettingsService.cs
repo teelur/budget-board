@@ -14,7 +14,10 @@ public class UserSettingsService(
     ILogger<IUserSettingsService> logger,
     UserDataContext userDataContext,
     IStringLocalizer<ResponseStrings> responseLocalizer,
-    IStringLocalizer<LogStrings> logLocalizer
+    IStringLocalizer<LogStrings> logLocalizer,
+    ITransactionCategoryService transactionCategoryService,
+    IAccountTypeService accountTypeService,
+    IAssetTypeService assetTypeService
 ) : IUserSettingsService
 {
     /// <inheritdoc />
@@ -53,9 +56,9 @@ public class UserSettingsService(
         HandleDateFormatChange();
         HandleBudgetWarningThresholdChange();
         HandleForceSyncLookbackMonthsChange();
-        HandleDisableBuiltInTransactionCategoriesChange();
-        HandleDisableBuiltInAccountTypesChange();
-        HandleDisableBuiltInAssetTypesChange();
+        await HandleDisableBuiltInTransactionCategoriesChange();
+        await HandleDisableBuiltInAccountTypesChange();
+        await HandleDisableBuiltInAssetTypesChange();
         HandleEnableAutoCategorizerChange();
         HandleAutoCategorizerMinimumProbabilityPercentageChange();
 
@@ -183,7 +186,7 @@ public class UserSettingsService(
             userSettings.ForceSyncLookbackMonths = request.ForceSyncLookbackMonths.Value;
         }
 
-        void HandleDisableBuiltInTransactionCategoriesChange()
+        async Task HandleDisableBuiltInTransactionCategoriesChange()
         {
             if (
                 !request.DisableBuiltInTransactionCategories.HasValue
@@ -194,12 +197,19 @@ public class UserSettingsService(
                 return;
             }
 
+            if (request.DisableBuiltInTransactionCategories.Value)
+            {
+                await transactionCategoryService.ClearBuiltInTransactionCategoryReferencesAsync(
+                    userGuid
+                );
+            }
+
             userSettings.DisableBuiltInTransactionCategories = request
                 .DisableBuiltInTransactionCategories
                 .Value;
         }
 
-        void HandleDisableBuiltInAccountTypesChange()
+        async Task HandleDisableBuiltInAccountTypesChange()
         {
             if (
                 !request.DisableBuiltInAccountTypes.HasValue
@@ -210,27 +220,13 @@ public class UserSettingsService(
                 return;
             }
 
-            var builtInTypeValues = AccountTypeConstants
-                .DefaultAccountTypes.Select(at => at.Value.ToLowerInvariant())
-                .ToHashSet();
+            var builtInTypeValues = new HashSet<string>(
+                AccountTypeConstants.DefaultAccountTypes.Select(at => at.Value),
+                StringComparer.OrdinalIgnoreCase
+            );
             if (request.DisableBuiltInAccountTypes.Value)
             {
-                var accountUsesBuiltInType = userData.Accounts.Any(a =>
-                    builtInTypeValues.Contains(a.Type.ToLowerInvariant())
-                );
-                var customTypeHasBuiltInParent = userData.AccountTypes.Any(cat =>
-                    builtInTypeValues.Contains(cat.Parent.ToLowerInvariant())
-                );
-                if (accountUsesBuiltInType || customTypeHasBuiltInParent)
-                {
-                    logger.LogError(
-                        "{LogMessage}",
-                        logLocalizer["DisableBuiltInAccountTypesInUseLog"]
-                    );
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["DisableBuiltInAccountTypesInUseError"]
-                    );
-                }
+                await accountTypeService.ClearBuiltInAccountTypeReferencesAsync(userGuid);
             }
             else
             {
@@ -252,7 +248,7 @@ public class UserSettingsService(
             userSettings.DisableBuiltInAccountTypes = request.DisableBuiltInAccountTypes.Value;
         }
 
-        void HandleDisableBuiltInAssetTypesChange()
+        async Task HandleDisableBuiltInAssetTypesChange()
         {
             if (
                 !request.DisableBuiltInAssetTypes.HasValue
@@ -262,27 +258,13 @@ public class UserSettingsService(
                 return;
             }
 
-            var builtInTypeValues = AssetTypeConstants
-                .DefaultAssetTypes.Select(at => at.Value.ToLowerInvariant())
-                .ToHashSet();
+            var builtInTypeValues = new HashSet<string>(
+                AssetTypeConstants.DefaultAssetTypes.Select(at => at.Value),
+                StringComparer.OrdinalIgnoreCase
+            );
             if (request.DisableBuiltInAssetTypes.Value)
             {
-                var assetsUsesBuiltInType = userData.Assets.Any(a =>
-                    builtInTypeValues.Contains(a.Type.ToLowerInvariant())
-                );
-                var customTypeHasBuiltInParent = userData.AssetTypes.Any(at =>
-                    builtInTypeValues.Contains(at.Parent.ToLowerInvariant())
-                );
-                if (assetsUsesBuiltInType || customTypeHasBuiltInParent)
-                {
-                    logger.LogError(
-                        "{LogMessage}",
-                        logLocalizer["DisableBuiltInAssetTypesInUseLog"]
-                    );
-                    throw new BudgetBoardServiceException(
-                        responseLocalizer["DisableBuiltInAssetTypesInUseError"]
-                    );
-                }
+                await assetTypeService.ClearBuiltInAssetTypeReferencesAsync(userGuid);
             }
             else
             {

@@ -1,7 +1,13 @@
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  accountsQueryKey,
+  accountTypesQueryKey,
+  assetTypesQueryKey,
+  assetsQueryKey,
+  institutionsQueryKey,
   transactionCategoriesQueryKey,
+  transactionsQueryKey,
   translateAxiosError,
   userSettingsQueryKey,
 } from "~/helpers/requests";
@@ -24,6 +30,12 @@ export const useUpdateUserSettingsMutation = () => {
       await queryClient.invalidateQueries({
         queryKey: [transactionCategoriesQueryKey],
       });
+      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountTypesQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [assetTypesQueryKey] });
+      await queryClient.invalidateQueries({ queryKey: [assetsQueryKey] });
     },
     onError: (error: any) => {
       notifications.show({

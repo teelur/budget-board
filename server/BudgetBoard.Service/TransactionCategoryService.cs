@@ -147,6 +147,32 @@ public class TransactionCategoryService(
     }
 
     /// <inheritdoc />
+    public async Task ClearBuiltInTransactionCategoryReferencesAsync(Guid userGuid)
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+        var transactions = userData.Accounts.SelectMany(a => a.Transactions);
+        var builtInCategoryValues = new HashSet<string>(
+            TransactionCategoriesConstants.DefaultTransactionCategories.Select(category =>
+                category.Value
+            ),
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        foreach (var category in builtInCategoryValues)
+        {
+            UpdateTransactionsUsingCategory(category, null, transactions, true);
+        }
+
+        foreach (var category in userData.TransactionCategories)
+        {
+            if (builtInCategoryValues.Contains(category.Parent))
+            {
+                category.Parent = string.Empty;
+            }
+        }
+    }
+
+    /// <inheritdoc />
     public async Task DeleteTransactionCategoryAsync(Guid userGuid, Guid guid)
     {
         var userData = await GetCurrentUserAsync(userGuid);

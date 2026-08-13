@@ -29,6 +29,13 @@ public interface ITransactionCategoryService
     Task UpdateTransactionCategoryAsync(Guid userGuid, ITransactionCategoryUpdateRequest request);
 
     /// <summary>
+    /// Clears built-in category references from the user's transactions and custom categories.
+    /// This only changes the current EF unit of work; the caller owns SaveChangesAsync.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    Task ClearBuiltInTransactionCategoryReferencesAsync(Guid userGuid);
+
+    /// <summary>
     /// Deletes a transaction category.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>

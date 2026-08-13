@@ -29,6 +29,13 @@ public interface IAssetTypeService
     Task UpdateAssetTypeAsync(Guid userGuid, IAssetTypeUpdateRequest request);
 
     /// <summary>
+    /// Clears built-in type references from the user's assets and custom asset types.
+    /// This only changes the current EF unit of work; the caller owns SaveChangesAsync.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    Task ClearBuiltInAssetTypeReferencesAsync(Guid userGuid);
+
+    /// <summary>
     /// Deletes an asset type.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>

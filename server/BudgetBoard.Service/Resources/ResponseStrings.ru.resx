@@ -181,9 +181,6 @@
   <data name="BudgetUpdateParentLimitError" xml:space="preserve">
         <value>The parent budget cannot be less than the sum of its children.</value>
   </data>
-  <data name="DisableBuiltInAssetTypesInUseError" xml:space="preserve">
-        <value>Built-in asset types cannot be disabled because they are currently in use by existing assets or custom asset types.</value>
-  </data>
   <data name="DuplicateLunchFlowAccountError" xml:space="preserve">
         <value>A LunchFlow account with this SyncID already exists.</value>
   </data>

@@ -942,6 +942,69 @@ public class TransactionCategoryServiceTests
     }
     #endregion
 
+    [Fact]
+    public async Task ClearBuiltInTransactionCategoryReferencesAsync_WhenTransactionsUseBuiltInCategories_ClearsMatchingFields()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        var transactionFaker = new TransactionFaker([account.ID]);
+        var builtInCategory = TransactionCategoriesConstants
+            .DefaultTransactionCategories.First(category => string.IsNullOrEmpty(category.Parent))
+            .Value;
+        var builtInSubcategory = TransactionCategoriesConstants
+            .DefaultTransactionCategories.First(category => !string.IsNullOrEmpty(category.Parent))
+            .Value;
+        var customCategory = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+        customCategory.Parent = builtInCategory.ToLowerInvariant();
+        var unrelatedCategory = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+        unrelatedCategory.Parent = "Custom Parent";
+
+        var categoryTransaction = transactionFaker.Generate();
+        categoryTransaction.Category = builtInCategory.ToUpperInvariant();
+        categoryTransaction.Subcategory = "Custom Subcategory";
+
+        var subcategoryTransaction = transactionFaker.Generate();
+        subcategoryTransaction.Category = "Custom Category";
+        subcategoryTransaction.Subcategory = builtInSubcategory.ToLowerInvariant();
+
+        var customTransaction = transactionFaker.Generate();
+        customTransaction.Category = "Custom Category";
+        customTransaction.Subcategory = "Custom Subcategory";
+
+        helper.UserDataContext.Accounts.Add(account);
+        helper.UserDataContext.TransactionCategories.AddRange(customCategory, unrelatedCategory);
+        helper.UserDataContext.Transactions.AddRange(
+            categoryTransaction,
+            subcategoryTransaction,
+            customTransaction
+        );
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await transactionCategoryService.ClearBuiltInTransactionCategoryReferencesAsync(
+            helper.demoUser.Id
+        );
+
+        // Assert
+        categoryTransaction.Category.Should().BeNull();
+        categoryTransaction.Subcategory.Should().BeNull();
+        subcategoryTransaction.Category.Should().BeNull();
+        subcategoryTransaction.Subcategory.Should().BeNull();
+        customTransaction.Category.Should().Be("Custom Category");
+        customTransaction.Subcategory.Should().Be("Custom Subcategory");
+        customCategory.Parent.Should().BeEmpty();
+        unrelatedCategory.Parent.Should().Be("Custom Parent");
+    }
+
     #region DeleteTransactionCategoryAsync
     [Fact]
     public async Task DeleteTransactionCategoryAsync_WhenCalledWithValidData_ShouldDeleteCategory()
