@@ -1,7 +1,7 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
-import { getIsParentCategory, getParentCategory } from "~/helpers/category";
+import { getIsParentCategory } from "~/helpers/category";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { areStringsEqual } from "~/helpers/utils";
 import TransactionCards from "./TransactionCards/TransactionCards";
@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import { CategoryTypes } from "~/models/category";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -27,7 +28,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { allTransactionCategories: transactionCategories } =
+  const { allTransactionCategories, getCategoryType } =
     useTransactionCategories();
   const transactionsQuery = useTransactionsQuery();
 
@@ -44,7 +45,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     .filter((transaction) => {
       if (
         !props.category ||
-        getIsParentCategory(props.category, transactionCategories)
+        getIsParentCategory(props.category, allTransactionCategories)
       ) {
         return areStringsEqual(
           transaction.category ?? "",
@@ -66,9 +67,9 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     getDateFromMonthsAgo(i, props.month ?? dayjs().toDate()),
   );
 
-  const isExpenseCategory = !areStringsEqual(
-    getParentCategory(props.category ?? "", transactionCategories),
-    "income",
+  const isExpenseCategory = areStringsEqual(
+    getCategoryType(props.category ?? ""),
+    CategoryTypes.Expense,
   );
 
   return (
@@ -127,7 +128,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             >
               <TransactionCards
                 transactions={transactionsForCategoryForCurrentMonth ?? []}
-                categories={transactionCategories}
+                categories={allTransactionCategories}
               />
             </Accordion.Item>
           </Accordion>

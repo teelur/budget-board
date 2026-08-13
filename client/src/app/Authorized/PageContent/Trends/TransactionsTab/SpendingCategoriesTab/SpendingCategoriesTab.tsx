@@ -14,8 +14,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { allTransactionCategories: transactionCategories } =
-    useTransactionCategories();
+  const { allTransactionCategories } = useTransactionCategories();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
     dayjs().startOf("month").toDate(),
@@ -42,7 +41,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
       : (transactionsQuery.data ?? []);
 
   const expenseCategoryValues = new Set(
-    transactionCategories
+    allTransactionCategories
       .filter(
         (c) => c.parent === "" && c.categoryType === CategoryTypes.Expense,
       )
@@ -109,7 +108,6 @@ const SpendingCategoriesTab = (): React.ReactNode => {
       <Flex justify="center">
         <SpendingCategoriesChart
           transactions={expenseTransactions}
-          categories={transactionCategories}
           showSubcategories={showSubcategories}
           isPending={transactionsQuery.isPending}
         />

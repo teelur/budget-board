@@ -27,6 +27,7 @@ import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface MetricWidgetProps {
   widget: IWidgetSettingsResponse;
@@ -44,16 +45,19 @@ const MetricWidget = ({
   const { intlLocale, dayjs } = useLocale();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
+  const { getCategoryType, isPending: transactionCategoriesPending } =
+    useTransactionCategories();
   const widgetSettingsQuery = useWidgetSettingsQuery();
 
   // The widget configuration is stored as a JSON string in the database.
   const { configTitle, configValue, configLabel } = React.useMemo(() => {
-    if (!widget?.configuration)
+    if (!widget?.configuration) {
       return {
         configTitle: undefined,
         configValue: undefined,
         configLabel: undefined,
       };
+    }
 
     try {
       const parsed = JSON.parse(widget.configuration) as {
@@ -119,6 +123,7 @@ const MetricWidget = ({
 
   const isPending =
     widgetSettingsQuery.isPending ||
+    (requirements.needsTransactions && transactionCategoriesPending) ||
     (requirements.needsTransactions &&
       (requirements.needsAllTimeTransactions
         ? allTimeTransactionsQuery.isPending
@@ -137,6 +142,7 @@ const MetricWidget = ({
       goals: goalsQuery.data ?? [],
       accounts: accountsQuery.data ?? [],
       accountTypes: allAccountTypes ?? [],
+      getCategoryType,
       preferredCurrency,
       intlLocale,
     }),
@@ -148,6 +154,7 @@ const MetricWidget = ({
       goalsQuery.data,
       accountsQuery.data,
       allAccountTypes,
+      getCategoryType,
       preferredCurrency,
       intlLocale,
     ],

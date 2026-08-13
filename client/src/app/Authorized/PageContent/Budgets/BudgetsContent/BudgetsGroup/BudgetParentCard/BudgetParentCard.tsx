@@ -1,9 +1,6 @@
 import classes from "./BudgetParentCard.module.css";
 
-import {
-  getCurrencySymbol,
-  SignDisplay,
-} from "~/helpers/currency";
+import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
 import {
   ActionIcon,
   Button,
@@ -20,7 +17,7 @@ import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { StatusColorType } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
-import { ICategoryNode } from "~/models/category";
+import { CategoryTypes, ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
 import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
 import Card from "~/components/core/Card/Card";
@@ -59,7 +56,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
-  const isIncome = areStringsEqual(props.categoryTree.value, "income");
+  const isIncome = areStringsEqual(
+    props.categoryTree.categoryType,
+    CategoryTypes.Income,
+  );
   const limit =
     props.categoryToLimitsMap.get(props.categoryTree.value.toLowerCase()) ?? 0;
   const amount =
