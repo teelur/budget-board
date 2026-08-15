@@ -9,7 +9,8 @@ import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 const Deleted = (): React.ReactNode => {
   const { t } = useTranslation();
   const transactionsQuery = useTransactionsQuery({
-    includeHidden: true,
+    includeHiddenCategory: true,
+    includeHiddenAccounts: true,
     includeDeleted: true,
   });
 

@@ -41,14 +41,16 @@ public interface ITransactionService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="year">Optional. The year to filter transactions by.</param>
     /// <param name="month">Optional. The month to filter transactions by.</param>
-    /// <param name="includeHidden">If true, includes hidden transactions in the response.</param>
+    /// <param name="includeHiddenAccounts">If true, includes transactions from hidden accounts in the response.</param>
+    /// <param name="includeHiddenCategory">If true, includes transactions from hidden categories in the response.</param>
     /// <param name="includeDeleted">If true, includes deleted transactions in the response.</param>
     /// <returns>A collection of transaction details sorted by date in descending order.</returns>
     Task<IReadOnlyList<ITransactionResponse>> ReadTransactionsAsync(
         Guid userGuid,
         int? year,
         int? month,
-        bool includeHidden,
+        bool includeHiddenAccounts,
+        bool includeHiddenCategory,
         bool includeDeleted
     );
 

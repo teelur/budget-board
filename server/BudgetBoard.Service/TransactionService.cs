@@ -87,7 +87,8 @@ public class TransactionService(
         Guid userGuid,
         int? year,
         int? month,
-        bool includeHidden,
+        bool includeHiddenAccounts,
+        bool includeHiddenCategory,
         bool includeDeleted
     )
     {
@@ -100,11 +101,15 @@ public class TransactionService(
             transactions = transactions.Where(t => t.Deleted == null);
         }
 
-        if (!includeHidden)
+        if (!includeHiddenAccounts)
+        {
+            transactions = transactions.Where(t => t.Account!.HideTransactions is false);
+        }
+
+        if (!includeHiddenCategory)
         {
             transactions = transactions.Where(t =>
-                t.Account!.HideTransactions is false
-                && t.Category != TransactionCategoriesConstants.HideFromBudgetsCategory
+                t.Category != TransactionCategoriesConstants.HideFromBudgetsCategory
             );
         }
 

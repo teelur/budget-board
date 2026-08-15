@@ -41,7 +41,9 @@ const ConfigureTransactions = (
   const { dayjs } = useLocale();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
-  const transactionsQuery = useTransactionsQuery();
+  const transactionsQuery = useTransactionsQuery({
+    includeHiddenCategory: true,
+  });
   const accountsQuery = useAccountsQuery();
 
   // The raw CSV data imported from the user's file.
@@ -400,7 +402,7 @@ const ConfigureTransactions = (
         category: columnsSelect.category ? row[columnsSelect.category] : null,
         amount: getImportedTransactionAmount(row),
         account: columnsOptions.useSingleAccount
-          ? (columnsSelect.account?.trim() || null)
+          ? columnsSelect.account?.trim() || null
           : columnsSelect.account && row[columnsSelect.account] != null
             ? String(row[columnsSelect.account])
             : null,

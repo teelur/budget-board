@@ -43,7 +43,8 @@ public class TransactionController(
     public async Task<IActionResult> Read(
         int? year,
         int? month,
-        bool includeHidden,
+        bool includeHiddenAccounts,
+        bool includeHiddenCategory,
         bool includeDeleted
     )
     {
@@ -61,7 +62,8 @@ public class TransactionController(
                     parsedUserId,
                     year,
                     month,
-                    includeHidden,
+                    includeHiddenAccounts,
+                    includeHiddenCategory,
                     includeDeleted
                 )
             );
