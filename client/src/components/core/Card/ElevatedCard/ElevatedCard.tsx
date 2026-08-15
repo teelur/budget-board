@@ -13,12 +13,13 @@ export interface ElevatedCardProps extends CardProps {
 const ElevatedCard = ({
   children,
   hoverEffect,
+  className,
   ...props
 }: ElevatedCardProps) => {
   return (
     <Card
       ref={props.ref}
-      className={elevatedClasses.root}
+      className={`${elevatedClasses.root}${className ? ` ${className}` : ""}`}
       style={{
         transition: "background 0.2s, border-color 0.2s",
       }}

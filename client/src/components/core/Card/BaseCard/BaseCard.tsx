@@ -10,11 +10,16 @@ export interface BaseCardProps extends CardProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-const BaseCard = ({ children, hoverEffect, ...props }: BaseCardProps) => {
+const BaseCard = ({
+  children,
+  hoverEffect,
+  className,
+  ...props
+}: BaseCardProps) => {
   return (
     <Card
       ref={props.ref}
-      className={baseClasses.root}
+      className={`${baseClasses.root}${className ? ` ${className}` : ""}`}
       style={{
         transition: "background 0.2s, border-color 0.2s",
       }}
