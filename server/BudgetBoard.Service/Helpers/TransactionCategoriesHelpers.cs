@@ -61,8 +61,9 @@ internal static class TransactionCategoriesHelpers
         );
         if (foundCategory != null)
         {
-            return categories.Any(c =>
-                c.Parent.Equals(foundCategory.Value, StringComparison.CurrentCultureIgnoreCase)
+            return foundCategory.Parent.Equals(
+                string.Empty,
+                StringComparison.CurrentCultureIgnoreCase
             );
         }
         return false;
