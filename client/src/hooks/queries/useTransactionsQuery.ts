@@ -11,14 +11,16 @@ export interface TransactionQueryDate {
 
 export interface useTransactionsQueryProps {
   selectedDates?: TransactionQueryDate[];
-  includeHidden?: boolean;
+  includeHiddenAccounts?: boolean;
+  includeHiddenCategory?: boolean;
   includeDeleted?: boolean;
   enabled?: boolean;
 }
 
 export const useTransactionsQuery = ({
   selectedDates,
-  includeHidden,
+  includeHiddenAccounts,
+  includeHiddenCategory,
   includeDeleted,
   enabled,
 }: useTransactionsQueryProps = {}) => {
@@ -31,7 +33,8 @@ export const useTransactionsQuery = ({
       queryKey: [
         transactionsQueryKey,
         {
-          includeHidden: includeHidden ?? false,
+          includeHiddenAccounts: includeHiddenAccounts ?? false,
+          includeHiddenCategory: includeHiddenCategory ?? false,
           includeDeleted: includeDeleted ?? false,
         },
       ],
@@ -40,7 +43,8 @@ export const useTransactionsQuery = ({
           url: "/api/transaction",
           method: "GET",
           params: {
-            includeHidden: includeHidden ?? false,
+            includeHiddenAccounts: includeHiddenAccounts ?? false,
+            includeHiddenCategory: includeHiddenCategory ?? false,
             includeDeleted: includeDeleted ?? false,
           },
         });
@@ -58,7 +62,8 @@ export const useTransactionsQuery = ({
         {
           month: date.month,
           year: date.year,
-          includeHidden: includeHidden ?? false,
+          includeHiddenAccounts: includeHiddenAccounts ?? false,
+          includeHiddenCategory: includeHiddenCategory ?? false,
           includeDeleted: includeDeleted ?? false,
         },
       ],
@@ -69,7 +74,8 @@ export const useTransactionsQuery = ({
           params: {
             month: date.month,
             year: date.year,
-            includeHidden: includeHidden ?? false,
+            includeHiddenAccounts: includeHiddenAccounts ?? false,
+            includeHiddenCategory: includeHiddenCategory ?? false,
             includeDeleted: includeDeleted ?? false,
           },
         });

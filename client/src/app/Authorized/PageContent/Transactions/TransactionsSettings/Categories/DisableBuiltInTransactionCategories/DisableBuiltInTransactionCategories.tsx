@@ -23,7 +23,10 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   const { allTransactionCategories, customTransactionCategories } =
     useTransactionCategories();
   const { disableBuiltInTransactionCategories } = useUserSettings();
-  const transactionsQuery = useTransactionsQuery();
+  const transactionsQuery = useTransactionsQuery({
+    includeHiddenCategory: true,
+    includeHiddenAccounts: true,
+  });
   const updateUserSettingsMutation = useUpdateUserSettingsMutation();
   const [isConfirmationOpen, setIsConfirmationOpen] = React.useState(false);
 

@@ -254,6 +254,7 @@ public class TransactionServiceTests
             null,
             null,
             false,
+            false,
             false
         );
 
@@ -299,6 +300,7 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             fakeDate.Year,
             null,
+            false,
             false,
             false
         );
@@ -351,6 +353,7 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             null,
             fakeDate.Month,
+            false,
             false,
             false
         );
@@ -408,6 +411,7 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             null,
             null,
+            true,
             true,
             false
         );
@@ -467,6 +471,7 @@ public class TransactionServiceTests
             helper.demoUser.Id,
             null,
             null,
+            false,
             false,
             false
         );

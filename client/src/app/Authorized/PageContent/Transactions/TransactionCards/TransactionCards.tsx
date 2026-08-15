@@ -32,7 +32,9 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   const { transactionFilters } = useTransactionFilters();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
-  const transactionsQuery = useTransactionsQuery();
+  const transactionsQuery = useTransactionsQuery({
+    includeHiddenCategory: true,
+  });
 
   const filteredTransactions = getFilteredTransactions(
     transactionsQuery.data ?? [],
@@ -62,13 +64,13 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   ]);
 
   return (
-    <Stack gap={"0.5rem"}>
+    <Stack gap="0.5rem">
       {transactionsQuery.isPending ? (
         Array.from({ length: skeletonCount }).map((_, index) => (
           <Skeleton key={index} height={40} radius="md" />
         ))
       ) : (
-        <Stack gap={"0.3rem"} align="center">
+        <Stack gap="0.3rem" align="center">
           {sortedFilteredTransactions.length > 0 ? (
             currentPageItems.map((transaction) => (
               <TransactionCard
