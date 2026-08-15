@@ -9,18 +9,24 @@ import TransactionCards from "./TransactionCards/TransactionCards";
 import BulkActionBar from "../../../../components/BulkActionBar/BulkActionBar";
 import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const Transactions = (): React.ReactNode => {
+  const { dayjs } = useLocale();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
+
   const [sort, setSort] = React.useState(Sorts.Date);
   const [sortDirection, setSortDirection] = React.useState<SortDirection>(
     SortDirection.Decending,
   );
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
-  const [currentPageTransactions, setCurrentPageTransactions] = React.useState<
+  const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
+    dayjs().startOf("month").toDate(),
+  ]);
+  const [currentViewTransactions, setCurrentViewTransactions] = React.useState<
     ITransaction[]
   >([]);
-
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
 
   const onToggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -45,17 +51,19 @@ const Transactions = (): React.ReactNode => {
         setSort={setSort}
         sortDirection={sortDirection}
         setSortDirection={setSortDirection}
+        setCurrentViewTransactions={setCurrentViewTransactions}
+        selectedMonths={selectedMonths}
+        setSelectedMonths={setSelectedMonths}
       />
       <TransactionCards
-        sort={sort}
-        sortDirection={sortDirection}
+        currentViewTransactions={currentViewTransactions}
+        isQueryPending={false}
         selectedIds={selectedIds}
         onToggleSelect={onToggleSelect}
-        onCurrentPageChange={setCurrentPageTransactions}
       />
       <BulkActionBar
         selectedIds={selectedIds}
-        currentPageTransactions={currentPageTransactions}
+        currentPageTransactions={currentViewTransactions}
         onClearSelection={onClearSelection}
         onSelectAll={onSelectAll}
         categories={transactionCategories}

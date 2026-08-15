@@ -1,4 +1,4 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { transactionsQueryKey } from "~/helpers/requests";
 import { ITransaction } from "~/models/transaction";
@@ -28,62 +28,39 @@ export const useTransactionsQuery = ({
 
   // TODO: We should move towards querying by month, since querying EVERYTHING will get very cumbersome once the data
   // set grows large.
-  if (!selectedDates || selectedDates.length === 0) {
-    return useQuery({
-      queryKey: [
-        transactionsQueryKey,
-        {
-          includeHiddenAccounts: includeHiddenAccounts ?? false,
-          includeHiddenCategory: includeHiddenCategory ?? false,
-          includeDeleted: includeDeleted ?? false,
-        },
-      ],
+  const commonParams = {
+    includeHiddenAccounts: includeHiddenAccounts ?? false,
+    includeHiddenCategory: includeHiddenCategory ?? false,
+    includeDeleted: includeDeleted ?? false,
+  };
+
+  const createQuery = (date?: TransactionQueryDate) => {
+    const params = date
+      ? { ...commonParams, month: date.month, year: date.year }
+      : commonParams;
+
+    return {
+      queryKey: [transactionsQueryKey, params],
       queryFn: async (): Promise<ITransaction[]> => {
         const res: AxiosResponse = await request({
           url: "/api/transaction",
           method: "GET",
-          params: {
-            includeHiddenAccounts: includeHiddenAccounts ?? false,
-            includeHiddenCategory: includeHiddenCategory ?? false,
-            includeDeleted: includeDeleted ?? false,
-          },
+          params,
         });
 
         return res.data as ITransaction[];
       },
       enabled: enabled ?? true,
-    });
-  }
+    };
+  };
+
+  const queries =
+    selectedDates === undefined
+      ? [createQuery()]
+      : selectedDates.map((date) => createQuery(date));
 
   return useQueries({
-    queries: selectedDates.map((date: TransactionQueryDate) => ({
-      queryKey: [
-        transactionsQueryKey,
-        {
-          month: date.month,
-          year: date.year,
-          includeHiddenAccounts: includeHiddenAccounts ?? false,
-          includeHiddenCategory: includeHiddenCategory ?? false,
-          includeDeleted: includeDeleted ?? false,
-        },
-      ],
-      queryFn: async (): Promise<ITransaction[]> => {
-        const res: AxiosResponse = await request({
-          url: "/api/transaction",
-          method: "GET",
-          params: {
-            month: date.month,
-            year: date.year,
-            includeHiddenAccounts: includeHiddenAccounts ?? false,
-            includeHiddenCategory: includeHiddenCategory ?? false,
-            includeDeleted: includeDeleted ?? false,
-          },
-        });
-
-        return res.data as ITransaction[];
-      },
-      enabled: enabled ?? true,
-    })),
+    queries,
     combine: (results) => {
       return {
         data: results.map((result) => result.data ?? []).flat(1),

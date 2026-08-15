@@ -20,12 +20,26 @@ import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/Tr
 import { useTranslation } from "react-i18next";
 import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransactionsModal";
 import { useNavigate } from "react-router";
+import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
+import { Filters, ITransaction } from "~/models/transaction";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import {
+  getFilteredTransactions,
+  sortTransactions,
+} from "~/helpers/transactions";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
   setSort: (newSort: Sorts) => void;
   sortDirection: SortDirection;
   setSortDirection: (newSortDirection: SortDirection) => void;
+  setCurrentViewTransactions: React.Dispatch<
+    React.SetStateAction<ITransaction[]>
+  >;
+  selectedMonths: Date[];
+  setSelectedMonths: React.Dispatch<React.SetStateAction<Date[]>>;
 }
 
 const TransactionsHeader = (
@@ -34,7 +48,39 @@ const TransactionsHeader = (
   const navigate = useNavigate();
 
   const { t } = useTranslation();
-  const { isFiltersPanelOpen, toggleFiltersPanel } = useTransactionFilters();
+  const { transactionFilters, isFiltersPanelOpen, toggleFiltersPanel } =
+    useTransactionFilters();
+  const { dayjs } = useLocale();
+  const { allTransactionCategories } = useTransactionCategories();
+  const transactionsQuery = useTransactionsQuery({
+    selectedDates: props.selectedMonths.map((date) => ({
+      month: dayjs(date).month() + 1,
+      year: dayjs(date).year(),
+    })),
+    includeHiddenCategory: true,
+  });
+
+  React.useEffect(() => {
+    const filteredTransactions = getFilteredTransactions(
+      transactionsQuery.data ?? [],
+      transactionFilters ?? new Filters(),
+      allTransactionCategories,
+    );
+
+    const sortedFilteredTransactions = sortTransactions(
+      filteredTransactions,
+      props.sort,
+      props.sortDirection,
+    );
+
+    props.setCurrentViewTransactions(sortedFilteredTransactions);
+  }, [
+    transactionsQuery.data,
+    transactionFilters,
+    allTransactionCategories,
+    props.sort,
+    props.sortDirection,
+  ]);
 
   return (
     <Stack className={classes.root}>
@@ -69,6 +115,13 @@ const TransactionsHeader = (
       <Collapse expanded={isFiltersPanelOpen} transitionDuration={100}>
         <FilterCard />
       </Collapse>
+      <MonthToolcards
+        selectedDates={props.selectedMonths}
+        setSelectedDates={props.setSelectedMonths}
+        timeToMonthlyTotalsMap={new Map()}
+        isPending={false}
+        allowSelectMultiple
+      />
     </Stack>
   );
 };
