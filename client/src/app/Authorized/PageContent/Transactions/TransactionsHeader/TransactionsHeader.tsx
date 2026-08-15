@@ -25,6 +25,7 @@ import { Filters, ITransaction } from "~/models/transaction";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import {
+  buildTimeToMonthlyTotalsMap,
   getFilteredTransactions,
   sortTransactions,
 } from "~/helpers/transactions";
@@ -59,6 +60,14 @@ const TransactionsHeader = (
     })),
     includeHiddenCategory: true,
   });
+  const timeToMonthlyTotalsMap = React.useMemo(
+    () =>
+      buildTimeToMonthlyTotalsMap(
+        props.selectedMonths,
+        transactionsQuery.data ?? [],
+      ),
+    [props.selectedMonths, transactionsQuery.data],
+  );
 
   React.useEffect(() => {
     const filteredTransactions = getFilteredTransactions(
@@ -118,8 +127,8 @@ const TransactionsHeader = (
       <MonthToolcards
         selectedDates={props.selectedMonths}
         setSelectedDates={props.setSelectedMonths}
-        timeToMonthlyTotalsMap={new Map()}
-        isPending={false}
+        timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
+        isPending={transactionsQuery.isPending}
         allowSelectMultiple
       />
     </Stack>
