@@ -1,4 +1,9 @@
 .root {
   width: 100%;
   max-width: 1400px;
+  height: calc(
+    100dvh - var(--app-shell-header-offset, 60px) - 1rem -
+      var(--bulk-bar-height, 0px)
+  );
+  min-height: 0;
 }

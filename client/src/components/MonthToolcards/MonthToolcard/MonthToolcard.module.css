@@ -1,0 +1,15 @@
+.card {
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.card:hover {
+  border-color: var(--mantine-primary-color-4);
+}
+
+.card[data-selected="true"] {
+  box-shadow:
+    0 0 0 1px var(--mantine-primary-color-filled),
+    var(--paper-shadow);
+}

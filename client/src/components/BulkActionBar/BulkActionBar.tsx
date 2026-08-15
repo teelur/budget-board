@@ -30,7 +30,6 @@ import useIsMobile from "~/hooks/useIsMobile";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
-import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { useUpdateTransactionsMutation } from "~/hooks/mutations/transactions/useUpdateTransactionsMutation";
 import { useDeleteTransactionsMutation } from "~/hooks/mutations/transactions/useDeleteTransactionsMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -67,9 +66,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const accountsQuery = useAccountsQuery();
   const updateTransactionsMutation = useUpdateTransactionsMutation();
   const deleteTransactionsMutation = useDeleteTransactionsMutation();
-  const transactionsQuery = useTransactionsQuery({
-    includeHiddenCategory: true,
-  });
 
   // Hold the bar element in state so the effect re-runs as soon as Mantine's
   // Transition renders it (which happens in a child render cycle, not the same
@@ -133,7 +129,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     setShowDeleteConfirm(false);
   };
 
-  const selectedTransactions = (transactionsQuery.data ?? []).filter((t) =>
+  const selectedTransactions = props.currentPageTransactions.filter((t) =>
     props.selectedIds.has(t.id),
   );
   const singleSelected =

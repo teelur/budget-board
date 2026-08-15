@@ -6,21 +6,57 @@ import React from "react";
 import { SortDirection } from "~/components/SortButton";
 import { Sorts } from "./TransactionsHeader/SortMenu/SortMenuHelpers";
 import TransactionCards from "./TransactionCards/TransactionCards";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import BulkActionBar from "../../../../components/BulkActionBar/BulkActionBar";
 import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 const Transactions = (): React.ReactNode => {
+  const { dayjs } = useLocale();
+  const { allTransactionCategories: transactionCategories } =
+    useTransactionCategories();
+
   const [sort, setSort] = React.useState(Sorts.Date);
   const [sortDirection, setSortDirection] = React.useState<SortDirection>(
     SortDirection.Decending,
   );
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
-  const [currentPageTransactions, setCurrentPageTransactions] = React.useState<
+  const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
+    dayjs().startOf("month").toDate(),
+  ]);
+  const transactionsQuery = useTransactionsQuery({
+    selectedDates: selectedMonths.map((date) => ({
+      month: dayjs(date).month() + 1,
+      year: dayjs(date).year(),
+    })),
+    includeHiddenCategory: true,
+  });
+  const [isViewUpdatePending, startViewUpdate] = React.useTransition();
+  const [currentViewTransactions, setCurrentViewTransactions] = React.useState<
     ITransaction[]
   >([]);
 
-  const { allTransactionCategories: transactionCategories } = useTransactionCategories();
+  const updateCurrentViewTransactions = React.useCallback(
+    (transactions: ITransaction[]) => {
+      startViewUpdate(() => setCurrentViewTransactions(transactions));
+    },
+    [],
+  );
+
+  React.useEffect(() => {
+    const currentViewIds = new Set(
+      currentViewTransactions.map((transaction) => transaction.id),
+    );
+
+    setSelectedIds((prev) => {
+      const next = new Set(
+        [...prev].filter((transactionId) => currentViewIds.has(transactionId)),
+      );
+
+      return next.size === prev.size ? prev : next;
+    });
+  }, [currentViewTransactions]);
 
   const onToggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -45,17 +81,22 @@ const Transactions = (): React.ReactNode => {
         setSort={setSort}
         sortDirection={sortDirection}
         setSortDirection={setSortDirection}
+        setCurrentViewTransactions={updateCurrentViewTransactions}
+        transactions={transactionsQuery.data ?? []}
+        isQueryPending={transactionsQuery.isPending}
+        selectedMonths={selectedMonths}
+        setSelectedMonths={setSelectedMonths}
       />
       <TransactionCards
-        sort={sort}
-        sortDirection={sortDirection}
+        currentViewTransactions={currentViewTransactions}
+        isQueryPending={transactionsQuery.isPending}
+        isViewUpdatePending={isViewUpdatePending}
         selectedIds={selectedIds}
         onToggleSelect={onToggleSelect}
-        onCurrentPageChange={setCurrentPageTransactions}
       />
       <BulkActionBar
         selectedIds={selectedIds}
-        currentPageTransactions={currentPageTransactions}
+        currentPageTransactions={currentViewTransactions}
         onClearSelection={onClearSelection}
         onSelectAll={onSelectAll}
         categories={transactionCategories}
