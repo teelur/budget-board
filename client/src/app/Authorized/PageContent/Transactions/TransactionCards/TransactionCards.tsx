@@ -46,7 +46,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
           aria-busy={isListPending}
         >
           {isListPending && (
-            <div className={classes.loadingRow} aria-hidden="true">
+<div className={classes.loadingRow}>
               <Loader size="sm" />
             </div>
           )}
