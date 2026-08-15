@@ -26,8 +26,6 @@ export const useTransactionsQuery = ({
 }: useTransactionsQueryProps = {}) => {
   const { request } = useAuth();
 
-  // TODO: We should move towards querying by month, since querying EVERYTHING will get very cumbersome once the data
-  // set grows large.
   const commonParams = {
     includeHiddenAccounts: includeHiddenAccounts ?? false,
     includeHiddenCategory: includeHiddenCategory ?? false,

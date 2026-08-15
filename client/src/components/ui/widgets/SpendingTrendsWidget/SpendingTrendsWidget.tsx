@@ -100,7 +100,7 @@ const SpendingTrendsWidget = (): React.ReactNode => {
       }
       elevation={1}
     >
-      <Stack gap={0} w="100%" p={"0.5rem"} style={{ flex: 1, minHeight: 0 }}>
+      <Stack gap={0} w="100%" p="0.5rem" style={{ flex: 1, minHeight: 0 }}>
         {transactionsQuery.isPending ? (
           <Skeleton height="100%" radius="md" />
         ) : (

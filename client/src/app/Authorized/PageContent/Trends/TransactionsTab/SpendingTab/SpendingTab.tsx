@@ -25,7 +25,7 @@ const SpendingTab = (): React.ReactNode => {
   });
 
   return (
-    <Stack p={"0.5rem"}>
+    <Stack p="0.5rem">
       <MonthToolcards
         selectedDates={selectedMonths}
         setSelectedDates={setSelectedMonths}
