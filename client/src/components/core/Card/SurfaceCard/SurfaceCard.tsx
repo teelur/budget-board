@@ -10,11 +10,16 @@ export interface SurfaceCardProps extends CardProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-const SurfaceCard = ({ children, hoverEffect, ...props }: SurfaceCardProps) => {
+const SurfaceCard = ({
+  children,
+  hoverEffect,
+  className,
+  ...props
+}: SurfaceCardProps) => {
   return (
     <Card
       ref={props.ref}
-      className={surfaceClasses.root}
+      className={`${surfaceClasses.root}${className ? ` ${className}` : ""}`}
       style={{
         transition: "background 0.2s, border-color 0.2s",
       }}
