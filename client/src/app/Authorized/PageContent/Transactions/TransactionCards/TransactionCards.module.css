@@ -28,10 +28,6 @@
   pointer-events: none;
 }
 
-.loadingRow[aria-hidden="true"] {
-  visibility: hidden;
-}
-
 .virtualList {
   position: relative;
   width: 100%;
