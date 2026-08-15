@@ -1368,6 +1368,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/react-virtual@npm:^3.14.9":
+  version: 3.14.9
+  resolution: "@tanstack/react-virtual@npm:3.14.9"
+  dependencies:
+    "@tanstack/virtual-core": "npm:3.17.7"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/4d89bb77c2e3db831e457500a003fbca62374e7f9cbf5c04e3ac92c75154bec5b9afaa9aa39d682d9983f8f6904d937746f9e88aecfd181ad1a96aed67b93768
+  languageName: node
+  linkType: hard
+
+"@tanstack/virtual-core@npm:3.17.7":
+  version: 3.17.7
+  resolution: "@tanstack/virtual-core@npm:3.17.7"
+  checksum: 10c0/9dd7cc9859af0f79e2189422a27fa4f72bddaccd3ecb027ad3f6968a28cd472e964a11b0005bd605ad0d534860233005711752d10d3c297f57fc3c5dbe397d56
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7.20.5":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -2271,6 +2290,7 @@ __metadata:
     "@tanstack/eslint-plugin-query": "npm:^5.101.4"
     "@tanstack/react-query": "npm:^5.101.4"
     "@tanstack/react-query-devtools": "npm:^5.101.4"
+    "@tanstack/react-virtual": "npm:^3.14.9"
     "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^26.2.0"
     "@types/papaparse": "npm:^5.5.2"

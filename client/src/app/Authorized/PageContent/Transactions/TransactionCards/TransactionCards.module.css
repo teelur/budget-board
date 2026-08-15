@@ -1,0 +1,29 @@
+.container {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.viewport {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-inline-end: 0.75rem;
+  box-sizing: border-box;
+  scrollbar-gutter: stable;
+}
+
+.virtualList {
+  position: relative;
+  width: 100%;
+}
+
+.virtualRow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-bottom: 0.3rem;
+  box-sizing: border-box;
+}
