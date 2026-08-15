@@ -658,7 +658,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.39.5, @eslint/js@npm:^9.9.1":
+"@eslint/js@npm:9.39.5, @eslint/js@npm:^9.39.5":
   version: 9.39.5
   resolution: "@eslint/js@npm:9.39.5"
   checksum: 10c0/49894e98ba313a7d3bfb1b20d55c0f9826be45a7db876fd84e533ac7f101b1d95b51cd22c6a6db3a45066b9c0d068c31b4a22fa0db8a6cc8744a25540efdb824
@@ -2270,7 +2270,7 @@ __metadata:
     "@babel/core": "npm:^8.0.1"
     "@dnd-kit/helpers": "npm:^0.5.0"
     "@dnd-kit/react": "npm:^0.5.0"
-    "@eslint/js": "npm:^9.9.1"
+    "@eslint/js": "npm:^9.39.5"
     "@fontsource-variable/ibm-plex-sans": "npm:^5.3.0"
     "@fontsource-variable/plus-jakarta-sans": "npm:^5.3.0"
     "@icons-pack/react-simple-icons": "npm:^13.13.0"
@@ -2303,7 +2303,7 @@ __metadata:
     dayjs: "npm:^1.11.21"
     embla-carousel: "npm:8.6.0"
     embla-carousel-react: "npm:8.6.0"
-    eslint: "npm:^9.9.1"
+    eslint: "npm:^9.39.5"
     eslint-config-mantine: "npm:^4.0.3"
     eslint-plugin-i18n-json: "npm:^4.0.1"
     eslint-plugin-jsonc: "npm:^3.4.1"
@@ -2312,11 +2312,11 @@ __metadata:
     eslint-plugin-react-compiler: "npm:^19.1.0-rc.2"
     eslint-plugin-react-hooks: "npm:^7.1.1"
     eslint-plugin-react-refresh: "npm:^0.5.4"
-    globals: "npm:^17.9.0"
+    globals: "npm:^17.11.0"
     i18next: "npm:^26.3.6"
     i18next-http-backend: "npm:^4.0.1"
     lucide-react: "npm:^1.31.0"
-    papaparse: "npm:^5.5.4"
+    papaparse: "npm:^5.6.0"
     postcss: "npm:^8.5.26"
     postcss-preset-mantine: "npm:^1.18.0"
     postcss-simple-vars: "npm:^7.0.1"
@@ -3146,7 +3146,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^9.9.1":
+"eslint@npm:^9.39.5":
   version: 9.39.5
   resolution: "eslint@npm:9.39.5"
   dependencies:
@@ -3520,10 +3520,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^17.9.0":
-  version: 17.9.0
-  resolution: "globals@npm:17.9.0"
-  checksum: 10c0/776116bffb916e462d548c26a44c9a5d8f4e551935a883991e9f5d68cbcb21b63e4c688e36bbc564f97d3025e304d8b2bb0a611ecf944825aeee164898dcfbdd
+"globals@npm:^17.11.0":
+  version: 17.11.0
+  resolution: "globals@npm:17.11.0"
+  checksum: 10c0/5e1be3d816e04d4d0d01b1cdd40e46b5fb6b5e9f15aece9a5919b060e0fb1b3f1b9e7327dce97ef19e05513a6d65872e0834999ddea251557556dddd0f5fde30
   languageName: node
   linkType: hard
 
@@ -4788,10 +4788,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"papaparse@npm:^5.5.4":
-  version: 5.5.4
-  resolution: "papaparse@npm:5.5.4"
-  checksum: 10c0/8942ae45dcc171b720fd67953f825a544fdeeeadb85cf28a239d016fd6cff0c59650e667b3158a9a0153c6e1d7674c199603bcf360d854ce7edce822eb7f7bb6
+"papaparse@npm:^5.6.0":
+  version: 5.6.0
+  resolution: "papaparse@npm:5.6.0"
+  checksum: 10c0/e7f338b86e4a37e828a75a3d5305aaa5132a460fa13cecc2157bfd8d3664a31fa86a52f012f945401180496d62d10c6dbd870b92a2b9abf6cf671793e406e670
   languageName: node
   linkType: hard
 
