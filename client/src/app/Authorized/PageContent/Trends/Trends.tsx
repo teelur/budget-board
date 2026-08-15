@@ -1,52 +1,19 @@
 import classes from "./Trends.module.css";
 
 import { Box, Group, Stack } from "@mantine/core";
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import NavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import SpendingTab from "./TransactionsTab/SpendingTab/SpendingTab";
-import SpendingCategoriesTab from "./TransactionsTab/SpendingCategoriesTab/SpendingCategoriesTab";
-import NetCashFlowTab from "./TransactionsTab/NetCashFlowTab/NetCashFlowTab";
-import AccountsAssetsTab from "./AccountsTab/AssetsTab/AssetsTab";
-import LiabilitiesTab from "./AccountsTab/LiabilitiesTab/LiabilitiesTab";
-import NetWorthTab from "./AccountsTab/NetWorthTab/NetWorthTab";
-import ValuesTab from "./AssetsTab/ValuesTab/ValuesTab";
-import FlowsTab from "./TransactionsTab/FlowsTab/FlowsTab";
-
-type TrendView =
-  | "spending"
-  | "spendingCategories"
-  | "netCashFlow"
-  | "flows"
-  | "accountAssets"
-  | "liabilities"
-  | "netWorth"
-  | "values";
 
 const Trends = (): React.ReactNode => {
   const { t } = useTranslation();
-  const [activeView, setActiveView] = useState<TrendView>("spending");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const renderContent = () => {
-    switch (activeView) {
-      case "spending":
-        return <SpendingTab />;
-      case "spendingCategories":
-        return <SpendingCategoriesTab />;
-      case "netCashFlow":
-        return <NetCashFlowTab />;
-      case "flows":
-        return <FlowsTab />;
-      case "accountAssets":
-        return <AccountsAssetsTab />;
-      case "liabilities":
-        return <LiabilitiesTab />;
-      case "netWorth":
-        return <NetWorthTab />;
-      case "values":
-        return <ValuesTab />;
-    }
+  const navigateToTrend = (path: string) => {
+    navigate(path);
   };
 
   return (
@@ -64,53 +31,53 @@ const Trends = (): React.ReactNode => {
           </DimmedText>
           <NavLink
             label={t("spending")}
-            active={activeView === "spending"}
-            onClick={() => setActiveView("spending")}
+            active={location.pathname.endsWith("/spending")}
+            onClick={() => navigateToTrend("spending")}
           />
           <NavLink
             label={t("spending_categories")}
-            active={activeView === "spendingCategories"}
-            onClick={() => setActiveView("spendingCategories")}
+            active={location.pathname.endsWith("/spending-categories")}
+            onClick={() => navigateToTrend("spending-categories")}
           />
           <NavLink
             label={t("net_cash_flow")}
-            active={activeView === "netCashFlow"}
-            onClick={() => setActiveView("netCashFlow")}
+            active={location.pathname.endsWith("/net-cash-flow")}
+            onClick={() => navigateToTrend("net-cash-flow")}
           />
           <NavLink
             label={t("flows")}
-            active={activeView === "flows"}
-            onClick={() => setActiveView("flows")}
+            active={location.pathname.endsWith("/flows")}
+            onClick={() => navigateToTrend("flows")}
           />
           <DimmedText size="xs" px="0.5rem" mt="xs">
             {t("accounts")}
           </DimmedText>
           <NavLink
             label={t("assets")}
-            active={activeView === "accountAssets"}
-            onClick={() => setActiveView("accountAssets")}
+            active={location.pathname.endsWith("/assets")}
+            onClick={() => navigateToTrend("assets")}
           />
           <NavLink
             label={t("liabilities")}
-            active={activeView === "liabilities"}
-            onClick={() => setActiveView("liabilities")}
+            active={location.pathname.endsWith("/liabilities")}
+            onClick={() => navigateToTrend("liabilities")}
           />
           <NavLink
             label={t("net_worth")}
-            active={activeView === "netWorth"}
-            onClick={() => setActiveView("netWorth")}
+            active={location.pathname.endsWith("/net-worth")}
+            onClick={() => navigateToTrend("net-worth")}
           />
           <DimmedText size="xs" px="0.5rem" mt="xs">
             {t("assets")}
           </DimmedText>
           <NavLink
             label={t("values")}
-            active={activeView === "values"}
-            onClick={() => setActiveView("values")}
+            active={location.pathname.endsWith("/values")}
+            onClick={() => navigateToTrend("values")}
           />
         </Stack>
         <Box w={{ base: "100%", sm: "auto" }} style={{ flex: 1, minWidth: 0 }}>
-          {renderContent()}
+          <Outlet />
         </Box>
       </Group>
     </Stack>

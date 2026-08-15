@@ -52,6 +52,31 @@ const BudgetsSettings = lazy(
 );
 const Goals = lazy(() => import("./Goals/Goals"));
 const Trends = lazy(() => import("./Trends/Trends"));
+const TrendsSpending = lazy(
+  () => import("./Trends/TransactionsTab/SpendingTab/SpendingTab"),
+);
+const TrendsSpendingCategories = lazy(
+  () =>
+    import("./Trends/TransactionsTab/SpendingCategoriesTab/SpendingCategoriesTab"),
+);
+const TrendsNetCashFlow = lazy(
+  () => import("./Trends/TransactionsTab/NetCashFlowTab/NetCashFlowTab"),
+);
+const TrendsFlows = lazy(
+  () => import("./Trends/TransactionsTab/FlowsTab/FlowsTab"),
+);
+const TrendsAssets = lazy(
+  () => import("./Trends/AccountsTab/AssetsTab/AssetsTab"),
+);
+const TrendsLiabilities = lazy(
+  () => import("./Trends/AccountsTab/LiabilitiesTab/LiabilitiesTab"),
+);
+const TrendsNetWorth = lazy(
+  () => import("./Trends/AccountsTab/NetWorthTab/NetWorthTab"),
+);
+const TrendsValues = lazy(
+  () => import("./Trends/AssetsTab/ValuesTab/ValuesTab"),
+);
 const ExternalAccounts = lazy(
   () => import("./ExternalAccounts/ExternalAccounts"),
 );
@@ -73,7 +98,7 @@ const PageContent = (): React.ReactNode => {
     <Stack
       h={"calc(100dvh - var(--app-shell-header-offset, 60px))"}
       justify="center"
-      align="center"
+      algn="center"
     >
       <LoadingScreen fullScreen={false} />
     </Stack>
@@ -152,7 +177,20 @@ const PageContent = (): React.ReactNode => {
               <Route path="settings" element={<BudgetsSettings />} />
             </Route>
             <Route path="/goals" element={<Goals />} />
-            <Route path="/trends" element={<Trends />} />
+            <Route path="/trends" element={<Trends />}>
+              <Route index element={<Navigate to="spending" replace />} />
+              <Route path="spending" element={<TrendsSpending />} />
+              <Route
+                path="spending-categories"
+                element={<TrendsSpendingCategories />}
+              />
+              <Route path="net-cash-flow" element={<TrendsNetCashFlow />} />
+              <Route path="flows" element={<TrendsFlows />} />
+              <Route path="assets" element={<TrendsAssets />} />
+              <Route path="liabilities" element={<TrendsLiabilities />} />
+              <Route path="net-worth" element={<TrendsNetWorth />} />
+              <Route path="values" element={<TrendsValues />} />
+            </Route>
             <Route path="/external-accounts" element={<ExternalAccounts />} />
             <Route path="/settings" element={<Settings />}>
               <Route index element={<Navigate to="user" replace />} />
