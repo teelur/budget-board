@@ -74,9 +74,9 @@ public class TransactionCategoriesHelpersTests
     }
 
     [Fact]
-    public void GetIsParentCategory_WhenCategoryHasNoChildren_ReturnsFalse()
+    public void GetIsParentCategory_WhenCategoryIsChild_ReturnsFalse()
     {
-        var result = TransactionCategoriesHelpers.GetIsParentCategory("Leaf", Categories);
+        var result = TransactionCategoriesHelpers.GetIsParentCategory("Child", Categories);
 
         result.Should().BeFalse();
     }

@@ -87,7 +87,9 @@ const ExportTransactionsModal = (): React.ReactNode => {
     useTransactionCategories();
   const institutionsQuery = useInstitutionsQuery();
   const isMobile = useIsMobile();
-  const transactionsQuery = useTransactionsQuery();
+  const transactionsQuery = useTransactionsQuery({
+    includeHiddenCategory: true,
+  });
 
   const accountLookup = React.useMemo<Record<string, string>>(() => {
     if (!institutionsQuery.data) {

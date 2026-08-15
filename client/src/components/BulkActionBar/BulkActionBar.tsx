@@ -67,7 +67,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const accountsQuery = useAccountsQuery();
   const updateTransactionsMutation = useUpdateTransactionsMutation();
   const deleteTransactionsMutation = useDeleteTransactionsMutation();
-  const transactionsQuery = useTransactionsQuery();
+  const transactionsQuery = useTransactionsQuery({
+    includeHiddenCategory: true,
+  });
 
   // Hold the bar element in state so the effect re-runs as soon as Mantine's
   // Transition renders it (which happens in a child render cycle, not the same
@@ -138,7 +140,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     selectedTransactions.length === 1 ? selectedTransactions[0] : null;
 
   const singleSelectedAccount = React.useMemo(() => {
-    if (!singleSelected) return null;
+    if (!singleSelected) {
+      return null;
+    }
     return (
       accountsQuery.data?.find((a) => a.id === singleSelected.accountID) ?? null
     );
