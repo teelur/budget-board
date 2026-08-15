@@ -61,10 +61,7 @@ internal static class TransactionCategoriesHelpers
         );
         if (foundCategory != null)
         {
-            return foundCategory.Parent.Equals(
-                string.Empty,
-                StringComparison.CurrentCultureIgnoreCase
-            );
+            return string.IsNullOrEmpty(foundCategory.Parent);
         }
         return false;
     }
