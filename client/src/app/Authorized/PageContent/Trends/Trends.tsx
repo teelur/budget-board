@@ -12,11 +12,13 @@ import AccountsAssetsTab from "./AccountsTab/AssetsTab/AssetsTab";
 import LiabilitiesTab from "./AccountsTab/LiabilitiesTab/LiabilitiesTab";
 import NetWorthTab from "./AccountsTab/NetWorthTab/NetWorthTab";
 import ValuesTab from "./AssetsTab/ValuesTab/ValuesTab";
+import FlowsTab from "./TransactionsTab/FlowsTab/FlowsTab";
 
 type TrendView =
   | "spending"
   | "spendingCategories"
   | "netCashFlow"
+  | "flows"
   | "accountAssets"
   | "liabilities"
   | "netWorth"
@@ -34,6 +36,8 @@ const Trends = (): React.ReactNode => {
         return <SpendingCategoriesTab />;
       case "netCashFlow":
         return <NetCashFlowTab />;
+      case "flows":
+        return <FlowsTab />;
       case "accountAssets":
         return <AccountsAssetsTab />;
       case "liabilities":
@@ -72,6 +76,11 @@ const Trends = (): React.ReactNode => {
             label={t("net_cash_flow")}
             active={activeView === "netCashFlow"}
             onClick={() => setActiveView("netCashFlow")}
+          />
+          <NavLink
+            label={t("flows")}
+            active={activeView === "flows"}
+            onClick={() => setActiveView("flows")}
           />
           <DimmedText size="xs" px="0.5rem" mt="xs">
             {t("accounts")}
