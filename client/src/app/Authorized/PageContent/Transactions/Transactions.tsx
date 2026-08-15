@@ -28,6 +28,20 @@ const Transactions = (): React.ReactNode => {
     ITransaction[]
   >([]);
 
+  React.useEffect(() => {
+    const currentViewIds = new Set(
+      currentViewTransactions.map((transaction) => transaction.id),
+    );
+
+    setSelectedIds((prev) => {
+      const next = new Set(
+        [...prev].filter((transactionId) => currentViewIds.has(transactionId)),
+      );
+
+      return next.size === prev.size ? prev : next;
+    });
+  }, [currentViewTransactions]);
+
   const onToggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
