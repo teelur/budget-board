@@ -22,8 +22,6 @@ import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransaction
 import { useNavigate } from "react-router";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import { Filters, ITransaction } from "~/models/transaction";
-import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
-import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import {
   buildTimeToMonthlyTotalsMap,
   getFilteredTransactions,
@@ -36,9 +34,9 @@ interface TransactionsHeaderProps {
   setSort: (newSort: Sorts) => void;
   sortDirection: SortDirection;
   setSortDirection: (newSortDirection: SortDirection) => void;
-  setCurrentViewTransactions: React.Dispatch<
-    React.SetStateAction<ITransaction[]>
-  >;
+  setCurrentViewTransactions: (transactions: ITransaction[]) => void;
+  transactions: ITransaction[];
+  isQueryPending: boolean;
   selectedMonths: Date[];
   setSelectedMonths: React.Dispatch<React.SetStateAction<Date[]>>;
 }
@@ -51,27 +49,19 @@ const TransactionsHeader = (
   const { t } = useTranslation();
   const { transactionFilters, isFiltersPanelOpen, toggleFiltersPanel } =
     useTransactionFilters();
-  const { dayjs } = useLocale();
   const { allTransactionCategories } = useTransactionCategories();
-  const transactionsQuery = useTransactionsQuery({
-    selectedDates: props.selectedMonths.map((date) => ({
-      month: dayjs(date).month() + 1,
-      year: dayjs(date).year(),
-    })),
-    includeHiddenCategory: true,
-  });
   const timeToMonthlyTotalsMap = React.useMemo(
-    () =>
-      buildTimeToMonthlyTotalsMap(
-        props.selectedMonths,
-        transactionsQuery.data ?? [],
-      ),
-    [props.selectedMonths, transactionsQuery.data],
+    () => buildTimeToMonthlyTotalsMap(props.selectedMonths, props.transactions),
+    [props.selectedMonths, props.transactions],
   );
 
   React.useEffect(() => {
+    if (props.isQueryPending) {
+      return;
+    }
+
     const filteredTransactions = getFilteredTransactions(
-      transactionsQuery.data ?? [],
+      props.transactions,
       transactionFilters ?? new Filters(),
       allTransactionCategories,
     );
@@ -84,7 +74,8 @@ const TransactionsHeader = (
 
     props.setCurrentViewTransactions(sortedFilteredTransactions);
   }, [
-    transactionsQuery.data,
+    props.transactions,
+    props.isQueryPending,
     transactionFilters,
     allTransactionCategories,
     props.sort,
@@ -128,7 +119,7 @@ const TransactionsHeader = (
         selectedDates={props.selectedMonths}
         setSelectedDates={props.setSelectedMonths}
         timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
-        isPending={transactionsQuery.isPending}
+        isPending={props.isQueryPending}
         allowSelectMultiple
       />
     </Stack>

@@ -6,6 +6,7 @@ import React from "react";
 import { SortDirection } from "~/components/SortButton";
 import { Sorts } from "./TransactionsHeader/SortMenu/SortMenuHelpers";
 import TransactionCards from "./TransactionCards/TransactionCards";
+import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import BulkActionBar from "../../../../components/BulkActionBar/BulkActionBar";
 import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -24,9 +25,24 @@ const Transactions = (): React.ReactNode => {
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
     dayjs().startOf("month").toDate(),
   ]);
+  const transactionsQuery = useTransactionsQuery({
+    selectedDates: selectedMonths.map((date) => ({
+      month: dayjs(date).month() + 1,
+      year: dayjs(date).year(),
+    })),
+    includeHiddenCategory: true,
+  });
+  const [isViewUpdatePending, startViewUpdate] = React.useTransition();
   const [currentViewTransactions, setCurrentViewTransactions] = React.useState<
     ITransaction[]
   >([]);
+
+  const updateCurrentViewTransactions = React.useCallback(
+    (transactions: ITransaction[]) => {
+      startViewUpdate(() => setCurrentViewTransactions(transactions));
+    },
+    [],
+  );
 
   React.useEffect(() => {
     const currentViewIds = new Set(
@@ -65,13 +81,16 @@ const Transactions = (): React.ReactNode => {
         setSort={setSort}
         sortDirection={sortDirection}
         setSortDirection={setSortDirection}
-        setCurrentViewTransactions={setCurrentViewTransactions}
+        setCurrentViewTransactions={updateCurrentViewTransactions}
+        transactions={transactionsQuery.data ?? []}
+        isQueryPending={transactionsQuery.isPending}
         selectedMonths={selectedMonths}
         setSelectedMonths={setSelectedMonths}
       />
       <TransactionCards
         currentViewTransactions={currentViewTransactions}
-        isQueryPending={false}
+        isQueryPending={transactionsQuery.isPending}
+        isViewUpdatePending={isViewUpdatePending}
         selectedIds={selectedIds}
         onToggleSelect={onToggleSelect}
       />

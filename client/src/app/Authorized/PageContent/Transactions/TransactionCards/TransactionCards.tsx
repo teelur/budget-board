@@ -1,7 +1,7 @@
 import React from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ITransaction } from "~/models/transaction";
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Loader, Skeleton, Stack } from "@mantine/core";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
@@ -14,6 +14,7 @@ interface TransactionCardsProps {
   isQueryPending: boolean;
   selectedIds: Set<string>;
   onToggleSelect: (id: string) => void;
+  isViewUpdatePending: boolean;
 }
 
 const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
@@ -29,16 +30,25 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
     getItemKey: (index) => props.currentViewTransactions[index]?.id ?? index,
     overscan: 5,
   });
+  const hasTransactions = props.currentViewTransactions.length > 0;
+  const isListPending = props.isQueryPending || props.isViewUpdatePending;
 
   return (
     <Stack gap="0.5rem" className={classes.container}>
-      {props.isQueryPending ? (
+      {props.isQueryPending && !hasTransactions ? (
         Array.from({ length: skeletonCount }).map((_, index) => (
           <Skeleton key={index} height={40} radius="md" />
         ))
       ) : (
-        <div ref={viewportRef} className={classes.viewport}>
-          {props.currentViewTransactions.length > 0 ? (
+        <div
+          ref={viewportRef}
+          className={classes.viewport}
+          aria-busy={isListPending}
+        >
+          <div className={classes.loadingRow} aria-hidden={!isListPending}>
+            {isListPending && <Loader size="sm" />}
+          </div>
+          {hasTransactions ? (
             <div
               className={classes.virtualList}
               style={{ height: virtualizer.getTotalSize() }}

@@ -5,6 +5,7 @@
 }
 
 .viewport {
+  position: relative;
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -12,6 +13,23 @@
   padding-inline-end: 0.75rem;
   box-sizing: border-box;
   scrollbar-gutter: stable;
+}
+
+.loadingRow {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5rem;
+  box-sizing: border-box;
+  background-color: var(--background-color-base);
+  pointer-events: none;
+}
+
+.loadingRow[aria-hidden="true"] {
+  visibility: hidden;
 }
 
 .virtualList {
