@@ -45,9 +45,11 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
           className={classes.viewport}
           aria-busy={isListPending}
         >
-          <div className={classes.loadingRow} aria-hidden={!isListPending}>
-            {isListPending && <Loader size="sm" />}
-          </div>
+          {isListPending && (
+            <div className={classes.loadingRow} aria-hidden="true">
+              <Loader size="sm" />
+            </div>
+          )}
           {hasTransactions ? (
             <div
               className={classes.virtualList}
