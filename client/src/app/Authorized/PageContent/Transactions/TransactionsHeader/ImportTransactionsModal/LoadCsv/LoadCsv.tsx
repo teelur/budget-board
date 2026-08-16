@@ -62,7 +62,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
   const loadCsv = async (
     file: File,
-    delimiter: string | null
+    delimiter: string | null,
   ): Promise<boolean> => {
     try {
       const delimitersToGuess = [
@@ -88,7 +88,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       // Display any errors that occurred during parsing.
       if (parsedText.errors.length > 0) {
         const uniqueErrorMessages = Array.from(
-          new Set(parsedText.errors.map((error) => error.message))
+          new Set(parsedText.errors.map((error) => error.message)),
         );
 
         uniqueErrorMessages.forEach((errorMessage) => {
@@ -110,7 +110,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
       props.loadCsv(
         parsedText.meta.fields ?? [],
-        parsedText.data.map((row: any, idx: number) => ({ ...row, uid: idx }))
+        parsedText.data.map((row: any, idx: number) => ({ ...row, uid: idx })),
       );
       return true;
     } catch (error) {
@@ -123,7 +123,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="0.5rem" w={600} maw="100%">
+    <Stack gap="0.5rem" w={600} maw="100%" mx="auto">
       <LoadingOverlay visible={isPending} />
       <FileInput
         {...fileField.getInputProps()}

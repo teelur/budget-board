@@ -14,6 +14,7 @@ import { TransactionCategoryProvider } from "~/providers/TransactionCategoryProv
 import { AccountTypeProvider } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { AssetTypeProvider } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { TransactionImportJobProvider } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
+import TransactionImportJobPanel from "~/components/TransactionImportJobPanel/TransactionImportJobPanel";
 
 const Authorized = (): React.ReactNode => {
   const [isNavbarOpen, { toggle, close }] = useDisclosure();
@@ -60,6 +61,7 @@ const Authorized = (): React.ReactNode => {
               <TransactionFiltersProvider>
                 <TransactionImportJobProvider>
                   <PageContent />
+                  <TransactionImportJobPanel />
                 </TransactionImportJobProvider>
               </TransactionFiltersProvider>
             </TransactionCategoryProvider>

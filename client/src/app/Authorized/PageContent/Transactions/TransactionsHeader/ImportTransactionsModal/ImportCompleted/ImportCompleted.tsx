@@ -7,18 +7,31 @@ interface ImportCompletedProps {
   goBackToPreviousDialog: () => void;
   closeModal: () => void;
   hasErrors?: boolean;
+  isCancelled?: boolean;
+  isFailed?: boolean;
 }
 
 const ImportCompleted = (props: ImportCompletedProps) => {
   const { t } = useTranslation();
 
   return (
-    <Stack justify="center" align="center" gap="0.5rem" w={600} maw="100%">
+    <Stack
+      justify="center"
+      align="center"
+      gap="0.5rem"
+      w={600}
+      maw="100%"
+      mx="auto"
+    >
       <PrimaryText size="md" py="1rem">
         {t(
-          props.hasErrors
-            ? "import_completed_with_errors"
-            : "import_completed_successfully",
+          props.isCancelled
+            ? "import_cancelled"
+            : props.isFailed
+              ? "import_failed"
+              : props.hasErrors
+                ? "import_completed_with_errors"
+                : "import_completed_successfully",
         )}
       </PrimaryText>
       <Group w="100%">

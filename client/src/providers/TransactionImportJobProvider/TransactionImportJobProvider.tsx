@@ -7,6 +7,7 @@ import {
   accountsQueryKey,
   balancesQueryKey,
   institutionsQueryKey,
+  transactionImportJobQueryKey,
   transactionsQueryKey,
 } from "~/helpers/requests";
 import { ITransactionImportJobResponse } from "~/models/transaction";
@@ -14,6 +15,7 @@ import {
   transactionImportJobTerminalStatuses,
   useTransactionImportJobQuery,
 } from "~/hooks/queries/useTransactionImportJobQuery";
+import { useCancelTransactionImportJobMutation } from "~/hooks/mutations/transactions/useCancelTransactionImportJobMutation";
 
 const transactionImportJobStorageKey = "budget-board:transaction-import-job";
 
@@ -21,7 +23,10 @@ interface TransactionImportJobContextValue {
   activeJobId: string | null;
   job: ITransactionImportJobResponse | undefined;
   isLoading: boolean;
+  isCancelling: boolean;
   startImport: (jobId: string) => void;
+  cancelImport: () => Promise<void>;
+  dismissImport: () => void;
 }
 
 export const TransactionImportJobContext =
@@ -54,6 +59,7 @@ export const TransactionImportJobProvider = ({
   const [completedJob, setCompletedJob] = React.useState<
     ITransactionImportJobResponse | undefined
   >();
+  const cancelImportMutation = useCancelTransactionImportJobMutation();
   const handledJobId = React.useRef<string | null>(null);
   const activeJobIdRef = React.useRef(activeJobId);
   const importJobQuery = useTransactionImportJobQuery(activeJobId);
@@ -84,17 +90,6 @@ export const TransactionImportJobProvider = ({
 
     handledJobId.current = importJob.id;
 
-    if (importJob.status === "Failed") {
-      setCompletedJob(importJob);
-      removeStoredJobId();
-      setActiveJobId(null);
-      notifications.show({
-        color: "var(--button-color-destructive)",
-        message: t("import_failed"),
-      });
-      return;
-    }
-
     void Promise.all([
       queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] }),
       queryClient.invalidateQueries({ queryKey: [balancesQueryKey] }),
@@ -109,11 +104,20 @@ export const TransactionImportJobProvider = ({
       removeStoredJobId();
       setActiveJobId(null);
       notifications.show({
-        color: "var(--button-color-success)",
+        color:
+          importJob.status === "Failed"
+            ? "var(--button-color-destructive)"
+            : importJob.status === "Cancelled"
+              ? "var(--button-color-warning)"
+              : "var(--button-color-success)",
         message: t(
-          importJob.status === "CompletedWithErrors"
-            ? "import_completed_with_errors"
-            : "import_completed_successfully",
+          importJob.status === "Failed"
+            ? "import_failed"
+            : importJob.status === "Cancelled"
+              ? "import_cancelled"
+              : importJob.status === "CompletedWithErrors"
+                ? "import_completed_with_errors"
+                : "import_completed_successfully",
         ),
       });
     });
@@ -126,11 +130,35 @@ export const TransactionImportJobProvider = ({
     setActiveJobId(jobId);
   };
 
+  const cancelImport = async () => {
+    if (!activeJobId) {
+      return;
+    }
+
+    const response = await cancelImportMutation.mutateAsync(activeJobId);
+    queryClient.setQueryData(
+      [transactionImportJobQueryKey, activeJobId],
+      response.data as ITransactionImportJobResponse,
+    );
+  };
+
+  const dismissImport = () => {
+    setCompletedJob(undefined);
+    if (activeJobId === null) {
+      queryClient.removeQueries({
+        queryKey: [transactionImportJobQueryKey],
+      });
+    }
+  };
+
   const value = {
     activeJobId,
     job: importJobQuery.data ?? completedJob,
     isLoading: activeJobId !== null && importJobQuery.isPending,
+    isCancelling: cancelImportMutation.isPending,
     startImport,
+    cancelImport,
+    dismissImport,
   };
 
   return (

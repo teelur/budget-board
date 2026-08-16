@@ -30,6 +30,7 @@ export interface ITransactionImportJobResponse {
   failedCount: number;
   progressPercentage: number;
   errorMessage: string | null;
+  cancellationRequested: boolean;
   createdAt: string;
   startedAt: string | null;
   completedAt: string | null;

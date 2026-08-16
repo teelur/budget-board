@@ -26,7 +26,15 @@ const ImportTransactionsModal = () => {
 
   const { t } = useTranslation();
   const importTransactionsMutation = useImportTransactionsMutation();
-  const { job, isLoading, startImport } = useTransactionImportJob();
+  const {
+    activeJobId,
+    job,
+    isLoading,
+    isCancelling,
+    startImport,
+    cancelImport,
+  } = useTransactionImportJob();
+  const trackedJobId = React.useRef<string | null>(null);
 
   // Load CSV Dialog Data
   const [headers, setHeaders] = React.useState<string[]>([]);
@@ -51,7 +59,12 @@ const ImportTransactionsModal = () => {
   };
 
   React.useEffect(() => {
-    if (job?.status === "Completed" || job?.status === "CompletedWithErrors") {
+    if (
+      trackedJobId.current === job?.id &&
+      ["Completed", "CompletedWithErrors", "Failed", "Cancelled"].includes(
+        job.status,
+      )
+    ) {
       setActiveStep(4);
     }
   }, [job]);
@@ -147,7 +160,13 @@ const ImportTransactionsModal = () => {
         rightSection={<FileDownIcon size="1rem" />}
         onClick={() => {
           resetData();
-          setActiveStep(0);
+          if (activeJobId && job?.id === activeJobId) {
+            trackedJobId.current = activeJobId;
+            setActiveStep(3);
+          } else {
+            trackedJobId.current = null;
+            setActiveStep(0);
+          }
           open();
         }}
       >
@@ -200,13 +219,23 @@ const ImportTransactionsModal = () => {
             label={t("step_4")}
             description={t("import_progress_step")}
           >
-            <ImportProgress job={job} isLoading={isLoading} />
+            <ImportProgress
+              job={job}
+              isLoading={isLoading}
+              isCancelling={isCancelling}
+              onCancel={async () => {
+                await cancelImport();
+                close();
+              }}
+            />
           </Stepper.Step>
           <Stepper.Completed>
             <ImportCompleted
               goBackToPreviousDialog={() => setActiveStep(2)}
               closeModal={close}
               hasErrors={job?.status === "CompletedWithErrors"}
+              isCancelled={job?.status === "Cancelled"}
+              isFailed={job?.status === "Failed"}
             />
           </Stepper.Completed>
         </Stepper>

@@ -7,6 +7,7 @@ export const transactionImportJobTerminalStatuses = [
   "Completed",
   "CompletedWithErrors",
   "Failed",
+  "Cancelled",
 ] as const;
 
 export const useTransactionImportJobQuery = (jobId: string | null) => {
