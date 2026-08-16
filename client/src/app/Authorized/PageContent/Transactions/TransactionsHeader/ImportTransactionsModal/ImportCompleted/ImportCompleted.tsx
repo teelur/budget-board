@@ -6,6 +6,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 interface ImportCompletedProps {
   goBackToPreviousDialog: () => void;
   closeModal: () => void;
+  hasErrors?: boolean;
 }
 
 const ImportCompleted = (props: ImportCompletedProps) => {
@@ -14,7 +15,11 @@ const ImportCompleted = (props: ImportCompletedProps) => {
   return (
     <Stack justify="center" align="center" gap="0.5rem" w={600} maw="100%">
       <PrimaryText size="md" py="1rem">
-        {t("import_completed_successfully")}
+        {t(
+          props.hasErrors
+            ? "import_completed_with_errors"
+            : "import_completed_successfully",
+        )}
       </PrimaryText>
       <Group w="100%">
         <Button

@@ -17,6 +17,8 @@ import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useImportTransactionsMutation } from "~/hooks/mutations/transactions/useImportTransactionsMutation";
+import ImportProgress from "./ImportProgress/ImportProgress";
+import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -24,6 +26,7 @@ const ImportTransactionsModal = () => {
 
   const { t } = useTranslation();
   const importTransactionsMutation = useImportTransactionsMutation();
+  const { job, isLoading, startImport } = useTransactionImportJob();
 
   // Load CSV Dialog Data
   const [headers, setHeaders] = React.useState<string[]>([]);
@@ -46,6 +49,12 @@ const ImportTransactionsModal = () => {
 
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
+
+  React.useEffect(() => {
+    if (job?.status === "Completed" || job?.status === "CompletedWithErrors") {
+      setActiveStep(4);
+    }
+  }, [job]);
 
   /**
    * Handle CSV import data from the file loader component.
@@ -117,7 +126,10 @@ const ImportTransactionsModal = () => {
     };
 
     importTransactionsMutation.mutate(transactionImportRequest, {
-      onSuccess: () => setActiveStep(3),
+      onSuccess: (response) => {
+        startImport(response.data.id);
+        setActiveStep(3);
+      },
     });
   };
 
@@ -184,10 +196,17 @@ const ImportTransactionsModal = () => {
               isSubmitting={importTransactionsMutation.isPending}
             />
           </Stepper.Step>
+          <Stepper.Step
+            label={t("step_4")}
+            description={t("import_progress_step")}
+          >
+            <ImportProgress job={job} isLoading={isLoading} />
+          </Stepper.Step>
           <Stepper.Completed>
             <ImportCompleted
               goBackToPreviousDialog={() => setActiveStep(2)}
               closeModal={close}
+              hasErrors={job?.status === "CompletedWithErrors"}
             />
           </Stepper.Completed>
         </Stepper>

@@ -1,18 +1,11 @@
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import {
-  accountsQueryKey,
-  balancesQueryKey,
-  institutionsQueryKey,
-  transactionsQueryKey,
-  translateAxiosError,
-} from "~/helpers/requests";
+import { translateAxiosError } from "~/helpers/requests";
 import { ITransactionImportRequest } from "~/models/transaction";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 export const useImportTransactionsMutation = () => {
-  const queryClient = useQueryClient();
   const { request } = useAuth();
 
   return useMutation({
@@ -21,13 +14,10 @@ export const useImportTransactionsMutation = () => {
         url: "/api/transaction/import",
         method: "POST",
         data: importedTransactions,
+        headers: {
+          "Idempotency-Key": crypto.randomUUID(),
+        },
       }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [balancesQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
-      await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
-    },
     onError: (error: AxiosError) => {
       notifications.show({
         color: "var(--button-color-destructive)",
