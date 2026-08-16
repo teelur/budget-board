@@ -138,7 +138,12 @@ const FlowsChartTooltip = ({
         ]
       : []),
     ...(parentValue > 0
-      ? [{ label: labels.percentOfBranch, value: formatPercent(value, parentValue) }]
+      ? [
+          {
+            label: labels.percentOfBranch,
+            value: formatPercent(value, parentValue),
+          },
+        ]
       : []),
   ];
   const hasTransactionCount =
@@ -155,17 +160,27 @@ const FlowsChartTooltip = ({
         )}
         {isLink ? (
           <Stack className={classes.route} gap="0.25rem">
-            <DimmedText className={classes.routeLabel}>{labels.from}</DimmedText>
-            <PrimaryText className={classes.routeValue}>{sourceName}</PrimaryText>
+            <DimmedText className={classes.routeLabel}>
+              {labels.from}
+            </DimmedText>
+            <PrimaryText className={classes.routeValue}>
+              {sourceName}
+            </PrimaryText>
             <DimmedText className={classes.routeLabel}>{labels.to}</DimmedText>
-            <PrimaryText className={classes.routeValue}>{targetName}</PrimaryText>
+            <PrimaryText className={classes.routeValue}>
+              {targetName}
+            </PrimaryText>
           </Stack>
         ) : (
           <PrimaryText className={classes.nodeName}>{item.name}</PrimaryText>
         )}
         <div className={classes.amountBlock}>
-          <DimmedText className={classes.amountLabel}>{labels.amount}</DimmedText>
-          <PrimaryText className={classes.amount}>{valueFormatter(value)}</PrimaryText>
+          <DimmedText className={classes.amountLabel}>
+            {labels.amount}
+          </DimmedText>
+          <PrimaryText className={classes.amount}>
+            {valueFormatter(value)}
+          </PrimaryText>
         </div>
         {(percentageMetrics.length > 0 || hasTransactionCount) && (
           <div className={classes.metrics}>
@@ -173,8 +188,12 @@ const FlowsChartTooltip = ({
               const numericPercent = Number.parseFloat(metric.value);
               return (
                 <div className={classes.metric} key={metric.label}>
-                  <DimmedText className={classes.metricLabel}>{metric.label}</DimmedText>
-                  <PrimaryText className={classes.metricValue}>{metric.value}</PrimaryText>
+                  <DimmedText className={classes.metricLabel}>
+                    {metric.label}
+                  </DimmedText>
+                  <PrimaryText className={classes.metricValue}>
+                    {metric.value}
+                  </PrimaryText>
                   <div className={classes.progressTrack}>
                     <div
                       className={classes.progressBar}
@@ -186,7 +205,9 @@ const FlowsChartTooltip = ({
             })}
             {hasTransactionCount && (
               <div className={`${classes.metric} ${classes.transactionCount}`}>
-                <DimmedText className={classes.metricLabel}>{labels.transactions}</DimmedText>
+                <DimmedText className={classes.metricLabel}>
+                  {labels.transactions}
+                </DimmedText>
                 <PrimaryText className={classes.metricValue}>
                   {metadata.transactionCount}
                 </PrimaryText>
