@@ -36,6 +36,10 @@ export interface IAccountsWidgetConfiguration {
   accountIds: string[];
 }
 
+export interface IFlowsWidgetConfiguration {
+  monthCount: number;
+}
+
 export interface INetWorthWidgetConfiguration {
   groups: Array<INetWorthWidgetGroup>;
 }

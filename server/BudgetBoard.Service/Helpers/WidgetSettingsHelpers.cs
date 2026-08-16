@@ -67,6 +67,15 @@ public static class WidgetSettingsHelpers
             SmY: 30,
             SmH: 6
         ),
+        new DefaultWidgetLayout(
+            WidgetTypes.Flows,
+            LgX: 0,
+            LgY: 33,
+            LgW: 12,
+            LgH: 24,
+            SmY: 63,
+            SmH: 24
+        ),
     ];
 
     /// <summary>
