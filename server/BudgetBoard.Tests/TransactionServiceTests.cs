@@ -1827,6 +1827,14 @@ public class TransactionServiceTests
                     MerchantName = "New transaction",
                     Account = "bongus",
                 },
+                new TransactionImport
+                {
+                    ID = newTransactionID,
+                    Amount = 20m,
+                    Date = new DateOnly(2026, 8, 19),
+                    MerchantName = "Duplicate new transaction",
+                    Account = "missing account mapping",
+                },
             ],
             AccountNameToIDMap = [new() { AccountName = "bongus", AccountID = account.ID }],
         };

@@ -343,15 +343,14 @@ public class TransactionService(
     {
         var userData = await GetCurrentUserAsync(userGuid);
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+        var transactionIds = userData
+            .Accounts.SelectMany(account => account.Transactions)
+            .Select(transaction => transaction.ID)
+            .ToHashSet();
 
         foreach (var transaction in request.Transactions)
         {
-            if (
-                transaction.ID is Guid transactionID
-                && userData
-                    .Accounts.SelectMany(account => account.Transactions)
-                    .Any(existingTransaction => existingTransaction.ID == transactionID)
-            )
+            if (transaction.ID is Guid transactionID && !transactionIds.Add(transactionID))
             {
                 continue;
             }
