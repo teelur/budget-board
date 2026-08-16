@@ -1,0 +1,125 @@
+.tooltip {
+  width: min(18rem, calc(100vw - 2rem));
+  overflow: hidden;
+  border-top: 3px solid var(--mantine-color-gray-5);
+}
+
+.income {
+  border-top-color: var(--mantine-color-green-6);
+}
+
+.expense {
+  border-top-color: var(--mantine-color-orange-6);
+}
+
+.surplus {
+  border-top-color: var(--mantine-color-blue-6);
+}
+
+.deficit {
+  border-top-color: var(--mantine-color-red-6);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.flowLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.route {
+  display: grid;
+  gap: 0.25rem;
+  border-left: 2px solid var(--base-color-border);
+  padding-left: 0.625rem;
+}
+
+.routeLabel {
+  font-size: 0.6875rem;
+  line-height: 1.1;
+}
+
+.routeValue,
+.nodeName {
+  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+.amountBlock {
+  display: grid;
+  gap: 0.125rem;
+  border-top: 1px solid var(--base-color-border);
+  padding-top: 0.625rem;
+}
+
+.amountLabel {
+  font-size: 0.6875rem;
+  line-height: 1.1;
+}
+
+.amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  border-top: 1px solid var(--base-color-border);
+  padding-top: 0.625rem;
+}
+
+.metric {
+  display: grid;
+  min-width: 0;
+  gap: 0.25rem;
+}
+
+.metricLabel {
+  overflow-wrap: anywhere;
+  font-size: 0.6875rem;
+  line-height: 1.15;
+}
+
+.metricValue {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.progressTrack {
+  height: 0.3rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--base-color-border);
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--mantine-primary-color-filled);
+}
+
+.income .progressBar {
+  background: var(--mantine-color-green-6);
+}
+
+.expense .progressBar {
+  background: var(--mantine-color-orange-6);
+}
+
+.transactionCount {
+  align-content: start;
+}

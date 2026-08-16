@@ -194,9 +194,31 @@ export const buildSpendingSubcategoryChartData = (
   return result;
 };
 
+export type FlowType = "income" | "expense" | "surplus" | "deficit";
+
+export interface FlowsChartNode {
+  name: string;
+  color?: string;
+  flowType?: FlowType;
+  parentName?: string;
+  transactionCount?: number;
+  [key: string]: unknown;
+}
+
+export interface FlowsChartLink {
+  source: number;
+  target: number;
+  value: number;
+  transactionCount?: number;
+  flowType?: FlowType;
+  [key: string]: unknown;
+}
+
 export interface FlowsChartData {
-  nodes: { name: string; color?: string }[];
-  links: { source: number; target: number; value: number }[];
+  nodes: FlowsChartNode[];
+  links: FlowsChartLink[];
+  totalIncome: number;
+  totalSpending: number;
 }
 
 interface FlowsChartLabels {
@@ -222,10 +244,20 @@ export const buildFlowsChartData = (
   const nodeIndexes = new Map<string, number>();
   const links = new Map<
     string,
-    { source: string; target: string; value: number }
+    {
+      source: string;
+      target: string;
+      value: number;
+      transactionCount: number;
+      flowType?: FlowType;
+    }
   >();
   const nodeLayers = new Map<string, number>();
   const nodeGroups = new Map<string, string>();
+  const nodeMetadata = new Map<
+    string,
+    { flowType?: FlowType; parentName?: string; transactionCount?: number }
+  >();
   const transferCategoryName =
     categories.find(
       (category) =>
@@ -234,9 +266,14 @@ export const buildFlowsChartData = (
   let incomeTotal = 0;
   let expenseTotal = 0;
   const transferChildNets = new Map<string, number>();
+  const transferChildCounts = new Map<string, number>();
   const categoryFlowNets = new Map<
     string,
-    { parentName: string; leafNets: Map<string, number> }
+    {
+      parentName: string;
+      leafNets: Map<string, number>;
+      leafCounts: Map<string, number>;
+    }
   >();
 
   const addNode = (name: string): string => {
@@ -247,7 +284,13 @@ export const buildFlowsChartData = (
     return name;
   };
 
-  const addLink = (source: string, target: string, value: number) => {
+  const addLink = (
+    source: string,
+    target: string,
+    value: number,
+    transactionCount = 0,
+    flowType?: FlowType,
+  ) => {
     if (source === target || value <= 0) {
       return;
     }
@@ -258,15 +301,28 @@ export const buildFlowsChartData = (
     const existing = links.get(key);
     if (existing) {
       existing.value += value;
+      existing.transactionCount += transactionCount;
     } else {
-      links.set(key, { source, target, value });
+      links.set(key, { source, target, value, transactionCount, flowType });
     }
   };
 
-  const markNode = (name: string, layer: number, group?: string) => {
+  const markNode = (
+    name: string,
+    layer: number,
+    group?: string,
+    metadata?: {
+      flowType?: FlowType;
+      parentName?: string;
+      transactionCount?: number;
+    },
+  ) => {
     addNode(name);
     nodeLayers.set(name, layer);
     nodeGroups.set(name, group ?? name);
+    if (metadata) {
+      nodeMetadata.set(name, metadata);
+    }
   };
 
   transactions.forEach((transaction) => {
@@ -320,6 +376,10 @@ export const buildFlowsChartData = (
         transferChildName,
         (transferChildNets.get(transferChildName) ?? 0) + transaction.amount,
       );
+      transferChildCounts.set(
+        transferChildName,
+        (transferChildCounts.get(transferChildName) ?? 0) + 1,
+      );
       return;
     }
     const leafName = transaction.subcategory
@@ -334,15 +394,20 @@ export const buildFlowsChartData = (
     const categoryFlow = categoryFlowNets.get(parentName) ?? {
       parentName,
       leafNets: new Map<string, number>(),
+      leafCounts: new Map<string, number>(),
     };
     categoryFlow.leafNets.set(
       leafName,
       (categoryFlow.leafNets.get(leafName) ?? 0) + transaction.amount,
     );
+    categoryFlow.leafCounts.set(
+      leafName,
+      (categoryFlow.leafCounts.get(leafName) ?? 0) + 1,
+    );
     categoryFlowNets.set(parentName, categoryFlow);
   });
 
-  categoryFlowNets.forEach(({ parentName, leafNets }) => {
+  categoryFlowNets.forEach(({ parentName, leafNets, leafCounts }) => {
     const positiveChildren = [...leafNets.entries()].filter(
       ([, net]) => net > 0,
     );
@@ -359,15 +424,33 @@ export const buildFlowsChartData = (
         (total, [, net]) => total + net,
         0,
       );
+      const branchTransactionCount = positiveChildren.reduce(
+        (total, [leafName]) => total + (leafCounts.get(leafName) ?? 0),
+        0,
+      );
 
       incomeTotal += branchTotal;
-      markNode(branchName, 1);
+      markNode(branchName, 1, undefined, {
+        flowType: "income",
+        transactionCount: branchTransactionCount,
+      });
       markNode(labels.cashAvailable, 2);
       positiveChildren.forEach(([leafName, net]) => {
-        markNode(leafName, 0, branchName);
-        addLink(leafName, branchName, net);
+        const transactionCount = leafCounts.get(leafName) ?? 0;
+        markNode(leafName, 0, branchName, {
+          flowType: "income",
+          parentName: branchName,
+          transactionCount,
+        });
+        addLink(leafName, branchName, net, transactionCount, "income");
       });
-      addLink(branchName, labels.cashAvailable, branchTotal);
+      addLink(
+        branchName,
+        labels.cashAvailable,
+        branchTotal,
+        branchTransactionCount,
+        "income",
+      );
     }
 
     if (negativeChildren.length > 0) {
@@ -379,15 +462,39 @@ export const buildFlowsChartData = (
         (total, [, net]) => total + Math.abs(net),
         0,
       );
+      const branchTransactionCount = negativeChildren.reduce(
+        (total, [leafName]) => total + (leafCounts.get(leafName) ?? 0),
+        0,
+      );
 
       expenseTotal += branchTotal;
       markNode(labels.cashAvailable, 2);
-      markNode(branchName, 3);
-      negativeChildren.forEach(([leafName, net]) => {
-        markNode(leafName, 4, branchName);
-        addLink(branchName, leafName, Math.abs(net));
+      markNode(branchName, 3, undefined, {
+        flowType: "expense",
+        transactionCount: branchTransactionCount,
       });
-      addLink(labels.cashAvailable, branchName, branchTotal);
+      negativeChildren.forEach(([leafName, net]) => {
+        const transactionCount = leafCounts.get(leafName) ?? 0;
+        markNode(leafName, 4, branchName, {
+          flowType: "expense",
+          parentName: branchName,
+          transactionCount,
+        });
+        addLink(
+          branchName,
+          leafName,
+          Math.abs(net),
+          transactionCount,
+          "expense",
+        );
+      });
+      addLink(
+        labels.cashAvailable,
+        branchName,
+        branchTotal,
+        branchTransactionCount,
+        "expense",
+      );
     }
   });
 
@@ -403,32 +510,83 @@ export const buildFlowsChartData = (
         ? `${childName} (${labels.total})`
         : childName;
     const absoluteNet = Math.abs(net);
+    const transactionCount = transferChildCounts.get(childName) ?? 0;
 
     if (net > 0) {
       incomeTotal += net;
-      markNode(transferIncomeParent, 1);
-      markNode(transferChildTotalName, 0, transferIncomeParent);
+      markNode(transferIncomeParent, 1, undefined, {
+        flowType: "income",
+        transactionCount,
+      });
+      markNode(transferChildTotalName, 0, transferIncomeParent, {
+        flowType: "income",
+        parentName: transferIncomeParent,
+        transactionCount,
+      });
       markNode(labels.cashAvailable, 2);
-      addLink(transferChildTotalName, transferIncomeParent, net);
-      addLink(transferIncomeParent, labels.cashAvailable, net);
+      addLink(
+        transferChildTotalName,
+        transferIncomeParent,
+        net,
+        transactionCount,
+        "income",
+      );
+      addLink(
+        transferIncomeParent,
+        labels.cashAvailable,
+        net,
+        transactionCount,
+        "income",
+      );
     } else {
       expenseTotal += absoluteNet;
       markNode(labels.cashAvailable, 2);
-      markNode(transferExpenseParent, 3);
-      markNode(transferChildTotalName, 4, transferExpenseParent);
-      addLink(labels.cashAvailable, transferExpenseParent, absoluteNet);
-      addLink(transferExpenseParent, transferChildTotalName, absoluteNet);
+      markNode(transferExpenseParent, 3, undefined, {
+        flowType: "expense",
+        transactionCount,
+      });
+      markNode(transferChildTotalName, 4, transferExpenseParent, {
+        flowType: "expense",
+        parentName: transferExpenseParent,
+        transactionCount,
+      });
+      addLink(
+        labels.cashAvailable,
+        transferExpenseParent,
+        absoluteNet,
+        transactionCount,
+        "expense",
+      );
+      addLink(
+        transferExpenseParent,
+        transferChildTotalName,
+        absoluteNet,
+        transactionCount,
+        "expense",
+      );
     }
   });
 
   if (incomeTotal > expenseTotal) {
     markNode(labels.cashAvailable, 2);
-    markNode(labels.surplus, 3);
-    addLink(labels.cashAvailable, labels.surplus, incomeTotal - expenseTotal);
+    markNode(labels.surplus, 3, undefined, { flowType: "surplus" });
+    addLink(
+      labels.cashAvailable,
+      labels.surplus,
+      incomeTotal - expenseTotal,
+      0,
+      "surplus",
+    );
   } else if (expenseTotal > incomeTotal) {
-    markNode(labels.deficit, 1);
+    markNode(labels.deficit, 1, undefined, { flowType: "deficit" });
     markNode(labels.cashAvailable, 2);
-    addLink(labels.deficit, labels.cashAvailable, expenseTotal - incomeTotal);
+    addLink(
+      labels.deficit,
+      labels.cashAvailable,
+      expenseTotal - incomeTotal,
+      0,
+      "deficit",
+    );
   }
 
   const incomingFlowTotals = new Map<string, number>();
@@ -482,12 +640,19 @@ export const buildFlowsChartData = (
   nodeNames.forEach((name, index) => nodeIndexes.set(name, index));
 
   return {
-    nodes: nodeNames.map((name) => ({ name })),
+    nodes: nodeNames.map((name) => ({
+      name,
+      ...nodeMetadata.get(name),
+    })),
     links: Array.from(links.values()).map((link) => ({
       source: nodeIndexes.get(link.source)!,
       target: nodeIndexes.get(link.target)!,
       value: link.value,
+      transactionCount: link.transactionCount,
+      flowType: link.flowType,
     })),
+    totalIncome: incomeTotal,
+    totalSpending: expenseTotal,
   };
 };
 

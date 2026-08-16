@@ -9,6 +9,7 @@ import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import type { SankeyElementType, SankeyLinkProps, SankeyProps } from "recharts";
+import FlowsChartTooltip from "./FlowsChartTooltip/FlowsChartTooltip";
 
 interface FlowsChartProps {
   transactions: ITransaction[];
@@ -167,6 +168,29 @@ const FlowsChart = (props: FlowsChartProps): React.ReactNode => {
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
         sort: false,
+      }}
+      tooltipProps={{
+        content: ({ active, payload }) => (
+          <FlowsChartTooltip
+            active={active}
+            payload={payload}
+            chartData={chartData}
+            valueFormatter={valueFormatter}
+            labels={{
+              amount: t("amount"),
+              from: t("from"),
+              to: t("to"),
+              percentOfIncome: t("percent_of_income"),
+              percentOfSpending: t("percent_of_spending"),
+              percentOfBranch: t("percent_of_branch"),
+              transactions: t("transactions"),
+              income: t("income"),
+              expense: t("expense"),
+              surplus: t("surplus"),
+              deficit: t("deficit"),
+            }}
+          />
+        ),
       }}
       w="100%"
       colors={chartColors}
