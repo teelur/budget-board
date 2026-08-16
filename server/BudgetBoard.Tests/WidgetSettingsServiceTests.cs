@@ -31,6 +31,7 @@ public class WidgetSettingsServiceTests
                 WidgetTypes.Metric,
                 JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration),
             ],
+            [WidgetTypes.Flows, "{\"monthCount\":1}"],
         ];
 
     private static WidgetSettingsService CreateService(TestHelper helper) =>
@@ -140,6 +141,33 @@ public class WidgetSettingsServiceTests
         settings
             .Configuration.Should()
             .Be(JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration));
+    }
+
+    [Fact]
+    public async Task CreateWidgetSettingsAsync_WhenFlowsTypeAndNoLayoutProvided_ShouldUseFlowsDefaults()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        // Act
+        await service.CreateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            new WidgetSettingsCreateRequest { WidgetType = WidgetTypes.Flows }
+        );
+
+        // Assert
+        var settings = helper.UserDataContext.WidgetSettings.Single(ws =>
+            ws.UserID == helper.demoUser.Id
+        );
+        settings.WidgetType.Should().Be("Flows");
+        settings.LgX.Should().Be(0);
+        settings.LgY.Should().Be(33);
+        settings.LgW.Should().Be(12);
+        settings.LgH.Should().Be(24);
+        settings.SmY.Should().Be(63);
+        settings.SmH.Should().Be(24);
+        settings.Configuration.Should().Be("{\"monthCount\":1}");
     }
 
     [Fact]
@@ -259,6 +287,45 @@ public class WidgetSettingsServiceTests
         // Assert
         settings.Should().NotBeNull();
         settings.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ReadWidgetSettingsAsync_WhenFlowsWidgetExists_ShouldReturnSerializedContract()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Flows,
+            LgX = 0,
+            LgY = 33,
+            LgW = 12,
+            LgH = 24,
+            SmY = 63,
+            SmH = 24,
+            Configuration = "{\"monthCount\":1}",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var response = (await service.ReadWidgetSettingsAsync(helper.demoUser.Id)).Single();
+
+        // Assert
+        response.ID.Should().Be(widget.ID);
+        response.WidgetType.Should().Be("Flows");
+        response.LgX.Should().Be(0);
+        response.LgY.Should().Be(33);
+        response.LgW.Should().Be(12);
+        response.LgH.Should().Be(24);
+        response.SmY.Should().Be(63);
+        response.SmH.Should().Be(24);
+        response.Configuration.Should().Be("{\"monthCount\":1}");
+        response.UserID.Should().Be(helper.demoUser.Id);
     }
 
     [Theory]
@@ -783,8 +850,247 @@ public class WidgetSettingsServiceTests
     }
 
     [Theory]
+    [InlineData(1)]
+    [InlineData(6)]
+    [InlineData(12)]
+    public async Task UpdateWidgetSettingsAsync_WhenFlowsMonthCountIsValid_ShouldSerializeConfiguration(
+        int monthCount
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Flows,
+            LgX = 2,
+            LgY = 7,
+            LgW = 10,
+            LgH = 18,
+            SmY = 9,
+            SmH = 18,
+            Configuration = "{\"monthCount\":1}",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [
+                new WidgetSettingsUpdateRequest
+                {
+                    ID = widget.ID,
+                    Configuration = JsonSerializer.SerializeToElement(new { monthCount }),
+                },
+            ]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be($"{{\"monthCount\":{monthCount}}}");
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(13)]
+    public async Task UpdateWidgetSettingsAsync_WhenFlowsMonthCountIsOutOfRange_ShouldThrowConfigurationError(
+        int monthCount
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Flows,
+            Configuration = "{\"monthCount\":1}",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var action = async () =>
+            await service.UpdateWidgetSettingsAsync(
+                helper.demoUser.Id,
+                [
+                    new WidgetSettingsUpdateRequest
+                    {
+                        ID = widget.ID,
+                        Configuration = JsonSerializer.SerializeToElement(new { monthCount }),
+                    },
+                ]
+            );
+
+        // Assert
+        await action
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenFlowsMonthCountIsDecimal_ShouldThrowConfigurationError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Flows,
+            Configuration = "{\"monthCount\":1}",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        var action = async () =>
+            await service.UpdateWidgetSettingsAsync(
+                helper.demoUser.Id,
+                [
+                    new WidgetSettingsUpdateRequest
+                    {
+                        ID = widget.ID,
+                        Configuration = JsonSerializer.SerializeToElement(new { monthCount = 1.5 }),
+                    },
+                ]
+            );
+
+        // Assert
+        await action
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("WidgetConfigurationDeserializationError");
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenFlowsConfigurationIsMissingMonthCount_ShouldUseDefault()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Flows,
+            Configuration = "{\"monthCount\":6}",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [
+                new WidgetSettingsUpdateRequest
+                {
+                    ID = widget.ID,
+                    Configuration = JsonSerializer.SerializeToElement(new { }),
+                },
+            ]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be("{\"monthCount\":1}");
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenFlowsConfigurationIsNull_ShouldRestoreDefault()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Flows,
+            Configuration = "{\"monthCount\":6}",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [new WidgetSettingsUpdateRequest { ID = widget.ID, Configuration = null }]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be("{\"monthCount\":1}");
+    }
+
+    [Fact]
+    public async Task UpdateWidgetSettingsAsync_WhenOnlyFlowsConfigurationChanges_ShouldPreserveLayout()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = WidgetTypes.Flows,
+            LgX = 2,
+            LgY = 7,
+            LgW = 10,
+            LgH = 18,
+            SmY = 9,
+            SmH = 18,
+            Configuration = "{\"monthCount\":1}",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [
+                new WidgetSettingsUpdateRequest
+                {
+                    ID = widget.ID,
+                    Configuration = JsonSerializer.SerializeToElement(new { monthCount = 6 }),
+                },
+            ]
+        );
+
+        // Assert
+        var updated = helper.UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID);
+        updated.LgX.Should().Be(2);
+        updated.LgY.Should().Be(7);
+        updated.LgW.Should().Be(10);
+        updated.LgH.Should().Be(18);
+        updated.SmY.Should().Be(9);
+        updated.SmH.Should().Be(18);
+        updated.Configuration.Should().Be("{\"monthCount\":6}");
+    }
+
+    [Theory]
     [InlineData(WidgetTypes.Accounts)]
     [InlineData(WidgetTypes.Metric)]
+    [InlineData(WidgetTypes.Flows)]
     public async Task UpdateWidgetSettingsAsync_WhenTypedConfigurationIsInvalid_ShouldThrowWidgetConfigurationDeserializationError(
         string widgetType
     )
@@ -831,6 +1137,7 @@ public class WidgetSettingsServiceTests
     [InlineData(WidgetTypes.NetWorth)]
     [InlineData(WidgetTypes.Accounts)]
     [InlineData(WidgetTypes.Metric)]
+    [InlineData(WidgetTypes.Flows)]
     public async Task UpdateWidgetSettingsAsync_WhenTypedConfigurationIsJsonNull_ShouldThrowWidgetConfigurationDeserializationError(
         string widgetType
     )

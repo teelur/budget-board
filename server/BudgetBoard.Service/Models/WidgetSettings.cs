@@ -9,6 +9,7 @@ public static class WidgetTypes
     public const string UncategorizedTransactions = "UncategorizedTransactions";
     public const string SpendingTrends = "SpendingTrends";
     public const string Metric = "Metric";
+    public const string Flows = "Flows";
 }
 
 public interface IWidgetSettingsCreateRequest

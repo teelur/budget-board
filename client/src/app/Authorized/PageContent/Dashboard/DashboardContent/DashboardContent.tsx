@@ -24,6 +24,7 @@ import {
 import SpendingTrendsWidget from "../../../../../components/ui/widgets/SpendingTrendsWidget/SpendingTrendsWidget";
 import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
 import MetricWidget from "~/components/ui/widgets/MetricWidget/MetricWidget";
+import FlowsWidget from "~/components/ui/widgets/FlowsWidget/FlowsWidget";
 import { useTranslation } from "react-i18next";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
@@ -76,7 +77,9 @@ const DashboardContent = ({
     const currentLayout = editTarget === "lg" ? lgLayout : smLayout;
     const hasChanged = layout.some((item) => {
       const current = currentLayout.find((c) => c.i === item.i);
-      if (!current) return true;
+      if (!current) {
+        return true;
+      }
       return editTarget === "lg"
         ? current.x !== item.x ||
             current.y !== item.y ||
@@ -85,7 +88,9 @@ const DashboardContent = ({
         : current.y !== item.y || current.h !== item.h;
     });
 
-    if (!hasChanged) return;
+    if (!hasChanged) {
+      return;
+    }
 
     const updates: IWidgetSettingsUpdateRequest[] =
       editTarget === "lg"
@@ -125,6 +130,14 @@ const DashboardContent = ({
         );
       case "SpendingTrends":
         return <SpendingTrendsWidget />;
+      case "Flows":
+        return (
+          <FlowsWidget
+            widget={widget}
+            settingsOpened={settingsOpenId === widget.id}
+            onSettingsClose={() => setSettingsOpenId(null)}
+          />
+        );
       case "UncategorizedTransactions":
         return <UncategorizedTransactionsWidget />;
       case "Metric":
@@ -151,7 +164,7 @@ const DashboardContent = ({
     (widgetSettingsQuery.data ?? []).length === 0;
 
   return (
-    <Flex ref={containerRef} w={"100%"} flex="1" justify="center">
+    <Flex ref={containerRef} w="100%" flex="1" justify="center">
       {widgetSettingsQuery.isPending ? (
         <Stack gap="md">
           {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
@@ -196,7 +209,8 @@ const DashboardContent = ({
                   onSettingsOpen={
                     widget.widgetType === "NetWorth" ||
                     widget.widgetType === "Accounts" ||
-                    widget.widgetType === "Metric"
+                    widget.widgetType === "Metric" ||
+                    widget.widgetType === "Flows"
                       ? () => setSettingsOpenId(widget.id)
                       : undefined
                   }

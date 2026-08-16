@@ -260,10 +260,14 @@ public class DemoSeedServiceTests
             .Should()
             .BeEquivalentTo(WidgetSettingsHelpers.DefaultLayouts.Select(dl => dl.WidgetType));
 
-        // Widgets with configurations: Accounts, NetWorth, Metric
+        // Widgets with configurations: Accounts, NetWorth, Metric, Flows
         widgetSettings
             .Where(ws =>
-                ws.WidgetType is WidgetTypes.Accounts or WidgetTypes.NetWorth or WidgetTypes.Metric
+                ws.WidgetType
+                    is WidgetTypes.Accounts
+                        or WidgetTypes.NetWorth
+                        or WidgetTypes.Metric
+                        or WidgetTypes.Flows
             )
             .Should()
             .OnlyContain(ws => !string.IsNullOrWhiteSpace(ws.Configuration));
@@ -278,6 +282,9 @@ public class DemoSeedServiceTests
 
         var accountsWidget = widgetSettings.First(ws => ws.WidgetType == WidgetTypes.Accounts);
         accountsWidget.Configuration.Should().Be("{\"accountIds\":[]}");
+
+        var flowsWidget = widgetSettings.First(ws => ws.WidgetType == WidgetTypes.Flows);
+        flowsWidget.Configuration.Should().Be("{\"monthCount\":1}");
     }
 
     [Fact]

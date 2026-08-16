@@ -1,6 +1,7 @@
 import { areStringsEqual } from "~/helpers/utils";
 import {
   IAccountsWidgetConfiguration,
+  IFlowsWidgetConfiguration,
   INetWorthWidgetCategory,
   INetWorthWidgetConfiguration,
   INetWorthWidgetGroup,
@@ -175,6 +176,17 @@ export const parseAccountsConfiguration = (
     : [];
 
   return { accountIds };
+};
+
+export const parseFlowsConfiguration = (
+  configuration?: string,
+): IFlowsWidgetConfiguration => {
+  const parsed = configuration ? safeParseJson(configuration) : undefined;
+  const monthCount = normalizeNumber(parsed?.monthCount ?? parsed?.MonthCount);
+
+  return {
+    monthCount: Math.min(12, Math.max(1, Math.round(monthCount || 1))),
+  };
 };
 
 /**
