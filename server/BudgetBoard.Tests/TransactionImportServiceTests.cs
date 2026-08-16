@@ -79,6 +79,37 @@ public class TransactionImportServiceTests
     }
 
     [Fact]
+    public async Task RequestCancellationAsync_ShouldCancelPendingOwnedJob()
+    {
+        var helper = new TestHelper();
+        var now = new DateTime(2026, 8, 16, 12, 0, 0, DateTimeKind.Utc);
+        var service = CreateService(helper, CreateNowProvider(now).Object);
+        var job = AddJob(helper, [new TransactionImport { Account = "Checking" }]);
+
+        var response = await service.RequestCancellationAsync(helper.demoUser.Id, job.ID);
+
+        response.Should().NotBeNull();
+        response!.Status.Should().Be(TransactionImportJobStatuses.Cancelled);
+        response.CancellationRequested.Should().BeTrue();
+        response.CompletedAt.Should().Be(now);
+        var cancelledJob = await helper.UserDataContext.TransactionImportJobs.FindAsync(job.ID);
+        cancelledJob!.Status.Should().Be(TransactionImportJobStatuses.Cancelled);
+    }
+
+    [Fact]
+    public async Task RequestCancellationAsync_ShouldNotCancelJobOwnedByAnotherUser()
+    {
+        var helper = new TestHelper();
+        var service = CreateService(helper, Mock.Of<INowProvider>());
+        var job = AddJob(helper, [new TransactionImport { Account = "Checking" }]);
+
+        var response = await service.RequestCancellationAsync(Guid.NewGuid(), job.ID);
+
+        response.Should().BeNull();
+        job.Status.Should().Be(TransactionImportJobStatuses.Pending);
+    }
+
+    [Fact]
     public async Task EnqueueAsync_WithSameIdempotencyKey_ShouldReturnExistingJob()
     {
         var helper = new TestHelper();
@@ -137,6 +168,51 @@ public class TransactionImportServiceTests
         completedJob.CompletedAt.Should().Be(now);
         completedJob.LeaseExpiresAt.Should().BeNull();
         completedJob.LastHeartbeatAt.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ProcessNextAsync_WhenCancellationIsRequestedAfterBatch_ShouldCancelJob()
+    {
+        var helper = new TestHelper();
+        var now = new DateTime(2026, 8, 16, 12, 0, 0, DateTimeKind.Utc);
+        var nowProvider = CreateNowProvider(now);
+        var importServiceMock = new Mock<ITransactionService>();
+        var service = CreateService(helper, nowProvider.Object, importServiceMock.Object);
+        var job = AddJob(helper, CreateTransactions(101));
+        importServiceMock
+            .Setup(transactionService =>
+                transactionService.ImportTransactionsAsync(
+                    helper.demoUser.Id,
+                    It.IsAny<ITransactionImportRequest>()
+                )
+            )
+            .Callback(() =>
+            {
+                if (job.CancellationRequestedAt is null)
+                {
+                    job.CancellationRequestedAt = now;
+                    helper.UserDataContext.SaveChanges();
+                }
+            })
+            .Returns(Task.CompletedTask);
+
+        var result = await service.ProcessNextAsync(CancellationToken.None);
+
+        result.Should().BeTrue();
+        var cancelledJob = await helper.UserDataContext.TransactionImportJobs.FindAsync(job.ID);
+        cancelledJob.Should().NotBeNull();
+        cancelledJob!.Status.Should().Be(TransactionImportJobStatuses.Cancelled);
+        cancelledJob.ProcessedCount.Should().Be(100);
+        cancelledJob.CompletedAt.Should().Be(now);
+        cancelledJob.LeaseExpiresAt.Should().BeNull();
+        importServiceMock.Verify(
+            transactionService =>
+                transactionService.ImportTransactionsAsync(
+                    helper.demoUser.Id,
+                    It.IsAny<ITransactionImportRequest>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -287,6 +363,35 @@ public class TransactionImportServiceTests
         );
         completedJob!.Status.Should().Be(TransactionImportJobStatuses.Completed);
         completedJob.AttemptCount.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task ProcessNextAsync_ShouldFinalizeExpiredCancelledJobs()
+    {
+        var helper = new TestHelper();
+        var now = new DateTime(2026, 8, 16, 12, 0, 0, DateTimeKind.Utc);
+        var job = new TransactionImportJob
+        {
+            UserID = helper.demoUser.Id,
+            Status = TransactionImportJobStatuses.Running,
+            Payload = JsonSerializer.Serialize(new TransactionImportRequest()),
+            TotalCount = 0,
+            CreatedAt = now.AddMinutes(-20),
+            CancellationRequestedAt = now.AddMinutes(-1),
+            LeaseExpiresAt = now.AddSeconds(-1),
+            LastHeartbeatAt = now.AddMinutes(-11),
+        };
+        helper.UserDataContext.TransactionImportJobs.Add(job);
+        await helper.UserDataContext.SaveChangesAsync();
+        var service = CreateService(helper, CreateNowProvider(now).Object);
+
+        var result = await service.ProcessNextAsync(CancellationToken.None);
+
+        result.Should().BeFalse();
+        var cancelledJob = await helper.UserDataContext.TransactionImportJobs.FindAsync(job.ID);
+        cancelledJob!.Status.Should().Be(TransactionImportJobStatuses.Cancelled);
+        cancelledJob.CompletedAt.Should().Be(now);
+        cancelledJob.LeaseExpiresAt.Should().BeNull();
     }
 
     [Fact]

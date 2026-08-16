@@ -7,6 +7,7 @@ public static class TransactionImportJobStatuses
     public const string Completed = "Completed";
     public const string CompletedWithErrors = "CompletedWithErrors";
     public const string Failed = "Failed";
+    public const string Cancelled = "Cancelled";
 }
 
 public class TransactionImportJob
@@ -42,6 +43,8 @@ public class TransactionImportJob
     public DateTime? LastHeartbeatAt { get; set; }
 
     public DateTime? LeaseExpiresAt { get; set; }
+
+    public DateTime? CancellationRequestedAt { get; set; }
 
     public string? ErrorMessage { get; set; }
 }

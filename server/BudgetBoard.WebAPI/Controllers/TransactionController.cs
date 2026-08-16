@@ -195,4 +195,26 @@ public class TransactionController(
             return importJob is null ? NotFound() : Ok(importJob);
         });
     }
+
+    [HttpPost]
+    [Authorize]
+    [Route("import/{jobId:guid}/cancel")]
+    public async Task<IActionResult> CancelImport(Guid jobId)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            var importJob = await transactionImportService.RequestCancellationAsync(
+                parsedUserId,
+                jobId
+            );
+            return importJob is null ? NotFound() : Ok(importJob);
+        });
+    }
 }

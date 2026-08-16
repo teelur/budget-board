@@ -12,6 +12,9 @@ public class TransactionImportJobResponse
     public DateTime? StartedAt { get; init; }
     public DateTime? CompletedAt { get; init; }
     public string? ErrorMessage { get; init; }
+
+    public bool CancellationRequested { get; init; }
+
     public int ProgressPercentage =>
         TotalCount == 0 ? 100 : (int)Math.Round(ProcessedCount * 100d / TotalCount);
 }

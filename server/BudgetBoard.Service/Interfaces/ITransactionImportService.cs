@@ -12,5 +12,7 @@ public interface ITransactionImportService
 
     Task<TransactionImportJobResponse?> ReadStatusAsync(Guid userGuid, Guid jobId);
 
+    Task<TransactionImportJobResponse?> RequestCancellationAsync(Guid userGuid, Guid jobId);
+
     Task<bool> ProcessNextAsync(CancellationToken cancellationToken);
 }

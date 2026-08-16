@@ -86,6 +86,38 @@ public class TransactionImportService(
         return job is null ? null : ToResponse(job);
     }
 
+    public async Task<TransactionImportJobResponse?> RequestCancellationAsync(
+        Guid userGuid,
+        Guid jobId
+    )
+    {
+        var job = await userDataContext.TransactionImportJobs.FirstOrDefaultAsync(importJob =>
+            importJob.ID == jobId && importJob.UserID == userGuid
+        );
+
+        if (job is null)
+        {
+            return null;
+        }
+
+        if (IsTerminalStatus(job.Status))
+        {
+            return ToResponse(job);
+        }
+
+        job.CancellationRequestedAt ??= nowProvider.UtcNow;
+        if (job.Status == TransactionImportJobStatuses.Pending)
+        {
+            job.Status = TransactionImportJobStatuses.Cancelled;
+            job.CompletedAt = nowProvider.UtcNow;
+            job.LastHeartbeatAt = null;
+            job.LeaseExpiresAt = null;
+        }
+
+        await userDataContext.SaveChangesAsync();
+        return ToResponse(job);
+    }
+
     public async Task<bool> ProcessNextAsync(CancellationToken cancellationToken)
     {
         var job = await ClaimNextJobAsync(cancellationToken);
@@ -177,6 +209,12 @@ public class TransactionImportService(
                     errors,
                     cancellationToken
                 );
+
+                if (await IsCancellationRequestedAsync(job.ID, cancellationToken))
+                {
+                    await CancelJobAsync(job.ID, cancellationToken);
+                    return true;
+                }
             }
 
             await CompleteJobAsync(job.ID, errors, cancellationToken);
@@ -242,17 +280,104 @@ public class TransactionImportService(
     )
     {
         userDataContext.ChangeTracker.Clear();
+        var completedAt = nowProvider.UtcNow;
+        var completedStatus =
+            errors.Count == 0
+                ? TransactionImportJobStatuses.Completed
+                : TransactionImportJobStatuses.CompletedWithErrors;
+
+        if (!userDataContext.Database.IsRelational())
+        {
+            var nonRelationalJob = await userDataContext.TransactionImportJobs.FindAsync(
+                [jobId],
+                cancellationToken
+            );
+            if (nonRelationalJob is null)
+            {
+                throw new InvalidOperationException(
+                    $"Transaction import job {jobId} was not found."
+                );
+            }
+
+            if (
+                nonRelationalJob.Status == TransactionImportJobStatuses.Running
+                && nonRelationalJob.CancellationRequestedAt != null
+            )
+            {
+                await CancelJobAsync(jobId, cancellationToken);
+            }
+            else if (nonRelationalJob.Status == TransactionImportJobStatuses.Running)
+            {
+                nonRelationalJob.Status = completedStatus;
+                nonRelationalJob.CompletedAt = completedAt;
+                nonRelationalJob.LastHeartbeatAt = null;
+                nonRelationalJob.LeaseExpiresAt = null;
+                await userDataContext.SaveChangesAsync(cancellationToken);
+            }
+
+            return;
+        }
+
+        var updatedCount = await userDataContext.TransactionImportJobs
+            .Where(job =>
+                job.ID == jobId
+                && job.Status == TransactionImportJobStatuses.Running
+                && job.CancellationRequestedAt == null
+            )
+            .ExecuteUpdateAsync(
+                setters =>
+                    setters
+                        .SetProperty(job => job.Status, completedStatus)
+                        .SetProperty(job => job.CompletedAt, completedAt)
+                        .SetProperty(job => job.LastHeartbeatAt, (DateTime?)null)
+                        .SetProperty(job => job.LeaseExpiresAt, (DateTime?)null),
+                cancellationToken
+            );
+
+        if (updatedCount > 0)
+        {
+            return;
+        }
+
+        userDataContext.ChangeTracker.Clear();
         var job = await userDataContext.TransactionImportJobs.FindAsync([jobId], cancellationToken);
         if (job is null)
         {
             throw new InvalidOperationException($"Transaction import job {jobId} was not found.");
         }
 
-        job.Status =
-            errors.Count == 0
-                ? TransactionImportJobStatuses.Completed
-                : TransactionImportJobStatuses.CompletedWithErrors;
-        job.CompletedAt = nowProvider.UtcNow;
+        if (job.Status == TransactionImportJobStatuses.Running && job.CancellationRequestedAt != null)
+        {
+            await CancelJobAsync(jobId, cancellationToken);
+        }
+    }
+
+    private async Task<bool> IsCancellationRequestedAsync(
+        Guid jobId,
+        CancellationToken cancellationToken
+    )
+    {
+        return await userDataContext.TransactionImportJobs
+            .AsNoTracking()
+            .AnyAsync(job => job.ID == jobId && job.CancellationRequestedAt != null, cancellationToken);
+    }
+
+    private async Task CancelJobAsync(Guid jobId, CancellationToken cancellationToken)
+    {
+        userDataContext.ChangeTracker.Clear();
+        var job = await userDataContext.TransactionImportJobs.FindAsync([jobId], cancellationToken);
+        if (job is null)
+        {
+            throw new InvalidOperationException($"Transaction import job {jobId} was not found.");
+        }
+
+        if (IsTerminalStatus(job.Status))
+        {
+            return;
+        }
+
+        job.Status = TransactionImportJobStatuses.Cancelled;
+        job.CompletedAt ??= nowProvider.UtcNow;
         job.LastHeartbeatAt = null;
         job.LeaseExpiresAt = null;
         await userDataContext.SaveChangesAsync(cancellationToken);
@@ -268,7 +393,20 @@ public class TransactionImportService(
         );
         if (userDataContext.Database.IsRelational())
         {
-            await expiredJobs.ExecuteUpdateAsync(
+            await expiredJobs
+                .Where(job => job.CancellationRequestedAt != null)
+                .ExecuteUpdateAsync(
+                    setters =>
+                        setters
+                            .SetProperty(job => job.Status, TransactionImportJobStatuses.Cancelled)
+                            .SetProperty(job => job.CompletedAt, now)
+                            .SetProperty(job => job.LeaseExpiresAt, (DateTime?)null)
+                            .SetProperty(job => job.LastHeartbeatAt, (DateTime?)null),
+                    cancellationToken
+                );
+            await expiredJobs
+                .Where(job => job.CancellationRequestedAt == null)
+                .ExecuteUpdateAsync(
                 setters =>
                     setters
                         .SetProperty(job => job.Status, TransactionImportJobStatuses.Pending)
@@ -282,7 +420,12 @@ public class TransactionImportService(
             var expiredJobsInMemory = await expiredJobs.ToListAsync(cancellationToken);
             foreach (var expiredJob in expiredJobsInMemory)
             {
-                expiredJob.Status = TransactionImportJobStatuses.Pending;
+                expiredJob.Status =
+                    expiredJob.CancellationRequestedAt != null
+                        ? TransactionImportJobStatuses.Cancelled
+                        : TransactionImportJobStatuses.Pending;
+                expiredJob.CompletedAt =
+                    expiredJob.CancellationRequestedAt != null ? now : expiredJob.CompletedAt;
                 expiredJob.LeaseExpiresAt = null;
                 expiredJob.LastHeartbeatAt = null;
             }
@@ -355,5 +498,12 @@ public class TransactionImportService(
             StartedAt = job.StartedAt,
             CompletedAt = job.CompletedAt,
             ErrorMessage = job.ErrorMessage,
+            CancellationRequested = job.CancellationRequestedAt != null,
         };
+
+    private static bool IsTerminalStatus(string status) =>
+        status is TransactionImportJobStatuses.Completed
+            or TransactionImportJobStatuses.CompletedWithErrors
+            or TransactionImportJobStatuses.Failed
+            or TransactionImportJobStatuses.Cancelled;
 }
