@@ -1843,7 +1843,9 @@ public class TransactionServiceTests
         persistedTransaction.Amount.Should().Be(42m);
         persistedTransaction.Date.Should().Be(new DateOnly(2026, 8, 16));
         persistedTransaction.MerchantName.Should().Be("Existing transaction");
-        helper.UserDataContext.Transactions.Should().Contain(transaction => transaction.ID == newTransactionID);
+        helper
+            .UserDataContext.Transactions.Should()
+            .Contain(transaction => transaction.ID == newTransactionID);
     }
 
     [Fact]
