@@ -1776,6 +1776,77 @@ public class TransactionServiceTests
     }
 
     [Fact]
+    public async Task ImportTransactionsAsync_WhenTransactionIDAlreadyExists_ShouldSkipTransaction()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAutomaticTransactionCategorizerService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
+        );
+
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        var newTransactionID = Guid.NewGuid();
+        helper.UserDataContext.Accounts.Add(account);
+
+        var existingTransaction = new Transaction
+        {
+            Amount = 42m,
+            Date = new DateOnly(2026, 8, 16),
+            MerchantName = "Existing transaction",
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+        };
+        helper.UserDataContext.Transactions.Add(existingTransaction);
+        helper.UserDataContext.SaveChanges();
+
+        var importRequest = new TransactionImportRequest
+        {
+            Transactions =
+            [
+                new TransactionImport
+                {
+                    ID = existingTransaction.ID,
+                    Amount = 999m,
+                    Date = new DateOnly(2026, 8, 17),
+                    MerchantName = "Should be skipped",
+                    Account = "missing account mapping",
+                },
+                new TransactionImport
+                {
+                    ID = newTransactionID,
+                    Amount = 10m,
+                    Date = new DateOnly(2026, 8, 18),
+                    MerchantName = "New transaction",
+                    Account = "bongus",
+                },
+            ],
+            AccountNameToIDMap = [new() { AccountName = "bongus", AccountID = account.ID }],
+        };
+
+        // Act
+        await transactionService.ImportTransactionsAsync(helper.demoUser.Id, importRequest);
+
+        // Assert
+        helper.UserDataContext.Transactions.Should().HaveCount(2);
+        var persistedTransaction = helper.UserDataContext.Transactions.Single(transaction =>
+            transaction.ID == existingTransaction.ID
+        );
+        persistedTransaction.ID.Should().Be(existingTransaction.ID);
+        persistedTransaction.Amount.Should().Be(42m);
+        persistedTransaction.Date.Should().Be(new DateOnly(2026, 8, 16));
+        persistedTransaction.MerchantName.Should().Be("Existing transaction");
+        helper.UserDataContext.Transactions.Should().Contain(transaction => transaction.ID == newTransactionID);
+    }
+
+    [Fact]
     public async Task ImportTransactionsAsync_WhenAccountNotFound_ShouldThrowTransactionAccountNotFoundError()
     {
         // Arrange

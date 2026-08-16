@@ -347,10 +347,10 @@ public class TransactionService(
         foreach (var transaction in request.Transactions)
         {
             if (
-                transaction.ID.HasValue
+                transaction.ID is Guid transactionID
                 && userData
                     .Accounts.SelectMany(account => account.Transactions)
-                    .Any(existingTransaction => existingTransaction.ID == transaction.ID)
+                    .Any(existingTransaction => existingTransaction.ID == transactionID)
             )
             {
                 continue;

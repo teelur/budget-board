@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using System.Text.Json;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
@@ -193,7 +194,7 @@ public class TransactionImportService(
             );
             if (job is null)
             {
-                throw;
+                ExceptionDispatchInfo.Capture(exception).Throw();
             }
 
             job.Status = TransactionImportJobStatuses.Failed;
@@ -260,13 +261,14 @@ public class TransactionImportService(
     private async Task<TransactionImportJob?> ClaimNextJobAsync(CancellationToken cancellationToken)
     {
         var now = nowProvider.UtcNow;
-        await userDataContext
-            .TransactionImportJobs.Where(job =>
-                job.Status == TransactionImportJobStatuses.Running
-                && job.LeaseExpiresAt != null
-                && job.LeaseExpiresAt < now
-            )
-            .ExecuteUpdateAsync(
+        var expiredJobs = userDataContext.TransactionImportJobs.Where(job =>
+            job.Status == TransactionImportJobStatuses.Running
+            && job.LeaseExpiresAt != null
+            && job.LeaseExpiresAt < now
+        );
+        if (userDataContext.Database.IsRelational())
+        {
+            await expiredJobs.ExecuteUpdateAsync(
                 setters =>
                     setters
                         .SetProperty(job => job.Status, TransactionImportJobStatuses.Pending)
@@ -274,27 +276,55 @@ public class TransactionImportService(
                         .SetProperty(job => job.LastHeartbeatAt, (DateTime?)null),
                 cancellationToken
             );
+        }
+        else
+        {
+            var expiredJobsInMemory = await expiredJobs.ToListAsync(cancellationToken);
+            foreach (var expiredJob in expiredJobsInMemory)
+            {
+                expiredJob.Status = TransactionImportJobStatuses.Pending;
+                expiredJob.LeaseExpiresAt = null;
+                expiredJob.LastHeartbeatAt = null;
+            }
 
-        await using var databaseTransaction = await userDataContext.Database.BeginTransactionAsync(
-            cancellationToken
-        );
+            await userDataContext.SaveChangesAsync(cancellationToken);
+        }
 
-        var job = await userDataContext
-            .TransactionImportJobs.FromSqlRaw(
-                """
-                SELECT *
-                FROM "TransactionImportJob"
-                WHERE "Status" = 'Pending'
-                ORDER BY "CreatedAt"
-                FOR UPDATE SKIP LOCKED
-                LIMIT 1
-                """
-            )
-            .FirstOrDefaultAsync(cancellationToken);
+        Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? databaseTransaction = null;
+        if (userDataContext.Database.IsRelational())
+        {
+            databaseTransaction = await userDataContext.Database.BeginTransactionAsync(
+                cancellationToken
+            );
+        }
+
+        var job = userDataContext.Database.IsRelational()
+            ? await userDataContext
+                .TransactionImportJobs.FromSqlRaw(
+                    """
+                    SELECT *
+                    FROM "TransactionImportJob"
+                    WHERE "Status" = 'Pending'
+                    ORDER BY "CreatedAt"
+                    FOR UPDATE SKIP LOCKED
+                    LIMIT 1
+                    """
+                )
+                .FirstOrDefaultAsync(cancellationToken)
+            : await userDataContext
+                .TransactionImportJobs.Where(importJob =>
+                    importJob.Status == TransactionImportJobStatuses.Pending
+                )
+                .OrderBy(importJob => importJob.CreatedAt)
+                .FirstOrDefaultAsync(cancellationToken);
 
         if (job is null)
         {
-            await databaseTransaction.CommitAsync(cancellationToken);
+            if (databaseTransaction is not null)
+            {
+                await databaseTransaction.CommitAsync(cancellationToken);
+                await databaseTransaction.DisposeAsync();
+            }
             return null;
         }
 
@@ -304,7 +334,11 @@ public class TransactionImportService(
         job.LastHeartbeatAt = now;
         job.LeaseExpiresAt = now.Add(JobLeaseDuration);
         await userDataContext.SaveChangesAsync(cancellationToken);
-        await databaseTransaction.CommitAsync(cancellationToken);
+        if (databaseTransaction is not null)
+        {
+            await databaseTransaction.CommitAsync(cancellationToken);
+            await databaseTransaction.DisposeAsync();
+        }
         return job;
     }
 
