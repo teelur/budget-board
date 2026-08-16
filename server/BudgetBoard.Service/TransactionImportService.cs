@@ -16,7 +16,7 @@ public class TransactionImportService(
     ILogger<TransactionImportService> logger
 ) : ITransactionImportService
 {
-    private const int BatchSize = 250;
+    private const int BatchSize = 100;
     private static readonly TimeSpan JobLeaseDuration = TimeSpan.FromMinutes(10);
 
     public async Task<TransactionImportJobResponse> EnqueueAsync(
