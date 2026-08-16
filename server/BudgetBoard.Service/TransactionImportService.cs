@@ -318,8 +318,8 @@ public class TransactionImportService(
             return;
         }
 
-        var updatedCount = await userDataContext.TransactionImportJobs
-            .Where(job =>
+        var updatedCount = await userDataContext
+            .TransactionImportJobs.Where(job =>
                 job.ID == jobId
                 && job.Status == TransactionImportJobStatuses.Running
                 && job.CancellationRequestedAt == null
@@ -346,7 +346,10 @@ public class TransactionImportService(
             throw new InvalidOperationException($"Transaction import job {jobId} was not found.");
         }
 
-        if (job.Status == TransactionImportJobStatuses.Running && job.CancellationRequestedAt != null)
+        if (
+            job.Status == TransactionImportJobStatuses.Running
+            && job.CancellationRequestedAt != null
+        )
         {
             await CancelJobAsync(jobId, cancellationToken);
         }
@@ -357,9 +360,12 @@ public class TransactionImportService(
         CancellationToken cancellationToken
     )
     {
-        return await userDataContext.TransactionImportJobs
-            .AsNoTracking()
-            .AnyAsync(job => job.ID == jobId && job.CancellationRequestedAt != null, cancellationToken);
+        return await userDataContext
+            .TransactionImportJobs.AsNoTracking()
+            .AnyAsync(
+                job => job.ID == jobId && job.CancellationRequestedAt != null,
+                cancellationToken
+            );
     }
 
     private async Task CancelJobAsync(Guid jobId, CancellationToken cancellationToken)
@@ -407,13 +413,13 @@ public class TransactionImportService(
             await expiredJobs
                 .Where(job => job.CancellationRequestedAt == null)
                 .ExecuteUpdateAsync(
-                setters =>
-                    setters
-                        .SetProperty(job => job.Status, TransactionImportJobStatuses.Pending)
-                        .SetProperty(job => job.LeaseExpiresAt, (DateTime?)null)
-                        .SetProperty(job => job.LastHeartbeatAt, (DateTime?)null),
-                cancellationToken
-            );
+                    setters =>
+                        setters
+                            .SetProperty(job => job.Status, TransactionImportJobStatuses.Pending)
+                            .SetProperty(job => job.LeaseExpiresAt, (DateTime?)null)
+                            .SetProperty(job => job.LastHeartbeatAt, (DateTime?)null),
+                    cancellationToken
+                );
         }
         else
         {
@@ -502,8 +508,9 @@ public class TransactionImportService(
         };
 
     private static bool IsTerminalStatus(string status) =>
-        status is TransactionImportJobStatuses.Completed
-            or TransactionImportJobStatuses.CompletedWithErrors
-            or TransactionImportJobStatuses.Failed
-            or TransactionImportJobStatuses.Cancelled;
+        status
+            is TransactionImportJobStatuses.Completed
+                or TransactionImportJobStatuses.CompletedWithErrors
+                or TransactionImportJobStatuses.Failed
+                or TransactionImportJobStatuses.Cancelled;
 }
