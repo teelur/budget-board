@@ -7,6 +7,7 @@ import SplitCard, {
   BorderThickness,
 } from "~/components/ui/SplitCard/SplitCard";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { parseFlowsConfiguration } from "~/helpers/widgets";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -36,13 +37,21 @@ const FlowsWidget = ({
     () => parseFlowsConfiguration(initializedConfiguration),
     [initializedConfiguration],
   );
+  const currentMonth = React.useMemo(() => dayjs().startOf("month"), [dayjs]);
   const selectedMonths = React.useMemo(
     () =>
       Array.from({ length: configuration.monthCount }, (_, index) =>
-        dayjs().startOf("month").subtract(index, "month").toDate(),
+        currentMonth.subtract(index, "month").toDate(),
       ),
-    [configuration.monthCount, dayjs],
+    [configuration.monthCount, currentMonth],
   );
+  const monthRange = React.useMemo(() => {
+    const firstMonth = selectedMonths.at(-1) ?? currentMonth.toDate();
+    const start = dayjs(firstMonth).format("MMM YYYY");
+    const end = currentMonth.format("MMM YYYY");
+
+    return start === end ? start : `${start} - ${end}`;
+  }, [currentMonth, dayjs, selectedMonths]);
 
   React.useEffect(() => {
     setInitializedConfiguration(widget.configuration);
@@ -64,11 +73,14 @@ const FlowsWidget = ({
         h="100%"
         border={BorderThickness.Thick}
         header={
-          <Group gap="0.25rem">
+          <Group gap="0.5rem" align="baseline" wrap="wrap">
             <GitBranchIcon color="var(--base-color-text-dimmed)" />
             <PrimaryHeading order={3} lh={1}>
               {t("flows")}
             </PrimaryHeading>
+            <DimmedText size="xs" lh={1.2}>
+              {t("flows_widget_month_range", { range: monthRange })}
+            </DimmedText>
           </Group>
         }
         elevation={1}
