@@ -138,12 +138,18 @@ const ImportTransactionsModal = () => {
       accountNameToIDMap: accountNameToAccountArray,
     };
 
-    importTransactionsMutation.mutate(transactionImportRequest, {
-      onSuccess: (response) => {
-        startImport(response.data.id);
-        setActiveStep(3);
+    importTransactionsMutation.mutate(
+      {
+        importedTransactions: transactionImportRequest,
+        idempotencyKey: crypto.randomUUID(),
       },
-    });
+      {
+        onSuccess: (response) => {
+          startImport(response.data.id);
+          setActiveStep(3);
+        },
+      },
+    );
   };
 
   const advanceToAccountMappingDialog = (

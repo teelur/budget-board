@@ -5,17 +5,25 @@ import { translateAxiosError } from "~/helpers/requests";
 import { ITransactionImportRequest } from "~/models/transaction";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
+interface IImportTransactionsMutationVariables {
+  importedTransactions: ITransactionImportRequest;
+  idempotencyKey: string;
+}
+
 export const useImportTransactionsMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async (importedTransactions: ITransactionImportRequest) =>
+    mutationFn: async ({
+      importedTransactions,
+      idempotencyKey,
+    }: IImportTransactionsMutationVariables) =>
       await request({
         url: "/api/transaction/import",
         method: "POST",
         data: importedTransactions,
         headers: {
-          "Idempotency-Key": crypto.randomUUID(),
+          "Idempotency-Key": idempotencyKey,
         },
       }),
     onError: (error: AxiosError) => {
