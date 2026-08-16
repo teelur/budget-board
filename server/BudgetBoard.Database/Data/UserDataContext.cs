@@ -107,7 +107,8 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         {
             j.Property(e => e.Payload).HasColumnType("jsonb");
             j.Property(e => e.Status).HasMaxLength(32).IsRequired();
-            j.Property(e => e.IdempotencyKey).HasMaxLength(200);
+            j.Property(e => e.IdempotencyKey)
+                .HasMaxLength(TransactionImportJob.MaxIdempotencyKeyLength);
             j.HasIndex(e => new { e.Status, e.LeaseExpiresAt });
             j.HasIndex(e => new { e.UserID, e.CreatedAt });
             j.HasIndex(e => new { e.UserID, e.IdempotencyKey }).IsUnique();

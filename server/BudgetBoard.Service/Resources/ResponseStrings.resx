@@ -403,6 +403,9 @@
     <data name="TransactionSplitInvalidAmountError" xml:space="preserve">
         <value>The split amount must be less than the transaction amount.</value>
     </data>
+    <data name="TransactionImportIdempotencyKeyTooLongError" xml:space="preserve">
+        <value>The Idempotency-Key header cannot exceed {0} characters.</value>
+    </data>
     <data name="TagAddRemoveOverlapError" xml:space="preserve">
         <value>A tag cannot be added and removed in the same request.</value>
     </data>

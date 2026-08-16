@@ -415,6 +415,15 @@
     <data name="TransactionSplitInvalidAmountLog" xml:space="preserve">
         <value>Attempt to split transaction with amount less than or equal to the split amount.</value>
     </data>
+    <data name="TransactionImportIdempotencyKeyTooLongLog" xml:space="preserve">
+        <value>Rejected a transaction import with an Idempotency-Key longer than {0} characters.</value>
+    </data>
+    <data name="TransactionImportBatchFailedLog" xml:space="preserve">
+        <value>Transaction import job {0} batch {1} failed; retrying rows individually.</value>
+    </data>
+    <data name="TransactionImportJobFailedLog" xml:space="preserve">
+        <value>Transaction import job {0} failed.</value>
+    </data>
     <data name="UserDataRetrievalErrorLog" xml:space="preserve">
         <value>An error occurred while retrieving the user data: {0}</value>
     </data>

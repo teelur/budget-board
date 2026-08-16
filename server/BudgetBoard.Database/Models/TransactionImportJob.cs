@@ -12,6 +12,8 @@ public static class TransactionImportJobStatuses
 
 public class TransactionImportJob
 {
+    public const int MaxIdempotencyKeyLength = 200;
+
     public Guid ID { get; set; } = Guid.NewGuid();
 
     public required Guid UserID { get; set; }

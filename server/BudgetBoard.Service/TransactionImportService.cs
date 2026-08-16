@@ -5,7 +5,9 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetBoard.Service;
@@ -14,6 +16,8 @@ public class TransactionImportService(
     UserDataContext userDataContext,
     ITransactionService transactionService,
     INowProvider nowProvider,
+    IStringLocalizer<ResponseStrings> responseLocalizer,
+    IStringLocalizer<LogStrings> logLocalizer,
     ILogger<TransactionImportService> logger
 ) : ITransactionImportService
 {
@@ -41,6 +45,23 @@ public class TransactionImportService(
         var normalizedIdempotencyKey = string.IsNullOrWhiteSpace(idempotencyKey)
             ? null
             : idempotencyKey.Trim();
+
+        if (normalizedIdempotencyKey?.Length > TransactionImportJob.MaxIdempotencyKeyLength)
+        {
+            logger.LogWarning(
+                "{LogMessage}",
+                logLocalizer[
+                    "TransactionImportIdempotencyKeyTooLongLog",
+                    TransactionImportJob.MaxIdempotencyKeyLength
+                ]
+            );
+            throw new BudgetBoardServiceException(
+                responseLocalizer[
+                    "TransactionImportIdempotencyKeyTooLongError",
+                    TransactionImportJob.MaxIdempotencyKeyLength
+                ]
+            );
+        }
 
         if (normalizedIdempotencyKey is not null)
         {
@@ -161,9 +182,8 @@ public class TransactionImportService(
                     userDataContext.ChangeTracker.Clear();
                     logger.LogWarning(
                         batchException,
-                        "Transaction import job {JobID} batch {BatchStart} failed; retrying rows individually",
-                        job.ID,
-                        offset
+                        "{LogMessage}",
+                        logLocalizer["TransactionImportBatchFailedLog", job.ID, offset]
                     );
 
                     foreach (
@@ -242,7 +262,11 @@ public class TransactionImportService(
             job.LeaseExpiresAt = null;
             await userDataContext.SaveChangesAsync(cancellationToken);
 
-            logger.LogError(exception, "Transaction import job {JobID} failed", job.ID);
+            logger.LogError(
+                exception,
+                "{LogMessage}",
+                logLocalizer["TransactionImportJobFailedLog", job.ID]
+            );
         }
 
         return true;

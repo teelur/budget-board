@@ -7,6 +7,7 @@ using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -124,6 +125,24 @@ public class TransactionImportServiceTests
 
         secondResponse.ID.Should().Be(firstResponse.ID);
         helper.UserDataContext.TransactionImportJobs.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task EnqueueAsync_WithOversizedIdempotencyKey_ShouldRejectBeforePersisting()
+    {
+        var helper = new TestHelper();
+        var service = CreateService(helper, Mock.Of<INowProvider>());
+        var oversizedKey = new string('k', TransactionImportJob.MaxIdempotencyKeyLength + 1);
+
+        var act = () =>
+            service.EnqueueAsync(helper.demoUser.Id, new TransactionImportRequest(), oversizedKey);
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage(
+                $"TransactionImportIdempotencyKeyTooLongError [{TransactionImportJob.MaxIdempotencyKeyLength}]"
+            );
+        helper.UserDataContext.TransactionImportJobs.Should().BeEmpty();
     }
 
     [Fact]
@@ -487,6 +506,8 @@ public class TransactionImportServiceTests
             context,
             Mock.Of<ITransactionService>(),
             nowProvider.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
             Mock.Of<ILogger<TransactionImportService>>()
         );
         var job = new TransactionImportJob
@@ -517,6 +538,8 @@ public class TransactionImportServiceTests
             context,
             Mock.Of<ITransactionService>(),
             Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
             Mock.Of<ILogger<TransactionImportService>>()
         );
 
@@ -535,6 +558,8 @@ public class TransactionImportServiceTests
             helper.UserDataContext,
             transactionService ?? Mock.Of<ITransactionService>(),
             nowProvider,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
             Mock.Of<ILogger<TransactionImportService>>()
         );
     }
