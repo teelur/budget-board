@@ -35,6 +35,12 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     maxInstances: 1,
   },
   {
+    widgetType: "Flows",
+    labelKey: "flows",
+    descriptionKey: "flows_widget_description",
+    maxInstances: 1,
+  },
+  {
     widgetType: "Metric",
     labelKey: "metric",
     descriptionKey: "metric_widget_description",

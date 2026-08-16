@@ -15,6 +15,7 @@ interface FlowsChartProps {
   transactions: ITransaction[];
   categories: ICategory[];
   isPending?: boolean;
+  height?: number;
 }
 
 const FlowsChart = (props: FlowsChartProps): React.ReactNode => {
@@ -43,7 +44,7 @@ const FlowsChart = (props: FlowsChartProps): React.ReactNode => {
     [formatSensitiveAmount],
   );
 
-  const chartHeight = 750;
+  const chartHeight = props.height ?? 750;
 
   const highlightedLinkIndexes = React.useMemo(() => {
     if (hoveredNodeIndex === null) {
