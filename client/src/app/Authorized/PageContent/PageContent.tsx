@@ -96,9 +96,9 @@ const PageContent = (): React.ReactNode => {
 
   const suspenseFallback = (
     <Stack
-      h={"calc(100dvh - var(--app-shell-header-offset, 60px))"}
+      h="calc(100dvh - var(--app-shell-header-offset, 60px))"
       justify="center"
-      algn="center"
+      align="center"
     >
       <LoadingScreen fullScreen={false} />
     </Stack>
