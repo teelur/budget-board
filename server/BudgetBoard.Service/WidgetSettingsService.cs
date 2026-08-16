@@ -5,6 +5,7 @@ using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Models.Widgets.AccountsWidget;
+using BudgetBoard.Service.Models.Widgets.FlowsWidget;
 using BudgetBoard.Service.Models.Widgets.MetricWidget;
 using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
 using BudgetBoard.Service.Resources;
@@ -215,6 +216,12 @@ public class WidgetSettingsService(
                     JsonSerializer.Deserialize<MetricWidgetConfiguration>(configuration)
                         ?? throw new JsonException()
                 ),
+                WidgetTypes.Flows => JsonSerializer.Serialize(
+                    ValidateFlowsConfiguration(
+                        JsonSerializer.Deserialize<FlowsWidgetConfiguration>(configuration)
+                            ?? throw new JsonException()
+                    )
+                ),
                 _ => configuration.GetRawText(),
             };
         }
@@ -225,6 +232,18 @@ public class WidgetSettingsService(
                 responseLocalizer["WidgetConfigurationDeserializationError"]
             );
         }
+    }
+
+    private static FlowsWidgetConfiguration ValidateFlowsConfiguration(
+        FlowsWidgetConfiguration configuration
+    )
+    {
+        if (configuration.MonthCount is < 1 or > 12)
+        {
+            throw new JsonException();
+        }
+
+        return configuration;
     }
 
     private static string? GetDefaultConfiguration(string widgetType)
@@ -238,6 +257,7 @@ public class WidgetSettingsService(
             WidgetTypes.Metric => JsonSerializer.Serialize(
                 WidgetSettingsHelpers.DefaultMetricWidgetConfiguration
             ),
+            WidgetTypes.Flows => JsonSerializer.Serialize(new FlowsWidgetConfiguration()),
             _ => null,
         };
     }
