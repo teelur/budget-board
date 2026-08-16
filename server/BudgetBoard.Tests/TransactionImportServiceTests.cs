@@ -128,6 +128,65 @@ public class TransactionImportServiceTests
     }
 
     [Fact]
+    public async Task EnqueueAsync_WhenInsertLosesIdempotencyRace_ShouldReturnExistingJob()
+    {
+        const string idempotencyKey = "import-1";
+        var connectionString =
+            "Data Source=file:transaction-import-idempotency?mode=memory&cache=shared";
+        await using var connection = new SqliteConnection(connectionString);
+        await connection.OpenAsync();
+        await using var competingConnection = new SqliteConnection(connectionString);
+        await competingConnection.OpenAsync();
+
+        var competingJob = new TransactionImportJob
+        {
+            UserID = Guid.NewGuid(),
+            Status = TransactionImportJobStatuses.Pending,
+            Payload = JsonSerializer.Serialize(new TransactionImportRequest()),
+            IdempotencyKey = idempotencyKey,
+            CreatedAt = DateTime.UtcNow,
+        };
+        var raceInterceptor = new RaceCreatingSaveChangesInterceptor(async () =>
+        {
+            var competingOptions = new DbContextOptionsBuilder<UserDataContext>()
+                .UseSqlite(competingConnection)
+                .Options;
+            await using var competingContext = new UserDataContext(competingOptions);
+            competingContext.TransactionImportJobs.Add(competingJob);
+            await competingContext.SaveChangesAsync();
+        });
+        var options = new DbContextOptionsBuilder<UserDataContext>()
+            .UseSqlite(connection)
+            .AddInterceptors(raceInterceptor, new SqliteImportClaimInterceptor())
+            .Options;
+        await using var context = new UserDataContext(options);
+        context.Database.EnsureCreated();
+        var user = new ApplicationUserFaker().Generate();
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+        competingJob.UserID = user.Id;
+        raceInterceptor.Enabled = true;
+
+        var service = new TransactionImportService(
+            context,
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<ILogger<TransactionImportService>>()
+        );
+
+        var response = await service.EnqueueAsync(
+            user.Id,
+            new TransactionImportRequest(),
+            idempotencyKey
+        );
+
+        response.ID.Should().Be(competingJob.ID);
+        context.TransactionImportJobs.Should().ContainSingle();
+    }
+
+    [Fact]
     public async Task EnqueueAsync_WithOversizedIdempotencyKey_ShouldRejectBeforePersisting()
     {
         var helper = new TestHelper();
@@ -659,6 +718,28 @@ public class TransactionImportServiceTests
                 string.Empty,
                 StringComparison.OrdinalIgnoreCase
             );
+        }
+    }
+
+    private sealed class RaceCreatingSaveChangesInterceptor(Func<Task> createCompetingJob)
+        : SaveChangesInterceptor
+    {
+        private int competingJobCreated;
+
+        public bool Enabled { get; set; }
+
+        public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData,
+            InterceptionResult<int> result,
+            CancellationToken cancellationToken = default
+        )
+        {
+            if (Enabled && Interlocked.Exchange(ref competingJobCreated, 1) == 0)
+            {
+                await createCompetingJob();
+            }
+
+            return await base.SavingChangesAsync(eventData, result, cancellationToken);
         }
     }
 }

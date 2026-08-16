@@ -92,7 +92,26 @@ public class TransactionImportService(
         };
 
         userDataContext.TransactionImportJobs.Add(job);
-        await userDataContext.SaveChangesAsync();
+        try
+        {
+            await userDataContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException) when (normalizedIdempotencyKey is not null)
+        {
+            userDataContext.ChangeTracker.Clear();
+            var existingJob = await userDataContext.TransactionImportJobs.FirstOrDefaultAsync(
+                importJob =>
+                    importJob.UserID == userGuid
+                    && importJob.IdempotencyKey == normalizedIdempotencyKey
+            );
+            if (existingJob is null)
+            {
+                throw;
+            }
+
+            return ToResponse(existingJob);
+        }
+
         return ToResponse(job);
     }
 
