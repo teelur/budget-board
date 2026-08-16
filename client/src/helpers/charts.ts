@@ -321,7 +321,13 @@ export const buildFlowsChartData = (
     nodeLayers.set(name, layer);
     nodeGroups.set(name, group ?? name);
     if (metadata) {
-      nodeMetadata.set(name, metadata);
+      const existing = nodeMetadata.get(name) ?? {};
+      const transactionCount =
+        metadata.transactionCount !== undefined
+          ? (existing.transactionCount ?? 0) + metadata.transactionCount
+          : existing.transactionCount;
+
+      nodeMetadata.set(name, { ...existing, ...metadata, transactionCount });
     }
   };
 
