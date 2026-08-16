@@ -38,10 +38,21 @@ public class TransactionService(
         bool deferSave = false
     )
     {
+        await CreateTransactionAsync(userData, request, deferSave, null);
+    }
+
+    private async Task CreateTransactionAsync(
+        ApplicationUser userData,
+        ITransactionCreateRequest request,
+        bool deferSave,
+        Guid? transactionId
+    )
+    {
         var account = GetAccountByID(userData, request.AccountID);
 
         var newTransaction = new Transaction
         {
+            ID = transactionId ?? Guid.NewGuid(),
             SyncID = request.SyncID,
             Amount = request.Amount,
             Date = request.Date,
@@ -335,6 +346,16 @@ public class TransactionService(
 
         foreach (var transaction in request.Transactions)
         {
+            if (
+                transaction.ID.HasValue
+                && userData
+                    .Accounts.SelectMany(account => account.Transactions)
+                    .Any(existingTransaction => existingTransaction.ID == transaction.ID)
+            )
+            {
+                continue;
+            }
+
             var accountId = request
                 .AccountNameToIDMap.FirstOrDefault(a =>
                     a.AccountName.Equals(
@@ -363,7 +384,7 @@ public class TransactionService(
             (newTransaction.Category, newTransaction.Subcategory) =
                 TransactionCategoriesHelpers.GetFullCategory(coercedCategoryValue, allCategories);
 
-            await CreateTransactionAsync(userData, newTransaction, true);
+            await CreateTransactionAsync(userData, newTransaction, true, transaction.ID);
         }
 
         await userDataContext.SaveChangesAsync();
