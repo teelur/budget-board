@@ -1,10 +1,19 @@
-import { Button, Group, Paper, Progress, Stack } from "@mantine/core";
+import {
+  Affix,
+  Button,
+  FloatingWindow,
+  Group,
+  Progress,
+  Stack,
+  Transition,
+} from "@mantine/core";
 import {
   BanIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   CircleCheckIcon,
   LoaderCircleIcon,
+  CircleXIcon,
   XIcon,
 } from "lucide-react";
 import React from "react";
@@ -21,6 +30,17 @@ const panelCollapsedStorageKey =
 const getStoredPanelCollapsed = () =>
   typeof window !== "undefined" &&
   window.localStorage.getItem(panelCollapsedStorageKey) === "true";
+
+const getInitialPosition = () => {
+  if (typeof window === "undefined") {
+    return { bottom: 10, left: 16 };
+  }
+
+  return {
+    bottom: 10,
+    left: Math.max(16, (window.innerWidth - 384) / 2),
+  };
+};
 
 const TransactionImportJobPanel = () => {
   const { t } = useTranslation();
@@ -88,130 +108,163 @@ const TransactionImportJobPanel = () => {
     });
   };
 
-  const collapsedStatus = isActive
-    ? t("import_in_progress")
-    : t("import_complete");
+  const collapsedStatus =
+    status === "Cancelled"
+      ? t("import_cancelled")
+      : status === "Failed"
+        ? t("import_failed")
+        : isActive
+          ? t("import_in_progress")
+          : t("import_complete");
+  const collapsedStatusIcon =
+    status === "Cancelled" || status === "Failed" ? (
+      <CircleXIcon className={classes.statusIndicator} size={16} />
+    ) : isActive ? (
+      <LoaderCircleIcon
+        className={`${classes.statusIndicator} ${classes.loadingIndicator}`}
+        size={16}
+      />
+    ) : (
+      <CircleCheckIcon className={classes.statusIndicator} size={16} />
+    );
 
   return (
     <>
-      <Paper
-        className={classes.root}
-        data-collapsed={isCollapsed}
-        shadow="md"
-        p="md"
-        radius="sm"
-      >
-        <Stack gap="sm">
-          <Group justify="space-between" align="flex-start" wrap="nowrap">
-            <Stack gap={0}>
-              <PrimaryHeading order={5}>
-                {t("import_transactions")}
-              </PrimaryHeading>
-              <PrimaryText size="sm">{statusMessage}</PrimaryText>
-            </Stack>
-            <Group gap={4} wrap="nowrap">
-              {isTerminal && (
-                <Button
-                  variant="subtle"
-                  size="compact-sm"
-                  p={4}
-                  aria-label={t("dismiss")}
-                  onClick={dismissImport}
-                >
-                  <XIcon size={16} />
-                </Button>
-              )}
-              <Button
-                className={classes.collapseButton}
-                variant="subtle"
-                size="compact-sm"
-                p={4}
-                aria-label={t("hide_import_panel")}
-                onClick={toggleCollapsed}
+      <Transition mounted={!isCollapsed} transition="slide-up" duration={220}>
+        {(styles) => (
+          <FloatingWindow
+            className={classes.root}
+            w="min(24rem, calc(100vw - 2rem))"
+            shadow="md"
+            p="md"
+            radius="sm"
+            withBorder
+            initialPosition={getInitialPosition()}
+            constrainToViewport
+            constrainOffset={16}
+            dragHandleSelector={`.${classes.dragHandle}`}
+            excludeDragHandleSelector="button"
+            style={{ ...styles, cursor: "move" }}
+          >
+            <Stack gap="sm">
+              <Group
+                className={classes.dragHandle}
+                justify="space-between"
+                align="flex-start"
+                wrap="nowrap"
               >
-                <ChevronDownIcon size={16} />
-              </Button>
-            </Group>
-          </Group>
-          {isLoading && !job ? (
-            <Progress value={0} animated />
-          ) : (
-            <>
-              <Progress
-                value={job?.progressPercentage ?? 0}
-                color={progressColor}
-                animated={!isTerminal && !isCancellationRequested}
-              />
-              <PrimaryText size="sm">
-                {t("import_progress", {
-                  processed: job?.processedCount ?? 0,
-                  total: job?.totalCount ?? 0,
-                })}
-              </PrimaryText>
-              {job?.errorMessage ? (
-                <PrimaryText size="sm" c="red">
-                  {job.errorMessage}
-                </PrimaryText>
-              ) : null}
-            </>
-          )}
-          {activeJobId && !isTerminal && !isConfirmingCancel && (
-            <Button
-              color="red"
-              variant="outline"
-              leftSection={<BanIcon size={16} />}
-              loading={isCancelling}
-              disabled={isCancellationRequested}
-              onClick={handleCancel}
-            >
-              {isCancellationRequested ? t("import_cancelling") : t("cancel")}
-            </Button>
-          )}
-          {activeJobId && !isTerminal && isConfirmingCancel && (
-            <Stack gap="xs">
-              <PrimaryText size="sm">
-                {t("confirm_cancel_import_message")}
-              </PrimaryText>
-              <Group grow>
-                <Button
-                  variant="default"
-                  onClick={() => setIsConfirmingCancel(false)}
-                >
-                  {t("cancel")}
-                </Button>
+                <Stack gap={0}>
+                  <PrimaryHeading order={5}>
+                    {t("import_transactions")}
+                  </PrimaryHeading>
+                  <PrimaryText size="sm">{statusMessage}</PrimaryText>
+                </Stack>
+                <Group gap={4} wrap="nowrap">
+                  {isTerminal && (
+                    <Button
+                      variant="subtle"
+                      size="compact-sm"
+                      p={4}
+                      aria-label={t("dismiss")}
+                      onClick={dismissImport}
+                    >
+                      <XIcon size={16} />
+                    </Button>
+                  )}
+                  <Button
+                    className={classes.collapseButton}
+                    variant="subtle"
+                    size="compact-sm"
+                    p={4}
+                    aria-label={t("hide_import_panel")}
+                    onClick={toggleCollapsed}
+                  >
+                    <ChevronDownIcon size={16} />
+                  </Button>
+                </Group>
+              </Group>
+              {isLoading && !job ? (
+                <Progress value={0} animated />
+              ) : (
+                <>
+                  <Progress
+                    value={job?.progressPercentage ?? 0}
+                    color={progressColor}
+                    animated={!isTerminal && !isCancellationRequested}
+                  />
+                  <PrimaryText size="sm">
+                    {t("import_progress", {
+                      processed: job?.processedCount ?? 0,
+                      total: job?.totalCount ?? 0,
+                    })}
+                  </PrimaryText>
+                  {job?.errorMessage ? (
+                    <PrimaryText size="sm" c="red">
+                      {job.errorMessage}
+                    </PrimaryText>
+                  ) : null}
+                </>
+              )}
+              {activeJobId && !isTerminal && !isConfirmingCancel && (
                 <Button
                   color="red"
-                  onClick={() => void confirmCancel()}
+                  variant="outline"
+                  leftSection={<BanIcon size={16} />}
                   loading={isCancelling}
+                  disabled={isCancellationRequested}
+                  onClick={handleCancel}
                 >
-                  {t("confirm_cancel_import")}
+                  {isCancellationRequested
+                    ? t("import_cancelling")
+                    : t("cancel")}
                 </Button>
-              </Group>
+              )}
+              {activeJobId && !isTerminal && isConfirmingCancel && (
+                <Stack gap="xs">
+                  <PrimaryText size="sm">
+                    {t("confirm_cancel_import_message")}
+                  </PrimaryText>
+                  <Group grow>
+                    <Button
+                      variant="default"
+                      onClick={() => setIsConfirmingCancel(false)}
+                    >
+                      {t("cancel")}
+                    </Button>
+                    <Button
+                      color="red"
+                      onClick={() => void confirmCancel()}
+                      loading={isCancelling}
+                    >
+                      {t("confirm_cancel_import")}
+                    </Button>
+                  </Group>
+                </Stack>
+              )}
             </Stack>
+          </FloatingWindow>
+        )}
+      </Transition>
+      <Affix
+        position={{ bottom: 0, left: "50%" }}
+        style={{ transform: "translateX(-50%)" }}
+      >
+        <Transition mounted={isCollapsed} transition="slide-up" duration={220}>
+          {(styles) => (
+            <Button
+              className={classes.tab}
+              size="sm"
+              aria-label={t("show_import_panel")}
+              onClick={toggleCollapsed}
+              leftSection={collapsedStatusIcon}
+              rightSection={<ChevronUpIcon size={16} />}
+              style={styles}
+            >
+              {collapsedStatus}
+            </Button>
           )}
-        </Stack>
-      </Paper>
-      {isCollapsed && (
-        <Button
-          className={classes.tab}
-          size="sm"
-          aria-label={t("show_import_panel")}
-          onClick={toggleCollapsed}
-          leftSection={
-            isActive ? (
-              <LoaderCircleIcon
-                className={`${classes.statusIndicator} ${classes.loadingIndicator}`}
-                size={16}
-              />
-            ) : (
-              <CircleCheckIcon className={classes.statusIndicator} size={16} />
-            )
-          }
-          rightSection={<ChevronUpIcon size={16} />}
-        >
-          {collapsedStatus}
-        </Button>
-      )}
+        </Transition>
+      </Affix>
     </>
   );
 };
