@@ -7,6 +7,7 @@ import {
   Stack,
   Transition,
 } from "@mantine/core";
+import type { SetFloatingWindowPosition } from "@mantine/hooks";
 import {
   BanIcon,
   ChevronDownIcon,
@@ -54,6 +55,11 @@ const TransactionImportJobPanel = () => {
   } = useTransactionImportJob();
   const [isConfirmingCancel, setIsConfirmingCancel] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(getStoredPanelCollapsed);
+  const setPositionRef = React.useRef<SetFloatingWindowPosition | null>(null);
+
+  React.useLayoutEffect(() => {
+    setPositionRef.current?.({ bottom: 16 });
+  }, [isConfirmingCancel]);
 
   if (!activeJobId && !job) {
     return null;
@@ -142,6 +148,7 @@ const TransactionImportJobPanel = () => {
             initialPosition={getInitialPosition()}
             constrainToViewport
             constrainOffset={16}
+            setPositionRef={setPositionRef}
             dragHandleSelector={`.${classes.dragHandle}`}
             excludeDragHandleSelector="button"
             style={{ ...styles, cursor: "move" }}
