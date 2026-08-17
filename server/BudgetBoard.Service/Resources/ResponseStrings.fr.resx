@@ -442,4 +442,7 @@
   <data name="AutomaticRuleInvalidTagsError" xml:space="preserve">
     <value>Tags must be provided as a non-empty JSON array of strings.</value>
   </data>
+  <data name="TransactionImportIdempotencyKeyTooLongError" xml:space="preserve">
+    <value>The Idempotency-Key header cannot exceed {0} characters.</value>
+  </data>
 </root>
