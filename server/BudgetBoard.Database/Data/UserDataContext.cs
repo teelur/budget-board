@@ -42,6 +42,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<SimpleFinOrganization> SimpleFinOrganizations { get; set; }
     public DbSet<SimpleFinAccount> SimpleFinAccounts { get; set; }
     public DbSet<LunchFlowAccount> LunchFlowAccounts { get; set; }
+    public DbSet<TransactionImportJob> TransactionImportJobs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -101,6 +102,22 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         modelBuilder.Entity<AccountType>().ToTable("AccountType");
 
         modelBuilder.Entity<Transaction>().ToTable("Transaction");
+
+        modelBuilder.Entity<TransactionImportJob>(j =>
+        {
+            j.Property(e => e.Payload).HasColumnType("jsonb");
+            j.Property(e => e.Status).HasMaxLength(32).IsRequired();
+            j.Property(e => e.IdempotencyKey)
+                .HasMaxLength(TransactionImportJob.MaxIdempotencyKeyLength);
+            j.HasIndex(e => new { e.Status, e.LeaseExpiresAt });
+            j.HasIndex(e => new { e.UserID, e.CreatedAt });
+            j.HasIndex(e => new { e.UserID, e.IdempotencyKey }).IsUnique();
+            j.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+            j.ToTable("TransactionImportJob");
+        });
 
         modelBuilder.Entity<Tag>(t =>
         {

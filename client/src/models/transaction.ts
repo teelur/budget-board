@@ -21,6 +21,21 @@ export interface ITransactionImportRequest {
   accountNameToIDMap: IAccountNameToIDKeyValuePair[];
 }
 
+export interface ITransactionImportJobResponse {
+  id: string;
+  status: string;
+  totalCount: number;
+  processedCount: number;
+  succeededCount: number;
+  failedCount: number;
+  progressPercentage: number;
+  errorMessage: string | null;
+  cancellationRequested: boolean;
+  createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
+}
+
 export interface ITransactionCreateRequest {
   syncID: string | null;
   amount: number;

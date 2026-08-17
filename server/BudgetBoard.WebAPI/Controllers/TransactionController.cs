@@ -1,7 +1,6 @@
 ﻿using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
-using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +15,7 @@ public class TransactionController(
     ILogger<TransactionController> logger,
     UserManager<ApplicationUser> userManager,
     ITransactionService transactionService,
+    ITransactionImportService transactionImportService,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : ApiControllerBase<TransactionController>(logger, logLocalizer, responseLocalizer)
@@ -162,8 +162,59 @@ public class TransactionController(
                 return Unauthorized();
             }
 
-            await transactionService.ImportTransactionsAsync(parsedUserId, importedTransactions);
-            return Ok();
+            var idempotencyKey = Request.Headers["Idempotency-Key"].FirstOrDefault();
+            var importJob = await transactionImportService.EnqueueAsync(
+                parsedUserId,
+                importedTransactions,
+                idempotencyKey
+            );
+
+            return AcceptedAtAction(
+                nameof(ReadImportStatus),
+                new { jobId = importJob.ID },
+                importJob
+            );
+        });
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("import/{jobId:guid}")]
+    public async Task<IActionResult> ReadImportStatus(Guid jobId)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            var importJob = await transactionImportService.ReadStatusAsync(parsedUserId, jobId);
+            return importJob is null ? NotFound() : Ok(importJob);
+        });
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("import/{jobId:guid}/cancel")]
+    public async Task<IActionResult> CancelImport(Guid jobId)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            var importJob = await transactionImportService.RequestCancellationAsync(
+                parsedUserId,
+                jobId
+            );
+            return importJob is null ? NotFound() : Ok(importJob);
         });
     }
 }

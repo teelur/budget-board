@@ -1,0 +1,41 @@
+.root {
+  background-color: var(--background-color-surface);
+}
+
+.dragHandle {
+  cursor: move;
+}
+
+.collapseButton {
+  flex: 0 0 auto;
+}
+
+.tab {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.statusIndicator {
+  flex: 0 0 auto;
+}
+
+.loadingIndicator {
+  animation: spin 1.1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.progress {
+  flex: 1;
+}
+
+@media (max-width: 30em) {
+  .tab {
+    max-width: calc(100vw - 1rem);
+  }
+}

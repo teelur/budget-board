@@ -17,6 +17,8 @@ import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useImportTransactionsMutation } from "~/hooks/mutations/transactions/useImportTransactionsMutation";
+import ImportProgress from "./ImportProgress/ImportProgress";
+import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -24,6 +26,15 @@ const ImportTransactionsModal = () => {
 
   const { t } = useTranslation();
   const importTransactionsMutation = useImportTransactionsMutation();
+  const {
+    activeJobId,
+    job,
+    isLoading,
+    isCancelling,
+    startImport,
+    cancelImport,
+  } = useTransactionImportJob();
+  const trackedJobId = React.useRef<string | null>(null);
 
   // Load CSV Dialog Data
   const [headers, setHeaders] = React.useState<string[]>([]);
@@ -46,6 +57,17 @@ const ImportTransactionsModal = () => {
 
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
+
+  React.useEffect(() => {
+    if (
+      trackedJobId.current === job?.id &&
+      ["Completed", "CompletedWithErrors", "Failed", "Cancelled"].includes(
+        job.status,
+      )
+    ) {
+      setActiveStep(4);
+    }
+  }, [job]);
 
   /**
    * Handle CSV import data from the file loader component.
@@ -116,9 +138,18 @@ const ImportTransactionsModal = () => {
       accountNameToIDMap: accountNameToAccountArray,
     };
 
-    importTransactionsMutation.mutate(transactionImportRequest, {
-      onSuccess: () => setActiveStep(3),
-    });
+    importTransactionsMutation.mutate(
+      {
+        importedTransactions: transactionImportRequest,
+        idempotencyKey: crypto.randomUUID(),
+      },
+      {
+        onSuccess: (response) => {
+          startImport(response.data.id);
+          setActiveStep(3);
+        },
+      },
+    );
   };
 
   const advanceToAccountMappingDialog = (
@@ -135,7 +166,13 @@ const ImportTransactionsModal = () => {
         rightSection={<FileDownIcon size="1rem" />}
         onClick={() => {
           resetData();
-          setActiveStep(0);
+          if (activeJobId && job?.id === activeJobId) {
+            trackedJobId.current = activeJobId;
+            setActiveStep(3);
+          } else {
+            trackedJobId.current = null;
+            setActiveStep(0);
+          }
           open();
         }}
       >
@@ -184,10 +221,27 @@ const ImportTransactionsModal = () => {
               isSubmitting={importTransactionsMutation.isPending}
             />
           </Stepper.Step>
+          <Stepper.Step
+            label={t("step_4")}
+            description={t("import_progress_step")}
+          >
+            <ImportProgress
+              job={job}
+              isLoading={isLoading}
+              isCancelling={isCancelling}
+              onCancel={async () => {
+                await cancelImport();
+                close();
+              }}
+            />
+          </Stepper.Step>
           <Stepper.Completed>
             <ImportCompleted
               goBackToPreviousDialog={() => setActiveStep(2)}
               closeModal={close}
+              hasErrors={job?.status === "CompletedWithErrors"}
+              isCancelled={job?.status === "Cancelled"}
+              isFailed={job?.status === "Failed"}
             />
           </Stepper.Completed>
         </Stepper>
