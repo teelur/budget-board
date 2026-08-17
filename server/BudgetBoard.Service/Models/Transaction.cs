@@ -87,6 +87,7 @@ public class TransactionSplitRequest : ITransactionSplitRequest
 
 public class TransactionImport
 {
+    public Guid? ID { get; set; } = null;
     public DateOnly? Date { get; set; } = null;
     public string? MerchantName { get; set; } = null;
     public string? Category { get; set; } = null;

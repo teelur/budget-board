@@ -1,5 +1,6 @@
 import "./App.css";
 import "@mantine/core/styles.css";
+import "@mantine/core/styles/FloatingWindow.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/notifications/styles.layer.css";
 import "@mantine/dates/styles.css";

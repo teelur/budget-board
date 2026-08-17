@@ -2,29 +2,16 @@ import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
-import { ITransactionImportRequest } from "~/models/transaction";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-interface IImportTransactionsMutationVariables {
-  importedTransactions: ITransactionImportRequest;
-  idempotencyKey: string;
-}
-
-export const useImportTransactionsMutation = () => {
+export const useCancelTransactionImportJobMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async ({
-      importedTransactions,
-      idempotencyKey,
-    }: IImportTransactionsMutationVariables) =>
+    mutationFn: async (jobId: string) =>
       await request({
-        url: "/api/transaction/import",
+        url: `/api/transaction/import/${jobId}/cancel`,
         method: "POST",
-        data: importedTransactions,
-        headers: {
-          "Idempotency-Key": idempotencyKey,
-        },
       }),
     onError: (error: AxiosError) => {
       notifications.show({

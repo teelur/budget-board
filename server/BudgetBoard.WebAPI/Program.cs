@@ -159,6 +159,7 @@ builder.Host.UseSerilog(
 );
 
 builder.Services.AddHttpClient();
+builder.Services.AddHostedService<TransactionImportWorker>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -217,6 +218,7 @@ builder.Services.AddSingleton<INowProvider, NowProvider>();
 // Add the services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ITransactionImportService, TransactionImportService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IBalanceService, BalanceService>();
