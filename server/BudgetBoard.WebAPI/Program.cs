@@ -99,6 +99,7 @@ builder.Services.AddScoped<ILargeObjectStore>(sp => sp.GetRequiredService<UserDa
 builder.Services.AddScoped<DatabaseMigrationRunner>();
 
 builder.Services.AddLocalization();
+builder.Services.AddHealthChecks();
 
 var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 var disableLocalAuth = builder.Configuration.GetValue<bool>("DISABLE_LOCAL_AUTH");
@@ -373,6 +374,7 @@ localizationOptions.RequestCultureProviders.Insert(0, new UserLanguageCulturePro
 
 app.UseRequestLocalization(localizationOptions);
 
+app.MapHealthChecks("/health").AllowAnonymous();
 app.MapControllers();
 
 // Automatically apply any Db changes

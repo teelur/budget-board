@@ -7,6 +7,7 @@ services:
     environment:
       Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
       CLIENT_ADDRESS: budget-board-client
+      ASPNETCORE_HTTP_PORTS: 8080
       POSTGRES_HOST: ${POSTGRES_HOST:-budget-board-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       POSTGRES_DATABASE: ${POSTGRES_DATABASE:?POSTGRES_DATABASE must be set; use --env-file compose.env}
@@ -32,6 +33,20 @@ services:
     depends_on:
       budget-board-db:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "http://localhost:8080/health",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   budget-board-client:
     container_name: budget-board-client
@@ -51,7 +66,8 @@ services:
     networks:
       - budget-board-network
     depends_on:
-      - budget-board-server
+      budget-board-server:
+        condition: service_healthy
   budget-board-db:
     container_name: postgres-db
     image: postgres:16

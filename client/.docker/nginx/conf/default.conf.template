@@ -26,6 +26,7 @@ server {
 
   location /api/ {
     # This will redirect a request from this container to our backend container.
+    client_max_body_size 50m;
     proxy_pass http://backend_server/api/;
     proxy_set_header Host ${DOLLAR}proxy_host:${DOLLAR}proxy_port;
     
