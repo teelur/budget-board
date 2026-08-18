@@ -145,6 +145,21 @@
     <data name="BudgetNotFoundLog" xml:space="preserve">
         <value>Attempted to access a budget that does not exist.</value>
     </data>
+    <data name="DatabaseAutomaticUpdatesDisabledLog" xml:space="preserve">
+        <value>Automatic database updates are not enabled.</value>
+    </data>
+    <data name="DatabaseMigrationCompletedLog" xml:space="preserve">
+        <value>Database migrations completed successfully.</value>
+    </data>
+    <data name="DatabaseMigrationFailedLog" xml:space="preserve">
+        <value>Database migration failed. Verify that PostgreSQL is available and the configured database is valid before restarting.</value>
+    </data>
+    <data name="DatabaseMigrationInvalidCredentialsLog" xml:space="preserve">
+        <value>Database migration failed because PostgreSQL rejected the configured credentials. Verify POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DATABASE, POSTGRES_USER, and POSTGRES_PASSWORD.</value>
+    </data>
+    <data name="DatabaseMigrationStartingLog" xml:space="preserve">
+        <value>Updating database with the latest migrations.</value>
+    </data>
     <data name="BudgetUpdateParentLimitErrorLog" xml:space="preserve">
         <value>Attempted to update parent budget to a value less than the sum of its children.</value>
     </data>

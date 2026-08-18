@@ -7,11 +7,12 @@ services:
     environment:
       Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
       CLIENT_ADDRESS: budget-board-client
+      ASPNETCORE_HTTP_PORTS: 8080
       POSTGRES_HOST: ${POSTGRES_HOST:-budget-board-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-budgetboard}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-superSecretPassword}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:?POSTGRES_DATABASE must be set; use --env-file compose.env}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set; use --env-file compose.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set; use --env-file compose.env}
       OIDC_ENABLED: ${OIDC_ENABLED:-false}
       OIDC_ISSUER: ${OIDC_ISSUER:-}
       OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
@@ -32,6 +33,20 @@ services:
     depends_on:
       budget-board-db:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "http://localhost:8080/health",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   budget-board-client:
     container_name: budget-board-client
@@ -51,16 +66,17 @@ services:
     networks:
       - budget-board-network
     depends_on:
-      - budget-board-server
+      budget-board-server:
+        condition: service_healthy
   budget-board-db:
     container_name: postgres-db
     image: postgres:16
     restart: unless-stopped
     command: ["-c", "timezone=${TZ:-UTC}"]
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-superSecretPassword}
-      POSTGRES_DB: ${POSTGRES_DATABASE:-budgetboard}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set; use --env-file compose.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set; use --env-file compose.env}
+      POSTGRES_DB: ${POSTGRES_DATABASE:?POSTGRES_DATABASE must be set; use --env-file compose.env}
     ports:
       - "6252:5432"
     volumes:
@@ -68,7 +84,11 @@ services:
     networks:
       - budget-board-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d budgetboard"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:?POSTGRES_USER must be set; use --env-file compose.env} -d ${POSTGRES_DATABASE:?POSTGRES_DATABASE must be set; use --env-file compose.env}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5

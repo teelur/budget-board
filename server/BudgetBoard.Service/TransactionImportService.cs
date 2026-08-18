@@ -482,56 +482,62 @@ public class TransactionImportService(
             await userDataContext.SaveChangesAsync(cancellationToken);
         }
 
-        Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? databaseTransaction = null;
         if (userDataContext.Database.IsRelational())
         {
-            databaseTransaction = await userDataContext.Database.BeginTransactionAsync(
-                cancellationToken
-            );
+            var executionStrategy = userDataContext.Database.CreateExecutionStrategy();
+            return await executionStrategy.ExecuteAsync(async () =>
+            {
+                await using var databaseTransaction =
+                    await userDataContext.Database.BeginTransactionAsync(cancellationToken);
+                var job = await userDataContext
+                    .TransactionImportJobs.FromSqlRaw(
+                        """
+                        SELECT *
+                        FROM "TransactionImportJob"
+                        WHERE "Status" = 'Pending'
+                        ORDER BY "CreatedAt"
+                        FOR UPDATE SKIP LOCKED
+                        LIMIT 1
+                        """
+                    )
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (job is null)
+                {
+                    await databaseTransaction.CommitAsync(cancellationToken);
+                    return null;
+                }
+
+                job.Status = TransactionImportJobStatuses.Running;
+                job.AttemptCount++;
+                job.StartedAt ??= now;
+                job.LastHeartbeatAt = now;
+                job.LeaseExpiresAt = now.Add(JobLeaseDuration);
+                await userDataContext.SaveChangesAsync(cancellationToken);
+                await databaseTransaction.CommitAsync(cancellationToken);
+                return job;
+            });
         }
 
-        var job = userDataContext.Database.IsRelational()
-            ? await userDataContext
-                .TransactionImportJobs.FromSqlRaw(
-                    """
-                    SELECT *
-                    FROM "TransactionImportJob"
-                    WHERE "Status" = 'Pending'
-                    ORDER BY "CreatedAt"
-                    FOR UPDATE SKIP LOCKED
-                    LIMIT 1
-                    """
-                )
-                .FirstOrDefaultAsync(cancellationToken)
-            : await userDataContext
-                .TransactionImportJobs.Where(importJob =>
-                    importJob.Status == TransactionImportJobStatuses.Pending
-                )
-                .OrderBy(importJob => importJob.CreatedAt)
-                .FirstOrDefaultAsync(cancellationToken);
+        var inMemoryJob = await userDataContext
+            .TransactionImportJobs.Where(importJob =>
+                importJob.Status == TransactionImportJobStatuses.Pending
+            )
+            .OrderBy(importJob => importJob.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (job is null)
+        if (inMemoryJob is null)
         {
-            if (databaseTransaction is not null)
-            {
-                await databaseTransaction.CommitAsync(cancellationToken);
-                await databaseTransaction.DisposeAsync();
-            }
             return null;
         }
 
-        job.Status = TransactionImportJobStatuses.Running;
-        job.AttemptCount++;
-        job.StartedAt ??= now;
-        job.LastHeartbeatAt = now;
-        job.LeaseExpiresAt = now.Add(JobLeaseDuration);
+        inMemoryJob.Status = TransactionImportJobStatuses.Running;
+        inMemoryJob.AttemptCount++;
+        inMemoryJob.StartedAt ??= now;
+        inMemoryJob.LastHeartbeatAt = now;
+        inMemoryJob.LeaseExpiresAt = now.Add(JobLeaseDuration);
         await userDataContext.SaveChangesAsync(cancellationToken);
-        if (databaseTransaction is not null)
-        {
-            await databaseTransaction.CommitAsync(cancellationToken);
-            await databaseTransaction.DisposeAsync();
-        }
-        return job;
+        return inMemoryJob;
     }
 
     private static TransactionImportJobResponse ToResponse(TransactionImportJob job) =>
