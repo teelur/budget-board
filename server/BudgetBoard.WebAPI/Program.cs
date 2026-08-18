@@ -5,6 +5,7 @@ using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
+using BudgetBoard.Service.Resources;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Extensions;
 using BudgetBoard.WebAPI.Jobs;
@@ -14,6 +15,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Npgsql;
 using Quartz;
 using Serilog;
 
@@ -65,23 +68,38 @@ var postgresPassword = builder.Configuration.GetValue<string>("POSTGRES_PASSWORD
 
 var postgresPort = builder.Configuration.GetValue<int?>("POSTGRES_PORT") ?? 5432;
 
-var connectionString = new string(
-    "Host={HOST};Port={PORT};Database={DATABASE};Username={USER};Password={PASSWORD}"
-)
-    .Replace("{HOST}", postgresHost)
-    .Replace("{PORT}", postgresPort.ToString())
-    .Replace("{DATABASE}", postgresDatabase)
-    .Replace("{USER}", postgresUser)
-    .Replace("{PASSWORD}", postgresPassword);
+var connectionStringBuilder = new NpgsqlConnectionStringBuilder
+{
+    Host = postgresHost,
+    Port = postgresPort,
+    Database = postgresDatabase,
+    Username = postgresUser,
+};
 
-System.Diagnostics.Debug.WriteLine("Connection string: " + connectionString);
+if (postgresPassword is not null)
+{
+    connectionStringBuilder.Password = postgresPassword;
+}
+
+var connectionString = connectionStringBuilder.ConnectionString;
 
 builder.Services.AddDbContext<UserDataContext>(o =>
-    o.UseNpgsql(connectionString).AddInterceptors(new StringSanitizationInterceptor())
+    o.UseNpgsql(
+            connectionString,
+            npgsqlOptions =>
+                npgsqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(5),
+                    errorCodesToAdd: null
+                )
+        )
+        .AddInterceptors(new StringSanitizationInterceptor())
 );
 builder.Services.AddScoped<ILargeObjectStore>(sp => sp.GetRequiredService<UserDataContext>());
+builder.Services.AddScoped<DatabaseMigrationRunner>();
 
 builder.Services.AddLocalization();
+builder.Services.AddHealthChecks();
 
 var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 var disableLocalAuth = builder.Configuration.GetValue<bool>("DISABLE_LOCAL_AUTH");
@@ -276,6 +294,7 @@ var app = builder.Build();
 
 // Log authentication configuration
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var logLocalizer = app.Services.GetRequiredService<IStringLocalizer<LogStrings>>();
 var disableNewUsers = builder.Configuration.GetValue<bool>("DISABLE_NEW_USERS");
 
 if (disableLocalAuth)
@@ -353,19 +372,28 @@ localizationOptions.RequestCultureProviders.Insert(0, new UserLanguageCulturePro
 
 app.UseRequestLocalization(localizationOptions);
 
+app.MapHealthChecks("/health").AllowAnonymous();
 app.MapControllers();
 
 // Automatically apply any Db changes
 if (autoUpdateDb)
 {
-    System.Diagnostics.Debug.WriteLine("Updating Db with latest migration...");
+    logger.LogInformation("{LogMessage}", logLocalizer["DatabaseMigrationStartingLog"]);
     using var serviceScope = app.Services.CreateScope();
     var dbContext = serviceScope.ServiceProvider.GetRequiredService<UserDataContext>();
-    dbContext.Database.Migrate();
+    var migrationRunner =
+        serviceScope.ServiceProvider.GetRequiredService<DatabaseMigrationRunner>();
+    var migrationSucceeded = await migrationRunner.RunAsync(dbContext);
+
+    if (!migrationSucceeded)
+    {
+        Environment.ExitCode = 1;
+        return;
+    }
 }
 else
 {
-    System.Diagnostics.Debug.WriteLine("Automatic Db updates not enabled.");
+    logger.LogInformation("{LogMessage}", logLocalizer["DatabaseAutomaticUpdatesDisabledLog"]);
 }
 
 // Enabling demo mode will clear the database and seed demo data on startup.
