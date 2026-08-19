@@ -9,10 +9,32 @@
   background-color: color-mix(
     in srgb,
     var(--mantine-primary-color-filled) 8%,
-    var(--card-bg, var(--background-color-surface))
+    var(--card-bg)
   );
   border-color: var(--mantine-primary-color-filled);
   cursor: pointer;
+}
+
+.hoverable[data-hover-effect="true"] {
+  border-color: var(--hoverable-border-color);
+}
+
+@keyframes hoverable-card-border-flash {
+  0% {
+    border-color: var(--hoverable-border-color);
+  }
+
+  35% {
+    border-color: var(--mantine-color-white, #ffffff);
+  }
+
+  100% {
+    border-color: var(--mantine-primary-color-filled);
+  }
+}
+
+.hoverable[data-hover-effect="true"][data-hover-variant="card"]:hover {
+  animation: hoverable-card-border-flash 0.3s ease both;
 }
 
 .outline[data-hover-effect="true"]:hover {

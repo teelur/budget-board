@@ -1,5 +1,6 @@
 .root {
   --card-bg: var(--background-color-surface);
+  --hoverable-border-color: var(--surface-color-border);
   border-color: var(--surface-color-border);
 }
 
