@@ -132,37 +132,35 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
             </Button>
           </Flex>
         )}
-        <Stack gap="0.5rem" flex="1 1 auto">
-          <Stack id={props.institution.id} gap="0.5rem">
-            <DragDropProvider
-              onDragEnd={(event) => {
-                const updatedList = move(sortedAccounts, event).map(
-                  (acc, index) => ({
-                    ...acc,
-                    index,
-                  }),
-                );
+        <Stack id={props.institution.id} w="100%" py="0.125rem" gap="0.5rem">
+          <DragDropProvider
+            onDragEnd={(event) => {
+              const updatedList = move(sortedAccounts, event).map(
+                (acc, index) => ({
+                  ...acc,
+                  index,
+                }),
+              );
 
-                setSortedAccounts(updatedList);
-              }}
-            >
-              {sortedAccounts.map((account, index) => (
-                <React.Fragment key={account.id}>
-                  <AccountItem
-                    account={account}
-                    isSortable={props.isSortable}
-                    container={
-                      document.getElementById(props.institution.id) as Element
-                    }
-                    openDetails={props.openDetails}
-                  />
-                  {index < sortedAccounts.length - 1 && (
-                    <Divider w="100%" size="xs" elevation={0} />
-                  )}
-                </React.Fragment>
-              ))}
-            </DragDropProvider>
-          </Stack>
+              setSortedAccounts(updatedList);
+            }}
+          >
+            {sortedAccounts.map((account, index) => (
+              <React.Fragment key={account.id}>
+                <AccountItem
+                  account={account}
+                  isSortable={props.isSortable}
+                  container={
+                    document.getElementById(props.institution.id) as Element
+                  }
+                  openDetails={props.openDetails}
+                />
+                {index < sortedAccounts.length - 1 && (
+                  <Divider w="100%" p={0} size="xs" elevation={0} />
+                )}
+              </React.Fragment>
+            ))}
+          </DragDropProvider>
         </Stack>
       </Group>
     </Card>
