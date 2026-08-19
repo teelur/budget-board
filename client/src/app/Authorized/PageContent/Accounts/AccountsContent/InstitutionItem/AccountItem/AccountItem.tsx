@@ -1,6 +1,6 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { Button, Flex, Group } from "@mantine/core";
+import { Button, Flex, Group, Stack } from "@mantine/core";
 import { GripVertical } from "lucide-react";
 import { IAccountResponse } from "~/models/account";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
@@ -9,7 +9,8 @@ import { closestCenter } from "@dnd-kit/collision";
 import { useDisclosure } from "@mantine/hooks";
 import AccountItemContent from "./AccountItemContent/AccountItemContent";
 import EditableAccountItemContent from "./EditableAccountItemContent/EditableAccountItemContent";
-import Card from "~/components/core/Card/Card";
+import classes from "./AccountItem.module.css";
+import hoverClasses from "~/styles/Hoverable.module.css";
 
 interface IAccountItemProps {
   account: IAccountResponse;
@@ -34,11 +35,14 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
   });
 
   return (
-    <Card
+    <Stack
+      mx="0.5rem"
+      my="0.25rem"
+      className={`${classes.root} ${hoverClasses.hoverable} ${hoverClasses.outline}`}
+      data-editing={isSelected}
+      data-hover-effect={!isSelected ? "true" : undefined}
       ref={props.isSortable ? ref : undefined}
       onClick={() => !isSelected && props.openDetails(props.account)}
-      hoverEffect={!isSelected}
-      elevation={2}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (
@@ -54,7 +58,7 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
           <AccountItemContent account={props.account} toggle={toggle} />
         )}
       </Group>
-    </Card>
+    </Stack>
   );
 };
 export default AccountItem;

@@ -1,0 +1,21 @@
+.hoverable {
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    outline-color 0.3s ease;
+}
+
+.hoverable[data-hover-effect="true"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-primary-color-filled) 8%,
+    var(--card-bg, var(--background-color-surface))
+  );
+  border-color: var(--mantine-primary-color-filled);
+  cursor: pointer;
+}
+
+.outline[data-hover-effect="true"]:hover {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: 1px;
+}
