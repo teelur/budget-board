@@ -1,4 +1,5 @@
 import classes from "./AccountItem.module.css";
+import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { Group, Stack } from "@mantine/core";
 import { IAccountResponse } from "~/models/account";
@@ -24,7 +25,12 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
       h="100%"
       justify="space-between"
       wrap="nowrap"
-      className={props.onClick ? classes.root : undefined}
+      className={
+        props.onClick
+          ? `${classes.root} ${hoverClasses.hoverable} ${hoverClasses.outline}`
+          : undefined
+      }
+      data-hover-effect={props.onClick ? "true" : undefined}
       onClick={props.onClick}
     >
       <Stack h="100%" gap={0}>
