@@ -29,10 +29,13 @@ const TransactionCardBase = ({
 }: TransactionCardBaseProps): React.ReactNode => {
   const { t } = useTranslation();
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false);
   const selectionMode = onToggleSelect !== undefined;
+  const hoverEffect = cardProps.hoverEffect ?? selectionMode;
+  const isDetailsExpanded = isDetailsOpen || (hoverEffect && isHovered);
   const detailsId = React.useId();
   const detailsLabel = t(
-    isDetailsOpen
+    isDetailsExpanded
       ? "collapse_transaction_details"
       : "expand_transaction_details",
   );
@@ -53,7 +56,7 @@ const TransactionCardBase = ({
       size="sm"
       aria-label={detailsLabel}
       title={detailsLabel}
-      aria-expanded={isDetailsOpen}
+      aria-expanded={isDetailsExpanded}
       aria-controls={detailsId}
       onClick={(event) => {
         event.stopPropagation();
@@ -68,54 +71,59 @@ const TransactionCardBase = ({
   );
 
   return (
-    <Card
-      w={cardProps.w ?? "100%"}
-      p={cardProps.p ?? "0.2rem"}
-      {...cardProps}
-      style={{ containerType: "inline-size" }}
-      onClick={
-        selectionMode ? () => onToggleSelect!(transaction.id) : undefined
-      }
-      hoverEffect={cardProps.hoverEffect ?? selectionMode}
-      elevation={elevation ?? 0}
-      className={cardProps.className}
-      data-selection-mode={selectionMode ? "true" : undefined}
+    <div
+      onMouseEnter={() => hoverEffect && setIsHovered(true)}
+      onMouseLeave={() => hoverEffect && setIsHovered(false)}
     >
-      {selectionMode ? (
-        <div className={classes.header}>
-          <Group
-            className={classes.selectionGroup}
-            data-selected={isSelected ? "true" : "false"}
-            wrap="nowrap"
-            gap="0.5rem"
-            align="center"
-          >
-            <div className={classes.checkboxWrapper}>
-              <Checkbox
-                size="xs"
-                checked={isSelected ?? false}
-                onChange={() => onToggleSelect!(transaction.id)}
-                onClick={(event) => event.stopPropagation()}
-                elevation={elevation ?? 0}
-              />
-            </div>
+      <Card
+        w={cardProps.w ?? "100%"}
+        p={cardProps.p ?? "0.2rem"}
+        {...cardProps}
+        style={{ containerType: "inline-size" }}
+        onClick={
+          selectionMode ? () => onToggleSelect!(transaction.id) : undefined
+        }
+        hoverEffect={hoverEffect}
+        elevation={elevation ?? 0}
+        className={cardProps.className}
+        data-selection-mode={selectionMode ? "true" : undefined}
+      >
+        {selectionMode ? (
+          <div className={classes.header}>
+            <Group
+              className={classes.selectionGroup}
+              data-selected={isSelected ? "true" : "false"}
+              wrap="nowrap"
+              gap="0.5rem"
+              align="center"
+            >
+              <div className={classes.checkboxWrapper}>
+                <Checkbox
+                  size="xs"
+                  checked={isSelected ?? false}
+                  onChange={() => onToggleSelect!(transaction.id)}
+                  onClick={(event) => event.stopPropagation()}
+                  elevation={elevation ?? 0}
+                />
+              </div>
+              {transactionContent}
+            </Group>
+            {detailsToggle}
+          </div>
+        ) : (
+          <div className={classes.header}>
             {transactionContent}
-          </Group>
-          {detailsToggle}
-        </div>
-      ) : (
-        <div className={classes.header}>
-          {transactionContent}
-          {detailsToggle}
-        </div>
-      )}
-      <Collapse id={detailsId} expanded={isDetailsOpen}>
-        <TransactionCardDetails
-          transaction={transaction}
-          elevation={elevation ?? 0}
-        />
-      </Collapse>
-    </Card>
+            {detailsToggle}
+          </div>
+        )}
+        <Collapse id={detailsId} expanded={isDetailsExpanded}>
+          <TransactionCardDetails
+            transaction={transaction}
+            elevation={elevation ?? 0}
+          />
+        </Collapse>
+      </Card>
+    </div>
   );
 };
 
