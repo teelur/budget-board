@@ -1,8 +1,10 @@
 import classes from "./BudgetParentCard.module.css";
+import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
 import {
   ActionIcon,
+  Box,
   Button,
   Flex,
   Group,
@@ -14,13 +16,14 @@ import { IBudget } from "~/models/budget";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
-import { PencilIcon, TrashIcon } from "lucide-react";
+import { ChevronDown, PencilIcon, TrashIcon } from "lucide-react";
 import { StatusColorType } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { CategoryTypes, ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
 import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
 import Card from "~/components/core/Card/Card";
+import Divider from "~/components/core/Divider/Divider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
@@ -34,6 +37,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -42,10 +46,13 @@ export interface BudgetParentCardProps {
   categoryToTransactionsTotalMap: Map<string, number>;
   selectedDate: Date | null;
   openDetails: (category: string, month: Date | null) => void;
+  isCollapsed: boolean;
+  toggleCollapsed: () => void;
 }
 
 const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const [isSelected, { toggle, close }] = useDisclosure(false);
+  const childrenId = React.useId();
 
   const { t } = useTranslation();
   const { dayjs, thousandsSeparator, decimalSeparator } = useLocale();
@@ -108,14 +115,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     0,
   );
 
-  interface ChildCards {
-    budgetChildCards: React.ReactNode[];
-    unbudgetChildCards: React.ReactNode[];
-  }
-
-  const buildChildren = (): ChildCards => {
-    const budgetChildCards: React.ReactNode[] = [];
-    const unbudgetChildCards: React.ReactNode[] = [];
+  const buildChildren = (): React.ReactNode[] => {
+    const budgetedChildCards: React.ReactNode[] = [];
+    const unbudgetedChildCards: React.ReactNode[] = [];
 
     props.categoryTree.subCategories.forEach((subCategory) => {
       if (
@@ -129,7 +131,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
           budgets.length === 1 && props.selectedDate
             ? (budgets[0]?.id ?? "")
             : "";
-        budgetChildCards.push(
+        budgetedChildCards.push(
           <BudgetChildCard
             key={subCategory.value}
             id={budgetId}
@@ -153,39 +155,42 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
           subCategory.value.toLocaleLowerCase(),
         )
       ) {
-        unbudgetChildCards.push(
-          <UnbudgetChildCard
-            key={subCategory.value}
-            category={subCategory.value}
-            amount={
-              props.categoryToTransactionsTotalMap.get(
-                subCategory.value.toLowerCase(),
-              ) ?? 0
-            }
-            selectedDate={props.selectedDate}
-            isIncome={isIncome}
-            openDetails={props.openDetails}
-          />,
-        );
+        const amount =
+          props.categoryToTransactionsTotalMap.get(
+            subCategory.value.toLowerCase(),
+          ) ?? 0;
+        if (roundAwayFromZero(amount) !== 0) {
+          unbudgetedChildCards.push(
+            <UnbudgetChildCard
+              key={subCategory.value}
+              category={subCategory.value}
+              amount={amount}
+              selectedDate={props.selectedDate}
+              isIncome={isIncome}
+              openDetails={props.openDetails}
+            />,
+          );
+        }
       }
     });
 
-    return { budgetChildCards, unbudgetChildCards };
+    return [...budgetedChildCards, ...unbudgetedChildCards];
   };
 
-  const { budgetChildCards, unbudgetChildCards } = buildChildren();
+  const childCards = buildChildren();
 
   return (
-    <Stack w="100%" gap="0.25rem">
-      <Card
+    <Card p={0} w="100%" elevation={1}>
+      <Box
+        m="0.25rem"
         p="0.25rem 0.5rem"
+        className={`${classes.header} ${hoverClasses.hoverable} ${hoverClasses.outline}`}
+        data-hover-effect="true"
         onClick={() => {
           if (id.length > 0) {
             props.openDetails(props.categoryTree.value, props.selectedDate);
           }
         }}
-        hoverEffect
-        elevation={1}
       >
         <LoadingOverlay
           visible={
@@ -201,9 +206,31 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               gap={0}
             >
               <Group gap="0.25rem" align="center">
-                <PrimaryText className={classes.title} elevation={1}>
+                {childCards.length > 0 && (
+                  <ActionIcon
+                    variant="transparent"
+                    size="md"
+                    aria-label={t("toggle_budget_category", {
+                      category: props.categoryTree.value,
+                    })}
+                    aria-expanded={!props.isCollapsed}
+                    aria-controls={childrenId}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      props.toggleCollapsed();
+                    }}
+                  >
+                    <ChevronDown
+                      className={
+                        props.isCollapsed ? classes.collapseIcon : undefined
+                      }
+                      size={18}
+                    />
+                  </ActionIcon>
+                )}
+                <PrimaryHeading className={classes.title}>
                   {props.categoryTree.value}
-                </PrimaryText>
+                </PrimaryHeading>
                 <ActionIcon
                   variant={isSelected ? "outline" : "transparent"}
                   size="md"
@@ -365,15 +392,26 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
             </Flex>
           )}
         </Group>
-      </Card>
-      {props.categoryTree.subCategories.length > 0 &&
-        (budgetChildCards.length > 0 || unbudgetChildCards.length > 0) && (
-          <Stack gap="0.25rem">
-            {budgetChildCards.length > 0 && budgetChildCards}
-            {unbudgetChildCards.length > 0 && unbudgetChildCards}
+      </Box>
+      {childCards.length > 0 && !props.isCollapsed && (
+        <>
+          <Divider w="100%" size="sm" elevation={0} />
+          <Stack
+            id={childrenId}
+            role="region"
+            aria-label={props.categoryTree.value}
+            gap={0}
+          >
+            {childCards.map((childCard, index) => (
+              <React.Fragment key={index}>
+                {index > 0 && <Divider w="100%" size="xs" elevation={0} />}
+                {childCard}
+              </React.Fragment>
+            ))}
           </Stack>
-        )}
-    </Stack>
+        </>
+      )}
+    </Card>
   );
 };
 

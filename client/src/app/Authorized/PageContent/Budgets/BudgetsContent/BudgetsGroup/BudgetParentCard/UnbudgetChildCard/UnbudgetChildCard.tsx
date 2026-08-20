@@ -1,10 +1,10 @@
 import classes from "./UnbudgetChildCard.module.css";
+import hoverClasses from "~/styles/Hoverable.module.css";
 
-import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
-import { CornerDownRight, PlusIcon } from "lucide-react";
+import { ActionIcon, Box, Group, LoadingOverlay } from "@mantine/core";
+import { PlusIcon } from "lucide-react";
 import React from "react";
 import { roundAwayFromZero } from "~/helpers/utils";
-import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -27,56 +27,55 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
   }
 
   return (
-    <Group wrap="nowrap">
-      <CornerDownRight />
-      <Card
+    <Box
+      mx="0.25rem"
+      my="0.125rem"
+      p="0.25rem"
+      pl="1.5rem"
+      data-hover-effect="true"
+      className={`${classes.row} ${hoverClasses.hoverable} ${hoverClasses.outline}`}
+      onClick={() => {
+        if (props.selectedDate) {
+          props.openDetails(props.category, props.selectedDate);
+        }
+      }}
+    >
+      <LoadingOverlay visible={createBudgetMutation.isPending} />
+      <Group
+        justify="space-between"
         w="100%"
-        p="0.25rem"
-        onClick={() => {
-          if (props.selectedDate) {
-            props.openDetails(props.category, props.selectedDate);
-          }
-        }}
-        hoverEffect
-        elevation={1}
+        style={{ containerType: "inline-size" }}
       >
-        <LoadingOverlay visible={createBudgetMutation.isPending} />
-        <Group
-          justify="space-between"
-          w="100%"
-          style={{ containerType: "inline-size" }}
-        >
+        <PrimaryText className={classes.text} elevation={1}>
+          {props.category}
+        </PrimaryText>
+        <Group gap="0.5rem">
           <PrimaryText className={classes.text} elevation={1}>
-            {props.category}
+            <SensitiveAmount
+              amount={props.amount * (props.isIncome ? 1 : -1)}
+              includeCents={false}
+            />
           </PrimaryText>
-          <Group gap="0.5rem">
-            <PrimaryText className={classes.text} elevation={1}>
-              <SensitiveAmount
-                amount={props.amount * (props.isIncome ? 1 : -1)}
-                includeCents={false}
-              />
-            </PrimaryText>
-            {props.selectedDate && (
-              <ActionIcon
-                size="sm"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  createBudgetMutation.mutate([
-                    {
-                      month: dayjs(props.selectedDate!).format("YYYY-MM-DD"),
-                      category: props.category,
-                      limit: Math.round(Math.abs(props.amount)),
-                    },
-                  ]);
-                }}
-              >
-                <PlusIcon />
-              </ActionIcon>
-            )}
-          </Group>
+          {props.selectedDate && (
+            <ActionIcon
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                createBudgetMutation.mutate([
+                  {
+                    month: dayjs(props.selectedDate!).format("YYYY-MM-DD"),
+                    category: props.category,
+                    limit: Math.round(Math.abs(props.amount)),
+                  },
+                ]);
+              }}
+            >
+              <PlusIcon />
+            </ActionIcon>
+          )}
         </Group>
-      </Card>
-    </Group>
+      </Group>
+    </Box>
   );
 };
 

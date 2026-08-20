@@ -1,17 +1,21 @@
 import classes from "./BudgetChildCard.module.css";
+import hoverClasses from "~/styles/Hoverable.module.css";
 
+import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
 import {
-  getCurrencySymbol,
-  SignDisplay,
-} from "~/helpers/currency";
-import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+  ActionIcon,
+  Box,
+  Flex,
+  Group,
+  LoadingOverlay,
+  Stack,
+} from "@mantine/core";
 import React from "react";
 import { useField } from "@mantine/form";
-import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
+import { PencilIcon, TrashIcon } from "lucide-react";
 import { StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
-import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
@@ -69,98 +73,54 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100,
   );
   return (
-    <Group wrap="nowrap">
-      <CornerDownRight />
-      <Card
-        p="0.25rem 0.5rem"
-        w="100%"
-        onClick={() => {
-          if (props.id.length > 0) {
-            props.openDetails(props.categoryValue, props.selectedDate);
-          }
-        }}
-        hoverEffect={!isSelected}
-        elevation={1}
-      >
-        <LoadingOverlay
-          visible={
-            updateBudgetMutation.isPending || deleteBudgetMutation.isPending
-          }
-        />
-        <Group gap="0.75rem" align="flex-start" wrap="nowrap">
-          <Stack gap={0} w="100%">
-            <Group
-              justify="space-between"
-              align="center"
-              style={{ containerType: "inline-size" }}
-            >
-              <Group gap="0.25rem" align="center">
-                <PrimaryText className={classes.title} elevation={1}>
-                  {props.categoryValue}
-                </PrimaryText>
-                <ActionIcon
-                  variant={isSelected ? "outline" : "transparent"}
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (props.id.length > 0) {
-                      newLimitField.setValue(props.limit);
-                      toggle();
-                    }
-                  }}
-                >
-                  <PencilIcon size={16} />
-                </ActionIcon>
-              </Group>
-              <Group gap="0.25rem" justify="flex-end" align="center">
-                {isSelected ? (
-                  <>
-                    <Trans
-                      i18nKey="budget_amount_fraction_editable_total_styled"
-                      values={{
-                        amount: formatSensitiveAmount(
-                          props.amount * (props.isIncome ? 1 : -1),
-                        ),
-                        total: formatSensitiveAmount(props.limit),
-                      }}
-                      components={[
-                        <PrimaryText
-                          className={classes.text}
-                          key="amount"
-                          elevation={1}
-                        />,
-                        <DimmedText size="sm" key="of" elevation={1} />,
-                      ]}
-                    />
-                    <Flex onClick={(e) => e.stopPropagation()}>
-                      <NumberInput
-                        {...newLimitField.getInputProps()}
-                        onBlur={() => handleEdit(newLimitField.getValue())}
-                        thousandSeparator={thousandsSeparator}
-                        decimalSeparator={decimalSeparator}
-                        min={0}
-                        max={999999}
-                        step={1}
-                        prefix={getCurrencySymbol(preferredCurrency)}
-                        placeholder={t("enter_limit")}
-                        size="xs"
-                        styles={{
-                          root: {
-                            maxWidth: "100px",
-                          },
-                          input: {
-                            padding: "0 10px",
-                            fontSize: "16px",
-                          },
-                        }}
-                        key="total-edit"
-                        elevation={1}
-                      />
-                    </Flex>
-                  </>
-                ) : (
+    <Box
+      mx="0.25rem"
+      my="0.125rem"
+      p="0.25rem 0.5rem"
+      pl="1.5rem"
+      data-hover-effect={!isSelected ? "true" : undefined}
+      className={`${classes.row} ${hoverClasses.hoverable} ${hoverClasses.outline}`}
+      onClick={() => {
+        if (props.id.length > 0) {
+          props.openDetails(props.categoryValue, props.selectedDate);
+        }
+      }}
+    >
+      <LoadingOverlay
+        visible={
+          updateBudgetMutation.isPending || deleteBudgetMutation.isPending
+        }
+      />
+      <Group gap="0.75rem" align="flex-start" wrap="nowrap">
+        <Stack gap={0} w="100%">
+          <Group
+            justify="space-between"
+            align="center"
+            style={{ containerType: "inline-size" }}
+          >
+            <Group gap="0.25rem" align="center">
+              <PrimaryText className={classes.title} elevation={1}>
+                {props.categoryValue}
+              </PrimaryText>
+              <ActionIcon
+                variant={isSelected ? "outline" : "transparent"}
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (props.id.length > 0) {
+                    newLimitField.setValue(props.limit);
+                    toggle();
+                  }
+                }}
+              >
+                <PencilIcon size={16} />
+              </ActionIcon>
+            </Group>
+            <Group gap="0.25rem" justify="flex-end" align="center">
+              {isSelected ? (
+                <>
                   <Trans
-                    i18nKey="budget_amount_fraction_styled"
+                    i18nKey="budget_amount_fraction_editable_total_styled"
                     values={{
                       amount: formatSensitiveAmount(
                         props.amount * (props.isIncome ? 1 : -1),
@@ -174,79 +134,122 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                         elevation={1}
                       />,
                       <DimmedText size="sm" key="of" elevation={1} />,
-                      <PrimaryText
-                        className={classes.text}
-                        key="total"
-                        elevation={1}
-                      />,
                     ]}
                   />
-                )}
-              </Group>
+                  <Flex onClick={(e) => e.stopPropagation()}>
+                    <NumberInput
+                      {...newLimitField.getInputProps()}
+                      onBlur={() => handleEdit(newLimitField.getValue())}
+                      thousandSeparator={thousandsSeparator}
+                      decimalSeparator={decimalSeparator}
+                      min={0}
+                      max={999999}
+                      step={1}
+                      prefix={getCurrencySymbol(preferredCurrency)}
+                      placeholder={t("enter_limit")}
+                      size="xs"
+                      styles={{
+                        root: {
+                          maxWidth: "100px",
+                        },
+                        input: {
+                          padding: "0 10px",
+                          fontSize: "16px",
+                        },
+                      }}
+                      key="total-edit"
+                      elevation={1}
+                    />
+                  </Flex>
+                </>
+              ) : (
+                <Trans
+                  i18nKey="budget_amount_fraction_styled"
+                  values={{
+                    amount: formatSensitiveAmount(
+                      props.amount * (props.isIncome ? 1 : -1),
+                    ),
+                    total: formatSensitiveAmount(props.limit),
+                  }}
+                  components={[
+                    <PrimaryText
+                      className={classes.text}
+                      key="amount"
+                      elevation={1}
+                    />,
+                    <DimmedText size="sm" key="of" elevation={1} />,
+                    <PrimaryText
+                      className={classes.text}
+                      key="total"
+                      elevation={1}
+                    />,
+                  ]}
+                />
+              )}
             </Group>
-            <Group
-              gap="0.25rem"
-              justify="flex-end"
-              align="center"
-              style={{ containerType: "inline-size" }}
-            >
-              <Flex style={{ flex: "1 1 auto" }}>
-                <Progress
-                  size={14}
-                  percentComplete={percentComplete}
-                  amount={props.amount}
-                  limit={props.limit}
+          </Group>
+          <Group
+            gap="0.25rem"
+            justify="flex-end"
+            align="center"
+            style={{ containerType: "inline-size" }}
+          >
+            <Flex style={{ flex: "1 1 auto" }}>
+              <Progress
+                size={14}
+                percentComplete={percentComplete}
+                amount={props.amount}
+                limit={props.limit}
+                type={
+                  props.isIncome ? ProgressType.Income : ProgressType.Expense
+                }
+                warningThreshold={budgetWarningThreshold}
+                elevation={1}
+              />
+            </Flex>
+            <Trans
+              i18nKey="budget_left_styled"
+              values={{
+                amount: formatSensitiveAmount(
+                  roundAwayFromZero(
+                    props.limit - props.amount * (props.isIncome ? 1 : -1),
+                  ),
+                ),
+              }}
+              components={[
+                <StatusText
+                  amount={roundAwayFromZero(props.amount)}
+                  total={props.limit}
                   type={
-                    props.isIncome ? ProgressType.Income : ProgressType.Expense
+                    props.isIncome
+                      ? StatusColorType.Income
+                      : StatusColorType.Expense
                   }
                   warningThreshold={budgetWarningThreshold}
-                  elevation={1}
-                />
-              </Flex>
-              <Trans
-                i18nKey="budget_left_styled"
-                values={{
-                  amount: formatSensitiveAmount(
-                    roundAwayFromZero(
-                      props.limit - props.amount * (props.isIncome ? 1 : -1),
-                    ),
-                  ),
-                }}
-                components={[
-                  <StatusText
-                    amount={roundAwayFromZero(props.amount)}
-                    total={props.limit}
-                    type={
-                      props.isIncome
-                        ? StatusColorType.Income
-                        : StatusColorType.Expense
-                    }
-                    warningThreshold={budgetWarningThreshold}
-                    size="md"
-                    key="amount"
-                  />,
-                  <DimmedText size="md" key="amount" elevation={1} />,
-                ]}
-              />
-            </Group>
-          </Stack>
-          {isSelected && (
-            <Group style={{ alignSelf: "stretch" }}>
-              <ActionIcon
-                color="var(--button-color-destructive)"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteBudgetMutation.mutate(props.id);
-                }}
-                h="100%"
-              >
-                <TrashIcon size="1rem" />
-              </ActionIcon>
-            </Group>
-          )}
-        </Group>
-      </Card>
-    </Group>
+                  size="md"
+                  key="amount"
+                />,
+                <DimmedText size="md" key="amount" elevation={1} />,
+              ]}
+            />
+          </Group>
+        </Stack>
+        {isSelected && (
+          <Group style={{ alignSelf: "stretch" }}>
+            <ActionIcon
+              color="var(--button-color-destructive)"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteBudgetMutation.mutate(props.id);
+              }}
+              h="100%"
+            >
+              <TrashIcon size="1rem" />
+            </ActionIcon>
+          </Group>
+        )}
+      </Group>
+    </Box>
   );
 };
 
