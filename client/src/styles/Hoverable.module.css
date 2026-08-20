@@ -1,8 +1,8 @@
 .hoverable {
   transition:
-    background 0.3s ease,
-    border-color 0.3s ease,
-    outline-color 0.3s ease;
+    background 0.2s ease,
+    border-color 0.2s ease,
+    outline-color 0.2s ease;
 }
 
 .hoverable[data-hover-effect="true"]:hover {
@@ -34,7 +34,7 @@
 }
 
 .hoverable[data-hover-effect="true"][data-hover-variant="card"]:hover {
-  animation: hoverable-card-border-flash 0.3s ease both;
+  animation: hoverable-card-border-flash 0.2s ease both;
 }
 
 .outline[data-hover-effect="true"]:hover {

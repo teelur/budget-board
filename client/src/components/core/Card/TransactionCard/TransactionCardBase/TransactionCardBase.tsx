@@ -76,8 +76,9 @@ const TransactionCardBase = ({
       onClick={
         selectionMode ? () => onToggleSelect!(transaction.id) : undefined
       }
+      hoverEffect={cardProps.hoverEffect ?? selectionMode}
       elevation={elevation ?? 0}
-      className={`${classes.card}${cardProps.className ? ` ${cardProps.className}` : ""}`}
+      className={cardProps.className}
       data-selection-mode={selectionMode ? "true" : undefined}
     >
       {selectionMode ? (
