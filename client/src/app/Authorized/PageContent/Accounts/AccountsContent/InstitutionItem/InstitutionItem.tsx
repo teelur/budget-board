@@ -20,12 +20,14 @@ import Divider from "~/components/core/Divider/Divider";
 interface IInstitutionItemProps {
   institution: IInstitution;
   isSortable: boolean;
-  container: Element;
+  container?: Element;
   openDetails: (account: IAccountResponse | undefined) => void;
 }
 
 const InstitutionItem = (props: IInstitutionItemProps) => {
   const [isEditable, { toggle }] = useDisclosure(false);
+  const [accountsContainer, setAccountsContainer] =
+    React.useState<HTMLDivElement | null>(null);
 
   // Some accounts might have conflicting indices, so we need to re-index them here
   // to ensure the drag-and-drop functionality works correctly
@@ -59,7 +61,9 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
     id: props.institution.id,
     index: props.institution.index,
     modifiers: [
-      RestrictToElement.configure({ element: props.container }),
+      ...(props.container
+        ? [RestrictToElement.configure({ element: props.container })]
+        : []),
       RestrictToVerticalAxis,
     ],
     collisionDetector: closestCorners,
@@ -132,7 +136,13 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
             </Button>
           </Flex>
         )}
-        <Stack id={props.institution.id} w="100%" py="0.125rem" gap="0.5rem">
+        <Stack
+          ref={setAccountsContainer}
+          id={props.institution.id}
+          w="100%"
+          py="0.125rem"
+          gap="0.5rem"
+        >
           <DragDropProvider
             onDragEnd={(event) => {
               const updatedList = move(sortedAccounts, event).map(
@@ -150,9 +160,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
                 <AccountItem
                   account={account}
                   isSortable={props.isSortable}
-                  container={
-                    document.getElementById(props.institution.id) as Element
-                  }
+                  container={accountsContainer ?? undefined}
                   openDetails={props.openDetails}
                 />
                 {index < sortedAccounts.length - 1 && (

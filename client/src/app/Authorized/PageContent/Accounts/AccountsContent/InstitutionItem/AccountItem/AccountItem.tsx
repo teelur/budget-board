@@ -15,7 +15,7 @@ import hoverClasses from "~/styles/Hoverable.module.css";
 interface IAccountItemProps {
   account: IAccountResponse;
   isSortable: boolean;
-  container: Element;
+  container?: Element;
   openDetails: (account: IAccountResponse | undefined) => void;
 }
 
@@ -26,9 +26,9 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
     id: props.account.id,
     index: props.account.index,
     modifiers: [
-      RestrictToElement.configure({
-        element: props.container,
-      }),
+      ...(props.container
+        ? [RestrictToElement.configure({ element: props.container })]
+        : []),
       RestrictToVerticalAxis,
     ],
     collisionDetector: closestCenter,

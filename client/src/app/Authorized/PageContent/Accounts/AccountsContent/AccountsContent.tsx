@@ -31,6 +31,8 @@ const AccountsContent = (props: AccountsContentProps) => {
   const [sortedInstitutions, setSortedInstitutions] = React.useState<
     IInstitution[]
   >([]);
+  const [institutionsContainer, setInstitutionsContainer] =
+    React.useState<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
     if (institutionQuery.data) {
@@ -61,7 +63,7 @@ const AccountsContent = (props: AccountsContentProps) => {
   }, [props.isSortable]);
 
   return (
-    <Stack id="institutions-stack" gap="1rem">
+    <Stack ref={setInstitutionsContainer} id="institutions-stack" gap="1rem">
       <LoadingOverlay visible={orderInstitutionsMutation.isPending} />
       {selectedAccount && (
         <AccountDetails
@@ -99,9 +101,7 @@ const AccountsContent = (props: AccountsContentProps) => {
               key={institution.id}
               institution={institution}
               isSortable={props.isSortable}
-              container={
-                document.getElementById("institutions-stack") as Element
-              }
+              container={institutionsContainer ?? undefined}
               openDetails={(account: IAccountResponse | undefined) => {
                 setSelectedAccount(account);
                 openDetails();
