@@ -214,7 +214,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       category: props.categoryTree.value,
                     })}
                     aria-expanded={!props.isCollapsed}
-                    aria-controls={childrenId}
+                    aria-controls={!props.isCollapsed ? childrenId : undefined}
                     onClick={(e) => {
                       e.stopPropagation();
                       props.toggleCollapsed();
