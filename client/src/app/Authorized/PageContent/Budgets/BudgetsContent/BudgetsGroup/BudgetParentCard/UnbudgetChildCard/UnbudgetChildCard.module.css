@@ -1,3 +1,7 @@
+.row {
+  border-radius: 6px;
+}
+
 .text {
   font-size: 1rem;
 

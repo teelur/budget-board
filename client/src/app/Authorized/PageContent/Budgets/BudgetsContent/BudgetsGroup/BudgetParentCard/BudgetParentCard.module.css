@@ -1,3 +1,12 @@
+.header {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.collapseIcon {
+  transform: rotate(-90deg);
+}
+
 .title {
   font-size: 1.2rem;
 

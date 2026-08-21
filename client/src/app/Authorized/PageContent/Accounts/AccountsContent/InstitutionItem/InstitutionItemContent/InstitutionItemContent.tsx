@@ -1,7 +1,7 @@
 import { ActionIcon, Group } from "@mantine/core";
 import { PencilIcon } from "lucide-react";
 import React from "react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { IInstitution } from "~/models/institution";
@@ -18,7 +18,7 @@ const InstitutionItemContent = (
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
-        <PrimaryText size="md">{props.institution.name}</PrimaryText>
+        <PrimaryHeading size="lg">{props.institution.name}</PrimaryHeading>
         <ActionIcon
           variant="transparent"
           size="md"
@@ -30,7 +30,7 @@ const InstitutionItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <StatusText amount={props.totalBalance} size="md">
+      <StatusText amount={props.totalBalance} size="lg">
         <SensitiveAmount amount={props.totalBalance} />
       </StatusText>
     </Group>

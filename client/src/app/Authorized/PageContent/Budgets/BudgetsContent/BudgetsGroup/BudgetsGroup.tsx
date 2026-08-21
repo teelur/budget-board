@@ -21,12 +21,23 @@ interface BudgetsGroupProps {
 
 const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
   const { t } = useTranslation();
+  const [collapsedCategories, setCollapsedCategories] = React.useState<
+    Record<string, boolean>
+  >({});
 
   const categoryToBudgetsMap = buildCategoryToBudgetsMap(props.budgets);
   const categoryToLimitsMap = buildCategoryToLimitsMap(
     props.budgets,
     props.categoryTree,
   );
+
+  const toggleCategory = (category: string) => {
+    const key = category.toLowerCase();
+    setCollapsedCategories((current) => ({
+      ...current,
+      [key]: !current[key],
+    }));
+  };
 
   return (
     <Stack gap="0.75rem" align="center">
@@ -49,6 +60,10 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
                 }
                 selectedDate={props.selectedDate}
                 openDetails={props.openDetails}
+                isCollapsed={
+                  collapsedCategories[category.value.toLowerCase()] ?? false
+                }
+                toggleCollapsed={() => toggleCategory(category.value)}
               />
             );
           }

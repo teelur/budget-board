@@ -1,7 +1,3 @@
-.card {
-  transition: background-color 0.2s ease;
-}
-
 .header {
   display: flex;
   align-items: center;
@@ -13,14 +9,6 @@
 .contentWrapper {
   flex: 1 1 auto;
   min-width: 0;
-}
-
-.card[data-selection-mode]:hover {
-  background-color: color-mix(
-    in srgb,
-    var(--mantine-primary-color-filled) 5%,
-    var(--card-bg)
-  );
 }
 
 .checkboxWrapper {
