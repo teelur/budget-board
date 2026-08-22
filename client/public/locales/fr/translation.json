@@ -365,6 +365,7 @@
   "metric_widget_title_label": "Titre",
   "metric_widget_title_placeholder": "Mon Widget",
   "metric_widget_value_label": "Valeur",
+  "metric_widget_value_placeholder": "",
   "missing_information": "Information manquante",
   "mm_dd_yyyy": "MM{{separator}}JJ{{separator}}AAAA",
   "mobile": "Mobile",
