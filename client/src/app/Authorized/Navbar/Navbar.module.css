@@ -43,8 +43,8 @@
 
 .groupToggle {
   flex: 0 0 auto;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
   color: var(--base-color-text-dimmed);
 
   &:hover {
@@ -71,7 +71,7 @@
   width: 100%;
   min-height: 2rem;
   padding: 0.125rem 0.25rem;
-  border-radius: var(--mantine-radius-md);
+  border-radius: var(--mantine-radius-sm);
   color: var(--navbar-link-color);
   align-items: center;
   transition:

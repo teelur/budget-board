@@ -166,7 +166,7 @@ const Navbar = (props: NavbarProps) => {
 
     return (
       <Stack key={item.path} gap={0} className={classes.itemGroup}>
-        <Group gap={0} wrap="nowrap" className={classes.itemHeader}>
+        <Group gap="0.25rem" wrap="nowrap" className={classes.itemHeader}>
           <NavbarLink
             icon={item.icon}
             label={item.label}
@@ -187,7 +187,6 @@ const Navbar = (props: NavbarProps) => {
             >
               <ActionIcon
                 variant="subtle"
-                size="lg"
                 className={classes.groupToggle}
                 aria-label={
                   isGroupExpanded
