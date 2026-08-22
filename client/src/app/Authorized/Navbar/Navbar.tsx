@@ -129,14 +129,20 @@ const Navbar = (props: NavbarProps) => {
       { path: "/settings/advanced", label: t("advanced_settings") },
     ],
   };
+  const activeSettingsGroupPath = [...sidebarItems, settingsItem].find(
+    (item) =>
+      item.settings?.length && isPathActive(location.pathname, item.path),
+  )?.path;
   const [expandedGroups, setExpandedGroups] = React.useState<Set<string>>(
-    () =>
-      new Set(
-        [...sidebarItems, settingsItem]
-          .filter((item) => item.settings?.length)
-          .map((item) => item.path),
-      ),
+    () => new Set(),
   );
+
+  React.useEffect(() => {
+    setExpandedGroups(
+      activeSettingsGroupPath ? new Set([activeSettingsGroupPath]) : new Set(),
+    );
+  }, [activeSettingsGroupPath, location.pathname]);
+
   const showExpandedNav = props.isMobile || props.isNavbarExpanded;
 
   const navigateTo = (path: string) => {
