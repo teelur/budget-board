@@ -10,6 +10,8 @@ import {
   Tooltip,
 } from "@mantine/core";
 import {
+  ArrowLeftFromLineIcon,
+  ArrowRightFromLineIcon,
   BanknoteArrowDownIcon,
   BanknoteIcon,
   CalculatorIcon,
@@ -20,8 +22,6 @@ import {
   LandmarkIcon,
   LayoutDashboardIcon,
   LogOutIcon,
-  PanelLeftCloseIcon,
-  PanelLeftOpenIcon,
   SettingsIcon,
 } from "lucide-react";
 import NavbarLink from "./NavbarLink/NavbarLink";
@@ -266,9 +266,9 @@ const Navbar = (props: NavbarProps) => {
               onClick={props.toggleNavbarExpanded}
             >
               {props.isNavbarExpanded ? (
-                <PanelLeftCloseIcon size="1.25rem" />
+                <ArrowLeftFromLineIcon size="1.25rem" />
               ) : (
-                <PanelLeftOpenIcon size="1.25rem" />
+                <ArrowRightFromLineIcon size="1.25rem" />
               )}
             </ActionIcon>
           </Tooltip>
