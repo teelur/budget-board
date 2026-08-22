@@ -51,7 +51,8 @@
   "appearance_mode": "Режим отображения",
   "apply_changes": "Применить изменения",
   "apply_existing_account_amount_to_goal": "Использовать имеющийся остаток на счете для достижения целевого показателя?",
-  "asset_details": "",
+  "asset": "Объект",
+  "asset_details": "Сведения об активах",
   "auto": "Авто",
   "auto_categorizer": "Авто-Категория"
 }
