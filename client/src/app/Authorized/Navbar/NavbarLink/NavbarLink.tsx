@@ -23,6 +23,7 @@ const NavbarLink = (props: NavbarLinkProps): React.ReactNode => {
     >
       <UnstyledButton
         onClick={props.onClick}
+        aria-label={!props.showLabel ? props.label : undefined}
         className={`${classes.link} ${!props.showLabel ? classes.collapsed : ""} ${props.compact ? classes.compact : ""} ${props.className ?? ""}`}
         data-active={props.active || undefined}
       >
