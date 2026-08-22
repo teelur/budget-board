@@ -59,13 +59,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AccountLockedOutEmailBody" xml:space="preserve">
-        <value>&lt;h2&gt;Your Account Has Been Locked&lt;/h2&gt;
-&lt;p&gt;We've detected multiple failed login attempts on your account. For your security, your account has been temporarily locked.&lt;/p&gt;
-&lt;p&gt;Your account will be automatically unlocked after the lockout period expires.&lt;/p&gt;
-&lt;p&gt;If this was you, please try again later or use the 'Forgot Password' option to reset your credentials.&lt;/p&gt;</value>
+        <value>&lt;h2&gt;Votre compte a été verrouillé&lt;/h2&gt;
+&lt;p&gt;Nous avons détecté plusieurs tentatives de connexion infructueuses sur votre compte. Pour votre sécurité, votre compte a été temporairement verrouillé.&lt;/p&gt;
+&lt;p&gt;Votre compte sera automatiquement déverrouillé une fois la période de verrouillage terminée.&lt;/p&gt;
+&lt;p&gt;S'il s'agissait bien de vous, veuillez réessayer plus tard ou utiliser l'option « Mot de passe oublié » pour réinitialiser vos identifiants.&lt;/p&gt;</value>
   </data>
   <data name="AccountLockedOutEmailSubject" xml:space="preserve">
-        <value>Account Locked Due to Multiple Failed Login Attempts</value>
+        <value>Compte verrouillé en raison de plusieurs tentatives de connexion infructueuses</value>
   </data>
   <data name="AuthCodeRequired" xml:space="preserve">
         <value>Le code d’autorisation est requis.</value>
@@ -74,13 +74,13 @@
         <value>L’authentification a échoué.</value>
   </data>
   <data name="DefaultWidgetSeedingFailedError" xml:space="preserve">
-        <value>Unable to initialize default dashboard widgets.</value>
+        <value>Impossible d'initialiser les widgets du tableau de bord par défaut.</value>
   </data>
   <data name="DemoModeNotAllowed" xml:space="preserve">
-        <value>This action is not allowed in demo mode.</value>
+        <value>Cette action n'est pas autorisée en mode démo.</value>
   </data>
   <data name="EmailSenderConfigMissing" xml:space="preserve">
-        <value>Email sender configuration is missing. Please set EMAIL_SENDER.</value>
+        <value>La configuration de l'expéditeur d'e-mail est manquante. Veuillez définir EMAIL_SENDER.</value>
   </data>
   <data name="EndpointNotFoundError" xml:space="preserve">
         <value>Impossible de trouver le point de terminaison nommé '{0}'.</value>
@@ -104,7 +104,7 @@
         <value>L’inscription est désactivée.</value>
   </data>
   <data name="SmtpHostConfigMissing" xml:space="preserve">
-        <value>SMTP host configuration is missing. Please set EMAIL_SMTP_HOST.</value>
+        <value>La configuration de l'hôte SMTP est manquante. Veuillez définir EMAIL_SMTP_HOST.</value>
   </data>
   <data name="UnexpectedServerError" xml:space="preserve">
         <value>Une erreur inattendue s’est produite.</value>
@@ -122,12 +122,12 @@
         <value>L’utilisateur est introuvable.</value>
   </data>
   <data name="OidcEmailClaimMissingError" xml:space="preserve">
-    <value>The OIDC provider did not return an email claim required for account linking.</value>
+    <value>Le fournisseur OIDC n'a pas renvoyé la revendication d'adresse e-mail requise pour la liaison de compte.</value>
   </data>
   <data name="OidcEmailMismatchError" xml:space="preserve">
-    <value>The OIDC email does not match the currently signed-in account email.</value>
+    <value>L'adresse e-mail OIDC ne correspond pas à celle du compte actuellement connecté.</value>
   </data>
   <data name="OidcExplicitLinkRequiredError" xml:space="preserve">
-    <value>An account with this email already exists. Sign in and link your OIDC account from account settings.</value>
+    <value>Un compte associé à cette adresse e-mail existe déjà. Connectez-vous et associez votre compte OIDC depuis les paramètres du compte.</value>
   </data>
 </root>
