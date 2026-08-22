@@ -1,11 +1,22 @@
 import classes from "./Navbar.module.css";
 
-import { Burger, ScrollArea, Stack } from "@mantine/core";
 import {
+  ActionIcon,
+  Burger,
+  Collapse,
+  Group,
+  ScrollArea,
+  Stack,
+  Tooltip,
+} from "@mantine/core";
+import {
+  ArrowLeftFromLineIcon,
+  ArrowRightFromLineIcon,
   BanknoteArrowDownIcon,
   BanknoteIcon,
   CalculatorIcon,
   ChartNoAxesColumnIncreasingIcon,
+  ChevronDownIcon,
   GoalIcon,
   HouseIcon,
   LandmarkIcon,
@@ -17,12 +28,31 @@ import NavbarLink from "./NavbarLink/NavbarLink";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router";
 import { useLogoutMutation } from "~/hooks/mutations/auth/useLogoutMutation";
+import React from "react";
 
 interface NavbarProps {
   isNavbarOpen: boolean;
   toggleNavbar: () => void;
   closeNavbar: () => void;
+  isMobile: boolean;
+  isNavbarExpanded: boolean;
+  toggleNavbarExpanded: () => void;
 }
+
+interface NavbarSettingsItem {
+  path: string;
+  label: string;
+}
+
+interface NavbarItem {
+  icon: React.ReactNode;
+  path: string;
+  label: string;
+  settings?: NavbarSettingsItem[];
+}
+
+const isPathActive = (pathname: string, path: string) =>
+  pathname === path || pathname.startsWith(`${path}/`);
 
 const Navbar = (props: NavbarProps) => {
   const { t } = useTranslation();
@@ -30,62 +60,183 @@ const Navbar = (props: NavbarProps) => {
   const location = useLocation();
   const logoutMutation = useLogoutMutation();
 
-  const sidebarItems = [
+  const sidebarItems: NavbarItem[] = [
     {
-      icon: <LayoutDashboardIcon color="var(--base-color-text-primary)" />,
+      icon: <LayoutDashboardIcon color="currentColor" />,
       path: "/dashboard",
       label: t("dashboard"),
     },
     {
-      icon: <LandmarkIcon color="var(--base-color-text-primary)" />,
+      icon: <LandmarkIcon color="currentColor" />,
       path: "/accounts",
       label: t("accounts"),
+      settings: [
+        { path: "/accounts/settings/account-types", label: t("account_types") },
+        { path: "/accounts/settings/deleted", label: t("deleted_accounts") },
+      ],
     },
     {
-      icon: <HouseIcon color="var(--base-color-text-primary)" />,
+      icon: <HouseIcon color="currentColor" />,
       path: "/assets",
       label: t("assets"),
+      settings: [
+        { path: "/assets/settings/asset-types", label: t("asset_types") },
+        { path: "/assets/settings/deleted", label: t("deleted_assets") },
+      ],
     },
     {
-      icon: <BanknoteIcon color="var(--base-color-text-primary)" />,
+      icon: <BanknoteIcon color="currentColor" />,
       path: "/transactions",
       label: t("transactions"),
+      settings: [
+        { path: "/transactions/settings/categories", label: t("categories") },
+        {
+          path: "/transactions/settings/auto-categorizer",
+          label: t("auto_categorizer"),
+        },
+        { path: "/transactions/settings/rules", label: t("automatic_rules") },
+        {
+          path: "/transactions/settings/deleted",
+          label: t("deleted_transactions"),
+        },
+      ],
     },
     {
-      icon: <CalculatorIcon color="var(--base-color-text-primary)" />,
+      icon: <CalculatorIcon color="currentColor" />,
       path: "/budgets",
       label: t("budgets"),
+      settings: [{ path: "/budgets/settings", label: t("settings") }],
     },
     {
-      icon: <GoalIcon color="var(--base-color-text-primary)" />,
+      icon: <GoalIcon color="currentColor" />,
       path: "/goals",
       label: t("goals"),
     },
     {
-      icon: (
-        <ChartNoAxesColumnIncreasingIcon color="var(--base-color-text-primary)" />
-      ),
+      icon: <ChartNoAxesColumnIncreasingIcon color="currentColor" />,
       path: "/trends",
       label: t("trends"),
     },
   ];
 
-  const links = sidebarItems.map((link) => (
-    <NavbarLink
-      {...link}
-      key={link.label}
-      active={location.pathname.startsWith(link.path)}
-      onClick={() => {
-        navigate(link.path);
-        props.closeNavbar();
-      }}
-    />
-  ));
+  const settingsItem: NavbarItem = {
+    icon: <SettingsIcon color="currentColor" />,
+    path: "/settings",
+    label: t("settings"),
+    settings: [
+      { path: "/settings/user", label: t("user_settings") },
+      { path: "/settings/security", label: t("security") },
+      { path: "/settings/advanced", label: t("advanced_settings") },
+    ],
+  };
+  const activeSettingsGroupPath = [...sidebarItems, settingsItem].find(
+    (item) =>
+      item.settings?.length && isPathActive(location.pathname, item.path),
+  )?.path;
+  const [expandedGroups, setExpandedGroups] = React.useState<Set<string>>(
+    () => new Set(),
+  );
+
+  React.useEffect(() => {
+    setExpandedGroups(
+      activeSettingsGroupPath ? new Set([activeSettingsGroupPath]) : new Set(),
+    );
+  }, [activeSettingsGroupPath, location.pathname]);
+
+  const showExpandedNav = props.isMobile || props.isNavbarExpanded;
+
+  const navigateTo = (path: string) => {
+    navigate(path);
+    props.closeNavbar();
+  };
+
+  const toggleGroup = (path: string) => {
+    setExpandedGroups((groups) => {
+      const nextGroups = new Set(groups);
+
+      if (nextGroups.has(path)) {
+        nextGroups.delete(path);
+      } else {
+        nextGroups.add(path);
+      }
+
+      return nextGroups;
+    });
+  };
+
+  const renderNavbarItem = (item: NavbarItem) => {
+    const isActive = isPathActive(location.pathname, item.path);
+    const hasSettings = Boolean(item.settings?.length);
+    const isGroupExpanded = showExpandedNav && expandedGroups.has(item.path);
+    const panelId = `navbar-settings-${item.path.replaceAll("/", "-")}`;
+
+    return (
+      <Stack key={item.path} gap={0} className={classes.itemGroup}>
+        <Group gap="0.25rem" wrap="nowrap" className={classes.itemHeader}>
+          <NavbarLink
+            icon={item.icon}
+            label={item.label}
+            active={isActive}
+            showLabel={showExpandedNav}
+            className={hasSettings ? classes.groupLink : undefined}
+            onClick={() => navigateTo(item.path)}
+          />
+          {hasSettings && showExpandedNav && (
+            <Tooltip
+              label={
+                isGroupExpanded
+                  ? t("collapse_sidebar_group")
+                  : t("expand_sidebar_group")
+              }
+              position="right"
+              transitionProps={{ duration: 0 }}
+            >
+              <ActionIcon
+                variant="subtle"
+                className={classes.groupToggle}
+                aria-label={
+                  isGroupExpanded
+                    ? t("collapse_sidebar_group")
+                    : t("expand_sidebar_group")
+                }
+                aria-expanded={isGroupExpanded}
+                aria-controls={panelId}
+                onClick={() => toggleGroup(item.path)}
+              >
+                <ChevronDownIcon
+                  size="1rem"
+                  className={isGroupExpanded ? classes.chevronOpen : undefined}
+                />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </Group>
+        {hasSettings && (
+          <Collapse expanded={isGroupExpanded} id={panelId}>
+            <Stack gap="0.125rem" className={classes.settingsGroup}>
+              {item.settings?.map((setting) => (
+                <NavbarLink
+                  key={setting.path}
+                  icon={null}
+                  label={setting.label}
+                  active={isPathActive(location.pathname, setting.path)}
+                  showLabel
+                  labelSize="xs"
+                  compact
+                  onClick={() => navigateTo(setting.path)}
+                />
+              ))}
+            </Stack>
+          </Collapse>
+        )}
+      </Stack>
+    );
+  };
 
   return (
     <ScrollArea h="100%" type="never">
-      <Stack justify="space-between" mih="100vh" p="6px">
-        <Stack justify="center" align="center" gap={5}>
+      <Stack justify="space-between" mih="100vh" p="6px" w="100%" gap={0}>
+        <Stack justify="center" align="center" gap="0.0625rem" w="100%">
           <Burger
             opened={props.isNavbarOpen}
             className={classes.burger}
@@ -94,32 +245,48 @@ const Navbar = (props: NavbarProps) => {
             hiddenFrom="xs"
             size="md"
           />
-          {links}
-        </Stack>
-        <Stack justify="center" align="center" gap={5}>
-          <NavbarLink
-            icon={
-              <BanknoteArrowDownIcon color="var(--base-color-text-primary)" />
+          <Tooltip
+            label={
+              props.isNavbarExpanded
+                ? t("collapse_sidebar")
+                : t("expand_sidebar")
             }
+            position="right"
+            transitionProps={{ duration: 0 }}
+          >
+            <ActionIcon
+              variant="subtle"
+              visibleFrom="xs"
+              className={`${classes.sidebarToggle} ${props.isNavbarExpanded ? classes.sidebarToggleExpanded : ""}`}
+              aria-label={
+                props.isNavbarExpanded
+                  ? t("collapse_sidebar")
+                  : t("expand_sidebar")
+              }
+              onClick={props.toggleNavbarExpanded}
+            >
+              {props.isNavbarExpanded ? (
+                <ArrowLeftFromLineIcon size="1.25rem" />
+              ) : (
+                <ArrowRightFromLineIcon size="1.25rem" />
+              )}
+            </ActionIcon>
+          </Tooltip>
+          {sidebarItems.map(renderNavbarItem)}
+        </Stack>
+        <Stack justify="center" align="center" gap="0.0625rem" w="100%">
+          <NavbarLink
+            icon={<BanknoteArrowDownIcon color="currentColor" />}
             label={t("external_accounts")}
-            active={location.pathname.startsWith("/external-accounts")}
-            onClick={() => {
-              navigate("/external-accounts");
-              props.closeNavbar();
-            }}
+            active={isPathActive(location.pathname, "/external-accounts")}
+            showLabel={showExpandedNav}
+            onClick={() => navigateTo("/external-accounts")}
           />
+          {renderNavbarItem(settingsItem)}
           <NavbarLink
-            icon={<SettingsIcon color="var(--base-color-text-primary)" />}
-            label={t("settings")}
-            active={location.pathname.startsWith("/settings")}
-            onClick={() => {
-              navigate("/settings");
-              props.closeNavbar();
-            }}
-          />
-          <NavbarLink
-            icon={<LogOutIcon color="var(--base-color-text-primary)" />}
+            icon={<LogOutIcon color="currentColor" />}
             label={t("logout")}
+            showLabel={showExpandedNav}
             onClick={() => logoutMutation.mutate()}
           />
         </Stack>
