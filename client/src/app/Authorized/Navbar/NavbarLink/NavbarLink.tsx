@@ -7,6 +7,10 @@ interface NavbarLinkProps {
   label: string;
   active?: boolean;
   onClick?: () => void;
+  showLabel?: boolean;
+  className?: string;
+  labelSize?: "sm" | "xs";
+  compact?: boolean;
 }
 
 const NavbarLink = (props: NavbarLinkProps): React.ReactNode => {
@@ -14,17 +18,29 @@ const NavbarLink = (props: NavbarLinkProps): React.ReactNode => {
     <Tooltip
       label={props.label}
       position="right"
+      disabled={props.showLabel}
       transitionProps={{ duration: 0 }}
     >
       <UnstyledButton
         onClick={props.onClick}
-        p="0.75rem 0.5rem"
-        className={classes.link}
+        className={`${classes.link} ${!props.showLabel ? classes.collapsed : ""} ${props.compact ? classes.compact : ""} ${props.className ?? ""}`}
         data-active={props.active || undefined}
       >
-        <Group>
+        <Group
+          justify={props.showLabel ? "flex-start" : "center"}
+          gap="xs"
+          wrap="nowrap"
+          w="100%"
+        >
           {props.icon}
-          <PrimaryText hiddenFrom="xs">{props.label}</PrimaryText>
+          {props.showLabel && (
+            <PrimaryText
+              size={props.labelSize ?? "sm"}
+              c="var(--navbar-link-color)"
+            >
+              {props.label}
+            </PrimaryText>
+          )}
         </Group>
       </UnstyledButton>
     </Tooltip>
