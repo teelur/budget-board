@@ -3,7 +3,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import NavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
@@ -14,9 +13,9 @@ const TransactionsSettings = (): React.ReactNode => {
 
   const navItems = [
     { path: "categories", label: t("categories") },
+    { path: "auto-categorizer", label: t("auto_categorizer") },
     { path: "rules", label: t("automatic_rules") },
     { path: "deleted", label: t("deleted_transactions") },
-    { path: "auto-categorizer", label: t("auto_categorizer") },
   ];
 
   const activeItem = navItems.find((item) =>
@@ -29,7 +28,7 @@ const TransactionsSettings = (): React.ReactNode => {
         <ActionIcon variant="subtle" onClick={() => navigate("/transactions")}>
           <ChevronLeftIcon />
         </ActionIcon>
-        <PrimaryHeading order={5}>{t("transactions_settings")}</PrimaryHeading>
+        <PrimaryHeading order={5}>{t("transactions")}</PrimaryHeading>
         {activeItem && (
           <>
             <ChevronRightIcon
@@ -41,20 +40,6 @@ const TransactionsSettings = (): React.ReactNode => {
         )}
       </Group>
       <Group align="flex-start" gap="md" wrap="wrap">
-        <Stack
-          w={{ base: "100%", sm: "200px" }}
-          style={{ flexShrink: 0 }}
-          gap={4}
-        >
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              label={item.label}
-              active={location.pathname.endsWith(item.path)}
-              onClick={() => navigate(item.path)}
-            />
-          ))}
-        </Stack>
         <Box
           w={{ base: "100%", sm: "auto" }}
           maw={800}

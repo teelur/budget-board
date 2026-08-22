@@ -3,7 +3,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import NavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
@@ -27,7 +26,7 @@ const AccountsSettings = (): React.ReactNode => {
         <ActionIcon variant="subtle" onClick={() => navigate("/accounts")}>
           <ChevronLeftIcon />
         </ActionIcon>
-        <PrimaryHeading order={5}>{t("accounts_settings")}</PrimaryHeading>
+        <PrimaryHeading order={5}>{t("accounts")}</PrimaryHeading>
         {activeItem && (
           <>
             <ChevronRightIcon
@@ -39,20 +38,6 @@ const AccountsSettings = (): React.ReactNode => {
         )}
       </Group>
       <Group align="flex-start" gap="md" wrap="wrap">
-        <Stack
-          w={{ base: "100%", sm: "200px" }}
-          style={{ flexShrink: 0 }}
-          gap={4}
-        >
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              label={item.label}
-              active={location.pathname.endsWith(item.path)}
-              onClick={() => navigate(item.path)}
-            />
-          ))}
-        </Stack>
         <Box
           w={{ base: "100%", sm: "auto" }}
           maw={800}

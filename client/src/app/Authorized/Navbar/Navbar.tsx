@@ -90,14 +90,14 @@ const Navbar = (props: NavbarProps) => {
       label: t("transactions"),
       settings: [
         { path: "/transactions/settings/categories", label: t("categories") },
+        {
+          path: "/transactions/settings/auto-categorizer",
+          label: t("auto_categorizer"),
+        },
         { path: "/transactions/settings/rules", label: t("automatic_rules") },
         {
           path: "/transactions/settings/deleted",
           label: t("deleted_transactions"),
-        },
-        {
-          path: "/transactions/settings/auto-categorizer",
-          label: t("auto_categorizer"),
         },
       ],
     },
@@ -105,7 +105,7 @@ const Navbar = (props: NavbarProps) => {
       icon: <CalculatorIcon color="currentColor" />,
       path: "/budgets",
       label: t("budgets"),
-      settings: [{ path: "/budgets/settings", label: t("budget_settings") }],
+      settings: [{ path: "/budgets/settings", label: t("settings") }],
     },
     {
       icon: <GoalIcon color="currentColor" />,

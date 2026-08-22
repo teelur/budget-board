@@ -54,7 +54,6 @@
   "asset_type_name": "Nome del tipo di risorsa",
   "asset_types": "Tipi di risorse",
   "assets": "Asset.",
-  "assets_settings": "Impostazioni Asset",
   "authorization_code_missing_message": "Nell'URL di callback manca il codice di autorizzazione.",
   "auto": "Automatico",
   "auto_categorizer": "Categorizzatore automatico",
@@ -72,7 +71,6 @@
   "budget_amount_fraction_editable_total_styled": "<0>{{quantità}}</0> <1>di</1>",
   "budget_details": "Dettagli del budget",
   "transactions": "Transazioni",
-  "transactions_settings": "Impostazioni transazioni",
   "trends": "Tendenze",
   "two_factor_auth_recovery_codes_info": "I codici di ripristino dell'autenticazione a due fattori possono essere utilizzati per accedere al tuo account nel caso in cui non riuscissi più ad accedere all'app di autenticazione.",
   "two_factor_auth_successfully_updated": "Le impostazioni dell'autenticazione a due fattori sono state aggiornate con successo."

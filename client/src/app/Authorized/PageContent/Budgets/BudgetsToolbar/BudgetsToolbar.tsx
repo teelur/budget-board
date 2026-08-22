@@ -1,14 +1,12 @@
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import { initCurrentMonth } from "~/helpers/datetime";
-import { Button, Group, Stack, ActionIcon } from "@mantine/core";
+import { Button, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import AddBudget from "./AddBudget/AddBudget";
 import { IBudgetCreateRequest } from "~/models/budget";
 import { notifications } from "@mantine/notifications";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { SettingsIcon } from "lucide-react";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
@@ -25,7 +23,6 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   const [canSelectMultiple, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { dayjs } = useLocale();
   const createBudgetMutation = useCreateBudgetMutation({ isCopying: true });
 
@@ -116,13 +113,6 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
           {props.selectedDates.length === 1 && (
             <AddBudget date={props.selectedDates[0]!} />
           )}
-          <ActionIcon
-            variant="subtle"
-            size="input-sm"
-            onClick={() => navigate("/budgets/settings")}
-          >
-            <SettingsIcon />
-          </ActionIcon>
         </Group>
       </Group>
     </Stack>

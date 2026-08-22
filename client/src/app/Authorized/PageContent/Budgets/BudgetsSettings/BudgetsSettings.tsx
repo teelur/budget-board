@@ -1,7 +1,7 @@
 import { ActionIcon, Box, Flex, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { ChevronLeftIcon, SendIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -11,6 +11,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
+import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 const BudgetsSettings = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -26,6 +27,12 @@ const BudgetsSettings = (): React.ReactNode => {
         : null,
   });
 
+  const navItems = [{ path: "settings", label: t("settings") }];
+
+  const activeItem = navItems.find((item) =>
+    location.pathname.endsWith(item.path),
+  );
+
   React.useEffect(() => {
     budgetWarningThresholdField.setValue(budgetWarningThreshold);
   }, [budgetWarningThreshold]);
@@ -36,9 +43,22 @@ const BudgetsSettings = (): React.ReactNode => {
         <ActionIcon variant="subtle" onClick={() => navigate("/budgets")}>
           <ChevronLeftIcon />
         </ActionIcon>
-        <PrimaryHeading order={4}>{t("budget_settings")}</PrimaryHeading>
+        <PrimaryHeading order={5}>{t("budgets")}</PrimaryHeading>
+        {activeItem && (
+          <>
+            <ChevronRightIcon
+              size="1rem"
+              color="var(--base-color-text-dimmed)"
+            />
+            <SecondaryHeading order={5}>{activeItem.label}</SecondaryHeading>
+          </>
+        )}
       </Group>
-      <Box maw={800} mx="auto" w="100%">
+      <Box
+        w={{ base: "100%", sm: "auto" }}
+        maw={800}
+        style={{ flex: 1, minWidth: 0 }}
+      >
         <Group gap="0.5rem" wrap="nowrap">
           <NumberInput
             flex="1 1 auto"
