@@ -30,12 +30,8 @@ interface EditableAccountItemContentProps {
 
 const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const { t } = useTranslation();
-  const {
-    dayjs,
-    dateFormat,
-    thousandsSeparator,
-    decimalSeparator,
-  } = useLocale();
+  const { dayjs, dateFormat, thousandsSeparator, decimalSeparator } =
+    useLocale();
   const { allAccountTypes } = useAccountTypes();
   const updateAccountMutation = useUpdateAccountMutation();
 
@@ -116,7 +112,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                   },
                 )
               }
-              elevation={2}
+              elevation={1}
             />
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon
@@ -153,7 +149,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                   },
                 )
               }
-              elevation={2}
+              elevation={1}
             />
             <Group gap="0.5rem">
               <Button
@@ -201,7 +197,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               accountTypeField.setValue(val);
             }}
             withinPortal
-            elevation={2}
+            elevation={1}
           />
           <DimmedText size="sm">
             {t("last_updated", {

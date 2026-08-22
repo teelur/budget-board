@@ -1,15 +1,13 @@
 import { Box, Group, Stack } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import { ChevronRightIcon } from "lucide-react";
-import NavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 const Settings = (): React.ReactNode => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const location = useLocation();
 
   const navItems = [
@@ -37,20 +35,6 @@ const Settings = (): React.ReactNode => {
         )}
       </Group>
       <Group align="flex-start" gap="md" wrap="wrap">
-        <Stack
-          w={{ base: "100%", sm: "200px" }}
-          style={{ flexShrink: 0 }}
-          gap={4}
-        >
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              label={item.label}
-              active={location.pathname.endsWith(item.path)}
-              onClick={() => navigate(item.path)}
-            />
-          ))}
-        </Stack>
         <Box
           w={{ base: "100%", sm: "auto" }}
           maw={800}

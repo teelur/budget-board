@@ -35,6 +35,7 @@
 @container (max-width: 400px) {
   .details {
     flex-direction: column;
+    gap: 0.5rem;
   }
 
   .detailItem {

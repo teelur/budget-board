@@ -8,7 +8,7 @@ import Navbar from "./Navbar/Navbar";
 import React from "react";
 import PageContent from "./PageContent/PageContent";
 import Header from "./Header/Header";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { TransactionFiltersProvider } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { TransactionCategoryProvider } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { AccountTypeProvider } from "~/providers/AccountTypeProvider/AccountTypeProvider";
@@ -18,13 +18,34 @@ import TransactionImportJobPanel from "~/components/TransactionImportJobPanel/Tr
 
 const Authorized = (): React.ReactNode => {
   const [isNavbarOpen, { toggle, close }] = useDisclosure();
+  const isMobile = useMediaQuery(
+    "(max-width: 29.999em)",
+    typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 29.999em)").matches,
+    {
+      getInitialValueInEffect: false,
+    },
+  );
+  const isLargeScreen = useMediaQuery(
+    "(min-width: 75em)",
+    typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 75em)").matches,
+    {
+      getInitialValueInEffect: false,
+    },
+  );
+  const [isNavbarExpanded, setIsNavbarExpanded] = React.useState(isLargeScreen);
+
+  React.useEffect(() => {
+    setIsNavbarExpanded(isLargeScreen);
+  }, [isLargeScreen]);
 
   return (
     <AppShell
       layout="alt"
       withBorder
       navbar={{
-        width: 60,
+        width: isMobile ? "100vw" : isNavbarExpanded ? 220 : 60,
         breakpoint: "xs",
         collapsed: { mobile: !isNavbarOpen },
       }}
@@ -36,18 +57,29 @@ const Authorized = (): React.ReactNode => {
     >
       <AppShellHeader
         bg="var(--background-color-header)"
-        style={{ borderWidth: "2px" }}
+        style={{
+          borderWidth: "1px",
+          borderColor: "var(--base-color-border)",
+        }}
       >
         <Header isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
       </AppShellHeader>
       <AppShellNavbar
         bg="var(--background-color-sidebar)"
-        style={{ borderWidth: "2px" }}
+        style={{
+          borderWidth: "1px",
+          borderColor: "var(--base-color-border)",
+        }}
       >
         <Navbar
           isNavbarOpen={isNavbarOpen}
           toggleNavbar={toggle}
           closeNavbar={close}
+          isMobile={isMobile}
+          isNavbarExpanded={isNavbarExpanded}
+          toggleNavbarExpanded={() =>
+            setIsNavbarExpanded((expanded) => !expanded)
+          }
         />
       </AppShellNavbar>
       <AppShellMain

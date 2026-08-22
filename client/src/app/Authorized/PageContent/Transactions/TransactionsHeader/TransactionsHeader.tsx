@@ -1,14 +1,7 @@
 import classes from "./TransactionsHeader.module.css";
 
-import {
-  ActionIcon,
-  Button,
-  Collapse,
-  Flex,
-  Group,
-  Stack,
-} from "@mantine/core";
-import { FilterIcon, SettingsIcon } from "lucide-react";
+import { Button, Collapse, Flex, Group, Stack } from "@mantine/core";
+import { FilterIcon } from "lucide-react";
 import React from "react";
 import SortMenu from "./SortMenu/SortMenu";
 import { SortDirection } from "~/components/SortButton";
@@ -19,7 +12,6 @@ import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransaction
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTranslation } from "react-i18next";
 import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransactionsModal";
-import { useNavigate } from "react-router";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import { Filters, ITransaction } from "~/models/transaction";
 import {
@@ -44,12 +36,11 @@ interface TransactionsHeaderProps {
 const TransactionsHeader = (
   props: TransactionsHeaderProps,
 ): React.ReactNode => {
-  const navigate = useNavigate();
-
   const { t } = useTranslation();
   const { transactionFilters, isFiltersPanelOpen, toggleFiltersPanel } =
     useTransactionFilters();
   const { allTransactionCategories } = useTransactionCategories();
+
   const timeToMonthlyTotalsMap = React.useMemo(
     () => buildTimeToMonthlyTotalsMap(props.selectedMonths, props.transactions),
     [props.selectedMonths, props.transactions],
@@ -103,13 +94,6 @@ const TransactionsHeader = (
             {t("filters")}
           </Button>
           <CreateTransactionModal />
-          <ActionIcon
-            variant="subtle"
-            size="input-sm"
-            onClick={() => navigate("/transactions/settings")}
-          >
-            <SettingsIcon />
-          </ActionIcon>
         </Group>
       </Flex>
       <Collapse expanded={isFiltersPanelOpen} transitionDuration={100}>

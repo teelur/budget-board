@@ -50,7 +50,6 @@
   "asset_type_name": "Nama Tipe Aset",
   "asset_types": "Tipe Aset",
   "assets": "Aset",
-  "assets_settings": "Pengaturan Aset",
   "authorization_code_missing_message": "Kode otorisasi tidak ditemukan pada URL callback.",
   "auto": "Otomatis",
   "auto_categorizer": "Pengategori otomatis",

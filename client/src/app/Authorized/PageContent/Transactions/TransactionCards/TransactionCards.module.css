@@ -15,22 +15,29 @@
   scrollbar-gutter: stable;
 }
 
-.loadingRow {
+.viewportPending::before {
+  content: "";
   position: sticky;
   top: 0;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 1.5rem;
-  box-sizing: border-box;
-  background-color: var(--background-color-base);
+  z-index: 2;
+  display: block;
+  width: 32%;
+  height: 2px;
+  margin-bottom: -2px;
+  background-color: var(--mantine-primary-color-filled);
   pointer-events: none;
+  animation: transactionPending 1.1s ease-in-out infinite;
 }
 
 .virtualList {
   position: relative;
   width: 100%;
+}
+
+.virtualListPending {
+  opacity: 0.58;
+  pointer-events: none;
+  transition: opacity 180ms ease;
 }
 
 .virtualRow {
@@ -40,4 +47,14 @@
   width: 100%;
   padding-bottom: 0.3rem;
   box-sizing: border-box;
+}
+
+@keyframes transactionPending {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(312%);
+  }
 }

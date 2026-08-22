@@ -1,5 +1,6 @@
 .root {
   --card-bg: var(--background-color-base);
+  --hoverable-border-color: var(--base-color-border);
 }
 
 [data-mantine-color-scheme] .root {

@@ -1,7 +1,7 @@
 import React from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ITransaction } from "~/models/transaction";
-import { Group, Loader, Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
@@ -42,17 +42,12 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
       ) : (
         <div
           ref={viewportRef}
-          className={classes.viewport}
+          className={`${classes.viewport}${isListPending && hasTransactions ? ` ${classes.viewportPending}` : ""}`}
           aria-busy={isListPending}
         >
-          {isListPending && (
-<div className={classes.loadingRow}>
-              <Loader size="sm" />
-            </div>
-          )}
           {hasTransactions ? (
             <div
-              className={classes.virtualList}
+              className={`${classes.virtualList}${isListPending ? ` ${classes.virtualListPending}` : ""}`}
               style={{ height: virtualizer.getTotalSize() }}
             >
               {virtualizer.getVirtualItems().map((virtualItem) => {
