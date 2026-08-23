@@ -5,6 +5,7 @@ import React from "react";
 import {
   IAccountNameToIDKeyValuePair,
   ITransactionImport,
+  ITransactionImportDuplicateOptions,
   ITransactionImportRequest,
   ITransactionImportTableData,
 } from "~/models/transaction";
@@ -19,6 +20,7 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import { useImportTransactionsMutation } from "~/hooks/mutations/transactions/useImportTransactionsMutation";
 import ImportProgress from "./ImportProgress/ImportProgress";
 import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
+import DuplicateReview from "./DuplicateReview/DuplicateReview";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -44,6 +46,20 @@ const ImportTransactionsModal = () => {
   const [importData, setImportData] = React.useState<
     ITransactionImportTableData[]
   >([]);
+  const [duplicateOptions, setDuplicateOptions] =
+    React.useState<ITransactionImportDuplicateOptions>({
+      filterDuplicates: false,
+      filterByOptions: {
+        date: false,
+        merchantName: false,
+        category: false,
+        amount: false,
+        account: false,
+      },
+    });
+  const [mappedImportData, setMappedImportData] = React.useState<
+    ITransactionImportTableData[]
+  >([]);
 
   // Account Mapping Dialog Data
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
@@ -54,6 +70,7 @@ const ImportTransactionsModal = () => {
     setCsvData([]);
 
     setImportData([]);
+    setMappedImportData([]);
 
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
@@ -65,7 +82,7 @@ const ImportTransactionsModal = () => {
         job.status,
       )
     ) {
-      setActiveStep(4);
+      setActiveStep(5);
     }
   }, [job]);
 
@@ -147,7 +164,7 @@ const ImportTransactionsModal = () => {
         onSuccess: (response) => {
           trackedJobId.current = response.data.id;
           startImport(response.data.id);
-          setActiveStep(3);
+          setActiveStep(4);
         },
       },
     );
@@ -155,9 +172,20 @@ const ImportTransactionsModal = () => {
 
   const advanceToAccountMappingDialog = (
     importData: ITransactionImportTableData[],
+    options: ITransactionImportDuplicateOptions,
   ) => {
     setImportData(importData);
+    setDuplicateOptions(options);
     setActiveStep(2);
+  };
+
+  const advanceToDuplicateReviewDialog = (
+    mappedData: ITransactionImportTableData[],
+    accountMap: Map<string, string>,
+  ) => {
+    setMappedImportData(mappedData);
+    setAccountNameToAccountIdMap(accountMap);
+    setActiveStep(3);
   };
 
   return (
@@ -169,7 +197,7 @@ const ImportTransactionsModal = () => {
           resetData();
           if (activeJobId && job?.id === activeJobId) {
             trackedJobId.current = activeJobId;
-            setActiveStep(3);
+            setActiveStep(4);
           } else {
             trackedJobId.current = null;
             setActiveStep(0);
@@ -218,12 +246,23 @@ const ImportTransactionsModal = () => {
               accountNameToAccountIdMap={accountNameToAccountIdMap}
               setAccountNameToAccountIdMap={setAccountNameToAccountIdMap}
               goBackToPreviousDialog={() => setActiveStep(1)}
-              submitImport={onSubmit}
-              isSubmitting={importTransactionsMutation.isPending}
+              advanceToNextDialog={advanceToDuplicateReviewDialog}
             />
           </Stepper.Step>
           <Stepper.Step
             label={t("step_4")}
+            description={t("duplicate_transactions")}
+          >
+            <DuplicateReview
+              importedTransactions={mappedImportData}
+              duplicateOptions={duplicateOptions}
+              accountNameToAccountIdMap={accountNameToAccountIdMap}
+              goBackToPreviousDialog={() => setActiveStep(2)}
+              advanceToNextDialog={onSubmit}
+            />
+          </Stepper.Step>
+          <Stepper.Step
+            label={t("step_5")}
             description={t("import_progress_step")}
           >
             <ImportProgress
@@ -238,7 +277,7 @@ const ImportTransactionsModal = () => {
           </Stepper.Step>
           <Stepper.Completed>
             <ImportCompleted
-              goBackToPreviousDialog={() => setActiveStep(2)}
+              goBackToPreviousDialog={() => setActiveStep(3)}
               closeModal={close}
               hasErrors={job?.status === "CompletedWithErrors"}
               isCancelled={job?.status === "Cancelled"}
