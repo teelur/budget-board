@@ -13,6 +13,7 @@ import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/Tr
 import { useTranslation } from "react-i18next";
 import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransactionsModal";
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
+import SelectLastNMonths from "~/components/SelectLastNMonths/SelectLastNMonths";
 import { Filters, ITransaction } from "~/models/transaction";
 import {
   buildTimeToMonthlyTotalsMap,
@@ -105,6 +106,11 @@ const TransactionsHeader = (
         timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
         isPending={props.isQueryPending}
         allowSelectMultiple
+      />
+      <SelectLastNMonths
+        monthButtons={[3, 6, 12]}
+        setSelectedMonths={props.setSelectedMonths}
+        showAllButton
       />
     </Stack>
   );
