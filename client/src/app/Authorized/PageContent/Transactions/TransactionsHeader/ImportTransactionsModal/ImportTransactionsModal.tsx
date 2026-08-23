@@ -5,6 +5,7 @@ import React from "react";
 import {
   IAccountNameToIDKeyValuePair,
   ITransactionImport,
+  ITransactionImportDuplicateFieldAvailability,
   ITransactionImportDuplicateOptions,
   ITransactionImportRequest,
   ITransactionImportTableData,
@@ -48,14 +49,22 @@ const ImportTransactionsModal = () => {
   >([]);
   const [duplicateOptions, setDuplicateOptions] =
     React.useState<ITransactionImportDuplicateOptions>({
-      filterDuplicates: false,
+      filterDuplicates: true,
       filterByOptions: {
-        date: false,
+        date: true,
         merchantName: false,
         category: false,
-        amount: false,
-        account: false,
+        amount: true,
+        account: true,
       },
+    });
+  const [availableDuplicateFields, setAvailableDuplicateFields] =
+    React.useState<ITransactionImportDuplicateFieldAvailability>({
+      date: false,
+      merchantName: false,
+      category: false,
+      amount: false,
+      account: false,
     });
   const [mappedImportData, setMappedImportData] = React.useState<
     ITransactionImportTableData[]
@@ -71,6 +80,23 @@ const ImportTransactionsModal = () => {
 
     setImportData([]);
     setMappedImportData([]);
+    setDuplicateOptions({
+      filterDuplicates: true,
+      filterByOptions: {
+        date: true,
+        merchantName: false,
+        category: false,
+        amount: true,
+        account: true,
+      },
+    });
+    setAvailableDuplicateFields({
+      date: false,
+      merchantName: false,
+      category: false,
+      amount: false,
+      account: false,
+    });
 
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
@@ -172,10 +198,10 @@ const ImportTransactionsModal = () => {
 
   const advanceToAccountMappingDialog = (
     importData: ITransactionImportTableData[],
-    options: ITransactionImportDuplicateOptions,
+    availableFields: ITransactionImportDuplicateFieldAvailability,
   ) => {
     setImportData(importData);
-    setDuplicateOptions(options);
+    setAvailableDuplicateFields(availableFields);
     setActiveStep(2);
   };
 
@@ -256,6 +282,8 @@ const ImportTransactionsModal = () => {
             <DuplicateReview
               importedTransactions={mappedImportData}
               duplicateOptions={duplicateOptions}
+              setDuplicateOptions={setDuplicateOptions}
+              availableDuplicateFields={availableDuplicateFields}
               accountNameToAccountIdMap={accountNameToAccountIdMap}
               goBackToPreviousDialog={() => setActiveStep(2)}
               advanceToNextDialog={onSubmit}

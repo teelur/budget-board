@@ -22,6 +22,17 @@ export interface ITransactionImportDuplicateOptions {
   };
 }
 
+export interface ITransactionImportDuplicateFieldAvailability {
+  date: boolean;
+  merchantName: boolean;
+  category: boolean;
+  amount: boolean;
+  account: boolean;
+}
+
+export type TransactionImportDuplicateField =
+  keyof ITransactionImportDuplicateFieldAvailability;
+
 export interface IAccountNameToIDKeyValuePair {
   accountName: string;
   accountID: string;

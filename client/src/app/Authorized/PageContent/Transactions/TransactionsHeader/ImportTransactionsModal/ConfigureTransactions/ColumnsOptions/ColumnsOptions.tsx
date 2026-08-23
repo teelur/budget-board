@@ -10,14 +10,6 @@ import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
-export interface IFilterByOptions {
-  date: boolean;
-  merchantName: boolean;
-  category: boolean;
-  amount: boolean;
-  account: boolean;
-}
-
 export const dateFormatOptions = [
   { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
   { value: "MM/DD/YY", label: "MM/DD/YY" },
@@ -36,8 +28,6 @@ export interface IColumnsOptions {
   includeExpensesColumn: boolean;
   expensesColumn: string | null;
   expensesColumnValue: string | null;
-  filterDuplicates: boolean;
-  filterByOptions: IFilterByOptions;
   useSingleAccount: boolean;
 }
 
@@ -76,27 +66,8 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
   const expensesColumnValueField = useField<string | null>({
     initialValue: props.columnsOptions.expensesColumnValue,
   });
-  const filterDuplicatesField = useField<boolean>({
-    initialValue: props.columnsOptions.filterDuplicates,
-  });
   const useSingleAccountField = useField<boolean>({
     initialValue: props.columnsOptions.useSingleAccount,
-  });
-
-  const filterByDateField = useField<boolean>({
-    initialValue: props.columnsOptions.filterByOptions?.date ?? false,
-  });
-  const filterByMerchantNameField = useField<boolean>({
-    initialValue: props.columnsOptions.filterByOptions?.merchantName ?? false,
-  });
-  const filterByCategoryField = useField<boolean>({
-    initialValue: props.columnsOptions.filterByOptions?.category ?? false,
-  });
-  const filterByAmountField = useField<boolean>({
-    initialValue: props.columnsOptions.filterByOptions?.amount ?? false,
-  });
-  const filterByAccountField = useField<boolean>({
-    initialValue: props.columnsOptions.filterByOptions?.account ?? false,
   });
 
   const { t } = useTranslation();
@@ -124,22 +95,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
         ? expensesColumnValueField.getValue()
         : null,
       useSingleAccount: useSingleAccountField.getValue(),
-      filterDuplicates: filterDuplicatesField.getValue(),
-      filterByOptions: filterDuplicatesField.getValue()
-        ? {
-            date: filterByDateField.getValue(),
-            merchantName: filterByMerchantNameField.getValue(),
-            category: filterByCategoryField.getValue(),
-            amount: filterByAmountField.getValue(),
-            account: filterByAccountField.getValue(),
-          }
-        : {
-            date: false,
-            merchantName: false,
-            category: false,
-            amount: false,
-            account: false,
-          },
     });
   }, [
     dateFormatField.getValue(),
@@ -149,12 +104,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
     splitAmountField.getValue(),
     useSingleAccountField.getValue(),
     expensesColumnValueField.getValue(),
-    filterDuplicatesField.getValue(),
-    filterByDateField.getValue(),
-    filterByMerchantNameField.getValue(),
-    filterByCategoryField.getValue(),
-    filterByAmountField.getValue(),
-    filterByAccountField.getValue(),
   ]);
 
   React.useEffect(() => {
@@ -258,18 +207,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                 elevation={0}
               />
             )}
-            <Group>
-              <Checkbox
-                checked={filterDuplicatesField.getValue()}
-                onChange={(event) => {
-                  filterDuplicatesField.setValue(event.currentTarget.checked);
-                }}
-                label={
-                  <PrimaryText size="sm">{t("filter_duplicates")}</PrimaryText>
-                }
-                elevation={0}
-              />
-            </Group>
             <Checkbox
               checked={useSingleAccountField.getValue()}
               onChange={(event) => {
@@ -284,64 +221,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
         </Stack>
       </Group>
       <Group w="100%" justify="flex-end">
-        {filterDuplicatesField.getValue() && (
-          <Card elevation={1}>
-            <Stack justify="center" gap="0.5rem">
-              <Stack gap="0">
-                <PrimaryText size="sm">{t("filter_duplicates")}</PrimaryText>
-                <DimmedText size="xs">
-                  {t("filter_duplicates_description")}
-                </DimmedText>
-              </Stack>
-              <Group gap="2rem">
-                <Checkbox
-                  checked={filterByDateField.getValue()}
-                  onChange={(event) =>
-                    filterByDateField.setValue(event.currentTarget.checked)
-                  }
-                  label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
-                  elevation={1}
-                />
-                <Checkbox
-                  checked={filterByMerchantNameField.getValue()}
-                  onChange={(event) =>
-                    filterByMerchantNameField.setValue(
-                      event.currentTarget.checked,
-                    )
-                  }
-                  label={
-                    <PrimaryText size="sm">{t("merchant_name")}</PrimaryText>
-                  }
-                  elevation={1}
-                />
-                <Checkbox
-                  checked={filterByCategoryField.getValue()}
-                  onChange={(event) =>
-                    filterByCategoryField.setValue(event.currentTarget.checked)
-                  }
-                  label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
-                  elevation={1}
-                />
-                <Checkbox
-                  checked={filterByAmountField.getValue()}
-                  onChange={(event) =>
-                    filterByAmountField.setValue(event.currentTarget.checked)
-                  }
-                  label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
-                  elevation={1}
-                />
-                <Checkbox
-                  checked={filterByAccountField.getValue()}
-                  onChange={(event) =>
-                    filterByAccountField.setValue(event.currentTarget.checked)
-                  }
-                  label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
-                  elevation={1}
-                />
-              </Group>
-            </Stack>
-          </Card>
-        )}
         {!splitAmountField.getValue() &&
           includeExpensesColumnField.getValue() && (
             <Card elevation={1}>

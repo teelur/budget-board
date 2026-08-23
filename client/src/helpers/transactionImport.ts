@@ -2,8 +2,10 @@ import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { areStringsEqual } from "~/helpers/utils";
 import {
   ITransaction,
+  ITransactionImportDuplicateFieldAvailability,
   ITransactionImportDuplicateOptions,
   ITransactionImportTableData,
+  TransactionImportDuplicateField,
 } from "~/models/transaction";
 import dayjs from "~/shared/dayjs";
 
@@ -34,6 +36,7 @@ export const getMappedAccountId = (
 interface DuplicateFilterResult {
   filteredTransactions: ITransactionImportTableData[];
   duplicateTransactions: Map<ITransactionImportTableData, ITransaction>;
+  duplicateMatchFields: Map<number, TransactionImportDuplicateField[]>;
 }
 
 export const filterImportedTransactionDuplicates = (
@@ -42,10 +45,15 @@ export const filterImportedTransactionDuplicates = (
   transactionCategories: Parameters<typeof getParentCategory>[1],
   duplicateOptions: ITransactionImportDuplicateOptions,
   accountMap: Map<string, string>,
+  availableDuplicateFields: ITransactionImportDuplicateFieldAvailability,
 ): DuplicateFilterResult => {
   const duplicateTransactions = new Map<
     ITransactionImportTableData,
     ITransaction
+  >();
+  const duplicateMatchFields = new Map<
+    number,
+    TransactionImportDuplicateField[]
   >();
 
   if (
@@ -56,10 +64,26 @@ export const filterImportedTransactionDuplicates = (
     return {
       filteredTransactions: importedTransactions,
       duplicateTransactions,
+      duplicateMatchFields,
     };
   }
 
-  const filterOptions = duplicateOptions.filterByOptions;
+  const filterOptions = {
+    date:
+      duplicateOptions.filterByOptions.date && availableDuplicateFields.date,
+    merchantName:
+      duplicateOptions.filterByOptions.merchantName &&
+      availableDuplicateFields.merchantName,
+    category:
+      duplicateOptions.filterByOptions.category &&
+      availableDuplicateFields.category,
+    amount:
+      duplicateOptions.filterByOptions.amount &&
+      availableDuplicateFields.amount,
+    account:
+      duplicateOptions.filterByOptions.account &&
+      availableDuplicateFields.account,
+  };
   if (
     !filterOptions.date &&
     !filterOptions.merchantName &&
@@ -70,6 +94,7 @@ export const filterImportedTransactionDuplicates = (
     return {
       filteredTransactions: importedTransactions,
       duplicateTransactions,
+      duplicateMatchFields,
     };
   }
 
@@ -181,10 +206,21 @@ export const filterImportedTransactionDuplicates = (
 
     if (matched) {
       duplicateTransactions.set(importedTransaction, matched);
+      duplicateMatchFields.set(importedTransaction.uid, [
+        ...(filterOptions.date ? ["date" as const] : []),
+        ...(filterOptions.merchantName ? ["merchantName" as const] : []),
+        ...(filterOptions.category ? ["category" as const] : []),
+        ...(filterOptions.amount ? ["amount" as const] : []),
+        ...(filterOptions.account ? ["account" as const] : []),
+      ]);
     } else {
       filteredTransactions.push(importedTransaction);
     }
   }
 
-  return { filteredTransactions, duplicateTransactions };
+  return {
+    filteredTransactions,
+    duplicateTransactions,
+    duplicateMatchFields,
+  };
 };

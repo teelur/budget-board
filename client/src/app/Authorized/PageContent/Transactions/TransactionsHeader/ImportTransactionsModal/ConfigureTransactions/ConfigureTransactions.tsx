@@ -2,7 +2,7 @@ import { Alert, Button, Group, Stack } from "@mantine/core";
 import React from "react";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import {
-  ITransactionImportDuplicateOptions,
+  ITransactionImportDuplicateFieldAvailability,
   ITransactionImportTableData,
 } from "~/models/transaction";
 import { CsvRow } from "../LoadCsv/LoadCsv";
@@ -23,7 +23,7 @@ interface ConfigureTransactionsProps {
   csvHeaders: string[];
   advanceToNextDialog: (
     data: ITransactionImportTableData[],
-    duplicateOptions: ITransactionImportDuplicateOptions,
+    availableDuplicateFields: ITransactionImportDuplicateFieldAvailability,
   ) => void;
   goBackToPreviousDialog: () => void;
 }
@@ -81,14 +81,6 @@ const ConfigureTransactions = (
     expensesColumn: null,
     expensesColumnValue: null,
     useSingleAccount: false,
-    filterDuplicates: false,
-    filterByOptions: {
-      date: false,
-      merchantName: false,
-      category: false,
-      amount: false,
-      account: false,
-    },
   });
 
   const disableNextButton = () => {
@@ -457,7 +449,7 @@ const ConfigureTransactions = (
     startTransition(() => {
       buildTableData();
     });
-  }, [csvData, columnsSelect, columnsOptions, columnsOptions.filterByOptions]);
+  }, [csvData, columnsSelect, columnsOptions]);
 
   /**
    * Applies new columns options and rebuilds the table data.
@@ -529,8 +521,15 @@ const ConfigureTransactions = (
           loading={isPending}
           onClick={() =>
             props.advanceToNextDialog(importedTransactionsTableData, {
-              filterDuplicates: columnsOptions.filterDuplicates,
-              filterByOptions: columnsOptions.filterByOptions,
+              date: Boolean(columnsSelect.date),
+              merchantName: Boolean(columnsSelect.merchantName),
+              category: Boolean(columnsSelect.category),
+              amount: Boolean(
+                columnsSelect.amount ||
+                columnsSelect.incomeAmount ||
+                columnsSelect.expenseAmount,
+              ),
+              account: Boolean(columnsSelect.account),
             })
           }
           rightSection={<MoveRightIcon size={16} />}
