@@ -40,12 +40,17 @@ const AccountMapping = (props: AccountMappingProps) => {
       label: account.name,
     }));
 
-  const filteredImportData = props.importedTransactions.filter(
-    (t) =>
-      getMappedAccountId(props.accountNameToAccountIdMap, t.account) !== "" &&
-      getMappedAccountId(props.accountNameToAccountIdMap, t.account) !==
-        "exclude",
-  );
+  const filteredImportData = props.importedTransactions
+    .filter(
+      (t) =>
+        getMappedAccountId(props.accountNameToAccountIdMap, t.account) !== "" &&
+        getMappedAccountId(props.accountNameToAccountIdMap, t.account) !==
+          "exclude",
+    )
+    .map((transaction) => ({
+      ...transaction,
+      account: transaction.account?.trim() ?? null,
+    }));
 
   return (
     <Stack gap="0.5rem" w={800} maw="100%" mx="auto">

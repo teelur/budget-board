@@ -4,7 +4,6 @@ import { FileDownIcon } from "lucide-react";
 import React from "react";
 import {
   IAccountNameToIDKeyValuePair,
-  ITransactionImport,
   ITransactionImportDuplicateFieldAvailability,
   ITransactionImportDuplicateOptions,
   ITransactionImportRequest,
@@ -22,6 +21,7 @@ import { useImportTransactionsMutation } from "~/hooks/mutations/transactions/us
 import ImportProgress from "./ImportProgress/ImportProgress";
 import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
 import DuplicateReview from "./DuplicateReview/DuplicateReview";
+import { normalizeImportedAccountName } from "~/helpers/transactionImport";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -177,7 +177,10 @@ const ImportTransactionsModal = () => {
         );
 
     const transactionImportRequest: ITransactionImportRequest = {
-      transactions: filteredImportedData as ITransactionImport[],
+      transactions: filteredImportedData.map((transaction) => ({
+        ...transaction,
+        account: normalizeImportedAccountName(transaction.account) || null,
+      })),
       accountNameToIDMap: accountNameToAccountArray,
     };
 

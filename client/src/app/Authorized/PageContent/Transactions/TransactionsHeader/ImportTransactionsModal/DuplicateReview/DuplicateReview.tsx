@@ -1,7 +1,12 @@
 import { Alert, Button, Checkbox, Divider, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
-import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
+import {
+  InfoIcon,
+  MoveLeftIcon,
+  MoveRightIcon,
+  RefreshCwIcon,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -141,7 +146,7 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
   ]);
 
   React.useEffect(() => {
-    if (transactionsQuery.isPending) {
+    if (transactionsQuery.isPending || transactionsQuery.isError) {
       return;
     }
 
@@ -161,6 +166,7 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
     props.duplicateOptions,
     props.accountNameToAccountIdMap,
     transactionsQuery.data,
+    transactionsQuery.isError,
     transactionsQuery.isPending,
     transactionCategories,
     props.availableDuplicateFields,
@@ -259,6 +265,26 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
         <PrimaryText size="sm">
           {t("duplicate_review_loading_message")}
         </PrimaryText>
+      ) : transactionsQuery.isError ? (
+        <Alert
+          variant="outline"
+          color="var(--text-color-status-bad)"
+          icon={<InfoIcon />}
+        >
+          <Stack gap="0.5rem">
+            <PrimaryText size="sm">
+              {t("duplicate_review_error_message")}
+            </PrimaryText>
+            <Button
+              w="fit-content"
+              loading={transactionsQuery.isRefetching}
+              onClick={() => transactionsQuery.refetch()}
+              leftSection={<RefreshCwIcon size={16} />}
+            >
+              {t("retry")}
+            </Button>
+          </Stack>
+        </Alert>
       ) : (
         <Stack gap="0.5rem">
           <Group justify="space-between" gap="1rem">
@@ -343,9 +369,13 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
         <Button
           flex="1 1 auto"
           disabled={
-            transactionsQuery.isPending || filteredTransactions.length === 0
+            transactionsQuery.isPending ||
+            transactionsQuery.isError ||
+            filteredTransactions.length === 0
           }
-          loading={transactionsQuery.isPending}
+          loading={
+            transactionsQuery.isPending || transactionsQuery.isRefetching
+          }
           onClick={() => props.advanceToNextDialog(filteredTransactions)}
           rightSection={<MoveRightIcon size={16} />}
         >

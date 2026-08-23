@@ -333,6 +333,9 @@ const ConfigureTransactions = (
    */
   const parseImportedTransactions = (): ITransactionImportTableData[] =>
     csvData.map((row: any) => {
+      const getImportedTextValue = (column: string | null): string | null =>
+        column && row[column] != null ? String(row[column]) : null;
+
       return {
         uid: row.uid,
         date: columnsSelect.date
@@ -340,10 +343,8 @@ const ConfigureTransactions = (
               "YYYY-MM-DD",
             )
           : null,
-        merchantName: columnsSelect.merchantName
-          ? row[columnsSelect.merchantName]
-          : null,
-        category: columnsSelect.category ? row[columnsSelect.category] : null,
+        merchantName: getImportedTextValue(columnsSelect.merchantName),
+        category: getImportedTextValue(columnsSelect.category),
         amount: getImportedTransactionAmount(row),
         account: columnsOptions.useSingleAccount
           ? columnsSelect.account?.trim() || null
@@ -524,11 +525,11 @@ const ConfigureTransactions = (
               date: Boolean(columnsSelect.date),
               merchantName: Boolean(columnsSelect.merchantName),
               category: Boolean(columnsSelect.category),
-              amount: Boolean(
-                columnsSelect.amount ||
-                columnsSelect.incomeAmount ||
-                columnsSelect.expenseAmount,
-              ),
+              amount: columnsOptions.splitAmountColumn
+                ? Boolean(
+                    columnsSelect.incomeAmount || columnsSelect.expenseAmount,
+                  )
+                : Boolean(columnsSelect.amount),
               account: Boolean(columnsSelect.account),
             })
           }
