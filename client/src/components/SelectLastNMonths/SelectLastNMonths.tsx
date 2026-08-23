@@ -5,6 +5,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 interface SelectLastNMonthsProps {
   monthButtons: number[];
   setSelectedMonths: React.Dispatch<React.SetStateAction<Date[]>>;
+  showAllButton?: boolean;
 }
 
 const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
@@ -31,13 +32,23 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
           {t("last_n_months", { count: months })}
         </Button>
       ))}
-      <Button
-        size="compact-sm"
-        variant="primary"
-        onClick={() => props.setSelectedMonths([])}
-      >
-        {t("clear_selection")}
-      </Button>
+      {props.showAllButton ? (
+        <Button
+          size="compact-sm"
+          variant="primary"
+          onClick={() => props.setSelectedMonths([])}
+        >
+          {t("all")}
+        </Button>
+      ) : (
+        <Button
+          size="compact-sm"
+          variant="primary"
+          onClick={() => props.setSelectedMonths([])}
+        >
+          {t("clear_selection")}
+        </Button>
+      )}
     </Group>
   );
 };

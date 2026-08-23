@@ -11,6 +11,28 @@ export interface ITransactionImportTableData extends ITransactionImport {
   type: string | null;
 }
 
+export interface ITransactionImportDuplicateOptions {
+  filterDuplicates: boolean;
+  filterByOptions: {
+    date: boolean;
+    merchantName: boolean;
+    category: boolean;
+    amount: boolean;
+    account: boolean;
+  };
+}
+
+export interface ITransactionImportDuplicateFieldAvailability {
+  date: boolean;
+  merchantName: boolean;
+  category: boolean;
+  amount: boolean;
+  account: boolean;
+}
+
+export type TransactionImportDuplicateField =
+  keyof ITransactionImportDuplicateFieldAvailability;
+
 export interface IAccountNameToIDKeyValuePair {
   accountName: string;
   accountID: string;

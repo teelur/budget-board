@@ -4,7 +4,7 @@ import { filterVisibleAccounts } from "~/helpers/accounts";
 import AccountMappingItem from "./AccountMappingItem/AccountMappingItem";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { MoveLeftIcon } from "lucide-react";
-import { areStringsEqual } from "~/helpers/utils";
+import { getMappedAccountId } from "~/helpers/transactionImport";
 import { useTranslation } from "react-i18next";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
@@ -20,8 +20,10 @@ interface AccountMappingProps {
     React.SetStateAction<Map<string, string>>
   >;
   goBackToPreviousDialog: () => void;
-  submitImport: (filteredImportData: ITransactionImportTableData[]) => void;
-  isSubmitting?: boolean;
+  advanceToNextDialog: (
+    filteredImportData: ITransactionImportTableData[],
+    accountMap: Map<string, string>,
+  ) => void;
 }
 
 const AccountMapping = (props: AccountMappingProps) => {
@@ -38,17 +40,17 @@ const AccountMapping = (props: AccountMappingProps) => {
       label: account.name,
     }));
 
-  const filteredImportData = props.importedTransactions.filter(
-    (t) =>
-      !areStringsEqual(
-        props.accountNameToAccountIdMap.get(t.account ?? "") ?? "",
-        "exclude",
-      ) &&
-      !areStringsEqual(
-        props.accountNameToAccountIdMap.get(t.account ?? "") ?? "",
-        "",
-      ),
-  );
+  const filteredImportData = props.importedTransactions
+    .filter(
+      (t) =>
+        getMappedAccountId(props.accountNameToAccountIdMap, t.account) !== "" &&
+        getMappedAccountId(props.accountNameToAccountIdMap, t.account) !==
+          "exclude",
+    )
+    .map((transaction) => ({
+      ...transaction,
+      account: transaction.account?.trim() ?? null,
+    }));
 
   return (
     <Stack gap="0.5rem" w={800} maw="100%" mx="auto">
@@ -80,11 +82,15 @@ const AccountMapping = (props: AccountMappingProps) => {
         </Button>
         <Button
           flex="1 1 auto"
-          onClick={() => props.submitImport(filteredImportData)}
-          loading={props.isSubmitting}
+          onClick={() =>
+            props.advanceToNextDialog(
+              filteredImportData,
+              props.accountNameToAccountIdMap,
+            )
+          }
           disabled={filteredImportData.length === 0}
         >
-          {t("import_n_transactions", { n: filteredImportData.length })}
+          {t("next")}
         </Button>
       </Group>
     </Stack>

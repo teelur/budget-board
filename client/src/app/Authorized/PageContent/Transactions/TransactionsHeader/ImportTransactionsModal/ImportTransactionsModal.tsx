@@ -4,7 +4,8 @@ import { FileDownIcon } from "lucide-react";
 import React from "react";
 import {
   IAccountNameToIDKeyValuePair,
-  ITransactionImport,
+  ITransactionImportDuplicateFieldAvailability,
+  ITransactionImportDuplicateOptions,
   ITransactionImportRequest,
   ITransactionImportTableData,
 } from "~/models/transaction";
@@ -19,6 +20,8 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import { useImportTransactionsMutation } from "~/hooks/mutations/transactions/useImportTransactionsMutation";
 import ImportProgress from "./ImportProgress/ImportProgress";
 import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
+import DuplicateReview from "./DuplicateReview/DuplicateReview";
+import { normalizeImportedAccountName } from "~/helpers/transactionImport";
 
 const ImportTransactionsModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -44,6 +47,28 @@ const ImportTransactionsModal = () => {
   const [importData, setImportData] = React.useState<
     ITransactionImportTableData[]
   >([]);
+  const [duplicateOptions, setDuplicateOptions] =
+    React.useState<ITransactionImportDuplicateOptions>({
+      filterDuplicates: true,
+      filterByOptions: {
+        date: true,
+        merchantName: false,
+        category: false,
+        amount: true,
+        account: true,
+      },
+    });
+  const [availableDuplicateFields, setAvailableDuplicateFields] =
+    React.useState<ITransactionImportDuplicateFieldAvailability>({
+      date: false,
+      merchantName: false,
+      category: false,
+      amount: false,
+      account: false,
+    });
+  const [mappedImportData, setMappedImportData] = React.useState<
+    ITransactionImportTableData[]
+  >([]);
 
   // Account Mapping Dialog Data
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
@@ -54,6 +79,24 @@ const ImportTransactionsModal = () => {
     setCsvData([]);
 
     setImportData([]);
+    setMappedImportData([]);
+    setDuplicateOptions({
+      filterDuplicates: true,
+      filterByOptions: {
+        date: true,
+        merchantName: false,
+        category: false,
+        amount: true,
+        account: true,
+      },
+    });
+    setAvailableDuplicateFields({
+      date: false,
+      merchantName: false,
+      category: false,
+      amount: false,
+      account: false,
+    });
 
     setAccountNameToAccountIdMap(new Map<string, string>());
   };
@@ -65,7 +108,7 @@ const ImportTransactionsModal = () => {
         job.status,
       )
     ) {
-      setActiveStep(4);
+      setActiveStep(5);
     }
   }, [job]);
 
@@ -134,7 +177,10 @@ const ImportTransactionsModal = () => {
         );
 
     const transactionImportRequest: ITransactionImportRequest = {
-      transactions: filteredImportedData as ITransactionImport[],
+      transactions: filteredImportedData.map((transaction) => ({
+        ...transaction,
+        account: normalizeImportedAccountName(transaction.account) || null,
+      })),
       accountNameToIDMap: accountNameToAccountArray,
     };
 
@@ -145,8 +191,9 @@ const ImportTransactionsModal = () => {
       },
       {
         onSuccess: (response) => {
+          trackedJobId.current = response.data.id;
           startImport(response.data.id);
-          setActiveStep(3);
+          setActiveStep(4);
         },
       },
     );
@@ -154,9 +201,20 @@ const ImportTransactionsModal = () => {
 
   const advanceToAccountMappingDialog = (
     importData: ITransactionImportTableData[],
+    availableFields: ITransactionImportDuplicateFieldAvailability,
   ) => {
     setImportData(importData);
+    setAvailableDuplicateFields(availableFields);
     setActiveStep(2);
+  };
+
+  const advanceToDuplicateReviewDialog = (
+    mappedData: ITransactionImportTableData[],
+    accountMap: Map<string, string>,
+  ) => {
+    setMappedImportData(mappedData);
+    setAccountNameToAccountIdMap(accountMap);
+    setActiveStep(3);
   };
 
   return (
@@ -168,7 +226,7 @@ const ImportTransactionsModal = () => {
           resetData();
           if (activeJobId && job?.id === activeJobId) {
             trackedJobId.current = activeJobId;
-            setActiveStep(3);
+            setActiveStep(4);
           } else {
             trackedJobId.current = null;
             setActiveStep(0);
@@ -217,12 +275,25 @@ const ImportTransactionsModal = () => {
               accountNameToAccountIdMap={accountNameToAccountIdMap}
               setAccountNameToAccountIdMap={setAccountNameToAccountIdMap}
               goBackToPreviousDialog={() => setActiveStep(1)}
-              submitImport={onSubmit}
-              isSubmitting={importTransactionsMutation.isPending}
+              advanceToNextDialog={advanceToDuplicateReviewDialog}
             />
           </Stepper.Step>
           <Stepper.Step
             label={t("step_4")}
+            description={t("duplicate_transactions")}
+          >
+            <DuplicateReview
+              importedTransactions={mappedImportData}
+              duplicateOptions={duplicateOptions}
+              setDuplicateOptions={setDuplicateOptions}
+              availableDuplicateFields={availableDuplicateFields}
+              accountNameToAccountIdMap={accountNameToAccountIdMap}
+              goBackToPreviousDialog={() => setActiveStep(2)}
+              advanceToNextDialog={onSubmit}
+            />
+          </Stepper.Step>
+          <Stepper.Step
+            label={t("step_5")}
             description={t("import_progress_step")}
           >
             <ImportProgress
@@ -237,7 +308,7 @@ const ImportTransactionsModal = () => {
           </Stepper.Step>
           <Stepper.Completed>
             <ImportCompleted
-              goBackToPreviousDialog={() => setActiveStep(2)}
+              goBackToPreviousDialog={() => setActiveStep(3)}
               closeModal={close}
               hasErrors={job?.status === "CompletedWithErrors"}
               isCancelled={job?.status === "Cancelled"}

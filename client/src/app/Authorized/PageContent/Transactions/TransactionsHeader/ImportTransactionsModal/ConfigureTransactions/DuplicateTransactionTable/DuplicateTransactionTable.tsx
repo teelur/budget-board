@@ -9,9 +9,11 @@ import {
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import {
   ITransaction,
   ITransactionImportTableData,
+  TransactionImportDuplicateField,
 } from "~/models/transaction";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -19,6 +21,7 @@ import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
+  matchFields: Map<number, TransactionImportDuplicateField[]>;
   restoreTransaction: (uid: number) => void;
 }
 
@@ -62,15 +65,17 @@ const DuplicateTransactionTable = (
   return (
     <Stack gap={0} justify="center">
       <Divider label={t("duplicate_transactions")} labelPosition="center" />
-      <Table.ScrollContainer minWidth={800} maxHeight={400}>
+      <Table.ScrollContainer minWidth={900} maxHeight={400}>
         <Table striped>
           <Table.Thead>
             <Table.Tr>
               <Table.Th />
+              <Table.Th>{t("transaction")}</Table.Th>
               <Table.Th>{t("date")}</Table.Th>
               <Table.Th>{t("merchant_name")}</Table.Th>
               <Table.Th>{t("amount")}</Table.Th>
               <Table.Th>{t("account")}</Table.Th>
+              <Table.Th>{t("matched_on")}</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -89,19 +94,21 @@ const DuplicateTransactionTable = (
                 <React.Fragment key={row.importedTransaction.uid}>
                   <Table.Tr>
                     <Table.Td>
-                      <Flex justify="center" align="center">
-                        <ActionIcon
-                          size="sm"
-                          variant="subtle"
-                          onClick={() => {
-                            props.restoreTransaction(
-                              row.importedTransaction.uid,
-                            );
-                          }}
-                        >
-                          <Undo2Icon />
-                        </ActionIcon>
-                      </Flex>
+                      <ActionIcon
+                        size="sm"
+                        variant="subtle"
+                        aria-label={t("restore_transaction")}
+                        onClick={() => {
+                          props.restoreTransaction(row.importedTransaction.uid);
+                        }}
+                      >
+                        <Undo2Icon />
+                      </ActionIcon>
+                    </Table.Td>
+                    <Table.Td>
+                      <PrimaryText size="sm">
+                        {t("imported_transaction")}
+                      </PrimaryText>
                     </Table.Td>
                     <Table.Td>
                       {dayjs(row.importedTransaction.date).format(dateFormat)}
@@ -113,11 +120,32 @@ const DuplicateTransactionTable = (
                       />
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.account}</Table.Td>
+                    <Table.Td>
+                      <Stack gap={0}>
+                        <PrimaryText size="xs">{t("matched_on")}:</PrimaryText>
+                        <PrimaryText size="xs">
+                          {props.matchFields
+                            .get(row.importedTransaction.uid)
+                            ?.map((field) =>
+                              t(
+                                field === "merchantName"
+                                  ? "merchant_name"
+                                  : field,
+                              ),
+                            )
+                            .join(", ")}
+                        </PrimaryText>
+                      </Stack>
+                    </Table.Td>
                   </Table.Tr>
                   <Table.Tr key={index + props.tableData.size}>
+                    <Table.Td />
                     <Table.Td>
-                      <Flex justify="center" align="center">
+                      <Flex align="center" gap="0.25rem">
                         <CornerDownRightIcon size="1rem" />
+                        <PrimaryText size="sm">
+                          {t("existing_transaction")}
+                        </PrimaryText>
                       </Flex>
                     </Table.Td>
                     <Table.Td>
@@ -134,6 +162,7 @@ const DuplicateTransactionTable = (
                         row.existingTransaction.accountID,
                       )}
                     </Table.Td>
+                    <Table.Td />
                   </Table.Tr>
                 </React.Fragment>
               ))}

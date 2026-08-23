@@ -2,7 +2,7 @@ import { Alert, Button, Group, Stack } from "@mantine/core";
 import React from "react";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import {
-  ITransaction,
+  ITransactionImportDuplicateFieldAvailability,
   ITransactionImportTableData,
 } from "~/models/transaction";
 import { CsvRow } from "../LoadCsv/LoadCsv";
@@ -12,21 +12,19 @@ import ColumnsOptions, {
 } from "./ColumnsOptions/ColumnsOptions";
 import { areStringsEqual } from "~/helpers/utils";
 import ColumnsSelect, { ISelectedColumns } from "./ColumnsSelect/ColumnsSelect";
-import DuplicateTransactionTable from "./DuplicateTransactionTable/DuplicateTransactionTable";
 import { notifications } from "@mantine/notifications";
-import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
-import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
-import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
 interface ConfigureTransactionsProps {
   csvData: CsvRow[];
   csvHeaders: string[];
-  advanceToNextDialog: (data: ITransactionImportTableData[]) => void;
+  advanceToNextDialog: (
+    data: ITransactionImportTableData[],
+    availableDuplicateFields: ITransactionImportDuplicateFieldAvailability,
+  ) => void;
   goBackToPreviousDialog: () => void;
 }
 
@@ -39,12 +37,6 @@ const ConfigureTransactions = (
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
-  const { allTransactionCategories: transactionCategories } =
-    useTransactionCategories();
-  const transactionsQuery = useTransactionsQuery({
-    includeHiddenCategory: true,
-  });
-  const accountsQuery = useAccountsQuery();
 
   // The raw CSV data imported from the user's file.
   const [csvData, setCsvData] = React.useState<CsvRow[]>(props.csvData);
@@ -89,20 +81,7 @@ const ConfigureTransactions = (
     expensesColumn: null,
     expensesColumnValue: null,
     useSingleAccount: false,
-    filterDuplicates: false,
-    filterByOptions: {
-      date: false,
-      merchantName: false,
-      category: false,
-      amount: false,
-      account: false,
-    },
   });
-
-  // Transactions detected as potential duplicates of existing transactions.
-  const [duplicateTransactions, setDuplicateTransactions] = React.useState<
-    Map<ITransactionImportTableData, ITransaction>
-  >(new Map<ITransactionImportTableData, ITransaction>());
 
   const disableNextButton = () => {
     // Cannot proceed if there are no imported transactions.
@@ -142,10 +121,6 @@ const ConfigureTransactions = (
       }
     }
 
-    if (columnsOptions.thousandsSeparator.length === 0) {
-      setAlertDetails(t("thousands_separator_required_message"));
-      return;
-    }
     if (columnsOptions.decimalSeparator.length === 0) {
       setAlertDetails(t("decimal_separator_required_message"));
       return;
@@ -220,40 +195,6 @@ const ConfigureTransactions = (
   };
 
   /**
-   * Restores a previously flagged duplicate transaction back into the imported transactions table.
-   *
-   * Searches the keys of the `duplicateTransactions` Map for a transaction whose `uid` matches the
-   * provided `uid`. When found, the transaction is appended to the `importedTransactionsTableData`
-   * state and removed from the `duplicateTransactions` state.
-   *
-   * State updates are performed immutably:
-   * - `importedTransactionsTableData` is updated by creating a new array with the restored transaction appended.
-   * - `duplicateTransactions` is updated by creating a shallow copy of the previous Map and deleting the restored key.
-   *
-   * If no matching transaction is found, the function returns early and does not modify state.
-   *
-   * @param uid - Unique identifier of the transaction to restore.
-   * @returns void
-   */
-  const restoreImportedTransaction = (uid: number) => {
-    const filteredTransaction = Array.from(duplicateTransactions.keys()).find(
-      (transaction) => transaction.uid === uid,
-    );
-
-    if (!filteredTransaction) {
-      return;
-    }
-
-    setImportedTransactionsTableData((prev) => [...prev, filteredTransaction]);
-
-    setDuplicateTransactions((prev) => {
-      const newMap = new Map(prev);
-      newMap.delete(filteredTransaction);
-      return newMap;
-    });
-  };
-
-  /**
    * Escapes special regex characters in a string to make it safe for use in RegExp.
    * @param str The string to escape.
    * @returns The escaped string safe for use in a RegExp pattern.
@@ -273,9 +214,7 @@ const ConfigureTransactions = (
       return amountStr;
     }
 
-    // Validate that separators are different
     if (
-      columnsOptions.thousandsSeparator.length === 0 ||
       columnsOptions.decimalSeparator.length === 0 ||
       columnsOptions.thousandsSeparator === columnsOptions.decimalSeparator
     ) {
@@ -291,10 +230,15 @@ const ConfigureTransactions = (
     normalized = normalized.replace(/[^\d]+$/, "");
 
     // Thousands separators are not needed for parsing, so remove them
-    normalized = normalized.replace(
-      new RegExp(escapeRegexCharacters(columnsOptions.thousandsSeparator), "g"),
-      "",
-    );
+    if (columnsOptions.thousandsSeparator.length > 0) {
+      normalized = normalized.replace(
+        new RegExp(
+          escapeRegexCharacters(columnsOptions.thousandsSeparator),
+          "g",
+        ),
+        "",
+      );
+    }
 
     // Replace decimal separator with standard period only if it's different
     if (columnsOptions.decimalSeparator !== ".") {
@@ -389,6 +333,9 @@ const ConfigureTransactions = (
    */
   const parseImportedTransactions = (): ITransactionImportTableData[] =>
     csvData.map((row: any) => {
+      const getImportedTextValue = (column: string | null): string | null =>
+        column && row[column] != null ? String(row[column]) : null;
+
       return {
         uid: row.uid,
         date: columnsSelect.date
@@ -396,10 +343,8 @@ const ConfigureTransactions = (
               "YYYY-MM-DD",
             )
           : null,
-        merchantName: columnsSelect.merchantName
-          ? row[columnsSelect.merchantName]
-          : null,
-        category: columnsSelect.category ? row[columnsSelect.category] : null,
+        merchantName: getImportedTextValue(columnsSelect.merchantName),
+        category: getImportedTextValue(columnsSelect.category),
         amount: getImportedTransactionAmount(row),
         account: columnsOptions.useSingleAccount
           ? columnsSelect.account?.trim() || null
@@ -454,216 +399,14 @@ const ConfigureTransactions = (
   };
 
   /**
-   * Filters out imported transactions that appear to be duplicates of existing transactions,
-   * based on the enabled comparison criteria in `columnsOptions.filterByOptions`.
-   *
-   * Side effects:
-   *  - Calls `setDuplicateTransactions` with a Map<ITransactionImportTableData, ITransaction>
-   *    representing found duplicates (cleared when there are no candidates).
-   *
-   * Notes / assumptions:
-   *  - `transactions` elements and existing `transactionsQuery.data` elements are expected to
-   *    have parsable `date` fields compatible with dayjs.
-   *  - `columnsOptions.filterByOptions` controls which fields are used for duplicate detection.
-   *  - `accountsQuery.data` is used to resolve account names to ids for account-based matching.
-   *
-   * @param transactions - Imported transactions to filter for duplicates (ITransactionImportTableData[]).
-   * @returns An array of imported transactions with duplicates removed (ITransactionImportTableData[]).
-   */
-  const filterDuplicates = (transactions: ITransactionImportTableData[]) => {
-    // Fast-paths
-    if (transactions.length === 0 || !transactionsQuery.data?.length) {
-      setDuplicateTransactions(
-        new Map<ITransactionImportTableData, ITransaction>(),
-      );
-      return transactions;
-    }
-
-    const filterOpts = columnsOptions.filterByOptions;
-    if (
-      !filterOpts?.date &&
-      !filterOpts?.merchantName &&
-      !filterOpts?.category &&
-      !filterOpts?.amount &&
-      !filterOpts?.account
-    ) {
-      setDuplicateTransactions(
-        new Map<ITransactionImportTableData, ITransaction>(),
-      );
-      return transactions;
-    }
-
-    // Precompute helper maps to avoid repeated work in inner loop
-    const accountNameToId = new Map<string, string>();
-    if (accountsQuery.data) {
-      for (const a of accountsQuery.data) {
-        if (a.name) {
-          accountNameToId.set(a.name.trim().toLowerCase(), a.id ?? "");
-        }
-      }
-    }
-
-    // Build an index of existing transactions by a composite key. The key includes
-    // date (startOf day) and any enabled comparison fields. This turns O(N*M) finds
-    // into O(N + M) map lookups.
-    type Key = string;
-    const makeKey = (
-      t: Partial<ITransaction> | ITransactionImportTableData,
-    ): Key => {
-      const parts: string[] = [];
-      if (filterOpts.date && (t as any).date) {
-        const d = dayjs((t as any).date)
-          .startOf("day")
-          .valueOf();
-        parts.push(String(d));
-      }
-      if (filterOpts.merchantName) {
-        parts.push(
-          ((t as any).merchantName ?? "").toString().trim().toLowerCase(),
-        );
-      }
-      if (filterOpts.category) {
-        // For existing transactions we expect `category` + `subcategory` fields,
-        // for imported rows we derive parent/child from the imported value.
-        if (
-          (t as ITransaction).category !== undefined ||
-          (t as ITransaction).subcategory !== undefined
-        ) {
-          parts.push(
-            ((t as ITransaction).category ?? "")
-              .toString()
-              .trim()
-              .toLowerCase(),
-          );
-          parts.push(
-            ((t as ITransaction).subcategory ?? "")
-              .toString()
-              .trim()
-              .toLowerCase(),
-          );
-        } else {
-          const importedParent = getParentCategory(
-            (t as any).category ?? "",
-            transactionCategories,
-          )
-            .toString()
-            .trim()
-            .toLowerCase();
-          const isParent = getIsParentCategory(
-            (t as any).category ?? "",
-            transactionCategories,
-          );
-          const importedChild = isParent ? "" : ((t as any).category ?? "");
-          parts.push(importedParent);
-          parts.push(importedChild.toString().trim().toLowerCase());
-        }
-      }
-      if (filterOpts.amount) {
-        parts.push(String((t as any).amount ?? ""));
-      }
-      if (filterOpts.account) {
-        if ((t as any).accountID !== undefined) {
-          parts.push(((t as any).accountID ?? "").toString().trim());
-        } else {
-          parts.push(
-            (
-              accountNameToId.get(
-                ((t as any).account ?? "").toString().trim().toLowerCase(),
-              ) ?? ""
-            )
-              .toString()
-              .trim(),
-          );
-        }
-      }
-      return parts.join("|");
-    };
-
-    const existingIndex = new Map<Key, ITransaction[]>();
-    for (const ex of transactionsQuery.data) {
-      const key = makeKey(ex as any);
-      if (!existingIndex.has(key)) {
-        existingIndex.set(key, []);
-      }
-      existingIndex.get(key)!.push(ex);
-    }
-
-    const tempDuplicateTransactions = new Map<
-      ITransactionImportTableData,
-      ITransaction
-    >();
-    const filtered = [] as ITransactionImportTableData[];
-
-    for (const imp of transactions) {
-      const key = makeKey(imp as any);
-      const candidates = existingIndex.get(key);
-      let matched: ITransaction | undefined;
-      if (candidates && candidates.length > 0) {
-        for (const c of candidates) {
-          let ok = true;
-          if (filterOpts.date) {
-            ok = ok && dayjs(c.date).isSame(imp.date, "day");
-          }
-          if (ok && filterOpts.merchantName) {
-            ok =
-              ok &&
-              areStringsEqual(c.merchantName ?? "", imp.merchantName ?? "");
-          }
-          if (ok && filterOpts.category) {
-            const importedParent = getParentCategory(
-              imp.category ?? "",
-              transactionCategories,
-            );
-            const isParent = getIsParentCategory(
-              imp.category ?? "",
-              transactionCategories,
-            );
-            const importedChild = isParent ? "" : (imp.category ?? "");
-            ok =
-              ok &&
-              areStringsEqual(c.category ?? "", importedParent) &&
-              areStringsEqual(c.subcategory ?? "", importedChild);
-          }
-          if (ok && filterOpts.amount) {
-            ok = ok && c.amount === imp.amount;
-          }
-          if (ok && filterOpts.account) {
-            const importedAccountID = accountNameToId.get(
-              ((imp.account ?? "") as string).toString().trim().toLowerCase(),
-            );
-            ok =
-              ok &&
-              !!importedAccountID &&
-              areStringsEqual(c.accountID ?? "", importedAccountID ?? "");
-          }
-          if (ok) {
-            matched = c;
-            break;
-          }
-        }
-      }
-
-      if (matched) {
-        tempDuplicateTransactions.set(imp, matched);
-      } else {
-        filtered.push(imp);
-      }
-    }
-
-    setDuplicateTransactions(tempDuplicateTransactions);
-    return filtered;
-  };
-
-  /**
    * Builds and updates the imported transactions table data from the current column mappings and options.
    *
    * Side effects:
-   * - Calls setImportedTransactionsTableData(filteredImportedTransactions ?? []).
-   * - Calls setDuplicateTransactions(...) to reset duplicate tracking when appropriate.
+   * - Calls setImportedTransactionsTableData(importedTransactions).
    *
    * Dependencies:
-   * - Uses external closures / helpers: columnsSelect, columnsOptions, parseImportedTransactions, applyExpensesColumn,
-   *   filterDuplicates, setImportedTransactionsTableData, setDuplicateTransactions.
+   * - Uses external closures / helpers: columnsSelect, columnsOptions, parseImportedTransactions,
+   *   applyExpensesColumn, and setImportedTransactionsTableData.
    *
    * Returns:
    * - void
@@ -683,9 +426,6 @@ const ConfigureTransactions = (
           !columnsSelect.expenseAmount)
       ) {
         setImportedTransactionsTableData([]);
-        setDuplicateTransactions(
-          new Map<ITransactionImportTableData, ITransaction>(),
-        );
       }
 
       const importedTransactions: ITransactionImportTableData[] =
@@ -694,18 +434,7 @@ const ConfigureTransactions = (
       // Expense transactions can be indicated in a separate column.
       applyExpensesColumn(importedTransactions);
 
-      let filteredImportedTransactions;
-      if (columnsOptions.filterDuplicates) {
-        filteredImportedTransactions = filterDuplicates(importedTransactions);
-      } else {
-        filteredImportedTransactions = importedTransactions;
-
-        setDuplicateTransactions(
-          new Map<ITransactionImportTableData, ITransaction>(),
-        );
-      }
-
-      setImportedTransactionsTableData(filteredImportedTransactions ?? []);
+      setImportedTransactionsTableData(importedTransactions);
     } catch (e) {
       notifications.show({
         color: "var(--button-color-destructive)",
@@ -714,9 +443,6 @@ const ConfigureTransactions = (
         }),
       });
       setImportedTransactionsTableData([]);
-      setDuplicateTransactions(
-        new Map<ITransactionImportTableData, ITransaction>(),
-      );
     }
   };
 
@@ -724,7 +450,7 @@ const ConfigureTransactions = (
     startTransition(() => {
       buildTableData();
     });
-  }, [csvData, columnsSelect, columnsOptions, columnsOptions.filterByOptions]);
+  }, [csvData, columnsSelect, columnsOptions]);
 
   /**
    * Applies new columns options and rebuilds the table data.
@@ -764,12 +490,6 @@ const ConfigureTransactions = (
           delete={deleteImportedTransaction}
         />
       )}
-      {columnsOptions.filterDuplicates && (
-        <DuplicateTransactionTable
-          tableData={duplicateTransactions}
-          restoreTransaction={restoreImportedTransaction}
-        />
-      )}
       {props.csvHeaders.length > 0 && (
         <ColumnsSelect
           csvHeaders={props.csvHeaders}
@@ -801,7 +521,17 @@ const ConfigureTransactions = (
           disabled={alertDetails !== null || isPending}
           loading={isPending}
           onClick={() =>
-            props.advanceToNextDialog(importedTransactionsTableData)
+            props.advanceToNextDialog(importedTransactionsTableData, {
+              date: Boolean(columnsSelect.date),
+              merchantName: Boolean(columnsSelect.merchantName),
+              category: Boolean(columnsSelect.category),
+              amount: columnsOptions.splitAmountColumn
+                ? Boolean(
+                    columnsSelect.incomeAmount || columnsSelect.expenseAmount,
+                  )
+                : Boolean(columnsSelect.amount),
+              account: Boolean(columnsSelect.account),
+            })
           }
           rightSection={<MoveRightIcon size={16} />}
         >

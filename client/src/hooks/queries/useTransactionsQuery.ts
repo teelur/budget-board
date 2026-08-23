@@ -63,6 +63,9 @@ export const useTransactionsQuery = ({
       return {
         data: results.map((result) => result.data ?? []).flat(1),
         isPending: results.some((result) => result.isPending),
+        isError: results.some((result) => result.isError),
+        isRefetching: results.some((result) => result.isRefetching),
+        refetch: () => Promise.all(results.map((result) => result.refetch())),
       };
     },
   });
