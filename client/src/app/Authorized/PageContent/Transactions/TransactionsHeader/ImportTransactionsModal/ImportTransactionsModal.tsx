@@ -145,6 +145,7 @@ const ImportTransactionsModal = () => {
       },
       {
         onSuccess: (response) => {
+          trackedJobId.current = response.data.id;
           startImport(response.data.id);
           setActiveStep(3);
         },
