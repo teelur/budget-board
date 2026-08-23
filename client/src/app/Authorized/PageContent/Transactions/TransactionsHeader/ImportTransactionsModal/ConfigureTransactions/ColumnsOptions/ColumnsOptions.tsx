@@ -188,7 +188,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
               window.open(
                 "https://budgetboard.net/features/importing-data/csv-import#date-format",
                 "_blank",
-                "noopener,noreferrer"
+                "noopener,noreferrer",
               )
             }
           >
@@ -204,7 +204,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
               }
               {...thousandsSeparatorField.getInputProps()}
               maxLength={1}
-              minLength={1}
               elevation={0}
             />
             <TextInput
@@ -248,7 +247,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                 checked={includeExpensesColumnField.getValue()}
                 onChange={(event) => {
                   includeExpensesColumnField.setValue(
-                    event.currentTarget.checked
+                    event.currentTarget.checked,
                   );
                 }}
                 label={
@@ -307,7 +306,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                   checked={filterByMerchantNameField.getValue()}
                   onChange={(event) =>
                     filterByMerchantNameField.setValue(
-                      event.currentTarget.checked
+                      event.currentTarget.checked,
                     )
                   }
                   label={
@@ -379,7 +378,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                         }
                         data={
                           props.getExpensesColumnValues(
-                            expensesColumnField.getValue() ?? ""
+                            expensesColumnField.getValue() ?? "",
                           ) ?? []
                         }
                         clearable
