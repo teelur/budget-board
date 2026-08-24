@@ -1905,6 +1905,296 @@ public class TransactionServiceTests
     }
     #endregion
 
+    #region Transaction linking
+    [Fact]
+    public async Task LinkTransactionsAsync_WhenValidPair_ShouldLinkAndNormalizeCategories()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var targetAccount = accountFaker.Generate();
+        var sourceTransaction = new Transaction
+        {
+            Amount = -100m,
+            Date = new DateOnly(2026, 8, 23),
+            Category = "Shopping",
+            Subcategory = "Groceries",
+            MerchantName = "Source",
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+            Account = sourceAccount,
+        };
+        var targetTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 24),
+            Category = null,
+            Subcategory = null,
+            MerchantName = "Target",
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+            Account = targetAccount,
+        };
+        sourceAccount.Transactions.Add(sourceTransaction);
+        targetAccount.Transactions.Add(targetTransaction);
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, targetAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var result = await transactionService.LinkTransactionsAsync(
+            helper.demoUser.Id,
+            new TransactionLinkRequest
+            {
+                TransactionID = sourceTransaction.ID,
+                LinkedTransactionID = targetTransaction.ID,
+            }
+        );
+
+        helper.UserDataContext.TransactionLinks.Should().ContainSingle();
+        sourceTransaction.Category.Should().Be("Transfer");
+        sourceTransaction.Subcategory.Should().BeNull();
+        targetTransaction.Category.Should().Be("Transfer");
+        result.Should().HaveCount(2);
+        result.Should().Contain(response => response.LinkedTransactionID == targetTransaction.ID);
+        result.Should().Contain(response => response.LinkedTransactionID == sourceTransaction.ID);
+    }
+
+    [Fact]
+    public async Task UnlinkTransactionAsync_WhenValidPair_ShouldKeepTransferCategories()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var targetAccount = accountFaker.Generate();
+        var sourceTransaction = new Transaction
+        {
+            Amount = -100m,
+            Date = new DateOnly(2026, 8, 23),
+            Category = "Transfer",
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+        };
+        var targetTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 23),
+            Category = "Transfer",
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+        };
+        sourceAccount.Transactions.Add(sourceTransaction);
+        targetAccount.Transactions.Add(targetTransaction);
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, targetAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+        await transactionService.LinkTransactionsAsync(
+            helper.demoUser.Id,
+            new TransactionLinkRequest
+            {
+                TransactionID = sourceTransaction.ID,
+                LinkedTransactionID = targetTransaction.ID,
+            }
+        );
+
+        await transactionService.UnlinkTransactionAsync(
+            helper.demoUser.Id,
+            sourceTransaction.ID
+        );
+
+        helper.UserDataContext.TransactionLinks.Should().BeEmpty();
+        sourceTransaction.Category.Should().Be("Transfer");
+        targetTransaction.Category.Should().Be("Transfer");
+    }
+
+    [Fact]
+    public async Task UpdateTransactionsAsync_WhenLinkedAmountWouldBreakPair_ShouldThrowError()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var targetAccount = accountFaker.Generate();
+        var sourceTransaction = new Transaction
+        {
+            Amount = -100m,
+            Date = new DateOnly(2026, 8, 23),
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+        };
+        var targetTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 23),
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+        };
+        sourceAccount.Transactions.Add(sourceTransaction);
+        targetAccount.Transactions.Add(targetTransaction);
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, targetAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+        await transactionService.LinkTransactionsAsync(
+            helper.demoUser.Id,
+            new TransactionLinkRequest
+            {
+                TransactionID = sourceTransaction.ID,
+                LinkedTransactionID = targetTransaction.ID,
+            }
+        );
+
+        Func<Task> act = async () =>
+            await transactionService.UpdateTransactionsAsync(
+                helper.demoUser.Id,
+                [
+                    new TransactionUpdateRequest
+                    {
+                        ID = sourceTransaction.ID,
+                        Amount = -99m,
+                    },
+                ]
+            );
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionLinkedAmountUpdateError");
+    }
+
+    [Fact]
+    public async Task LinkTransactionsAsync_WhenAmountsAreNotOpposite_ShouldThrowError()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var targetAccount = accountFaker.Generate();
+        var sourceTransaction = new Transaction
+        {
+            Amount = -100m,
+            Date = new DateOnly(2026, 8, 23),
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+        };
+        var targetTransaction = new Transaction
+        {
+            Amount = 99m,
+            Date = new DateOnly(2026, 8, 23),
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+        };
+        sourceAccount.Transactions.Add(sourceTransaction);
+        targetAccount.Transactions.Add(targetTransaction);
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, targetAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        Func<Task> act = async () =>
+            await transactionService.LinkTransactionsAsync(
+                helper.demoUser.Id,
+                new TransactionLinkRequest
+                {
+                    TransactionID = sourceTransaction.ID,
+                    LinkedTransactionID = targetTransaction.ID,
+                }
+            );
+
+        await act.Should().ThrowAsync<BudgetBoardServiceException>().WithMessage("TransactionLinkAmountsError");
+    }
+
+    [Fact]
+    public async Task ReadTransactionLinkCandidatesAsync_ShouldExcludeSameAccountAndReturnDateMatches()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var targetAccount = accountFaker.Generate();
+        var sourceTransaction = new Transaction
+        {
+            Amount = -100m,
+            Date = new DateOnly(2026, 8, 23),
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+        };
+        var matchingTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 21),
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+            Account = targetAccount,
+        };
+        var distantTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 30),
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+        };
+        var sameAccountTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 23),
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+        };
+        sourceAccount.Transactions.Add(sourceTransaction);
+        sourceAccount.Transactions.Add(sameAccountTransaction);
+        targetAccount.Transactions.Add(matchingTransaction);
+        targetAccount.Transactions.Add(distantTransaction);
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, targetAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var candidates = await transactionService.ReadTransactionLinkCandidatesAsync(
+            helper.demoUser.Id,
+            sourceTransaction.ID,
+            3
+        );
+
+        candidates.Should().ContainSingle().Which.ID.Should().Be(matchingTransaction.ID);
+    }
+
+    [Fact]
+    public async Task DeleteTransactionsAsync_WhenTransactionIsLinked_ShouldRemoveLink()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var targetAccount = accountFaker.Generate();
+        var sourceTransaction = new Transaction
+        {
+            Amount = -100m,
+            Date = new DateOnly(2026, 8, 23),
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+        };
+        var targetTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 23),
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+        };
+        sourceAccount.Transactions.Add(sourceTransaction);
+        targetAccount.Transactions.Add(targetTransaction);
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, targetAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+        await transactionService.LinkTransactionsAsync(
+            helper.demoUser.Id,
+            new TransactionLinkRequest
+            {
+                TransactionID = sourceTransaction.ID,
+                LinkedTransactionID = targetTransaction.ID,
+            }
+        );
+
+        await transactionService.DeleteTransactionsAsync(
+            helper.demoUser.Id,
+            [sourceTransaction.ID]
+        );
+
+        helper.UserDataContext.TransactionLinks.Should().BeEmpty();
+    }
+    #endregion
+
     private static async Task<Transaction> CreateTransactionWithTagsAsync(
         TestHelper helper,
         TransactionService transactionService,
@@ -1935,4 +2225,15 @@ public class TransactionServiceTests
 
     private static ITagService CreateTagService(TestHelper helper) =>
         new TagService(helper.UserDataContext, TestHelper.CreateMockLocalizer<ResponseStrings>());
+
+    private static TransactionService CreateTransactionService(TestHelper helper) =>
+        new(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAutomaticTransactionCategorizerService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper)
+        );
 }

@@ -85,6 +85,18 @@ public class TransactionSplitRequest : ITransactionSplitRequest
     public string Subcategory { get; set; } = string.Empty;
 }
 
+public interface ITransactionLinkRequest
+{
+    Guid TransactionID { get; }
+    Guid LinkedTransactionID { get; }
+}
+
+public class TransactionLinkRequest : ITransactionLinkRequest
+{
+    public Guid TransactionID { get; set; } = Guid.Empty;
+    public Guid LinkedTransactionID { get; set; } = Guid.Empty;
+}
+
 public class TransactionImport
 {
     public Guid? ID { get; set; } = null;
@@ -129,6 +141,11 @@ public interface ITransactionResponse
     string Source { get; }
     Guid AccountID { get; }
     IReadOnlyList<string> Tags { get; }
+    Guid? LinkedTransactionID { get; }
+    string? LinkedAccountName { get; }
+    DateOnly? LinkedDate { get; }
+    decimal? LinkedAmount { get; }
+    string? LinkedMerchantName { get; }
 }
 
 public class TransactionResponse : ITransactionResponse
@@ -147,6 +164,11 @@ public class TransactionResponse : ITransactionResponse
     public string Source { get; set; } = string.Empty;
     public Guid AccountID { get; set; } = Guid.Empty;
     public IReadOnlyList<string> Tags { get; set; } = [];
+    public Guid? LinkedTransactionID { get; set; } = null;
+    public string? LinkedAccountName { get; set; } = null;
+    public DateOnly? LinkedDate { get; set; } = null;
+    public decimal? LinkedAmount { get; set; } = null;
+    public string? LinkedMerchantName { get; set; } = null;
 
     public TransactionResponse(Transaction transaction)
     {
@@ -162,10 +184,24 @@ public class TransactionResponse : ITransactionResponse
         AccountName = transaction.Account?.Name ?? string.Empty;
         Source = transaction.Source;
         AccountID = transaction.AccountID;
-        Tags = transaction
-            .TransactionTags.Where(transactionTag => transactionTag.Tag != null)
-            .Select(transactionTag => transactionTag.Tag!.Value)
-            .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        Tags =
+        [
+            .. transaction
+                .TransactionTags.Where(transactionTag => transactionTag.Tag != null)
+                .Select(transactionTag => transactionTag.Tag!.Value)
+                .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase),
+        ];
+
+        var linkedTransaction =
+            transaction.SourceTransactionLink?.TargetTransaction
+            ?? transaction.TargetTransactionLink?.SourceTransaction;
+        if (linkedTransaction != null)
+        {
+            LinkedTransactionID = linkedTransaction.ID;
+            LinkedAccountName = linkedTransaction.Account?.Name;
+            LinkedDate = linkedTransaction.Date;
+            LinkedAmount = linkedTransaction.Amount;
+            LinkedMerchantName = linkedTransaction.MerchantName;
+        }
     }
 }

@@ -20,6 +20,9 @@ public class TransactionService(
     ITagService tagService
 ) : ITransactionService
 {
+    private const int DefaultLinkCandidateDateWindowDays = 3;
+    private const string TransferCategory = "Transfer";
+
     /// <inheritdoc />
     public async Task CreateTransactionAsync(
         Guid userGuid,
@@ -156,6 +159,18 @@ public class TransactionService(
             var finalAmount = request.Amount ?? originalAmount;
             var finalDate = request.Date ?? originalDate;
 
+            var linkedTransaction = GetLinkedTransaction(transaction);
+            if (
+                linkedTransaction != null
+                && request.Amount.HasValue
+                && !AreOppositeAmounts(finalAmount, linkedTransaction.Amount)
+            )
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionLinkedAmountUpdateError"]
+                );
+            }
+
             if (request.Amount.HasValue)
             {
                 transaction.Amount = finalAmount;
@@ -237,9 +252,16 @@ public class TransactionService(
         var removedTagIds = new HashSet<Guid>();
 
         var uniqueTransactionIds = transactionIds.Distinct().ToList();
+        var linksToRemove = new HashSet<TransactionLink>();
         foreach (var transactionId in uniqueTransactionIds)
         {
             var transaction = GetTransactionByID(userData, transactionId);
+
+            var linkedTransactionLink = GetTransactionLink(transaction);
+            if (linkedTransactionLink != null)
+            {
+                linksToRemove.Add(linkedTransactionLink);
+            }
 
             transaction.Deleted = nowProvider.UtcNow;
             transaction.Category = null;
@@ -251,6 +273,8 @@ public class TransactionService(
                 SubtractAmountFromBalances(transaction, transaction.Amount, transaction.Date);
             }
         }
+
+        userDataContext.TransactionLinks.RemoveRange(linksToRemove);
 
         await tagService.DeleteOrphanedTagsAsync(userData.Id, removedTagIds);
 
@@ -298,6 +322,11 @@ public class TransactionService(
         var userData = await GetCurrentUserAsync(userGuid);
         var transaction = GetTransactionByID(userData, transactionSplitRequest.ID);
 
+        if (GetTransactionLink(transaction) != null)
+        {
+            throw new BudgetBoardServiceException(responseLocalizer["TransactionLinkedSplitError"]);
+        }
+
         if (Math.Abs(transaction.Amount) <= Math.Abs(transactionSplitRequest.Amount))
         {
             logger.LogError("{LogMessage}", logLocalizer["TransactionSplitInvalidAmountLog"]);
@@ -336,6 +365,152 @@ public class TransactionService(
         );
 
         await userDataContext.SaveChangesAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ITransactionResponse>> ReadTransactionLinkCandidatesAsync(
+        Guid userGuid,
+        Guid transactionID,
+        int dateWindowDays = DefaultLinkCandidateDateWindowDays
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+        var transaction = GetTransactionByID(userData, transactionID);
+
+        if (transaction.Deleted != null || transaction.Account?.Deleted != null)
+        {
+            throw new BudgetBoardServiceException(responseLocalizer["TransactionLinkDeletedError"]);
+        }
+
+        if (GetTransactionLink(transaction) != null)
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionAlreadyLinkedError"]
+            );
+        }
+
+        var boundedDateWindow = Math.Clamp(dateWindowDays, 0, 365);
+        return userData
+            .Accounts.SelectMany(account => account.Transactions)
+            .Where(candidate =>
+                candidate.ID != transaction.ID
+                && candidate.Deleted == null
+                && candidate.Account?.Deleted == null
+                && candidate.AccountID != transaction.AccountID
+                && AreOppositeAmounts(transaction.Amount, candidate.Amount)
+                && Math.Abs(candidate.Date.DayNumber - transaction.Date.DayNumber)
+                    <= boundedDateWindow
+                && GetTransactionLink(candidate) == null
+            )
+            .OrderBy(candidate => Math.Abs(candidate.Date.DayNumber - transaction.Date.DayNumber))
+            .ThenBy(candidate => candidate.Account!.Name)
+            .ThenBy(candidate => candidate.MerchantName)
+            .ThenBy(candidate => candidate.ID)
+            .Select(candidate => (ITransactionResponse)new TransactionResponse(candidate))
+            .ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ITransactionResponse>> LinkTransactionsAsync(
+        Guid userGuid,
+        ITransactionLinkRequest request
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+        var sourceTransaction = GetTransactionByID(userData, request.TransactionID);
+        var targetTransaction = GetTransactionByID(userData, request.LinkedTransactionID);
+
+        if (sourceTransaction.ID == targetTransaction.ID)
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionLinkSameTransactionError"]
+            );
+        }
+
+        if (
+            sourceTransaction.Deleted != null
+            || targetTransaction.Deleted != null
+            || sourceTransaction.Account?.Deleted != null
+            || targetTransaction.Account?.Deleted != null
+        )
+        {
+            throw new BudgetBoardServiceException(responseLocalizer["TransactionLinkDeletedError"]);
+        }
+
+        if (sourceTransaction.AccountID == targetTransaction.AccountID)
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionLinkSameAccountError"]
+            );
+        }
+
+        if (!AreOppositeAmounts(sourceTransaction.Amount, targetTransaction.Amount))
+        {
+            throw new BudgetBoardServiceException(responseLocalizer["TransactionLinkAmountsError"]);
+        }
+
+        if (
+            GetTransactionLink(sourceTransaction) != null
+            || GetTransactionLink(targetTransaction) != null
+        )
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionAlreadyLinkedError"]
+            );
+        }
+
+        sourceTransaction.Category = TransferCategory;
+        sourceTransaction.Subcategory = NormalizeTransferSubcategory(
+            userData,
+            sourceTransaction.Subcategory
+        );
+        targetTransaction.Category = TransferCategory;
+        targetTransaction.Subcategory = NormalizeTransferSubcategory(
+            userData,
+            targetTransaction.Subcategory
+        );
+
+        var link = new TransactionLink
+        {
+            SourceTransactionID = sourceTransaction.ID,
+            SourceTransaction = sourceTransaction,
+            TargetTransactionID = targetTransaction.ID,
+            TargetTransaction = targetTransaction,
+        };
+        sourceTransaction.SourceTransactionLink = link;
+        targetTransaction.TargetTransactionLink = link;
+        userDataContext.TransactionLinks.Add(link);
+        await userDataContext.SaveChangesAsync();
+
+        return
+        [
+            new TransactionResponse(sourceTransaction),
+            new TransactionResponse(targetTransaction),
+        ];
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ITransactionResponse>> UnlinkTransactionAsync(
+        Guid userGuid,
+        Guid transactionID
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+        var transaction = GetTransactionByID(userData, transactionID);
+        var link =
+            GetTransactionLink(transaction)
+            ?? throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionNotLinkedError"]
+            );
+        var linkedTransaction = GetLinkedTransaction(transaction)!;
+        userDataContext.TransactionLinks.Remove(link);
+        transaction.SourceTransactionLink = null;
+        transaction.TargetTransactionLink = null;
+        linkedTransaction.SourceTransactionLink = null;
+        linkedTransaction.TargetTransactionLink = null;
+        await userDataContext.SaveChangesAsync();
+
+        return [new TransactionResponse(transaction), new TransactionResponse(linkedTransaction)];
     }
 
     /// <inheritdoc />
@@ -404,6 +579,16 @@ public class TransactionService(
                     .ThenInclude(t => t.TransactionTags)
                     .ThenInclude(transactionTag => transactionTag.Tag)
                     .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Transactions)
+                    .ThenInclude(t => t.SourceTransactionLink)
+                    .ThenInclude(link => link!.TargetTransaction)
+                    .ThenInclude(transaction => transaction!.Account)
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Transactions)
+                    .ThenInclude(t => t.TargetTransactionLink)
+                    .ThenInclude(link => link!.SourceTransaction)
+                    .ThenInclude(transaction => transaction!.Account)
+                    .Include(u => u.Accounts)
                     .ThenInclude(a => a.Balances)
                     .Include(u => u.UserSettings)
                     .Include(u => u.TransactionCategories)
@@ -435,6 +620,44 @@ public class TransactionService(
         }
 
         return account;
+    }
+
+    private static TransactionLink? GetTransactionLink(Transaction transaction)
+    {
+        return transaction.SourceTransactionLink ?? transaction.TargetTransactionLink;
+    }
+
+    private static Transaction? GetLinkedTransaction(Transaction transaction)
+    {
+        return transaction.SourceTransactionLink?.TargetTransaction
+            ?? transaction.TargetTransactionLink?.SourceTransaction;
+    }
+
+    private static bool AreOppositeAmounts(decimal firstAmount, decimal secondAmount)
+    {
+        return firstAmount != 0 && firstAmount == -secondAmount;
+    }
+
+    private static string? NormalizeTransferSubcategory(
+        ApplicationUser userData,
+        string? subcategory
+    )
+    {
+        if (string.IsNullOrWhiteSpace(subcategory))
+        {
+            return null;
+        }
+
+        var isValidTransferSubcategory =
+            TransactionCategoriesConstants.DefaultTransactionCategories.Any(category =>
+                category.Parent.Equals(TransferCategory, StringComparison.OrdinalIgnoreCase)
+                && category.Value.Equals(subcategory, StringComparison.OrdinalIgnoreCase)
+            )
+            || userData.TransactionCategories.Any(category =>
+                category.Parent.Equals(TransferCategory, StringComparison.OrdinalIgnoreCase)
+                && category.Value.Equals(subcategory, StringComparison.OrdinalIgnoreCase)
+            );
+        return isValidTransferSubcategory ? subcategory : null;
     }
 
     private static void SubtractAmountFromBalances(

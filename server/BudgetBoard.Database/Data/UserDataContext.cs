@@ -23,6 +23,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<Account> Accounts { get; set; }
     public DbSet<AccountType> AccountTypes { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<TransactionLink> TransactionLinks { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<TransactionTag> TransactionTags { get; set; }
     public DbSet<Budget> Budgets { get; set; }
@@ -102,6 +103,21 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         modelBuilder.Entity<AccountType>().ToTable("AccountType");
 
         modelBuilder.Entity<Transaction>().ToTable("Transaction");
+
+        modelBuilder.Entity<TransactionLink>(l =>
+        {
+            l.HasOne(e => e.SourceTransaction)
+                .WithOne(e => e.SourceTransactionLink)
+                .HasForeignKey<TransactionLink>(e => e.SourceTransactionID)
+                .OnDelete(DeleteBehavior.Cascade);
+            l.HasOne(e => e.TargetTransaction)
+                .WithOne(e => e.TargetTransactionLink)
+                .HasForeignKey<TransactionLink>(e => e.TargetTransactionID)
+                .OnDelete(DeleteBehavior.Cascade);
+            l.HasIndex(e => e.SourceTransactionID).IsUnique();
+            l.HasIndex(e => e.TargetTransactionID).IsUnique();
+            l.ToTable("TransactionLink");
+        });
 
         modelBuilder.Entity<TransactionImportJob>(j =>
         {

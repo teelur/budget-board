@@ -98,6 +98,31 @@ public interface ITransactionService
     Task SplitTransactionAsync(Guid userGuid, ITransactionSplitRequest request);
 
     /// <summary>
+    /// Retrieves eligible transfer-link candidates for a transaction.
+    /// </summary>
+    Task<IReadOnlyList<ITransactionResponse>> ReadTransactionLinkCandidatesAsync(
+        Guid userGuid,
+        Guid transactionID,
+        int dateWindowDays = 3
+    );
+
+    /// <summary>
+    /// Links two existing transactions as a transfer pair.
+    /// </summary>
+    Task<IReadOnlyList<ITransactionResponse>> LinkTransactionsAsync(
+        Guid userGuid,
+        ITransactionLinkRequest request
+    );
+
+    /// <summary>
+    /// Removes the transfer link for a transaction.
+    /// </summary>
+    Task<IReadOnlyList<ITransactionResponse>> UnlinkTransactionAsync(
+        Guid userGuid,
+        Guid transactionID
+    );
+
+    /// <summary>
     /// Imports a batch of transactions.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
