@@ -11,6 +11,8 @@ import { ActionIcon, Collapse, Group } from "@mantine/core";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+const hoverOpenDelay = 300;
+
 export interface TransactionCardBaseProps extends CardProps {
   transaction: ITransaction;
   categories: ICategory[];
@@ -30,10 +32,21 @@ const TransactionCardBase = ({
   const { t } = useTranslation();
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);
+  const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const selectionMode = onToggleSelect !== undefined;
   const hoverEffect = cardProps.hoverEffect ?? selectionMode;
   const isDetailsExpanded = isDetailsOpen || (hoverEffect && isHovered);
   const detailsId = React.useId();
+
+  React.useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current !== null) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
   const detailsLabel = t(
     isDetailsExpanded
       ? "collapse_transaction_details"
@@ -72,8 +85,32 @@ const TransactionCardBase = ({
 
   return (
     <div
-      onMouseEnter={() => hoverEffect && setIsHovered(true)}
-      onMouseLeave={() => hoverEffect && setIsHovered(false)}
+      onMouseEnter={() => {
+        if (!hoverEffect) {
+          return;
+        }
+
+        if (hoverTimeoutRef.current !== null) {
+          clearTimeout(hoverTimeoutRef.current);
+        }
+
+        hoverTimeoutRef.current = setTimeout(() => {
+          setIsHovered(true);
+          hoverTimeoutRef.current = null;
+        }, hoverOpenDelay);
+      }}
+      onMouseLeave={() => {
+        if (!hoverEffect) {
+          return;
+        }
+
+        if (hoverTimeoutRef.current !== null) {
+          clearTimeout(hoverTimeoutRef.current);
+          hoverTimeoutRef.current = null;
+        }
+
+        setIsHovered(false);
+      }}
     >
       <Card
         w={cardProps.w ?? "100%"}
