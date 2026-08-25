@@ -5,7 +5,6 @@ import {
   accountsQueryKey,
   balancesQueryKey,
   institutionsQueryKey,
-  transactionLinkCandidatesQueryKey,
   transactionsQueryKey,
   translateAxiosError,
 } from "~/helpers/requests";
@@ -30,9 +29,6 @@ export const useLinkTransactionsMutation = () => {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });
-      await queryClient.invalidateQueries({
-        queryKey: [transactionLinkCandidatesQueryKey],
-      });
       await queryClient.invalidateQueries({ queryKey: [balancesQueryKey] });
       await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
       await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });

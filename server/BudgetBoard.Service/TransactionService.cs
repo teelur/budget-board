@@ -382,7 +382,12 @@ public class TransactionService(
             throw new BudgetBoardServiceException(responseLocalizer["TransactionLinkDeletedError"]);
         }
 
-        if (GetTransactionLink(transaction) != null)
+        var linkedTransactionIDs = await userDataContext
+            .TransactionLinks.Select(link => link.SourceTransactionID)
+            .Concat(userDataContext.TransactionLinks.Select(link => link.TargetTransactionID))
+            .ToHashSetAsync();
+
+        if (linkedTransactionIDs.Contains(transaction.ID))
         {
             throw new BudgetBoardServiceException(
                 responseLocalizer["TransactionAlreadyLinkedError"]
@@ -400,7 +405,7 @@ public class TransactionService(
                 && AreOppositeAmounts(transaction.Amount, candidate.Amount)
                 && Math.Abs(candidate.Date.DayNumber - transaction.Date.DayNumber)
                     <= boundedDateWindow
-                && GetTransactionLink(candidate) == null
+                && !linkedTransactionIDs.Contains(candidate.ID)
             )
             .OrderBy(candidate => Math.Abs(candidate.Date.DayNumber - transaction.Date.DayNumber))
             .ThenBy(candidate => candidate.Account!.Name)
@@ -450,8 +455,8 @@ public class TransactionService(
         }
 
         if (
-            GetTransactionLink(sourceTransaction) != null
-            || GetTransactionLink(targetTransaction) != null
+            await HasTransactionLinkAsync(sourceTransaction.ID)
+            || await HasTransactionLinkAsync(targetTransaction.ID)
         )
         {
             throw new BudgetBoardServiceException(
@@ -470,6 +475,15 @@ public class TransactionService(
             targetTransaction.Subcategory
         );
 
+        var linkDate =
+            sourceTransaction.Date <= targetTransaction.Date
+                ? sourceTransaction.Date
+                : targetTransaction.Date;
+        UpdateBalanceForDateChange(sourceTransaction, linkDate);
+        UpdateBalanceForDateChange(targetTransaction, linkDate);
+        sourceTransaction.Date = linkDate;
+        targetTransaction.Date = linkDate;
+
         var link = new TransactionLink
         {
             SourceTransactionID = sourceTransaction.ID,
@@ -487,6 +501,21 @@ public class TransactionService(
             new TransactionResponse(sourceTransaction),
             new TransactionResponse(targetTransaction),
         ];
+
+        void UpdateBalanceForDateChange(Transaction transaction, DateOnly finalDate)
+        {
+            if (
+                transaction.Date == finalDate
+                || transaction.Account!.Source != AccountSource.Manual
+            )
+            {
+                return;
+            }
+
+            SubtractAmountFromBalances(transaction, transaction.Amount, transaction.Date);
+            CreateBalanceForDateIfNotExists(transaction.Account, finalDate);
+            AddAmountToBalances(transaction, transaction.Amount, finalDate);
+        }
     }
 
     /// <inheritdoc />
@@ -498,17 +527,54 @@ public class TransactionService(
         var userData = await GetCurrentUserAsync(userGuid);
         var transaction = GetTransactionByID(userData, transactionID);
         var link =
-            GetTransactionLink(transaction)
+            await userDataContext
+                .TransactionLinks.AsNoTracking()
+                .Where(link =>
+                    link.SourceTransactionID == transactionID
+                    || link.TargetTransactionID == transactionID
+                )
+                .Select(link => new { link.SourceTransactionID, link.TargetTransactionID })
+                .FirstOrDefaultAsync()
             ?? throw new BudgetBoardServiceException(
                 responseLocalizer["TransactionNotLinkedError"]
             );
-        var linkedTransaction = GetLinkedTransaction(transaction)!;
-        userDataContext.TransactionLinks.Remove(link);
+        var linkedTransaction = GetTransactionByID(
+            userData,
+            link.SourceTransactionID == transactionID
+                ? link.TargetTransactionID
+                : link.SourceTransactionID
+        );
+
+        if (userDataContext.Database.IsRelational())
+        {
+            await userDataContext
+                .TransactionLinks.Where(transactionLink =>
+                    transactionLink.SourceTransactionID == transactionID
+                    || transactionLink.TargetTransactionID == transactionID
+                )
+                .ExecuteDeleteAsync();
+        }
+        else
+        {
+            var trackedLinks = await userDataContext
+                .TransactionLinks.Where(transactionLink =>
+                    transactionLink.SourceTransactionID == transactionID
+                    || transactionLink.TargetTransactionID == transactionID
+                )
+                .ToListAsync();
+            userDataContext.TransactionLinks.RemoveRange(trackedLinks);
+            await userDataContext.SaveChangesAsync();
+        }
+
         transaction.SourceTransactionLink = null;
         transaction.TargetTransactionLink = null;
         linkedTransaction.SourceTransactionLink = null;
         linkedTransaction.TargetTransactionLink = null;
-        await userDataContext.SaveChangesAsync();
+
+        foreach (var entry in userDataContext.ChangeTracker.Entries<TransactionLink>())
+        {
+            entry.State = EntityState.Detached;
+        }
 
         return [new TransactionResponse(transaction), new TransactionResponse(linkedTransaction)];
     }
@@ -631,6 +697,13 @@ public class TransactionService(
     {
         return transaction.SourceTransactionLink?.TargetTransaction
             ?? transaction.TargetTransactionLink?.SourceTransaction;
+    }
+
+    private Task<bool> HasTransactionLinkAsync(Guid transactionID)
+    {
+        return userDataContext.TransactionLinks.AnyAsync(link =>
+            link.SourceTransactionID == transactionID || link.TargetTransactionID == transactionID
+        );
     }
 
     private static bool AreOppositeAmounts(decimal firstAmount, decimal secondAmount)
