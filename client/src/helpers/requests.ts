@@ -16,6 +16,8 @@ export const simpleFinAccountQueryKey: string = "simpleFinAccounts";
 export const transactionCategoriesQueryKey: string = "transactionCategories";
 export const tagSuggestionsQueryKey: string = "tagSuggestions";
 export const transactionsQueryKey: string = "transactions";
+export const transactionLinkCandidatesQueryKey: string =
+  "transactionLinkCandidates";
 export const transactionImportJobQueryKey: string = "transactionImportJob";
 export const twoFactorAuthQueryKey: string = "twoFactorAuth";
 export const userSettingsQueryKey: string = "userSettings";

@@ -88,6 +88,11 @@ export interface ITransactionSplitRequest {
   subcategory: string;
 }
 
+export interface ITransactionLinkRequest {
+  transactionID: string;
+  linkedTransactionID: string;
+}
+
 export interface ITransaction {
   id: string;
   syncID: string | null;
@@ -103,6 +108,11 @@ export interface ITransaction {
   accountName: string;
   source: string;
   accountID: string;
+  linkedTransactionID: string | null;
+  linkedAccountName: string | null;
+  linkedDate: string | null;
+  linkedAmount: number | null;
+  linkedMerchantName: string | null;
 }
 
 export interface IFilters {

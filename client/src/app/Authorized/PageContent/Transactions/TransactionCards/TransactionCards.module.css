@@ -45,6 +45,7 @@
   top: 0;
   left: 0;
   width: 100%;
+  container-type: inline-size;
   padding-bottom: 0.3rem;
   box-sizing: border-box;
 }
