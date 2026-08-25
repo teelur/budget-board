@@ -38,10 +38,6 @@
   overflow-wrap: anywhere;
 }
 
-.summaryAction {
-  flex: 0 0 auto;
-}
-
 .leg {
   position: relative;
   min-width: 0;

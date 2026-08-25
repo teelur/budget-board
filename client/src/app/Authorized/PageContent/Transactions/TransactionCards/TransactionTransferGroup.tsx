@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
-import TransactionLinkDialog from "~/components/core/Card/TransactionCard/TransactionCardBase/TransactionCardDetails/TransactionLinkDialog";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import classes from "./TransactionTransferGroup.module.css";
 
@@ -58,9 +57,6 @@ const TransactionTransferGroup = ({
             </Group>
           </Stack>
         </Group>
-        <div className={classes.summaryAction}>
-          <TransactionLinkDialog transaction={transactions[0]} />
-        </div>
       </div>
       {transactions.map((transaction) => (
         <div key={transaction.id} className={classes.leg}>
@@ -71,7 +67,6 @@ const TransactionTransferGroup = ({
             isSelected={selectedIds.has(transaction.id)}
             onToggleSelect={onToggleSelect}
             p="0.2rem"
-            showTransactionLink={false}
           />
         </div>
       ))}

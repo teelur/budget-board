@@ -1,12 +1,4 @@
-import {
-  Alert,
-  Button,
-  Group,
-  Loader,
-  Paper,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Alert, Button, Group, Paper, Skeleton, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
@@ -21,6 +13,7 @@ import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsPr
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import LinkCandidateCard from "./LinkCandidateCard/LinkCandidateCard";
 
 interface TransactionLinkDialogProps {
   transaction: ITransaction;
@@ -73,25 +66,23 @@ const TransactionLinkDialog = ({
     unlinkMutation.mutate(transaction.id, { onSuccess: closeUnlink });
   };
 
-  const linkedDetails = transaction.linkedTransactionID ? (
-    <Stack gap="0.25rem">
-      <Button
-        variant="subtle"
-        size="compact-xs"
-        leftSection={<Unlink size="0.85rem" />}
-        onClick={(event) => {
-          event.stopPropagation();
-          openUnlink();
-        }}
-        loading={unlinkMutation.isPending}
-      >
-        {t("unlink_transactions")}
-      </Button>
-    </Stack>
+  const linkAction = transaction.linkedTransactionID ? (
+    <Button
+      variant="subtle"
+      size="compact-sm"
+      leftSection={<Unlink size="0.85rem" />}
+      onClick={(event) => {
+        event.stopPropagation();
+        openUnlink();
+      }}
+      loading={unlinkMutation.isPending}
+    >
+      {t("unlink_transactions")}
+    </Button>
   ) : (
     <Button
       variant="subtle"
-      size="compact-xs"
+      size="compact-sm"
       leftSection={<ArrowRightLeft size="0.85rem" />}
       onClick={(event) => {
         event.stopPropagation();
@@ -104,7 +95,7 @@ const TransactionLinkDialog = ({
 
   return (
     <>
-      {linkedDetails}
+      {linkAction}
       <Modal
         opened={linkOpened}
         onClose={closeLink}
@@ -126,45 +117,28 @@ const TransactionLinkDialog = ({
             {t("transfer_category_warning")}
           </Alert>
           {candidatesQuery.isPending ? (
-            <Group justify="center">
-              <Loader size="sm" />
-            </Group>
+            <Stack gap="xs">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Paper key={index} withBorder p="xs">
+                  <Stack gap="0.25rem">
+                    <Skeleton height="1rem" width="45%" />
+                    <Skeleton height="0.75rem" width="70%" />
+                  </Stack>
+                </Paper>
+              ))}
+            </Stack>
           ) : candidatesQuery.isError ? (
             <Alert color="red">{t("transaction_link_candidates_error")}</Alert>
           ) : candidatesQuery.data?.length ? (
             <Stack gap="xs">
-              {candidatesQuery.data.map((candidate) => {
-                const isSelected = candidate.id === selectedTransactionID;
-                return (
-                  <Paper
-                    key={candidate.id}
-                    withBorder
-                    p="xs"
-                    bg={
-                      isSelected ? "var(--mantine-color-blue-light)" : undefined
-                    }
-                  >
-                    <Button
-                      variant="subtle"
-                      fullWidth
-                      justify="space-between"
-                      onClick={() => setSelectedTransactionID(candidate.id)}
-                      aria-pressed={isSelected}
-                    >
-                      <Stack gap={0} align="flex-start">
-                        <Text size="sm" fw={600}>
-                          {candidate.accountName || t("unknown_account")}
-                        </Text>
-                        <Text size="xs">
-                          {candidate.merchantName || t("no_merchant_name")} ·{" "}
-                          {formatDate(candidate.date)}
-                        </Text>
-                      </Stack>
-                      <Text size="sm">{formatAmount(candidate.amount)}</Text>
-                    </Button>
-                  </Paper>
-                );
-              })}
+              {candidatesQuery.data.map((candidate) => (
+                <LinkCandidateCard
+                  key={candidate.id}
+                  candidate={candidate}
+                  isSelected={candidate.id === selectedTransactionID}
+                  onSelect={setSelectedTransactionID}
+                />
+              ))}
             </Stack>
           ) : (
             <DimmedText size="sm">{t("no_transfer_candidates")}</DimmedText>

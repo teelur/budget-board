@@ -24,6 +24,7 @@ import { getTagChanges, getUniqueTags } from "~/helpers/tags";
 import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
+import TransactionLinkDialog from "~/components/core/Card/TransactionCard/TransactionCardBase/TransactionCardDetails/TransactionLinkDialog/TransactionLinkDialog";
 import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
@@ -408,12 +409,15 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 style={{ marginLeft: "auto" }}
               >
                 {singleSelected && (
-                  <SplitTransaction
-                    id={singleSelected.id}
-                    originalAmount={singleSelected.amount}
-                    categories={props.categories}
-                    elevation={1}
-                  />
+                  <>
+                    <TransactionLinkDialog transaction={singleSelected} />
+                    <SplitTransaction
+                      id={singleSelected.id}
+                      originalAmount={singleSelected.amount}
+                      categories={props.categories}
+                      elevation={1}
+                    />
+                  </>
                 )}
                 <ActionIcon
                   color="var(--button-color-destructive)"
