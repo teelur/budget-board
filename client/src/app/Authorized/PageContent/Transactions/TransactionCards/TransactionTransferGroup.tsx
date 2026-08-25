@@ -59,11 +59,7 @@ const TransactionTransferGroup = ({
           </Stack>
         </Group>
         <div className={classes.summaryAction}>
-          <TransactionLinkDialog
-            transaction={transactions[0]}
-            elevation={1}
-            showLinkedDetails={false}
-          />
+          <TransactionLinkDialog transaction={transactions[0]} />
         </div>
       </div>
       {transactions.map((transaction) => (

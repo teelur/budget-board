@@ -6,10 +6,12 @@ import { Badge, Group } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import TransactionLinkDialog from "./TransactionLinkDialog";
 
 interface TransactionCardDetailsProps {
   transaction: ITransaction;
   elevation: number;
+  showTransactionLink?: boolean;
 }
 
 const borderColorByElevation: Record<number, string> = {
@@ -21,6 +23,7 @@ const borderColorByElevation: Record<number, string> = {
 const TransactionCardDetails = ({
   transaction,
   elevation,
+  showTransactionLink = true,
 }: TransactionCardDetailsProps): React.ReactNode => {
   const { t } = useTranslation();
   const notes = transaction.notes.trim();
@@ -71,6 +74,11 @@ const TransactionCardDetails = ({
           </PrimaryText>
         )}
       </div>
+      {showTransactionLink ? (
+        <div className={classes.detailItem}>
+          <TransactionLinkDialog transaction={transaction} />
+        </div>
+      ) : null}
     </div>
   );
 };

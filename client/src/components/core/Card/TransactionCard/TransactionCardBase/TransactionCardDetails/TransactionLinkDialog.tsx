@@ -20,19 +20,14 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface TransactionLinkDialogProps {
   transaction: ITransaction;
-  elevation: number;
-  showLinkedDetails?: boolean;
 }
 
 const TransactionLinkDialog = ({
   transaction,
-  elevation,
-  showLinkedDetails = true,
 }: TransactionLinkDialogProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, longDateFormat } = useLocale();
@@ -80,30 +75,6 @@ const TransactionLinkDialog = ({
 
   const linkedDetails = transaction.linkedTransactionID ? (
     <Stack gap="0.25rem">
-      {showLinkedDetails ? (
-        <>
-          <Group gap="0.35rem" wrap="nowrap">
-            <Link2 size="0.9rem" />
-            <PrimaryText size="sm" elevation={elevation}>
-              {t("linked_transaction")}
-            </PrimaryText>
-          </Group>
-          <DimmedText size="xs" elevation={elevation}>
-            {transaction.linkedAccountName || t("unknown_account")}
-            {transaction.linkedDate
-              ? ` · ${formatDate(transaction.linkedDate)}`
-              : ""}
-            {transaction.linkedAmount !== null
-              ? ` · ${formatAmount(transaction.linkedAmount)}`
-              : ""}
-          </DimmedText>
-          {transaction.linkedMerchantName ? (
-            <DimmedText size="xs" elevation={elevation}>
-              {transaction.linkedMerchantName}
-            </DimmedText>
-          ) : null}
-        </>
-      ) : null}
       <Button
         variant="subtle"
         size="compact-xs"

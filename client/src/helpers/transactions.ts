@@ -142,10 +142,11 @@ export const getTransactionDisplayItems = (
     const linkedTransaction = transaction.linkedTransactionID
       ? transactionsById.get(transaction.linkedTransactionID)
       : undefined;
-    const isReciprocalLink =
-      linkedTransaction?.linkedTransactionID === transaction.id;
+    const hasBothTransactionsInCurrentView =
+      linkedTransaction !== undefined &&
+      linkedTransaction.linkedTransactionID === transaction.id;
 
-    if (!linkedTransaction || !isReciprocalLink) {
+    if (!hasBothTransactionsInCurrentView) {
       return [{ type: "transaction", transactions: [transaction] }];
     }
 
