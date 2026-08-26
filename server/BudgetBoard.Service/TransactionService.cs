@@ -494,7 +494,17 @@ public class TransactionService(
         sourceTransaction.SourceTransactionLink = link;
         targetTransaction.TargetTransactionLink = link;
         userDataContext.TransactionLinks.Add(link);
-        await userDataContext.SaveChangesAsync();
+        try
+        {
+            await userDataContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException exception)
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionAlreadyLinkedError"],
+                exception
+            );
+        }
 
         return
         [
