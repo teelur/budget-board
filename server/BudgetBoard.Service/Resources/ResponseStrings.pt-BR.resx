@@ -445,4 +445,28 @@
   <data name="TransactionImportIdempotencyKeyTooLongError" xml:space="preserve">
     <value>The Idempotency-Key header cannot exceed {0} characters.</value>
   </data>
+  <data name="TransactionLinkedAmountUpdateError" xml:space="preserve">
+    <value>The amount cannot be changed while the transaction is linked unless it remains an exact transfer pair.</value>
+  </data>
+  <data name="TransactionLinkedSplitError" xml:space="preserve">
+    <value>A linked transaction must be unlinked before it can be split.</value>
+  </data>
+  <data name="TransactionLinkDeletedError" xml:space="preserve">
+    <value>Deleted transactions cannot be linked.</value>
+  </data>
+  <data name="TransactionAlreadyLinkedError" xml:space="preserve">
+    <value>One of these transactions is already linked.</value>
+  </data>
+  <data name="TransactionLinkSameTransactionError" xml:space="preserve">
+    <value>A transaction cannot be linked to itself.</value>
+  </data>
+  <data name="TransactionLinkSameAccountError" xml:space="preserve">
+    <value>Transactions must belong to different accounts.</value>
+  </data>
+  <data name="TransactionLinkAmountsError" xml:space="preserve">
+    <value>Transactions must have exact opposite amounts.</value>
+  </data>
+  <data name="TransactionNotLinkedError" xml:space="preserve">
+    <value>The transaction is not linked.</value>
+  </data>
 </root>
