@@ -26,30 +26,49 @@ const LinkCandidateCard = ({
   const date = dayjs(candidate.date).format(longDateFormat);
 
   return (
-    <Card
-      w="100%"
-      hoverEffect
-      className={classes.candidateCard}
-      data-selected={isSelected ? "true" : "false"}
+    <div
+      className={classes.candidateWrapper}
+      role="button"
+      tabIndex={0}
+      aria-pressed={isSelected}
       onClick={(event) => {
         event.stopPropagation();
         onSelect(candidate.id);
       }}
+      onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key !== "Enter" && event.key !== " ") {
+          return;
+        }
+
+        event.preventDefault();
+        onSelect(candidate.id);
+      }}
     >
-      <div className={classes.candidateContent}>
-        <Stack gap={0} align="flex-start" className={classes.candidateDetails}>
-          <Text size="sm" fw={600}>
-            {candidate.accountName.trim() || t("unknown_account")}
+      <Card
+        w="100%"
+        hoverEffect
+        className={classes.candidateCard}
+        data-selected={isSelected ? "true" : "false"}
+      >
+        <div className={classes.candidateContent}>
+          <Stack
+            gap={0}
+            align="flex-start"
+            className={classes.candidateDetails}
+          >
+            <Text size="sm" fw={600}>
+              {candidate.accountName.trim() || t("unknown_account")}
+            </Text>
+            <Text size="xs">
+              {candidate.merchantName || t("no_merchant_name")} · {date}
+            </Text>
+          </Stack>
+          <Text size="sm" className={classes.candidateAmount}>
+            {amount}
           </Text>
-          <Text size="xs">
-            {candidate.merchantName || t("no_merchant_name")} · {date}
-          </Text>
-        </Stack>
-        <Text size="sm" className={classes.candidateAmount}>
-          {amount}
-        </Text>
-      </div>
-    </Card>
+        </div>
+      </Card>
+    </div>
   );
 };
 

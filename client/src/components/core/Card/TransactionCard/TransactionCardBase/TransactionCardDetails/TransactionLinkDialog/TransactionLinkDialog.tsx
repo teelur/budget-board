@@ -43,6 +43,9 @@ const TransactionLinkDialog = ({
     linkOpened,
     parsedDateWindowDays,
   );
+  const hasSelectedCandidate = candidatesQuery.data?.some(
+    (candidate) => candidate.id === selectedTransactionID,
+  );
   const linkMutation = useLinkTransactionsMutation();
   const unlinkMutation = useUnlinkTransactionMutation();
 
@@ -53,6 +56,11 @@ const TransactionLinkDialog = ({
   const onOpenLink = () => {
     setSelectedTransactionID(null);
     openLink();
+  };
+
+  const onDateWindowChange = (value: number | string) => {
+    setDateWindowDays(value);
+    setSelectedTransactionID(null);
   };
 
   const onLink = () => {
@@ -130,7 +138,7 @@ const TransactionLinkDialog = ({
             max={365}
             step={1}
             decimalScale={0}
-            onChange={setDateWindowDays}
+            onChange={onDateWindowChange}
             size="xs"
           />
           {candidatesQuery.isPending ? (
@@ -163,7 +171,11 @@ const TransactionLinkDialog = ({
           <Button
             leftSection={<Link2 size="1rem" />}
             onClick={onLink}
-            disabled={!selectedTransactionID || candidatesQuery.isError}
+            disabled={
+              !hasSelectedCandidate ||
+              candidatesQuery.isPending ||
+              candidatesQuery.isError
+            }
             loading={linkMutation.isPending}
           >
             {t("confirm_link")}

@@ -459,10 +459,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 <Button
                   size="compact-sm"
                   color="var(--button-color-destructive)"
-                  loading={
-                    updateTransactionsMutation.isPending ||
-                    deleteTransactionsMutation.isPending
-                  }
+                  loading={deleteTransactionsMutation.isPending}
                   onClick={() => {
                     deleteTransactionsMutation.mutate(
                       Array.from(props.selectedIds),
