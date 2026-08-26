@@ -158,6 +158,7 @@
   "date_format_description": "Specify the format of dates in your CSV file.",
   "date_is_required": "Date is required.",
   "date_range": "Date Range",
+  "date_window_days": "Date window (days)",
   "days_since_deleted": "{{days}} days since deleted",
   "dd_mm_yyyy": "DD{{separator}}MM{{separator}}YYYY",
   "decimal_separator": "Decimal Separator",

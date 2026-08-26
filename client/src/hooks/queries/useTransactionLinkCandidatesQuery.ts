@@ -6,15 +6,21 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 export const useTransactionLinkCandidatesQuery = (
   transactionID: string,
   enabled: boolean,
+  dateWindowDays: number,
 ) => {
   const { request } = useAuth();
 
   return useQuery({
-    queryKey: [transactionLinkCandidatesQueryKey, transactionID],
+    queryKey: [
+      transactionLinkCandidatesQueryKey,
+      transactionID,
+      dateWindowDays,
+    ],
     queryFn: async (): Promise<ITransaction[]> => {
       const response = await request({
         url: `/api/transaction/link-candidates/${transactionID}`,
         method: "GET",
+        params: { dateWindowDays },
       });
 
       return response.data as ITransaction[];

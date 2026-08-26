@@ -10,6 +10,7 @@ import { useTransactionLinkCandidatesQuery } from "~/hooks/queries/useTransactio
 import { ITransaction } from "~/models/transaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -32,9 +33,15 @@ const TransactionLinkDialog = ({
   const [selectedTransactionID, setSelectedTransactionID] = React.useState<
     string | null
   >(null);
+  const [dateWindowDays, setDateWindowDays] = React.useState<number | string>(
+    3,
+  );
+  const parsedDateWindowDays =
+    typeof dateWindowDays === "number" ? dateWindowDays : 3;
   const candidatesQuery = useTransactionLinkCandidatesQuery(
     transaction.id,
     linkOpened,
+    parsedDateWindowDays,
   );
   const linkMutation = useLinkTransactionsMutation();
   const unlinkMutation = useUnlinkTransactionMutation();
@@ -116,6 +123,16 @@ const TransactionLinkDialog = ({
           >
             {t("transfer_category_warning")}
           </Alert>
+          <NumberInput
+            label={t("date_window_days")}
+            value={dateWindowDays}
+            min={0}
+            max={365}
+            step={1}
+            decimalScale={0}
+            onChange={setDateWindowDays}
+            size="xs"
+          />
           {candidatesQuery.isPending ? (
             <Stack gap="xs">
               {Array.from({ length: 3 }).map((_, index) => (
