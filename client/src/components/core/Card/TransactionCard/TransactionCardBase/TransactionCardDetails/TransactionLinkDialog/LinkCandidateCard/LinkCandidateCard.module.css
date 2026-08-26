@@ -1,0 +1,36 @@
+.candidateWrapper:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: 2px;
+}
+
+.candidateCard {
+  text-align: left;
+}
+
+.candidateCard[data-selected="true"] {
+  border-color: var(--mantine-primary-color-filled);
+  background-color: var(--mantine-color-blue-light);
+  box-shadow: 0 0 0 1px var(--mantine-primary-color-filled);
+}
+
+.candidateContent {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--mantine-spacing-sm);
+}
+
+.candidateDetails {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.candidateDetails > * {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.candidateAmount {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}

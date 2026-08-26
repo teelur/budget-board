@@ -146,6 +146,66 @@ public class TransactionController(
         });
     }
 
+    [HttpGet]
+    [Authorize]
+    [Route("link-candidates/{transactionID:guid}")]
+    public async Task<IActionResult> ReadLinkCandidates(Guid transactionID, int dateWindowDays = 3)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(
+                await transactionService.ReadTransactionLinkCandidatesAsync(
+                    parsedUserId,
+                    transactionID,
+                    dateWindowDays
+                )
+            );
+        });
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("link")]
+    public async Task<IActionResult> Link([FromBody] TransactionLinkRequest request)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await transactionService.LinkTransactionsAsync(parsedUserId, request));
+        });
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("unlink/{transactionID:guid}")]
+    public async Task<IActionResult> Unlink(Guid transactionID)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await transactionService.UnlinkTransactionAsync(parsedUserId, transactionID));
+        });
+    }
+
     [HttpPost]
     [Authorize]
     [Route("[action]")]

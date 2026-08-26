@@ -66,4 +66,7 @@ public class Transaction
     public Account? Account { get; set; } = null;
 
     public ICollection<TransactionTag> TransactionTags { get; set; } = [];
+
+    public TransactionLink? SourceTransactionLink { get; set; } = null;
+    public TransactionLink? TargetTransactionLink { get; set; } = null;
 }

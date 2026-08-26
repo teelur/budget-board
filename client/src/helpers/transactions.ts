@@ -112,6 +112,56 @@ export const getVisibleTransactions = (
 ): ITransaction[] =>
   transactions.filter((t: ITransaction) => t.deleted === null);
 
+export interface ITransactionDisplayItem {
+  type: "transaction";
+  transactions: [ITransaction];
+}
+
+export interface ITransactionTransferDisplayItem {
+  type: "transfer";
+  transactions: [ITransaction, ITransaction];
+}
+
+export type TransactionDisplayItem =
+  | ITransactionDisplayItem
+  | ITransactionTransferDisplayItem;
+
+export const getTransactionDisplayItems = (
+  transactions: ITransaction[],
+): TransactionDisplayItem[] => {
+  const transactionsById = new Map(
+    transactions.map((transaction) => [transaction.id, transaction]),
+  );
+  const groupedTransactionIds = new Set<string>();
+
+  return transactions.flatMap((transaction): TransactionDisplayItem[] => {
+    if (groupedTransactionIds.has(transaction.id)) {
+      return [];
+    }
+
+    const linkedTransaction = transaction.linkedTransactionID
+      ? transactionsById.get(transaction.linkedTransactionID)
+      : undefined;
+    const hasBothTransactionsInCurrentView =
+      linkedTransaction !== undefined &&
+      linkedTransaction.linkedTransactionID === transaction.id;
+
+    if (!hasBothTransactionsInCurrentView) {
+      return [{ type: "transaction", transactions: [transaction] }];
+    }
+
+    groupedTransactionIds.add(transaction.id);
+    groupedTransactionIds.add(linkedTransaction.id);
+
+    return [
+      {
+        type: "transfer",
+        transactions: [transaction, linkedTransaction],
+      },
+    ];
+  });
+};
+
 /**
  * Filters transactions based on accounts, categories, date range, merchant name, amount range, and tags.
  *
