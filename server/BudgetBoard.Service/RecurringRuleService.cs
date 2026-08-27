@@ -156,15 +156,18 @@ public class RecurringRuleService(
                 ? monthStart
                 : today;
 
-        var rules = await ReadUserRulesQuery(userGuid)
-            .Where(rule =>
-                rule.IsActive
-                && rule.StartDate <= monthEnd
-                && (rule.EndDate == null || rule.EndDate >= rangeStart)
-                && rule.Account!.HideTransactions == false
-                && !IsExcludedBudgetCategory(rule.Category)
-            )
-            .ToListAsync();
+        var rules = (
+            await ReadUserRulesQuery(userGuid)
+                .Where(rule =>
+                    rule.IsActive
+                    && rule.StartDate <= monthEnd
+                    && (rule.EndDate == null || rule.EndDate >= rangeStart)
+                    && rule.Account!.HideTransactions == false
+                )
+                .ToListAsync()
+        )
+            .Where(rule => !IsExcludedBudgetCategory(rule.Category))
+            .ToList();
 
         var forecast = new List<RecurringForecastOccurrenceResponse>();
         foreach (var rule in rules)
@@ -220,13 +223,13 @@ public class RecurringRuleService(
             return;
         }
 
-        var rules = await ReadUserRulesQuery(userGuid)
-            .Where(rule =>
-                rule.IsActive
-                && rule.AccountID == transaction.AccountID
-                && !IsExcludedBudgetCategory(rule.Category)
-            )
-            .ToListAsync();
+        var rules = (
+            await ReadUserRulesQuery(userGuid)
+                .Where(rule => rule.IsActive && rule.AccountID == transaction.AccountID)
+                .ToListAsync()
+        )
+            .Where(rule => !IsExcludedBudgetCategory(rule.Category))
+            .ToList();
 
         var matchingRules = rules.Where(rule => IsTransactionMatch(rule, transaction)).ToList();
 
