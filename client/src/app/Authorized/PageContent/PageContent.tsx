@@ -38,6 +38,10 @@ const TransactionsSettingsRules = lazy(
   () =>
     import("./Transactions/TransactionsSettings/AutomaticRules/AutomaticRules"),
 );
+const TransactionsSettingsRecurringRules = lazy(
+  () =>
+    import("./Transactions/TransactionsSettings/RecurringRules/RecurringRules"),
+);
 const TransactionsSettingsDeleted = lazy(
   () =>
     import("./Transactions/TransactionsSettings/DeletedTransactions/DeletedTransactions"),
@@ -162,6 +166,10 @@ const PageContent = (): React.ReactNode => {
                   element={<TransactionsSettingsCategories />}
                 />
                 <Route path="rules" element={<TransactionsSettingsRules />} />
+                <Route
+                  path="recurring"
+                  element={<TransactionsSettingsRecurringRules />}
+                />
                 <Route
                   path="deleted"
                   element={<TransactionsSettingsDeleted />}

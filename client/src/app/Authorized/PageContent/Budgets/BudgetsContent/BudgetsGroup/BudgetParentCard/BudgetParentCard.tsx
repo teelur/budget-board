@@ -44,6 +44,7 @@ export interface BudgetParentCardProps {
   categoryToBudgetsMap: Map<string, IBudget[]>;
   categoryToLimitsMap: Map<string, number>;
   categoryToTransactionsTotalMap: Map<string, number>;
+  categoryToRecurringForecastTotalMap: Map<string, number>;
   selectedDate: Date | null;
   openDetails: (category: string, month: Date | null) => void;
   isCollapsed: boolean;
@@ -73,6 +74,11 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     props.categoryToTransactionsTotalMap.get(
       props.categoryTree.value.toLowerCase(),
     ) ?? 0;
+  const projectedAmount =
+    amount +
+    (props.categoryToRecurringForecastTotalMap.get(
+      props.categoryTree.value.toLowerCase(),
+    ) ?? 0);
 
   const budgets =
     props.categoryToBudgetsMap.get(props.categoryTree.value.toLowerCase()) ??
@@ -140,6 +146,14 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               props.categoryToTransactionsTotalMap.get(
                 subCategory.value.toLowerCase(),
               ) ?? 0
+            }
+            projectedAmount={
+              (props.categoryToTransactionsTotalMap.get(
+                subCategory.value.toLowerCase(),
+              ) ?? 0) +
+              (props.categoryToRecurringForecastTotalMap.get(
+                subCategory.value.toLowerCase(),
+              ) ?? 0)
             }
             limit={
               props.categoryToLimitsMap.get(subCategory.value.toLowerCase()) ??
@@ -327,6 +341,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   percentComplete={percentComplete}
                   amount={amount}
                   limit={limit}
+                  projectedAmount={projectedAmount}
                   type={isIncome ? ProgressType.Income : ProgressType.Expense}
                   warningThreshold={budgetWarningThreshold}
                   elevation={1}

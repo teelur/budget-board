@@ -105,6 +105,7 @@ export interface ITransaction {
   deleted: Date | null;
   notes: string;
   tags: string[];
+  recurringRuleID: string | null;
   accountName: string;
   source: string;
   accountID: string;

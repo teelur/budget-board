@@ -15,6 +15,8 @@ import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useTranslation } from "react-i18next";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { buildCategoryToRecurringForecastTotalMap } from "~/helpers/recurringRules";
+import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
@@ -33,9 +35,15 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const { t } = useTranslation();
   const { allTransactionCategories, getCategoryType } =
     useTransactionCategories();
+  const recurringForecastQuery = useRecurringForecastQuery({
+    month: props.selectedDate,
+    enabled: props.selectedDate !== null,
+  });
 
   const categoryToTransactionsTotalMap: Map<string, number> =
     buildCategoryToTransactionsTotalMap(props.transactions);
+  const categoryToRecurringForecastTotalMap =
+    buildCategoryToRecurringForecastTotalMap(recurringForecastQuery.data ?? []);
 
   const categoryTree = buildCategoriesTree(allTransactionCategories);
 
@@ -103,6 +111,9 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               budgets={incomeBudgets}
               categoryTree={incomeCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+              categoryToRecurringForecastTotalMap={
+                categoryToRecurringForecastTotalMap
+              }
               selectedDate={props.selectedDate}
               openDetails={openBudgetDetails}
             />
@@ -127,6 +138,9 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               budgets={expenseBudgets}
               categoryTree={expenseCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+              categoryToRecurringForecastTotalMap={
+                categoryToRecurringForecastTotalMap
+              }
               selectedDate={props.selectedDate}
               openDetails={openBudgetDetails}
             />

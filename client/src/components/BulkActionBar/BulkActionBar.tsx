@@ -26,6 +26,7 @@ import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
 import TransactionLinkDialog from "~/components/core/Card/TransactionCard/TransactionCardBase/TransactionCardDetails/TransactionLinkDialog/TransactionLinkDialog";
 import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
+import RecurringRuleAction from "~/components/RecurringRuleAction/RecurringRuleAction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
@@ -411,6 +412,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 {singleSelected && (
                   <>
                     <TransactionLinkDialog transaction={singleSelected} />
+                    <RecurringRuleAction transaction={singleSelected} />
                     <SplitTransaction
                       id={singleSelected.id}
                       originalAmount={singleSelected.amount}

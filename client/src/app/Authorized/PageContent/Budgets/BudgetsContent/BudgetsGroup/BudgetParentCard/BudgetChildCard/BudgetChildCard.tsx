@@ -33,6 +33,7 @@ interface BudgetChildCardProps {
   id: string;
   categoryValue: string;
   amount: number;
+  projectedAmount?: number;
   limit: number;
   isIncome: boolean;
   selectedDate: Date;
@@ -200,6 +201,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 percentComplete={percentComplete}
                 amount={props.amount}
                 limit={props.limit}
+                  projectedAmount={props.projectedAmount}
                 type={
                   props.isIncome ? ProgressType.Income : ProgressType.Expense
                 }
