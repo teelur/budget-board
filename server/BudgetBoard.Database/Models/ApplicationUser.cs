@@ -73,6 +73,11 @@ public class ApplicationUser : IdentityUser<Guid>
     public ICollection<AutomaticRule> AutomaticRules { get; set; } = [];
 
     /// <summary>
+    /// Collection of recurring rules for transaction processing.
+    /// </summary>
+    public ICollection<RecurringRule> RecurringRules { get; set; } = [];
+
+    /// <summary>
     /// Collection of financial assets owned by the user.
     /// </summary>
     public ICollection<Asset> Assets { get; set; } = [];

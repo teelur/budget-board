@@ -469,4 +469,16 @@
     <data name="SimpleFinAccessTokenParseError" xml:space="preserve">
         <value>The provided SimpleFIN access token is invalid or malformed.</value>
     </data>
+    <data name="RecurringRuleAccountMismatchError" xml:space="preserve">
+        <value>The recurring rule and transaction must belong to the same account.</value>
+    </data>
+    <data name="RecurringRuleAccountNotFoundError" xml:space="preserve">
+        <value>The account for this recurring rule does not exist.</value>
+    </data>
+    <data name="RecurringRuleNotFoundError" xml:space="preserve">
+        <value>The recurring rule you are trying to access does not exist.</value>
+    </data>
+    <data name="TransactionAlreadyRecurringError" xml:space="preserve">
+        <value>This transaction is already associated with a recurring rule.</value>
+    </data>
 </root>

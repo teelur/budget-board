@@ -463,4 +463,7 @@
     <data name="WidgetSettingsNotFoundLog" xml:space="preserve">
         <value>Attempted to access widget settings for a widget that does not exist.</value>
     </data>
+    <data name="RecurringRuleAmbiguousMatchLog" xml:space="preserve">
+        <value>Transaction {0} matched multiple recurring rules and was left unassigned.</value>
+    </data>
 </root>

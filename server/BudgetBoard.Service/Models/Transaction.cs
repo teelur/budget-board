@@ -141,6 +141,7 @@ public interface ITransactionResponse
     string Source { get; }
     Guid AccountID { get; }
     IReadOnlyList<string> Tags { get; }
+    Guid? RecurringRuleID { get; }
     Guid? LinkedTransactionID { get; }
     string? LinkedAccountName { get; }
     DateOnly? LinkedDate { get; }
@@ -164,6 +165,7 @@ public class TransactionResponse : ITransactionResponse
     public string Source { get; set; } = string.Empty;
     public Guid AccountID { get; set; } = Guid.Empty;
     public IReadOnlyList<string> Tags { get; set; } = [];
+    public Guid? RecurringRuleID { get; set; } = null;
     public Guid? LinkedTransactionID { get; set; } = null;
     public string? LinkedAccountName { get; set; } = null;
     public DateOnly? LinkedDate { get; set; } = null;
@@ -184,6 +186,7 @@ public class TransactionResponse : ITransactionResponse
         AccountName = transaction.Account?.Name ?? string.Empty;
         Source = transaction.Source;
         AccountID = transaction.AccountID;
+        RecurringRuleID = transaction.RecurringRuleID;
         Tags =
         [
             .. transaction
