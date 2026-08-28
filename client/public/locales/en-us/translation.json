@@ -83,6 +83,8 @@
   "budget_amount_fraction_no_total_styled": "<0>{{amount}}</0>",
   "budget_amount_fraction_styled": "<0>{{amount}}</0> <1>of</1> <2>{{total}}</2>",
   "budget_details": "Budget Details",
+  "budget_left_after_predictions_styled": "<0>{{amount}}</0> <1>left after predictions</1>",
+  "budget_left_now_styled": "<0>{{amount}}</0> <1>left now</1>",
   "budget_left_styled": "<0>{{amount}}</0> <1>left</1>",
   "budget_monthly_amount_fraction_editable_styled": "<0>{{amount}}</0> <1>of</1>",
   "budget_monthly_amount_fraction_styled": "<0>{{amount}}</0> <1>of</1> <2>{{total}}</2> <1>this month</1>",

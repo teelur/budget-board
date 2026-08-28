@@ -17,7 +17,6 @@ import React from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
 import { ChevronDown, PencilIcon, TrashIcon } from "lucide-react";
-import { StatusColorType } from "~/helpers/budgets";
 import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { CategoryTypes, ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
@@ -28,10 +27,10 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Popover from "~/components/core/Popover/Popover";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
+import BudgetMetrics from "./BudgetMetrics/BudgetMetrics";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
@@ -79,7 +78,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     (props.categoryToRecurringForecastTotalMap.get(
       props.categoryTree.value.toLowerCase(),
     ) ?? 0);
-
   const budgets =
     props.categoryToBudgetsMap.get(props.categoryTree.value.toLowerCase()) ??
     [];
@@ -329,12 +327,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 )}
               </Group>
             </Group>
-            <Group
-              gap="0.25rem"
-              justify="flex-end"
-              align="baseline"
-              style={{ containerType: "inline-size" }}
-            >
+            <Group gap="0.25rem" style={{ containerType: "inline-size" }}>
               <Flex style={{ flex: "1 1 auto" }}>
                 <Progress
                   size={16}
@@ -347,30 +340,15 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   elevation={1}
                 />
               </Flex>
-              <Trans
-                i18nKey="budget_left_styled"
-                values={{
-                  amount: formatSensitiveAmount(
-                    roundAwayFromZero(limit - amount * (isIncome ? 1 : -1)),
-                  ),
-                }}
-                components={[
-                  <StatusText
-                    amount={roundAwayFromZero(amount)}
-                    total={limit}
-                    type={
-                      isIncome
-                        ? StatusColorType.Income
-                        : StatusColorType.Expense
-                    }
-                    warningThreshold={budgetWarningThreshold}
-                    size="md"
-                    key="amount"
-                  />,
-                  <DimmedText size="md" key="amount" elevation={1} />,
-                ]}
-              />
             </Group>
+            <BudgetMetrics
+              amount={amount}
+              projectedAmount={projectedAmount}
+              limit={limit}
+              isIncome={isIncome}
+              budgetWarningThreshold={budgetWarningThreshold}
+              formatAmount={formatSensitiveAmount}
+            />
           </Stack>
           {isSelected && (
             <Flex
