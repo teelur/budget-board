@@ -78,19 +78,31 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         </Flex>
       </Group>
       {!props.hideProgress && (props.total ?? 0) > 0 && (
-        <Progress
-          size={16}
-          percentComplete={percentComplete}
-          amount={props.amount}
-          limit={props.total ?? 0}
-          type={
-            props.budgetValueType === StatusColorType.Income
-              ? ProgressType.Income
-              : ProgressType.Expense
-          }
-          warningThreshold={budgetWarningThreshold}
-          elevation={1}
-        />
+        <Group gap="0.5rem" align="center">
+          <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
+            <Progress
+              size={8}
+              percentComplete={percentComplete}
+              amount={props.amount}
+              limit={props.total ?? 0}
+              type={
+                props.budgetValueType === StatusColorType.Income
+                  ? ProgressType.Income
+                  : ProgressType.Expense
+              }
+              warningThreshold={budgetWarningThreshold}
+              elevation={1}
+              showPercentLabel={false}
+            />
+          </Flex>
+          <PrimaryText
+            size="sm"
+            elevation={1}
+            style={{ flexShrink: 0, lineHeight: 1 }}
+          >
+            {percentComplete.toFixed(0)}%
+          </PrimaryText>
+        </Group>
       )}
     </Stack>
   );
