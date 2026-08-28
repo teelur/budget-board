@@ -40,7 +40,9 @@ public static class RecurringRuleOccurrenceCalculator
     )
     {
         var daysSinceAnchor = start.DayNumber - anchor.DayNumber;
-        var daysUntilOccurrence = ((intervalDays - (daysSinceAnchor % intervalDays)) % intervalDays);
+        var daysUntilOccurrence = (
+            (intervalDays - (daysSinceAnchor % intervalDays)) % intervalDays
+        );
         var occurrence = start.AddDays(daysUntilOccurrence);
         var occurrences = new List<DateOnly>();
 
@@ -97,9 +99,7 @@ public static class RecurringRuleOccurrenceCalculator
         return occurrences;
     }
 
-    private static DateOnly Max(DateOnly first, DateOnly second) =>
-        first > second ? first : second;
+    private static DateOnly Max(DateOnly first, DateOnly second) => first > second ? first : second;
 
-    private static DateOnly Min(DateOnly first, DateOnly second) =>
-        first < second ? first : second;
+    private static DateOnly Min(DateOnly first, DateOnly second) => first < second ? first : second;
 }

@@ -112,10 +112,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         modelBuilder.Entity<RecurringRule>(r =>
         {
             r.Property(e => e.Cadence).HasConversion<string>().HasMaxLength(32).IsRequired();
-            r.Property(e => e.AmountMode)
-                .HasConversion<string>()
-                .HasMaxLength(32)
-                .IsRequired();
+            r.Property(e => e.AmountMode).HasConversion<string>().HasMaxLength(32).IsRequired();
             r.HasOne(e => e.User)
                 .WithMany(e => e.RecurringRules)
                 .HasForeignKey(e => e.UserID)

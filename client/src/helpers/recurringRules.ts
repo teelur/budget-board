@@ -11,7 +11,10 @@ export const buildCategoryToRecurringForecastTotalMap = (
 
     const subcategory = (occurrence.subcategory ?? "").toLocaleLowerCase();
     if (subcategory && subcategory !== category) {
-      totals.set(subcategory, (totals.get(subcategory) ?? 0) + occurrence.amount);
+      totals.set(
+        subcategory,
+        (totals.get(subcategory) ?? 0) + occurrence.amount,
+      );
     }
   });
 
