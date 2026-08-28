@@ -77,12 +77,6 @@ const TransactionsHeader = (
   return (
     <Stack className={classes.root}>
       <Flex className={classes.header}>
-        <SortMenu
-          currentSort={props.sort}
-          setCurrentSort={props.setSort}
-          sortDirection={props.sortDirection}
-          setSortDirection={props.setSortDirection}
-        />
         <Group className={classes.buttonGroup}>
           <ImportTransactionsModal />
           <ExportTransactionsModal />
@@ -107,11 +101,18 @@ const TransactionsHeader = (
         isPending={props.isQueryPending}
         allowSelectMultiple
       />
-      <SelectLastNMonths
-        monthButtons={[3, 6, 12]}
-        setSelectedMonths={props.setSelectedMonths}
-        showAllButton
-      />
+      <Group w="100%" justify="space-between" align="center" wrap="wrap">
+        <SortMenu
+          currentSort={props.sort}
+          setCurrentSort={props.setSort}
+          sortDirection={props.sortDirection}
+          setSortDirection={props.setSortDirection}
+        />
+        <SelectLastNMonths
+          monthButtons={[3, 6, 12]}
+          setSelectedMonths={props.setSelectedMonths}
+        />
+      </Group>
     </Stack>
   );
 };

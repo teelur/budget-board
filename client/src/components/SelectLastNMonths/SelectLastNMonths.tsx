@@ -13,7 +13,7 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
   const { dayjs } = useLocale();
 
   return (
-    <Group w="100%" justify="end">
+    <Group justify="end">
       {props.monthButtons.map((months) => (
         <Button
           size="compact-sm"
