@@ -100,6 +100,7 @@ const TransactionsHeader = (
         timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
         isPending={props.isQueryPending}
         allowSelectMultiple
+        allowFutureMonths
       />
       <Group w="100%" justify="space-between" align="center" wrap="wrap">
         <SortMenu
