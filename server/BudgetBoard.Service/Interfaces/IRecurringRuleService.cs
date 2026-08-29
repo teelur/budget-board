@@ -9,6 +9,18 @@ namespace BudgetBoard.Service.Interfaces;
 public interface IRecurringRuleService
 {
     /// <summary>
+    /// Creates a recurring rule for the specified user.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="request">The recurring rule creation details.</param>
+    /// <param name="transactionID">Optional. The unique identifier of a transaction to associate with the rule.</param>
+    Task CreateRecurringRuleAsync(
+        Guid userGuid,
+        IRecurringRuleRequest request,
+        Guid? transactionID = null
+    );
+
+    /// <summary>
     /// Retrieves the recurring rules for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
@@ -16,28 +28,11 @@ public interface IRecurringRuleService
     Task<IReadOnlyList<IRecurringRuleResponse>> ReadRecurringRulesAsync(Guid userGuid);
 
     /// <summary>
-    /// Creates a recurring rule for the specified user.
-    /// </summary>
-    /// <param name="userGuid">The unique identifier of the user.</param>
-    /// <param name="request">The recurring rule creation details.</param>
-    /// <param name="transactionID">Optional. The unique identifier of a transaction to associate with the rule.</param>
-    /// <returns>The created recurring rule details.</returns>
-    Task<IRecurringRuleResponse> CreateRecurringRuleAsync(
-        Guid userGuid,
-        IRecurringRuleRequest request,
-        Guid? transactionID = null
-    );
-
-    /// <summary>
     /// Updates an existing recurring rule.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The recurring rule update details.</param>
-    /// <returns>The updated recurring rule details.</returns>
-    Task<IRecurringRuleResponse> UpdateRecurringRuleAsync(
-        Guid userGuid,
-        IRecurringRuleUpdateRequest request
-    );
+    Task UpdateRecurringRuleAsync(Guid userGuid, IRecurringRuleUpdateRequest request);
 
     /// <summary>
     /// Deletes a recurring rule.

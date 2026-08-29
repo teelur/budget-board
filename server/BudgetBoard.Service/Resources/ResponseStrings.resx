@@ -475,8 +475,23 @@
     <data name="RecurringRuleAccountNotFoundError" xml:space="preserve">
         <value>The account for this recurring rule does not exist.</value>
     </data>
+    <data name="RecurringRuleAccountAndStartDateRequiredError" xml:space="preserve">
+        <value>Recurring rule account and start date are required.</value>
+    </data>
+    <data name="RecurringRuleEndDateBeforeStartDateError" xml:space="preserve">
+        <value>Recurring rule end date must not precede its start date.</value>
+    </data>
+    <data name="RecurringRuleInvalidAmountModeError" xml:space="preserve">
+        <value>Invalid recurring amount mode.</value>
+    </data>
+    <data name="RecurringRuleInvalidCadenceError" xml:space="preserve">
+        <value>Invalid recurring cadence.</value>
+    </data>
     <data name="RecurringRuleNotFoundError" xml:space="preserve">
         <value>The recurring rule you are trying to access does not exist.</value>
+    </data>
+    <data name="RecurringRuleZeroAmountError" xml:space="preserve">
+        <value>Recurring rule amount must not be zero.</value>
     </data>
     <data name="TransactionAlreadyRecurringError" xml:space="preserve">
         <value>This transaction is already associated with a recurring rule.</value>

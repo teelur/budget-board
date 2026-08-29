@@ -19,47 +19,37 @@ public class RecurringRuleService(
 ) : IRecurringRuleService
 {
     private const int MatchDateWindowDays = 5;
-    private const decimal MatchAmountTolerance = 0.2M;
-    private const string TransferCategory = "Transfer";
+    private static readonly decimal MatchAmountTolerance = 0.2M;
 
-    public async Task<IReadOnlyList<IRecurringRuleResponse>> ReadRecurringRulesAsync(Guid userGuid)
-    {
-        var rules = await ReadUserRulesQuery(userGuid)
-            .OrderBy(rule => rule.StartDate)
-            .ThenBy(rule => rule.MerchantName)
-            .ToListAsync();
-
-        return
-        [
-            .. rules.Select(rule =>
-                (IRecurringRuleResponse)new RecurringRuleResponse(rule, nowProvider.Today)
-            ),
-        ];
-    }
-
-    public async Task<IRecurringRuleResponse> CreateRecurringRuleAsync(
+    public async Task CreateRecurringRuleAsync(
         Guid userGuid,
         IRecurringRuleRequest request,
         Guid? transactionID = null
     )
     {
-        var account =
-            await userDataContext.Accounts.FirstOrDefaultAsync(account =>
-                account.ID == request.AccountID && account.UserID == userGuid
-            ) ?? throw CreateServiceException("RecurringRuleAccountNotFoundError");
         ValidateRequest(request);
+        var userData = await GetCurrentUserAsync(userGuid);
+        var foundAccount =
+            userData.Accounts.FirstOrDefault(a => a.ID == request.AccountID)
+            ?? throw new BudgetBoardServiceException(
+                responseLocalizer["RecurringRuleAccountNotFoundError"]
+            );
 
         Transaction? transaction = null;
         if (transactionID.HasValue)
         {
-            transaction = await FindTransactionAsync(userGuid, transactionID.Value);
+            transaction = GetTransactionById(userData, transactionID.Value);
             if (transaction.AccountID != request.AccountID)
             {
-                throw CreateServiceException("RecurringRuleAccountMismatchError");
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["RecurringRuleAccountMismatchError"]
+                );
             }
             if (transaction.RecurringRuleID.HasValue)
             {
-                throw CreateServiceException("TransactionAlreadyRecurringError");
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionAlreadyRecurringError"]
+                );
             }
         }
 
@@ -67,7 +57,7 @@ public class RecurringRuleService(
         {
             UserID = userGuid,
             AccountID = request.AccountID,
-            Account = account,
+            Account = foundAccount,
             MerchantName = request.MerchantName,
             Category = request.Category,
             Subcategory = request.Subcategory,
@@ -87,28 +77,27 @@ public class RecurringRuleService(
 
         userDataContext.RecurringRules.Add(rule);
         await userDataContext.SaveChangesAsync();
-
-        return new RecurringRuleResponse(rule, nowProvider.Today);
     }
 
-    public async Task<IRecurringRuleResponse> UpdateRecurringRuleAsync(
-        Guid userGuid,
-        IRecurringRuleUpdateRequest request
-    )
+    public async Task<IReadOnlyList<IRecurringRuleResponse>> ReadRecurringRulesAsync(Guid userGuid)
     {
-        var rule = await ReadUserRulesQuery(userGuid).FirstOrDefaultAsync(r => r.ID == request.ID);
-        if (rule is null)
-        {
-            throw CreateServiceException("RecurringRuleNotFoundError");
-        }
+        var userData = await GetCurrentUserAsync(userGuid);
+        return
+        [
+            .. userData
+                .RecurringRules.OrderBy(rule => rule.StartDate)
+                .ThenBy(rule => rule.MerchantName)
+                .Select(rule =>
+                    (IRecurringRuleResponse)new RecurringRuleResponse(rule, nowProvider.Today)
+                ),
+        ];
+    }
 
-        var account = await userDataContext.Accounts.FirstOrDefaultAsync(a =>
-            a.ID == request.AccountID && a.UserID == userGuid
-        );
-        if (account is null)
-        {
-            throw CreateServiceException("RecurringRuleAccountNotFoundError");
-        }
+    public async Task UpdateRecurringRuleAsync(Guid userGuid, IRecurringRuleUpdateRequest request)
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+        var rule = GetRecurringRuleById(userData, request.ID);
+        var account = GetAccountById(userData, request.AccountID);
 
         ValidateRequest(request);
 
@@ -125,14 +114,13 @@ public class RecurringRuleService(
         rule.Amount = request.Amount;
 
         await userDataContext.SaveChangesAsync();
-        return new RecurringRuleResponse(rule, nowProvider.Today);
     }
 
     public async Task DeleteRecurringRuleAsync(Guid userGuid, Guid recurringRuleID)
     {
-        var rule =
-            await ReadUserRulesQuery(userGuid).FirstOrDefaultAsync(r => r.ID == recurringRuleID)
-            ?? throw CreateServiceException("RecurringRuleNotFoundError");
+        var userData = await GetCurrentUserAsync(userGuid);
+        var rule = GetRecurringRuleById(userData, recurringRuleID);
+
         userDataContext.RecurringRules.Remove(rule);
         await userDataContext.SaveChangesAsync();
     }
@@ -156,21 +144,19 @@ public class RecurringRuleService(
                 ? monthStart
                 : today;
 
-        var rules = (
-            await ReadUserRulesQuery(userGuid)
-                .Where(rule =>
-                    rule.IsActive
-                    && rule.StartDate <= monthEnd
-                    && (rule.EndDate == null || rule.EndDate >= rangeStart)
-                    && rule.Account!.HideTransactions == false
-                )
-                .ToListAsync()
-        )
-            .Where(rule => !IsExcludedBudgetCategory(rule.Category))
+        var userData = await GetCurrentUserAsync(userGuid);
+        var rules = userData
+            .RecurringRules.Where(rule =>
+                rule.IsActive
+                && rule.StartDate <= monthEnd
+                && (rule.EndDate is null || rule.EndDate.Value >= rangeStart)
+                && rule.Account!.HideTransactions == false
+            )
             .ToList();
+        var filteredRules = rules.Where(rule => !IsExcludedBudgetCategory(rule.Category)).ToList();
 
         var forecast = new List<RecurringForecastOccurrenceResponse>();
-        foreach (var rule in rules)
+        foreach (var rule in filteredRules)
         {
             var dates = RecurringRuleOccurrenceCalculator.GetOccurrences(
                 rule,
@@ -194,7 +180,7 @@ public class RecurringRuleService(
                         Amount = amount,
                         MerchantName = rule.MerchantName,
                         AccountID = rule.AccountID,
-                        AccountName = rule.Account?.Name ?? string.Empty,
+                        AccountName = rule.Account!.Name ?? string.Empty,
                         Category = rule.Category,
                         Subcategory = rule.Subcategory,
                     }
@@ -223,16 +209,13 @@ public class RecurringRuleService(
             return;
         }
 
-        var rules = (
-            await ReadUserRulesQuery(userGuid)
-                .Where(rule => rule.IsActive && rule.AccountID == transaction.AccountID)
-                .ToListAsync()
-        )
+        var userData = await GetCurrentUserAsync(userGuid);
+        var rules = userData
+            .RecurringRules.Where(rule => rule.IsActive && rule.AccountID == transaction.AccountID)
             .Where(rule => !IsExcludedBudgetCategory(rule.Category))
             .ToList();
 
         var matchingRules = rules.Where(rule => IsTransactionMatch(rule, transaction)).ToList();
-
         if (matchingRules.Count != 1)
         {
             if (matchingRules.Count > 1)
@@ -256,21 +239,25 @@ public class RecurringRuleService(
         Guid transactionID
     )
     {
-        var rule = await ReadUserRulesQuery(userGuid)
-            .FirstOrDefaultAsync(r => r.ID == recurringRuleID);
-        if (rule is null)
-        {
-            throw CreateServiceException("RecurringRuleNotFoundError");
-        }
+        var userData = await GetCurrentUserAsync(userGuid);
+        var rule =
+            userData.RecurringRules.FirstOrDefault(r => r.ID == recurringRuleID)
+            ?? throw new BudgetBoardServiceException(
+                responseLocalizer["RecurringRuleNotFoundError"]
+            );
 
-        var transaction = await FindTransactionAsync(userGuid, transactionID);
+        var transaction = GetTransactionById(userData, transactionID);
         if (transaction.AccountID != rule.AccountID)
         {
-            throw CreateServiceException("RecurringRuleAccountMismatchError");
+            throw new BudgetBoardServiceException(
+                responseLocalizer["RecurringRuleAccountMismatchError"]
+            );
         }
-        if (transaction.RecurringRuleID.HasValue && transaction.RecurringRuleID != rule.ID)
+        if (transaction.RecurringRuleID is Guid assignedRuleID && assignedRuleID != rule.ID)
         {
-            throw CreateServiceException("TransactionAlreadyRecurringError");
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionAlreadyRecurringError"]
+            );
         }
 
         transaction.RecurringRuleID = rule.ID;
@@ -280,27 +267,55 @@ public class RecurringRuleService(
 
     public async Task UnassignTransactionAsync(Guid userGuid, Guid transactionID)
     {
-        var transaction = await FindTransactionAsync(userGuid, transactionID);
+        var userData = await GetCurrentUserAsync(userGuid);
+        var transaction = GetTransactionById(userData, transactionID);
+
         transaction.RecurringRuleID = null;
         transaction.RecurringRule = null;
+
         await userDataContext.SaveChangesAsync();
     }
 
-    private IQueryable<RecurringRule> ReadUserRulesQuery(Guid userGuid)
+    private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
-        return userDataContext
-            .RecurringRules.Where(rule => rule.UserID == userGuid)
-            .Include(rule => rule.Account)
-            .Include(rule => rule.Transactions);
+        return await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            id,
+            users =>
+                users
+                    .Include(u => u.RecurringRules)
+                    .ThenInclude(r => r.Account)
+                    .Include(u => u.RecurringRules)
+                    .ThenInclude(r => r.Transactions)
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Transactions)
+        );
     }
 
-    private async Task<Transaction> FindTransactionAsync(Guid userGuid, Guid transactionID)
+    private RecurringRule GetRecurringRuleById(ApplicationUser user, Guid recurringRuleID)
     {
-        var transaction = await userDataContext
-            .Transactions.Include(t => t.Account)
-            .FirstOrDefaultAsync(t => t.ID == transactionID && t.Account!.UserID == userGuid);
+        return user.RecurringRules.FirstOrDefault(r => r.ID == recurringRuleID)
+            ?? throw new BudgetBoardServiceException(
+                responseLocalizer["RecurringRuleNotFoundError"]
+            );
+    }
 
-        return transaction ?? throw CreateServiceException("TransactionNotFoundError");
+    private Account GetAccountById(ApplicationUser user, Guid accountID)
+    {
+        return user.Accounts.FirstOrDefault(a => a.ID == accountID)
+            ?? throw new BudgetBoardServiceException(
+                responseLocalizer["RecurringRuleAccountNotFoundError"]
+            );
+    }
+
+    private Transaction GetTransactionById(ApplicationUser user, Guid transactionID)
+    {
+        return user.Accounts.SelectMany(a => a.Transactions)
+                .FirstOrDefault(t => t.ID == transactionID)
+            ?? throw new BudgetBoardServiceException(responseLocalizer["TransactionNotFoundError"]);
     }
 
     private static bool IsTransactionMatch(RecurringRule rule, Transaction transaction)
@@ -317,8 +332,8 @@ public class RecurringRuleService(
 
         var nearbyOccurrences = RecurringRuleOccurrenceCalculator.GetOccurrences(
             rule,
-            transaction.Date.AddDays(-MatchDateWindowDays),
-            transaction.Date.AddDays(MatchDateWindowDays)
+            transaction.Date.AddDays(-MatchDateWindowDays * 2),
+            transaction.Date.AddDays(MatchDateWindowDays * 2)
         );
 
         return nearbyOccurrences.Any(occurrence =>
@@ -377,58 +392,65 @@ public class RecurringRuleService(
         string.Equals(Normalize(first), Normalize(second), StringComparison.OrdinalIgnoreCase);
 
     private static string Normalize(string? value) =>
-        new string((value ?? string.Empty).Where(char.IsLetterOrDigit).ToArray());
+        new([.. (value ?? string.Empty).Where(char.IsLetterOrDigit)]);
 
     private static bool IsExcludedBudgetCategory(string? category) =>
-        string.Equals(category, TransferCategory, StringComparison.OrdinalIgnoreCase)
+        string.Equals(
+            category,
+            TransactionCategoriesConstants.TransferCategory,
+            StringComparison.OrdinalIgnoreCase
+        )
         || string.Equals(
             category,
             TransactionCategoriesConstants.HideFromBudgetsCategory,
             StringComparison.OrdinalIgnoreCase
         );
 
-    private static RecurringCadence ParseCadence(string cadence)
+    private RecurringCadence ParseCadence(string cadence)
     {
         if (Enum.TryParse<RecurringCadence>(cadence, true, out var parsed))
         {
             return parsed;
         }
 
-        throw new BudgetBoardServiceException("Invalid recurring cadence.");
+        throw new BudgetBoardServiceException(
+            responseLocalizer["RecurringRuleInvalidCadenceError"]
+        );
     }
 
-    private static RecurringAmountMode ParseAmountMode(string amountMode)
+    private RecurringAmountMode ParseAmountMode(string amountMode)
     {
         if (Enum.TryParse<RecurringAmountMode>(amountMode, true, out var parsed))
         {
             return parsed;
         }
 
-        throw new BudgetBoardServiceException("Invalid recurring amount mode.");
+        throw new BudgetBoardServiceException(
+            responseLocalizer["RecurringRuleInvalidAmountModeError"]
+        );
     }
 
-    private static void ValidateRequest(IRecurringRuleRequest request)
+    private void ValidateRequest(IRecurringRuleRequest request)
     {
         ParseCadence(request.Cadence);
         ParseAmountMode(request.AmountMode);
         if (request.AccountID == Guid.Empty || request.StartDate == DateOnly.MinValue)
         {
             throw new BudgetBoardServiceException(
-                "Recurring rule account and start date are required."
+                responseLocalizer["RecurringRuleAccountAndStartDateRequiredError"]
             );
         }
         if (request.EndDate.HasValue && request.EndDate.Value < request.StartDate)
         {
             throw new BudgetBoardServiceException(
-                "Recurring rule end date must not precede its start date."
+                responseLocalizer["RecurringRuleEndDateBeforeStartDateError"]
             );
         }
         if (request.Amount == 0)
         {
-            throw new BudgetBoardServiceException("Recurring rule amount must not be zero.");
+            throw new BudgetBoardServiceException(
+                responseLocalizer["RecurringRuleZeroAmountError"]
+            );
         }
     }
-
-    private BudgetBoardServiceException CreateServiceException(string resourceKey) =>
-        new(responseLocalizer[resourceKey]);
 }

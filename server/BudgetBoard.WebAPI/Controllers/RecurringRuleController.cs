@@ -32,7 +32,8 @@ public class RecurringRuleController(
                 return Unauthorized();
             }
 
-            return Ok(await recurringRuleService.CreateRecurringRuleAsync(parsedUserId, request));
+            await recurringRuleService.CreateRecurringRuleAsync(parsedUserId, request);
+            return Ok();
         });
     }
 
@@ -52,13 +53,12 @@ public class RecurringRuleController(
                 return Unauthorized();
             }
 
-            return Ok(
-                await recurringRuleService.CreateRecurringRuleAsync(
-                    parsedUserId,
-                    request,
-                    transactionID
-                )
+            await recurringRuleService.CreateRecurringRuleAsync(
+                parsedUserId,
+                request,
+                transactionID
             );
+            return Ok();
         });
     }
 
@@ -109,7 +109,8 @@ public class RecurringRuleController(
                 return Unauthorized();
             }
 
-            return Ok(await recurringRuleService.UpdateRecurringRuleAsync(parsedUserId, request));
+            await recurringRuleService.UpdateRecurringRuleAsync(parsedUserId, request);
+            return Ok();
         });
     }
 

@@ -16,22 +16,10 @@ public class RecurringRuleServiceTests
     [Fact]
     public void GetOccurrences_ShouldHonorCadenceAnchorsAndMonthBoundaries()
     {
-        var weeklyRule = CreateRule(
-            RecurringCadence.Weekly,
-            new DateOnly(2026, 8, 3)
-        );
-        var biweeklyRule = CreateRule(
-            RecurringCadence.Biweekly,
-            new DateOnly(2026, 8, 3)
-        );
-        var monthlyRule = CreateRule(
-            RecurringCadence.Monthly,
-            new DateOnly(2026, 1, 31)
-        );
-        var yearlyRule = CreateRule(
-            RecurringCadence.Yearly,
-            new DateOnly(2024, 2, 29)
-        );
+        var weeklyRule = CreateRule(RecurringCadence.Weekly, new DateOnly(2026, 8, 3));
+        var biweeklyRule = CreateRule(RecurringCadence.Biweekly, new DateOnly(2026, 8, 3));
+        var monthlyRule = CreateRule(RecurringCadence.Monthly, new DateOnly(2026, 1, 31));
+        var yearlyRule = CreateRule(RecurringCadence.Yearly, new DateOnly(2024, 2, 29));
 
         RecurringRuleOccurrenceCalculator
             .GetOccurrences(weeklyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31))
@@ -77,18 +65,19 @@ public class RecurringRuleServiceTests
             Amount = 100,
         };
         var historicalTransactions = new[] { 100m, 120m, 140m }.Select(
-            (amount, index) => new Transaction
-            {
-                Amount = amount,
-                Date = new DateOnly(2026, index + 1, 1),
-                MerchantName = "Rent",
-                Category = "Housing",
-                Subcategory = "Rent",
-                Source = TransactionSource.Manual,
-                AccountID = account.ID,
-                Account = account,
-                RecurringRule = rule,
-            }
+            (amount, index) =>
+                new Transaction
+                {
+                    Amount = amount,
+                    Date = new DateOnly(2026, index + 1, 1),
+                    MerchantName = "Rent",
+                    Category = "Housing",
+                    Subcategory = "Rent",
+                    Source = TransactionSource.Manual,
+                    AccountID = account.ID,
+                    Account = account,
+                    RecurringRule = rule,
+                }
         );
         rule.Transactions = historicalTransactions.ToList();
         helper.UserDataContext.RecurringRules.Add(rule);
@@ -129,6 +118,26 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public async Task ReadForecastAsync_ShouldUseEmptyAccountNameWhenAccountNameIsNull()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        account.Name = null!;
+        AddRule(helper, account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        var forecast = await service.ReadForecastAsync(
+            helper.demoUser.Id,
+            new DateOnly(2026, 8, 1)
+        );
+
+        forecast.Should().ContainSingle();
+        forecast[0].AccountName.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task MatchTransactionAsync_ShouldMatchNormalizedFieldsWithinAmountTolerance()
     {
         var helper = new TestHelper();
@@ -163,6 +172,83 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public async Task MatchTransactionAsync_ShouldMatchZeroAmountExactly()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account, amount: 0);
+        var transaction = new Transaction
+        {
+            Amount = 0,
+            Date = new DateOnly(2026, 8, 1),
+            MerchantName = "Merchant",
+            Category = "Category",
+            Subcategory = "Subcategory",
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+        };
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await service.MatchTransactionAsync(helper.demoUser.Id, transaction);
+
+        transaction.RecurringRuleID.Should().Be(rule.ID);
+    }
+
+    [Fact]
+    public async Task MatchTransactionAsync_ShouldMatchTransactionsWithNullFields()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account);
+        rule.MerchantName = null;
+        rule.Category = null;
+        rule.Subcategory = null;
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var transaction = new Transaction
+        {
+            Amount = 100,
+            Date = new DateOnly(2026, 8, 1),
+            MerchantName = null,
+            Category = null,
+            Subcategory = null,
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+        };
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await service.MatchTransactionAsync(helper.demoUser.Id, transaction);
+
+        transaction.RecurringRuleID.Should().Be(rule.ID);
+    }
+
+    [Fact]
+    public async Task MatchTransactionAsync_ShouldRejectOccurrencesOutsideDateWindow()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        AddRule(helper, account);
+        var transaction = new Transaction
+        {
+            Amount = 100,
+            Date = new DateOnly(2026, 8, 10),
+            MerchantName = "Merchant",
+            Category = "Category",
+            Subcategory = "Subcategory",
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+        };
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await service.MatchTransactionAsync(helper.demoUser.Id, transaction);
+
+        transaction.RecurringRuleID.Should().BeNull();
+    }
+
+    [Fact]
     public async Task MatchTransactionAsync_ShouldLeaveAmbiguousMatchesUnassigned()
     {
         var helper = new TestHelper();
@@ -191,18 +277,481 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public void IsTransactionMatch_ShouldIgnoreTheTransactionBeingMatched()
+    {
+        var rule = CreateRule(RecurringCadence.Monthly, new DateOnly(2026, 8, 1));
+        rule.MerchantName = "Merchant";
+        rule.Category = "Category";
+        rule.Subcategory = "Subcategory";
+        rule.Amount = 100;
+        var transaction = new Transaction
+        {
+            Amount = 100,
+            Date = new DateOnly(2026, 8, 1),
+            MerchantName = "Merchant",
+            Category = "Category",
+            Subcategory = "Subcategory",
+            Source = TransactionSource.Manual,
+            AccountID = rule.AccountID,
+        };
+        rule.Transactions.Add(transaction);
+
+        var method = typeof(RecurringRuleService).GetMethod(
+            "IsTransactionMatch",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
+        );
+
+        method.Should().NotBeNull();
+        method!.Invoke(null, [rule, transaction]).Should().Be(true);
+    }
+
+    [Fact]
+    public async Task CreateRecurringRuleAsync_ShouldRejectAMissingStartDate()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+        var request = CreateRequest(account.ID);
+        request.StartDate = DateOnly.MinValue;
+
+        await AssertServiceException(
+            () => service.CreateRecurringRuleAsync(helper.demoUser.Id, request),
+            "RecurringRuleAccountAndStartDateRequiredError"
+        );
+    }
+
+    [Fact]
     public async Task ReadRecurringRulesAsync_ShouldOnlyReturnRulesOwnedByUser()
     {
         var helper = new TestHelper();
         var account = AddAccount(helper);
         AddRule(helper, account);
+        var otherUser = new ApplicationUser { UserName = "other-user" };
+        helper.UserDataContext.Users.Add(otherUser);
+        helper.UserDataContext.SaveChanges();
         var service = CreateService(helper, new DateOnly(2026, 8, 1));
 
-        var otherUserRules = await service.ReadRecurringRulesAsync(Guid.NewGuid());
+        var otherUserRules = await service.ReadRecurringRulesAsync(otherUser.Id);
         var userRules = await service.ReadRecurringRulesAsync(helper.demoUser.Id);
 
         otherUserRules.Should().BeEmpty();
         userRules.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task CreateRecurringRuleAsync_ShouldCreateRuleWithAndWithoutTransaction()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await service.CreateRecurringRuleAsync(
+            helper.demoUser.Id,
+            CreateRequest(account.ID, amount: 42, endDate: new DateOnly(2026, 12, 31))
+        );
+        var rulesAfterCreate = await service.ReadRecurringRulesAsync(helper.demoUser.Id);
+        rulesAfterCreate
+            .Should()
+            .ContainSingle(rule =>
+                rule.AccountID == account.ID
+                && rule.Amount == 42
+                && rule.EndDate == new DateOnly(2026, 12, 31)
+            );
+
+        var transaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 75);
+        await service.CreateRecurringRuleAsync(
+            helper.demoUser.Id,
+            CreateRequest(account.ID, merchantName: "Attached", amount: 75),
+            transaction.ID
+        );
+
+        var ruleWithTransaction = (
+            await service.ReadRecurringRulesAsync(helper.demoUser.Id)
+        ).Single(rule => rule.MerchantName == "Attached");
+        ruleWithTransaction.MerchantName.Should().Be("Attached");
+        ruleWithTransaction.MatchedTransactionCount.Should().Be(1);
+        transaction.RecurringRuleID.Should().Be(ruleWithTransaction.ID);
+    }
+
+    [Fact]
+    public async Task CreateRecurringRuleAsync_ShouldRejectInvalidReferencesAndRequests()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await AssertServiceException(
+            () =>
+                service.CreateRecurringRuleAsync(helper.demoUser.Id, CreateRequest(Guid.NewGuid())),
+            "RecurringRuleAccountNotFoundError"
+        );
+        await AssertServiceException(
+            () =>
+                service.CreateRecurringRuleAsync(
+                    helper.demoUser.Id,
+                    CreateRequest(account.ID),
+                    Guid.NewGuid()
+                ),
+            "TransactionNotFoundError"
+        );
+
+        var otherAccount = AddAccount(helper, "Savings");
+        var transaction = AddTransaction(helper, otherAccount, new DateOnly(2026, 8, 1), 100);
+        await AssertServiceException(
+            () =>
+                service.CreateRecurringRuleAsync(
+                    helper.demoUser.Id,
+                    CreateRequest(account.ID),
+                    transaction.ID
+                ),
+            "RecurringRuleAccountMismatchError"
+        );
+
+        var assignedRule = AddRule(helper, account);
+        transaction = AddTransaction(
+            helper,
+            account,
+            new DateOnly(2026, 8, 1),
+            100,
+            assignedRule.ID
+        );
+        await AssertServiceException(
+            () =>
+                service.CreateRecurringRuleAsync(
+                    helper.demoUser.Id,
+                    CreateRequest(account.ID),
+                    transaction.ID
+                ),
+            "TransactionAlreadyRecurringError"
+        );
+
+        var invalidCadence = CreateRequest(account.ID);
+        invalidCadence.Cadence = "Daily";
+        await AssertServiceException(
+            () => service.CreateRecurringRuleAsync(helper.demoUser.Id, invalidCadence),
+            "RecurringRuleInvalidCadenceError"
+        );
+
+        var invalidAmountMode = CreateRequest(account.ID);
+        invalidAmountMode.AmountMode = "Variable";
+        await AssertServiceException(
+            () => service.CreateRecurringRuleAsync(helper.demoUser.Id, invalidAmountMode),
+            "RecurringRuleInvalidAmountModeError"
+        );
+
+        var missingAccount = CreateRequest(Guid.Empty);
+        await AssertServiceException(
+            () => service.CreateRecurringRuleAsync(helper.demoUser.Id, missingAccount),
+            "RecurringRuleAccountAndStartDateRequiredError"
+        );
+
+        var missingStartDate = CreateRequest(account.ID);
+        missingStartDate.StartDate = DateOnly.MinValue;
+        await AssertServiceException(
+            () => service.CreateRecurringRuleAsync(helper.demoUser.Id, missingStartDate),
+            "RecurringRuleAccountAndStartDateRequiredError"
+        );
+
+        var invalidEndDate = CreateRequest(account.ID);
+        invalidEndDate.EndDate = invalidEndDate.StartDate.AddDays(-1);
+        await AssertServiceException(
+            () => service.CreateRecurringRuleAsync(helper.demoUser.Id, invalidEndDate),
+            "RecurringRuleEndDateBeforeStartDateError"
+        );
+
+        var zeroAmount = CreateRequest(account.ID);
+        zeroAmount.Amount = 0;
+        await AssertServiceException(
+            () => service.CreateRecurringRuleAsync(helper.demoUser.Id, zeroAmount),
+            "RecurringRuleZeroAmountError"
+        );
+    }
+
+    [Fact]
+    public async Task UpdateRecurringRuleAsync_ShouldUpdateRuleAndRejectInvalidReferences()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var replacementAccount = AddAccount(helper, "Savings");
+        var rule = AddRule(helper, account);
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        var request = new RecurringRuleUpdateRequest
+        {
+            ID = rule.ID,
+            AccountID = replacementAccount.ID,
+            MerchantName = "Updated Merchant",
+            Category = "Updated Category",
+            Subcategory = "Updated Subcategory",
+            Cadence = RecurringCadenceValues.Weekly,
+            StartDate = new DateOnly(2026, 7, 1),
+            EndDate = new DateOnly(2026, 12, 31),
+            IsActive = false,
+            AmountMode = RecurringAmountModeValues.Automatic,
+            Amount = 250,
+        };
+
+        await service.UpdateRecurringRuleAsync(helper.demoUser.Id, request);
+        var response = (await service.ReadRecurringRulesAsync(helper.demoUser.Id)).Single();
+
+        response.AccountID.Should().Be(replacementAccount.ID);
+        response.MerchantName.Should().Be("Updated Merchant");
+        response.Cadence.Should().Be(RecurringCadenceValues.Weekly);
+        response.IsActive.Should().BeFalse();
+        response.AmountMode.Should().Be(RecurringAmountModeValues.Automatic);
+        response.Amount.Should().Be(250);
+
+        request.ID = Guid.NewGuid();
+        await AssertServiceException(
+            () => service.UpdateRecurringRuleAsync(helper.demoUser.Id, request),
+            "RecurringRuleNotFoundError"
+        );
+
+        request.ID = rule.ID;
+        request.AccountID = Guid.NewGuid();
+        await AssertServiceException(
+            () => service.UpdateRecurringRuleAsync(helper.demoUser.Id, request),
+            "RecurringRuleAccountNotFoundError"
+        );
+    }
+
+    [Fact]
+    public async Task DeleteRecurringRuleAsync_ShouldDeleteRuleAndRejectMissingRule()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account);
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await service.DeleteRecurringRuleAsync(helper.demoUser.Id, rule.ID);
+
+        (await service.ReadRecurringRulesAsync(helper.demoUser.Id)).Should().BeEmpty();
+        await AssertServiceException(
+            () => service.DeleteRecurringRuleAsync(helper.demoUser.Id, rule.ID),
+            "RecurringRuleNotFoundError"
+        );
+    }
+
+    [Fact]
+    public async Task ReadForecastAsync_ShouldFilterRulesAndCalculateAutomaticAmounts()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var hiddenAccount = AddAccount(helper, "Hidden", hideTransactions: true);
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        var fixedRule = AddRule(helper, account, amount: 10);
+        var evenRule = AddRule(helper, account, merchantName: "Even", amount: 999);
+        evenRule.AmountMode = RecurringAmountMode.Automatic;
+        evenRule.Transactions =
+        [
+            AddTransaction(helper, account, new DateOnly(2026, 6, 1), 40),
+            AddTransaction(helper, account, new DateOnly(2026, 7, 1), 60),
+        ];
+        var oneTransactionRule = AddRule(helper, account, merchantName: "One", amount: 88);
+        oneTransactionRule.AmountMode = RecurringAmountMode.Automatic;
+        oneTransactionRule.Transactions.Add(
+            AddTransaction(helper, account, new DateOnly(2026, 7, 1), 33)
+        );
+        var deletedTransactionsRule = AddRule(helper, account, merchantName: "Deleted", amount: 77);
+        deletedTransactionsRule.AmountMode = RecurringAmountMode.Automatic;
+        deletedTransactionsRule.Transactions =
+        [
+            AddTransaction(helper, account, new DateOnly(2026, 6, 1), 12, deleted: DateTime.UtcNow),
+            AddTransaction(helper, account, new DateOnly(2026, 7, 1), 14, deleted: DateTime.UtcNow),
+        ];
+        var endingRule = AddRule(helper, account, merchantName: "Ending", amount: 25);
+        endingRule.EndDate = new DateOnly(2026, 12, 31);
+
+        AddRule(helper, account, category: "Transfer", amount: 20);
+        AddRule(helper, account, category: TransactionCategoriesConstants.HideFromBudgetsCategory);
+        AddRule(helper, hiddenAccount, merchantName: "Hidden account");
+        var inactiveRule = AddRule(helper, account, merchantName: "Inactive");
+        inactiveRule.IsActive = false;
+        var futureRule = AddRule(helper, account, merchantName: "Future");
+        futureRule.StartDate = new DateOnly(2026, 9, 1);
+        var endedRule = AddRule(helper, account, merchantName: "Ended");
+        endedRule.EndDate = new DateOnly(2026, 7, 31);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var forecast = await service.ReadForecastAsync(
+            helper.demoUser.Id,
+            new DateOnly(2026, 8, 1)
+        );
+
+        forecast.Should().HaveCount(5);
+        forecast.Should().ContainSingle(item => item.RuleID == fixedRule.ID && item.Amount == 10);
+        forecast.Should().ContainSingle(item => item.RuleID == evenRule.ID && item.Amount == 50);
+        forecast.Should().ContainSingle(item => item.RuleID == endingRule.ID && item.Amount == 25);
+        forecast
+            .Should()
+            .ContainSingle(item => item.RuleID == oneTransactionRule.ID && item.Amount == 88);
+        forecast
+            .Should()
+            .ContainSingle(item => item.RuleID == deletedTransactionsRule.ID && item.Amount == 77);
+
+        (await service.ReadForecastAsync(helper.demoUser.Id, new DateOnly(2026, 7, 1)))
+            .Should()
+            .BeEmpty();
+        (await service.ReadForecastAsync(helper.demoUser.Id, new DateOnly(2026, 9, 1)))
+            .Should()
+            .NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task MatchTransactionAsync_ShouldSkipExcludedTransactionsAndUnmatchedRules()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var inactiveRule = AddRule(helper, account, merchantName: "Inactive");
+        inactiveRule.IsActive = false;
+        var otherAccount = AddAccount(helper, "Other");
+        AddRule(helper, otherAccount, merchantName: "Other account");
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        var skippedTransactions = new[]
+        {
+            new Transaction
+            {
+                Amount = 100,
+                Date = new DateOnly(2026, 8, 1),
+                Source = TransactionSource.Manual,
+                AccountID = account.ID,
+                Account = account,
+                RecurringRuleID = Guid.NewGuid(),
+            },
+            new Transaction
+            {
+                Amount = 100,
+                Date = new DateOnly(2026, 8, 1),
+                Source = TransactionSource.Manual,
+                AccountID = account.ID,
+                Account = account,
+                Deleted = DateTime.UtcNow,
+            },
+            new Transaction
+            {
+                Amount = 100,
+                Date = new DateOnly(2026, 8, 1),
+                Source = TransactionSource.Manual,
+                AccountID = account.ID,
+                Account = account,
+                Category = "Transfer",
+            },
+            new Transaction
+            {
+                Amount = 100,
+                Date = new DateOnly(2026, 8, 1),
+                Source = TransactionSource.Manual,
+                AccountID = account.ID,
+                Account = account,
+                Category = TransactionCategoriesConstants.HideFromBudgetsCategory,
+            },
+            new Transaction
+            {
+                Amount = 100,
+                Date = new DateOnly(2026, 8, 1),
+                Source = TransactionSource.Manual,
+                AccountID = account.ID,
+                Account = account,
+                SourceTransactionLink = new TransactionLink
+                {
+                    SourceTransactionID = Guid.NewGuid(),
+                    TargetTransactionID = Guid.NewGuid(),
+                },
+            },
+            new Transaction
+            {
+                Amount = 100,
+                Date = new DateOnly(2026, 8, 1),
+                Source = TransactionSource.Manual,
+                AccountID = account.ID,
+                Account = account,
+                TargetTransactionLink = new TransactionLink
+                {
+                    SourceTransactionID = Guid.NewGuid(),
+                    TargetTransactionID = Guid.NewGuid(),
+                },
+            },
+        };
+
+        foreach (var transaction in skippedTransactions)
+        {
+            var initialRuleID = transaction.RecurringRuleID;
+            await service.MatchTransactionAsync(helper.demoUser.Id, transaction);
+            transaction.RecurringRuleID.Should().Be(initialRuleID);
+        }
+
+        var unmatchedRule = AddRule(helper, account, merchantName: "Expected");
+        var unmatchedTransaction = new Transaction
+        {
+            Amount = 100,
+            Date = new DateOnly(2026, 8, 1),
+            MerchantName = "Different",
+            Category = unmatchedRule.Category,
+            Subcategory = unmatchedRule.Subcategory,
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+        };
+        await service.MatchTransactionAsync(helper.demoUser.Id, unmatchedTransaction);
+        unmatchedTransaction.RecurringRuleID.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task AssignAndUnassignTransactionAsync_ShouldManageAssignmentsAndRejectInvalidReferences()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var otherAccount = AddAccount(helper, "Savings");
+        var rule = AddRule(helper, account);
+        var otherRule = AddRule(helper, account, merchantName: "Other");
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await AssertServiceException(
+            () =>
+                service.AssignTransactionAsync(helper.demoUser.Id, Guid.NewGuid(), Guid.NewGuid()),
+            "RecurringRuleNotFoundError"
+        );
+
+        var transaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 100);
+        await service.AssignTransactionAsync(helper.demoUser.Id, rule.ID, transaction.ID);
+        transaction.RecurringRuleID.Should().Be(rule.ID);
+
+        await service.AssignTransactionAsync(helper.demoUser.Id, rule.ID, transaction.ID);
+        transaction.RecurringRuleID.Should().Be(rule.ID);
+
+        await AssertServiceException(
+            () => service.AssignTransactionAsync(helper.demoUser.Id, otherRule.ID, transaction.ID),
+            "TransactionAlreadyRecurringError"
+        );
+
+        var otherAccountTransaction = AddTransaction(
+            helper,
+            otherAccount,
+            new DateOnly(2026, 8, 1),
+            100
+        );
+        await AssertServiceException(
+            () =>
+                service.AssignTransactionAsync(
+                    helper.demoUser.Id,
+                    rule.ID,
+                    otherAccountTransaction.ID
+                ),
+            "RecurringRuleAccountMismatchError"
+        );
+        await AssertServiceException(
+            () => service.AssignTransactionAsync(helper.demoUser.Id, rule.ID, Guid.NewGuid()),
+            "TransactionNotFoundError"
+        );
+
+        await service.UnassignTransactionAsync(helper.demoUser.Id, transaction.ID);
+        transaction.RecurringRuleID.Should().BeNull();
+        await AssertServiceException(
+            () => service.UnassignTransactionAsync(helper.demoUser.Id, Guid.NewGuid()),
+            "TransactionNotFoundError"
+        );
     }
 
     private static RecurringRuleService CreateService(TestHelper helper, DateOnly today)
@@ -219,18 +768,76 @@ public class RecurringRuleServiceTests
         );
     }
 
-    private static Account AddAccount(TestHelper helper)
+    private static RecurringRuleCreateRequest CreateRequest(
+        Guid accountID,
+        string merchantName = "Merchant",
+        decimal amount = 100,
+        DateOnly? endDate = null
+    ) =>
+        new()
+        {
+            AccountID = accountID,
+            MerchantName = merchantName,
+            Category = "Category",
+            Subcategory = "Subcategory",
+            Cadence = RecurringCadenceValues.Monthly,
+            StartDate = new DateOnly(2026, 8, 1),
+            EndDate = endDate,
+            IsActive = true,
+            AmountMode = RecurringAmountModeValues.Fixed,
+            Amount = amount,
+        };
+
+    private static async Task AssertServiceException(Func<Task> action, string message)
+    {
+        var exception = await Assert.ThrowsAsync<BudgetBoardServiceException>(action);
+        exception.Message.Should().Be(message);
+    }
+
+    private static Account AddAccount(
+        TestHelper helper,
+        string name = "Checking",
+        bool hideTransactions = false
+    )
     {
         var account = new Account
         {
-            Name = "Checking",
+            Name = name,
             InstitutionID = Guid.NewGuid(),
             Type = "checking",
+            HideTransactions = hideTransactions,
             UserID = helper.demoUser.Id,
         };
         helper.UserDataContext.Accounts.Add(account);
         helper.UserDataContext.SaveChanges();
         return account;
+    }
+
+    private static Transaction AddTransaction(
+        TestHelper helper,
+        Account account,
+        DateOnly date,
+        decimal amount,
+        Guid? recurringRuleID = null,
+        DateTime? deleted = null
+    )
+    {
+        var transaction = new Transaction
+        {
+            Amount = amount,
+            Date = date,
+            MerchantName = "Merchant",
+            Category = "Category",
+            Subcategory = "Subcategory",
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+            RecurringRuleID = recurringRuleID,
+            Deleted = deleted,
+        };
+        helper.UserDataContext.Transactions.Add(transaction);
+        helper.UserDataContext.SaveChanges();
+        return transaction;
     }
 
     private static RecurringRule AddRule(
