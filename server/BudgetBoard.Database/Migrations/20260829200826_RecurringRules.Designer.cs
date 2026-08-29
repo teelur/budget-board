@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    [Migration("20260829165001_RecurringRules")]
+    [Migration("20260829200826_RecurringRules")]
     partial class RecurringRules
     {
         /// <inheritdoc />
