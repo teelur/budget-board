@@ -1,5 +1,7 @@
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
+using BudgetBoard.Service.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.Service.Models;
 
@@ -29,13 +31,7 @@ public class RecurringRuleCreateRequest : IRecurringRuleRequest
     public string? MerchantName { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
-    public RecurringCadence Cadence { get; set; } =
-        new()
-        {
-            Version = 1,
-            Unit = RecurringCadenceUnitValues.Month,
-            Interval = 1,
-        };
+    public RecurringCadence Cadence { get; set; } = RecurringCadenceSerializer.CreateDefault();
     public DateOnly StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
     public bool IsActive { get; set; } = true;
@@ -88,7 +84,11 @@ public class RecurringRuleResponse : IRecurringRuleResponse
     public int MatchedTransactionCount { get; set; }
     public DateOnly? NextOccurrenceDate { get; set; }
 
-    public RecurringRuleResponse(RecurringRule rule, DateOnly today)
+    public RecurringRuleResponse(
+        RecurringRule rule,
+        DateOnly today,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
     {
         ID = rule.ID;
         AccountID = rule.AccountID;
@@ -96,7 +96,7 @@ public class RecurringRuleResponse : IRecurringRuleResponse
         MerchantName = rule.MerchantName;
         Category = rule.Category;
         Subcategory = rule.Subcategory;
-        Cadence = RecurringCadenceSerializer.Deserialize(rule.Cadence);
+        Cadence = RecurringCadenceSerializer.Deserialize(rule.Cadence, responseLocalizer);
         StartDate = rule.StartDate;
         EndDate = rule.EndDate;
         IsActive = rule.IsActive;
@@ -105,7 +105,8 @@ public class RecurringRuleResponse : IRecurringRuleResponse
         MatchedTransactionCount = rule.Transactions.Count;
         NextOccurrenceDate = rule.IsActive
             ? RecurringRuleOccurrenceCalculator
-                .GetOccurrences(rule, today, today.AddYears(1))
+                .GetOccurrences(rule, today, today.AddYears(1), responseLocalizer)
+                .Select(date => (DateOnly?)date)
                 .FirstOrDefault()
             : null;
     }

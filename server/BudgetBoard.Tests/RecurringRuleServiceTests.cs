@@ -6,6 +6,7 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -14,6 +15,9 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class RecurringRuleServiceTests
 {
+    private static readonly IStringLocalizer<ResponseStrings> ResponseLocalizer =
+        TestHelper.CreateMockLocalizer<ResponseStrings>();
+
     #region GetOccurrences
     [Fact]
     public void GetOccurrences_ShouldHonorCadenceAnchorsAndMonthBoundaries()
@@ -28,7 +32,12 @@ public class RecurringRuleServiceTests
         var yearlyRule = CreateRule(RecurringCadenceUnitValues.Year, 1, new DateOnly(2024, 2, 29));
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(weeklyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31))
+            .GetOccurrences(
+                weeklyRule,
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(
                 new DateOnly(2026, 8, 3),
@@ -38,15 +47,30 @@ public class RecurringRuleServiceTests
                 new DateOnly(2026, 8, 31)
             );
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(biweeklyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31))
+            .GetOccurrences(
+                biweeklyRule,
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(new DateOnly(2026, 8, 3), new DateOnly(2026, 8, 17), new DateOnly(2026, 8, 31));
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(monthlyRule, new DateOnly(2026, 2, 1), new DateOnly(2026, 3, 31))
+            .GetOccurrences(
+                monthlyRule,
+                new DateOnly(2026, 2, 1),
+                new DateOnly(2026, 3, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(new DateOnly(2026, 2, 28), new DateOnly(2026, 3, 31));
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(yearlyRule, new DateOnly(2027, 1, 1), new DateOnly(2028, 12, 31))
+            .GetOccurrences(
+                yearlyRule,
+                new DateOnly(2027, 1, 1),
+                new DateOnly(2028, 12, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(new DateOnly(2027, 2, 28), new DateOnly(2028, 2, 29));
     }
@@ -64,7 +88,12 @@ public class RecurringRuleServiceTests
         var yearlyRule = CreateRule(RecurringCadenceUnitValues.Year, 2, new DateOnly(2024, 2, 29));
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(dailyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 10))
+            .GetOccurrences(
+                dailyRule,
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 10),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(
                 new DateOnly(2026, 8, 1),
@@ -73,11 +102,21 @@ public class RecurringRuleServiceTests
                 new DateOnly(2026, 8, 10)
             );
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(weeklyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31))
+            .GetOccurrences(
+                weeklyRule,
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(new DateOnly(2026, 8, 3), new DateOnly(2026, 8, 17), new DateOnly(2026, 8, 31));
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(monthlyRule, new DateOnly(2026, 1, 1), new DateOnly(2026, 7, 31))
+            .GetOccurrences(
+                monthlyRule,
+                new DateOnly(2026, 1, 1),
+                new DateOnly(2026, 7, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(
                 new DateOnly(2026, 1, 31),
@@ -86,7 +125,12 @@ public class RecurringRuleServiceTests
                 new DateOnly(2026, 7, 31)
             );
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(yearlyRule, new DateOnly(2024, 1, 1), new DateOnly(2030, 12, 31))
+            .GetOccurrences(
+                yearlyRule,
+                new DateOnly(2024, 1, 1),
+                new DateOnly(2030, 12, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(
                 new DateOnly(2024, 2, 29),
@@ -125,11 +169,21 @@ public class RecurringRuleServiceTests
         );
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(dailyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 2))
+            .GetOccurrences(
+                dailyRule,
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 2),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 2));
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(twiceWeeklyRule, new DateOnly(2026, 8, 3), new DateOnly(2026, 8, 17))
+            .GetOccurrences(
+                twiceWeeklyRule,
+                new DateOnly(2026, 8, 3),
+                new DateOnly(2026, 8, 17),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(
                 new DateOnly(2026, 8, 3),
@@ -139,7 +193,12 @@ public class RecurringRuleServiceTests
                 new DateOnly(2026, 8, 17)
             );
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(twiceMonthlyRule, new DateOnly(2026, 1, 1), new DateOnly(2026, 3, 31))
+            .GetOccurrences(
+                twiceMonthlyRule,
+                new DateOnly(2026, 1, 1),
+                new DateOnly(2026, 3, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(
                 new DateOnly(2026, 1, 31),
@@ -149,7 +208,12 @@ public class RecurringRuleServiceTests
                 new DateOnly(2026, 3, 31)
             );
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(thriceYearlyRule, new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31))
+            .GetOccurrences(
+                thriceYearlyRule,
+                new DateOnly(2024, 1, 1),
+                new DateOnly(2025, 12, 31),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(
                 new DateOnly(2024, 2, 29),
@@ -162,12 +226,38 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public void GetOccurrences_ShouldDeduplicateShortPerUnitPeriods()
+    {
+        var rule = CreateRule(
+            RecurringCadenceUnitValues.Month,
+            31,
+            new DateOnly(2026, 2, 1),
+            RecurringCadenceModeValues.PerUnit
+        );
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(
+                rule,
+                new DateOnly(2026, 2, 1),
+                new DateOnly(2026, 2, 28),
+                ResponseLocalizer
+            )
+            .Should()
+            .Equal(Enumerable.Range(1, 28).Select(day => new DateOnly(2026, 2, day)).ToArray());
+    }
+
+    [Fact]
     public void GetOccurrences_ShouldReturnEmptyWhenRangeIsReversed()
     {
         var rule = CreateRule(RecurringCadenceUnitValues.Day, 1, new DateOnly(2026, 8, 1));
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(rule, new DateOnly(2026, 8, 10), new DateOnly(2026, 8, 1))
+            .GetOccurrences(
+                rule,
+                new DateOnly(2026, 8, 10),
+                new DateOnly(2026, 8, 1),
+                ResponseLocalizer
+            )
             .Should()
             .BeEmpty();
     }
@@ -179,7 +269,12 @@ public class RecurringRuleServiceTests
         rule.IsActive = false;
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(rule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 10))
+            .GetOccurrences(
+                rule,
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 10),
+                ResponseLocalizer
+            )
             .Should()
             .BeEmpty();
     }
@@ -191,7 +286,12 @@ public class RecurringRuleServiceTests
         rule.EndDate = new DateOnly(2026, 7, 31);
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(rule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 10))
+            .GetOccurrences(
+                rule,
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 10),
+                ResponseLocalizer
+            )
             .Should()
             .BeEmpty();
     }
@@ -202,7 +302,12 @@ public class RecurringRuleServiceTests
         var rule = CreateRule(RecurringCadenceUnitValues.Day, 1, new DateOnly(2026, 9, 1));
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(rule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31))
+            .GetOccurrences(
+                rule,
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 31),
+                ResponseLocalizer
+            )
             .Should()
             .BeEmpty();
     }
@@ -220,12 +325,13 @@ public class RecurringRuleServiceTests
                     Version = 1,
                     Unit = "Fortnight",
                     Interval = 1,
-                }
+                },
+                ResponseLocalizer
             );
 
         act.Should()
             .Throw<RecurringCadenceValidationException>()
-            .WithMessage("Cadence unit is not supported.");
+            .WithMessage("RecurringCadenceUnsupportedUnitError");
     }
 
     [Fact]
@@ -239,7 +345,12 @@ public class RecurringRuleServiceTests
         );
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(rule, new DateOnly(2026, 8, 4), new DateOnly(2026, 8, 6))
+            .GetOccurrences(
+                rule,
+                new DateOnly(2026, 8, 4),
+                new DateOnly(2026, 8, 6),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(new DateOnly(2026, 8, 6));
     }
@@ -255,7 +366,12 @@ public class RecurringRuleServiceTests
         );
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(rule, new DateOnly(2024, 3, 1), new DateOnly(2024, 9, 1))
+            .GetOccurrences(
+                rule,
+                new DateOnly(2024, 3, 1),
+                new DateOnly(2024, 9, 1),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(new DateOnly(2024, 6, 30));
     }
@@ -266,7 +382,12 @@ public class RecurringRuleServiceTests
         var rule = CreateRule(RecurringCadenceUnitValues.Year, 1, new DateOnly(2024, 2, 29));
 
         RecurringRuleOccurrenceCalculator
-            .GetOccurrences(rule, new DateOnly(2027, 3, 1), new DateOnly(2028, 2, 29))
+            .GetOccurrences(
+                rule,
+                new DateOnly(2027, 3, 1),
+                new DateOnly(2028, 2, 29),
+                ResponseLocalizer
+            )
             .Should()
             .Equal(new DateOnly(2028, 2, 29));
     }
@@ -283,8 +404,8 @@ public class RecurringRuleServiceTests
             Interval = 2,
         };
 
-        var serialized = RecurringCadenceSerializer.Serialize(cadence);
-        var deserialized = RecurringCadenceSerializer.Deserialize(serialized);
+        var serialized = RecurringCadenceSerializer.Serialize(cadence, ResponseLocalizer);
+        var deserialized = RecurringCadenceSerializer.Deserialize(serialized, ResponseLocalizer);
 
         deserialized.Version.Should().Be(1);
         deserialized.Unit.Should().Be(RecurringCadenceUnitValues.Month);
@@ -305,6 +426,31 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public void RecurringCadenceSerializer_ShouldCanonicalizeUnitAndModeValues()
+    {
+        var perUnitCadence = new RecurringCadence
+        {
+            Version = 1,
+            Unit = "mOnTh",
+            Interval = 2,
+            Mode = "perunit",
+        };
+
+        RecurringCadenceSerializer
+            .Serialize(perUnitCadence, ResponseLocalizer)
+            .Should()
+            .Be("{\"version\":1,\"unit\":\"Month\",\"interval\":2,\"mode\":\"PerUnit\"}");
+
+        var intervalCadence = RecurringCadenceSerializer.Deserialize(
+            "{\"version\":1,\"unit\":\"WEEK\",\"interval\":2,\"mode\":\"INTERVAL\"}",
+            ResponseLocalizer
+        );
+        intervalCadence.Unit.Should().Be(RecurringCadenceUnitValues.Week);
+        intervalCadence.Interval.Should().Be(2);
+        intervalCadence.Mode.Should().BeNull();
+    }
+
+    [Fact]
     public void RecurringCadenceSerializer_ShouldRejectUnsupportedDefinitions()
     {
         Action[] invalidDefinitions =
@@ -316,7 +462,8 @@ public class RecurringRuleServiceTests
                         Version = 2,
                         Unit = RecurringCadenceUnitValues.Day,
                         Interval = 1,
-                    }
+                    },
+                    ResponseLocalizer
                 ),
             () =>
                 RecurringCadenceSerializer.Validate(
@@ -325,7 +472,8 @@ public class RecurringRuleServiceTests
                         Version = 1,
                         Unit = "Fortnight",
                         Interval = 1,
-                    }
+                    },
+                    ResponseLocalizer
                 ),
             () =>
                 RecurringCadenceSerializer.Validate(
@@ -334,7 +482,8 @@ public class RecurringRuleServiceTests
                         Version = 1,
                         Unit = RecurringCadenceUnitValues.Day,
                         Interval = 0,
-                    }
+                    },
+                    ResponseLocalizer
                 ),
             () =>
                 RecurringCadenceSerializer.Validate(
@@ -344,7 +493,8 @@ public class RecurringRuleServiceTests
                         Unit = RecurringCadenceUnitValues.Week,
                         Interval = 8,
                         Mode = RecurringCadenceModeValues.PerUnit,
-                    }
+                    },
+                    ResponseLocalizer
                 ),
             () =>
                 RecurringCadenceSerializer.Validate(
@@ -354,7 +504,8 @@ public class RecurringRuleServiceTests
                         Unit = RecurringCadenceUnitValues.Day,
                         Interval = 2,
                         Mode = RecurringCadenceModeValues.PerUnit,
-                    }
+                    },
+                    ResponseLocalizer
                 ),
             () =>
                 RecurringCadenceSerializer.Validate(
@@ -364,10 +515,15 @@ public class RecurringRuleServiceTests
                         Unit = RecurringCadenceUnitValues.Week,
                         Interval = 2,
                         Mode = "Unsupported",
-                    }
+                    },
+                    ResponseLocalizer
                 ),
-            () => RecurringCadenceSerializer.Deserialize("{\"version\":1,\"unit\":\"Day\"}"),
-            () => RecurringCadenceSerializer.Deserialize("not-json"),
+            () =>
+                RecurringCadenceSerializer.Deserialize(
+                    "{\"version\":1,\"unit\":\"Day\"}",
+                    ResponseLocalizer
+                ),
+            () => RecurringCadenceSerializer.Deserialize("not-json", ResponseLocalizer),
         ];
 
         foreach (var invalidDefinition in invalidDefinitions)
@@ -390,7 +546,8 @@ public class RecurringRuleServiceTests
                 Version = 1,
                 Unit = RecurringCadenceUnitValues.Day,
                 Interval = 5,
-            }
+            },
+            ResponseLocalizer
         );
         var transaction = AddTransaction(helper, account, new DateOnly(2026, 8, 4), 100);
         transaction.RecurringRule = rule;
@@ -415,7 +572,8 @@ public class RecurringRuleServiceTests
                 Version = 1,
                 Unit = RecurringCadenceUnitValues.Day,
                 Interval = 5,
-            }
+            },
+            ResponseLocalizer
         );
         var firstTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 4), 100);
         var secondTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 8), 100);
@@ -452,7 +610,8 @@ public class RecurringRuleServiceTests
                     Version = 1,
                     Unit = RecurringCadenceUnitValues.Month,
                     Interval = 1,
-                }
+                },
+                ResponseLocalizer
             ),
             StartDate = new DateOnly(2026, 1, 1),
             IsActive = true,
@@ -525,7 +684,8 @@ public class RecurringRuleServiceTests
                 Unit = RecurringCadenceUnitValues.Month,
                 Interval = 2,
                 Mode = RecurringCadenceModeValues.PerUnit,
-            }
+            },
+            ResponseLocalizer
         );
         rule.StartDate = new DateOnly(2026, 8, 1);
         var firstTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 100);
@@ -611,7 +771,8 @@ public class RecurringRuleServiceTests
                 Unit = RecurringCadenceUnitValues.Month,
                 Interval = 2,
                 Mode = RecurringCadenceModeValues.PerUnit,
-            }
+            },
+            ResponseLocalizer
         );
         rule.StartDate = new DateOnly(2026, 8, 1);
         var transaction = new Transaction
@@ -659,7 +820,7 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
-    public async Task MatchTransactionAsync_ShouldMatchTransactionsWithNullFields()
+    public async Task MatchTransactionAsync_ShouldTreatNullAndEmptyFieldsAsEquivalent()
     {
         var helper = new TestHelper();
         var account = AddAccount(helper);
@@ -673,9 +834,9 @@ public class RecurringRuleServiceTests
         {
             Amount = 100,
             Date = new DateOnly(2026, 8, 1),
-            MerchantName = null,
-            Category = null,
-            Subcategory = null,
+            MerchantName = string.Empty,
+            Category = string.Empty,
+            Subcategory = string.Empty,
             Source = TransactionSource.Manual,
             AccountID = account.ID,
             Account = account,
@@ -688,6 +849,30 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public async Task MatchTransactionAsync_ShouldMatchAtDateWindowBoundary()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        AddRule(helper, account);
+        var transaction = new Transaction
+        {
+            Amount = 100,
+            Date = new DateOnly(2026, 8, 6),
+            MerchantName = "Merchant",
+            Category = "Category",
+            Subcategory = "Subcategory",
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+        };
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await service.MatchTransactionAsync(helper.demoUser.Id, transaction);
+
+        transaction.RecurringRuleID.Should().NotBeNull();
+    }
+
+    [Fact]
     public async Task MatchTransactionAsync_ShouldRejectOccurrencesOutsideDateWindow()
     {
         var helper = new TestHelper();
@@ -696,7 +881,7 @@ public class RecurringRuleServiceTests
         var transaction = new Transaction
         {
             Amount = 100,
-            Date = new DateOnly(2026, 8, 10),
+            Date = new DateOnly(2026, 8, 7),
             MerchantName = "Merchant",
             Category = "Category",
             Subcategory = "Subcategory",
@@ -767,7 +952,7 @@ public class RecurringRuleServiceTests
         );
 
         method.Should().NotBeNull();
-        method!.Invoke(null, [rule, transaction]).Should().Be(true);
+        method!.Invoke(null, [rule, transaction, ResponseLocalizer]).Should().Be(true);
     }
 
     [Fact]
@@ -792,7 +977,7 @@ public class RecurringRuleServiceTests
         method.Should().NotBeNull();
         var pairs =
             (IReadOnlyDictionary<Transaction, DateOnly>)
-                method!.Invoke(null, [rule, null, null, null])!;
+                method!.Invoke(null, [rule, ResponseLocalizer, null, null, null])!;
 
         pairs.Should().ContainKey(transaction);
         pairs[transaction].Should().Be(transactionDate);
@@ -834,6 +1019,22 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public async Task ReadRecurringRulesAsync_ShouldReturnNullNextOccurrenceWhenRuleHasEnded()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account);
+        rule.EndDate = new DateOnly(2026, 7, 31);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var response = await CreateService(helper, new DateOnly(2026, 8, 1))
+            .ReadRecurringRulesAsync(helper.demoUser.Id);
+
+        response.Should().ContainSingle();
+        response[0].NextOccurrenceDate.Should().BeNull();
+    }
+
+    [Fact]
     public async Task CreateRecurringRuleAsync_ShouldCreateRuleWithAndWithoutTransaction()
     {
         var helper = new TestHelper();
@@ -866,6 +1067,32 @@ public class RecurringRuleServiceTests
         ruleWithTransaction.MerchantName.Should().Be("Attached");
         ruleWithTransaction.MatchedTransactionCount.Should().Be(1);
         transaction.RecurringRuleID.Should().Be(ruleWithTransaction.ID);
+    }
+
+    [Fact]
+    public async Task CreateRecurringRuleAsync_ShouldCanonicalizeCadenceValues()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var request = CreateRequest(account.ID);
+        request.Cadence = new()
+        {
+            Version = 1,
+            Unit = "mOnTh",
+            Interval = 2,
+            Mode = "perunit",
+        };
+
+        await CreateService(helper, new DateOnly(2026, 8, 1))
+            .CreateRecurringRuleAsync(helper.demoUser.Id, request);
+
+        var response = (
+            await CreateService(helper, new DateOnly(2026, 8, 1))
+                .ReadRecurringRulesAsync(helper.demoUser.Id)
+        ).Single();
+        response.Cadence.Unit.Should().Be(RecurringCadenceUnitValues.Month);
+        response.Cadence.Interval.Should().Be(2);
+        response.Cadence.Mode.Should().Be(RecurringCadenceModeValues.PerUnit);
     }
 
     [Fact]
@@ -1404,7 +1631,8 @@ public class RecurringRuleServiceTests
                     Version = 1,
                     Unit = RecurringCadenceUnitValues.Month,
                     Interval = 1,
-                }
+                },
+                ResponseLocalizer
             ),
             StartDate = new DateOnly(2026, 8, 1),
             IsActive = true,
@@ -1433,7 +1661,8 @@ public class RecurringRuleServiceTests
                     Unit = unit,
                     Interval = interval,
                     Mode = mode,
-                }
+                },
+                ResponseLocalizer
             ),
             StartDate = startDate,
             IsActive = true,

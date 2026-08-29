@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    [Migration("20260826234041_AddRecurringRules")]
-    partial class AddRecurringRules
+    [Migration("20260829165001_RecurringRules")]
+    partial class RecurringRules
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -495,8 +495,7 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Property<string>("Cadence")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("Category")
                         .HasColumnType("text");
@@ -525,7 +524,10 @@ namespace BudgetBoard.Database.Migrations
 
                     b.HasIndex("UserID", "IsActive");
 
-                    b.ToTable("RecurringRule", (string)null);
+                    b.ToTable("RecurringRule", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RecurringRule_Cadence_IsObject", "jsonb_typeof(\"Cadence\") = 'object'");
+                        });
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.RuleParameterBase", b =>

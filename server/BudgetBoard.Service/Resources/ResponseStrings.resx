@@ -487,6 +487,27 @@
     <data name="RecurringRuleInvalidCadenceError" xml:space="preserve">
         <value>Invalid recurring cadence.</value>
     </data>
+    <data name="RecurringCadenceRequiredError" xml:space="preserve">
+        <value>Cadence is required.</value>
+    </data>
+    <data name="RecurringCadenceInvalidDefinitionError" xml:space="preserve">
+        <value>Cadence must be a valid recurrence definition.</value>
+    </data>
+    <data name="RecurringCadenceUnsupportedVersionError" xml:space="preserve">
+        <value>Cadence version is not supported.</value>
+    </data>
+    <data name="RecurringCadenceUnsupportedUnitError" xml:space="preserve">
+        <value>Cadence unit is not supported.</value>
+    </data>
+    <data name="RecurringCadenceInvalidIntervalError" xml:space="preserve">
+        <value>Cadence interval must be positive.</value>
+    </data>
+    <data name="RecurringCadenceUnsupportedModeError" xml:space="preserve">
+        <value>Cadence mode is not supported.</value>
+    </data>
+    <data name="RecurringCadenceMaximumOccurrencesError" xml:space="preserve">
+        <value>Cadence occurrences per unit exceed the supported maximum.</value>
+    </data>
     <data name="RecurringRuleNotFoundError" xml:space="preserve">
         <value>The recurring rule you are trying to access does not exist.</value>
     </data>

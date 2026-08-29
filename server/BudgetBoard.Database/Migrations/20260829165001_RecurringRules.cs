@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BudgetBoard.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class AddRecurringRules : Migration
+    public partial class RecurringRules : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,7 +27,7 @@ namespace BudgetBoard.Database.Migrations
                     MerchantName = table.Column<string>(type: "text", nullable: true),
                     Category = table.Column<string>(type: "text", nullable: true),
                     Subcategory = table.Column<string>(type: "text", nullable: true),
-                    Cadence = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Cadence = table.Column<string>(type: "jsonb", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
@@ -37,6 +37,7 @@ namespace BudgetBoard.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RecurringRule", x => x.ID);
+                    table.CheckConstraint("CK_RecurringRule_Cadence_IsObject", "jsonb_typeof(\"Cadence\") = 'object'");
                     table.ForeignKey(
                         name: "FK_RecurringRule_Account_AccountID",
                         column: x => x.AccountID,

@@ -61,7 +61,7 @@ public class RecurringRuleService(
             MerchantName = request.MerchantName,
             Category = request.Category,
             Subcategory = request.Subcategory,
-            Cadence = RecurringCadenceSerializer.Serialize(request.Cadence),
+            Cadence = RecurringCadenceSerializer.Serialize(request.Cadence, responseLocalizer),
             StartDate = request.StartDate,
             EndDate = request.EndDate,
             IsActive = request.IsActive,
@@ -88,7 +88,8 @@ public class RecurringRuleService(
                 .RecurringRules.OrderBy(rule => rule.StartDate)
                 .ThenBy(rule => rule.MerchantName)
                 .Select(rule =>
-                    (IRecurringRuleResponse)new RecurringRuleResponse(rule, nowProvider.Today)
+                    (IRecurringRuleResponse)
+                        new RecurringRuleResponse(rule, nowProvider.Today, responseLocalizer)
                 ),
         ];
     }
@@ -106,7 +107,7 @@ public class RecurringRuleService(
         rule.MerchantName = request.MerchantName;
         rule.Category = request.Category;
         rule.Subcategory = request.Subcategory;
-        rule.Cadence = RecurringCadenceSerializer.Serialize(request.Cadence);
+        rule.Cadence = RecurringCadenceSerializer.Serialize(request.Cadence, responseLocalizer);
         rule.StartDate = request.StartDate;
         rule.EndDate = request.EndDate;
         rule.IsActive = request.IsActive;
@@ -161,11 +162,17 @@ public class RecurringRuleService(
             var dates = RecurringRuleOccurrenceCalculator.GetOccurrences(
                 rule,
                 rangeStart,
-                monthEnd
+                monthEnd,
+                responseLocalizer
             );
             var amount = GetForecastAmount(rule);
 
-            var pairedOccurrences = GetPairedOccurrences(rule, rangeStart, monthEnd);
+            var pairedOccurrences = GetPairedOccurrences(
+                rule,
+                responseLocalizer,
+                rangeStart,
+                monthEnd
+            );
             foreach (var date in dates)
             {
                 if (pairedOccurrences.Values.Contains(date))
@@ -216,7 +223,9 @@ public class RecurringRuleService(
             .Where(rule => !IsExcludedBudgetCategory(rule.Category))
             .ToList();
 
-        var matchingRules = rules.Where(rule => IsTransactionMatch(rule, transaction)).ToList();
+        var matchingRules = rules
+            .Where(rule => IsTransactionMatch(rule, transaction, responseLocalizer))
+            .ToList();
         if (matchingRules.Count != 1)
         {
             if (matchingRules.Count > 1)
@@ -319,7 +328,11 @@ public class RecurringRuleService(
             ?? throw new BudgetBoardServiceException(responseLocalizer["TransactionNotFoundError"]);
     }
 
-    private static bool IsTransactionMatch(RecurringRule rule, Transaction transaction)
+    private static bool IsTransactionMatch(
+        RecurringRule rule,
+        Transaction transaction,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
     {
         if (
             !AreEqual(rule.MerchantName, transaction.MerchantName)
@@ -333,15 +346,17 @@ public class RecurringRuleService(
 
         return GetPairedOccurrences(
                 rule,
+            responseLocalizer,
                 transaction.Date.AddDays(-MatchDateWindowDays),
                 transaction.Date.AddDays(MatchDateWindowDays),
-                transaction
+            transaction
             )
             .ContainsKey(transaction);
     }
 
     private static IReadOnlyDictionary<Transaction, DateOnly> GetPairedOccurrences(
         RecurringRule rule,
+        IStringLocalizer<ResponseStrings> responseLocalizer,
         DateOnly? requestedRangeStart = null,
         DateOnly? requestedRangeEnd = null,
         Transaction? additionalTransaction = null
@@ -373,7 +388,12 @@ public class RecurringRuleService(
             Math.Min(DateOnly.MaxValue.DayNumber, latestDate.DayNumber + MatchDateWindowDays)
         );
         var occurrences = RecurringRuleOccurrenceCalculator
-            .GetOccurrences(rule, occurrenceRangeStart, occurrenceRangeEnd)
+            .GetOccurrences(
+                rule,
+                occurrenceRangeStart,
+                occurrenceRangeEnd,
+                responseLocalizer
+            )
             .ToHashSet();
         var remainingTransactions = transactions.ToHashSet();
         var remainingOccurrences = occurrences.ToHashSet();
@@ -503,7 +523,7 @@ public class RecurringRuleService(
     {
         try
         {
-            RecurringCadenceSerializer.Validate(cadence);
+            RecurringCadenceSerializer.Validate(cadence, responseLocalizer);
         }
         catch (RecurringCadenceValidationException)
         {

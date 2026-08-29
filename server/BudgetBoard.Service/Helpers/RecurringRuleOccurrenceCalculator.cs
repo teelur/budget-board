@@ -1,5 +1,7 @@
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.Service.Helpers;
 
@@ -8,7 +10,8 @@ public static class RecurringRuleOccurrenceCalculator
     public static IReadOnlyList<DateOnly> GetOccurrences(
         RecurringRule rule,
         DateOnly rangeStart,
-        DateOnly rangeEnd
+        DateOnly rangeEnd,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         if (rangeEnd < rangeStart || !rule.IsActive || rule.EndDate < rangeStart)
@@ -23,15 +26,16 @@ public static class RecurringRuleOccurrenceCalculator
             return [];
         }
 
-        var cadence = RecurringCadenceSerializer.Deserialize(rule.Cadence);
-        return GetOccurrences(rule.StartDate, start, end, cadence);
+        var cadence = RecurringCadenceSerializer.Deserialize(rule.Cadence, responseLocalizer);
+        return GetOccurrences(rule.StartDate, start, end, cadence, responseLocalizer);
     }
 
     internal static IReadOnlyList<DateOnly> GetOccurrences(
         DateOnly anchor,
         DateOnly start,
         DateOnly end,
-        RecurringCadence cadence
+        RecurringCadence cadence,
+        IStringLocalizer<ResponseStrings> responseLocalizer
     )
     {
         var isPerUnit = cadence.Mode == RecurringCadenceModeValues.PerUnit;
@@ -52,7 +56,9 @@ public static class RecurringRuleOccurrenceCalculator
             RecurringCadenceUnitValues.Year => isPerUnit
                 ? GetYearlyPerUnitOccurrences(anchor, start, end, cadence.Interval)
                 : GetYearlyOccurrences(anchor, start, end, cadence.Interval),
-            _ => throw new RecurringCadenceValidationException("Cadence unit is not supported."),
+            _ => throw new RecurringCadenceValidationException(
+                responseLocalizer["RecurringCadenceUnsupportedUnitError"]
+            ),
         };
 
         return occurrences.Distinct().OrderBy(date => date).ToList();

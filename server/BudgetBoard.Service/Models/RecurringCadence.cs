@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BudgetBoard.Service.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.Service.Models;
 
@@ -46,17 +48,24 @@ public static class RecurringCadenceSerializer
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
     };
 
-    public static string Serialize(RecurringCadence cadence)
+    public static string Serialize(
+        RecurringCadence cadence,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
     {
-        Validate(cadence);
-        return JsonSerializer.Serialize(cadence, SerializerOptions);
+        return JsonSerializer.Serialize(Normalize(cadence, responseLocalizer), SerializerOptions);
     }
 
-    public static RecurringCadence Deserialize(string cadence)
+    public static RecurringCadence Deserialize(
+        string cadence,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
     {
         if (string.IsNullOrWhiteSpace(cadence))
         {
-            throw new RecurringCadenceValidationException("Cadence is required.");
+            throw new RecurringCadenceValidationException(
+                responseLocalizer["RecurringCadenceRequiredError"]
+            );
         }
 
         try
@@ -65,59 +74,62 @@ public static class RecurringCadenceSerializer
                 cadence,
                 SerializerOptions
             );
-            Validate(definition);
-            return definition!;
+            return Normalize(definition, responseLocalizer);
         }
         catch (JsonException exception)
         {
             throw new RecurringCadenceValidationException(
-                "Cadence must be a valid recurrence definition.",
+                responseLocalizer["RecurringCadenceInvalidDefinitionError"],
                 exception
             );
         }
     }
 
-    public static void Validate(RecurringCadence? cadence)
+    public static void Validate(
+        RecurringCadence? cadence,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
     {
         if (cadence is null)
         {
-            throw new RecurringCadenceValidationException("Cadence is required.");
+            throw new RecurringCadenceValidationException(
+                responseLocalizer["RecurringCadenceRequiredError"]
+            );
         }
 
         if (cadence.Version != 1)
         {
-            throw new RecurringCadenceValidationException("Cadence version is not supported.");
+            throw new RecurringCadenceValidationException(
+                responseLocalizer["RecurringCadenceUnsupportedVersionError"]
+            );
         }
 
-        if (
-            cadence.Unit
-            is not RecurringCadenceUnitValues.Day
-                and not RecurringCadenceUnitValues.Week
-                and not RecurringCadenceUnitValues.Month
-                and not RecurringCadenceUnitValues.Year
-        )
+        if (GetCanonicalUnit(cadence.Unit) is null)
         {
-            throw new RecurringCadenceValidationException("Cadence unit is not supported.");
+            throw new RecurringCadenceValidationException(
+                responseLocalizer["RecurringCadenceUnsupportedUnitError"]
+            );
         }
 
         if (cadence.Interval <= 0)
         {
-            throw new RecurringCadenceValidationException("Cadence interval must be positive.");
+            throw new RecurringCadenceValidationException(
+                responseLocalizer["RecurringCadenceInvalidIntervalError"]
+            );
         }
 
-        var mode = cadence.Mode ?? RecurringCadenceModeValues.Interval;
-        if (
-            mode
-            is not RecurringCadenceModeValues.Interval
-                and not RecurringCadenceModeValues.PerUnit
-        )
-        {
-            throw new RecurringCadenceValidationException("Cadence mode is not supported.");
-        }
-
+        var mode =
+            (
+                cadence.Mode is null
+                    ? RecurringCadenceModeValues.Interval
+                    : GetCanonicalMode(cadence.Mode)
+            )
+            ?? throw new RecurringCadenceValidationException(
+                responseLocalizer["RecurringCadenceUnsupportedModeError"]
+            );
         if (mode == RecurringCadenceModeValues.PerUnit)
         {
-            var maximumOccurrences = cadence.Unit switch
+            var maximumOccurrences = GetCanonicalUnit(cadence.Unit) switch
             {
                 RecurringCadenceUnitValues.Day => 1,
                 RecurringCadenceUnitValues.Week => 7,
@@ -129,9 +141,54 @@ public static class RecurringCadenceSerializer
             if (cadence.Interval > maximumOccurrences)
             {
                 throw new RecurringCadenceValidationException(
-                    "Cadence occurrences per unit exceed the supported maximum."
+                    responseLocalizer["RecurringCadenceMaximumOccurrencesError"]
                 );
             }
         }
     }
+
+    public static RecurringCadence CreateDefault() =>
+        new()
+        {
+            Version = 1,
+            Unit = RecurringCadenceUnitValues.Month,
+            Interval = 1,
+        };
+
+    private static RecurringCadence Normalize(
+        RecurringCadence? cadence,
+        IStringLocalizer<ResponseStrings> responseLocalizer
+    )
+    {
+        Validate(cadence, responseLocalizer);
+
+        var mode = cadence!.Mode is null ? null : GetCanonicalMode(cadence.Mode);
+        return new RecurringCadence
+        {
+            Version = cadence.Version,
+            Unit = GetCanonicalUnit(cadence.Unit),
+            Interval = cadence.Interval,
+            Mode = mode == RecurringCadenceModeValues.PerUnit ? mode : null,
+        };
+    }
+
+    private static string? GetCanonicalUnit(string? unit) =>
+        unit is null
+            ? null
+            : new[]
+            {
+                RecurringCadenceUnitValues.Day,
+                RecurringCadenceUnitValues.Week,
+                RecurringCadenceUnitValues.Month,
+                RecurringCadenceUnitValues.Year,
+            }.FirstOrDefault(value =>
+                string.Equals(value, unit, StringComparison.OrdinalIgnoreCase)
+            );
+
+    private static string? GetCanonicalMode(string mode) =>
+        new[]
+        {
+            RecurringCadenceModeValues.Interval,
+            RecurringCadenceModeValues.PerUnit,
+        }.FirstOrDefault(value => string.Equals(value, mode, StringComparison.OrdinalIgnoreCase));
 }
