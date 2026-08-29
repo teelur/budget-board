@@ -24,24 +24,34 @@ public static class RecurringRuleOccurrenceCalculator
         }
 
         var cadence = RecurringCadenceSerializer.Deserialize(rule.Cadence);
+        return GetOccurrences(rule.StartDate, start, end, cadence);
+    }
+
+    internal static IReadOnlyList<DateOnly> GetOccurrences(
+        DateOnly anchor,
+        DateOnly start,
+        DateOnly end,
+        RecurringCadence cadence
+    )
+    {
         var isPerUnit = cadence.Mode == RecurringCadenceModeValues.PerUnit;
         var occurrences = cadence.Unit switch
         {
             RecurringCadenceUnitValues.Day => GetDayOccurrences(
-                rule.StartDate,
+                anchor,
                 start,
                 end,
                 isPerUnit ? 1 : cadence.Interval
             ),
             RecurringCadenceUnitValues.Week => isPerUnit
-                ? GetWeeklyPerUnitOccurrences(rule.StartDate, start, end, cadence.Interval)
-                : GetDayOccurrences(rule.StartDate, start, end, (long)cadence.Interval * 7),
+                ? GetWeeklyPerUnitOccurrences(anchor, start, end, cadence.Interval)
+                : GetDayOccurrences(anchor, start, end, (long)cadence.Interval * 7),
             RecurringCadenceUnitValues.Month => isPerUnit
-                ? GetMonthlyPerUnitOccurrences(rule.StartDate, start, end, cadence.Interval)
-                : GetMonthlyOccurrences(rule.StartDate, start, end, cadence.Interval),
+                ? GetMonthlyPerUnitOccurrences(anchor, start, end, cadence.Interval)
+                : GetMonthlyOccurrences(anchor, start, end, cadence.Interval),
             RecurringCadenceUnitValues.Year => isPerUnit
-                ? GetYearlyPerUnitOccurrences(rule.StartDate, start, end, cadence.Interval)
-                : GetYearlyOccurrences(rule.StartDate, start, end, cadence.Interval),
+                ? GetYearlyPerUnitOccurrences(anchor, start, end, cadence.Interval)
+                : GetYearlyOccurrences(anchor, start, end, cadence.Interval),
             _ => throw new RecurringCadenceValidationException("Cadence unit is not supported."),
         };
 
@@ -95,7 +105,9 @@ public static class RecurringRuleOccurrenceCalculator
 
             for (var occurrenceIndex = 0; occurrenceIndex < occurrencesPerMonth; occurrenceIndex++)
             {
-                var day = (anchorDay + occurrenceIndex * daysInMonth / occurrencesPerMonth) % daysInMonth + 1;
+                var day =
+                    (anchorDay + occurrenceIndex * daysInMonth / occurrencesPerMonth) % daysInMonth
+                    + 1;
                 var occurrence = new DateOnly(month.Year, month.Month, day);
                 if (occurrence >= start && occurrence <= end)
                 {
@@ -129,7 +141,8 @@ public static class RecurringRuleOccurrenceCalculator
 
             for (var occurrenceIndex = 0; occurrenceIndex < occurrencesPerYear; occurrenceIndex++)
             {
-                var dayOfYear = (anchorDay + occurrenceIndex * daysInYear / occurrencesPerYear) % daysInYear;
+                var dayOfYear =
+                    (anchorDay + occurrenceIndex * daysInYear / occurrencesPerYear) % daysInYear;
                 var occurrence = new DateOnly(year, 1, 1).AddDays(dayOfYear);
                 if (occurrence >= start && occurrence <= end)
                 {
@@ -174,7 +187,8 @@ public static class RecurringRuleOccurrenceCalculator
         var startMonth = GetMonthIndex(start);
         var endMonth = GetMonthIndex(end);
         var monthsSinceAnchor = startMonth - anchorMonth;
-        var monthsUntilOccurrence = (intervalMonths - (monthsSinceAnchor % intervalMonths)) % intervalMonths;
+        var monthsUntilOccurrence =
+            (intervalMonths - (monthsSinceAnchor % intervalMonths)) % intervalMonths;
         var monthIndex = startMonth + monthsUntilOccurrence;
 
         while (monthIndex <= endMonth)
@@ -201,7 +215,8 @@ public static class RecurringRuleOccurrenceCalculator
     {
         var occurrences = new List<DateOnly>();
         var yearsSinceAnchor = start.Year - anchor.Year;
-        var yearsUntilOccurrence = (intervalYears - (yearsSinceAnchor % intervalYears)) % intervalYears;
+        var yearsUntilOccurrence =
+            (intervalYears - (yearsSinceAnchor % intervalYears)) % intervalYears;
         var year = (long)start.Year + yearsUntilOccurrence;
         while (year <= end.Year)
         {

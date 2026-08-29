@@ -14,6 +14,7 @@ namespace BudgetBoard.IntegrationTests;
 [Collection("IntegrationTests")]
 public class RecurringRuleServiceTests
 {
+    #region GetOccurrences
     [Fact]
     public void GetOccurrences_ShouldHonorCadenceAnchorsAndMonthBoundaries()
     {
@@ -98,6 +99,12 @@ public class RecurringRuleServiceTests
     [Fact]
     public void GetOccurrences_ShouldSupportMultipleOccurrencesPerUnit()
     {
+        var dailyRule = CreateRule(
+            RecurringCadenceUnitValues.Day,
+            1,
+            new DateOnly(2026, 8, 1),
+            RecurringCadenceModeValues.PerUnit
+        );
         var twiceWeeklyRule = CreateRule(
             RecurringCadenceUnitValues.Week,
             2,
@@ -117,6 +124,10 @@ public class RecurringRuleServiceTests
             RecurringCadenceModeValues.PerUnit
         );
 
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(dailyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 2))
+            .Should()
+            .Equal(new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 2));
         RecurringRuleOccurrenceCalculator
             .GetOccurrences(twiceWeeklyRule, new DateOnly(2026, 8, 3), new DateOnly(2026, 8, 17))
             .Should()
@@ -150,6 +161,118 @@ public class RecurringRuleServiceTests
             );
     }
 
+    [Fact]
+    public void GetOccurrences_ShouldReturnEmptyWhenRangeIsReversed()
+    {
+        var rule = CreateRule(RecurringCadenceUnitValues.Day, 1, new DateOnly(2026, 8, 1));
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(rule, new DateOnly(2026, 8, 10), new DateOnly(2026, 8, 1))
+            .Should()
+            .BeEmpty();
+    }
+
+    [Fact]
+    public void GetOccurrences_ShouldReturnEmptyForInactiveRules()
+    {
+        var rule = CreateRule(RecurringCadenceUnitValues.Day, 1, new DateOnly(2026, 8, 1));
+        rule.IsActive = false;
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(rule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 10))
+            .Should()
+            .BeEmpty();
+    }
+
+    [Fact]
+    public void GetOccurrences_ShouldReturnEmptyWhenRuleEndedBeforeRange()
+    {
+        var rule = CreateRule(RecurringCadenceUnitValues.Day, 1, new DateOnly(2026, 7, 1));
+        rule.EndDate = new DateOnly(2026, 7, 31);
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(rule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 10))
+            .Should()
+            .BeEmpty();
+    }
+
+    [Fact]
+    public void GetOccurrences_ShouldReturnEmptyWhenRuleStartsAfterRange()
+    {
+        var rule = CreateRule(RecurringCadenceUnitValues.Day, 1, new DateOnly(2026, 9, 1));
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(rule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31))
+            .Should()
+            .BeEmpty();
+    }
+
+    [Fact]
+    public void GetOccurrences_ShouldRejectUnsupportedUnitInDispatch()
+    {
+        var act = () =>
+            RecurringRuleOccurrenceCalculator.GetOccurrences(
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 31),
+                new RecurringCadence
+                {
+                    Version = 1,
+                    Unit = "Fortnight",
+                    Interval = 1,
+                }
+            );
+
+        act.Should()
+            .Throw<RecurringCadenceValidationException>()
+            .WithMessage("Cadence unit is not supported.");
+    }
+
+    [Fact]
+    public void GetOccurrences_ShouldFilterWeeklyPerUnitOccurrencesToRange()
+    {
+        var rule = CreateRule(
+            RecurringCadenceUnitValues.Week,
+            2,
+            new DateOnly(2026, 8, 3),
+            RecurringCadenceModeValues.PerUnit
+        );
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(rule, new DateOnly(2026, 8, 4), new DateOnly(2026, 8, 6))
+            .Should()
+            .Equal(new DateOnly(2026, 8, 6));
+    }
+
+    [Fact]
+    public void GetOccurrences_ShouldFilterYearlyPerUnitOccurrencesToRange()
+    {
+        var rule = CreateRule(
+            RecurringCadenceUnitValues.Year,
+            3,
+            new DateOnly(2024, 2, 29),
+            RecurringCadenceModeValues.PerUnit
+        );
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(rule, new DateOnly(2024, 3, 1), new DateOnly(2024, 9, 1))
+            .Should()
+            .Equal(new DateOnly(2024, 6, 30));
+    }
+
+    [Fact]
+    public void GetOccurrences_ShouldFilterYearlyOccurrencesToRange()
+    {
+        var rule = CreateRule(RecurringCadenceUnitValues.Year, 1, new DateOnly(2024, 2, 29));
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(rule, new DateOnly(2027, 3, 1), new DateOnly(2028, 2, 29))
+            .Should()
+            .Equal(new DateOnly(2028, 2, 29));
+    }
+
+    #endregion
+    #region RecurringCadenceSerializer
     [Fact]
     public void RecurringCadenceSerializer_ShouldValidateAndRoundTripV1Definition()
     {
@@ -253,6 +376,8 @@ public class RecurringRuleServiceTests
         }
     }
 
+    #endregion
+    #region ReadForecastAsync
     [Fact]
     public async Task ReadForecastAsync_ShouldSuppressOnlyTheNearestOccurrence()
     {
@@ -437,6 +562,8 @@ public class RecurringRuleServiceTests
         forecast[0].AccountName.Should().BeEmpty();
     }
 
+    #endregion
+    #region MatchTransactionAsync
     [Fact]
     public async Task MatchTransactionAsync_ShouldMatchNormalizedFieldsWithinAmountTolerance()
     {
@@ -501,10 +628,8 @@ public class RecurringRuleServiceTests
         helper.UserDataContext.Transactions.Add(transaction);
         await helper.UserDataContext.SaveChangesAsync();
 
-        await CreateService(helper, new DateOnly(2026, 8, 1)).MatchTransactionAsync(
-            helper.demoUser.Id,
-            transaction
-        );
+        await CreateService(helper, new DateOnly(2026, 8, 1))
+            .MatchTransactionAsync(helper.demoUser.Id, transaction);
 
         transaction.RecurringRuleID.Should().Be(rule.ID);
     }
@@ -614,6 +739,8 @@ public class RecurringRuleServiceTests
         transaction.RecurringRuleID.Should().BeNull();
     }
 
+    #endregion
+    #region MatchingHelpers
     [Fact]
     public void IsTransactionMatch_ShouldIgnoreTheTransactionBeingMatched()
     {
@@ -643,6 +770,36 @@ public class RecurringRuleServiceTests
         method!.Invoke(null, [rule, transaction]).Should().Be(true);
     }
 
+    [Fact]
+    public void GetPairedOccurrences_ShouldInferRangeFromTransactionsWhenRangeIsOmitted()
+    {
+        var transactionDate = new DateOnly(2026, 8, 10);
+        var rule = CreateRule(RecurringCadenceUnitValues.Day, 1, transactionDate);
+        var transaction = new Transaction
+        {
+            Amount = 100,
+            Date = transactionDate,
+            Source = TransactionSource.Manual,
+            AccountID = rule.AccountID,
+        };
+        rule.Transactions.Add(transaction);
+
+        var method = typeof(RecurringRuleService).GetMethod(
+            "GetPairedOccurrences",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
+        );
+
+        method.Should().NotBeNull();
+        var pairs =
+            (IReadOnlyDictionary<Transaction, DateOnly>)
+                method!.Invoke(null, [rule, null, null, null])!;
+
+        pairs.Should().ContainKey(transaction);
+        pairs[transaction].Should().Be(transactionDate);
+    }
+
+    #endregion
+    #region RecurringRuleCrud
     [Fact]
     public async Task CreateRecurringRuleAsync_ShouldRejectAMissingStartDate()
     {
@@ -876,6 +1033,8 @@ public class RecurringRuleServiceTests
         );
     }
 
+    #endregion
+    #region AdditionalForecastScenarios
     [Fact]
     public async Task ReadForecastAsync_ShouldFilterRulesAndCalculateAutomaticAmounts()
     {
@@ -942,6 +1101,35 @@ public class RecurringRuleServiceTests
             .NotBeEmpty();
     }
 
+    [Fact]
+    public async Task ReadForecastAsync_ShouldKeepOccurrenceWhenNearestTransactionsAreAmbiguous()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account);
+        rule.StartDate = new DateOnly(2026, 8, 10);
+        rule.Transactions =
+        [
+            AddTransaction(helper, account, new DateOnly(2026, 8, 8), 100),
+            AddTransaction(helper, account, new DateOnly(2026, 8, 12), 100),
+        ];
+        await helper.UserDataContext.SaveChangesAsync();
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        var forecast = await service.ReadForecastAsync(
+            helper.demoUser.Id,
+            new DateOnly(2026, 8, 1)
+        );
+
+        forecast
+            .Should()
+            .ContainSingle(item =>
+                item.RuleID == rule.ID && item.Date == new DateOnly(2026, 8, 10)
+            );
+    }
+
+    #endregion
+    #region AdditionalTransactionMatching
     [Fact]
     public async Task MatchTransactionAsync_ShouldSkipExcludedTransactionsAndUnmatchedRules()
     {
@@ -1042,6 +1230,8 @@ public class RecurringRuleServiceTests
         unmatchedTransaction.RecurringRuleID.Should().BeNull();
     }
 
+    #endregion
+    #region AssignAndUnassignTransactionAsync
     [Fact]
     public async Task AssignAndUnassignTransactionAsync_ShouldManageAssignmentsAndRejectInvalidReferences()
     {
@@ -1097,6 +1287,8 @@ public class RecurringRuleServiceTests
             "TransactionNotFoundError"
         );
     }
+
+    #endregion
 
     private static RecurringRuleService CreateService(TestHelper helper, DateOnly today)
     {
