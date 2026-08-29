@@ -5,6 +5,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 interface SelectLastNMonthsProps {
   monthButtons: number[];
   setSelectedMonths: React.Dispatch<React.SetStateAction<Date[]>>;
+  onSelectMonths?: () => void;
   showAllButton?: boolean;
 }
 
@@ -27,6 +28,7 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
               );
             }
             props.setSelectedMonths(newMonths);
+            props.onSelectMonths?.();
           }}
         >
           {t("last_n_months", { count: months })}

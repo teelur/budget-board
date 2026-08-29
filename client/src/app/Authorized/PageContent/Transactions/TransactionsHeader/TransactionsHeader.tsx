@@ -1,6 +1,7 @@
 import classes from "./TransactionsHeader.module.css";
 
 import { Button, Collapse, Flex, Group, Stack } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { FilterIcon } from "lucide-react";
 import React from "react";
 import SortMenu from "./SortMenu/SortMenu";
@@ -21,6 +22,8 @@ import {
   sortTransactions,
 } from "~/helpers/transactions";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { getMonthsInDateRange } from "~/helpers/datetime";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface TransactionsHeaderProps {
   sort: Sorts;
@@ -41,11 +44,52 @@ const TransactionsHeader = (
   const { transactionFilters, isFiltersPanelOpen, toggleFiltersPanel } =
     useTransactionFilters();
   const { allTransactionCategories } = useTransactionCategories();
+  const { dayjs } = useLocale();
+  const [canSelectMultiple, { toggle, open }] = useDisclosure(false);
+
+  const toggleSelectMultiple = () => {
+    if (canSelectMultiple) {
+      if (props.selectedMonths.length === 0) {
+        props.setSelectedMonths([dayjs().startOf("month").toDate()]);
+      } else {
+        props.setSelectedMonths([
+          new Date(
+            Math.max(...props.selectedMonths.map((date) => date.getTime())),
+          ),
+        ]);
+      }
+    }
+
+    toggle();
+  };
 
   const timeToMonthlyTotalsMap = React.useMemo(
     () => buildTimeToMonthlyTotalsMap(props.selectedMonths, props.transactions),
     [props.selectedMonths, props.transactions],
   );
+
+  React.useEffect(() => {
+    const [startDate, endDate] = transactionFilters.dateRange;
+
+    if (startDate && endDate) {
+      const monthsInDateRange = getMonthsInDateRange(startDate, endDate);
+
+      props.setSelectedMonths((selectedMonths) => {
+        const isSelectionUnchanged =
+          selectedMonths.length === monthsInDateRange.length &&
+          selectedMonths.every(
+            (month, index) =>
+              month.getTime() === monthsInDateRange[index]?.getTime(),
+          );
+
+        return isSelectionUnchanged ? selectedMonths : monthsInDateRange;
+      });
+
+      if (monthsInDateRange.length > 1) {
+        open();
+      }
+    }
+  }, [transactionFilters.dateRange, props.setSelectedMonths, open]);
 
   React.useEffect(() => {
     if (props.isQueryPending) {
@@ -99,7 +143,7 @@ const TransactionsHeader = (
         setSelectedDates={props.setSelectedMonths}
         timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
         isPending={props.isQueryPending}
-        allowSelectMultiple
+        allowSelectMultiple={canSelectMultiple}
         allowFutureMonths
       />
       <Group w="100%" justify="space-between" align="center" wrap="wrap">
@@ -109,10 +153,21 @@ const TransactionsHeader = (
           sortDirection={props.sortDirection}
           setSortDirection={props.setSortDirection}
         />
-        <SelectLastNMonths
-          monthButtons={[3, 6, 12]}
-          setSelectedMonths={props.setSelectedMonths}
-        />
+        <Group gap="0.5rem">
+          <Button
+            size="compact-sm"
+            onClick={toggleSelectMultiple}
+            variant="outline"
+            color={canSelectMultiple ? "var(--button-color-confirm)" : ""}
+          >
+            {t("select_multiple")}
+          </Button>
+          <SelectLastNMonths
+            monthButtons={[3, 6, 12]}
+            setSelectedMonths={props.setSelectedMonths}
+            onSelectMonths={open}
+          />
+        </Group>
       </Group>
     </Stack>
   );
