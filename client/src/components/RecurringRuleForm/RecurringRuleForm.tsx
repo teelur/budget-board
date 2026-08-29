@@ -82,10 +82,20 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
   const cadenceIntervalField = useField<number | string>({
     initialValue:
       sourceRule?.cadence.interval ?? defaultRecurringCadence.interval,
-    validate: (value) =>
-      Number.isInteger(Number(value)) && Number(value) > 0
-        ? null
-        : t("recurring_interval_required"),
+    validate: (value) => {
+      const interval = Number(value);
+      if (!Number.isInteger(interval) || interval <= 0) {
+        return t("recurring_interval_required");
+      }
+
+      const maximum = getRecurringCadenceIntervalMaximum(
+        cadenceUnitField.getValue(),
+        cadenceModeField.getValue(),
+      );
+      return maximum !== undefined && interval > maximum
+        ? t("recurring_cadence_maximum", { maximum })
+        : null;
+    },
   });
   const startDateField = useField<Date | null>({
     initialValue: dayjs(
@@ -247,6 +257,12 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
           },
         ]}
         {...cadenceModeField.getInputProps()}
+        onChange={(value) => {
+          if (value) {
+            cadenceModeField.setValue(value as RecurringCadenceMode);
+            cadenceIntervalField.validate();
+          }
+        }}
         elevation={0}
       />
       <Group grow align="flex-start">
@@ -271,6 +287,12 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
             },
           ]}
           {...cadenceUnitField.getInputProps()}
+          onChange={(value) => {
+            if (value) {
+              cadenceUnitField.setValue(value as RecurringCadenceUnit);
+              cadenceIntervalField.validate();
+            }
+          }}
           elevation={0}
         />
         <NumberInput

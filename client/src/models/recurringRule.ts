@@ -21,6 +21,7 @@ export interface IRecurringCadence {
   unit: RecurringCadenceUnit;
   interval: number;
   mode?: RecurringCadenceMode;
+  unsupported?: boolean;
 }
 
 export type RecurringCadence = IRecurringCadence;

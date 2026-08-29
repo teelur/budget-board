@@ -38,6 +38,7 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
   const deleteMutation = useDeleteRecurringRuleMutation();
   const category =
     props.rule.subcategory ?? props.rule.category ?? t("any_category");
+  const hasUnsupportedCadence = props.rule.cadence.unsupported === true;
 
   return (
     <Card elevation={1}>
@@ -84,9 +85,16 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
           )}
         </Stack>
         <Group gap="0.25rem" wrap="nowrap">
-          <Tooltip label={t("edit")}>
+          <Tooltip
+            label={
+              hasUnsupportedCadence
+                ? t("recurring_cadence_unsupported_edit")
+                : t("edit")
+            }
+          >
             <ActionIcon
               aria-label={t("edit")}
+              disabled={hasUnsupportedCadence}
               onClick={() => props.onEdit(props.rule)}
             >
               <PencilIcon size="1rem" />

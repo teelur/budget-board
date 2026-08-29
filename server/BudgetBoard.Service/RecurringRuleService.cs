@@ -346,10 +346,10 @@ public class RecurringRuleService(
 
         return GetPairedOccurrences(
                 rule,
-            responseLocalizer,
+                responseLocalizer,
                 transaction.Date.AddDays(-MatchDateWindowDays),
                 transaction.Date.AddDays(MatchDateWindowDays),
-            transaction
+                transaction
             )
             .ContainsKey(transaction);
     }
@@ -388,12 +388,7 @@ public class RecurringRuleService(
             Math.Min(DateOnly.MaxValue.DayNumber, latestDate.DayNumber + MatchDateWindowDays)
         );
         var occurrences = RecurringRuleOccurrenceCalculator
-            .GetOccurrences(
-                rule,
-                occurrenceRangeStart,
-                occurrenceRangeEnd,
-                responseLocalizer
-            )
+            .GetOccurrences(rule, occurrenceRangeStart, occurrenceRangeEnd, responseLocalizer)
             .ToHashSet();
         var remainingTransactions = transactions.ToHashSet();
         var remainingOccurrences = occurrences.ToHashSet();

@@ -19,6 +19,11 @@ const LEGACY_CADENCE_MAP: Record<string, IRecurringCadence> = {
   yearly: { version: 1, unit: RecurringCadenceUnits.Year, interval: 1 },
 };
 
+const createUnsupportedRecurringCadence = (): IRecurringCadence => ({
+  ...defaultRecurringCadence,
+  unsupported: true,
+});
+
 export const createRecurringCadence = (
   unit: RecurringCadenceUnit,
   interval: number,
@@ -63,15 +68,15 @@ export const normalizeRecurringCadence = (
       try {
         return normalizeRecurringCadence(JSON.parse(cadence));
       } catch {
-        return defaultRecurringCadence;
+        return createUnsupportedRecurringCadence();
       }
     }
 
-    return defaultRecurringCadence;
+    return createUnsupportedRecurringCadence();
   }
 
   if (typeof cadence !== "object" || cadence === null) {
-    return defaultRecurringCadence;
+    return createUnsupportedRecurringCadence();
   }
 
   const rawCadence = cadence as Record<string, unknown>;
@@ -91,7 +96,7 @@ export const normalizeRecurringCadence = (
       (candidate) => candidate.toLowerCase() === rawMode.toLowerCase(),
     );
     if (!matchingMode) {
-      return defaultRecurringCadence;
+      return createUnsupportedRecurringCadence();
     }
     mode = matchingMode;
   }
@@ -109,7 +114,7 @@ export const normalizeRecurringCadence = (
     return createRecurringCadence(unit, interval, mode);
   }
 
-  return defaultRecurringCadence;
+  return createUnsupportedRecurringCadence();
 };
 
 export const getRecurringCadenceLabel = (
@@ -117,6 +122,10 @@ export const getRecurringCadenceLabel = (
   translate: TFunction,
 ): string => {
   const normalizedCadence = normalizeRecurringCadence(cadence);
+  if (normalizedCadence.unsupported) {
+    return translate("recurring_cadence_unsupported");
+  }
+
   const unitKey = normalizedCadence.unit.toLowerCase();
   if (normalizedCadence.mode === RecurringCadenceModes.PerUnit) {
     if (normalizedCadence.interval === 1) {
@@ -145,6 +154,7 @@ export const getUpcomingRecurringDates = (
   endDate?: string | null,
 ): string[] => {
   if (
+    cadence.unsupported ||
     cadence.version !== 1 ||
     !Number.isInteger(cadence.interval) ||
     cadence.interval <= 0
@@ -160,6 +170,7 @@ export const getUpcomingRecurringDates = (
 
   if (cadence.mode === RecurringCadenceModes.PerUnit) {
     const dates: string[] = [];
+    const seenDates = new Set<string>();
     for (
       let periodIndex = 0;
       dates.length < PREVIEW_OCCURRENCE_COUNT;
@@ -174,9 +185,12 @@ export const getUpcomingRecurringDates = (
         if (
           dates.length < PREVIEW_OCCURRENCE_COUNT &&
           !candidate.isBefore(start, "day") &&
-          !candidate.isAfter(end, "day")
+          !candidate.isAfter(end, "day") &&
+          !seenDates.has(candidate.format("YYYY-MM-DD"))
         ) {
-          dates.push(candidate.format("YYYY-MM-DD"));
+          const formattedDate = candidate.format("YYYY-MM-DD");
+          seenDates.add(formattedDate);
+          dates.push(formattedDate);
         }
       });
 
