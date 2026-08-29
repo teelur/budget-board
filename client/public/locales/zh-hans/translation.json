@@ -20,6 +20,7 @@
   "account_is_required": "需要账户",
   "account_mapping": "账号映射",
   "account_name": "账号名称",
+  "account_name_is_required_message": "需要账户名。",
   "account_trends": "账户动态",
   "account_type": "账户类型",
   "account_type_name": "账户类型名称",
