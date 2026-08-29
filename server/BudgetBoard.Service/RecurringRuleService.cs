@@ -104,6 +104,15 @@ public class RecurringRuleService(
 
         ValidateRequest(request);
 
+        if (rule.AccountID != request.AccountID)
+        {
+            foreach (var transaction in rule.Transactions.ToList())
+            {
+                transaction.RecurringRuleID = null;
+                transaction.RecurringRule = null;
+            }
+        }
+
         rule.AccountID = request.AccountID;
         rule.Account = account;
         rule.MerchantName = request.MerchantName;

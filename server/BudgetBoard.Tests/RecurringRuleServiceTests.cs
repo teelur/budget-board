@@ -1199,6 +1199,8 @@ public class RecurringRuleServiceTests
         var replacementAccount = AddAccount(helper, "Savings");
         var rule = AddRule(helper, account);
         var service = CreateService(helper, new DateOnly(2026, 8, 1));
+        var matchedTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 100);
+        await service.AssignTransactionsAsync(helper.demoUser.Id, rule.ID, [matchedTransaction.ID]);
 
         var request = new RecurringRuleUpdateRequest
         {
@@ -1230,6 +1232,14 @@ public class RecurringRuleServiceTests
         response.IsActive.Should().BeFalse();
         response.AmountMode.Should().Be(RecurringAmountModeValues.Automatic);
         response.Amount.Should().Be(250);
+        matchedTransaction.RecurringRuleID.Should().BeNull();
+        matchedTransaction.RecurringRule.Should().BeNull();
+        helper
+            .UserDataContext.Transactions.Single(transaction =>
+                transaction.ID == matchedTransaction.ID
+            )
+            .RecurringRuleID.Should()
+            .BeNull();
 
         request.ID = Guid.NewGuid();
         await AssertServiceException(
