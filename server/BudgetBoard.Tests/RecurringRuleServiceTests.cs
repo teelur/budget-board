@@ -1055,12 +1055,7 @@ public class RecurringRuleServiceTests
             );
 
         var transaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 75);
-        var secondTransaction = AddTransaction(
-            helper,
-            account,
-            new DateOnly(2026, 8, 2),
-            75
-        );
+        var secondTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 2), 75);
         await service.CreateRecurringRuleAsync(
             helper.demoUser.Id,
             CreateRequest(account.ID, merchantName: "Attached", amount: 75),
