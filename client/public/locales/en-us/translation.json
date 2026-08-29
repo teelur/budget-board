@@ -90,6 +90,7 @@
   "budget_monthly_amount_fraction_styled": "<0>{{amount}}</0> <1>of</1> <2>{{total}}</2> <1>this month</1>",
   "budget_previous_month_no_budgets": "Previous month has no budgets.",
   "budget_projected_editable_styled": "<0>Projected:</0>",
+  "budget_projected_fraction_styled": "<0>Projected:</0> <1>{{amount}}</1> <2>of</2> <3>{{total}}</3>",
   "budget_projected_styled": "<0>Projected:</0> <1>{{amount}}</1>",
   "budget_summary": "Budget Summary",
   "budget_warning_threshold": "Budget Warning Threshold",

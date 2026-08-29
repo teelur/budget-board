@@ -17,12 +17,16 @@ import { useTranslation } from "react-i18next";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { buildCategoryToRecurringForecastTotalMap } from "~/helpers/recurringRules";
 import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
+import { useRecurringForecastQueries } from "~/hooks/queries/useRecurringForecastQueries";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
   transactions: ITransaction[];
+  selectedDates: Date[];
   selectedDate: Date | null;
   isPending?: boolean;
+  isTransactionsPending?: boolean;
 }
 
 const BudgetsContent = (props: BudgetsContentProps) => {
@@ -33,11 +37,16 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const [selectedMonth, setSelectedMonth] = React.useState<Date | null>(null);
 
   const { t } = useTranslation();
+  const { dayjs } = useLocale();
   const { allTransactionCategories, getCategoryType } =
     useTransactionCategories();
   const recurringForecastQuery = useRecurringForecastQuery({
     month: props.selectedDate,
     enabled: props.selectedDate !== null,
+  });
+  const recurringForecastQueries = useRecurringForecastQueries({
+    months: props.selectedDates,
+    enabled: props.selectedDates.length > 0,
   });
 
   const categoryToTransactionsTotalMap: Map<string, number> =
@@ -46,6 +55,17 @@ const BudgetsContent = (props: BudgetsContentProps) => {
     buildCategoryToRecurringForecastTotalMap(recurringForecastQuery.data ?? []);
 
   const categoryTree = buildCategoriesTree(allTransactionCategories);
+
+  const summaryTransactions = props.transactions.filter((transaction) =>
+    dayjs(transaction.date).isSameOrBefore(dayjs(), "day"),
+  );
+  const summaryCategoryToTransactionsTotalMap =
+    buildCategoryToTransactionsTotalMap(summaryTransactions);
+  const summaryForecastOccurrences = recurringForecastQueries.data.filter(
+    (occurrence) => dayjs(occurrence.date).isSameOrAfter(dayjs(), "day"),
+  );
+  const summaryCategoryToRecurringForecastTotalMap =
+    buildCategoryToRecurringForecastTotalMap(summaryForecastOccurrences);
 
   const incomeBudgets = props.budgets.filter((budget) =>
     areStringsEqual(getCategoryType(budget.category), CategoryTypes.Income),
@@ -86,6 +106,20 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const unbudgetedExpenseCategoryTree = unbudgetedCategoryTree.filter((c) =>
     areStringsEqual(c.categoryType, CategoryTypes.Expense),
   );
+
+  const isBudgetedCategory = (category: string): boolean =>
+    props.budgets.some((budget) =>
+      areStringsEqual(
+        getParentCategory(budget.category, allTransactionCategories),
+        getParentCategory(category, allTransactionCategories),
+      ),
+    );
+
+  const projectedUnbudgetedTransactionsTotal =
+    summaryForecastOccurrences.reduce((total, occurrence) => {
+      const category = occurrence.category ?? occurrence.subcategory ?? "";
+      return isBudgetedCategory(category) ? total : total + occurrence.amount;
+    }, 0);
 
   const openBudgetDetails = (category: string, month: Date | null) => {
     open();
@@ -167,10 +201,21 @@ const BudgetsContent = (props: BudgetsContentProps) => {
           incomeCategories={incomeCategoryTree}
           expenseCategories={expenseCategoryTree}
           budgets={props.budgets}
-          categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+          categoryToTransactionsTotalMap={summaryCategoryToTransactionsTotalMap}
+          categoryToRecurringForecastTotalMap={
+            summaryCategoryToRecurringForecastTotalMap
+          }
           unbudgetedIncomeCategoryTree={unbudgetedIncomeCategoryTree}
           unbudgetedExpenseCategoryTree={unbudgetedExpenseCategoryTree}
-          isPending={props.isPending ?? false}
+          projectedUnbudgetedTransactionsTotal={
+            projectedUnbudgetedTransactionsTotal
+          }
+          isPending={
+            (props.isPending ?? false) ||
+            (props.isTransactionsPending ?? false) ||
+            recurringForecastQueries.isPending
+          }
+          isForecastError={recurringForecastQueries.isError}
         />
         <FixParentBudgetButton
           budgets={props.budgets}
