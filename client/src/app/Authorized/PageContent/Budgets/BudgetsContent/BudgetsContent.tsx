@@ -19,6 +19,7 @@ import { buildCategoryToRecurringForecastTotalMap } from "~/helpers/recurringRul
 import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
 import { useRecurringForecastQueries } from "~/hooks/queries/useRecurringForecastQueries";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import classes from "./BudgetsContent.module.css";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
@@ -193,6 +194,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         </Stack>
       </Stack>
       <Stack
+        className={classes.summary}
         style={{ flexGrow: 1 }}
         w={{ base: "100%", md: "20%" }}
         h={{ base: "auto", md: "100%" }}
