@@ -90,6 +90,25 @@ export const getDateFromMonthsAgo = (
   return lastMonth;
 };
 
+export const getMonthsInDateRange = (
+  startDate: Date,
+  endDate: Date,
+): Date[] => {
+  const startMonth = dayjs(startDate).startOf("month");
+  const endMonth = dayjs(endDate).startOf("month");
+  const rangeStart = startMonth.isBefore(endMonth) ? startMonth : endMonth;
+  const rangeEnd = startMonth.isBefore(endMonth) ? endMonth : startMonth;
+  const months: Date[] = [];
+  let currentMonth = rangeStart;
+
+  while (currentMonth.isBefore(rangeEnd) || currentMonth.isSame(rangeEnd)) {
+    months.push(currentMonth.toDate());
+    currentMonth = currentMonth.add(1, "month");
+  }
+
+  return months;
+};
+
 /**
  * Returns an array of unique years from an array of Date objects.
  *

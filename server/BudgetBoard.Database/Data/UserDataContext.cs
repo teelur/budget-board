@@ -24,6 +24,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<AccountType> AccountTypes { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<TransactionLink> TransactionLinks { get; set; }
+    public DbSet<RecurringRule> RecurringRules { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<TransactionTag> TransactionTags { get; set; }
     public DbSet<Budget> Budgets { get; set; }
@@ -94,6 +95,10 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
                     .WithOne(e => e.Account)
                     .HasForeignKey(e => e.AccountID);
 
+                a.HasMany(e => e.RecurringRules)
+                    .WithOne(e => e.Account)
+                    .HasForeignKey(e => e.AccountID);
+
                 a.HasMany(e => e.Balances).WithOne(e => e.Account).HasForeignKey(e => e.AccountID);
 
                 a.ToTable("Account");
@@ -103,6 +108,46 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         modelBuilder.Entity<AccountType>().ToTable("AccountType");
 
         modelBuilder.Entity<Transaction>().ToTable("Transaction");
+
+        modelBuilder.Entity<RecurringRule>(r =>
+        {
+            r.Property(e => e.Cadence).HasColumnType("jsonb").IsRequired();
+            r.Property(e => e.AmountMode).HasConversion<string>().HasMaxLength(32).IsRequired();
+            r.HasOne(e => e.User)
+                .WithMany(e => e.RecurringRules)
+                .HasForeignKey(e => e.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+            r.HasOne(e => e.Account)
+                .WithMany(e => e.RecurringRules)
+                .HasForeignKey(e => e.AccountID)
+                .OnDelete(DeleteBehavior.Cascade);
+            r.HasIndex(e => new { e.UserID, e.IsActive });
+            r.HasIndex(e => e.AccountID);
+            if (Database.IsNpgsql())
+            {
+                r.ToTable(
+                    "RecurringRule",
+                    table =>
+                        table.HasCheckConstraint(
+                            "CK_RecurringRule_Cadence_IsObject",
+                            "jsonb_typeof(\"Cadence\") = 'object'"
+                        )
+                );
+            }
+            else
+            {
+                r.ToTable("RecurringRule");
+            }
+        });
+
+        modelBuilder.Entity<Transaction>(t =>
+        {
+            t.HasOne(e => e.RecurringRule)
+                .WithMany(e => e.Transactions)
+                .HasForeignKey(e => e.RecurringRuleID)
+                .OnDelete(DeleteBehavior.SetNull);
+            t.HasIndex(e => e.RecurringRuleID);
+        });
 
         modelBuilder.Entity<TransactionLink>(l =>
         {

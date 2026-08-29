@@ -1,0 +1,38 @@
+.metrics {
+  width: 100%;
+  container-type: inline-size;
+  justify-content: space-between;
+  column-gap: clamp(1rem, 3%, 2rem);
+  row-gap: 0.125rem;
+}
+
+.forecastGroup {
+  flex: 1 1 auto;
+  justify-content: flex-start;
+}
+
+.metric {
+  white-space: nowrap;
+}
+
+.currentMetric {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.inlineText {
+  display: inline;
+  margin: 0;
+}
+
+.heroAmount {
+  font-size: 1.1rem;
+
+  @container (max-width: 380px) {
+    font-size: 1rem;
+  }
+
+  @container (max-width: 300px) {
+    font-size: 0.95rem;
+  }
+}

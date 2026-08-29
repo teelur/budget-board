@@ -15,6 +15,7 @@ const TransactionsSettings = (): React.ReactNode => {
     { path: "categories", label: t("categories") },
     { path: "auto-categorizer", label: t("auto_categorizer") },
     { path: "rules", label: t("automatic_rules") },
+    { path: "recurring", label: t("recurring_transactions") },
     { path: "deleted", label: t("deleted_transactions") },
   ];
 

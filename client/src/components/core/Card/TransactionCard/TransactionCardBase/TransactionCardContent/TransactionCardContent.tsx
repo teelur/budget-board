@@ -1,6 +1,6 @@
 import classes from "./TransactionCardContent.module.css";
 
-import { Badge, Flex } from "@mantine/core";
+import { Badge, Flex, Tooltip } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
@@ -10,6 +10,8 @@ import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { Repeat2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;
@@ -21,6 +23,7 @@ const TransactionCardContent = (
   props: TransactionCardContentProps,
 ): React.ReactNode => {
   const { dayjs, longDateFormat } = useLocale();
+  const { t } = useTranslation();
 
   const categoryValue =
     (props.transaction.subcategory ?? "").length > 0
@@ -44,6 +47,15 @@ const TransactionCardContent = (
       >
         {props.transaction.merchantName}
       </PrimaryText>
+      {props.transaction.recurringRuleID && (
+        <Tooltip label={t("recurring")}>
+          <Repeat2
+            size="1.5rem"
+            aria-label={t("recurring")}
+            color="var(--mantine-primary-color-filled)"
+          />
+        </Tooltip>
+      )}
       <Flex
         className={classes.contentSubcontainer}
         gap="0.5rem"

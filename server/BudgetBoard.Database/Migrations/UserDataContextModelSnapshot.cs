@@ -473,6 +473,60 @@ namespace BudgetBoard.Database.Migrations
                     b.ToTable("LunchFlowAccount", (string)null);
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.RecurringRule", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountID")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("AmountMode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("Cadence")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MerchantName")
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Subcategory")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("AccountID");
+
+                    b.HasIndex("UserID", "IsActive");
+
+                    b.ToTable("RecurringRule", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RecurringRule_Cadence_IsObject", "jsonb_typeof(\"Cadence\") = 'object'");
+                        });
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.RuleParameterBase", b =>
                 {
                     b.Property<Guid>("ID")
@@ -646,6 +700,9 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("RecurringRuleID")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("text");
@@ -659,6 +716,8 @@ namespace BudgetBoard.Database.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("AccountID");
+
+                    b.HasIndex("RecurringRuleID");
 
                     b.ToTable("Transaction", (string)null);
                 });
@@ -1194,6 +1253,25 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.RecurringRule", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.Account", "Account")
+                        .WithMany("RecurringRules")
+                        .HasForeignKey("AccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany("RecurringRules")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinAccount", b =>
                 {
                     b.HasOne("BudgetBoard.Database.Models.Account", "LinkedAccount")
@@ -1247,7 +1325,14 @@ namespace BudgetBoard.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BudgetBoard.Database.Models.RecurringRule", "RecurringRule")
+                        .WithMany("Transactions")
+                        .HasForeignKey("RecurringRuleID")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Account");
+
+                    b.Navigation("RecurringRule");
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.TransactionImportJob", b =>
@@ -1411,6 +1496,8 @@ namespace BudgetBoard.Database.Migrations
 
                     b.Navigation("LunchFlowAccount");
 
+                    b.Navigation("RecurringRules");
+
                     b.Navigation("SimpleFinAccount");
 
                     b.Navigation("Transactions");
@@ -1435,6 +1522,8 @@ namespace BudgetBoard.Database.Migrations
                     b.Navigation("Institutions");
 
                     b.Navigation("LunchFlowAccounts");
+
+                    b.Navigation("RecurringRules");
 
                     b.Navigation("SimpleFinAccounts");
 
@@ -1464,6 +1553,11 @@ namespace BudgetBoard.Database.Migrations
             modelBuilder.Entity("BudgetBoard.Database.Models.Institution", b =>
                 {
                     b.Navigation("Accounts");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.RecurringRule", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("BudgetBoard.Database.Models.SimpleFinOrganization", b =>

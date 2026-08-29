@@ -65,8 +65,28 @@ public class Transaction
     /// </summary>
     public Account? Account { get; set; } = null;
 
+    /// <summary>
+    /// Identifier for the recurring rule associated with the transaction, if any.
+    /// </summary>
+    public Guid? RecurringRuleID { get; set; }
+
+    /// <summary>
+    /// Reference to the recurring rule associated with the transaction, if any.
+    /// </summary>
+    public RecurringRule? RecurringRule { get; set; }
+
+    /// <summary>
+    /// Tags associated with the transaction.
+    /// </summary>
     public ICollection<TransactionTag> TransactionTags { get; set; } = [];
 
+    /// <summary>
+    /// Link where this transaction is the source transaction, if any.
+    /// </summary>
     public TransactionLink? SourceTransactionLink { get; set; } = null;
+
+    /// <summary>
+    /// Link where this transaction is the target transaction, if any.
+    /// </summary>
     public TransactionLink? TargetTransactionLink { get; set; } = null;
 }

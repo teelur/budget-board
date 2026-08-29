@@ -238,6 +238,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionImportService, TransactionImportService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IRecurringRuleService, RecurringRuleService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IBalanceService, BalanceService>();
 builder.Services.AddScoped<ITransactionCategoryService, TransactionCategoryService>();

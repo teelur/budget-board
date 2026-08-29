@@ -14,6 +14,7 @@ import { InfoIcon } from "lucide-react";
 interface BudgetsGroupProps {
   budgets: IBudget[];
   categoryToTransactionsTotalMap: Map<string, number>;
+  categoryToRecurringForecastTotalMap: Map<string, number>;
   categoryTree: ICategoryNode[];
   selectedDate: Date | null;
   openDetails: (category: string, month: Date | null) => void;
@@ -57,6 +58,9 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
                 categoryToLimitsMap={categoryToLimitsMap}
                 categoryToTransactionsTotalMap={
                   props.categoryToTransactionsTotalMap
+                }
+                categoryToRecurringForecastTotalMap={
+                  props.categoryToRecurringForecastTotalMap
                 }
                 selectedDate={props.selectedDate}
                 openDetails={props.openDetails}

@@ -1,0 +1,9 @@
+.summary {
+  order: -1;
+}
+
+@media (min-width: 62em) {
+  .summary {
+    order: 0;
+  }
+}
