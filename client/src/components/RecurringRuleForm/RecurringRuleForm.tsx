@@ -36,6 +36,7 @@ import {
 interface RecurringRuleFormProps {
   rule?: IRecurringRuleResponse;
   transaction?: ITransaction;
+  transactionIDs?: string[];
   onSuccess: () => void;
   onCancel?: () => void;
 }
@@ -189,7 +190,14 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
     }
 
     createMutation.mutate(
-      { data, transactionID: sourceTransaction?.id },
+      {
+        data: {
+          ...data,
+          transactionIDs:
+            props.transactionIDs ??
+            (sourceTransaction ? [sourceTransaction.id] : undefined),
+        },
+      },
       { onSuccess: props.onSuccess },
     );
   };

@@ -12,7 +12,6 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 interface CreateRecurringRuleMutationInput {
   data: IRecurringRuleCreateRequest;
-  transactionID?: string;
 }
 
 export const useCreateRecurringRuleMutation = () => {
@@ -20,14 +19,9 @@ export const useCreateRecurringRuleMutation = () => {
   const { request } = useAuth();
 
   return useMutation({
-    mutationFn: async ({
-      data,
-      transactionID,
-    }: CreateRecurringRuleMutationInput) =>
+    mutationFn: async ({ data }: CreateRecurringRuleMutationInput) =>
       await request({
-        url: transactionID
-          ? `/api/recurringRule/from-transaction/${transactionID}`
-          : "/api/recurringRule",
+        url: "/api/recurringRule",
         method: "POST",
         data,
       }),

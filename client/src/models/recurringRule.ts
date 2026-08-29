@@ -42,6 +42,7 @@ export type RecurringAmountMode =
 
 export interface IRecurringRuleCreateRequest {
   accountID: string;
+  transactionIDs?: string[];
   merchantName: string | null;
   category: string | null;
   subcategory: string | null;

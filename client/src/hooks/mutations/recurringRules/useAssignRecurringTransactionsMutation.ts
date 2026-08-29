@@ -9,23 +9,24 @@ import {
 } from "~/helpers/requests";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-interface AssignRecurringTransactionInput {
+interface AssignRecurringTransactionsInput {
   recurringRuleID: string;
-  transactionID: string;
+  transactionIDs: string[];
 }
 
-export const useAssignRecurringTransactionMutation = () => {
+export const useAssignRecurringTransactionsMutation = () => {
   const queryClient = useQueryClient();
   const { request } = useAuth();
 
   return useMutation({
     mutationFn: async ({
       recurringRuleID,
-      transactionID,
-    }: AssignRecurringTransactionInput) =>
+      transactionIDs,
+    }: AssignRecurringTransactionsInput) =>
       await request({
-        url: `/api/recurringRule/${recurringRuleID}/transactions/${transactionID}`,
+        url: `/api/recurringRule/${recurringRuleID}/transactions`,
         method: "POST",
+        data: transactionIDs,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [transactionsQueryKey] });

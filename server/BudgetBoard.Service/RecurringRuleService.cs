@@ -24,7 +24,7 @@ public class RecurringRuleService(
     public async Task CreateRecurringRuleAsync(
         Guid userGuid,
         IRecurringRuleRequest request,
-        Guid? transactionID = null
+        IEnumerable<Guid>? transactionIDs = null
     )
     {
         ValidateRequest(request);
@@ -35,10 +35,12 @@ public class RecurringRuleService(
                 responseLocalizer["RecurringRuleAccountNotFoundError"]
             );
 
-        Transaction? transaction = null;
-        if (transactionID.HasValue)
+        var transactions = (transactionIDs ?? Enumerable.Empty<Guid>())
+            .Distinct()
+            .Select(transactionID => GetTransactionById(userData, transactionID))
+            .ToList();
+        foreach (var transaction in transactions)
         {
-            transaction = GetTransactionById(userData, transactionID.Value);
             if (transaction.AccountID != request.AccountID)
             {
                 throw new BudgetBoardServiceException(
@@ -69,7 +71,7 @@ public class RecurringRuleService(
             Amount = request.Amount,
         };
 
-        if (transaction is not null)
+        foreach (var transaction in transactions)
         {
             rule.Transactions.Add(transaction);
             transaction.RecurringRule = rule;
@@ -243,10 +245,10 @@ public class RecurringRuleService(
         transaction.RecurringRule = matchingRule;
     }
 
-    public async Task AssignTransactionAsync(
+    public async Task AssignTransactionsAsync(
         Guid userGuid,
         Guid recurringRuleID,
-        Guid transactionID
+        IEnumerable<Guid> transactionIDs
     )
     {
         var userData = await GetCurrentUserAsync(userGuid);
@@ -256,22 +258,33 @@ public class RecurringRuleService(
                 responseLocalizer["RecurringRuleNotFoundError"]
             );
 
-        var transaction = GetTransactionById(userData, transactionID);
-        if (transaction.AccountID != rule.AccountID)
+        var transactions = transactionIDs
+            .Distinct()
+            .Select(transactionID => GetTransactionById(userData, transactionID))
+            .ToList();
+
+        foreach (var transaction in transactions)
         {
-            throw new BudgetBoardServiceException(
-                responseLocalizer["RecurringRuleAccountMismatchError"]
-            );
-        }
-        if (transaction.RecurringRuleID is Guid assignedRuleID && assignedRuleID != rule.ID)
-        {
-            throw new BudgetBoardServiceException(
-                responseLocalizer["TransactionAlreadyRecurringError"]
-            );
+            if (transaction.AccountID != rule.AccountID)
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["RecurringRuleAccountMismatchError"]
+                );
+            }
+            if (transaction.RecurringRuleID is Guid assignedRuleID && assignedRuleID != rule.ID)
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionAlreadyRecurringError"]
+                );
+            }
         }
 
-        transaction.RecurringRuleID = rule.ID;
-        transaction.RecurringRule = rule;
+        foreach (var transaction in transactions)
+        {
+            transaction.RecurringRuleID = rule.ID;
+            transaction.RecurringRule = rule;
+        }
+
         await userDataContext.SaveChangesAsync();
     }
 

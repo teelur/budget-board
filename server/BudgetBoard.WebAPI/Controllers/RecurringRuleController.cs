@@ -32,7 +32,11 @@ public class RecurringRuleController(
                 return Unauthorized();
             }
 
-            await recurringRuleService.CreateRecurringRuleAsync(parsedUserId, request);
+            await recurringRuleService.CreateRecurringRuleAsync(
+                parsedUserId,
+                request,
+                request.TransactionIDs
+            );
             return Ok();
         });
     }
@@ -56,7 +60,7 @@ public class RecurringRuleController(
             await recurringRuleService.CreateRecurringRuleAsync(
                 parsedUserId,
                 request,
-                transactionID
+                [transactionID]
             );
             return Ok();
         });
@@ -132,9 +136,12 @@ public class RecurringRuleController(
         });
     }
 
-    [HttpPost("{recurringRuleID:guid}/transactions/{transactionID:guid}")]
+    [HttpPost("{recurringRuleID:guid}/transactions")]
     [Authorize]
-    public async Task<IActionResult> AssignTransaction(Guid recurringRuleID, Guid transactionID)
+    public async Task<IActionResult> AssignTransactions(
+        Guid recurringRuleID,
+        [FromBody] IEnumerable<Guid> transactionIDs
+    )
     {
         return await HandleRequestAsync(async () =>
         {
@@ -145,10 +152,10 @@ public class RecurringRuleController(
                 return Unauthorized();
             }
 
-            await recurringRuleService.AssignTransactionAsync(
+            await recurringRuleService.AssignTransactionsAsync(
                 parsedUserId,
                 recurringRuleID,
-                transactionID
+                transactionIDs
             );
             return Ok();
         });

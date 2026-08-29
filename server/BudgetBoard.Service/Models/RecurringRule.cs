@@ -28,6 +28,7 @@ public interface IRecurringRuleRequest
 public class RecurringRuleCreateRequest : IRecurringRuleRequest
 {
     public Guid AccountID { get; set; }
+    public List<Guid> TransactionIDs { get; set; } = [];
     public string? MerchantName { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }

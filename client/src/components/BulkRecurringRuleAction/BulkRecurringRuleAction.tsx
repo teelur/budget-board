@@ -4,22 +4,22 @@ import { Repeat2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import ModalContentHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import Modal from "~/components/core/Modal/Modal";
 import RecurringRuleForm from "~/components/RecurringRuleForm/RecurringRuleForm";
+import Select from "~/components/core/Select/Select/Select";
 import { useAssignRecurringTransactionsMutation } from "~/hooks/mutations/recurringRules/useAssignRecurringTransactionsMutation";
-import { useUnassignRecurringTransactionMutation } from "~/hooks/mutations/recurringRules/useUnassignRecurringTransactionMutation";
 import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
 import { ITransaction } from "~/models/transaction";
-import Modal from "../core/Modal/Modal";
-import Select from "../core/Select/Select/Select";
 
-interface RecurringRuleActionProps {
-  transaction: ITransaction;
+interface BulkRecurringRuleActionProps {
+  transactions: ITransaction[];
+  onSuccess: () => void;
 }
 
 type RecurringRuleMode = "new" | "existing";
 
-const RecurringRuleAction = (
-  props: RecurringRuleActionProps,
+const BulkRecurringRuleAction = (
+  props: BulkRecurringRuleActionProps,
 ): React.ReactNode => {
   const { t } = useTranslation();
   const [opened, { open, close }] = useDisclosure(false);
@@ -29,20 +29,27 @@ const RecurringRuleAction = (
   const [mode, setMode] = React.useState<RecurringRuleMode>("new");
   const rulesQuery = useRecurringRulesQuery();
   const assignMutation = useAssignRecurringTransactionsMutation();
-  const unassignMutation = useUnassignRecurringTransactionMutation();
+  const firstTransaction = [...props.transactions].sort((first, second) =>
+    first.date.localeCompare(second.date),
+  )[0];
 
-  if (props.transaction.recurringRuleID) {
-    return (
-      <Button
-        size="compact-sm"
-        variant="subtle"
-        loading={unassignMutation.isPending}
-        onClick={() => unassignMutation.mutate(props.transaction.id)}
-      >
-        {t("remove_recurring_rule")}
-      </Button>
+  const selectedAccountID = props.transactions[0]?.accountID ?? null;
+  const hasSingleAccount =
+    selectedAccountID !== null &&
+    props.transactions.every(
+      (transaction) => transaction.accountID === selectedAccountID,
     );
-  }
+  const hasExistingAssignment = props.transactions.some(
+    (transaction) => transaction.recurringRuleID !== null,
+  );
+
+  const closeModal = () => {
+    setMode("new");
+    setSelectedRuleID(null);
+    close();
+  };
+
+  const hasExistingRules = (rulesQuery.data ?? []).length > 0;
 
   const assignExistingRule = () => {
     if (!selectedRuleID) {
@@ -52,19 +59,20 @@ const RecurringRuleAction = (
     assignMutation.mutate(
       {
         recurringRuleID: selectedRuleID,
-        transactionIDs: [props.transaction.id],
+        transactionIDs: props.transactions.map((transaction) => transaction.id),
       },
-      { onSuccess: closeModal },
+      {
+        onSuccess: () => {
+          closeModal();
+          props.onSuccess();
+        },
+      },
     );
   };
 
-  const closeModal = () => {
-    setMode("new");
-    setSelectedRuleID(null);
-    close();
-  };
-
-  const hasExistingRules = (rulesQuery.data ?? []).length > 0;
+  if (props.transactions.length < 2 || hasExistingAssignment) {
+    return null;
+  }
 
   return (
     <>
@@ -78,7 +86,7 @@ const RecurringRuleAction = (
           open();
         }}
       >
-        {t("mark_as_recurring")}
+        {t("assign_recurring_rule")}
       </Button>
       <Modal
         opened={opened}
@@ -108,8 +116,14 @@ const RecurringRuleAction = (
           )}
           {mode === "new" ? (
             <RecurringRuleForm
-              transaction={props.transaction}
-              onSuccess={closeModal}
+              transaction={firstTransaction}
+              transactionIDs={props.transactions.map(
+                (transaction) => transaction.id,
+              )}
+              onSuccess={() => {
+                closeModal();
+                props.onSuccess();
+              }}
               onCancel={closeModal}
             />
           ) : (
@@ -119,7 +133,9 @@ const RecurringRuleAction = (
                 placeholder={t("select_existing_recurring_rule")}
                 data={rulesQuery.data?.map((rule) => ({
                   value: rule.id,
-                  label: `${rule.merchantName || t("any_merchant")} · ${rule.accountName}`,
+                  label: `${rule.merchantName || t("any_merchant")} - ${rule.accountName}`,
+                  disabled:
+                    !hasSingleAccount || rule.accountID !== selectedAccountID,
                 }))}
                 value={selectedRuleID}
                 onChange={setSelectedRuleID}
@@ -130,7 +146,7 @@ const RecurringRuleAction = (
               <Group>
                 <Button
                   variant="outline"
-                  disabled={!selectedRuleID}
+                  disabled={!selectedRuleID || !hasSingleAccount}
                   loading={assignMutation.isPending}
                   onClick={assignExistingRule}
                 >
@@ -145,4 +161,4 @@ const RecurringRuleAction = (
   );
 };
 
-export default RecurringRuleAction;
+export default BulkRecurringRuleAction;

@@ -13,11 +13,11 @@ public interface IRecurringRuleService
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="request">The recurring rule creation details.</param>
-    /// <param name="transactionID">Optional. The unique identifier of a transaction to associate with the rule.</param>
+    /// <param name="transactionIDs">Optional. The unique identifiers of transactions to associate with the rule.</param>
     Task CreateRecurringRuleAsync(
         Guid userGuid,
         IRecurringRuleRequest request,
-        Guid? transactionID = null
+        IEnumerable<Guid>? transactionIDs = null
     );
 
     /// <summary>
@@ -60,12 +60,16 @@ public interface IRecurringRuleService
     Task MatchTransactionAsync(Guid userGuid, Transaction transaction);
 
     /// <summary>
-    /// Assigns a transaction to a recurring rule.
+    /// Assigns one or more transactions to a recurring rule.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="recurringRuleID">The unique identifier of the recurring rule.</param>
-    /// <param name="transactionID">The unique identifier of the transaction.</param>
-    Task AssignTransactionAsync(Guid userGuid, Guid recurringRuleID, Guid transactionID);
+    /// <param name="transactionIDs">The unique identifiers of the transactions.</param>
+    Task AssignTransactionsAsync(
+        Guid userGuid,
+        Guid recurringRuleID,
+        IEnumerable<Guid> transactionIDs
+    );
 
     /// <summary>
     /// Removes the recurring rule assignment from a transaction.

@@ -27,6 +27,7 @@ import SplitTransaction from "~/components/core/Card/TransactionCard/Transaction
 import TransactionLinkDialog from "~/components/core/Card/TransactionCard/TransactionCardBase/TransactionCardDetails/TransactionLinkDialog/TransactionLinkDialog";
 import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
 import RecurringRuleAction from "~/components/RecurringRuleAction/RecurringRuleAction";
+import BulkRecurringRuleAction from "~/components/BulkRecurringRuleAction/BulkRecurringRuleAction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
@@ -420,6 +421,15 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                       elevation={1}
                     />
                   </>
+                )}
+                {selectedTransactions.length > 1 && (
+                  <BulkRecurringRuleAction
+                    transactions={selectedTransactions}
+                    onSuccess={() => {
+                      props.onClearSelection();
+                      resetFields();
+                    }}
+                  />
                 )}
                 <ActionIcon
                   color="var(--button-color-destructive)"

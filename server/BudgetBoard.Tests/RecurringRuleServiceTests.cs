@@ -1035,7 +1035,7 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
-    public async Task CreateRecurringRuleAsync_ShouldCreateRuleWithAndWithoutTransaction()
+    public async Task CreateRecurringRuleAsync_ShouldCreateRuleWithAndWithoutTransactions()
     {
         var helper = new TestHelper();
         var account = AddAccount(helper);
@@ -1055,18 +1055,25 @@ public class RecurringRuleServiceTests
             );
 
         var transaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 75);
+        var secondTransaction = AddTransaction(
+            helper,
+            account,
+            new DateOnly(2026, 8, 2),
+            75
+        );
         await service.CreateRecurringRuleAsync(
             helper.demoUser.Id,
             CreateRequest(account.ID, merchantName: "Attached", amount: 75),
-            transaction.ID
+            [transaction.ID, secondTransaction.ID]
         );
 
         var ruleWithTransaction = (
             await service.ReadRecurringRulesAsync(helper.demoUser.Id)
         ).Single(rule => rule.MerchantName == "Attached");
         ruleWithTransaction.MerchantName.Should().Be("Attached");
-        ruleWithTransaction.MatchedTransactionCount.Should().Be(1);
+        ruleWithTransaction.MatchedTransactionCount.Should().Be(2);
         transaction.RecurringRuleID.Should().Be(ruleWithTransaction.ID);
+        secondTransaction.RecurringRuleID.Should().Be(ruleWithTransaction.ID);
     }
 
     [Fact]
@@ -1112,7 +1119,7 @@ public class RecurringRuleServiceTests
                 service.CreateRecurringRuleAsync(
                     helper.demoUser.Id,
                     CreateRequest(account.ID),
-                    Guid.NewGuid()
+                    [Guid.NewGuid()]
                 ),
             "TransactionNotFoundError"
         );
@@ -1124,7 +1131,7 @@ public class RecurringRuleServiceTests
                 service.CreateRecurringRuleAsync(
                     helper.demoUser.Id,
                     CreateRequest(account.ID),
-                    transaction.ID
+                    [transaction.ID]
                 ),
             "RecurringRuleAccountMismatchError"
         );
@@ -1142,7 +1149,7 @@ public class RecurringRuleServiceTests
                 service.CreateRecurringRuleAsync(
                     helper.demoUser.Id,
                     CreateRequest(account.ID),
-                    transaction.ID
+                    [transaction.ID]
                 ),
             "TransactionAlreadyRecurringError"
         );
@@ -1458,9 +1465,9 @@ public class RecurringRuleServiceTests
     }
 
     #endregion
-    #region AssignAndUnassignTransactionAsync
+    #region AssignAndUnassignTransactionsAsync
     [Fact]
-    public async Task AssignAndUnassignTransactionAsync_ShouldManageAssignmentsAndRejectInvalidReferences()
+    public async Task AssignAndUnassignTransactionsAsync_ShouldManageAssignmentsAndRejectInvalidReferences()
     {
         var helper = new TestHelper();
         var account = AddAccount(helper);
@@ -1471,19 +1478,24 @@ public class RecurringRuleServiceTests
 
         await AssertServiceException(
             () =>
-                service.AssignTransactionAsync(helper.demoUser.Id, Guid.NewGuid(), Guid.NewGuid()),
+                service.AssignTransactionsAsync(
+                    helper.demoUser.Id,
+                    Guid.NewGuid(),
+                    [Guid.NewGuid()]
+                ),
             "RecurringRuleNotFoundError"
         );
 
         var transaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 100);
-        await service.AssignTransactionAsync(helper.demoUser.Id, rule.ID, transaction.ID);
+        await service.AssignTransactionsAsync(helper.demoUser.Id, rule.ID, [transaction.ID]);
         transaction.RecurringRuleID.Should().Be(rule.ID);
 
-        await service.AssignTransactionAsync(helper.demoUser.Id, rule.ID, transaction.ID);
+        await service.AssignTransactionsAsync(helper.demoUser.Id, rule.ID, [transaction.ID]);
         transaction.RecurringRuleID.Should().Be(rule.ID);
 
         await AssertServiceException(
-            () => service.AssignTransactionAsync(helper.demoUser.Id, otherRule.ID, transaction.ID),
+            () =>
+                service.AssignTransactionsAsync(helper.demoUser.Id, otherRule.ID, [transaction.ID]),
             "TransactionAlreadyRecurringError"
         );
 
@@ -1495,15 +1507,15 @@ public class RecurringRuleServiceTests
         );
         await AssertServiceException(
             () =>
-                service.AssignTransactionAsync(
+                service.AssignTransactionsAsync(
                     helper.demoUser.Id,
                     rule.ID,
-                    otherAccountTransaction.ID
+                    [otherAccountTransaction.ID]
                 ),
             "RecurringRuleAccountMismatchError"
         );
         await AssertServiceException(
-            () => service.AssignTransactionAsync(helper.demoUser.Id, rule.ID, Guid.NewGuid()),
+            () => service.AssignTransactionsAsync(helper.demoUser.Id, rule.ID, [Guid.NewGuid()]),
             "TransactionNotFoundError"
         );
 
@@ -1513,6 +1525,44 @@ public class RecurringRuleServiceTests
             () => service.UnassignTransactionAsync(helper.demoUser.Id, Guid.NewGuid()),
             "TransactionNotFoundError"
         );
+    }
+
+    [Fact]
+    public async Task AssignTransactionsAsync_ShouldAssignAllTransactionsAfterValidation()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var otherAccount = AddAccount(helper, "Savings");
+        var rule = AddRule(helper, account);
+        var firstTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 100);
+        var secondTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 2), 100);
+        var otherAccountTransaction = AddTransaction(
+            helper,
+            otherAccount,
+            new DateOnly(2026, 8, 3),
+            100
+        );
+        var service = CreateService(helper, new DateOnly(2026, 8, 1));
+
+        await service.AssignTransactionsAsync(
+            helper.demoUser.Id,
+            rule.ID,
+            [firstTransaction.ID, secondTransaction.ID]
+        );
+
+        firstTransaction.RecurringRuleID.Should().Be(rule.ID);
+        secondTransaction.RecurringRuleID.Should().Be(rule.ID);
+
+        await AssertServiceException(
+            () =>
+                service.AssignTransactionsAsync(
+                    helper.demoUser.Id,
+                    rule.ID,
+                    [firstTransaction.ID, otherAccountTransaction.ID]
+                ),
+            "RecurringRuleAccountMismatchError"
+        );
+        otherAccountTransaction.RecurringRuleID.Should().BeNull();
     }
 
     #endregion
