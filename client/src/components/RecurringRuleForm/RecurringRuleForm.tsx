@@ -8,9 +8,13 @@ import { useCreateRecurringRuleMutation } from "~/hooks/mutations/recurringRules
 import { useUpdateRecurringRuleMutation } from "~/hooks/mutations/recurringRules/useUpdateRecurringRuleMutation";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import {
+  defaultRecurringCadence,
   IRecurringRuleResponse,
   RecurringAmountModes,
-  RecurringCadences,
+  RecurringCadenceMode,
+  RecurringCadenceModes,
+  RecurringCadenceUnit,
+  RecurringCadenceUnits,
 } from "~/models/recurringRule";
 import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -23,6 +27,11 @@ import CategorySelect from "~/components/core/Select/CategorySelect/CategorySele
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "../core/Select/Select/Select";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
+import {
+  createRecurringCadence,
+  getRecurringCadenceIntervalMaximum,
+  getUpcomingRecurringDates,
+} from "~/helpers/recurringRules";
 
 interface RecurringRuleFormProps {
   rule?: IRecurringRuleResponse;
@@ -64,8 +73,20 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
       sourceTransaction?.category ??
       "",
   });
-  const cadenceField = useField<string>({
-    initialValue: sourceRule?.cadence ?? RecurringCadences.Monthly,
+  const cadenceUnitField = useField<RecurringCadenceUnit>({
+    initialValue: sourceRule?.cadence.unit ?? defaultRecurringCadence.unit,
+  });
+  const cadenceModeField = useField<RecurringCadenceMode>({
+    initialValue:
+      sourceRule?.cadence.mode ?? RecurringCadenceModes.Interval,
+  });
+  const cadenceIntervalField = useField<number | string>({
+    initialValue:
+      sourceRule?.cadence.interval ?? defaultRecurringCadence.interval,
+    validate: (value) =>
+      Number.isInteger(Number(value)) && Number(value) > 0
+        ? null
+        : t("recurring_interval_required"),
   });
   const startDateField = useField<Date | null>({
     initialValue: dayjs(
@@ -115,13 +136,30 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
       !getIsParentCategory(selectedCategory, allTransactionCategories)
         ? selectedCategory
         : null;
+    const cadenceInterval = Number(cadenceIntervalField.getValue());
+    const cadenceMode = cadenceModeField.getValue();
+    const cadenceIntervalMaximum = getRecurringCadenceIntervalMaximum(
+      cadenceUnitField.getValue(),
+      cadenceMode,
+    );
+    if (
+      !Number.isInteger(cadenceInterval)
+      || cadenceInterval <= 0
+      || (cadenceIntervalMaximum !== undefined && cadenceInterval > cadenceIntervalMaximum)
+    ) {
+      cadenceIntervalField.validate();
+      return;
+    }
     const data = {
       accountID,
       merchantName: merchantNameField.getValue() || null,
       category,
       subcategory,
-      cadence:
-        cadenceField.getValue() as (typeof RecurringCadences)[keyof typeof RecurringCadences],
+      cadence: createRecurringCadence(
+        cadenceUnitField.getValue(),
+        cadenceInterval,
+        cadenceModeField.getValue(),
+      ),
       startDate: dayjs(startDate).format("YYYY-MM-DD"),
       endDate: endDateField.getValue()
         ? dayjs(endDateField.getValue()!).format("YYYY-MM-DD")
@@ -147,6 +185,21 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const cadence = createRecurringCadence(
+    cadenceUnitField.getValue(),
+    Number(cadenceIntervalField.getValue()),
+    cadenceModeField.getValue(),
+  );
+  const previewDates =
+    startDateField.getValue() && cadence.interval > 0
+      ? getUpcomingRecurringDates(
+          cadence,
+          dayjs(startDateField.getValue()!).format("YYYY-MM-DD"),
+          endDateField.getValue()
+            ? dayjs(endDateField.getValue()!).format("YYYY-MM-DD")
+            : null,
+        )
+      : [];
   const accountOptions = (accountsQuery.data ?? [])
     .filter((account) => account.deleted === null)
     .sort((first, second) => first.name.localeCompare(second.name))
@@ -179,30 +232,61 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         withinPortal
         elevation={0}
       />
-      <Group grow>
+      <Select
+        label={<PrimaryText size="sm">{t("recurring_cadence_mode")}</PrimaryText>}
+        data={[
+          {
+            value: RecurringCadenceModes.Interval,
+            label: t("recurring_cadence_mode_interval"),
+          },
+          {
+            value: RecurringCadenceModes.PerUnit,
+            label: t("recurring_cadence_mode_per_unit"),
+          },
+        ]}
+        {...cadenceModeField.getInputProps()}
+        elevation={0}
+      />
+      <Group grow align="flex-start">
         <Select
           label={<PrimaryText size="sm">{t("recurring_cadence")}</PrimaryText>}
           data={[
-            {
-              value: RecurringCadences.Weekly,
-              label: t("recurring_cadence_weekly"),
-            },
-            {
-              value: RecurringCadences.Biweekly,
-              label: t("recurring_cadence_biweekly"),
-            },
-            {
-              value: RecurringCadences.Monthly,
-              label: t("recurring_cadence_monthly"),
-            },
-            {
-              value: RecurringCadences.Yearly,
-              label: t("recurring_cadence_yearly"),
-            },
+            { value: RecurringCadenceUnits.Day, label: t("recurring_unit_day") },
+            { value: RecurringCadenceUnits.Week, label: t("recurring_unit_week") },
+            { value: RecurringCadenceUnits.Month, label: t("recurring_unit_month") },
+            { value: RecurringCadenceUnits.Year, label: t("recurring_unit_year") },
           ]}
-          {...cadenceField.getInputProps()}
+          {...cadenceUnitField.getInputProps()}
           elevation={0}
         />
+        <NumberInput
+          label={
+            <PrimaryText size="sm">
+              {t(
+                cadenceModeField.getValue() === RecurringCadenceModes.PerUnit
+                  ? "recurring_occurrences"
+                  : "recurring_interval",
+              )}
+            </PrimaryText>
+          }
+          min={1}
+          max={getRecurringCadenceIntervalMaximum(
+            cadenceUnitField.getValue(),
+            cadenceModeField.getValue(),
+          )}
+          allowDecimal={false}
+          allowNegative={false}
+          {...cadenceIntervalField.getInputProps()}
+          elevation={0}
+        />
+      </Group>
+      {previewDates.length > 0 && (
+        <Stack gap="0.25rem">
+          <DimmedText size="sm">{t("recurring_upcoming_dates")}</DimmedText>
+          <DimmedText size="sm">{previewDates.join(", ")}</DimmedText>
+        </Stack>
+      )}
+      <Group grow>
         <Select
           label={
             <PrimaryText size="sm">{t("recurring_amount_mode")}</PrimaryText>

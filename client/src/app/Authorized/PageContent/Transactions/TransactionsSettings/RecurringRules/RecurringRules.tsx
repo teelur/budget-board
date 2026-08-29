@@ -23,8 +23,8 @@ import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
 import {
   IRecurringRuleResponse,
   RecurringAmountModes,
-  RecurringCadences,
 } from "~/models/recurringRule";
+import { getRecurringCadenceLabel } from "~/helpers/recurringRules";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface RecurringRuleCardProps {
@@ -36,12 +36,6 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, longDateFormat } = useLocale();
   const deleteMutation = useDeleteRecurringRuleMutation();
-  const cadenceLabels = {
-    [RecurringCadences.Weekly]: t("recurring_cadence_weekly"),
-    [RecurringCadences.Biweekly]: t("recurring_cadence_biweekly"),
-    [RecurringCadences.Monthly]: t("recurring_cadence_monthly"),
-    [RecurringCadences.Yearly]: t("recurring_cadence_yearly"),
-  };
   const category =
     props.rule.subcategory ?? props.rule.category ?? t("any_category");
 
@@ -53,7 +47,9 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
             <PrimaryText>
               {props.rule.merchantName || t("any_merchant")}
             </PrimaryText>
-            <Badge variant="light">{cadenceLabels[props.rule.cadence]}</Badge>
+            <Badge variant="light">
+              {getRecurringCadenceLabel(props.rule.cadence, t)}
+            </Badge>
             {!props.rule.isActive && (
               <Badge color="gray">{t("inactive")}</Badge>
             )}

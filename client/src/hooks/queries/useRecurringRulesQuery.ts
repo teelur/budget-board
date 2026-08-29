@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { recurringRulesQueryKey } from "~/helpers/requests";
+import { normalizeRecurringCadence } from "~/helpers/recurringRules";
 import { IRecurringRuleResponse } from "~/models/recurringRule";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
@@ -14,7 +15,10 @@ export const useRecurringRulesQuery = () => {
         method: "GET",
       });
 
-      return response.data as IRecurringRuleResponse[];
+      return (response.data as IRecurringRuleResponse[]).map((rule) => ({
+        ...rule,
+        cadence: normalizeRecurringCadence(rule.cadence),
+      }));
     },
   });
 };

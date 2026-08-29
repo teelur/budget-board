@@ -1,12 +1,35 @@
-export const RecurringCadences = {
-  Weekly: "Weekly",
-  Biweekly: "Biweekly",
-  Monthly: "Monthly",
-  Yearly: "Yearly",
+export const RecurringCadenceUnits = {
+  Day: "Day",
+  Week: "Week",
+  Month: "Month",
+  Year: "Year",
 } as const;
 
-export type RecurringCadence =
-  (typeof RecurringCadences)[keyof typeof RecurringCadences];
+export type RecurringCadenceUnit =
+  (typeof RecurringCadenceUnits)[keyof typeof RecurringCadenceUnits];
+
+export const RecurringCadenceModes = {
+  Interval: "Interval",
+  PerUnit: "PerUnit",
+} as const;
+
+export type RecurringCadenceMode =
+  (typeof RecurringCadenceModes)[keyof typeof RecurringCadenceModes];
+
+export interface IRecurringCadence {
+  version: number;
+  unit: RecurringCadenceUnit;
+  interval: number;
+  mode?: RecurringCadenceMode;
+}
+
+export type RecurringCadence = IRecurringCadence;
+
+export const defaultRecurringCadence: IRecurringCadence = {
+  version: 1,
+  unit: RecurringCadenceUnits.Month,
+  interval: 1,
+};
 
 export const RecurringAmountModes = {
   Fixed: "Fixed",
@@ -21,7 +44,7 @@ export interface IRecurringRuleCreateRequest {
   merchantName: string | null;
   category: string | null;
   subcategory: string | null;
-  cadence: RecurringCadence;
+  cadence: IRecurringCadence;
   startDate: string;
   endDate: string | null;
   isActive: boolean;
