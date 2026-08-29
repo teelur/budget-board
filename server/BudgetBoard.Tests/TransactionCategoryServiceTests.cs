@@ -311,6 +311,13 @@ public class TransactionCategoryServiceTests
             .Concat(expectedDefaultCategories);
 
         result.Should().BeEquivalentTo(expectedAll);
+        result
+            .Count(category =>
+                category.Value == TransactionCategoriesConstants.TransferCategory
+                && category.Parent == string.Empty
+            )
+            .Should()
+            .Be(1);
     }
 
     [Fact]

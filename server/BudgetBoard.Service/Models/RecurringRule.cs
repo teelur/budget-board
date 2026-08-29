@@ -3,14 +3,6 @@ using BudgetBoard.Service.Helpers;
 
 namespace BudgetBoard.Service.Models;
 
-public static class RecurringCadenceValues
-{
-    public const string Weekly = "Weekly";
-    public const string Biweekly = "Biweekly";
-    public const string Monthly = "Monthly";
-    public const string Yearly = "Yearly";
-}
-
 public static class RecurringAmountModeValues
 {
     public const string Fixed = "Fixed";
@@ -23,7 +15,7 @@ public interface IRecurringRuleRequest
     string? MerchantName { get; }
     string? Category { get; }
     string? Subcategory { get; }
-    string Cadence { get; }
+    RecurringCadence Cadence { get; }
     DateOnly StartDate { get; }
     DateOnly? EndDate { get; }
     bool IsActive { get; }
@@ -37,7 +29,12 @@ public class RecurringRuleCreateRequest : IRecurringRuleRequest
     public string? MerchantName { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
-    public string Cadence { get; set; } = RecurringCadenceValues.Monthly;
+    public RecurringCadence Cadence { get; set; } = new()
+    {
+        Version = 1,
+        Unit = RecurringCadenceUnitValues.Month,
+        Interval = 1,
+    };
     public DateOnly StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
     public bool IsActive { get; set; } = true;
@@ -63,7 +60,7 @@ public interface IRecurringRuleResponse
     string? MerchantName { get; }
     string? Category { get; }
     string? Subcategory { get; }
-    string Cadence { get; }
+    RecurringCadence Cadence { get; }
     DateOnly StartDate { get; }
     DateOnly? EndDate { get; }
     bool IsActive { get; }
@@ -81,7 +78,7 @@ public class RecurringRuleResponse : IRecurringRuleResponse
     public string? MerchantName { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
-    public string Cadence { get; set; } = string.Empty;
+    public RecurringCadence Cadence { get; set; } = new();
     public DateOnly StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
     public bool IsActive { get; set; }
@@ -98,7 +95,7 @@ public class RecurringRuleResponse : IRecurringRuleResponse
         MerchantName = rule.MerchantName;
         Category = rule.Category;
         Subcategory = rule.Subcategory;
-        Cadence = rule.Cadence.ToString();
+        Cadence = RecurringCadenceSerializer.Deserialize(rule.Cadence);
         StartDate = rule.StartDate;
         EndDate = rule.EndDate;
         IsActive = rule.IsActive;

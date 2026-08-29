@@ -61,7 +61,7 @@ public class RecurringRuleService(
             MerchantName = request.MerchantName,
             Category = request.Category,
             Subcategory = request.Subcategory,
-            Cadence = ParseCadence(request.Cadence),
+            Cadence = RecurringCadenceSerializer.Serialize(request.Cadence),
             StartDate = request.StartDate,
             EndDate = request.EndDate,
             IsActive = request.IsActive,
@@ -106,7 +106,7 @@ public class RecurringRuleService(
         rule.MerchantName = request.MerchantName;
         rule.Category = request.Category;
         rule.Subcategory = request.Subcategory;
-        rule.Cadence = ParseCadence(request.Cadence);
+        rule.Cadence = RecurringCadenceSerializer.Serialize(request.Cadence);
         rule.StartDate = request.StartDate;
         rule.EndDate = request.EndDate;
         rule.IsActive = request.IsActive;
@@ -165,9 +165,10 @@ public class RecurringRuleService(
             );
             var amount = GetForecastAmount(rule);
 
+            var pairedOccurrences = GetPairedOccurrences(rule, rangeStart, monthEnd);
             foreach (var date in dates)
             {
-                if (HasMatchedOccurrence(rule, date))
+                if (pairedOccurrences.Values.Contains(date))
                 {
                     continue;
                 }
@@ -330,29 +331,126 @@ public class RecurringRuleService(
             return false;
         }
 
-        var nearbyOccurrences = RecurringRuleOccurrenceCalculator.GetOccurrences(
+        return GetPairedOccurrences(
             rule,
-            transaction.Date.AddDays(-MatchDateWindowDays * 2),
-            transaction.Date.AddDays(MatchDateWindowDays * 2)
-        );
-
-        return nearbyOccurrences.Any(occurrence =>
-            Math.Abs(occurrence.DayNumber - transaction.Date.DayNumber) <= MatchDateWindowDays
-            && !HasMatchedOccurrence(rule, occurrence, transaction.ID)
-        );
+            transaction.Date.AddDays(-MatchDateWindowDays),
+            transaction.Date.AddDays(MatchDateWindowDays),
+            transaction
+        ).ContainsKey(transaction);
     }
 
-    private static bool HasMatchedOccurrence(
+    private static IReadOnlyDictionary<Transaction, DateOnly> GetPairedOccurrences(
         RecurringRule rule,
-        DateOnly occurrence,
-        Guid? ignoredTransactionID = null
+        DateOnly? requestedRangeStart = null,
+        DateOnly? requestedRangeEnd = null,
+        Transaction? additionalTransaction = null
     )
     {
-        return rule.Transactions.Any(transaction =>
-            transaction.ID != ignoredTransactionID
-            && transaction.Deleted is null
-            && Math.Abs(transaction.Date.DayNumber - occurrence.DayNumber) <= MatchDateWindowDays
+        var transactions = rule.Transactions.Where(transaction =>
+                transaction.Deleted is null
+                && transaction != additionalTransaction
+                && IsWithinExpandedRange(
+                    transaction.Date,
+                    requestedRangeStart,
+                    requestedRangeEnd
+                )
+            )
+            .ToList();
+        if (additionalTransaction is not null)
+        {
+            transactions.Add(additionalTransaction);
+        }
+
+        if (transactions.Count == 0)
+        {
+            return new Dictionary<Transaction, DateOnly>();
+        }
+
+        var earliestDate = requestedRangeStart ?? transactions.Min(transaction => transaction.Date);
+        var latestDate = requestedRangeEnd ?? transactions.Max(transaction => transaction.Date);
+        var occurrenceRangeStart = DateOnly.FromDayNumber(
+            Math.Max(DateOnly.MinValue.DayNumber, earliestDate.DayNumber - MatchDateWindowDays)
         );
+        var occurrenceRangeEnd = DateOnly.FromDayNumber(
+            Math.Min(DateOnly.MaxValue.DayNumber, latestDate.DayNumber + MatchDateWindowDays)
+        );
+        var occurrences = RecurringRuleOccurrenceCalculator
+            .GetOccurrences(rule, occurrenceRangeStart, occurrenceRangeEnd)
+            .ToHashSet();
+        var remainingTransactions = transactions.ToHashSet();
+        var remainingOccurrences = occurrences.ToHashSet();
+        var pairs = new List<(Transaction Transaction, DateOnly Occurrence)>();
+
+        while (remainingTransactions.Count > 0 && remainingOccurrences.Count > 0)
+        {
+            var edges = remainingTransactions
+                .SelectMany(transaction =>
+                    remainingOccurrences
+                        .Where(occurrence =>
+                            Math.Abs(transaction.Date.DayNumber - occurrence.DayNumber)
+                            <= MatchDateWindowDays
+                        )
+                        .Select(occurrence =>
+                            (
+                                Transaction: transaction,
+                                Occurrence: occurrence,
+                                Distance: Math.Abs(
+                                    transaction.Date.DayNumber - occurrence.DayNumber
+                                )
+                            )
+                        )
+                )
+                .ToList();
+            if (edges.Count == 0)
+            {
+                break;
+            }
+
+            var nearestDistance = edges.Min(edge => edge.Distance);
+            var nearestEdges = edges
+                .Where(edge => edge.Distance == nearestDistance)
+                .ToList();
+            var transactionCounts = nearestEdges
+                .GroupBy(edge => edge.Transaction)
+                .ToDictionary(group => group.Key, group => group.Count());
+            var occurrenceCounts = nearestEdges
+                .GroupBy(edge => edge.Occurrence)
+                .ToDictionary(group => group.Key, group => group.Count());
+            var unambiguousPairs = nearestEdges.Where(edge =>
+                transactionCounts[edge.Transaction] == 1
+                && occurrenceCounts[edge.Occurrence] == 1
+            );
+            var pairCount = 0;
+            foreach (var edge in unambiguousPairs)
+            {
+                pairs.Add((edge.Transaction, edge.Occurrence));
+                remainingTransactions.Remove(edge.Transaction);
+                remainingOccurrences.Remove(edge.Occurrence);
+                pairCount++;
+            }
+
+            if (pairCount == 0)
+            {
+                break;
+            }
+        }
+
+        return pairs.ToDictionary(pair => pair.Transaction, pair => pair.Occurrence);
+    }
+
+    private static bool IsWithinExpandedRange(
+        DateOnly date,
+        DateOnly? rangeStart,
+        DateOnly? rangeEnd
+    )
+    {
+        if (rangeStart is null || rangeEnd is null)
+        {
+            return true;
+        }
+
+        return date.DayNumber >= rangeStart.Value.DayNumber - MatchDateWindowDays
+            && date.DayNumber <= rangeEnd.Value.DayNumber + MatchDateWindowDays;
     }
 
     private static decimal GetForecastAmount(RecurringRule rule)
@@ -406,16 +504,16 @@ public class RecurringRuleService(
             StringComparison.OrdinalIgnoreCase
         );
 
-    private RecurringCadence ParseCadence(string cadence)
+    private void ValidateCadence(RecurringCadence cadence)
     {
-        if (Enum.TryParse<RecurringCadence>(cadence, true, out var parsed))
+        try
         {
-            return parsed;
+            RecurringCadenceSerializer.Validate(cadence);
         }
-
-        throw new BudgetBoardServiceException(
-            responseLocalizer["RecurringRuleInvalidCadenceError"]
-        );
+        catch (RecurringCadenceValidationException)
+        {
+            throw new BudgetBoardServiceException(responseLocalizer["RecurringRuleInvalidCadenceError"]);
+        }
     }
 
     private RecurringAmountMode ParseAmountMode(string amountMode)
@@ -432,7 +530,7 @@ public class RecurringRuleService(
 
     private void ValidateRequest(IRecurringRuleRequest request)
     {
-        ParseCadence(request.Cadence);
+        ValidateCadence(request.Cadence);
         ParseAmountMode(request.AmountMode);
         if (request.AccountID == Guid.Empty || request.StartDate == DateOnly.MinValue)
         {

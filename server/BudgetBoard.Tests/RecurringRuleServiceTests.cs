@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
@@ -16,10 +17,14 @@ public class RecurringRuleServiceTests
     [Fact]
     public void GetOccurrences_ShouldHonorCadenceAnchorsAndMonthBoundaries()
     {
-        var weeklyRule = CreateRule(RecurringCadence.Weekly, new DateOnly(2026, 8, 3));
-        var biweeklyRule = CreateRule(RecurringCadence.Biweekly, new DateOnly(2026, 8, 3));
-        var monthlyRule = CreateRule(RecurringCadence.Monthly, new DateOnly(2026, 1, 31));
-        var yearlyRule = CreateRule(RecurringCadence.Yearly, new DateOnly(2024, 2, 29));
+        var weeklyRule = CreateRule(RecurringCadenceUnitValues.Week, 1, new DateOnly(2026, 8, 3));
+        var biweeklyRule = CreateRule(RecurringCadenceUnitValues.Week, 2, new DateOnly(2026, 8, 3));
+        var monthlyRule = CreateRule(
+            RecurringCadenceUnitValues.Month,
+            1,
+            new DateOnly(2026, 1, 31)
+        );
+        var yearlyRule = CreateRule(RecurringCadenceUnitValues.Year, 1, new DateOnly(2024, 2, 29));
 
         RecurringRuleOccurrenceCalculator
             .GetOccurrences(weeklyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31))
@@ -46,6 +51,264 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public void GetOccurrences_ShouldSupportArbitraryIntervals()
+    {
+        var dailyRule = CreateRule(RecurringCadenceUnitValues.Day, 3, new DateOnly(2026, 8, 1));
+        var weeklyRule = CreateRule(RecurringCadenceUnitValues.Week, 2, new DateOnly(2026, 8, 3));
+        var monthlyRule = CreateRule(
+            RecurringCadenceUnitValues.Month,
+            2,
+            new DateOnly(2026, 1, 31)
+        );
+        var yearlyRule = CreateRule(RecurringCadenceUnitValues.Year, 2, new DateOnly(2024, 2, 29));
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(dailyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 10))
+            .Should()
+            .Equal(
+                new DateOnly(2026, 8, 1),
+                new DateOnly(2026, 8, 4),
+                new DateOnly(2026, 8, 7),
+                new DateOnly(2026, 8, 10)
+            );
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(weeklyRule, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31))
+            .Should()
+            .Equal(new DateOnly(2026, 8, 3), new DateOnly(2026, 8, 17), new DateOnly(2026, 8, 31));
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(monthlyRule, new DateOnly(2026, 1, 1), new DateOnly(2026, 7, 31))
+            .Should()
+            .Equal(
+                new DateOnly(2026, 1, 31),
+                new DateOnly(2026, 3, 31),
+                new DateOnly(2026, 5, 31),
+                new DateOnly(2026, 7, 31)
+            );
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(yearlyRule, new DateOnly(2024, 1, 1), new DateOnly(2030, 12, 31))
+            .Should()
+            .Equal(
+                new DateOnly(2024, 2, 29),
+                new DateOnly(2026, 2, 28),
+                new DateOnly(2028, 2, 29),
+                new DateOnly(2030, 2, 28)
+            );
+    }
+
+    [Fact]
+    public void GetOccurrences_ShouldSupportMultipleOccurrencesPerUnit()
+    {
+        var twiceWeeklyRule = CreateRule(
+            RecurringCadenceUnitValues.Week,
+            2,
+            new DateOnly(2026, 8, 3),
+            RecurringCadenceModeValues.PerUnit
+        );
+        var twiceMonthlyRule = CreateRule(
+            RecurringCadenceUnitValues.Month,
+            2,
+            new DateOnly(2026, 1, 31),
+            RecurringCadenceModeValues.PerUnit
+        );
+        var thriceYearlyRule = CreateRule(
+            RecurringCadenceUnitValues.Year,
+            3,
+            new DateOnly(2024, 2, 29),
+            RecurringCadenceModeValues.PerUnit
+        );
+
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(twiceWeeklyRule, new DateOnly(2026, 8, 3), new DateOnly(2026, 8, 17))
+            .Should()
+            .Equal(
+                new DateOnly(2026, 8, 3),
+                new DateOnly(2026, 8, 6),
+                new DateOnly(2026, 8, 10),
+                new DateOnly(2026, 8, 13),
+                new DateOnly(2026, 8, 17)
+            );
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(twiceMonthlyRule, new DateOnly(2026, 1, 1), new DateOnly(2026, 3, 31))
+            .Should()
+            .Equal(
+                new DateOnly(2026, 1, 31),
+                new DateOnly(2026, 2, 14),
+                new DateOnly(2026, 2, 28),
+                new DateOnly(2026, 3, 15),
+                new DateOnly(2026, 3, 31)
+            );
+        RecurringRuleOccurrenceCalculator
+            .GetOccurrences(thriceYearlyRule, new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31))
+            .Should()
+            .Equal(
+                new DateOnly(2024, 2, 29),
+                new DateOnly(2024, 6, 30),
+                new DateOnly(2024, 10, 30),
+                new DateOnly(2025, 2, 28),
+                new DateOnly(2025, 6, 29),
+                new DateOnly(2025, 10, 29)
+            );
+    }
+
+    [Fact]
+    public void RecurringCadenceSerializer_ShouldValidateAndRoundTripV1Definition()
+    {
+        var cadence = new RecurringCadence
+        {
+            Version = 1,
+            Unit = RecurringCadenceUnitValues.Month,
+            Interval = 2,
+        };
+
+        var serialized = RecurringCadenceSerializer.Serialize(cadence);
+        var deserialized = RecurringCadenceSerializer.Deserialize(serialized);
+
+        deserialized.Version.Should().Be(1);
+        deserialized.Unit.Should().Be(RecurringCadenceUnitValues.Month);
+        deserialized.Interval.Should().Be(2);
+
+        var apiJson = JsonSerializer.Serialize(
+            new RecurringRuleCreateRequest { Cadence = cadence },
+            new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        );
+        apiJson.Should().Contain("\"cadence\":{\"version\":1,\"unit\":\"Month\",\"interval\":2}");
+        JsonSerializer
+            .Deserialize<RecurringRuleCreateRequest>(
+                apiJson,
+                new JsonSerializerOptions(JsonSerializerDefaults.Web)
+            )!
+            .Cadence.Unit.Should()
+            .Be(RecurringCadenceUnitValues.Month);
+    }
+
+    [Fact]
+    public void RecurringCadenceSerializer_ShouldRejectUnsupportedDefinitions()
+    {
+        Action[] invalidDefinitions =
+        [
+            () =>
+                RecurringCadenceSerializer.Validate(
+                    new()
+                    {
+                        Version = 2,
+                        Unit = RecurringCadenceUnitValues.Day,
+                        Interval = 1,
+                    }
+                ),
+            () =>
+                RecurringCadenceSerializer.Validate(
+                    new()
+                    {
+                        Version = 1,
+                        Unit = "Fortnight",
+                        Interval = 1,
+                    }
+                ),
+            () =>
+                RecurringCadenceSerializer.Validate(
+                    new()
+                    {
+                        Version = 1,
+                        Unit = RecurringCadenceUnitValues.Day,
+                        Interval = 0,
+                    }
+                ),
+            () =>
+                RecurringCadenceSerializer.Validate(
+                    new()
+                    {
+                        Version = 1,
+                        Unit = RecurringCadenceUnitValues.Week,
+                        Interval = 8,
+                        Mode = RecurringCadenceModeValues.PerUnit,
+                    }
+                ),
+            () =>
+                RecurringCadenceSerializer.Validate(
+                    new()
+                    {
+                        Version = 1,
+                        Unit = RecurringCadenceUnitValues.Day,
+                        Interval = 2,
+                        Mode = RecurringCadenceModeValues.PerUnit,
+                    }
+                ),
+            () =>
+                RecurringCadenceSerializer.Validate(
+                    new()
+                    {
+                        Version = 1,
+                        Unit = RecurringCadenceUnitValues.Week,
+                        Interval = 2,
+                        Mode = "Unsupported",
+                    }
+                ),
+            () => RecurringCadenceSerializer.Deserialize("{\"version\":1,\"unit\":\"Day\"}"),
+            () => RecurringCadenceSerializer.Deserialize("not-json"),
+        ];
+
+        foreach (var invalidDefinition in invalidDefinitions)
+        {
+            invalidDefinition.Should().Throw<RecurringCadenceValidationException>();
+        }
+    }
+
+    [Fact]
+    public async Task ReadForecastAsync_ShouldSuppressOnlyTheNearestOccurrence()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account);
+        rule.Cadence = RecurringCadenceSerializer.Serialize(
+            new RecurringCadence
+            {
+                Version = 1,
+                Unit = RecurringCadenceUnitValues.Day,
+                Interval = 5,
+            }
+        );
+        var transaction = AddTransaction(helper, account, new DateOnly(2026, 8, 4), 100);
+        transaction.RecurringRule = rule;
+        rule.Transactions.Add(transaction);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var forecast = await CreateService(helper, new DateOnly(2026, 8, 1))
+            .ReadForecastAsync(helper.demoUser.Id, new DateOnly(2026, 8, 1));
+
+        forecast.Should().ContainSingle(item => item.Date == new DateOnly(2026, 8, 1));
+    }
+
+    [Fact]
+    public async Task ReadForecastAsync_ShouldLeaveEquallyCloseOccurrencesUnpaired()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account);
+        rule.Cadence = RecurringCadenceSerializer.Serialize(
+            new RecurringCadence
+            {
+                Version = 1,
+                Unit = RecurringCadenceUnitValues.Day,
+                Interval = 5,
+            }
+        );
+        var firstTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 4), 100);
+        var secondTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 8), 100);
+        firstTransaction.RecurringRule = rule;
+        secondTransaction.RecurringRule = rule;
+        rule.Transactions.Add(firstTransaction);
+        rule.Transactions.Add(secondTransaction);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var forecast = await CreateService(helper, new DateOnly(2026, 8, 1))
+            .ReadForecastAsync(helper.demoUser.Id, new DateOnly(2026, 8, 1));
+
+        forecast.Should().Contain(item => item.Date == new DateOnly(2026, 8, 1));
+        forecast.Should().Contain(item => item.Date == new DateOnly(2026, 8, 6));
+        forecast.Should().Contain(item => item.Date == new DateOnly(2026, 8, 11));
+    }
+
+    [Fact]
     public async Task ReadForecastAsync_ShouldUseAutomaticMedianAndSkipMatchedOccurrences()
     {
         var helper = new TestHelper();
@@ -58,7 +321,14 @@ public class RecurringRuleServiceTests
             MerchantName = "Rent",
             Category = "Housing",
             Subcategory = "Rent",
-            Cadence = RecurringCadence.Monthly,
+            Cadence = RecurringCadenceSerializer.Serialize(
+                new()
+                {
+                    Version = 1,
+                    Unit = RecurringCadenceUnitValues.Month,
+                    Interval = 1,
+                }
+            ),
             StartDate = new DateOnly(2026, 1, 1),
             IsActive = true,
             AmountMode = RecurringAmountMode.Automatic,
@@ -118,6 +388,36 @@ public class RecurringRuleServiceTests
     }
 
     [Fact]
+    public async Task ReadForecastAsync_ShouldSuppressEachMatchedPerUnitOccurrence()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account);
+        rule.Cadence = RecurringCadenceSerializer.Serialize(
+            new RecurringCadence
+            {
+                Version = 1,
+                Unit = RecurringCadenceUnitValues.Month,
+                Interval = 2,
+                Mode = RecurringCadenceModeValues.PerUnit,
+            }
+        );
+        rule.StartDate = new DateOnly(2026, 8, 1);
+        var firstTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 1), 100);
+        var secondTransaction = AddTransaction(helper, account, new DateOnly(2026, 8, 16), 100);
+        firstTransaction.RecurringRule = rule;
+        secondTransaction.RecurringRule = rule;
+        rule.Transactions.Add(firstTransaction);
+        rule.Transactions.Add(secondTransaction);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var forecast = await CreateService(helper, new DateOnly(2026, 8, 1))
+            .ReadForecastAsync(helper.demoUser.Id, new DateOnly(2026, 8, 1));
+
+        forecast.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task ReadForecastAsync_ShouldUseEmptyAccountNameWhenAccountNameIsNull()
     {
         var helper = new TestHelper();
@@ -167,6 +467,44 @@ public class RecurringRuleServiceTests
         var service = CreateService(helper, new DateOnly(2026, 8, 1));
 
         await service.MatchTransactionAsync(helper.demoUser.Id, transaction);
+
+        transaction.RecurringRuleID.Should().Be(rule.ID);
+    }
+
+    [Fact]
+    public async Task MatchTransactionAsync_ShouldMatchASecondPerUnitOccurrence()
+    {
+        var helper = new TestHelper();
+        var account = AddAccount(helper);
+        var rule = AddRule(helper, account);
+        rule.Cadence = RecurringCadenceSerializer.Serialize(
+            new RecurringCadence
+            {
+                Version = 1,
+                Unit = RecurringCadenceUnitValues.Month,
+                Interval = 2,
+                Mode = RecurringCadenceModeValues.PerUnit,
+            }
+        );
+        rule.StartDate = new DateOnly(2026, 8, 1);
+        var transaction = new Transaction
+        {
+            Amount = 100,
+            Date = new DateOnly(2026, 8, 16),
+            MerchantName = rule.MerchantName,
+            Category = rule.Category,
+            Subcategory = rule.Subcategory,
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+        };
+        helper.UserDataContext.Transactions.Add(transaction);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await CreateService(helper, new DateOnly(2026, 8, 1)).MatchTransactionAsync(
+            helper.demoUser.Id,
+            transaction
+        );
 
         transaction.RecurringRuleID.Should().Be(rule.ID);
     }
@@ -279,7 +617,7 @@ public class RecurringRuleServiceTests
     [Fact]
     public void IsTransactionMatch_ShouldIgnoreTheTransactionBeingMatched()
     {
-        var rule = CreateRule(RecurringCadence.Monthly, new DateOnly(2026, 8, 1));
+        var rule = CreateRule(RecurringCadenceUnitValues.Month, 1, new DateOnly(2026, 8, 1));
         rule.MerchantName = "Merchant";
         rule.Category = "Category";
         rule.Subcategory = "Subcategory";
@@ -426,7 +764,7 @@ public class RecurringRuleServiceTests
         );
 
         var invalidCadence = CreateRequest(account.ID);
-        invalidCadence.Cadence = "Daily";
+        invalidCadence.Cadence = new() { Unit = "Daily" };
         await AssertServiceException(
             () => service.CreateRecurringRuleAsync(helper.demoUser.Id, invalidCadence),
             "RecurringRuleInvalidCadenceError"
@@ -483,7 +821,12 @@ public class RecurringRuleServiceTests
             MerchantName = "Updated Merchant",
             Category = "Updated Category",
             Subcategory = "Updated Subcategory",
-            Cadence = RecurringCadenceValues.Weekly,
+            Cadence = new()
+            {
+                Version = 1,
+                Unit = RecurringCadenceUnitValues.Week,
+                Interval = 1,
+            },
             StartDate = new DateOnly(2026, 7, 1),
             EndDate = new DateOnly(2026, 12, 31),
             IsActive = false,
@@ -496,7 +839,8 @@ public class RecurringRuleServiceTests
 
         response.AccountID.Should().Be(replacementAccount.ID);
         response.MerchantName.Should().Be("Updated Merchant");
-        response.Cadence.Should().Be(RecurringCadenceValues.Weekly);
+        response.Cadence.Unit.Should().Be(RecurringCadenceUnitValues.Week);
+        response.Cadence.Interval.Should().Be(1);
         response.IsActive.Should().BeFalse();
         response.AmountMode.Should().Be(RecurringAmountModeValues.Automatic);
         response.Amount.Should().Be(250);
@@ -780,7 +1124,12 @@ public class RecurringRuleServiceTests
             MerchantName = merchantName,
             Category = "Category",
             Subcategory = "Subcategory",
-            Cadence = RecurringCadenceValues.Monthly,
+            Cadence = new()
+            {
+                Version = 1,
+                Unit = RecurringCadenceUnitValues.Month,
+                Interval = 1,
+            },
             StartDate = new DateOnly(2026, 8, 1),
             EndDate = endDate,
             IsActive = true,
@@ -857,7 +1206,14 @@ public class RecurringRuleServiceTests
             MerchantName = merchantName,
             Category = category,
             Subcategory = subcategory,
-            Cadence = RecurringCadence.Monthly,
+            Cadence = RecurringCadenceSerializer.Serialize(
+                new()
+                {
+                    Version = 1,
+                    Unit = RecurringCadenceUnitValues.Month,
+                    Interval = 1,
+                }
+            ),
             StartDate = new DateOnly(2026, 8, 1),
             IsActive = true,
             AmountMode = RecurringAmountMode.Fixed,
@@ -868,12 +1224,25 @@ public class RecurringRuleServiceTests
         return rule;
     }
 
-    private static RecurringRule CreateRule(RecurringCadence cadence, DateOnly startDate) =>
+    private static RecurringRule CreateRule(
+        string unit,
+        int interval,
+        DateOnly startDate,
+        string? mode = null
+    ) =>
         new()
         {
             UserID = Guid.NewGuid(),
             AccountID = Guid.NewGuid(),
-            Cadence = cadence,
+            Cadence = RecurringCadenceSerializer.Serialize(
+                new RecurringCadence
+                {
+                    Version = 1,
+                    Unit = unit,
+                    Interval = interval,
+                    Mode = mode,
+                }
+            ),
             StartDate = startDate,
             IsActive = true,
             Amount = 100,

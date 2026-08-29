@@ -1,32 +1,6 @@
 namespace BudgetBoard.Database.Models;
 
 /// <summary>
-/// Defines how often a recurring rule repeats.
-/// </summary>
-public enum RecurringCadence
-{
-    /// <summary>
-    /// Repeats every week.
-    /// </summary>
-    Weekly,
-
-    /// <summary>
-    /// Repeats every two weeks.
-    /// </summary>
-    Biweekly,
-
-    /// <summary>
-    /// Repeats every month.
-    /// </summary>
-    Monthly,
-
-    /// <summary>
-    /// Repeats every year.
-    /// </summary>
-    Yearly,
-}
-
-/// <summary>
 /// Defines how the amount for a recurring rule is determined.
 /// </summary>
 public enum RecurringAmountMode
@@ -88,9 +62,9 @@ public class RecurringRule
     public string? Subcategory { get; set; }
 
     /// <summary>
-    /// Frequency at which the rule repeats.
+    /// JSON cadence definition at which the rule repeats.
     /// </summary>
-    public RecurringCadence Cadence { get; set; } = RecurringCadence.Monthly;
+    public string Cadence { get; set; } = "{\"version\":1,\"unit\":\"Month\",\"interval\":1}";
 
     /// <summary>
     /// Date on which the recurring rule begins.

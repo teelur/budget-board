@@ -615,12 +615,6 @@ public static class TransactionCategoriesConstants
                 },
                 new TransactionCategoryBase
                 {
-                    Value = "Transfer",
-                    Parent = "",
-                    CategoryType = TransactionCategoryTypes.Expense,
-                },
-                new TransactionCategoryBase
-                {
                     Value = "Credit Card Payment",
                     Parent = "Transfer",
                     CategoryType = TransactionCategoryTypes.Expense,
