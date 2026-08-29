@@ -29,12 +29,13 @@ public class RecurringRuleCreateRequest : IRecurringRuleRequest
     public string? MerchantName { get; set; }
     public string? Category { get; set; }
     public string? Subcategory { get; set; }
-    public RecurringCadence Cadence { get; set; } = new()
-    {
-        Version = 1,
-        Unit = RecurringCadenceUnitValues.Month,
-        Interval = 1,
-    };
+    public RecurringCadence Cadence { get; set; } =
+        new()
+        {
+            Version = 1,
+            Unit = RecurringCadenceUnitValues.Month,
+            Interval = 1,
+        };
     public DateOnly StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
     public bool IsActive { get; set; } = true;

@@ -100,11 +100,11 @@ export const normalizeRecurringCadence = (
     : undefined;
 
   if (
-    version === 1
-    && unit
-    && Number.isInteger(interval)
-    && interval > 0
-    && (maximumInterval === undefined || interval <= maximumInterval)
+    version === 1 &&
+    unit &&
+    Number.isInteger(interval) &&
+    interval > 0 &&
+    (maximumInterval === undefined || interval <= maximumInterval)
   ) {
     return createRecurringCadence(unit, interval, mode);
   }
@@ -145,9 +145,9 @@ export const getUpcomingRecurringDates = (
   endDate?: string | null,
 ): string[] => {
   if (
-    cadence.version !== 1
-    || !Number.isInteger(cadence.interval)
-    || cadence.interval <= 0
+    cadence.version !== 1 ||
+    !Number.isInteger(cadence.interval) ||
+    cadence.interval <= 0
   ) {
     return [];
   }
@@ -160,13 +160,21 @@ export const getUpcomingRecurringDates = (
 
   if (cadence.mode === RecurringCadenceModes.PerUnit) {
     const dates: string[] = [];
-    for (let periodIndex = 0; dates.length < PREVIEW_OCCURRENCE_COUNT; periodIndex++) {
-      const candidates = getPerUnitPeriodOccurrences(cadence, start, periodIndex);
+    for (
+      let periodIndex = 0;
+      dates.length < PREVIEW_OCCURRENCE_COUNT;
+      periodIndex++
+    ) {
+      const candidates = getPerUnitPeriodOccurrences(
+        cadence,
+        start,
+        periodIndex,
+      );
       candidates.forEach((candidate) => {
         if (
-          dates.length < PREVIEW_OCCURRENCE_COUNT
-          && !candidate.isBefore(start, "day")
-          && !candidate.isAfter(end, "day")
+          dates.length < PREVIEW_OCCURRENCE_COUNT &&
+          !candidate.isBefore(start, "day") &&
+          !candidate.isAfter(end, "day")
         ) {
           dates.push(candidate.format("YYYY-MM-DD"));
         }
@@ -181,7 +189,11 @@ export const getUpcomingRecurringDates = (
   }
 
   const dates: string[] = [];
-  for (let occurrenceIndex = 0; dates.length < PREVIEW_OCCURRENCE_COUNT; occurrenceIndex++) {
+  for (
+    let occurrenceIndex = 0;
+    dates.length < PREVIEW_OCCURRENCE_COUNT;
+    occurrenceIndex++
+  ) {
     const candidate = getRecurringOccurrence(cadence, start, occurrenceIndex);
     if (!candidate.isValid() || candidate.isAfter(end, "day")) {
       break;
@@ -197,37 +209,57 @@ const getPerUnitPeriodOccurrences = (
   start: Dayjs,
   periodIndex: number,
 ): Dayjs[] => {
-  const occurrences = Array.from({ length: cadence.interval }, (_, occurrenceIndex) => {
-    switch (cadence.unit) {
-      case RecurringCadenceUnits.Day:
-        return start.add(periodIndex, "day");
-      case RecurringCadenceUnits.Week:
-        return start
-          .add(periodIndex * 7, "day")
-          .add(Math.floor(occurrenceIndex * 7 / cadence.interval), "day");
-      case RecurringCadenceUnits.Month: {
-        const month = start.add(periodIndex, "month").startOf("month");
-        const daysInMonth = month.daysInMonth();
-        const anchorDay = Math.min(start.date(), daysInMonth) - 1;
-        const day = (anchorDay + Math.floor(occurrenceIndex * daysInMonth / cadence.interval)) % daysInMonth + 1;
-        return month.date(day);
+  const occurrences = Array.from(
+    { length: cadence.interval },
+    (_, occurrenceIndex) => {
+      switch (cadence.unit) {
+        case RecurringCadenceUnits.Day:
+          return start.add(periodIndex, "day");
+        case RecurringCadenceUnits.Week:
+          return start
+            .add(periodIndex * 7, "day")
+            .add(Math.floor((occurrenceIndex * 7) / cadence.interval), "day");
+        case RecurringCadenceUnits.Month: {
+          const month = start.add(periodIndex, "month").startOf("month");
+          const daysInMonth = month.daysInMonth();
+          const anchorDay = Math.min(start.date(), daysInMonth) - 1;
+          const day =
+            ((anchorDay +
+              Math.floor((occurrenceIndex * daysInMonth) / cadence.interval)) %
+              daysInMonth) +
+            1;
+          return month.date(day);
+        }
+        case RecurringCadenceUnits.Year: {
+          const yearStart = start.add(periodIndex, "year").startOf("year");
+          const year = yearStart.year();
+          const daysInYear =
+            year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
+              ? 366
+              : 365;
+          const anchorDate = start
+            .add(periodIndex, "year")
+            .month(start.month())
+            .date(
+              Math.min(
+                start.date(),
+                start.add(periodIndex, "year").daysInMonth(),
+              ),
+            );
+          const anchorDay = anchorDate.diff(yearStart, "day");
+          const dayOfYear =
+            (anchorDay +
+              Math.floor((occurrenceIndex * daysInYear) / cadence.interval)) %
+            daysInYear;
+          return yearStart.add(dayOfYear, "day");
+        }
       }
-      case RecurringCadenceUnits.Year: {
-        const yearStart = start.add(periodIndex, "year").startOf("year");
-        const year = yearStart.year();
-        const daysInYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 366 : 365;
-        const anchorDate = start
-          .add(periodIndex, "year")
-          .month(start.month())
-          .date(Math.min(start.date(), start.add(periodIndex, "year").daysInMonth()));
-        const anchorDay = anchorDate.diff(yearStart, "day");
-        const dayOfYear = (anchorDay + Math.floor(occurrenceIndex * daysInYear / cadence.interval)) % daysInYear;
-        return yearStart.add(dayOfYear, "day");
-      }
-    }
-  });
+    },
+  );
 
-  return occurrences.sort((first, second) => first.valueOf() - second.valueOf());
+  return occurrences.sort(
+    (first, second) => first.valueOf() - second.valueOf(),
+  );
 };
 
 const getRecurringOccurrence = (
@@ -246,7 +278,9 @@ const getRecurringOccurrence = (
       const year = Math.floor(monthIndex / 12);
       const month = monthIndex % 12;
       const firstOfMonth = dayjs(new Date(year, month, 1));
-      return firstOfMonth.date(Math.min(start.date(), firstOfMonth.daysInMonth()));
+      return firstOfMonth.date(
+        Math.min(start.date(), firstOfMonth.daysInMonth()),
+      );
     }
     case RecurringCadenceUnits.Year: {
       const year = start.year() + occurrenceIndex * cadence.interval;

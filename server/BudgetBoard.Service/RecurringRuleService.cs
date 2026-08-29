@@ -332,11 +332,12 @@ public class RecurringRuleService(
         }
 
         return GetPairedOccurrences(
-            rule,
-            transaction.Date.AddDays(-MatchDateWindowDays),
-            transaction.Date.AddDays(MatchDateWindowDays),
-            transaction
-        ).ContainsKey(transaction);
+                rule,
+                transaction.Date.AddDays(-MatchDateWindowDays),
+                transaction.Date.AddDays(MatchDateWindowDays),
+                transaction
+            )
+            .ContainsKey(transaction);
     }
 
     private static IReadOnlyDictionary<Transaction, DateOnly> GetPairedOccurrences(
@@ -346,14 +347,11 @@ public class RecurringRuleService(
         Transaction? additionalTransaction = null
     )
     {
-        var transactions = rule.Transactions.Where(transaction =>
+        var transactions = rule
+            .Transactions.Where(transaction =>
                 transaction.Deleted is null
                 && transaction != additionalTransaction
-                && IsWithinExpandedRange(
-                    transaction.Date,
-                    requestedRangeStart,
-                    requestedRangeEnd
-                )
+                && IsWithinExpandedRange(transaction.Date, requestedRangeStart, requestedRangeEnd)
             )
             .ToList();
         if (additionalTransaction is not null)
@@ -407,9 +405,7 @@ public class RecurringRuleService(
             }
 
             var nearestDistance = edges.Min(edge => edge.Distance);
-            var nearestEdges = edges
-                .Where(edge => edge.Distance == nearestDistance)
-                .ToList();
+            var nearestEdges = edges.Where(edge => edge.Distance == nearestDistance).ToList();
             var transactionCounts = nearestEdges
                 .GroupBy(edge => edge.Transaction)
                 .ToDictionary(group => group.Key, group => group.Count());
@@ -417,8 +413,7 @@ public class RecurringRuleService(
                 .GroupBy(edge => edge.Occurrence)
                 .ToDictionary(group => group.Key, group => group.Count());
             var unambiguousPairs = nearestEdges.Where(edge =>
-                transactionCounts[edge.Transaction] == 1
-                && occurrenceCounts[edge.Occurrence] == 1
+                transactionCounts[edge.Transaction] == 1 && occurrenceCounts[edge.Occurrence] == 1
             );
             var pairCount = 0;
             foreach (var edge in unambiguousPairs)
@@ -512,7 +507,9 @@ public class RecurringRuleService(
         }
         catch (RecurringCadenceValidationException)
         {
-            throw new BudgetBoardServiceException(responseLocalizer["RecurringRuleInvalidCadenceError"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["RecurringRuleInvalidCadenceError"]
+            );
         }
     }
 

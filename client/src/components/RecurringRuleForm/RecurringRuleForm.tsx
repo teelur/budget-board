@@ -77,8 +77,7 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
     initialValue: sourceRule?.cadence.unit ?? defaultRecurringCadence.unit,
   });
   const cadenceModeField = useField<RecurringCadenceMode>({
-    initialValue:
-      sourceRule?.cadence.mode ?? RecurringCadenceModes.Interval,
+    initialValue: sourceRule?.cadence.mode ?? RecurringCadenceModes.Interval,
   });
   const cadenceIntervalField = useField<number | string>({
     initialValue:
@@ -143,9 +142,10 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
       cadenceMode,
     );
     if (
-      !Number.isInteger(cadenceInterval)
-      || cadenceInterval <= 0
-      || (cadenceIntervalMaximum !== undefined && cadenceInterval > cadenceIntervalMaximum)
+      !Number.isInteger(cadenceInterval) ||
+      cadenceInterval <= 0 ||
+      (cadenceIntervalMaximum !== undefined &&
+        cadenceInterval > cadenceIntervalMaximum)
     ) {
       cadenceIntervalField.validate();
       return;
@@ -233,7 +233,9 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         elevation={0}
       />
       <Select
-        label={<PrimaryText size="sm">{t("recurring_cadence_mode")}</PrimaryText>}
+        label={
+          <PrimaryText size="sm">{t("recurring_cadence_mode")}</PrimaryText>
+        }
         data={[
           {
             value: RecurringCadenceModes.Interval,
@@ -251,10 +253,22 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         <Select
           label={<PrimaryText size="sm">{t("recurring_cadence")}</PrimaryText>}
           data={[
-            { value: RecurringCadenceUnits.Day, label: t("recurring_unit_day") },
-            { value: RecurringCadenceUnits.Week, label: t("recurring_unit_week") },
-            { value: RecurringCadenceUnits.Month, label: t("recurring_unit_month") },
-            { value: RecurringCadenceUnits.Year, label: t("recurring_unit_year") },
+            {
+              value: RecurringCadenceUnits.Day,
+              label: t("recurring_unit_day"),
+            },
+            {
+              value: RecurringCadenceUnits.Week,
+              label: t("recurring_unit_week"),
+            },
+            {
+              value: RecurringCadenceUnits.Month,
+              label: t("recurring_unit_month"),
+            },
+            {
+              value: RecurringCadenceUnits.Year,
+              label: t("recurring_unit_year"),
+            },
           ]}
           {...cadenceUnitField.getInputProps()}
           elevation={0}

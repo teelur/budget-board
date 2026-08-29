@@ -23,31 +23,20 @@ namespace BudgetBoard.Database.Migrations
                 END;
                 """
             );
-
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_RecurringRule_Cadence_IsObject",
-                table: "RecurringRule",
-                sql: "jsonb_typeof(\"Cadence\") = 'object'"
-            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropCheckConstraint(
-                name: "CK_RecurringRule_Cadence_IsObject",
-                table: "RecurringRule"
-            );
-
             migrationBuilder.Sql(
                 """
                 ALTER TABLE "RecurringRule"
                 ALTER COLUMN "Cadence" TYPE character varying(32)
                 USING CASE
-                    WHEN "Cadence" = '{"version":1,"unit":"Week","interval":1}'::jsonb THEN 'Weekly'
-                    WHEN "Cadence" = '{"version":1,"unit":"Week","interval":2}'::jsonb THEN 'Biweekly'
-                    WHEN "Cadence" = '{"version":1,"unit":"Month","interval":1}'::jsonb THEN 'Monthly'
-                    WHEN "Cadence" = '{"version":1,"unit":"Year","interval":1}'::jsonb THEN 'Yearly'
+                    WHEN "Cadence"->>'unit' = 'Week' AND ("Cadence"->>'interval')::integer = 1 THEN 'Weekly'
+                    WHEN "Cadence"->>'unit' = 'Week' AND ("Cadence"->>'interval')::integer = 2 THEN 'Biweekly'
+                    WHEN "Cadence"->>'unit' = 'Month' AND ("Cadence"->>'interval')::integer = 1 THEN 'Monthly'
+                    WHEN "Cadence"->>'unit' = 'Year' AND ("Cadence"->>'interval')::integer = 1 THEN 'Yearly'
                     ELSE 'Monthly'
                 END;
                 """

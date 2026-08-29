@@ -22,6 +22,7 @@ public sealed class RecurringCadence
     public int Version { get; set; }
     public string? Unit { get; set; }
     public int Interval { get; set; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Mode { get; set; }
 }
@@ -37,7 +38,9 @@ public sealed class RecurringCadenceValidationException : Exception
 
 public static class RecurringCadenceSerializer
 {
-    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
+    private static readonly JsonSerializerOptions SerializerOptions = new(
+        JsonSerializerDefaults.Web
+    )
     {
         PropertyNameCaseInsensitive = true,
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
@@ -58,7 +61,10 @@ public static class RecurringCadenceSerializer
 
         try
         {
-            var definition = JsonSerializer.Deserialize<RecurringCadence>(cadence, SerializerOptions);
+            var definition = JsonSerializer.Deserialize<RecurringCadence>(
+                cadence,
+                SerializerOptions
+            );
             Validate(definition);
             return definition!;
         }
@@ -84,7 +90,8 @@ public static class RecurringCadenceSerializer
         }
 
         if (
-            cadence.Unit is not RecurringCadenceUnitValues.Day
+            cadence.Unit
+            is not RecurringCadenceUnitValues.Day
                 and not RecurringCadenceUnitValues.Week
                 and not RecurringCadenceUnitValues.Month
                 and not RecurringCadenceUnitValues.Year
@@ -99,7 +106,11 @@ public static class RecurringCadenceSerializer
         }
 
         var mode = cadence.Mode ?? RecurringCadenceModeValues.Interval;
-        if (mode is not RecurringCadenceModeValues.Interval and not RecurringCadenceModeValues.PerUnit)
+        if (
+            mode
+            is not RecurringCadenceModeValues.Interval
+                and not RecurringCadenceModeValues.PerUnit
+        )
         {
             throw new RecurringCadenceValidationException("Cadence mode is not supported.");
         }

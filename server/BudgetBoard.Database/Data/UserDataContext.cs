@@ -127,10 +127,11 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
             {
                 r.ToTable(
                     "RecurringRule",
-                    table => table.HasCheckConstraint(
-                        "CK_RecurringRule_Cadence_IsObject",
-                        "jsonb_typeof(\"Cadence\") = 'object'"
-                    )
+                    table =>
+                        table.HasCheckConstraint(
+                            "CK_RecurringRule_Cadence_IsObject",
+                            "jsonb_typeof(\"Cadence\") = 'object'"
+                        )
                 );
             }
             else
