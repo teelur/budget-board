@@ -17,7 +17,8 @@ public class TransactionService(
     IAutomaticTransactionCategorizerService automaticTransactionCategorizerService,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer,
-    ITagService tagService
+    ITagService tagService,
+    IRecurringRuleService recurringRuleService
 ) : ITransactionService
 {
     private const int DefaultLinkCandidateDateWindowDays = 3;
@@ -72,6 +73,7 @@ public class TransactionService(
         );
 
         userDataContext.Transactions.Add(newTransaction);
+        await recurringRuleService.MatchTransactionAsync(userData.Id, newTransaction);
 
         // Manual accounts need to manually update the balance
         if (account.Source == AccountSource.Manual)
@@ -207,6 +209,8 @@ public class TransactionService(
                     )
                 );
             }
+
+            await recurringRuleService.MatchTransactionAsync(userData.Id, transaction);
 
             UpdateBalancesForEditedTransaction(
                 transaction,

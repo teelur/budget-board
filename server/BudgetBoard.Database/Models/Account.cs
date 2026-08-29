@@ -66,6 +66,11 @@ public class Account
     public ICollection<Transaction> Transactions { get; set; } = [];
 
     /// <summary>
+    /// Collection of recurring rules associated with the account.
+    /// </summary>
+    public ICollection<RecurringRule> RecurringRules { get; set; } = [];
+
+    /// <summary>
     /// Collection of financial goals linked to the account.
     /// </summary>
     public ICollection<Goal> Goals { get; set; } = [];

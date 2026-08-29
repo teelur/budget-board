@@ -48,10 +48,12 @@ const Budgets = (): React.ReactNode => {
       <BudgetsContent
         budgets={budgetsQuery.data}
         transactions={transactionsQuery.data ?? []}
+        selectedDates={selectedDates}
         selectedDate={
           selectedDates.length === 1 ? (selectedDates[0] ?? null) : null
         }
         isPending={budgetsQuery.isPending}
+        isTransactionsPending={transactionsQuery.isPending}
       />
     </Stack>
   );

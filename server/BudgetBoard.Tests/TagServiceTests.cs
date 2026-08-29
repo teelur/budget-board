@@ -422,6 +422,7 @@ public class TagServiceTests
             Mock.Of<IAutomaticTransactionCategorizerService>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
-            tagService
+            tagService,
+            Mock.Of<IRecurringRuleService>()
         );
 }

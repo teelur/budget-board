@@ -96,6 +96,10 @@ const Navbar = (props: NavbarProps) => {
         },
         { path: "/transactions/settings/rules", label: t("automatic_rules") },
         {
+          path: "/transactions/settings/recurring",
+          label: t("recurring_transactions"),
+        },
+        {
           path: "/transactions/settings/deleted",
           label: t("deleted_transactions"),
         },

@@ -15,6 +15,9 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { CategoryTypes } from "~/models/category";
+import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
+import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import StatusText from "~/components/core/Text/StatusText/StatusText";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -31,6 +34,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const { allTransactionCategories, getCategoryType } =
     useTransactionCategories();
   const transactionsQuery = useTransactionsQuery();
+  const forecastQuery = useRecurringForecastQuery({
+    month: props.month,
+    enabled: props.isOpen && props.month !== null,
+  });
 
   const transactionsForCategory = (transactionsQuery.data ?? [])
     .filter((transaction) =>
@@ -62,6 +69,18 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     transactionsForCategory?.filter((transaction) =>
       dayjs(transaction.date).isSame(props.month, "month"),
     );
+
+  const forecastForCategory = (forecastQuery.data ?? []).filter(
+    (occurrence) => {
+      if (
+        !props.category ||
+        getIsParentCategory(props.category, allTransactionCategories)
+      ) {
+        return areStringsEqual(occurrence.category ?? "", props.category ?? "");
+      }
+      return areStringsEqual(occurrence.subcategory ?? "", props.category);
+    },
+  );
 
   const chartMonths = Array.from({ length: chartLookbackMonths }, (_, i) =>
     getDateFromMonthsAgo(i, props.month ?? dayjs().toDate()),
@@ -130,6 +149,37 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                 transactions={transactionsForCategoryForCurrentMonth ?? []}
                 categories={allTransactionCategories}
               />
+            </Accordion.Item>
+            <Accordion.Item
+              title={
+                <PrimaryHeading order={5} size="md">
+                  {t("projected")}
+                </PrimaryHeading>
+              }
+            >
+              {forecastQuery.isPending ? (
+                <Skeleton height={35} radius="md" />
+              ) : forecastForCategory.length > 0 ? (
+                <Stack gap="0.25rem">
+                  {forecastForCategory.map((occurrence) => (
+                    <Group
+                      key={`${occurrence.ruleID}-${occurrence.date}`}
+                      justify="space-between"
+                    >
+                      <PrimaryText size="sm">
+                        {dayjs(occurrence.date).format("LL")}
+                      </PrimaryText>
+                      <StatusText size="sm" amount={occurrence.amount}>
+                        <SensitiveAmount amount={occurrence.amount} />
+                      </StatusText>
+                    </Group>
+                  ))}
+                </Stack>
+              ) : (
+                <DimmedText size="sm">
+                  {t("no_projected_transactions")}
+                </DimmedText>
+              )}
             </Accordion.Item>
           </Accordion>
         </Stack>

@@ -13,16 +13,15 @@ import {
 import React from "react";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
-import { StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
+import BudgetMetrics from "../BudgetMetrics/BudgetMetrics";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
@@ -33,6 +32,7 @@ interface BudgetChildCardProps {
   id: string;
   categoryValue: string;
   amount: number;
+  projectedAmount?: number;
   limit: number;
   isIncome: boolean;
   selectedDate: Date;
@@ -50,6 +50,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     formatAmount(amount, false, SignDisplay.Auto);
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
+  const projectedAmount = props.projectedAmount ?? props.amount;
 
   const newLimitField = useField<number | string>({
     initialValue: props.limit ?? 0,
@@ -189,50 +190,41 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
             </Group>
           </Group>
           <Group
-            gap="0.25rem"
-            justify="flex-end"
+            gap="0.5rem"
             align="center"
             style={{ containerType: "inline-size" }}
           >
-            <Flex style={{ flex: "1 1 auto" }}>
+            <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
               <Progress
-                size={14}
+                size={10}
                 percentComplete={percentComplete}
                 amount={props.amount}
                 limit={props.limit}
+                projectedAmount={projectedAmount}
                 type={
                   props.isIncome ? ProgressType.Income : ProgressType.Expense
                 }
                 warningThreshold={budgetWarningThreshold}
                 elevation={1}
+                showPercentLabel={false}
               />
             </Flex>
-            <Trans
-              i18nKey="budget_left_styled"
-              values={{
-                amount: formatSensitiveAmount(
-                  roundAwayFromZero(
-                    props.limit - props.amount * (props.isIncome ? 1 : -1),
-                  ),
-                ),
-              }}
-              components={[
-                <StatusText
-                  amount={roundAwayFromZero(props.amount)}
-                  total={props.limit}
-                  type={
-                    props.isIncome
-                      ? StatusColorType.Income
-                      : StatusColorType.Expense
-                  }
-                  warningThreshold={budgetWarningThreshold}
-                  size="md"
-                  key="amount"
-                />,
-                <DimmedText size="md" key="amount" elevation={1} />,
-              ]}
-            />
+            <PrimaryText
+              size="sm"
+              elevation={1}
+              style={{ flexShrink: 0, lineHeight: 1 }}
+            >
+              {percentComplete.toFixed(0)}%
+            </PrimaryText>
           </Group>
+          <BudgetMetrics
+            amount={props.amount}
+            projectedAmount={projectedAmount}
+            limit={props.limit}
+            isIncome={props.isIncome}
+            budgetWarningThreshold={budgetWarningThreshold}
+            formatAmount={formatSensitiveAmount}
+          />
         </Stack>
         {isSelected && (
           <Group style={{ alignSelf: "stretch" }}>

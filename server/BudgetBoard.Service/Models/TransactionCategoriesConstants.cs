@@ -3,6 +3,7 @@
 public static class TransactionCategoriesConstants
 {
     public const string HideFromBudgetsCategory = "Hide from Budgets";
+    public const string TransferCategory = "Transfer";
 
     public static readonly IReadOnlyCollection<ITransactionCategory> SpecialTransactionCategories =
         new List<ITransactionCategory>(
@@ -10,6 +11,12 @@ public static class TransactionCategoriesConstants
                 new TransactionCategoryBase
                 {
                     Value = HideFromBudgetsCategory,
+                    Parent = "",
+                    CategoryType = TransactionCategoryTypes.Expense,
+                },
+                new TransactionCategoryBase
+                {
+                    Value = TransferCategory,
                     Parent = "",
                     CategoryType = TransactionCategoryTypes.Expense,
                 },
@@ -604,12 +611,6 @@ public static class TransactionCategoriesConstants
                 {
                     Value = "State Tax",
                     Parent = "Taxes",
-                    CategoryType = TransactionCategoryTypes.Expense,
-                },
-                new TransactionCategoryBase
-                {
-                    Value = "Transfer",
-                    Parent = "",
                     CategoryType = TransactionCategoryTypes.Expense,
                 },
                 new TransactionCategoryBase

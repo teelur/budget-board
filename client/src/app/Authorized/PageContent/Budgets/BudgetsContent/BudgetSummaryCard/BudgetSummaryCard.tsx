@@ -12,15 +12,19 @@ import SplitCard, {
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { PiggyBankIcon } from "lucide-react";
 import Divider from "~/components/core/Divider/Divider";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface BudgetSummaryCardProps {
   incomeCategories: ICategory[];
   expenseCategories: ICategory[];
   budgets: IBudget[];
   categoryToTransactionsTotalMap: Map<string, number>;
+  categoryToRecurringForecastTotalMap: Map<string, number>;
   unbudgetedIncomeCategoryTree: ICategory[];
   unbudgetedExpenseCategoryTree: ICategory[];
+  projectedUnbudgetedTransactionsTotal: number;
   isPending: boolean;
+  isForecastError: boolean;
 }
 
 const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
@@ -70,6 +74,38 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
       .reduce((acc, total) => acc + total, 0) +
     (props.categoryToTransactionsTotalMap.get("") ?? 0);
 
+  const getForecastTotal = (category: ICategory): number =>
+    props.categoryToRecurringForecastTotalMap.get(
+      category.value.toLocaleLowerCase(),
+    ) ?? 0;
+  const incomeForecastTotal = props.incomeCategories.reduce(
+    (acc, category) => acc + getForecastTotal(category),
+    0,
+  );
+  const expenseForecastTotal = props.expenseCategories.reduce(
+    (acc, category) => acc + getForecastTotal(category),
+    0,
+  );
+  const projectedIncomeTransactionsTotal = props.isForecastError
+    ? undefined
+    : incomeTransactionsTotal + incomeForecastTotal;
+  const projectedExpenseTransactionsTotal = props.isForecastError
+    ? undefined
+    : expenseTransactionsTotal + expenseForecastTotal;
+  const projectedUnbudgetedTotal = props.isForecastError
+    ? undefined
+    : unbudgetedTransactionsTotal + props.projectedUnbudgetedTransactionsTotal;
+  const projectedNetExpensesTotal =
+    projectedIncomeTransactionsTotal === undefined ||
+    projectedExpenseTransactionsTotal === undefined
+      ? undefined
+      : projectedIncomeTransactionsTotal + projectedExpenseTransactionsTotal;
+  const projectedNetCashFlowTotal =
+    projectedNetExpensesTotal === undefined ||
+    projectedUnbudgetedTotal === undefined
+      ? undefined
+      : projectedNetExpensesTotal + projectedUnbudgetedTotal;
+
   return (
     <SplitCard
       border={BorderThickness.Thick}
@@ -83,6 +119,13 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
       }
       elevation={1}
     >
+      {props.isForecastError && (
+        <Group gap="0.25rem" px="0.75rem" mt="0.25rem">
+          <DimmedText size="xs">
+            {t("error_loading_configuration_message")}
+          </DimmedText>
+        </Group>
+      )}
       <Stack my="0.5rem" gap={0}>
         {props.isPending ? (
           <Flex h="100%" w="100%" p="0.5rem">
@@ -94,6 +137,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
               label={t("income")}
               amount={incomeTransactionsTotal}
               total={incomeBudgetsTotal}
+              projectedAmount={projectedIncomeTransactionsTotal}
               budgetValueType={StatusColorType.Income}
               showDivider={incomeBudgetsTotal <= 0}
             />
@@ -101,12 +145,14 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
               label={t("expenses")}
               amount={expenseTransactionsTotal}
               total={expenseBudgetsTotal}
+              projectedAmount={projectedExpenseTransactionsTotal}
               budgetValueType={StatusColorType.Expense}
               showDivider={expenseBudgetsTotal <= 0}
             />
             <BudgetSummaryItem
               label={t("net_expenses")}
               amount={incomeTransactionsTotal + expenseTransactionsTotal}
+              projectedAmount={projectedNetExpensesTotal}
               budgetValueType={StatusColorType.Total}
               hideProgress
               showDivider
@@ -123,6 +169,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
             <BudgetSummaryItem
               label={t("unbudgeted")}
               amount={unbudgetedTransactionsTotal}
+              projectedAmount={projectedUnbudgetedTotal}
               budgetValueType={StatusColorType.Total}
               hideProgress
               showDivider
@@ -143,6 +190,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
                 expenseTransactionsTotal +
                 unbudgetedTransactionsTotal
               }
+              projectedAmount={projectedNetCashFlowTotal}
               budgetValueType={StatusColorType.Total}
               hideProgress
               showDivider

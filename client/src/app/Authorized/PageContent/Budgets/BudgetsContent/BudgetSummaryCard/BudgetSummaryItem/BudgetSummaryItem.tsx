@@ -10,10 +10,12 @@ import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBa
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { roundAwayFromZero } from "~/helpers/utils";
 
 interface BudgetSummaryItemProps {
   label: string;
   amount: number;
+  projectedAmount?: number;
   total?: number;
   budgetValueType: StatusColorType;
   hideProgress?: boolean;
@@ -35,8 +37,15 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
 
   const signedAmount =
     props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
+  const hasProjection =
+    props.projectedAmount !== undefined &&
+    roundAwayFromZero(props.projectedAmount - props.amount) !== 0;
+  const signedProjectedAmount =
+    (props.projectedAmount ?? 0) *
+    (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
 
   const formattedAmount = formatSensitiveAmount(signedAmount);
+  const formattedProjectedAmount = formatSensitiveAmount(signedProjectedAmount);
   const formattedTotal = formatSensitiveAmount(props.total ?? 0);
 
   const statusTextProps = {
@@ -45,6 +54,13 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     type: props.budgetValueType,
     warningThreshold: budgetWarningThreshold,
     size: "md" as const,
+  };
+  const projectedStatusTextProps = {
+    amount: props.projectedAmount ?? 0,
+    total: props.total ?? 0,
+    type: props.budgetValueType,
+    warningThreshold: budgetWarningThreshold,
+    size: "sm" as const,
   };
 
   const i18nKey = props.total
@@ -62,35 +78,80 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         <PrimaryText size="md" key="total" />,
       ]
     : [<StatusText {...statusTextProps} key="amount" />];
+  const projectedI18nKey = props.total
+    ? "budget_projected_fraction_styled"
+    : "budget_projected_styled";
+  const projectedTransValues = props.total
+    ? { amount: formattedProjectedAmount, total: formattedTotal }
+    : { amount: formattedProjectedAmount };
+  const projectedTransComponents = props.total
+    ? [
+        <DimmedText size="xs" key="label" />,
+        <StatusText {...projectedStatusTextProps} key="amount" />,
+        <DimmedText size="xs" key="of" />,
+        <PrimaryText size="sm" key="total" />,
+      ]
+    : [
+        <DimmedText size="xs" key="label" />,
+        <StatusText {...projectedStatusTextProps} key="amount" />,
+      ];
 
   return (
     <Stack gap={0}>
-      <Group gap="0.25rem" justify="space-between">
-        <Flex>
+      <Group gap="0.25rem" justify="space-between" align="center">
+        <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
           <PrimaryText size="md">{props.label}</PrimaryText>
         </Flex>
-        <Flex gap="0.25rem" align="baseline">
-          <Trans
-            i18nKey={i18nKey}
-            values={transValues}
-            components={transComponents}
-          />
-        </Flex>
+        <Stack
+          gap={0}
+          align="flex-end"
+          style={{ minWidth: 0, maxWidth: "100%" }}
+        >
+          <Flex gap="0.25rem" align="baseline">
+            <Trans
+              i18nKey={i18nKey}
+              values={transValues}
+              components={transComponents}
+            />
+          </Flex>
+          {hasProjection && (
+            <Flex gap="0.25rem" align="baseline" style={{ maxWidth: "100%" }}>
+              <Trans
+                i18nKey={projectedI18nKey}
+                values={projectedTransValues}
+                components={projectedTransComponents}
+              />
+            </Flex>
+          )}
+        </Stack>
       </Group>
       {!props.hideProgress && (props.total ?? 0) > 0 && (
-        <Progress
-          size={16}
-          percentComplete={percentComplete}
-          amount={props.amount}
-          limit={props.total ?? 0}
-          type={
-            props.budgetValueType === StatusColorType.Income
-              ? ProgressType.Income
-              : ProgressType.Expense
-          }
-          warningThreshold={budgetWarningThreshold}
-          elevation={1}
-        />
+        <Group gap="0.5rem" align="center">
+          <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
+            <Progress
+              size={8}
+              percentComplete={percentComplete}
+              amount={props.amount}
+              limit={props.total ?? 0}
+              projectedAmount={props.projectedAmount}
+              type={
+                props.budgetValueType === StatusColorType.Income
+                  ? ProgressType.Income
+                  : ProgressType.Expense
+              }
+              warningThreshold={budgetWarningThreshold}
+              elevation={1}
+              showPercentLabel={false}
+            />
+          </Flex>
+          <PrimaryText
+            size="sm"
+            elevation={1}
+            style={{ flexShrink: 0, lineHeight: 1 }}
+          >
+            {percentComplete.toFixed(0)}%
+          </PrimaryText>
+        </Group>
       )}
     </Stack>
   );
