@@ -655,7 +655,7 @@ function resolveExpression(
       token.periodError,
     );
     if (period.kind === "invalid") {
-      return "[invalid period]";
+      return `[${period.error ?? "invalid period"}]`;
     }
     if (token.range && token.source !== "transactions") {
       return "[unsupported period]";
