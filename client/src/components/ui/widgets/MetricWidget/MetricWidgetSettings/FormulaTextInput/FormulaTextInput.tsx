@@ -1,6 +1,10 @@
 import { Combobox, TextInput, useCombobox } from "@mantine/core";
 import React from "react";
-import { PERIOD_KEYWORDS } from "~/helpers/metricWidget";
+import {
+  METRIC_RANGE_ENDPOINTS,
+  METRIC_RANGE_EXAMPLES,
+  PERIOD_KEYWORDS,
+} from "~/helpers/metricWidget";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import dropdownClasses from "~/styles/Dropdown.module.css";
 
@@ -38,6 +42,8 @@ const SOURCE_PARAM_VALUES: Record<string, Record<string, string[]>> = {
     type: ["expense", "income", "all"],
   },
 };
+
+const RANGE_PARAM_KEYS: string[] = ["start", "end"];
 
 interface FormulaSuggestionData {
   transactionCategories: string[];
@@ -89,6 +95,41 @@ type FormulaStage =
 interface FormulaSuggestion {
   label: string;
   insert: string;
+}
+
+function getRangeSuggestions(
+  source: string,
+  metric: string,
+  query: string,
+): FormulaSuggestion[] {
+  if (source !== "transactions") {
+    return [];
+  }
+
+  return METRIC_RANGE_EXAMPLES.filter((example) =>
+    example.startsWith(query),
+  ).map((example) => ({
+    label: example,
+    insert: `@${source}.${metric}(${example})`,
+  }));
+}
+
+function getRangeEndpointSuggestions(
+  source: string,
+  metric: string,
+  key: string,
+  query: string,
+): FormulaSuggestion[] {
+  if (source !== "transactions" || !RANGE_PARAM_KEYS.includes(key)) {
+    return [];
+  }
+
+  return METRIC_RANGE_ENDPOINTS.filter((endpoint) =>
+    endpoint.startsWith(query.toLowerCase()),
+  ).map((endpoint) => ({
+    label: endpoint,
+    insert: `@${source}.${metric}(${key}=${endpoint}`,
+  }));
 }
 
 interface ActiveFormulaMatch {
@@ -172,6 +213,21 @@ function getFormulaSuggestions(
 
     case "first_arg": {
       const usesPeriod = SOURCE_USES_PERIOD[stage.source] ?? false;
+      const rangeEqIdx =
+        stage.source === "transactions" ? stage.query.indexOf("=") : -1;
+      if (rangeEqIdx !== -1) {
+        const rangeKey = stage.query.slice(0, rangeEqIdx).trim();
+        const rangeSuggestions = getRangeEndpointSuggestions(
+          stage.source,
+          stage.metric,
+          rangeKey,
+          stage.query.slice(rangeEqIdx + 1),
+        );
+        if (rangeSuggestions.length > 0) {
+          return rangeSuggestions;
+        }
+      }
+
       if (usesPeriod) {
         const exactMatch = PERIOD_KEYWORDS.find((p) => p === stage.query);
         if (exactMatch) {
@@ -184,12 +240,16 @@ function getFormulaSuggestions(
             })),
           ];
         }
-        return PERIOD_KEYWORDS.filter((p) => p.startsWith(stage.query)).map(
-          (p) => ({
-            label: p,
-            insert: `@${stage.source}.${stage.metric}(${p}`,
-          }),
-        );
+        const periodSuggestions = PERIOD_KEYWORDS.filter((p) =>
+          p.startsWith(stage.query),
+        ).map((p) => ({
+          label: p,
+          insert: `@${stage.source}.${stage.metric}(${p}`,
+        }));
+        return [
+          ...periodSuggestions,
+          ...getRangeSuggestions(stage.source, stage.metric, stage.query),
+        ];
       }
       // No period: first arg is a param key=value
       const eqIdx = stage.query.indexOf("=");
@@ -233,8 +293,12 @@ function getFormulaSuggestions(
       if (stage.query === "") {
         suggestions.push({ label: ")", insert: `${base})` });
       }
+      const parameterKeys =
+        stage.source === "transactions"
+          ? [...RANGE_PARAM_KEYS, ...(SOURCE_PARAM_KEYS[stage.source] ?? [])]
+          : (SOURCE_PARAM_KEYS[stage.source] ?? []);
       suggestions.push(
-        ...(SOURCE_PARAM_KEYS[stage.source] ?? [])
+        ...parameterKeys
           .filter((k) => !usedKeys.includes(k))
           .filter((k) => k.startsWith(stage.query.toLowerCase()))
           .map((k) => ({ label: `${k}=…`, insert: `${base}, ${k}=` })),
@@ -243,7 +307,18 @@ function getFormulaSuggestions(
     }
 
     case "param_value": {
-      const values = sourceParamValues[stage.source]?.[stage.key] ?? [];
+      const rangeSuggestions = getRangeEndpointSuggestions(
+        stage.source,
+        stage.metric,
+        stage.key,
+        stage.query,
+      );
+      const values =
+        rangeSuggestions.length > 0 ||
+        (stage.source === "transactions" &&
+          RANGE_PARAM_KEYS.includes(stage.key))
+          ? [...METRIC_RANGE_ENDPOINTS]
+          : (sourceParamValues[stage.source]?.[stage.key] ?? []);
       const usedKeys = stage.argsPrefix
         .split(",")
         .map((p) => (p.trim().split("=")[0] ?? "").trim())
@@ -256,7 +331,11 @@ function getFormulaSuggestions(
       );
       if (exactMatch) {
         const base = `@${stage.source}.${stage.metric}(${argsSoFar}${exactMatch}`;
-        const remainingKeys = (SOURCE_PARAM_KEYS[stage.source] ?? []).filter(
+        const parameterKeys =
+          stage.source === "transactions"
+            ? [...RANGE_PARAM_KEYS, ...(SOURCE_PARAM_KEYS[stage.source] ?? [])]
+            : (SOURCE_PARAM_KEYS[stage.source] ?? []);
+        const remainingKeys = parameterKeys.filter(
           (k) => !usedKeys.includes(k) && k !== stage.key,
         );
         return [

@@ -22,8 +22,13 @@ import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
 import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
+import { METRIC_RANGE_EXAMPLES } from "~/helpers/metricWidget";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
+@transactions.sum(${METRIC_RANGE_EXAMPLES[0]}, type=expense)
+@transactions.sum(${METRIC_RANGE_EXAMPLES[1]}, type=expense)
+@transactions.sum(${METRIC_RANGE_EXAMPLES[2]}, type=expense)
+@transactions.sum(${METRIC_RANGE_EXAMPLES[3]}, type=expense)
 @budgets.percent_used(this_month, category=Groceries)
 @budgets.spent(this_month, category=Groceries) of @budgets.total(this_month, category=Groceries)
 @goals.percent_complete(name=Emergency Fund)
