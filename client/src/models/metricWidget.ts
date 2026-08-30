@@ -3,11 +3,18 @@ export interface LiteralToken {
   text: string;
 }
 
+export interface MetricDateRangeExpression {
+  start: string;
+  end: string;
+}
+
 export interface ExpressionToken {
   type: "expression";
   source: string;
   metric: string;
   period?: string;
+  range?: MetricDateRangeExpression;
+  periodError?: string;
   params: Record<string, string>;
   raw: string;
 }

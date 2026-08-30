@@ -401,7 +401,7 @@
   "metric_widget_syntax_examples": "Examples",
   "metric_widget_syntax_periods": "Periods",
   "metric_widget_syntax_reference": "Syntax reference",
-  "metric_widget_syntax_schema": "@source.metric(period, key=value)",
+  "metric_widget_syntax_schema": "@source.metric(period | start=endpoint, end=endpoint, key=value)",
   "metric_widget_syntax_sources": "Sources",
   "metric_widget_title_label": "Title",
   "metric_widget_title_placeholder": "My Widget",
