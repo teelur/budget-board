@@ -49,6 +49,8 @@ export const METRIC_RANGE_EXAMPLES = [
   "start=week[-1]:start,end=week[0]:end",
 ] as const;
 
+const MAX_TRANSACTION_MONTHS_FOR_REQUESTS = 12;
+
 export interface ResolvedMetricPeriod {
   kind: "range" | "all_time" | "invalid";
   start?: Date;
@@ -769,6 +771,10 @@ export function buildDataRequirements(
       });
     }
   });
+
+  if (transactionMonthsMap.size > MAX_TRANSACTION_MONTHS_FOR_REQUESTS) {
+    needsAllTimeTransactions = true;
+  }
 
   if (needsAllTimeTransactions) {
     transactionMonthsMap.clear();
