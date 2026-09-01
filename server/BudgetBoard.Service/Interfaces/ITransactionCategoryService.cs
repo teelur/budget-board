@@ -29,6 +29,16 @@ public interface ITransactionCategoryService
     Task UpdateTransactionCategoryAsync(Guid userGuid, ITransactionCategoryUpdateRequest request);
 
     /// <summary>
+    /// Sets the emoji displayed for a transaction category.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="request">The category icon details. An empty icon removes the emoji.</param>
+    Task SetTransactionCategoryIconAsync(
+        Guid userGuid,
+        ITransactionCategoryIconUpdateRequest request
+    );
+
+    /// <summary>
     /// Clears built-in category references from the user's transactions and custom categories.
     /// This only changes the current EF unit of work; the caller owns SaveChangesAsync.
     /// </summary>

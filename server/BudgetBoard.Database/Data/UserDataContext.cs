@@ -31,6 +31,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<Goal> Goals { get; set; }
     public DbSet<Balance> Balances { get; set; }
     public DbSet<Category> TransactionCategories { get; set; }
+    public DbSet<CategoryIcon> TransactionCategoryIcons { get; set; }
     public DbSet<Institution> Institutions { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }
     public DbSet<AutomaticRule> AutomaticRules { get; set; }
@@ -66,6 +67,10 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
             u.HasMany(e => e.TransactionCategories)
                 .WithOne(e => e.User)
                 .HasForeignKey(e => e.UserID);
+            u.HasMany(e => e.TransactionCategoryIcons)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserID)
+                .IsRequired();
             u.HasMany(e => e.Tags).WithOne(e => e.User).HasForeignKey(e => e.UserID).IsRequired();
 
             u.HasOne(e => e.UserSettings)
@@ -216,6 +221,13 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         modelBuilder.Entity<Balance>().ToTable("Balance");
 
         modelBuilder.Entity<Category>().ToTable("TransactionCategory");
+
+        modelBuilder.Entity<CategoryIcon>(i =>
+        {
+            i.Property(e => e.Icon).HasMaxLength(CategoryIcon.MaxIconLength).IsRequired();
+            i.HasIndex(e => new { e.UserID, e.Category }).IsUnique();
+            i.ToTable("TransactionCategoryIcon");
+        });
 
         modelBuilder.Entity<Institution>(
             (i) =>

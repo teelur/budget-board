@@ -11,6 +11,8 @@ import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmo
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
+import { getCategoryIcon } from "~/helpers/category";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
@@ -22,6 +24,7 @@ interface UnbudgetedCardProps {
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs } = useLocale();
+  const { allTransactionCategories } = useTransactionCategories();
   const createBudgetMutation = useCreateBudgetMutation();
 
   if (
@@ -33,6 +36,11 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   ) {
     return null;
   }
+
+  const categoryIcon = getCategoryIcon(
+    props.categoryTree.value,
+    allTransactionCategories,
+  );
 
   const getUnbudgetedChildCards = (): React.ReactNode => {
     if (props.categoryTree.subCategories.length === 0) {
@@ -59,6 +67,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
             )!
           }
           selectedDate={props.selectedDate}
+          icon={getCategoryIcon(subCategory.value, allTransactionCategories)}
           openDetails={props.openDetails}
         />,
       );
@@ -86,6 +95,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
         <LoadingOverlay visible={createBudgetMutation.isPending} />
         <Group w="100%" justify="space-between">
           <PrimaryText size="md" fw={600}>
+            {categoryIcon.length > 0 ? `${categoryIcon} ` : ""}
             {props.categoryTree.value.length === 0
               ? t(uncategorizedTransactionCategory)
               : props.categoryTree.value}

@@ -90,6 +90,7 @@ internal static class TransactionCategoriesHelpers
 
     /// <summary>
     /// Combines built-in and custom transaction categories based on the specified settings.
+    /// The emojis the user has assigned to their categories are applied to the result.
     /// </summary>
     /// <param name="customCategories">
     /// A collection of custom transaction categories to include in the combined list.
@@ -104,7 +105,7 @@ internal static class TransactionCategoriesHelpers
         ApplicationUser userData
     )
     {
-        var allTransactionCategories = new List<ITransactionCategoryResponse>();
+        var allTransactionCategories = new List<CategoryResponse>();
         allTransactionCategories.AddRange(
             userData.TransactionCategories.Select(tc => new CategoryResponse(tc)).ToList()
         );
@@ -124,6 +125,19 @@ internal static class TransactionCategoriesHelpers
                     .ToList()
             );
         }
+
+        // Icons are stored separately, so that built-in categories can have one too.
+        var icons = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var icon in userData.TransactionCategoryIcons)
+        {
+            icons[icon.Category] = icon.Icon;
+        }
+
+        foreach (var category in allTransactionCategories)
+        {
+            category.Icon = icons.GetValueOrDefault(category.Value, string.Empty);
+        }
+
         return allTransactionCategories;
     }
 }
