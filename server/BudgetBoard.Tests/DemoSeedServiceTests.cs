@@ -206,6 +206,43 @@ public class DemoSeedServiceTests
     }
 
     [Fact]
+    public async Task ResetAndSeedAsync_WhenCalled_SeedsExpectedRecurringRules()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var mockUserManager = CreateMockUserManager(helper);
+        var service = CreateService(helper, mockUserManager);
+
+        // Act
+        await service.ResetAndSeedAsync();
+
+        // Assert
+        var rules = helper
+            .UserDataContext.RecurringRules.Where(rule => rule.UserID == DemoUserId)
+            .ToList();
+        rules.Should().HaveCount(2);
+        rules.Select(rule => rule.MerchantName).Should().BeEquivalentTo(["Comcast", "Netflix"]);
+        rules
+            .Should()
+            .ContainSingle(rule =>
+                rule.MerchantName == "Comcast"
+                && rule.Category == "Bills & Utilities"
+                && rule.Subcategory == "Internet"
+                && rule.AmountMode == RecurringAmountMode.Automatic
+                && rule.Amount == -69.99m
+            );
+        rules
+            .Should()
+            .ContainSingle(rule =>
+                rule.MerchantName == "Netflix"
+                && rule.Category == "Entertainment"
+                && rule.Subcategory == "Movies"
+                && rule.AmountMode == RecurringAmountMode.Fixed
+                && rule.Amount == -17.99m
+            );
+    }
+
+    [Fact]
     public async Task ResetAndSeedAsync_WhenCalled_SeedsAsset()
     {
         // Arrange
@@ -358,6 +395,18 @@ public class DemoSeedServiceTests
             )
             .Returns(Task.CompletedTask);
 
+        var nowProvider = new Mock<INowProvider>();
+        nowProvider
+            .Setup(provider => provider.Today)
+            .Returns(DateOnly.FromDateTime(DateTime.UtcNow));
+        var recurringRuleService = new RecurringRuleService(
+            Mock.Of<ILogger<IRecurringRuleService>>(),
+            helper.UserDataContext,
+            nowProvider.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
         var widgetSettingsService = new WidgetSettingsService(
             Mock.Of<ILogger<IWidgetSettingsService>>(),
             helper.UserDataContext,
@@ -372,6 +421,7 @@ public class DemoSeedServiceTests
             mockUserManager.Object,
             TestHelper.CreateMockLocalizer<LogStrings>(),
             mockTransactionService.Object,
+            recurringRuleService,
             widgetSettingsService
         );
     }

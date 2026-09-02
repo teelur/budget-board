@@ -18,6 +18,7 @@ public class DemoSeedService(
     UserManager<ApplicationUser> userManager,
     IStringLocalizer<LogStrings> logLocalizer,
     ITransactionService transactionService,
+    IRecurringRuleService recurringRuleService,
     IWidgetSettingsService widgetSettingsService
 ) : IDemoSeedService
 {
@@ -162,6 +163,9 @@ public class DemoSeedService(
         var creditCard = userDataContext.Accounts.First(a =>
             a.UserID == user.Id && a.Name == "Visa Rewards"
         );
+
+        await SeedRecurringRuleDataAsync(user, checking, creditCard);
+
         await SeedAccountDataAsync(
             user.Id,
             creditCard.ID,
@@ -193,6 +197,54 @@ public class DemoSeedService(
         await SeedWidgetSettingsDataAsync(user);
 
         await userDataContext.SaveChangesAsync();
+    }
+
+    private async Task SeedRecurringRuleDataAsync(
+        ApplicationUser user,
+        Account checking,
+        Account creditCard
+    )
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var startDate = new DateOnly(today.Year, today.Month, 1)
+            .AddMonths(-(MonthsOfData - 1))
+            .AddDays(4);
+        var monthlyCadence = new RecurringCadence
+        {
+            Version = 1,
+            Unit = RecurringCadenceUnitValues.Month,
+            Interval = 1,
+        };
+
+        await recurringRuleService.CreateRecurringRuleAsync(
+            user.Id,
+            new RecurringRuleCreateRequest
+            {
+                AccountID = checking.ID,
+                MerchantName = "Comcast",
+                Category = "Bills & Utilities",
+                Subcategory = "Internet",
+                Cadence = monthlyCadence,
+                StartDate = startDate,
+                AmountMode = RecurringAmountModeValues.Automatic,
+                Amount = -69.99m,
+            }
+        );
+
+        await recurringRuleService.CreateRecurringRuleAsync(
+            user.Id,
+            new RecurringRuleCreateRequest
+            {
+                AccountID = creditCard.ID,
+                MerchantName = "Netflix",
+                Category = "Entertainment",
+                Subcategory = "Movies",
+                Cadence = monthlyCadence,
+                StartDate = startDate,
+                AmountMode = RecurringAmountModeValues.Fixed,
+                Amount = -17.99m,
+            }
+        );
     }
 
     private void SeedUserAccounts(ApplicationUser user)
