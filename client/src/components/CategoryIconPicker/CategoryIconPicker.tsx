@@ -48,12 +48,26 @@ const CategoryIconPicker = (
     [search, getGroupLabel],
   );
 
+  // The mutation stays pending until its query invalidation settles, so this
+  // also covers the window where props.icon is still the previous value.
+  const isSaving = setTransactionCategoryIconMutation.isPending;
+
+  const openPicker = () => {
+    if (isSaving) {
+      return;
+    }
+    setIsPickerOpen(true);
+  };
+
   const closePicker = () => {
     setIsPickerOpen(false);
     setSearch("");
   };
 
   const handlePick = (icon: string) => {
+    if (isSaving) {
+      return;
+    }
     closePicker();
     if (icon === props.icon) {
       return;
@@ -67,7 +81,7 @@ const CategoryIconPicker = (
   return (
     <Popover
       opened={isPickerOpen}
-      onChange={(opened) => (opened ? setIsPickerOpen(true) : closePicker())}
+      onChange={(opened) => (opened ? openPicker() : closePicker())}
       position="bottom-start"
       trapFocus
       withArrow
@@ -77,12 +91,13 @@ const CategoryIconPicker = (
           variant={isPickerOpen ? "outline" : "transparent"}
           size={props.size ?? "md"}
           aria-label={t("set_category_icon", { category: props.category })}
+          loading={isSaving}
           onClick={(e) => {
             e.stopPropagation();
             if (isPickerOpen) {
               closePicker();
             } else {
-              setIsPickerOpen(true);
+              openPicker();
             }
           }}
         >
@@ -135,6 +150,7 @@ const CategoryIconPicker = (
                           data-selected={
                             option.icon === props.icon || undefined
                           }
+                          disabled={isSaving}
                           onClick={() => handlePick(option.icon)}
                         >
                           {option.icon}
@@ -150,6 +166,7 @@ const CategoryIconPicker = (
             <Button
               variant="default"
               size="compact-xs"
+              disabled={isSaving}
               onClick={() => handlePick("")}
             >
               {t("remove_category_icon")}

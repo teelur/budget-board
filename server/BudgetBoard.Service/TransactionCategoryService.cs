@@ -161,32 +161,63 @@ public class TransactionCategoryService(
         var category = GetTransactionCategoryByValue(allTransactionCategories, request.Category);
         ThrowIfIconTooLong(request.Icon);
 
-        var icon = userData.TransactionCategoryIcons.FirstOrDefault(i =>
-            i.Category.Equals(category.Value, StringComparison.OrdinalIgnoreCase)
+        ApplyIcon(
+            userData.TransactionCategoryIcons.FirstOrDefault(i =>
+                i.Category.Equals(category.Value, StringComparison.OrdinalIgnoreCase)
+            )
         );
 
-        if (string.IsNullOrWhiteSpace(request.Icon))
+        try
         {
-            if (icon != null)
-                userData.TransactionCategoryIcons.Remove(icon);
+            await userDataContext.SaveChangesAsync();
         }
-        else if (icon != null)
+        catch (DbUpdateException)
         {
-            icon.Icon = request.Icon;
-        }
-        else
-        {
-            userDataContext.TransactionCategoryIcons.Add(
-                new CategoryIcon
-                {
-                    Category = category.Value,
-                    Icon = request.Icon,
-                    UserID = userData.Id,
-                }
+            // A concurrent request wrote this category's icon first, so the unique
+            // (UserID, Category) index rejected ours. Discard the losing change,
+            // then apply this request on top of the row that won.
+            foreach (
+                var entry in userDataContext
+                    .ChangeTracker.Entries<CategoryIcon>()
+                    .Where(e => e.State != EntityState.Unchanged)
+                    .ToList()
+            )
+            {
+                await entry.ReloadAsync();
+            }
+
+            ApplyIcon(
+                await userDataContext.TransactionCategoryIcons.FirstOrDefaultAsync(i =>
+                    i.UserID == userData.Id && i.Category == category.Value
+                )
             );
+
+            await userDataContext.SaveChangesAsync();
         }
 
-        await userDataContext.SaveChangesAsync();
+        void ApplyIcon(CategoryIcon? existingIcon)
+        {
+            if (string.IsNullOrWhiteSpace(request.Icon))
+            {
+                if (existingIcon != null)
+                    userDataContext.TransactionCategoryIcons.Remove(existingIcon);
+            }
+            else if (existingIcon != null)
+            {
+                existingIcon.Icon = request.Icon;
+            }
+            else
+            {
+                userDataContext.TransactionCategoryIcons.Add(
+                    new CategoryIcon
+                    {
+                        Category = category.Value,
+                        Icon = request.Icon,
+                        UserID = userData.Id,
+                    }
+                );
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -417,9 +448,11 @@ public class TransactionCategoryService(
         }
     }
 
-    private void ThrowIfIconTooLong(string icon)
+    private void ThrowIfIconTooLong(string? icon)
     {
-        if (icon.Length > CategoryIcon.MaxIconLength)
+        // A null icon clears the category's icon, the same as an empty one, so it
+        // must not fall through to a length check that would dereference it.
+        if (icon?.Length > CategoryIcon.MaxIconLength)
         {
             logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryIconTooLongLog"]);
             throw new BudgetBoardServiceException(

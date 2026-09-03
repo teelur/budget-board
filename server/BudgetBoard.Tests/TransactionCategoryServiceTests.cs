@@ -1157,6 +1157,48 @@ public class TransactionCategoryServiceTests
     }
 
     [Fact]
+    public async Task SetTransactionCategoryIconAsync_WhenIconIsNull_ShouldRemoveIcon()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var category = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+        var icon = new CategoryIcon
+        {
+            Category = category.Value,
+            Icon = "\U0001F34E",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.TransactionCategoryIcons.Add(icon);
+        helper.UserDataContext.SaveChanges();
+
+        // A null icon is what arrives when a client posts \"icon\": null.
+        var iconUpdateRequest = new TransactionCategoryIconUpdateRequest
+        {
+            Category = category.Value,
+            Icon = null!,
+        };
+
+        // Act
+        await transactionCategoryService.SetTransactionCategoryIconAsync(
+            helper.demoUser.Id,
+            iconUpdateRequest
+        );
+
+        // Assert
+        helper.UserDataContext.TransactionCategoryIcons.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task SetTransactionCategoryIconAsync_WhenCategoryDoesNotExist_ShouldThrowTransactionCategoryNotFoundError()
     {
         // Arrange
