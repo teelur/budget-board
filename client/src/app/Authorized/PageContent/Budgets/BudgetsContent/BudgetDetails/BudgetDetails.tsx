@@ -1,7 +1,7 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
-import { getIsParentCategory } from "~/helpers/category";
+import { getCategoryIcon, getIsParentCategory } from "~/helpers/category";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { areStringsEqual } from "~/helpers/utils";
 import TransactionCards from "./TransactionCards/TransactionCards";
@@ -38,6 +38,11 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
     month: props.month,
     enabled: props.isOpen && props.month !== null,
   });
+
+  const categoryIcon = getCategoryIcon(
+    props.category ?? "",
+    allTransactionCategories,
+  );
 
   const transactionsForCategory = (transactionsQuery.data ?? [])
     .filter((transaction) =>
@@ -113,6 +118,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             <Stack gap={0}>
               <DimmedText size="xs">{t("category")}</DimmedText>
               <PrimaryText size="lg">
+                {categoryIcon.length > 0 ? `${categoryIcon} ` : ""}
                 {props.category ?? t("no_category")}
               </PrimaryText>
             </Stack>

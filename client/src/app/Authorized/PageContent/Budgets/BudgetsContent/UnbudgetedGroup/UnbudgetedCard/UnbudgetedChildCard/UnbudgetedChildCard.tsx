@@ -14,6 +14,7 @@ interface UnbudgetedChildCardProps {
   category: string;
   amount: number;
   selectedDate: Date | null;
+  icon: string;
   openDetails: (category: string, month: Date | null) => void;
 }
 
@@ -43,7 +44,10 @@ const UnbudgetedChildCard = (
       >
         <LoadingOverlay visible={createBudgetMutation.isPending} />
         <Group w="100%" justify="space-between">
-          <PrimaryText className={classes.text}>{props.category}</PrimaryText>
+          <PrimaryText className={classes.text}>
+            {props.icon.length > 0 ? `${props.icon} ` : ""}
+            {props.category}
+          </PrimaryText>
           <Group gap="sm">
             <PrimaryText className={classes.text}>
               <SensitiveAmount amount={props.amount} includeCents={false} />

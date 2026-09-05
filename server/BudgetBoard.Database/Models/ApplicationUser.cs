@@ -45,6 +45,11 @@ public class ApplicationUser : IdentityUser<Guid>
     /// </summary>
     public ICollection<Category> TransactionCategories { get; set; } = [];
 
+    /// <summary>
+    /// Collection of emojis the user has assigned to transaction categories.
+    /// </summary>
+    public ICollection<CategoryIcon> TransactionCategoryIcons { get; set; } = [];
+
     public ICollection<Tag> Tags { get; set; } = [];
 
     /// <summary>

@@ -1,4 +1,4 @@
-import { CategoryNode, ICategory } from "~/models/category";
+import { CategoryNode, ICategory, ICategoryResponse } from "~/models/category";
 import { areStringsEqual } from "./utils";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
 
@@ -38,6 +38,21 @@ export const buildCategoriesTree = (
 
   return roots;
 };
+
+/**
+ * Retrieves the emoji the user has assigned to the given category.
+ *
+ * The comparison is case-insensitive, leveraging the utility function areStringsEqual.
+ *
+ * @param {string} categoryValue - The category value to look for.
+ * @param {ICategoryResponse[]} categories - An array of all available categories.
+ * @returns {string} The category's emoji, or an empty string if it does not have one.
+ */
+export const getCategoryIcon = (
+  categoryValue: string,
+  categories: ICategoryResponse[],
+): string =>
+  categories.find((c) => areStringsEqual(c.value, categoryValue))?.icon ?? "";
 
 /**
  * Searches the given categories for a category matching the provided string.
