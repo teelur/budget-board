@@ -370,6 +370,46 @@ public class TransactionCategoryServiceTests
                 )
             );
     }
+
+    [Fact]
+    public async Task ReadTransactionCategoriesAsync_WhenCategoryHasIcon_ShouldReturnIcon()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var builtInCategory = TransactionCategoriesConstants
+            .DefaultTransactionCategories.First(category => string.IsNullOrEmpty(category.Parent))
+            .Value;
+
+        helper.UserDataContext.TransactionCategoryIcons.Add(
+            new CategoryIcon
+            {
+                Category = builtInCategory,
+                Icon = "🚗",
+                UserID = helper.demoUser.Id,
+            }
+        );
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var result = await transactionCategoryService.ReadTransactionCategoriesAsync(
+            helper.demoUser.Id
+        );
+
+        // Assert
+        result.First(c => c.Value == builtInCategory).Icon.Should().Be("🚗");
+        result
+            .Where(c => c.Value != builtInCategory)
+            .Should()
+            .AllSatisfy(c => c.Icon.Should().BeEmpty());
+    }
     #endregion
 
     #region UpdateTransactionCategoryAsync
@@ -947,6 +987,285 @@ public class TransactionCategoryServiceTests
             .Should()
             .AllSatisfy(c => c.Parent.Should().Be(categoryUpdateRequest.Value));
     }
+
+    [Fact]
+    public async Task UpdateTransactionCategoryAsync_WhenRenamed_ShouldUpdateIcons()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
+        var category = transactionCategoryFaker.Generate();
+        category.Parent = string.Empty;
+
+        var icon = new CategoryIcon
+        {
+            Category = category.Value,
+            Icon = "🍎",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.TransactionCategoryIcons.Add(icon);
+        helper.UserDataContext.SaveChanges();
+
+        var categoryUpdateRequest = new TransactionCategoryUpdateRequest
+        {
+            ID = category.ID,
+            Value = "NewValue",
+            Parent = category.Parent,
+            CategoryType = category.CategoryType,
+        };
+
+        // Act
+        await transactionCategoryService.UpdateTransactionCategoryAsync(
+            helper.demoUser.Id,
+            categoryUpdateRequest
+        );
+
+        // Assert
+        icon.Category.Should().Be(categoryUpdateRequest.Value);
+    }
+    #endregion
+
+    #region SetTransactionCategoryIconAsync
+    [Fact]
+    public async Task SetTransactionCategoryIconAsync_WhenCalledWithBuiltInCategory_ShouldCreateIcon()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var builtInCategory = TransactionCategoriesConstants
+            .DefaultTransactionCategories.First(category => string.IsNullOrEmpty(category.Parent))
+            .Value;
+
+        var iconUpdateRequest = new TransactionCategoryIconUpdateRequest
+        {
+            Category = builtInCategory.ToLowerInvariant(),
+            Icon = "🚗",
+        };
+
+        // Act
+        await transactionCategoryService.SetTransactionCategoryIconAsync(
+            helper.demoUser.Id,
+            iconUpdateRequest
+        );
+
+        // Assert
+        var icon = helper.UserDataContext.TransactionCategoryIcons.Single();
+        icon.Category.Should().Be(builtInCategory);
+        icon.Icon.Should().Be(iconUpdateRequest.Icon);
+    }
+
+    [Fact]
+    public async Task SetTransactionCategoryIconAsync_WhenCategoryAlreadyHasIcon_ShouldUpdateIcon()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var category = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+        var icon = new CategoryIcon
+        {
+            Category = category.Value,
+            Icon = "🍎",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.TransactionCategoryIcons.Add(icon);
+        helper.UserDataContext.SaveChanges();
+
+        var iconUpdateRequest = new TransactionCategoryIconUpdateRequest
+        {
+            Category = category.Value,
+            Icon = "🍌",
+        };
+
+        // Act
+        await transactionCategoryService.SetTransactionCategoryIconAsync(
+            helper.demoUser.Id,
+            iconUpdateRequest
+        );
+
+        // Assert
+        helper
+            .UserDataContext.TransactionCategoryIcons.Single()
+            .Icon.Should()
+            .Be(iconUpdateRequest.Icon);
+    }
+
+    [Fact]
+    public async Task SetTransactionCategoryIconAsync_WhenIconIsEmpty_ShouldRemoveIcon()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var category = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+        var icon = new CategoryIcon
+        {
+            Category = category.Value,
+            Icon = "🍎",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.TransactionCategoryIcons.Add(icon);
+        helper.UserDataContext.SaveChanges();
+
+        var iconUpdateRequest = new TransactionCategoryIconUpdateRequest
+        {
+            Category = category.Value,
+            Icon = string.Empty,
+        };
+
+        // Act
+        await transactionCategoryService.SetTransactionCategoryIconAsync(
+            helper.demoUser.Id,
+            iconUpdateRequest
+        );
+
+        // Assert
+        helper.UserDataContext.TransactionCategoryIcons.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SetTransactionCategoryIconAsync_WhenIconIsNull_ShouldRemoveIcon()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var category = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+        var icon = new CategoryIcon
+        {
+            Category = category.Value,
+            Icon = "\U0001F34E",
+            UserID = helper.demoUser.Id,
+        };
+
+        helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.TransactionCategoryIcons.Add(icon);
+        helper.UserDataContext.SaveChanges();
+
+        // A null icon is what arrives when a client posts \"icon\": null.
+        var iconUpdateRequest = new TransactionCategoryIconUpdateRequest
+        {
+            Category = category.Value,
+            Icon = null!,
+        };
+
+        // Act
+        await transactionCategoryService.SetTransactionCategoryIconAsync(
+            helper.demoUser.Id,
+            iconUpdateRequest
+        );
+
+        // Assert
+        helper.UserDataContext.TransactionCategoryIcons.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SetTransactionCategoryIconAsync_WhenCategoryDoesNotExist_ShouldThrowTransactionCategoryNotFoundError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var iconUpdateRequest = new TransactionCategoryIconUpdateRequest
+        {
+            Category = "CategoryThatDoesNotExist",
+            Icon = "🍎",
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionCategoryService.SetTransactionCategoryIconAsync(
+                helper.demoUser.Id,
+                iconUpdateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionCategoryNotFoundError");
+    }
+
+    [Fact]
+    public async Task SetTransactionCategoryIconAsync_WhenIconIsTooLong_ShouldThrowTransactionCategoryIconTooLongError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var category = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+
+        helper.UserDataContext.TransactionCategories.Add(category);
+        helper.UserDataContext.SaveChanges();
+
+        var iconUpdateRequest = new TransactionCategoryIconUpdateRequest
+        {
+            Category = category.Value,
+            Icon = new string('a', CategoryIcon.MaxIconLength + 1),
+        };
+
+        // Act
+        Func<Task> act = async () =>
+            await transactionCategoryService.SetTransactionCategoryIconAsync(
+                helper.demoUser.Id,
+                iconUpdateRequest
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionCategoryIconTooLongError");
+    }
     #endregion
 
     [Fact]
@@ -1010,6 +1329,54 @@ public class TransactionCategoryServiceTests
         customTransaction.Subcategory.Should().Be("Custom Subcategory");
         customCategory.Parent.Should().BeEmpty();
         unrelatedCategory.Parent.Should().Be("Custom Parent");
+    }
+
+    [Fact]
+    public async Task ClearBuiltInTransactionCategoryReferencesAsync_WhenBuiltInCategoriesHaveIcons_RemovesIcons()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var builtInCategory = TransactionCategoriesConstants
+            .DefaultTransactionCategories.First(category => string.IsNullOrEmpty(category.Parent))
+            .Value;
+        var customCategory = new TransactionCategoryFaker(helper.demoUser.Id).Generate();
+
+        helper.UserDataContext.TransactionCategories.Add(customCategory);
+        helper.UserDataContext.TransactionCategoryIcons.AddRange(
+            new CategoryIcon
+            {
+                Category = builtInCategory,
+                Icon = "🚗",
+                UserID = helper.demoUser.Id,
+            },
+            new CategoryIcon
+            {
+                Category = customCategory.Value,
+                Icon = "🍎",
+                UserID = helper.demoUser.Id,
+            }
+        );
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await transactionCategoryService.ClearBuiltInTransactionCategoryReferencesAsync(
+            helper.demoUser.Id
+        );
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Assert
+        helper
+            .UserDataContext.TransactionCategoryIcons.Single()
+            .Category.Should()
+            .Be(customCategory.Value);
     }
 
     #region DeleteTransactionCategoryAsync
@@ -1333,6 +1700,54 @@ public class TransactionCategoryServiceTests
             .UserDataContext.RuleActions.First(a => a.ID == categoryAction.ID)
             .Value.Should()
             .BeEmpty();
+    }
+
+    [Fact]
+    public async Task DeleteTransactionCategoryAsync_WhenCalledWithParentCategoryWithIcons_ShouldRemoveIcons()
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var transactionCategoryService = new TransactionCategoryService(
+            Mock.Of<ILogger<ITransactionCategoryService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var transactionCategoryFaker = new TransactionCategoryFaker(helper.demoUser.Id);
+        var parent = transactionCategoryFaker.Generate();
+        parent.Parent = string.Empty;
+
+        var child = transactionCategoryFaker.Generate();
+        child.Parent = parent.Value;
+
+        helper.UserDataContext.TransactionCategories.Add(parent);
+        helper.UserDataContext.TransactionCategories.Add(child);
+        helper.UserDataContext.TransactionCategoryIcons.AddRange(
+            new CategoryIcon
+            {
+                Category = parent.Value,
+                Icon = "🚗",
+                UserID = helper.demoUser.Id,
+            },
+            new CategoryIcon
+            {
+                Category = child.Value,
+                Icon = "🍎",
+                UserID = helper.demoUser.Id,
+            }
+        );
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await transactionCategoryService.DeleteTransactionCategoryAsync(
+            helper.demoUser.Id,
+            parent.ID
+        );
+
+        // Assert
+        helper.UserDataContext.TransactionCategoryIcons.Should().BeEmpty();
     }
     #endregion
 }

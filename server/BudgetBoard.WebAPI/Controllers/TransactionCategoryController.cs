@@ -85,6 +85,29 @@ public class TransactionCategoryController(
         });
     }
 
+    [HttpPut("icon")]
+    [Authorize]
+    public async Task<IActionResult> SetIcon(
+        [FromBody] TransactionCategoryIconUpdateRequest updatedTransactionCategoryIcon
+    )
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await transactionCategoryService.SetTransactionCategoryIconAsync(
+                parsedUserId,
+                updatedTransactionCategoryIcon
+            );
+            return Ok();
+        });
+    }
+
     [HttpDelete]
     [Authorize]
     public async Task<IActionResult> Delete(Guid transactionCategoryId)

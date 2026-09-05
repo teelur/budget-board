@@ -1,0 +1,29 @@
+.option {
+  align-items: center;
+  aspect-ratio: 1;
+  border-radius: var(--mantine-radius-sm);
+  display: flex;
+  font-size: 1.1rem;
+  justify-content: center;
+  line-height: 1;
+  width: 100%;
+
+  &:hover {
+    background-color: var(--elevated-color-input-background);
+  }
+
+  &[data-selected] {
+    &,
+    &:hover {
+      background-color: light-dark(
+        var(--mantine-primary-color-5),
+        var(--mantine-primary-color-8)
+      );
+    }
+  }
+}
+
+.icon {
+  font-size: 1rem;
+  line-height: 1;
+}

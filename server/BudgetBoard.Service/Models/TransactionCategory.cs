@@ -75,6 +75,7 @@ public interface ITransactionCategoryResponse : ITransactionCategory
 {
     Guid ID { get; }
     Guid UserID { get; }
+    string Icon { get; }
 }
 
 public class CategoryResponse : ITransactionCategoryResponse
@@ -84,6 +85,7 @@ public class CategoryResponse : ITransactionCategoryResponse
     public string Parent { get; set; } = string.Empty;
     public string CategoryType { get; set; } = TransactionCategoryTypes.Expense;
     public Guid UserID { get; set; } = Guid.Empty;
+    public string Icon { get; set; } = string.Empty;
 
     public CategoryResponse(Category category)
     {
@@ -101,5 +103,24 @@ public class CategoryResponse : ITransactionCategoryResponse
         Parent = category.Parent;
         CategoryType = category.CategoryType;
         UserID = Guid.Empty;
+    }
+}
+
+public interface ITransactionCategoryIconUpdateRequest
+{
+    public string Category { get; }
+    public string Icon { get; }
+}
+
+public class TransactionCategoryIconUpdateRequest : ITransactionCategoryIconUpdateRequest
+{
+    public string Category { get; set; }
+    public string Icon { get; set; }
+
+    [JsonConstructor]
+    public TransactionCategoryIconUpdateRequest()
+    {
+        Category = string.Empty;
+        Icon = string.Empty;
     }
 }
