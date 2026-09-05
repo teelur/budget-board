@@ -50,16 +50,16 @@ const ProgressBase = ({
   };
 
   const direction = type === ProgressType.Expense ? -1 : 1;
-  const actualValue =
-    limit > 0
-      ? Math.min(100, Math.max(0, ((amount * direction) / limit) * 100))
-      : Math.min(100, Math.max(0, percentComplete));
+  const actualValue = Math.min(100, Math.max(0, percentComplete));
   const projectedPercentComplete =
     projectedAmount === undefined || limit <= 0
       ? actualValue
       : Math.min(
           100,
-          Math.max(0, ((projectedAmount * direction) / limit) * 100),
+          Math.max(
+            0,
+            roundAwayFromZero(((projectedAmount * direction) / limit) * 100),
+          ),
         );
   const projectedValue = Math.max(0, projectedPercentComplete - actualValue);
 
