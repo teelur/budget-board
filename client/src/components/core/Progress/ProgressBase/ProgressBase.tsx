@@ -56,7 +56,10 @@ const ProgressBase = ({
       ? actualValue
       : Math.min(
           100,
-          Math.max(0, ((projectedAmount * direction) / limit) * 100),
+          Math.max(
+            0,
+            roundAwayFromZero(((projectedAmount * direction) / limit) * 100),
+          ),
         );
   const projectedValue = Math.max(0, projectedPercentComplete - actualValue);
 
