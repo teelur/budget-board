@@ -27,6 +27,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import CategoryIconPicker from "~/components/CategoryIconPicker/CategoryIconPicker";
 
 interface BudgetChildCardProps {
   id: string;
@@ -35,6 +36,7 @@ interface BudgetChildCardProps {
   projectedAmount?: number;
   limit: number;
   isIncome: boolean;
+  icon: string;
   selectedDate: Date;
   openDetails: (category: string, month: Date) => void;
 }
@@ -100,7 +102,15 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
             style={{ containerType: "inline-size" }}
           >
             <Group gap="0.25rem" align="center">
+              {isSelected && (
+                <CategoryIconPicker
+                  category={props.categoryValue}
+                  icon={props.icon}
+                  size="sm"
+                />
+              )}
               <PrimaryText className={classes.title} elevation={1}>
+                {!isSelected && props.icon.length > 0 ? `${props.icon} ` : ""}
                 {props.categoryValue}
               </PrimaryText>
               <ActionIcon

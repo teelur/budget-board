@@ -404,28 +404,28 @@
     <value>Le compte associé à cette opération n'existe pas.</value>
   </data>
   <data name="ValueNotFoundError" xml:space="preserve">
-    <value>The value you are trying to access does not exist.</value>
+    <value>La valeur à laquelle vous tentez d'accéder n'existe pas.</value>
   </data>
   <data name="WidgetUpdateNotFoundError" xml:space="preserve">
-    <value>The widget you are trying to update does not exist.</value>
+    <value>Le widget que vous tentez de mettre à jour n'existe pas.</value>
   </data>
   <data name="SimpleFinAccountNotFoundError" xml:space="preserve">
-    <value>The SimpleFIN account you are trying to access does not exist.</value>
+    <value>Le compte SimpleFIN auquel vous essayez d'accéder n'existe pas.</value>
   </data>
   <data name="SimpleFinOrganizationNotFoundError" xml:space="preserve">
-    <value>The SimpleFIN organization you are trying to access does not exist.</value>
+    <value>L'organisation SimpleFIN à laquelle vous tentez d'accéder n'existe pas.</value>
   </data>
   <data name="SimpleFinAccessTokenParseError" xml:space="preserve">
     <value>The provided SimpleFIN access token is invalid or malformed.</value>
   </data>
   <data name="TagAddRemoveOverlapError" xml:space="preserve">
-    <value>A tag cannot be added and removed in the same request.</value>
+    <value>Un tag ne peut pas être ajouté et supprimé dans la même requête.</value>
   </data>
   <data name="TagValueEmptyError" xml:space="preserve">
-    <value>Tag values cannot be empty.</value>
+    <value>Les valeurs des tags ne peuvent pas être vides.</value>
   </data>
   <data name="TagValueTooLongError" xml:space="preserve">
-    <value>Tag values cannot exceed 50 characters.</value>
+    <value>Les valeurs des tags ne peuvent pas dépasser 50 caractères.</value>
   </data>
   <data name="AutomaticRuleInvalidAmountExpressionError" xml:space="preserve">
     <value>The amount expression '{0}' is invalid.</value>
@@ -434,40 +434,40 @@
     <value>The action '{1}' cannot be used with the field '{0}'.</value>
   </data>
   <data name="AutomaticRuleDivisionByZeroError" xml:space="preserve">
-    <value>An amount cannot be divided by zero.</value>
+    <value>Un montant ne peut pas être divisé par zéro.</value>
   </data>
   <data name="AutomaticRuleArithmeticOverflowError" xml:space="preserve">
-    <value>The arithmetic operation produced an amount outside the supported range.</value>
+    <value>Un montant produit par l'opération arithmétique dépasse la plage autorisée.</value>
   </data>
   <data name="AutomaticRuleInvalidTagsError" xml:space="preserve">
-    <value>Tags must be provided as a non-empty JSON array of strings.</value>
+    <value>Les tags doivent être fournies sous la forme JSON (tableau de chaînes de caractères)</value>
   </data>
   <data name="TransactionImportIdempotencyKeyTooLongError" xml:space="preserve">
-    <value>The Idempotency-Key header cannot exceed {0} characters.</value>
+    <value>L'en-tête Idempotency-Key ne peut pas dépasser {0} caractères.</value>
   </data>
   <data name="TransactionLinkedAmountUpdateError" xml:space="preserve">
-    <value>The amount cannot be changed while the transaction is linked unless it remains an exact transfer pair.</value>
+    <value>Le montant ne peut pas être modifié tant que la transaction est liée, sauf s'il s'agit d'une paire de virement exacte.</value>
   </data>
   <data name="TransactionLinkedSplitError" xml:space="preserve">
-    <value>A linked transaction must be unlinked before it can be split.</value>
+    <value>Une transaction liée doit être dissociée avant de pouvoir être séparée.</value>
   </data>
   <data name="TransactionLinkDeletedError" xml:space="preserve">
-    <value>Deleted transactions cannot be linked.</value>
+    <value>Les transactions supprimées ne peuvent pas être liées.</value>
   </data>
   <data name="TransactionAlreadyLinkedError" xml:space="preserve">
-    <value>One of these transactions is already linked.</value>
+    <value>L'une de ces transactions est déjà liée.</value>
   </data>
   <data name="TransactionLinkSameTransactionError" xml:space="preserve">
-    <value>A transaction cannot be linked to itself.</value>
+    <value>Une transaction ne peut pas être liée à elle-même.</value>
   </data>
   <data name="TransactionLinkSameAccountError" xml:space="preserve">
-    <value>Transactions must belong to different accounts.</value>
+    <value>Les transactions doivent appartenir à des comptes différents.</value>
   </data>
   <data name="TransactionLinkAmountsError" xml:space="preserve">
-    <value>Transactions must have exact opposite amounts.</value>
+    <value>Les transactions doivent avoir des montants exactement opposés.</value>
   </data>
   <data name="TransactionNotLinkedError" xml:space="preserve">
-    <value>The transaction is not linked.</value>
+    <value>La transaction n'est pas liée.</value>
   </data>
   <data name="RecurringRuleAccountMismatchError" xml:space="preserve">
     <value>The recurring rule and transaction must belong to the same account.</value>
@@ -516,5 +516,8 @@
   </data>
   <data name="TransactionAlreadyRecurringError" xml:space="preserve">
     <value>This transaction is already associated with a recurring rule.</value>
+  </data>
+  <data name="TransactionCategoryIconTooLongError" xml:space="preserve">
+    <value>The transaction category icon is too long.</value>
   </data>
 </root>

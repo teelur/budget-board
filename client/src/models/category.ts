@@ -22,6 +22,12 @@ export interface ICategoryUpdateRequest extends ITransactionCategory {
 
 export interface ICategoryResponse extends ITransactionCategory {
   id: string;
+  icon: string;
+}
+
+export interface ICategoryIconUpdateRequest {
+  category: string;
+  icon: string;
 }
 
 export interface ICategoryNode extends ITransactionCategory {

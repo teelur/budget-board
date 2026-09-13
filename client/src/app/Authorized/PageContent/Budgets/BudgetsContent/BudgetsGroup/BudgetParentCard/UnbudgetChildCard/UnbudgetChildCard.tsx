@@ -15,6 +15,7 @@ interface UnbudgetChildCardProps {
   category: string;
   amount: number;
   isIncome: boolean;
+  icon: string;
   openDetails: (category: string, month: Date | null) => void;
 }
 
@@ -47,6 +48,7 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
         style={{ containerType: "inline-size" }}
       >
         <PrimaryText className={classes.text} elevation={1}>
+          {props.icon.length > 0 ? `${props.icon} ` : ""}
           {props.category}
         </PrimaryText>
         <Group gap="0.5rem">

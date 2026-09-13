@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
     <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
@@ -405,6 +405,9 @@
     </data>
     <data name="TransactionCategoryEmptyNameLog" xml:space="preserve">
         <value>Attempted to save a transaction category with an empty name.</value>
+    </data>
+    <data name="TransactionCategoryIconTooLongLog" xml:space="preserve">
+        <value>Attempted to save a transaction category icon that is too long.</value>
     </data>
     <data name="TransactionCategoryNotFoundLog" xml:space="preserve">
         <value>Attempted to access a transaction category that does not exist.</value>

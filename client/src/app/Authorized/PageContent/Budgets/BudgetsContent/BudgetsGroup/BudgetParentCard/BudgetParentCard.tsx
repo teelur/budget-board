@@ -37,6 +37,9 @@ import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudg
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import CategoryIconPicker from "~/components/CategoryIconPicker/CategoryIconPicker";
+import { getCategoryIcon } from "~/helpers/category";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -57,6 +60,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, thousandsSeparator, decimalSeparator } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const { allTransactionCategories } = useTransactionCategories();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
     formatAmount(amount, false, SignDisplay.Auto);
@@ -66,6 +70,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const isIncome = areStringsEqual(
     props.categoryTree.categoryType,
     CategoryTypes.Income,
+  );
+  const categoryIcon = getCategoryIcon(
+    props.categoryTree.value,
+    allTransactionCategories,
   );
   const limit =
     props.categoryToLimitsMap.get(props.categoryTree.value.toLowerCase()) ?? 0;
@@ -158,6 +166,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               0
             }
             isIncome={isIncome}
+            icon={getCategoryIcon(subCategory.value, allTransactionCategories)}
             selectedDate={props.selectedDate ?? dayjs().toDate()}
             openDetails={props.openDetails}
           />,
@@ -179,6 +188,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               amount={amount}
               selectedDate={props.selectedDate}
               isIncome={isIncome}
+              icon={getCategoryIcon(
+                subCategory.value,
+                allTransactionCategories,
+              )}
               openDetails={props.openDetails}
             />,
           );
@@ -240,7 +253,16 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     />
                   </ActionIcon>
                 )}
+                {isSelected && (
+                  <CategoryIconPicker
+                    category={props.categoryTree.value}
+                    icon={categoryIcon}
+                  />
+                )}
                 <PrimaryHeading className={classes.title}>
+                  {!isSelected && categoryIcon.length > 0
+                    ? `${categoryIcon} `
+                    : ""}
                   {props.categoryTree.value}
                 </PrimaryHeading>
                 <ActionIcon

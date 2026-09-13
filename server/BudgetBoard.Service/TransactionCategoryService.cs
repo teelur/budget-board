@@ -102,6 +102,7 @@ public class TransactionCategoryService(
             request.Value,
             userData.AutomaticRules.SelectMany(r => r.Actions)
         );
+        UpdateIconsUsingCategory(oldValue, request.Value, userData.TransactionCategoryIcons);
 
         UpdateChildrenCategoryType(
             userData.TransactionCategories,
@@ -147,6 +148,79 @@ public class TransactionCategoryService(
     }
 
     /// <inheritdoc />
+    public async Task SetTransactionCategoryIconAsync(
+        Guid userGuid,
+        ITransactionCategoryIconUpdateRequest request
+    )
+    {
+        var userData = await GetCurrentUserAsync(userGuid);
+        var allTransactionCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(
+            userData
+        );
+
+        var category = GetTransactionCategoryByValue(allTransactionCategories, request.Category);
+        ThrowIfIconTooLong(request.Icon);
+
+        ApplyIcon(
+            userData.TransactionCategoryIcons.FirstOrDefault(i =>
+                i.Category.Equals(category.Value, StringComparison.OrdinalIgnoreCase)
+            )
+        );
+
+        try
+        {
+            await userDataContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // A concurrent request wrote this category's icon first, so the unique
+            // (UserID, Category) index rejected ours. Discard the losing change,
+            // then apply this request on top of the row that won.
+            foreach (
+                var entry in userDataContext
+                    .ChangeTracker.Entries<CategoryIcon>()
+                    .Where(e => e.State != EntityState.Unchanged)
+                    .ToList()
+            )
+            {
+                await entry.ReloadAsync();
+            }
+
+            ApplyIcon(
+                await userDataContext.TransactionCategoryIcons.FirstOrDefaultAsync(i =>
+                    i.UserID == userData.Id && i.Category == category.Value
+                )
+            );
+
+            await userDataContext.SaveChangesAsync();
+        }
+
+        void ApplyIcon(CategoryIcon? existingIcon)
+        {
+            if (string.IsNullOrWhiteSpace(request.Icon))
+            {
+                if (existingIcon != null)
+                    userDataContext.TransactionCategoryIcons.Remove(existingIcon);
+            }
+            else if (existingIcon != null)
+            {
+                existingIcon.Icon = request.Icon;
+            }
+            else
+            {
+                userDataContext.TransactionCategoryIcons.Add(
+                    new CategoryIcon
+                    {
+                        Category = category.Value,
+                        Icon = request.Icon,
+                        UserID = userData.Id,
+                    }
+                );
+            }
+        }
+    }
+
+    /// <inheritdoc />
     public async Task ClearBuiltInTransactionCategoryReferencesAsync(Guid userGuid)
     {
         var userData = await GetCurrentUserAsync(userGuid);
@@ -161,6 +235,7 @@ public class TransactionCategoryService(
         foreach (var category in builtInCategoryValues)
         {
             UpdateTransactionsUsingCategory(category, null, transactions, true);
+            RemoveIconsUsingCategory(category, userData.TransactionCategoryIcons);
         }
 
         foreach (var category in userData.TransactionCategories)
@@ -198,6 +273,7 @@ public class TransactionCategoryService(
             null,
             userData.AutomaticRules.SelectMany(r => r.Actions)
         );
+        RemoveIconsUsingCategory(transactionCategory.Value, userData.TransactionCategoryIcons);
 
         userData.TransactionCategories.Remove(transactionCategory);
         await userDataContext.SaveChangesAsync();
@@ -223,6 +299,7 @@ public class TransactionCategoryService(
                     null,
                     userData.AutomaticRules.SelectMany(r => r.Actions)
                 );
+                RemoveIconsUsingCategory(child.Value, userData.TransactionCategoryIcons);
                 userData.TransactionCategories.Remove(child);
             }
         }
@@ -252,6 +329,7 @@ public class TransactionCategoryService(
             users =>
                 users
                     .Include(u => u.TransactionCategories)
+                    .Include(u => u.TransactionCategoryIcons)
                     .Include(u => u.Accounts)
                     .ThenInclude(a => a.Transactions)
                     .Include(u => u.Budgets)
@@ -264,6 +342,25 @@ public class TransactionCategoryService(
     private Category GetTransactionCategoryById(ApplicationUser userData, Guid id)
     {
         var transactionCategory = userData.TransactionCategories.FirstOrDefault(t => t.ID == id);
+        if (transactionCategory == null)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryNotFoundLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionCategoryNotFoundError"]
+            );
+        }
+
+        return transactionCategory;
+    }
+
+    private ITransactionCategoryResponse GetTransactionCategoryByValue(
+        IEnumerable<ITransactionCategoryResponse> categories,
+        string value
+    )
+    {
+        var transactionCategory = categories.FirstOrDefault(c =>
+            c.Value.Equals(value, StringComparison.OrdinalIgnoreCase)
+        );
         if (transactionCategory == null)
         {
             logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryNotFoundLog"]);
@@ -351,6 +448,19 @@ public class TransactionCategoryService(
         }
     }
 
+    private void ThrowIfIconTooLong(string? icon)
+    {
+        // A null icon clears the category's icon, the same as an empty one, so it
+        // must not fall through to a length check that would dereference it.
+        if (icon?.Length > CategoryIcon.MaxIconLength)
+        {
+            logger.LogError("{LogMessage}", logLocalizer["TransactionCategoryIconTooLongLog"]);
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionCategoryIconTooLongError"]
+            );
+        }
+    }
+
     private void ThrowIfInvalidCategoryType(string categoryType)
     {
         if (!TransactionCategoryTypes.AllTypes.Contains(categoryType))
@@ -401,6 +511,28 @@ public class TransactionCategoryService(
                 transaction.Subcategory = replacement;
             }
         }
+    }
+
+    private static void UpdateIconsUsingCategory(
+        string oldValue,
+        string newValue,
+        IEnumerable<CategoryIcon> icons
+    )
+    {
+        foreach (var icon in icons)
+        {
+            if (icon.Category.Equals(oldValue, StringComparison.OrdinalIgnoreCase))
+                icon.Category = newValue;
+        }
+    }
+
+    private static void RemoveIconsUsingCategory(string value, ICollection<CategoryIcon> icons)
+    {
+        var toRemove = icons
+            .Where(i => i.Category.Equals(value, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        foreach (var icon in toRemove)
+            icons.Remove(icon);
     }
 
     private static void UpdateRuleActionsUsingCategory(
