@@ -138,6 +138,13 @@ public class DemoSeedService(
         var checking = userDataContext.Accounts.First(a =>
             a.UserID == user.Id && a.Name == "Checking"
         );
+
+        var creditCard = userDataContext.Accounts.First(a =>
+            a.UserID == user.Id && a.Name == "Visa Rewards"
+        );
+
+        await SeedRecurringRuleDataAsync(user, checking, creditCard);
+
         await SeedAccountDataAsync(
             user.Id,
             checking.ID,
@@ -159,12 +166,6 @@ public class DemoSeedService(
             expenseFrequencyPerMonth: 0,
             savingsTransferAmount: 400m
         );
-
-        var creditCard = userDataContext.Accounts.First(a =>
-            a.UserID == user.Id && a.Name == "Visa Rewards"
-        );
-
-        await SeedRecurringRuleDataAsync(user, checking, creditCard);
 
         await SeedAccountDataAsync(
             user.Id,
