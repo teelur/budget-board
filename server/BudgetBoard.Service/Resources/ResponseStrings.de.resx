@@ -517,4 +517,7 @@
   <data name="TransactionAlreadyRecurringError" xml:space="preserve">
     <value>This transaction is already associated with a recurring rule.</value>
   </data>
+  <data name="TransactionCategoryIconTooLongError" xml:space="preserve">
+    <value>The transaction category icon is too long.</value>
+  </data>
 </root>
