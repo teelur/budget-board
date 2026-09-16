@@ -1,4 +1,4 @@
-import { Divider, Group, Stack } from "@mantine/core";
+import { Divider, SimpleGrid, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ export interface ISelectedColumns {
   category: string | null;
   amount: string | null;
   account: string | null;
+  notes: string | null;
   incomeAmount: string | null;
   expenseAmount: string | null;
 }
@@ -40,6 +41,9 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
   const accountColumnField = useField<string | null>({
     initialValue: props.selectedColumns.account,
   });
+  const notesColumnField = useField<string | null>({
+    initialValue: props.selectedColumns.notes,
+  });
   const incomeAmountColumnField = useField<string | null>({
     initialValue: props.selectedColumns.incomeAmount,
   });
@@ -65,6 +69,7 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
       category: categoryColumnField.getValue(),
       amount: amountColumnField.getValue(),
       account: accountColumnField.getValue(),
+      notes: notesColumnField.getValue(),
       incomeAmount: incomeAmountColumnField.getValue(),
       expenseAmount: expenseAmountColumnField.getValue(),
     });
@@ -74,79 +79,99 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
     categoryColumnField.getValue(),
     amountColumnField.getValue(),
     accountColumnField.getValue(),
+    notesColumnField.getValue(),
     incomeAmountColumnField.getValue(),
     expenseAmountColumnField.getValue(),
   ]);
 
   return (
-    <Stack gap={0}>
+    <Stack gap="md">
       <Divider label={t("columns_fields")} labelPosition="center" />
-      <Group>
-        <Select
-          label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
-          data={props.csvHeaders}
-          clearable
-          {...dateColumnField.getInputProps()}
-          elevation={0}
-        />
-        <Select
-          label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
-          data={props.csvHeaders}
-          clearable
-          {...merchantNameColumnField.getInputProps()}
-          elevation={0}
-        />
-        <Select
-          label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
-          data={props.csvHeaders}
-          clearable
-          {...categoryColumnField.getInputProps()}
-          elevation={0}
-        />
-        {props.isAmountSplit ? (
-          <>
-            <Select
-              label={<PrimaryText size="sm">{t("income_amount")}</PrimaryText>}
-              data={props.csvHeaders}
-              clearable
-              {...incomeAmountColumnField.getInputProps()}
-              elevation={0}
-            />
-            <Select
-              label={<PrimaryText size="sm">{t("expense_amount")}</PrimaryText>}
-              data={props.csvHeaders}
-              clearable
-              {...expenseAmountColumnField.getInputProps()}
-              elevation={0}
-            />
-          </>
-        ) : (
+      <Stack gap="sm">
+        <Divider label={t("core_fields")} labelPosition="left" />
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
           <Select
-            label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+            label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
             data={props.csvHeaders}
             clearable
-            {...amountColumnField.getInputProps()}
+            {...dateColumnField.getInputProps()}
             elevation={0}
           />
-        )}
-        {props.isSingleAccount ? (
-          <TextInput
-            label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
-            placeholder={t("account_name")}
-            {...accountColumnField.getInputProps()}
-            value={accountColumnField.getValue() ?? ""}
-            elevation={0}
-          />
-        ) : (
           <Select
-            label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+            label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
             data={props.csvHeaders}
             clearable
-            {...accountColumnField.getInputProps()}
+            {...merchantNameColumnField.getInputProps()}
             elevation={0}
           />
-        )}
-      </Group>
+          <Select
+            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+            data={props.csvHeaders}
+            clearable
+            {...categoryColumnField.getInputProps()}
+            elevation={0}
+          />
+          {props.isAmountSplit ? (
+            <>
+              <Select
+                label={
+                  <PrimaryText size="sm">{t("income_amount")}</PrimaryText>
+                }
+                data={props.csvHeaders}
+                clearable
+                {...incomeAmountColumnField.getInputProps()}
+                elevation={0}
+              />
+              <Select
+                label={
+                  <PrimaryText size="sm">{t("expense_amount")}</PrimaryText>
+                }
+                data={props.csvHeaders}
+                clearable
+                {...expenseAmountColumnField.getInputProps()}
+                elevation={0}
+              />
+            </>
+          ) : (
+            <Select
+              label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+              data={props.csvHeaders}
+              clearable
+              {...amountColumnField.getInputProps()}
+              elevation={0}
+            />
+          )}
+          {props.isSingleAccount ? (
+            <TextInput
+              label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+              placeholder={t("account_name")}
+              {...accountColumnField.getInputProps()}
+              value={accountColumnField.getValue() ?? ""}
+              elevation={0}
+            />
+          ) : (
+            <Select
+              label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+              data={props.csvHeaders}
+              clearable
+              {...accountColumnField.getInputProps()}
+              elevation={0}
+            />
+          )}
+        </SimpleGrid>
+      </Stack>
+      <Stack gap="sm">
+        <Divider label={t("additional_fields")} labelPosition="left" />
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+          <Select
+            label={<PrimaryText size="sm">{t("notes")}</PrimaryText>}
+            data={props.csvHeaders}
+            clearable
+            {...notesColumnField.getInputProps()}
+            elevation={0}
+          />
+        </SimpleGrid>
+      </Stack>
     </Stack>
   );
 };

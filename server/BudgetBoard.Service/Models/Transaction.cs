@@ -10,6 +10,7 @@ public interface ITransactionCreateRequest
     string? Category { get; }
     string? Subcategory { get; }
     string? MerchantName { get; }
+    string Notes { get; }
     string? Source { get; }
     Guid AccountID { get; }
 }
@@ -22,6 +23,7 @@ public class TransactionCreateRequest : ITransactionCreateRequest
     public string? Category { get; set; } = null;
     public string? Subcategory { get; set; } = null;
     public string? MerchantName { get; set; } = null;
+    public string Notes { get; set; } = string.Empty;
     public string? Source { get; set; } = null;
     public Guid AccountID { get; set; } = Guid.Empty;
 }
@@ -104,6 +106,7 @@ public class TransactionImport
     public string? MerchantName { get; set; } = null;
     public string? Category { get; set; } = null;
     public decimal? Amount { get; set; } = null;
+    public string? Notes { get; set; } = null;
     public string Account { get; set; } = string.Empty;
 }
 

@@ -39,6 +39,8 @@ const buildTransactionsCsv = (
         return t.subcategory?.trim() ? t.subcategory : (t.category ?? "");
       case "account":
         return accountLookup[t.accountID] ?? "";
+      case "notes":
+        return t.notes;
       case "pending":
         return t.pending ? "true" : "false";
       case "source":
@@ -70,6 +72,7 @@ export const EXPORT_FIELDS: IExportField[] = [
   { key: "amount", labelKey: "amount" },
   { key: "category", labelKey: "category" },
   { key: "account", labelKey: "account" },
+  { key: "notes", labelKey: "notes" },
   { key: "pending", labelKey: "pending" },
   { key: "source", labelKey: "source" },
 ];

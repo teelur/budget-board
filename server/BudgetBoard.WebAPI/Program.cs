@@ -217,9 +217,9 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
             trigger
                 .ForJob(jobKey)
                 // Allow a minute for everything to settle after boot before starting the job
-                .StartAt(DateBuilder.FutureDate(1, IntervalUnit.Minute))
+                .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
                 .WithSimpleSchedule(schedule =>
-                    schedule.WithIntervalInHours(syncIntervalHours).RepeatForever()
+                    schedule.WithInterval(TimeSpan.FromHours(syncIntervalHours)).RepeatForever()
                 )
         );
     });
@@ -280,8 +280,10 @@ if (demoModeEnabled)
             trigger
                 .ForJob(jobKey)
                 // Allow a minute for everything to settle after boot before starting the job
-                .StartAt(DateBuilder.FutureDate(1, IntervalUnit.Minute))
-                .WithSimpleSchedule(schedule => schedule.WithIntervalInHours(4).RepeatForever())
+                .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
+                .WithSimpleSchedule(schedule =>
+                    schedule.WithInterval(TimeSpan.FromHours(4)).RepeatForever()
+                )
         );
     });
 

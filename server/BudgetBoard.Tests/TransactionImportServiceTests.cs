@@ -41,6 +41,7 @@ public class TransactionImportServiceTests
                         ID = existingRowId,
                         Account = "Checking",
                         Amount = 10,
+                        Notes = "Imported note",
                     },
                     new TransactionImport { Account = "Checking", Amount = -5 },
                 ],
@@ -58,6 +59,8 @@ public class TransactionImportServiceTests
         persistedRequest.Should().NotBeNull();
         persistedRequest!.Transactions.Should().OnlyContain(transaction => transaction.ID != null);
         persistedRequest.Transactions.First().ID.Should().Be(existingRowId);
+        persistedRequest.Transactions.First().Notes.Should().Be("Imported note");
+        persistedRequest.Transactions.Last().Notes.Should().BeNull();
         response.ProgressPercentage.Should().Be(0);
         response.CreatedAt.Should().Be(now);
     }

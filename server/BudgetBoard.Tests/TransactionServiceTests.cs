@@ -1672,6 +1672,7 @@ public class TransactionServiceTests
                 MerchantName = t.MerchantName ?? string.Empty,
                 Category = "Auto & Transport",
                 Amount = t.Amount,
+                Notes = "Imported note",
                 Account = "bongus",
             }),
             AccountNameToIDMap = [new() { AccountName = "bongus", AccountID = account.ID }],
@@ -1691,6 +1692,7 @@ public class TransactionServiceTests
             importedTransaction.MerchantName.Should().Be(transaction.MerchantName);
             importedTransaction.Category.Should().Be(transaction.Category);
             importedTransaction.Amount.Should().Be(transaction.Amount);
+            importedTransaction.Notes.Should().Be("Imported note");
             importedTransaction.AccountID.Should().Be(account.ID);
         }
     }
@@ -1748,6 +1750,7 @@ public class TransactionServiceTests
         importedTransaction.Date.Should().Be(fakeDate);
         importedTransaction.Amount.Should().Be(0m);
         importedTransaction.MerchantName.Should().Be("ImportedWithoutDate");
+        importedTransaction.Notes.Should().BeEmpty();
         importedTransaction.AccountID.Should().Be(account.ID);
         importedTransaction.Category.Should().Be(string.Empty);
         helper.UserDataContext.Balances.Should().ContainSingle();

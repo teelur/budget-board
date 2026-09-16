@@ -38,6 +38,7 @@ public class TransactionImportService(
                 MerchantName = transaction.MerchantName,
                 Category = transaction.Category,
                 Amount = transaction.Amount,
+                Notes = transaction.Notes,
                 Account = transaction.Account,
             })
             .ToList();
