@@ -29,7 +29,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   return (
     <Stack gap={0} justify="center">
       <Divider label={t("transactions")} labelPosition="center" />
-      <Table.ScrollContainer minWidth={800} maxHeight={400}>
+      <Table.ScrollContainer minWidth={950} maxHeight={400}>
         <Table striped>
           <Table.Thead>
             <Table.Tr>
@@ -39,6 +39,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
               <Table.Th>{t("category")}</Table.Th>
               <Table.Th>{t("amount")}</Table.Th>
               <Table.Th>{t("account")}</Table.Th>
+              <Table.Th>{t("notes")}</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -74,6 +75,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                     <SensitiveAmount amount={row.amount ?? 0} />
                   </Table.Td>
                   <Table.Td>{row.account}</Table.Td>
+                  <Table.Td>{row.notes}</Table.Td>
                 </Table.Tr>
               ))}
           </Table.Tbody>

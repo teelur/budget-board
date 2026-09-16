@@ -4,6 +4,7 @@ export interface ITransactionImport {
   category: string | null;
   amount: number | null;
   account: string | null;
+  notes: string | null;
 }
 
 export interface ITransactionImportTableData extends ITransactionImport {

@@ -21,7 +21,10 @@ public class SyncBackgroundJob(
     private readonly ISyncService _simpleFinService = simpleFinService;
     private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
 
-    public async Task Execute(IJobExecutionContext context)
+    public async ValueTask Execute(
+        IJobExecutionContext context,
+        CancellationToken cancellationToken
+    )
     {
         var users = _userDataContext
             .ApplicationUsers.Include(user => user.Accounts)

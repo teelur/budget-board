@@ -66,6 +66,9 @@ const ConfigureTransactions = (
       props.csvHeaders.find((header) =>
         areStringsEqual(header, t("account")),
       ) ?? null,
+    notes:
+      props.csvHeaders.find((header) => areStringsEqual(header, t("notes"))) ??
+      null,
     incomeAmount: null,
     expenseAmount: null,
   });
@@ -351,6 +354,7 @@ const ConfigureTransactions = (
           : columnsSelect.account && row[columnsSelect.account] != null
             ? String(row[columnsSelect.account])
             : null,
+        notes: getImportedTextValue(columnsSelect.notes),
         type:
           columnsOptions.includeExpensesColumn &&
           columnsOptions.expensesColumn &&

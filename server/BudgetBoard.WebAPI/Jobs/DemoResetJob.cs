@@ -9,7 +9,10 @@ public class DemoResetJob(ILogger<DemoResetJob> logger, IDemoSeedService demoSee
     private readonly ILogger<DemoResetJob> _logger = logger;
     private readonly IDemoSeedService _demoSeedService = demoSeedService;
 
-    public async Task Execute(IJobExecutionContext context)
+    public async ValueTask Execute(
+        IJobExecutionContext context,
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogInformation("Demo reset job starting nightly database reset…");
         try
