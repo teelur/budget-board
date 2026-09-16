@@ -63,6 +63,7 @@ public class TransactionService(
             Category = request.Category,
             Subcategory = request.Subcategory,
             MerchantName = request.MerchantName,
+            Notes = request.Notes,
             Source = request.Source ?? TransactionSource.Manual,
             AccountID = request.AccountID,
             Account = account,
@@ -626,6 +627,7 @@ public class TransactionService(
                 Amount = transaction.Amount ?? 0,
                 Date = transaction.Date ?? nowProvider.Today,
                 MerchantName = transaction.MerchantName,
+                Notes = transaction.Notes ?? string.Empty,
                 Source = TransactionSource.Manual,
                 AccountID = account.ID,
             };
