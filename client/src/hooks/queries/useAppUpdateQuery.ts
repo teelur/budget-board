@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  APP_REPOSITORY,
   getAppBuildInfo,
   isNewerDevBuild,
   isNewerStableVersion,
@@ -9,106 +8,75 @@ import {
 } from "~/helpers/appUpdates";
 import { appUpdateQueryKey } from "~/helpers/requests";
 
-const GITHUB_API_URL = "https://api.github.com";
-const DEV_WORKFLOW_FILE = "docker-image-dev-build.yml";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
-interface IGitHubReleaseResponse {
-  tag_name?: unknown;
-  html_url?: unknown;
-  draft?: unknown;
-  prerelease?: unknown;
+interface IAppUpdateResponse {
+  channel: string;
+  latestVersion: string;
+  url: string;
 }
 
-interface IGitHubWorkflowRun {
-  head_sha?: unknown;
-  html_url?: unknown;
-  conclusion?: unknown;
-}
+const isAppUpdateResponse = (value: unknown): value is IAppUpdateResponse => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
 
-interface IGitHubWorkflowRunsResponse {
-  workflow_runs?: unknown;
-}
+  const response = value as Partial<IAppUpdateResponse>;
+  return (
+    typeof response.channel === "string" &&
+    typeof response.latestVersion === "string" &&
+    typeof response.url === "string"
+  );
+};
 
-const fetchGitHubJson = async <T>(url: string): Promise<T> => {
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/vnd.github+json",
-    },
-    cache: "no-store",
+const getAppUpdate = async (
+  currentBuild: IAppBuildInfo,
+  request: ReturnType<typeof useAuth>["request"],
+): Promise<IAppUpdate | null> => {
+  const response = await request({
+    url: "/api/app-update",
+    method: "GET",
+    params: { channel: currentBuild.channel },
   });
 
-  if (!response.ok) {
-    throw new Error(`GitHub API returned ${response.status}`);
-  }
-
-  return (await response.json()) as T;
-};
-
-const getStableUpdate = async (
-  currentBuild: IAppBuildInfo,
-): Promise<IAppUpdate | null> => {
-  const release = await fetchGitHubJson<IGitHubReleaseResponse>(
-    `${GITHUB_API_URL}/repos/${APP_REPOSITORY}/releases/latest`,
-  );
-
-  if (
-    typeof release.tag_name !== "string" ||
-    typeof release.html_url !== "string" ||
-    release.draft === true ||
-    release.prerelease === true
-  ) {
+  if (response.status === 204 || !isAppUpdateResponse(response.data)) {
     return null;
   }
 
-  const latestBuild = getAppBuildInfo(release.tag_name);
-  if (
-    !latestBuild ||
-    latestBuild.channel !== "stable" ||
-    !isNewerStableVersion(
-      currentBuild.normalizedVersion,
-      latestBuild.normalizedVersion,
-    )
-  ) {
+  if (response.data.channel !== currentBuild.channel) {
+    return null;
+  }
+
+  const latestBuild = getAppBuildInfo(response.data.latestVersion);
+  if (!latestBuild || latestBuild.channel !== currentBuild.channel) {
+    return null;
+  }
+
+  const isNewer =
+    currentBuild.channel === "stable"
+      ? isNewerStableVersion(
+          currentBuild.normalizedVersion,
+          latestBuild.normalizedVersion,
+        )
+      : isNewerDevBuild(
+          currentBuild.normalizedVersion,
+          latestBuild.normalizedVersion,
+        );
+
+  if (!isNewer) {
     return null;
   }
 
   return {
-    channel: "stable",
+    channel: currentBuild.channel,
     currentVersion: currentBuild.version,
     latestVersion: latestBuild.version,
-    url: release.html_url,
-  };
-};
-
-const getDevUpdate = async (
-  currentBuild: IAppBuildInfo,
-): Promise<IAppUpdate | null> => {
-  const workflowRuns = await fetchGitHubJson<IGitHubWorkflowRunsResponse>(
-    `${GITHUB_API_URL}/repos/${APP_REPOSITORY}/actions/workflows/${DEV_WORKFLOW_FILE}/runs?branch=main&status=success&per_page=1`,
-  );
-  const latestRun = Array.isArray(workflowRuns.workflow_runs)
-    ? (workflowRuns.workflow_runs[0] as IGitHubWorkflowRun | undefined)
-    : undefined;
-
-  if (
-    !latestRun ||
-    typeof latestRun.head_sha !== "string" ||
-    typeof latestRun.html_url !== "string" ||
-    latestRun.conclusion !== "success" ||
-    !isNewerDevBuild(currentBuild.normalizedVersion, latestRun.head_sha)
-  ) {
-    return null;
-  }
-
-  return {
-    channel: "dev",
-    currentVersion: currentBuild.version,
-    latestVersion: `sha-${latestRun.head_sha.slice(0, 7)}`,
-    url: latestRun.html_url,
+    url: response.data.url,
   };
 };
 
 export const useAppUpdateQuery = () => {
+  const { request } = useAuth();
   const currentBuild = getAppBuildInfo(import.meta.env.VITE_VERSION);
 
   return useQuery<IAppUpdate | null>({
@@ -120,9 +88,7 @@ export const useAppUpdateQuery = () => {
       }
 
       try {
-        return currentBuild.channel === "stable"
-          ? await getStableUpdate(currentBuild)
-          : await getDevUpdate(currentBuild);
+        return await getAppUpdate(currentBuild, request);
       } catch {
         return null;
       }
