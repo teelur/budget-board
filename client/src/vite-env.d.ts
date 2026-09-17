@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_BUDGET_BOARD_DOMAIN: string;
+  readonly VITE_VERSION: string;
   readonly VITE_OIDC_ENABLED: string;
   readonly VITE_OIDC_PROVIDER: string;
   readonly VITE_OIDC_CLIENT_ID: string;

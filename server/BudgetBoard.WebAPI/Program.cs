@@ -176,7 +176,18 @@ builder.Host.UseSerilog(
     (context, configuration) => configuration.ReadFrom.Configuration(context.Configuration)
 );
 
+builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient(
+    AppUpdateService.GitHubHttpClientName,
+    client =>
+    {
+        client.BaseAddress = new Uri("https://api.github.com/");
+        client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("BudgetBoard");
+    }
+);
+builder.Services.AddSingleton<IAppUpdateService, AppUpdateService>();
 builder.Services.AddHostedService<TransactionImportWorker>();
 
 builder.Services.AddEndpointsApiExplorer();
