@@ -1,15 +1,20 @@
 using BudgetBoard.WebAPI.Models;
+using BudgetBoard.WebAPI.Resources;
 using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Controllers;
 
 [Route("api/app-update")]
 [ApiController]
 [Authorize]
-public class AppUpdateController(IAppUpdateService appUpdateService, IConfiguration configuration)
-    : ControllerBase
+public class AppUpdateController(
+    IAppUpdateService appUpdateService,
+    IConfiguration configuration,
+    IStringLocalizer<ApiResponseStrings> responseLocalizer
+) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(AppUpdateResponse), StatusCodes.Status200OK)]
@@ -23,7 +28,7 @@ public class AppUpdateController(IAppUpdateService appUpdateService, IConfigurat
     {
         if (!AppUpdateChannels.TryNormalize(channel, out var normalizedChannel))
         {
-            return BadRequest("The channel must be either 'stable' or 'dev'.");
+            return BadRequest(responseLocalizer["InvalidUpdateChannel"].Value);
         }
 
         if (configuration.GetValue<bool>("DISABLE_UPDATE_CHECK"))

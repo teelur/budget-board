@@ -88,6 +88,9 @@
     <data name="InvalidJsonType" xml:space="preserve">
         <value>The provided JSON token type is invalid.</value>
     </data>
+    <data name="InvalidUpdateChannel" xml:space="preserve">
+        <value>The channel must be either 'stable' or 'dev'.</value>
+    </data>
     <data name="InvalidLanguageError" xml:space="preserve">
         <value>The specified language '{0}' is not supported.</value>
     </data>
@@ -117,6 +120,9 @@
     </data>
     <data name="UnexpectedServerError" xml:space="preserve">
         <value>An unexpected error occurred.</value>
+    </data>
+    <data name="UpdateChannelNotSupported" xml:space="preserve">
+        <value>The update channel is not supported.</value>
     </data>
     <data name="UserEmailRequiredError" xml:space="preserve">
         <value>The user must have an email address.</value>

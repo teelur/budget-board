@@ -2,11 +2,13 @@ using System.Net;
 using System.Text;
 using BudgetBoard.WebAPI.Controllers;
 using BudgetBoard.WebAPI.Models;
+using BudgetBoard.WebAPI.Resources;
 using BudgetBoard.WebAPI.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
@@ -171,7 +173,11 @@ public class AppUpdateServiceTests
                 new Dictionary<string, string?> { ["DISABLE_UPDATE_CHECK"] = "true" }
             )
             .Build();
-        var controller = new AppUpdateController(service.Object, configuration);
+        var controller = new AppUpdateController(
+            service.Object,
+            configuration,
+            Mock.Of<IStringLocalizer<ApiResponseStrings>>()
+        );
 
         var result = await controller.Get("stable", CancellationToken.None);
 
@@ -188,7 +194,20 @@ public class AppUpdateServiceTests
     {
         var service = new Mock<IAppUpdateService>();
         var configuration = new ConfigurationBuilder().Build();
-        var controller = new AppUpdateController(service.Object, configuration);
+        var responseLocalizer = new Mock<IStringLocalizer<ApiResponseStrings>>();
+        responseLocalizer
+            .Setup(localizer => localizer["InvalidUpdateChannel"])
+            .Returns(
+                new LocalizedString(
+                    "InvalidUpdateChannel",
+                    "The channel must be either 'stable' or 'dev'."
+                )
+            );
+        var controller = new AppUpdateController(
+            service.Object,
+            configuration,
+            responseLocalizer.Object
+        );
 
         var result = await controller.Get("preview", CancellationToken.None);
 
@@ -211,7 +230,9 @@ public class AppUpdateServiceTests
         var service = new AppUpdateService(
             httpClientFactory.Object,
             cache,
-            Mock.Of<ILogger<AppUpdateService>>()
+            Mock.Of<ILogger<AppUpdateService>>(),
+            Mock.Of<IStringLocalizer<ApiLogStrings>>(),
+            Mock.Of<IStringLocalizer<ApiResponseStrings>>()
         );
 
         return (service, handler);

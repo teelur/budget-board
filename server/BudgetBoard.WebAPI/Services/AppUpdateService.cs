@@ -3,14 +3,18 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using BudgetBoard.WebAPI.Models;
+using BudgetBoard.WebAPI.Resources;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Services;
 
 public sealed class AppUpdateService(
     IHttpClientFactory httpClientFactory,
     IMemoryCache cache,
-    ILogger<AppUpdateService> logger
+    ILogger<AppUpdateService> logger,
+    IStringLocalizer<ApiLogStrings> logLocalizer,
+    IStringLocalizer<ApiResponseStrings> responseLocalizer
 ) : IAppUpdateService
 {
     public const string GitHubHttpClientName = "GitHub";
@@ -39,7 +43,10 @@ public sealed class AppUpdateService(
     {
         if (!AppUpdateChannels.TryNormalize(channel, out var normalizedChannel))
         {
-            throw new ArgumentException("The update channel is not supported.", nameof(channel));
+            throw new ArgumentException(
+                responseLocalizer["UpdateChannelNotSupported"].Value,
+                nameof(channel)
+            );
         }
 
         var cacheKey = $"{CacheKeyPrefix}:{normalizedChannel}";
@@ -88,8 +95,8 @@ public sealed class AppUpdateService(
         {
             logger.LogWarning(
                 exception,
-                "GitHub update metadata request failed for {Channel}.",
-                channel
+                "{LogMessage}",
+                logLocalizer["GitHubUpdateMetadataRequestFailedLog"]
             );
             return null;
         }
@@ -97,8 +104,8 @@ public sealed class AppUpdateService(
         {
             logger.LogWarning(
                 exception,
-                "GitHub update metadata was invalid for {Channel}.",
-                channel
+                "{LogMessage}",
+                logLocalizer["GitHubUpdateMetadataInvalidLog"]
             );
             return null;
         }

@@ -85,6 +85,12 @@
     <data name="FetchingSigningKeysLog" xml:space="preserve">
         <value>Fetching signing keys from: {0}</value>
     </data>
+    <data name="GitHubUpdateMetadataInvalidLog" xml:space="preserve">
+        <value>GitHub update metadata was invalid.</value>
+    </data>
+    <data name="GitHubUpdateMetadataRequestFailedLog" xml:space="preserve">
+        <value>GitHub update metadata request failed.</value>
+    </data>
     <data name="IdTokenExpiredLog" xml:space="preserve">
         <value>The ID token has expired.</value>
     </data>
