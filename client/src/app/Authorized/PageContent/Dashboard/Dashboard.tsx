@@ -1,6 +1,5 @@
 import { Stack } from "@mantine/core";
 import React from "react";
-import DashboardFooter from "./DashboardFooter/DashboardFooter";
 import DashboardHeader from "./DashboardHeader/DashboardHeader";
 import DashboardMobileHeader from "./DashboardMobileHeader/DashboardMobileHeader";
 import DashboardContent from "./DashboardContent/DashboardContent";
@@ -34,7 +33,6 @@ const Dashboard = (): React.ReactNode => {
           editTarget={effectiveEditTarget}
         />
       </Stack>
-      <DashboardFooter />
     </Stack>
   );
 };

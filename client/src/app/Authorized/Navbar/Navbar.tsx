@@ -25,6 +25,7 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import NavbarLink from "./NavbarLink/NavbarLink";
+import NavbarFooter from "./NavbarFooter/NavbarFooter";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router";
 import { useLogoutMutation } from "~/hooks/mutations/auth/useLogoutMutation";
@@ -293,6 +294,7 @@ const Navbar = (props: NavbarProps) => {
             showLabel={showExpandedNav}
             onClick={() => logoutMutation.mutate()}
           />
+          <NavbarFooter showExpandedNav={showExpandedNav} />
         </Stack>
       </Stack>
     </ScrollArea>
