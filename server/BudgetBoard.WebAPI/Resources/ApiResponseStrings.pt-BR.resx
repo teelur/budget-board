@@ -130,4 +130,10 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>The user was not found.</value>
   </data>
+  <data name="InvalidUpdateChannel" xml:space="preserve">
+    <value>The channel must be either 'stable' or 'dev'.</value>
+  </data>
+  <data name="UpdateChannelNotSupported" xml:space="preserve">
+    <value>The update channel is not supported.</value>
+  </data>
 </root>
