@@ -19,12 +19,7 @@ const NavbarFooter = ({
   const version = import.meta.env.VITE_VERSION;
   const repositoryUrl = `https://github.com/${APP_REPOSITORY}`;
   const updateLabel = update
-    ? t(
-        update.channel === "stable"
-          ? "update_available"
-          : "dev_update_available",
-        { version: update.latestVersion },
-      )
+    ? t("update_available", { version: update.latestVersion })
     : undefined;
   const currentVersionLabel = t("current_version", { version });
   const versionTextRef = React.useRef<HTMLParagraphElement>(null);
