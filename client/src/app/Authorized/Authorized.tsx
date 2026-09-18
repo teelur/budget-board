@@ -44,6 +44,7 @@ const Authorized = (): React.ReactNode => {
     <AppShell
       layout="alt"
       withBorder
+      transitionDuration={0}
       navbar={{
         width: isMobile ? "100vw" : isNavbarExpanded ? 220 : 60,
         breakpoint: "xs",
