@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { useTranslation } from "react-i18next";
@@ -38,8 +38,8 @@ export const useSyncMutation = () => {
       });
       if ((data.data?.length ?? 0) > 0) {
         data.data?.forEach((error: SyncError) =>
-          notifications.show({
-            color: "var(--button-color-destructive)",
+          showNotification({
+            type: NotificationType.Error,
             title: t("syncErrorFromSource", { source: error.source }),
             message: error.message,
           }),
@@ -47,8 +47,8 @@ export const useSyncMutation = () => {
       }
     },
     onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(error),
       });
     },

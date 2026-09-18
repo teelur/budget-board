@@ -1,7 +1,7 @@
 import { ActionIcon, Button, Stack } from "@mantine/core";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { PlusIcon } from "lucide-react";
 import { areStringsEqual } from "~/helpers/utils";
 import { AccountSource, IAccountCreateRequest } from "~/models/account";
@@ -60,9 +60,9 @@ const CreateAccount = () => {
       );
 
       if (institutionForAccount === undefined) {
-        notifications.show({
+        showNotification({
           message: t("institution_creation_failed_message"),
-          color: "var(--button-color-destructive)",
+          type: NotificationType.Error,
         });
         return;
       }

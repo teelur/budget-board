@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import React from "react";
 import GoalCard from "./GoalCard/GoalCard";
 import GoalsHeader from "./GoalsHeader/GoalsHeader";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import CompletedGoalsAccordion from "./CompletedGoalsAccordion/CompletedGoalsAccordion";
 import GoalDetails from "./GoalDetails/GoalDetails";
@@ -28,8 +28,8 @@ const Goals = (): React.ReactNode => {
 
   React.useEffect(() => {
     if (goalsQuery.isError) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(goalsQuery.error as AxiosError),
       });
     }

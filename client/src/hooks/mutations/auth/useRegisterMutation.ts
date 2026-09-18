@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { translateAxiosError, ValidationError } from "~/helpers/requests";
@@ -26,8 +26,8 @@ export const useRegisterMutation = () => {
         },
       }),
     onSuccess: async (res: AxiosResponse) => {
-      notifications.show({
-        color: "var(--button-color-confirm)",
+      showNotification({
+        type: NotificationType.Success,
         message: `${t("account_created_message")}${
           (res.data as RegisterResponse).emailConfirmationRequired
             ? t("account_created_check_your_email_message")
@@ -42,16 +42,16 @@ export const useRegisterMutation = () => {
         (error.response.data as ValidationError).title ===
           "One or more validation errors occurred."
       ) {
-        notifications.show({
+        showNotification({
           title: t("validation_errors_occurred_message"),
-          color: "var(--button-color-destructive)",
+          type: NotificationType.Error,
           message: Object.values(
             (error.response.data as ValidationError).errors,
           ).join("\n"),
         });
       } else {
-        notifications.show({
-          color: "var(--button-color-destructive)",
+        showNotification({
+          type: NotificationType.Error,
           message: translateAxiosError(error),
         });
       }

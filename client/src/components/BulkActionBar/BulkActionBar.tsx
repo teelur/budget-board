@@ -9,7 +9,7 @@ import {
   Transition,
   Badge,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -236,8 +236,8 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     }
     const parsed = dayjs(val);
     if (!parsed.isValid()) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("invalid_date"),
       });
       return;

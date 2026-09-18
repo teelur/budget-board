@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
@@ -34,16 +34,16 @@ export const useRunAutomaticRuleMutation = () => {
         queryKey: [balancesQueryKey],
       });
 
-      notifications.show({
+      showNotification({
         title: t("rule_executed"),
         message: data?.data ?? t("rule_run_successfully"),
-        color: "var(--button-color-confirm)",
+        type: NotificationType.Success,
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({
+      showNotification({
         message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
+        type: NotificationType.Error,
       });
     },
   });

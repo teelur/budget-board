@@ -1,5 +1,5 @@
 import React from "react";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import {
@@ -61,8 +61,8 @@ const OidcCallback = (): React.ReactNode => {
     // The OIDC provider provided an error
     if (error) {
       clearOidcState(state);
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("oidc_provider_error_message", {
           error: errorDescription ?? error,
         }),
@@ -74,8 +74,8 @@ const OidcCallback = (): React.ReactNode => {
     // An authorization code is required to complete the OIDC flow.
     if (!code) {
       clearOidcState(state);
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("authorization_code_missing_message"),
       });
       navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);
@@ -85,8 +85,8 @@ const OidcCallback = (): React.ReactNode => {
     // The state parameter is required to prevent CSRF attacks.
     if (!state || state !== savedState) {
       clearOidcState(state);
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("state_parameter_invalid_message"),
       });
       navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);
@@ -107,8 +107,7 @@ const OidcCallback = (): React.ReactNode => {
           },
         );
         navigate(OidcAuthFlowSuccessRedirectEndpoints[oidcFlow]);
-        return;
-      } else if (oidcFlow == OidcAuthFlows.SignIn) {
+      } else if (oidcFlow === OidcAuthFlows.SignIn) {
         const rememberMe =
           sessionStorage.getItem(`oidc_remember_me_${state}`) === "true";
         const response = await oidcCallbackMutation.mutateAsync({
@@ -121,8 +120,8 @@ const OidcCallback = (): React.ReactNode => {
         if (response.data?.success) {
           navigate(OidcAuthFlowSuccessRedirectEndpoints[oidcFlow]);
         } else {
-          notifications.show({
-            color: "var(--button-color-destructive)",
+          showNotification({
+            type: NotificationType.Error,
             message: t("oidc_authentication_failed_message"),
           });
           navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);
@@ -130,8 +129,8 @@ const OidcCallback = (): React.ReactNode => {
       }
     } catch (error) {
       clearOidcState(state);
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(error as AxiosError),
       });
       navigate(OidcAuthFlowFailedRedirectEndpoints[oidcFlow]);

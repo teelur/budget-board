@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   simpleFinAccountQueryKey,
@@ -39,8 +39,8 @@ export const useUpdateSyncStartDateMutation = () => {
       });
     },
     onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(error),
       });
     },

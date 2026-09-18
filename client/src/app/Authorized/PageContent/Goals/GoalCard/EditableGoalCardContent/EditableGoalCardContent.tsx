@@ -16,7 +16,7 @@ import {
   SignDisplay,
 } from "~/helpers/currency";
 import { IGoalResponse } from "~/models/goal";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
@@ -102,8 +102,8 @@ const EditableGoalCardContent = (
                       name: event.currentTarget.value,
                     });
                   } else {
-                    notifications.show({
-                      color: "var(--button-color-destructive)",
+                    showNotification({
+                      type: NotificationType.Error,
                       message: t("invalid_goal_name"),
                     });
                   }
@@ -181,8 +181,8 @@ const EditableGoalCardContent = (
                             amount: goalTargetAmountField.getValue(),
                           });
                         } else {
-                          notifications.show({
-                            color: "var(--button-color-destructive)",
+                          showNotification({
+                            type: NotificationType.Error,
                             message: t("invalid_target_amount"),
                           });
                         }
@@ -258,8 +258,8 @@ const EditableGoalCardContent = (
                               completeDate: parsedDate.format("YYYY-MM-DD"),
                             });
                           } else {
-                            notifications.show({
-                              color: "var(--button-color-destructive)",
+                            showNotification({
+                              type: NotificationType.Error,
                               message: t("invalid_target_date"),
                             });
                           }
@@ -322,8 +322,8 @@ const EditableGoalCardContent = (
                               goalMonthlyContributionField.getValue(),
                           });
                         } else {
-                          notifications.show({
-                            color: "var(--button-color-destructive)",
+                          showNotification({
+                            type: NotificationType.Error,
                             message: t("invalid_monthly_contribution"),
                           });
                         }

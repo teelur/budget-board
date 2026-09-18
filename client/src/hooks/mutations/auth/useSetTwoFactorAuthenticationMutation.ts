@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -46,15 +46,15 @@ export const useSetTwoFactorAuthenticationMutation = () => {
 
       const data = res.data as TwoFactorAuthResponse;
       if (!data) {
-        notifications.show({
-          color: "var(--button-color-destructive)",
+        showNotification({
+          type: NotificationType.Error,
           message: t("no_data_returned_from_server"),
         });
         return;
       }
 
-      notifications.show({
-        color: "var(--button-color-confirm)",
+      showNotification({
+        type: NotificationType.Success,
         message: t("two_factor_auth_successfully_updated"),
       });
 
@@ -67,20 +67,20 @@ export const useSetTwoFactorAuthenticationMutation = () => {
           error.response?.status === 400 &&
           errorData.title === "One or more validation errors occurred."
         ) {
-          notifications.show({
+          showNotification({
             title: t("one_or_more_validation_errors_occurred"),
-            color: "var(--button-color-destructive)",
+            type: NotificationType.Error,
             message: Object.values(errorData.errors).join("\n"),
           });
         } else {
-          notifications.show({
-            color: "var(--button-color-destructive)",
+          showNotification({
+            type: NotificationType.Error,
             message: translateAxiosError(error),
           });
         }
       } else {
-        notifications.show({
-          color: "var(--button-color-destructive)",
+        showNotification({
+          type: NotificationType.Error,
           message: translateAxiosError(error),
         });
       }

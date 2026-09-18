@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Group, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { PencilIcon, PlayIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import {
@@ -48,9 +48,9 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
       return true;
     }
 
-    notifications.show({
+    showNotification({
       message: t("at_least_one_tag_required"),
-      color: "var(--button-color-destructive)",
+      type: NotificationType.Error,
     });
     return false;
   };

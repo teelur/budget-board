@@ -1,5 +1,5 @@
 import React from "react";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useTranslation } from "react-i18next";
 import { IAccountTypeResponse } from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
@@ -27,8 +27,8 @@ export const AccountTypeProvider = (props: AccountTypeProviderProps) => {
 
   React.useEffect(() => {
     if (accountTypesQuery.isError) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("account_types_query_error"),
       });
     }

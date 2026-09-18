@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { budgetsQueryKey, translateAxiosError } from "~/helpers/requests";
@@ -27,9 +27,9 @@ export const useCreateBudgetMutation = (
       await queryClient.invalidateQueries({ queryKey: [budgetsQueryKey] });
     },
     onError: (error: AxiosError) => {
-      notifications.show({
+      showNotification({
         message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
+        type: NotificationType.Error,
       });
     },
   });
