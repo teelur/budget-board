@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import classes from "../Navbar.module.css";
 import { APP_REPOSITORY } from "~/helpers/appUpdates";
 import { useAppUpdateQuery } from "~/hooks/queries/useAppUpdateQuery";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface NavbarFooterProps {
   showExpandedNav: boolean;
@@ -28,6 +27,25 @@ const NavbarFooter = ({
       )
     : undefined;
   const currentVersionLabel = t("current_version", { version });
+  const versionTextRef = React.useRef<HTMLParagraphElement>(null);
+  const [isVersionTruncated, setIsVersionTruncated] = React.useState(false);
+
+  React.useEffect(() => {
+    const versionText = versionTextRef.current;
+    if (!versionText) {
+      return;
+    }
+
+    const updateTruncationState = () => {
+      setIsVersionTruncated(versionText.scrollWidth > versionText.clientWidth);
+    };
+
+    updateTruncationState();
+    const observer = new ResizeObserver(updateTruncationState);
+    observer.observe(versionText);
+
+    return () => observer.disconnect();
+  }, [currentVersionLabel]);
 
   if (!showExpandedNav) {
     return (
@@ -89,9 +107,22 @@ const NavbarFooter = ({
         justify="space-between"
         wrap="nowrap"
       >
-        <PrimaryText className={classes.versionText} size="xs" truncate>
-          {currentVersionLabel}
-        </PrimaryText>
+        <Tooltip
+          label={currentVersionLabel}
+          position="right"
+          disabled={!isVersionTruncated}
+        >
+          <Text
+            ref={versionTextRef}
+            className={classes.versionText}
+            size="xs"
+            c="var(--base-color-text-primary)"
+            fw={500}
+            truncate
+          >
+            {currentVersionLabel}
+          </Text>
+        </Tooltip>
         <Tooltip label={t("github_repository")} position="right">
           <ActionIcon
             component="a"
