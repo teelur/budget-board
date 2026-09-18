@@ -2,6 +2,9 @@ import { defineConfig } from "vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const configDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -24,7 +27,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "~": path.resolve(__dirname, "./src"),
+      "~": path.resolve(configDirectory, "./src"),
     },
   },
 });
