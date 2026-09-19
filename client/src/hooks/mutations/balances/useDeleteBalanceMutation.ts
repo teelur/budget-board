@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
@@ -35,14 +35,14 @@ export const useDeleteBalanceMutation = ({
       await queryClient.invalidateQueries({ queryKey: [accountsQueryKey] });
       await queryClient.invalidateQueries({ queryKey: [institutionsQueryKey] });
 
-      notifications.show({
-        color: "var(--button-color-confirm)",
+      showNotification({
+        type: NotificationType.Success,
         message: t("balance_deleted_successfully_message"),
       });
     },
     onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(error),
       }),
   });

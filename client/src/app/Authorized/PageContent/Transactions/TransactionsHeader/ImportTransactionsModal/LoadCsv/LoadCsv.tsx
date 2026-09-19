@@ -1,6 +1,6 @@
 import { Button, Group, LoadingOverlay, Stack, Switch } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import Papa from "papaparse";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -92,8 +92,8 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
         );
 
         uniqueErrorMessages.forEach((errorMessage) => {
-          notifications.show({
-            color: "var(--button-color-destructive)",
+          showNotification({
+            type: NotificationType.Error,
             message: t("error_parsing_csv_message", { errorMessage }),
           });
         });
@@ -101,8 +101,8 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       }
 
       if (parsedText.data.length === 0) {
-        notifications.show({
-          color: "var(--button-color-destructive)",
+        showNotification({
+          type: NotificationType.Error,
           message: t("csv_file_is_empty_message"),
         });
         return false;
@@ -114,8 +114,8 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       );
       return true;
     } catch (error) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("error_reading_file_message", { error }),
       });
       return false;
@@ -161,16 +161,16 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
               : null;
 
             if (!file || fileField.error) {
-              notifications.show({
-                color: "var(--button-color-destructive)",
+              showNotification({
+                type: NotificationType.Error,
                 message: t("please_select_valid_csv_file_message"),
               });
               return;
             }
 
             if (useDelimiter.getValue() && delimiterField.error) {
-              notifications.show({
-                color: "var(--button-color-destructive)",
+              showNotification({
+                type: NotificationType.Error,
                 message: t("please_provide_valid_delimiter_message"),
               });
               return;

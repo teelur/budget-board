@@ -1,6 +1,6 @@
 import { ActionIcon, Box, Flex, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { ChevronLeftIcon, ChevronRightIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -83,8 +83,8 @@ const BudgetsSettings = (): React.ReactNode => {
               size="md"
               onClick={() => {
                 if (budgetWarningThresholdField.error) {
-                  notifications.show({
-                    color: "var(--button-color-destructive)",
+                  showNotification({
+                    type: NotificationType.Error,
                     message: budgetWarningThresholdField.error,
                   });
                   return;

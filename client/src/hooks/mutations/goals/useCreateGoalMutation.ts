@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { goalsQueryKey, translateAxiosError } from "~/helpers/requests";
 import { IGoalCreateRequest } from "~/models/goal";
@@ -19,8 +19,8 @@ export const useCreateGoalMutation = () => {
       await queryClient.invalidateQueries({ queryKey: [goalsQueryKey] });
     },
     onError: (error: any) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(error),
       });
     },

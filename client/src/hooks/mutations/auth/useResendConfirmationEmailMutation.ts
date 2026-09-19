@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
@@ -19,14 +19,14 @@ export const useResendConfirmationEmailMutation = () => {
         },
       }),
     onSuccess: async () => {
-      notifications.show({
-        color: "var(--button-color-confirm)",
+      showNotification({
+        type: NotificationType.Success,
         message: t("verification_email_resent_message"),
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(error),
       });
     },

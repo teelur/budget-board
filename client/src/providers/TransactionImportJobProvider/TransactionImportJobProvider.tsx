@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { AxiosError } from "axios";
 import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -103,13 +103,14 @@ export const TransactionImportJobProvider = ({
       setCompletedJob(importJob);
       removeStoredJobId();
       setActiveJobId(null);
-      notifications.show({
-        color:
+      showNotification({
+        type:
           importJob.status === "Failed"
-            ? "var(--button-color-destructive)"
-            : importJob.status === "Cancelled"
-              ? "var(--button-color-warning)"
-              : "var(--button-color-success)",
+            ? NotificationType.Error
+            : importJob.status === "Cancelled" ||
+                importJob.status === "CompletedWithErrors"
+              ? NotificationType.Warning
+              : NotificationType.Success,
         message: t(
           importJob.status === "Failed"
             ? "import_failed"

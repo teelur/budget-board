@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import AddBudget from "./AddBudget/AddBudget";
 import { IBudgetCreateRequest } from "~/models/budget";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
@@ -45,9 +45,9 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
     const budgets = previousMonthBudgetsQuery.data;
 
     if (!budgets || budgets.length === 0) {
-      notifications.show({
+      showNotification({
         message: t("budget_previous_month_no_budgets"),
-        color: "var(--button-color-destructive)",
+        type: NotificationType.Error,
       });
       return;
     }

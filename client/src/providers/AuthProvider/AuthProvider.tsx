@@ -1,7 +1,7 @@
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import {
   IOidcDiscoveryDocument,
   OidcAuthFlow,
@@ -55,9 +55,9 @@ export const AuthProvider = ({
     const onSuccess = (response: AxiosResponse): AxiosResponse => response;
     const onError = (error: AxiosError): any => {
       if (isUserAuthenticated && error.response?.status === 401) {
-        notifications.show({
+        showNotification({
           message: t("unauthorized_message"),
-          color: "var(--button-color-destructive)",
+          type: NotificationType.Error,
         });
 
         localStorage.setItem("isAuthenticated", "false");
@@ -83,9 +83,9 @@ export const AuthProvider = ({
         setIsUserAuthenticated(authed);
       })
       .catch(() => {
-        notifications.show({
-          message: "Failed to check authentication status",
-          color: "var(--button-color-destructive)",
+        showNotification({
+          message: t("failed_to_check_authentication_status"),
+          type: NotificationType.Error,
         });
         localStorage.setItem("isAuthenticated", "false");
         setIsUserAuthenticated(false);
@@ -111,8 +111,8 @@ export const AuthProvider = ({
       const redirectUri = `${window.location.origin}/oidc-callback`;
 
       if (!authorizeUrl || !clientId) {
-        notifications.show({
-          color: "var(--button-color-destructive)",
+        showNotification({
+          type: NotificationType.Error,
           message: t("oidc_enabled_but_not_configured"),
         });
         return;
@@ -137,8 +137,8 @@ export const AuthProvider = ({
       const discoveryUrl = `${authorizeUrl}/.well-known/openid-configuration`;
       const discoveryResponse = await fetch(discoveryUrl);
       if (!discoveryResponse.ok) {
-        notifications.show({
-          color: "var(--button-color-destructive)",
+        showNotification({
+          type: NotificationType.Error,
           message: t("oidc_discovery_document_failed_message"),
         });
         return;
@@ -153,14 +153,14 @@ export const AuthProvider = ({
           discoveryData.authorization_endpoint
         }?${params.toString()}`;
       } else {
-        notifications.show({
-          color: "var(--button-color-destructive)",
+        showNotification({
+          type: NotificationType.Error,
           message: t("oidc_redirect_failed_message"),
         });
       }
     } catch (error) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("oidc_redirect_unspecified_error_message"),
       });
     } finally {

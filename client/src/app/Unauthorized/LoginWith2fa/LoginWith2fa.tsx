@@ -5,7 +5,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PinInput from "~/components/core/Input/PinInput/PinInput";
@@ -33,8 +33,8 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
 
   const submitUserLogin = (): void => {
     if (!authenticationCodeField.getValue()) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("enter_authentication_code_message"),
       });
       return;
@@ -57,13 +57,13 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
           const axiosError = error as AxiosError;
 
           if ((axiosError.response?.data as any)?.detail === "Failed") {
-            notifications.show({
-              color: "var(--button-color-destructive)",
+            showNotification({
+              type: NotificationType.Error,
               message: t("login_failed_message"),
             });
           } else {
-            notifications.show({
-              color: "var(--button-color-destructive)",
+            showNotification({
+              type: NotificationType.Error,
               message: translateAxiosError(axiosError),
             });
           }

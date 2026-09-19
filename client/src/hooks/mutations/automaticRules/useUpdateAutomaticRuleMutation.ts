@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import {
@@ -26,9 +26,9 @@ export const useUpdateAutomaticRuleMutation = () => {
       });
     },
     onError: (error: AxiosError) => {
-      notifications.show({
+      showNotification({
         message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
+        type: NotificationType.Error,
       });
     },
   });

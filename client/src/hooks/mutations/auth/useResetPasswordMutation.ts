@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
@@ -27,14 +27,14 @@ export const useResetPasswordMutation = () => {
         },
       }),
     onSuccess: async () => {
-      notifications.show({
-        color: "var(--button-color-confirm)",
+      showNotification({
+        type: NotificationType.Success,
         message: t("reset_password_success_message"),
       });
     },
     onError: (error: AxiosError) =>
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(error),
       }),
   });
