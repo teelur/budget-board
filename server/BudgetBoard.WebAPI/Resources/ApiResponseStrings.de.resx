@@ -130,4 +130,10 @@
   <data name="OidcExplicitLinkRequiredError" xml:space="preserve">
     <value>Ein Konto mit dieser E-Mail-Adresse existiert bereits. Melden Sie sich an und verknüpfen Sie Ihr OIDC-Konto in den Kontoeinstellungen.</value>
   </data>
+  <data name="InvalidUpdateChannel" xml:space="preserve">
+    <value>The channel must be either 'stable' or 'dev'.</value>
+  </data>
+  <data name="UpdateChannelNotSupported" xml:space="preserve">
+    <value>The update channel is not supported.</value>
+  </data>
 </root>

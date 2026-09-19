@@ -130,4 +130,10 @@
   <data name="OidcExplicitLinkRequiredError" xml:space="preserve">
     <value>Akun dengan email ini telah ada. Masuk dan sambungkan OIDC akun anda dari Setelan Akun.</value>
   </data>
+  <data name="InvalidUpdateChannel" xml:space="preserve">
+    <value>The channel must be either 'stable' or 'dev'.</value>
+  </data>
+  <data name="UpdateChannelNotSupported" xml:space="preserve">
+    <value>The update channel is not supported.</value>
+  </data>
 </root>
