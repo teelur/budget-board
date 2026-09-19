@@ -84,7 +84,7 @@ export const AuthProvider = ({
       })
       .catch(() => {
         showNotification({
-          message: "Failed to check authentication status",
+          message: t("failed_to_check_authentication_status"),
           type: NotificationType.Error,
         });
         localStorage.setItem("isAuthenticated", "false");
