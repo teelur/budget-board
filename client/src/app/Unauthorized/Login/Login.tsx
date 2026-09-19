@@ -14,7 +14,7 @@ import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
@@ -97,8 +97,8 @@ const Login = (props: LoginProps): React.ReactNode => {
             (axiosError.response?.data as any)?.detail ===
             "EmailNotVerifiedError"
           ) {
-            notifications.show({
-              color: "var(--button-color-destructive)",
+            showNotification({
+              type: NotificationType.Error,
               message: (
                 <Group gap="1rem" wrap="nowrap">
                   <div>{t("login_account_not_verified_message")}</div>
@@ -120,13 +120,13 @@ const Login = (props: LoginProps): React.ReactNode => {
             (axiosError.response?.data as any)?.detail ===
             "InvalidEmailOrPasswordError"
           ) {
-            notifications.show({
-              color: "var(--button-color-destructive)",
+            showNotification({
+              type: NotificationType.Error,
               message: t("login_failed_message"),
             });
           } else {
-            notifications.show({
-              color: "var(--button-color-destructive)",
+            showNotification({
+              type: NotificationType.Error,
               message: translateAxiosError(axiosError),
             });
           }
@@ -158,7 +158,7 @@ const Login = (props: LoginProps): React.ReactNode => {
         </Alert>
       )}
       {envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-        <Stack w="100%" align="center" gap="0.75rem" pb={"0.5rem"} p={"1rem"}>
+        <Stack w="100%" align="center" gap="0.75rem" pb="0.5rem" p="1rem">
           <TextInput
             {...emailField.getInputProps()}
             label={<PrimaryText size="sm">{t("email_address")}</PrimaryText>}
@@ -188,8 +188,8 @@ const Login = (props: LoginProps): React.ReactNode => {
                     },
                   });
                 } else {
-                  notifications.show({
-                    color: "var(--button-color-destructive)",
+                  showNotification({
+                    type: NotificationType.Error,
                     message: t("reset_password_missing_email_message"),
                   });
                 }

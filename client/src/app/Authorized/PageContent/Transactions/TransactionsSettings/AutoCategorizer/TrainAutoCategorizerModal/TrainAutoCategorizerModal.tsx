@@ -1,7 +1,7 @@
 import { Button, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -34,8 +34,8 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
     const startDate = startDateField.getValue();
     const endDate = endDateField.getValue();
     if (startDate != null && endDate != null && startDate > endDate) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("train_auto_categorizer_dates_error"),
       });
       return;

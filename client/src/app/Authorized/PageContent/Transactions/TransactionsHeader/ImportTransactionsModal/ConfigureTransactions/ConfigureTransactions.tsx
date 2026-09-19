@@ -12,7 +12,7 @@ import ColumnsOptions, {
 } from "./ColumnsOptions/ColumnsOptions";
 import { areStringsEqual } from "~/helpers/utils";
 import ColumnsSelect, { ISelectedColumns } from "./ColumnsSelect/ColumnsSelect";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
@@ -290,8 +290,8 @@ const ConfigureTransactions = (
         : null;
 
       if (incomeValue && expenseValue) {
-        notifications.show({
-          color: "var(--button-color-warning)",
+        showNotification({
+          type: NotificationType.Warning,
           message: t("both_income_and_expense_values_present_message", {
             uid: row.uid,
           }),
@@ -440,8 +440,8 @@ const ConfigureTransactions = (
 
       setImportedTransactionsTableData(importedTransactions);
     } catch (e) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("error_building_imported_transactions_table_message", {
           error: (e as Error).message,
         }),

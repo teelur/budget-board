@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import React from "react";
 import { useTwoFactorAuthenticationQuery } from "~/hooks/queries/useTwoFactorAuthenticationQuery";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
 import { useDisclosure } from "@mantine/hooks";
@@ -83,8 +83,8 @@ const TwoFactorAuth = (): React.ReactNode => {
                     color={copied ? "teal" : "blue"}
                     onClick={() => {
                       copy();
-                      notifications.show({
-                        color: "teal",
+                      showNotification({
+                        type: NotificationType.Information,
                         message: t("recovery_codes_copied_to_clipboard"),
                       });
                     }}
@@ -154,8 +154,8 @@ const TwoFactorAuth = (): React.ReactNode => {
                     color={copied ? "teal" : "blue"}
                     onClick={() => {
                       copy();
-                      notifications.show({
-                        color: "teal",
+                      showNotification({
+                        type: NotificationType.Information,
                         message: t("code_copied_to_clipboard"),
                       });
                     }}

@@ -1,4 +1,4 @@
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError, userSettingsQueryKey } from "~/helpers/requests";
@@ -20,9 +20,9 @@ export const useTrainAutomaticTransactionCategorizerMutation = () => {
       await queryClient.invalidateQueries({ queryKey: [userSettingsQueryKey] });
     },
     onError: (error: AxiosError) => {
-      notifications.show({
+      showNotification({
         message: translateAxiosError(error),
-        color: "var(--button-color-destructive)",
+        type: NotificationType.Error,
       });
     },
   });

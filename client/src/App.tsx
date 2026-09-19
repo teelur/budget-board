@@ -11,13 +11,26 @@ import {
   createTheme,
   CSSVariablesResolver,
   MantineProvider,
+  Notification,
 } from "@mantine/core";
 import {
   QueryCache,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { notifications, Notifications } from "@mantine/notifications";
+import {
+  notifications,
+  Notifications,
+  type NotificationData,
+} from "@mantine/notifications";
+import {
+  AlertCircle,
+  CircleCheckIcon,
+  InfoIcon,
+  TriangleAlert,
+} from "lucide-react";
+import i18n from "~/i18n/config";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 
 import Welcome from "~/app/Unauthorized/Welcome";
@@ -42,6 +55,74 @@ import {
 import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
 import { LocaleProvider } from "./providers/LocaleProvider/LocaleProvider";
 import { PrivacyModeProvider } from "./providers/PrivacyModeProvider/PrivacyModeProvider";
+
+const notificationStatusConfig = {
+  [NotificationType.Error]: {
+    icon: AlertCircle,
+    titleKey: "error",
+    fallbackTitle: "Error",
+  },
+  [NotificationType.Success]: {
+    icon: CircleCheckIcon,
+    titleKey: "success",
+    fallbackTitle: "Success",
+  },
+  [NotificationType.Warning]: {
+    icon: TriangleAlert,
+    titleKey: "warning",
+    fallbackTitle: "Warning",
+  },
+  [NotificationType.Information]: {
+    icon: InfoIcon,
+    titleKey: "information",
+    fallbackTitle: "Information",
+  },
+} as const;
+
+const renderNotification = (notification: NotificationData) => {
+  const notificationType = notification[
+    "data-notification-type"
+  ] as NotificationType;
+  const status =
+    notificationStatusConfig[notificationType] ??
+    notificationStatusConfig[NotificationType.Information];
+  const StatusIcon = status.icon;
+  const {
+    id,
+    message,
+    title,
+    color,
+    icon,
+    withCloseButton,
+    allowClose,
+    autoClose: _autoClose,
+    position: _position,
+    priority: _priority,
+    onClose: _onClose,
+    onOpen: _onOpen,
+    renderNotification: _renderNotification,
+    ...notificationProps
+  } = notification;
+
+  return (
+    <Notification
+      {...notificationProps}
+      color={color}
+      title={
+        title ?? i18n.t(status.titleKey, { defaultValue: status.fallbackTitle })
+      }
+      icon={icon ?? <StatusIcon size={16} strokeWidth={2.25} />}
+      withCloseButton={allowClose === false ? false : withCloseButton}
+      onClose={() => {
+        if (id) {
+          notifications.hide(id);
+        }
+      }}
+    >
+      {message}
+    </Notification>
+  );
+};
 
 // Your theme configuration is merged with default theme
 const theme = createTheme({
@@ -73,6 +154,52 @@ const theme = createTheme({
     blue,
     orange,
     red,
+  },
+  components: {
+    Notification: {
+      defaultProps: {
+        radius: "xs",
+        withBorder: true,
+      },
+      styles: {
+        root: {
+          backgroundColor:
+            "color-mix(in srgb, var(--notification-color) 15%, var(--background-color-elevated))",
+          borderColor:
+            "color-mix(in srgb, var(--notification-color) 35%, var(--elevated-color-border))",
+          boxShadow: "var(--mantine-shadow-lg)",
+          padding: "var(--mantine-spacing-sm)",
+        },
+        icon: {
+          width: 24,
+          height: 24,
+          marginInlineEnd: "var(--mantine-spacing-sm)",
+        },
+        loader: {
+          width: 24,
+          height: 24,
+          marginInlineEnd: "var(--mantine-spacing-sm)",
+        },
+        body: {
+          marginInlineEnd: "var(--mantine-spacing-xs)",
+        },
+        title: {
+          color: "var(--base-color-text-primary)",
+          fontFamily: "Plus Jakarta Sans Variable, sans-serif",
+          fontSize: "var(--mantine-font-size-xs)",
+          fontWeight: 600,
+        },
+        description: {
+          color: "var(--base-color-text-secondary)",
+          fontFamily: "IBM Plex Sans Variable, sans-serif",
+          overflowWrap: "anywhere",
+        },
+        closeButton: {
+          color: "var(--base-color-text-dimmed)",
+          flexShrink: 0,
+        },
+      },
+    },
   },
 });
 
@@ -188,8 +315,8 @@ const queryClient = new QueryClient({
         return;
       }
 
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: translateAxiosError(error as any),
       });
     },
@@ -210,7 +337,11 @@ function App() {
     >
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <Notifications />
+          <Notifications
+            layout="stacked"
+            limit={5}
+            renderNotification={renderNotification}
+          />
           <BrowserRouter>
             <Routes>
               <Route

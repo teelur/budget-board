@@ -1,6 +1,6 @@
 import { Button, Group, Stack } from "@mantine/core";
 import React from "react";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import {
   FieldToOperatorType,
   IRuleParameterEdit,
@@ -49,9 +49,9 @@ const AddAutomaticRule = (): React.ReactNode => {
       return true;
     }
 
-    notifications.show({
+    showNotification({
       message: t("at_least_one_tag_required"),
-      color: "var(--button-color-destructive)",
+      type: NotificationType.Error,
     });
     return false;
   };

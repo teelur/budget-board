@@ -1,5 +1,5 @@
 import { Button, Stepper } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import { FileDownIcon } from "lucide-react";
 import React from "react";
 import {
@@ -125,8 +125,8 @@ const ImportTransactionsModal = () => {
       if (headers.length > 0) {
         setHeaders(headers);
       } else {
-        notifications.show({
-          color: "var(--button-color-destructive)",
+        showNotification({
+          type: NotificationType.Error,
           message: t("csv_file_missing_header_row_message"),
         });
         return;
@@ -134,8 +134,8 @@ const ImportTransactionsModal = () => {
 
       setCsvData(rows);
     } catch (error) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("error_reading_file_message", { error }),
       });
       resetData();
@@ -158,8 +158,8 @@ const ImportTransactionsModal = () => {
     filteredImportedData: ITransactionImportTableData[],
   ) => {
     if (filteredImportedData.length === 0) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("no_transactions_to_import_message"),
       });
       return;

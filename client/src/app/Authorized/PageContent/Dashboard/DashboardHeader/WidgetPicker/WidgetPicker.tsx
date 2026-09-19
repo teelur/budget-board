@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import Drawer from "~/components/core/Drawer/Drawer";
 import { WIDGET_REGISTRY } from "~/shared/dashboardGrid";
 import WidgetPickerItem from "./WidgetPickerItem/WidgetPickerItem";
-import { notifications } from "@mantine/notifications";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useCreateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useCreateWidgetSettingsMutation";
@@ -25,8 +25,8 @@ const WidgetPicker = ({
   const handleAddWidget = (widgetType: string) => {
     const entry = WIDGET_REGISTRY.find((r) => r.widgetType === widgetType);
     if (!entry) {
-      notifications.show({
-        color: "var(--button-color-destructive)",
+      showNotification({
+        type: NotificationType.Error,
         message: t("error_widget_type_not_found", { widgetType }),
       });
       return;
