@@ -69,11 +69,12 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
               values={{ amount: props.formatAmount(projectedRemaining) }}
               components={[
                 <StatusText
+                  size="sm"
                   amount={props.projectedAmount}
                   total={props.limit}
                   type={statusType}
                   warningThreshold={props.budgetWarningThreshold}
-                  className={`${classes.heroAmount} ${classes.inlineText}`}
+                  className={classes.inlineText}
                   key="amount"
                 />,
                 <DimmedText
