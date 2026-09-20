@@ -1,4 +1,5 @@
-import { Button, Group, SegmentedControl } from "@mantine/core";
+import { Group, SegmentedControl } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import DashboardEditor from "./DashboardEditor/DashboardEditor";
 import { LayoutIcon } from "lucide-react";
 import React from "react";
@@ -49,8 +50,9 @@ const DashboardHeader = ({
             />
           ) : (
             <Button
+              variant="filled"
+              color="primary"
               size="xs"
-              variant="subtle"
               leftSection={<LayoutIcon size={16} />}
               onClick={() => setIsEditMode(true)}
             >

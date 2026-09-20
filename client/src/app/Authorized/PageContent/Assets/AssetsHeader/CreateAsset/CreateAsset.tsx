@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Stack } from "@mantine/core";
+import { ActionIcon, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
@@ -24,9 +25,9 @@ const CreateAsset = (): React.ReactNode => {
 
   return (
     <>
-      <ActionIcon size="input-sm" onClick={open}>
-        <PlusIcon />
-      </ActionIcon>
+      <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
+        <PlusIcon size={22} />
+      </Button>
       <Modal
         opened={opened}
         onClose={close}
@@ -44,6 +45,9 @@ const CreateAsset = (): React.ReactNode => {
             elevation={0}
           />
           <Button
+            variant="filled"
+            color="primary"
+            size="compact-sm"
             loading={createAssetMutation.isPending}
             onClick={() =>
               createAssetMutation.mutate(

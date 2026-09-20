@@ -1,11 +1,5 @@
-import {
-  ActionIcon,
-  Group,
-  Stack,
-  LoadingOverlay,
-  Button,
-  Flex,
-} from "@mantine/core";
+import { ActionIcon, Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
@@ -108,12 +102,10 @@ const EditableAssetItemContent = (
               </ActionIcon>
             </Flex>
             <Button
-              bg={
-                hideAssetField.getValue()
-                  ? "var(--button-color-warning)"
-                  : undefined
-              }
-              variant={hideAssetField.getValue() ? "filled" : "outline"}
+              variant="filled"
+              color="primary"
+              size="sm"
+              selected={hideAssetField.getValue()}
               onClick={() => {
                 updateAssetMutation.mutate(
                   {

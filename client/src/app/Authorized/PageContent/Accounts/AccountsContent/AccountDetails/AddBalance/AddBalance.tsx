@@ -1,4 +1,5 @@
-import { Button, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
@@ -54,6 +55,9 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
         elevation={0}
       />
       <Button
+        variant="filled"
+        color="primary"
+        size="compact-sm"
         loading={createBalanceMutation.isPending}
         onClick={() =>
           createBalanceMutation.mutate({

@@ -1,6 +1,7 @@
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import { initCurrentMonth } from "~/helpers/datetime";
-import { Button, Group, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import AddBudget from "./AddBudget/AddBudget";
@@ -81,7 +82,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="1rem">
+    <Stack gap="0.75rem">
       <MonthToolcards
         selectedDates={props.selectedDates}
         setSelectedDates={props.setSelectedDates}
@@ -92,15 +93,20 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
       />
       <Group justify="space-between" gap="0.5rem">
         <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
+          selected={canSelectMultiple}
           onClick={toggleSelectMultiple}
-          variant="outline"
-          color={canSelectMultiple ? "var(--button-color-confirm)" : ""}
         >
           {t("select_multiple")}
         </Button>
         <Group gap="0.5rem">
           {props.showCopy && (
             <Button
+              variant="filled"
+              color="primary"
+              size="compact-sm"
               onClick={onCopyBudgets}
               loading={
                 createBudgetMutation.isPending ||

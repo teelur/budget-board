@@ -5,13 +5,13 @@ import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
 import {
   ActionIcon,
   Box,
-  Button,
   Flex,
   Group,
   LoadingOverlay,
   Popover as MantinePopover,
   Stack,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
@@ -404,7 +404,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       {t("all_children_will_also_be_deleted")}
                     </DimmedText>
                     <Button
-                      color="var(--button-color-destructive)"
+                      variant="filled"
+                      color="error"
                       size="compact-xs"
                       onClick={() => {
                         deleteBudgetMutation.mutate(id);

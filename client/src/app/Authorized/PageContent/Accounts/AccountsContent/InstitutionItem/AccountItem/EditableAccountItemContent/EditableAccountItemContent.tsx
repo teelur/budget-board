@@ -1,11 +1,5 @@
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
@@ -153,12 +147,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             />
             <Group gap="0.5rem">
               <Button
-                bg={
-                  hideAccountField.getValue()
-                    ? "var(--button-color-warning)"
-                    : undefined
-                }
-                variant={hideAccountField.getValue() ? "filled" : "outline"}
+                variant="filled"
+                color="primary"
+                size="sm"
+                selected={hideAccountField.getValue()}
                 onClick={() =>
                   hideAccountField.setValue(!hideAccountField.getValue())
                 }
@@ -166,13 +158,14 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 {t("hide_account")}
               </Button>
               <Button
+                variant="filled"
+                color="secondary"
+                size="sm"
+                selected={hideTransactionsField.getValue()}
                 bg={
                   hideTransactionsField.getValue()
                     ? "var(--accent-color-purple)"
                     : undefined
-                }
-                variant={
-                  hideTransactionsField.getValue() ? "filled" : "outline"
                 }
                 onClick={() =>
                   hideTransactionsField.setValue(

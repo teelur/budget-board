@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Popover, Stack } from "@mantine/core";
+import { ActionIcon, Popover, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -28,8 +29,9 @@ const PermaDeleteAccountPopover = (
             {t("perma_delete_account_warning")}
           </PrimaryText>
           <Button
+            variant="filled"
+            color="error"
             size="xs"
-            color="var(--button-color-destructive)"
             loading={permanentDeleteAccountMutation.isPending}
             onClick={() =>
               permanentDeleteAccountMutation.mutate(props.accountId)

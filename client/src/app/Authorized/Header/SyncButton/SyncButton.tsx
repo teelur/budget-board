@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Tooltip } from "@mantine/core";
+import { ActionIcon, Tooltip } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { CloudSyncIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -32,6 +33,9 @@ const SyncButton = ({ compact = false }: SyncButtonProps): React.ReactNode => {
 
   return (
     <Button
+      variant="filled"
+      color="primary"
+      size="sm"
       onClick={() => syncMutation.mutateAsync()}
       loading={syncMutation.isPending}
     >

@@ -1,10 +1,10 @@
 import {
-  ActionIcon,
   LoadingOverlay,
   Stack,
   Popover as MantinePopover,
   Group,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
@@ -39,9 +39,9 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   return (
     <Popover>
       <MantinePopover.Target>
-        <ActionIcon size="input-sm">
-          <PlusIcon />
-        </ActionIcon>
+        <Button variant="filled" color="primary" size="compact-sm">
+          <PlusIcon size={22} />
+        </Button>
       </MantinePopover.Target>
       <MantinePopover.Dropdown p="0.5rem">
         <LoadingOverlay visible={createBudgetMutation.isPending} />
@@ -69,7 +69,10 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
               alignSelf: "stretch",
             }}
           >
-            <ActionIcon
+            <Button
+              variant="filled"
+              color="primary"
+              size="compact-sm"
               h="100%"
               disabled={
                 categoryField.getValue() === "" || limitField.getValue() === ""
@@ -88,7 +91,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
               }
             >
               <SendIcon size={18} />
-            </ActionIcon>
+            </Button>
           </Stack>
         </Group>
       </MantinePopover.Dropdown>

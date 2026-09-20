@@ -33,7 +33,7 @@ const Budgets = (): React.ReactNode => {
   );
 
   return (
-    <Stack w="100%" maw={1400}>
+    <Stack w="100%" maw={1400} gap="0.75rem">
       <BudgetsToolbar
         selectedDates={selectedDates}
         setSelectedDates={setSelectedDates}
