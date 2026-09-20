@@ -77,13 +77,13 @@ const TransactionImportJobPanel = () => {
     status === "Failed"
       ? t("import_failed")
       : status === "Cancelled"
-        ? t("import_cancelled")
+        ? t("import_stopped")
         : status === "CompletedWithErrors"
           ? t("import_completed_with_errors")
           : status === "Completed"
             ? t("import_completed_successfully")
             : isCancellationRequested
-              ? t("import_cancellation_requested")
+              ? t("import_stop_requested")
               : status === "Pending"
                 ? t("import_queued")
                 : t("import_in_progress");
@@ -116,7 +116,7 @@ const TransactionImportJobPanel = () => {
 
   const collapsedStatus =
     status === "Cancelled"
-      ? t("import_cancelled")
+      ? t("import_stopped")
       : status === "Failed"
         ? t("import_failed")
         : isActive
@@ -221,15 +221,13 @@ const TransactionImportJobPanel = () => {
                   disabled={isCancellationRequested}
                   onClick={handleCancel}
                 >
-                  {isCancellationRequested
-                    ? t("import_cancelling")
-                    : t("cancel")}
+                  {isCancellationRequested ? t("import_stopping") : t("stop")}
                 </Button>
               )}
               {activeJobId && !isTerminal && isConfirmingCancel && (
                 <Stack gap="xs">
                   <PrimaryText size="sm">
-                    {t("confirm_cancel_import_message")}
+                    {t("confirm_stop_import_message")}
                   </PrimaryText>
                   <Group grow>
                     <Button
@@ -243,7 +241,7 @@ const TransactionImportJobPanel = () => {
                       onClick={() => void confirmCancel()}
                       loading={isCancelling}
                     >
-                      {t("confirm_cancel_import")}
+                      {t("confirm_stop")}
                     </Button>
                   </Group>
                 </Stack>

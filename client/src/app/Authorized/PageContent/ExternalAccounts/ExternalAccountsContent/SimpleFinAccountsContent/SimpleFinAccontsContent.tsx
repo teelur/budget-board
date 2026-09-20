@@ -1,4 +1,5 @@
-import { Badge, Button, Group, Skeleton, Stack } from "@mantine/core";
+import { Badge, Group, Skeleton, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import SimpleFinOrganizationCards from "./SimpleFinOrganizationCards/SimpleFinOrganizationCards";
@@ -35,7 +36,8 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
         </Group>
         {applicationUserQuery.data?.simpleFinAccessToken && (
           <Button
-            bg="var(--button-color-destructive)"
+            variant="filled"
+            color="error"
             size="xs"
             loading={removeAccessTokenMutation.isPending}
             disabled={

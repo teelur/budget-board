@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Group, Stack } from "@mantine/core";
+import { ActionIcon, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { PencilIcon, PlayIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -67,7 +68,20 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
           />
           <Group w="100%">
             <Button
-              flex="1 1 auto"
+              variant="filled"
+              color="neutral"
+              size="compact-sm"
+              flex="1 1 0"
+              onClick={() => setIsSelected(false)}
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="filled"
+              color="primary"
+              size="compact-sm"
+              flex="1 1 0"
+              loading={updateAutomaticRuleMutation.isPending}
               onClick={() => {
                 if (!hasValidActions()) {
                   return;
@@ -96,16 +110,8 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
                   },
                 );
               }}
-              loading={updateAutomaticRuleMutation.isPending}
             >
               {t("save")}
-            </Button>
-            <Button
-              flex="1 1 auto"
-              variant="outline"
-              onClick={() => setIsSelected(false)}
-            >
-              {t("cancel")}
             </Button>
           </Group>
         </Stack>

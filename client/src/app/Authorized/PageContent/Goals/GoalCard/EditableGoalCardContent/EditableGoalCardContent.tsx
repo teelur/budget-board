@@ -3,18 +3,15 @@ import classes from "./EditableGoalCardContent.module.css";
 import {
   ActionIcon,
   Badge,
-  Button,
   Flex,
   Group,
   LoadingOverlay,
   Stack,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
-import {
-  getCurrencySymbol,
-  SignDisplay,
-} from "~/helpers/currency";
+import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
 import { IGoalResponse } from "~/models/goal";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { PencilIcon, TrashIcon } from "lucide-react";
@@ -124,8 +121,9 @@ const EditableGoalCardContent = (
               {/* This is an escape hatch in case the sync does not catch it */}
               {props.goal.percentComplete >= 100 && (
                 <Button
-                  size="compact-xs"
-                  bg="var(--button-color-confirm)"
+                  variant="filled"
+                  color="success"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     completeGoalMutation.mutate(props.goal.id);

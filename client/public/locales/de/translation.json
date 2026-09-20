@@ -128,8 +128,6 @@
   "completed_goals": "Erledigte Ziele",
   "configure_details": "Details konfigurieren",
   "configure_transactions": "Transaktionen konfigurieren",
-  "confirm_cancel_import": "Bestätigen Abbrechen",
-  "confirm_cancel_import_message": "Diesen Import abbrechen? Bereits bearbeitete Transaktionen bleiben erhalten.",
   "confirm_clear": "Löschung bestätigen",
   "confirm_delete_budget_message": "Möchten Sie dieses Budget wirklich löschen?",
   "confirm_delete_transactions_message": "Möchten Sie wirklich {{count}} Transaktion(en) löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",

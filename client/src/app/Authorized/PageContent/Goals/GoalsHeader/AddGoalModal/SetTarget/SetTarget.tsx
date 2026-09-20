@@ -1,5 +1,6 @@
 import React from "react";
-import { Button, Group, SegmentedControl, Stack } from "@mantine/core";
+import { Group, SegmentedControl, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { MoveLeftIcon } from "lucide-react";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -89,10 +90,19 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
         />
       )}
       <Group w="100%">
-        <Button flex="1 1 0" onClick={() => props.goBackToPreviousDialog()}>
+        <Button
+          variant="filled"
+          color="primary"
+          size="sm"
+          flex="1 1 0"
+          onClick={() => props.goBackToPreviousDialog()}
+        >
           {<MoveLeftIcon size={16} />}
         </Button>
         <Button
+          variant="filled"
+          color="primary"
+          size="sm"
           flex="1 1 0"
           onClick={() => {
             props.createGoal(

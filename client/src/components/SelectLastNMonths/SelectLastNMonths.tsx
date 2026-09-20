@@ -7,6 +7,7 @@ interface SelectLastNMonthsProps {
   setSelectedMonths: React.Dispatch<React.SetStateAction<Date[]>>;
   onSelectMonths?: () => void;
   showAllButton?: boolean;
+  showClearButton?: boolean;
 }
 
 const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
@@ -42,7 +43,7 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
         >
           {t("all")}
         </Button>
-      ) : (
+      ) : props.showClearButton ? (
         <Button
           size="compact-sm"
           variant="primary"
@@ -50,7 +51,7 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
         >
           {t("clear_selection")}
         </Button>
-      )}
+      ) : null}
     </Group>
   );
 };

@@ -1,4 +1,5 @@
-import { Button, Group, Progress, Stack } from "@mantine/core";
+import { Group, Progress, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { BanIcon } from "lucide-react";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -43,9 +44,9 @@ const ImportProgress = (props: ImportProgressProps) => {
         {isFailed
           ? t("import_failed")
           : isCancelled
-            ? t("import_cancelled")
+            ? t("import_stopped")
             : isCancellationRequested
-              ? t("import_cancellation_requested")
+              ? t("import_stop_requested")
               : props.job?.status === "Pending"
                 ? t("import_queued")
                 : t("import_in_progress")}
@@ -72,33 +73,38 @@ const ImportProgress = (props: ImportProgressProps) => {
           ) : null}
           {canCancel && !isConfirmingCancel ? (
             <Button
-              color="red"
-              variant="outline"
+              variant="filled"
+              color="error"
+              size="compact-sm"
               leftSection={<BanIcon size={16} />}
               loading={props.isCancelling}
               onClick={() => setIsConfirmingCancel(true)}
             >
-              {t("cancel")}
+              {t("stop")}
             </Button>
           ) : null}
           {canCancel && isConfirmingCancel ? (
             <Stack gap="xs">
               <PrimaryText size="sm">
-                {t("confirm_cancel_import_message")}
+                {t("confirm_stop_import_message")}
               </PrimaryText>
               <Group grow>
                 <Button
-                  variant="default"
+                  variant="filled"
+                  color="neutral"
+                  size="compact-sm"
                   onClick={() => setIsConfirmingCancel(false)}
                 >
                   {t("cancel")}
                 </Button>
                 <Button
-                  color="red"
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   onClick={() => void confirmCancel()}
                   loading={props.isCancelling}
                 >
-                  {t("confirm_cancel_import")}
+                  {t("confirm_stop")}
                 </Button>
               </Group>
             </Stack>

@@ -1,7 +1,8 @@
 import classes from "./ExportTransactionsModal.module.css";
 
 import React from "react";
-import { Button, Flex, Stack } from "@mantine/core";
+import { Flex, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { FileUpIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -152,7 +153,9 @@ const ExportTransactionsModal = (): React.ReactNode => {
   return (
     <>
       <Button
-        size="sm"
+        variant="filled"
+        color="primary"
+        size="xs"
         rightSection={<FileUpIcon size="1rem" />}
         onClick={open}
       >
@@ -184,9 +187,12 @@ const ExportTransactionsModal = (): React.ReactNode => {
             />
           </Flex>
           <Button
-            onClick={handleExport}
+            variant="filled"
+            color="primary"
+            size="compact-sm"
             disabled={orderedFields.length === 0}
-            rightSection={<FileUpIcon size="1rem" />}
+            leftSection={<FileUpIcon size="1rem" />}
+            onClick={handleExport}
           >
             {t("export_csv")}
           </Button>

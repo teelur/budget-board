@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
+import { ListChecksIcon } from "lucide-react";
 
 interface BudgetsToolbarProps {
   selectedDates: Date[];
@@ -91,35 +92,34 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         allowSelectMultiple={canSelectMultiple}
         allowFutureMonths
       />
-      <Group justify="space-between" gap="0.5rem">
+      <Group justify="right" gap="0.5rem">
         <Button
           variant="filled"
           color="primary"
-          size="compact-sm"
+          size="xs"
           selected={canSelectMultiple}
+          rightSection={<ListChecksIcon size="1rem" />}
           onClick={toggleSelectMultiple}
         >
           {t("select_multiple")}
         </Button>
-        <Group gap="0.5rem">
-          {props.showCopy && (
-            <Button
-              variant="filled"
-              color="primary"
-              size="compact-sm"
-              onClick={onCopyBudgets}
-              loading={
-                createBudgetMutation.isPending ||
-                previousMonthBudgetsQuery.isPending
-              }
-            >
-              {t("copy_previous")}
-            </Button>
-          )}
-          {props.selectedDates.length === 1 && (
-            <AddBudget date={props.selectedDates[0]!} />
-          )}
-        </Group>
+        {props.showCopy && (
+          <Button
+            variant="filled"
+            color="primary"
+            size="xs"
+            onClick={onCopyBudgets}
+            loading={
+              createBudgetMutation.isPending ||
+              previousMonthBudgetsQuery.isPending
+            }
+          >
+            {t("copy_previous")}
+          </Button>
+        )}
+        {props.selectedDates.length === 1 && (
+          <AddBudget date={props.selectedDates[0]!} />
+        )}
       </Group>
     </Stack>
   );

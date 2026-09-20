@@ -1,4 +1,5 @@
-import { Alert, Button, Group, Stack } from "@mantine/core";
+import { Alert, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import {
@@ -514,14 +515,21 @@ const ConfigureTransactions = (
       )}
       <Group w="100%">
         <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
           flex="1 1 auto"
-          onClick={() => props.goBackToPreviousDialog()}
           leftSection={<MoveLeftIcon size={16} />}
+          onClick={() => props.goBackToPreviousDialog()}
         >
           {t("back")}
         </Button>
         <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
           flex="1 1 auto"
+          rightSection={<MoveRightIcon size={16} />}
           disabled={alertDetails !== null || isPending}
           loading={isPending}
           onClick={() =>
@@ -537,7 +545,6 @@ const ConfigureTransactions = (
               account: Boolean(columnsSelect.account),
             })
           }
-          rightSection={<MoveRightIcon size={16} />}
         >
           {t("next")}
         </Button>

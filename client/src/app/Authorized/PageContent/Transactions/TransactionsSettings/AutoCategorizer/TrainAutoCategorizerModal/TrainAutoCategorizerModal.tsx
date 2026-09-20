@@ -1,4 +1,5 @@
-import { Button, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -71,7 +72,7 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
             })
           : t("train_auto_categorizer_not_trained")}
       </DimmedText>
-      <Button size="xs" onClick={open}>
+      <Button variant="filled" color="primary" size="xs" onClick={open}>
         {t("train_auto_categorizer_button")}
       </Button>
       <Modal
@@ -79,28 +80,32 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
         onClose={close}
         title={<PrimaryText>{t("train_auto_categorizer")}</PrimaryText>}
       >
-        <Stack gap="0.25rem">
-          <DimmedText size="xs">
-            {t("train_auto_categorizer_date_range_description")}
-          </DimmedText>
-          <DateInput
-            label={<PrimaryText size="sm">{t("start_date")}</PrimaryText>}
-            placeholder={t("select_a_date")}
-            {...startDateField.getInputProps()}
-            elevation={0}
-            clearable
-          />
-          <DateInput
-            label={<PrimaryText size="sm">{t("end_date")}</PrimaryText>}
-            placeholder={t("select_a_date")}
-            {...endDateField.getInputProps()}
-            elevation={0}
-            clearable
-          />
+        <Stack gap="1rem">
+          <Stack gap="0.25rem">
+            <DimmedText size="xs">
+              {t("train_auto_categorizer_date_range_description")}
+            </DimmedText>
+            <DateInput
+              label={<PrimaryText size="sm">{t("start_date")}</PrimaryText>}
+              placeholder={t("select_a_date")}
+              {...startDateField.getInputProps()}
+              elevation={0}
+              clearable
+            />
+            <DateInput
+              label={<PrimaryText size="sm">{t("end_date")}</PrimaryText>}
+              placeholder={t("select_a_date")}
+              {...endDateField.getInputProps()}
+              elevation={0}
+              clearable
+            />
+          </Stack>
           <Button
-            mt="0.25rem"
-            onClick={onSubmit}
+            variant="filled"
+            color="primary"
+            size="compact-sm"
             loading={trainAutomaticTransactionCategorizerMutation.isPending}
+            onClick={onSubmit}
           >
             {t("submit")}
           </Button>
