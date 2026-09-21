@@ -1,12 +1,12 @@
 import {
   ActionIcon,
   Badge,
-  Button,
   Group,
   Skeleton,
   Stack,
   Tooltip,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -135,8 +135,16 @@ const RecurringRules = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
+      <PrimaryText size="md">{t("recurring_rules")}</PrimaryText>
       <DimmedText size="sm">{t("recurring_rules_description")}</DimmedText>
-      <Button leftSection={<PlusIcon size="1rem" />} onClick={openCreate}>
+      <Button
+        variant="filled"
+        color="primary"
+        size="compact-sm"
+        fullWidth
+        rightSection={<PlusIcon size="1rem" />}
+        onClick={openCreate}
+      >
         {t("add_recurring_rule")}
       </Button>
       {rulesQuery.isPending ? (

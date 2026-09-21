@@ -4,14 +4,8 @@ import {
   INetWorthWidgetLine,
 } from "~/models/widgetSettings";
 import NetWorthLineItem from "./NetWorthLineItem/NetWorthLineItem";
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { GripVertical, PlusIcon } from "lucide-react";
 import {
   INetWorthWidgetLineCreateRequest,
@@ -91,7 +85,13 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
       <Group gap="0.5rem">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
-            <Button h="100%" px={0} w={{ base: 25, xs: 30 }} radius="lg">
+            <Button
+              variant="filled"
+              color="primary"
+              h="100%"
+              px={0}
+              w={{ base: 25, xs: 30 }}
+            >
               <GripVertical size={25} />
             </Button>
           </Flex>

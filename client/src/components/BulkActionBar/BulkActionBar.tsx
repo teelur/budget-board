@@ -1,5 +1,4 @@
 import {
-  Button,
   Collapse,
   Flex,
   Group,
@@ -9,6 +8,7 @@ import {
   Transition,
   Badge,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { TrashIcon } from "lucide-react";
 import React from "react";
@@ -282,8 +282,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 {t("n_selected", { count: props.selectedIds.size })}
               </DimmedText>
               <Button
+                variant="ghost"
+                color="primary"
                 size="compact-xs"
-                variant="subtle"
                 onClick={() =>
                   props.onSelectAll(
                     props.currentPageTransactions.map((t) => t.id),
@@ -293,8 +294,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 {t("select_all")} ({props.currentPageTransactions.length})
               </Button>
               <Button
+                variant="outline"
+                color="error"
                 size="compact-xs"
-                variant="subtle"
                 onClick={() => {
                   props.onClearSelection();
                   resetFields();
@@ -431,17 +433,20 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                     }}
                   />
                 )}
-                <ActionIcon
-                  color="var(--button-color-destructive)"
-                  onClick={handleDeleteClick}
+                <Button
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   loading={deleteTransactionsMutation.isPending}
                   title={t("delete_transactions")}
+                  onClick={handleDeleteClick}
                 >
                   <TrashIcon size="1rem" />
-                </ActionIcon>
+                </Button>
                 <Button
+                  variant="filled"
+                  color="neutral"
                   size="compact-sm"
-                  variant="subtle"
                   onClick={() => {
                     props.onClearSelection();
                     resetFields();
@@ -450,6 +455,8 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                   {t("cancel")}
                 </Button>
                 <Button
+                  variant="filled"
+                  color="primary"
                   size="compact-sm"
                   disabled={isApplyDisabled}
                   loading={updateTransactionsMutation.isPending}
@@ -469,8 +476,17 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                   })}
                 </PrimaryText>
                 <Button
+                  variant="filled"
+                  color="neutral"
                   size="compact-sm"
-                  color="var(--button-color-destructive)"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  {t("cancel")}
+                </Button>
+                <Button
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   loading={deleteTransactionsMutation.isPending}
                   onClick={() => {
                     deleteTransactionsMutation.mutate(
@@ -486,13 +502,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                   }}
                 >
                   {t("delete")}
-                </Button>
-                <Button
-                  size="compact-sm"
-                  variant="subtle"
-                  onClick={() => setShowDeleteConfirm(false)}
-                >
-                  {t("cancel")}
                 </Button>
               </Group>
             </Collapse>

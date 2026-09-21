@@ -1,11 +1,5 @@
-import {
-  Alert,
-  Button,
-  LoadingOverlay,
-  Stack,
-  Divider,
-  Group,
-} from "@mantine/core";
+import { Alert, Stack, Divider, Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { Info } from "lucide-react";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
@@ -103,8 +97,9 @@ const Login = (props: LoginProps): React.ReactNode => {
                 <Group gap="1rem" wrap="nowrap">
                   <div>{t("login_account_not_verified_message")}</div>
                   <Button
+                    variant="filled"
+                    color="primary"
                     size="xs"
-                    miw="fit-content"
                     loading={resendConfirmationEmailMutation.isPending}
                     onClick={() =>
                       resendConfirmationEmailMutation.mutate(email)
@@ -140,11 +135,6 @@ const Login = (props: LoginProps): React.ReactNode => {
 
   return (
     <Stack gap={0} align="center" w="100%">
-      <LoadingOverlay
-        visible={forgotPasswordMutation.isPending || loginMutation.isPending}
-        zIndex={1000}
-        overlayProps={{ radius: "sm", blur: 2 }}
-      />
       {envVariables.VITE_DEMO_MODE?.toLowerCase() === "true" && (
         <Alert
           icon={<Info size={16} />}
@@ -171,14 +161,22 @@ const Login = (props: LoginProps): React.ReactNode => {
             w="100%"
             elevation={1}
           />
-          <Button variant="filled" fullWidth onClick={doLogin}>
+          <Button
+            variant="filled"
+            color="primary"
+            size="compact-md"
+            fullWidth
+            loading={loginMutation.isPending}
+            onClick={doLogin}
+          >
             {t("login")}
           </Button>
           <Group justify="center" w="100%">
             <Button
-              size="xs"
-              variant="subtle"
-              fw={600}
+              variant="ghost"
+              color="primary"
+              size="compact-sm"
+              loading={forgotPasswordMutation.isPending}
               onClick={() => {
                 if (emailField.getValue()) {
                   forgotPasswordMutation.mutate(emailField.getValue(), {
@@ -207,13 +205,15 @@ const Login = (props: LoginProps): React.ReactNode => {
       {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" && (
         <Stack w="100%" pt="0.5rem" p="1rem">
           <Button
-            variant="outline"
+            variant="filled"
+            color="secondary"
+            size="compact-md"
             fullWidth
+            loading={oidcLoading}
             onClick={() =>
               startOidcLogin &&
               startOidcLogin(props.rememberMe, OidcAuthFlows.SignIn)
             }
-            loading={oidcLoading}
           >
             {t("login_with_oidc")}
           </Button>

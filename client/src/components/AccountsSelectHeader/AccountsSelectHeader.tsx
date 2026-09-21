@@ -1,4 +1,5 @@
-import { Button, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { IAccountResponse } from "~/models/account";
 import React from "react";
@@ -43,6 +44,9 @@ const AccountsSelectHeader = (
           elevation={1}
         />
         <Button
+          variant="filled"
+          color="primary"
+          size="sm"
           onClick={() => {
             props.setSelectedAccountIds(
               accountsQuery.data
@@ -60,7 +64,12 @@ const AccountsSelectHeader = (
         >
           {t("select_all")}
         </Button>
-        <Button onClick={() => props.setSelectedAccountIds([])}>
+        <Button
+          variant="filled"
+          color="primary"
+          size="sm"
+          onClick={() => props.setSelectedAccountIds([])}
+        >
           {t("clear_all")}
         </Button>
       </Group>

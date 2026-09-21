@@ -125,7 +125,6 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem" w={600} maw="100%" mx="auto">
-      <LoadingOverlay visible={isPending} />
       <FileInput
         {...fileField.getInputProps()}
         accept="text/csv"
@@ -163,6 +162,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
           !!delimiterField.error ||
           isPending
         }
+        loading={isPending}
         onClick={async () => {
           startTransition(async () => {
             const file = fileField.getValue();

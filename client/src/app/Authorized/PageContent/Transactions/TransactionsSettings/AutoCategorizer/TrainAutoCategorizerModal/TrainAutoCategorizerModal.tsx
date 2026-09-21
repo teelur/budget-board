@@ -59,8 +59,8 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
 
   return (
     <>
-      <PrimaryText size="sm">{t("train_auto_categorizer")}</PrimaryText>
-      <DimmedText size="xs">
+      <PrimaryText size="md">{t("train_auto_categorizer")}</PrimaryText>
+      <DimmedText size="sm">
         {t("train_auto_categorizer_description")}
       </DimmedText>
       <DimmedText size="xs">
@@ -72,7 +72,7 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
             })
           : t("train_auto_categorizer_not_trained")}
       </DimmedText>
-      <Button variant="filled" color="primary" size="xs" onClick={open}>
+      <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
         {t("train_auto_categorizer_button")}
       </Button>
       <Modal

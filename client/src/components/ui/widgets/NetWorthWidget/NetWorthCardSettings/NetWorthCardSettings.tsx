@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Group, Stack } from "@mantine/core";
+import { ActionIcon, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
 import Modal from "~/components/core/Modal/Modal";
@@ -88,17 +89,22 @@ const NetWorthCardSettings = ({
         <DimmedText size="sm">
           {t("net_worth_settings_widget_message")}
         </DimmedText>
-        <Group w="100%">
+        <Group>
           <Button
-            flex="1 0 auto"
-            size="xs"
-            bg={isSortable ? "var(--button-color-confirm)" : ""}
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            selected={!isSortable}
+            flex="1 1 0"
             onClick={toggleIsSortable}
           >
             {isSortable ? t("save_changes") : t("reorder")}
           </Button>
           <Button
-            size="xs"
+            variant="filled"
+            color="error"
+            size="compact-sm"
+            flex="1 1 0"
             loading={updateWidgetSettingsMutation.isPending}
             onClick={() =>
               updateWidgetSettingsMutation.mutate([

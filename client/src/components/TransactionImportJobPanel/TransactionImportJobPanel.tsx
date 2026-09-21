@@ -1,12 +1,12 @@
 import {
   Affix,
-  Button,
   FloatingWindow,
   Group,
   Progress,
   Stack,
   Transition,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import type { SetFloatingWindowPosition } from "@mantine/hooks";
 import {
   BanIcon,
@@ -169,7 +169,8 @@ const TransactionImportJobPanel = () => {
                 <Group gap={4} wrap="nowrap">
                   {isTerminal && (
                     <Button
-                      variant="subtle"
+                      variant="ghost"
+                      color="primary"
                       size="compact-sm"
                       p={4}
                       aria-label={t("dismiss")}
@@ -179,8 +180,8 @@ const TransactionImportJobPanel = () => {
                     </Button>
                   )}
                   <Button
-                    className={classes.collapseButton}
-                    variant="subtle"
+                    variant="ghost"
+                    color="primary"
                     size="compact-sm"
                     p={4}
                     aria-label={t("hide_import_panel")}
@@ -214,9 +215,10 @@ const TransactionImportJobPanel = () => {
               )}
               {activeJobId && !isTerminal && !isConfirmingCancel && (
                 <Button
-                  color="red"
                   variant="outline"
-                  leftSection={<BanIcon size={16} />}
+                  color="error"
+                  size="compact-sm"
+                  rightSection={<BanIcon size={16} />}
                   loading={isCancelling}
                   disabled={isCancellationRequested}
                   onClick={handleCancel}
@@ -229,17 +231,23 @@ const TransactionImportJobPanel = () => {
                   <PrimaryText size="sm">
                     {t("confirm_stop_import_message")}
                   </PrimaryText>
-                  <Group grow>
+                  <Group gap="0.5rem">
                     <Button
-                      variant="default"
+                      variant="filled"
+                      color="neutral"
+                      size="compact-sm"
+                      flex="1 1 0"
                       onClick={() => setIsConfirmingCancel(false)}
                     >
                       {t("cancel")}
                     </Button>
                     <Button
-                      color="red"
-                      onClick={() => void confirmCancel()}
+                      variant="filled"
+                      color="error"
+                      size="compact-sm"
+                      flex="1 1 0"
                       loading={isCancelling}
+                      onClick={() => void confirmCancel()}
                     >
                       {t("confirm_stop")}
                     </Button>
@@ -257,8 +265,10 @@ const TransactionImportJobPanel = () => {
         <Transition mounted={isCollapsed} transition="slide-up" duration={220}>
           {(styles) => (
             <Button
+              variant="filled"
+              color="primary"
+              size="compact-sm"
               className={classes.tab}
-              size="sm"
               aria-label={t("show_import_panel")}
               onClick={toggleCollapsed}
               leftSection={collapsedStatusIcon}

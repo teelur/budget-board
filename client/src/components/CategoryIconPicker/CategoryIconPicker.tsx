@@ -3,13 +3,13 @@ import dropdownClasses from "~/styles/Dropdown.module.css";
 
 import {
   ActionIcon,
-  Button,
   Popover as MantinePopover,
   ScrollArea,
   SimpleGrid,
   Stack,
   UnstyledButton,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { SmilePlusIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -164,7 +164,8 @@ const CategoryIconPicker = (
           )}
           {props.icon.length > 0 && (
             <Button
-              variant="default"
+              variant="filled"
+              color="error"
               size="compact-xs"
               disabled={isSaving}
               onClick={() => handlePick("")}

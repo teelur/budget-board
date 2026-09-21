@@ -1,4 +1,4 @@
-import { LoadingOverlay, Stack, Tooltip } from "@mantine/core";
+import { Stack, Tooltip } from "@mantine/core";
 import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
@@ -21,7 +21,7 @@ const EnableAutoCategorizer = (): React.ReactNode => {
           ? "error"
           : "primary"
       }
-      size="xs"
+      size="compact-sm"
       disabled={autoCategorizerModelOID == null}
       loading={updateUserSettingsMutation.isPending}
       onClick={
@@ -47,11 +47,13 @@ const EnableAutoCategorizer = (): React.ReactNode => {
 
   return (
     <Stack gap="0.25rem">
-      <PrimaryText size="sm">{t("enable_auto_categorizer")}</PrimaryText>
-      <DimmedText size="xs">
+      <PrimaryText size="md">{t("enable_auto_categorizer")}</PrimaryText>
+      <DimmedText size="sm">
         {t("enable_auto_categorizer_description")}
       </DimmedText>
-      <DimmedText size="xs">{t("enable_auto_categorizer_warning")}</DimmedText>
+      <PrimaryText size="sm">
+        {t("enable_auto_categorizer_warning")}
+      </PrimaryText>
       {autoCategorizerModelOID == null ? tooltip : button}
     </Stack>
   );

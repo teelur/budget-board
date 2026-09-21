@@ -6,6 +6,7 @@ import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useAutomaticRulesQuery } from "~/hooks/queries/useAutomaticRulesQuery";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 const AutomaticRules = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -30,7 +31,8 @@ const AutomaticRules = (): React.ReactNode => {
   };
 
   return (
-    <Stack gap="0.5rem">
+    <Stack gap="0.25rem">
+      <PrimaryText size="md">{t("automatic_rules")}</PrimaryText>
       <DimmedText size="sm">{t("automatic_rules_description")}</DimmedText>
       <AddAutomaticRule />
       {getAutomaticRulesContent()}

@@ -38,7 +38,9 @@ const NetCashFlowTab = (): React.ReactNode => {
       />
       <SelectLastNMonths
         monthButtons={monthButtons}
+        selectedMonths={selectedMonths}
         setSelectedMonths={setSelectedMonths}
+        size="compact-sm"
       />
       <NetCashFlowChart
         transactions={transactionsQuery.data ?? []}

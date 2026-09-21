@@ -1,4 +1,5 @@
-import { Alert, Button, Group, Paper, Skeleton, Stack } from "@mantine/core";
+import { Alert, Group, Paper, Skeleton, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
@@ -83,9 +84,10 @@ const TransactionLinkDialog = ({
 
   const linkAction = transaction.linkedTransactionID ? (
     <Button
-      variant="subtle"
+      variant="ghost"
+      color="error"
       size="compact-sm"
-      leftSection={<Unlink size="0.85rem" />}
+      rightSection={<Unlink size="0.85rem" />}
       onClick={(event) => {
         event.stopPropagation();
         openUnlink();
@@ -96,9 +98,10 @@ const TransactionLinkDialog = ({
     </Button>
   ) : (
     <Button
-      variant="subtle"
+      variant="ghost"
+      color="primary"
       size="compact-sm"
-      leftSection={<ArrowRightLeft size="0.85rem" />}
+      rightSection={<ArrowRightLeft size="0.85rem" />}
       onClick={(event) => {
         event.stopPropagation();
         onOpenLink();
@@ -169,14 +172,17 @@ const TransactionLinkDialog = ({
             <DimmedText size="sm">{t("no_transfer_candidates")}</DimmedText>
           )}
           <Button
-            leftSection={<Link2 size="1rem" />}
-            onClick={onLink}
+            variant="filled"
+            color="primary"
+            size="compact-sm"
             disabled={
               !hasSelectedCandidate ||
               candidatesQuery.isPending ||
               candidatesQuery.isError
             }
             loading={linkMutation.isPending}
+            rightSection={<Link2 size="1rem" />}
+            onClick={onLink}
           >
             {t("confirm_link")}
           </Button>
@@ -191,15 +197,24 @@ const TransactionLinkDialog = ({
       >
         <Stack gap="sm">
           <DimmedText size="sm">{t("unlink_transfer_message")}</DimmedText>
-          <Group justify="flex-end">
-            <Button variant="default" onClick={closeUnlink}>
+          <Group gap="0.5rem">
+            <Button
+              variant="filled"
+              color="neutral"
+              size="compact-sm"
+              flex="1 1 0"
+              onClick={closeUnlink}
+            >
               {t("cancel")}
             </Button>
             <Button
-              color="red"
-              leftSection={<Unlink size="1rem" />}
-              onClick={onUnlink}
+              variant="filled"
+              color="error"
+              size="compact-sm"
+              rightSection={<Unlink size="1rem" />}
+              flex="1 1 0"
               loading={unlinkMutation.isPending}
+              onClick={onUnlink}
             >
               {t("unlink_transactions")}
             </Button>

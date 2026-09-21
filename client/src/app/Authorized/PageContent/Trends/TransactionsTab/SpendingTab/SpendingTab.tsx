@@ -38,7 +38,9 @@ const SpendingTab = (): React.ReactNode => {
       />
       <SelectLastNMonths
         monthButtons={monthButtons}
+        selectedMonths={selectedMonths}
         setSelectedMonths={setSelectedMonths}
+        size="compact-sm"
       />
       <SpendingChart
         h={400}

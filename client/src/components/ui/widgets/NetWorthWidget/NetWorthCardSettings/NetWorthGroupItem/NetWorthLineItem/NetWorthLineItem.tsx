@@ -1,11 +1,5 @@
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { INetWorthWidgetLine } from "~/models/widgetSettings";
@@ -63,7 +57,13 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
       <Group gap="0.5rem">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
-            <Button h="100%" px={0} w={{ base: 25, xs: 30 }} radius="lg">
+            <Button
+              variant="filled"
+              color="secondary"
+              h="100%"
+              px={0}
+              w={{ base: 25, xs: 30 }}
+            >
               <GripVertical size={25} />
             </Button>
           </Flex>

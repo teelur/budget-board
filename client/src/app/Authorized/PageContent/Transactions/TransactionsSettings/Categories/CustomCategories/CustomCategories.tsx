@@ -12,8 +12,8 @@ const CustomCategories = (): React.ReactNode => {
   return (
     <Stack gap="0.5rem">
       <Stack gap="0.25rem">
-        <PrimaryText size="sm">{t("custom_categories")}</PrimaryText>
-        <DimmedText size="xs">{t("custom_categories_description")}</DimmedText>
+        <PrimaryText size="md">{t("custom_categories")}</PrimaryText>
+        <DimmedText size="sm">{t("custom_categories_description")}</DimmedText>
       </Stack>
       <AddCategory />
       <CustomCategoryCards />

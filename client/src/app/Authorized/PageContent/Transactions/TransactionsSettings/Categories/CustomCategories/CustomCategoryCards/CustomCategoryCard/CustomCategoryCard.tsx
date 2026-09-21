@@ -1,13 +1,13 @@
 import {
   ActionIcon,
   Badge,
-  Button,
   Flex,
   Group,
   LoadingOverlay,
   SegmentedControl,
   Stack,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -155,10 +155,22 @@ const CustomCategoryCard = (
               </Stack>
             )}
             <Group justify="flex-end" gap="0.5rem">
-              <Button variant="default" size="xs" onClick={handleCancel}>
+              <Button
+                variant="filled"
+                color="neutral"
+                size="xs"
+                flex="1 1 0"
+                onClick={handleCancel}
+              >
                 {t("cancel")}
               </Button>
-              <Button size="xs" onClick={handleSave}>
+              <Button
+                variant="filled"
+                color="primary"
+                size="xs"
+                flex="1 1 0"
+                onClick={handleSave}
+              >
                 {t("save")}
               </Button>
             </Group>

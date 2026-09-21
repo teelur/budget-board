@@ -160,8 +160,8 @@ const TransactionsHeader = (
           <Button
             variant="filled"
             color="primary"
-            size="xs"
-            selected={canSelectMultiple}
+            size="compact-sm"
+            selected={!canSelectMultiple}
             rightSection={<ListChecksIcon size="1rem" />}
             onClick={toggleSelectMultiple}
           >
@@ -169,8 +169,10 @@ const TransactionsHeader = (
           </Button>
           <SelectLastNMonths
             monthButtons={[3, 6, 12]}
+            selectedMonths={props.selectedMonths}
             setSelectedMonths={props.setSelectedMonths}
             onSelectMonths={open}
+            size="compact-sm"
           />
         </Group>
       </Group>

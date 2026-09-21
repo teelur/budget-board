@@ -1,11 +1,14 @@
-import { Button, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface SelectLastNMonthsProps {
   monthButtons: number[];
+  selectedMonths: Date[];
   setSelectedMonths: React.Dispatch<React.SetStateAction<Date[]>>;
   onSelectMonths?: () => void;
+  size: "xs" | "compact-sm";
   showAllButton?: boolean;
   showClearButton?: boolean;
 }
@@ -18,8 +21,10 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
     <Group justify="end">
       {props.monthButtons.map((months) => (
         <Button
-          size="compact-sm"
-          variant="light"
+          variant="filled"
+          color="primary"
+          size={props.size}
+          selected={props.selectedMonths.length !== months}
           key={months}
           onClick={() => {
             const newMonths: Date[] = [];
@@ -37,16 +42,19 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
       ))}
       {props.showAllButton ? (
         <Button
-          size="compact-sm"
-          variant="primary"
+          variant="filled"
+          color="primary"
+          size={props.size}
           onClick={() => props.setSelectedMonths([])}
         >
           {t("all")}
         </Button>
       ) : props.showClearButton ? (
         <Button
-          size="compact-sm"
-          variant="primary"
+          variant="filled"
+          color="primary"
+          size={props.size}
+          disabled={props.selectedMonths.length === 0}
           onClick={() => props.setSelectedMonths([])}
         >
           {t("clear_selection")}
