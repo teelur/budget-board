@@ -1,5 +1,5 @@
-import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Button, ActionIcon } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
@@ -111,8 +111,9 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon
                 variant="outline"
+                color="primary"
+                size="xs"
                 h="100%"
-                size="md"
                 onClick={(e) => {
                   e.stopPropagation();
                   props.toggle();

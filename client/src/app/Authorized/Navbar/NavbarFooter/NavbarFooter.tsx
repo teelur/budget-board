@@ -1,9 +1,11 @@
-import { ActionIcon, Group, Stack, Text, Tooltip } from "@mantine/core";
+import classes from "../Navbar.module.css";
+
+import { Group, Stack, Text, Tooltip } from "@mantine/core";
 import { ArrowUpRightIcon, CircleArrowUpIcon } from "lucide-react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import classes from "../Navbar.module.css";
 import { APP_REPOSITORY } from "~/helpers/appUpdates";
 import { useAppUpdateQuery } from "~/hooks/queries/useAppUpdateQuery";
 
@@ -24,6 +26,9 @@ const NavbarFooter = ({
   const currentVersionLabel = t("current_version", { version });
   const versionTextRef = React.useRef<HTMLParagraphElement>(null);
   const [isVersionTruncated, setIsVersionTruncated] = React.useState(false);
+  const openExternalLink = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   React.useEffect(() => {
     const versionText = versionTextRef.current;
@@ -51,13 +56,11 @@ const NavbarFooter = ({
         {update && updateLabel && (
           <Tooltip label={updateLabel} position="right">
             <ActionIcon
-              component="a"
-              href={update.url}
-              target="_blank"
-              rel="noreferrer"
+              variant="ghost"
+              color="primary"
+              size="xs"
+              onClick={() => openExternalLink(update.url)}
               aria-label={updateLabel}
-              className={classes.updateIcon}
-              variant="subtle"
             >
               <CircleArrowUpIcon size="1.25rem" />
             </ActionIcon>
@@ -120,15 +123,13 @@ const NavbarFooter = ({
         </Tooltip>
         <Tooltip label={t("github_repository")} position="right">
           <ActionIcon
-            component="a"
-            href={repositoryUrl}
-            target="_blank"
-            rel="noreferrer"
+            variant="ghost"
+            color="muted"
+            size="xs"
+            onClick={() => openExternalLink(repositoryUrl)}
             aria-label={t("github_repository")}
-            className={classes.footerIcon}
-            variant="subtle"
           >
-            <SiGithub />
+            <SiGithub size="1.15rem" />
           </ActionIcon>
         </Tooltip>
       </Group>

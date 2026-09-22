@@ -1,5 +1,5 @@
-import { ActionIcon, Popover, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Popover, Stack } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -19,7 +19,7 @@ const PermaDeleteAccountPopover = (
   return (
     <Popover>
       <Popover.Target>
-        <ActionIcon h="100%" bg={"var(--button-color-destructive)"}>
+        <ActionIcon variant="filled" color="error" size="compact-sm" h="100%">
           <Trash2Icon size="1.2rem" />
         </ActionIcon>
       </Popover.Target>

@@ -1,4 +1,5 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
@@ -24,8 +25,9 @@ const BalanceItemContent = (
           {dayjs(props.balance.date).format(longDateFormat)}
         </PrimaryText>
         <ActionIcon
-          variant="transparent"
-          size="md"
+          variant="ghost"
+          color="primary"
+          size="compact-xs"
           onClick={(e) => {
             e.stopPropagation();
             props.doSelect();

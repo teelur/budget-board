@@ -1,8 +1,9 @@
-import { ActionIcon, Box, Group, Stack } from "@mantine/core";
+import { Box, Group, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon, ArrowLeftIcon } from "lucide-react";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
@@ -23,8 +24,13 @@ const AccountsSettings = (): React.ReactNode => {
   return (
     <Stack w="100%" p="0.5rem">
       <Group gap="xs">
-        <ActionIcon variant="subtle" onClick={() => navigate("/accounts")}>
-          <ChevronLeftIcon />
+        <ActionIcon
+          variant="ghost"
+          color="primary"
+          size="compact-sm"
+          onClick={() => navigate("/accounts")}
+        >
+          <ArrowLeftIcon />
         </ActionIcon>
         <PrimaryHeading order={5}>{t("accounts")}</PrimaryHeading>
         {activeItem && (
