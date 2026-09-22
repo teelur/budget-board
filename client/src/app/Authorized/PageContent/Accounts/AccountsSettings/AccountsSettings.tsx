@@ -1,15 +1,11 @@
 import { Box, Group, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Outlet, useLocation, useNavigate } from "react-router";
-import { ChevronRightIcon, ArrowLeftIcon } from "lucide-react";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
+import { Outlet, useLocation } from "react-router";
+import SettingsHeading from "~/components/SettingsHeading/SettingsHeading";
 
 const AccountsSettings = (): React.ReactNode => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const location = useLocation();
 
   const navItems = [
@@ -23,26 +19,11 @@ const AccountsSettings = (): React.ReactNode => {
 
   return (
     <Stack w="100%" p="0.5rem">
-      <Group gap="xs">
-        <ActionIcon
-          variant="ghost"
-          color="primary"
-          size="compact-sm"
-          onClick={() => navigate("/accounts")}
-        >
-          <ArrowLeftIcon />
-        </ActionIcon>
-        <PrimaryHeading order={5}>{t("accounts")}</PrimaryHeading>
-        {activeItem && (
-          <>
-            <ChevronRightIcon
-              size="1rem"
-              color="var(--base-color-text-dimmed)"
-            />
-            <SecondaryHeading order={5}>{activeItem.label}</SecondaryHeading>
-          </>
-        )}
-      </Group>
+      <SettingsHeading
+        title={t("accounts")}
+        backTo="/accounts"
+        activeItem={activeItem?.label}
+      />
       <Group align="flex-start" gap="md" wrap="wrap">
         <Box
           w={{ base: "100%", sm: "auto" }}

@@ -1,23 +1,21 @@
 import { ActionIcon, Box, Flex, Group, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { NotificationType, showNotification } from "~/helpers/notifications";
-import { ChevronLeftIcon, ChevronRightIcon, SendIcon } from "lucide-react";
+import { SendIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
+import SettingsHeading from "~/components/SettingsHeading/SettingsHeading";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
-import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 const BudgetsSettings = (): React.ReactNode => {
   const { t } = useTranslation();
   const { budgetWarningThreshold } = useUserSettings();
   const updateUserSettingsMutation = useUpdateUserSettingsMutation();
-  const navigate = useNavigate();
 
   const budgetWarningThresholdField = useField<number>({
     initialValue: budgetWarningThreshold,
@@ -39,21 +37,11 @@ const BudgetsSettings = (): React.ReactNode => {
 
   return (
     <Stack w="100%" p="0.5rem">
-      <Group gap="xs">
-        <ActionIcon variant="subtle" onClick={() => navigate("/budgets")}>
-          <ChevronLeftIcon />
-        </ActionIcon>
-        <PrimaryHeading order={5}>{t("budgets")}</PrimaryHeading>
-        {activeItem && (
-          <>
-            <ChevronRightIcon
-              size="1rem"
-              color="var(--base-color-text-dimmed)"
-            />
-            <SecondaryHeading order={5}>{activeItem.label}</SecondaryHeading>
-          </>
-        )}
-      </Group>
+      <SettingsHeading
+        title={t("budgets")}
+        backTo="/budgets"
+        activeItem={activeItem?.label}
+      />
       <Box
         w={{ base: "100%", sm: "auto" }}
         maw={800}
