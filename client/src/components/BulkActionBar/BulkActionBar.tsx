@@ -4,11 +4,10 @@ import {
   Group,
   Portal,
   Stack,
-  ActionIcon,
   Transition,
   Badge,
 } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { TrashIcon } from "lucide-react";
 import React from "react";
@@ -433,7 +432,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                     }}
                   />
                 )}
-                <Button
+                <ActionIcon
                   variant="filled"
                   color="error"
                   size="compact-sm"
@@ -442,7 +441,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                   onClick={handleDeleteClick}
                 >
                   <TrashIcon size="1rem" />
-                </Button>
+                </ActionIcon>
                 <Button
                   variant="filled"
                   color="neutral"

@@ -1,6 +1,6 @@
 import React from "react";
-import { ActionIcon, Stack, Popover as MantinePopover } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Stack, Popover as MantinePopover } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { SplitIcon } from "lucide-react";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
@@ -39,9 +39,9 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
   return (
     <Popover>
       <MantinePopover.Target>
-        <Button variant="filled" color="primary" size="compact-sm">
+        <ActionIcon variant="filled" color="primary" size="compact-sm">
           <SplitIcon size="1rem" />
-        </Button>
+        </ActionIcon>
       </MantinePopover.Target>
       <MantinePopover.Dropdown style={{ padding: "0.5rem" }}>
         <Stack gap="0.5rem">
