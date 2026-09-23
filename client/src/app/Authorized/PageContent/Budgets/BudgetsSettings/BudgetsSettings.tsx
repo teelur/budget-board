@@ -1,10 +1,10 @@
-import { ActionIcon, Box, Flex, Group, Stack } from "@mantine/core";
+import { Box, Flex, Group, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { SendIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -67,8 +67,11 @@ const BudgetsSettings = (): React.ReactNode => {
           />
           <Flex style={{ alignSelf: "stretch" }} p={0}>
             <ActionIcon
+              variant="filled"
+              color="primary"
+              size="compact-xs"
+              loading={updateUserSettingsMutation.isPending}
               h="100%"
-              size="md"
               onClick={() => {
                 if (budgetWarningThresholdField.error) {
                   showNotification({
@@ -83,7 +86,6 @@ const BudgetsSettings = (): React.ReactNode => {
                     budgetWarningThresholdField.getValue(),
                 });
               }}
-              loading={updateUserSettingsMutation.isPending}
             >
               <SendIcon size={20} />
             </ActionIcon>

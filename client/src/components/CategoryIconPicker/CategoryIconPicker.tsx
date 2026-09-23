@@ -2,14 +2,13 @@ import classes from "./CategoryIconPicker.module.css";
 import dropdownClasses from "~/styles/Dropdown.module.css";
 
 import {
-  ActionIcon,
   Popover as MantinePopover,
   ScrollArea,
   SimpleGrid,
   Stack,
   UnstyledButton,
 } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { SmilePlusIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -88,10 +87,11 @@ const CategoryIconPicker = (
     >
       <MantinePopover.Target>
         <ActionIcon
-          variant={isPickerOpen ? "outline" : "transparent"}
-          size={props.size ?? "md"}
-          aria-label={t("set_category_icon", { category: props.category })}
+          variant="ghost"
+          color="primary"
+          size={props.size ?? "compact-sm"}
           loading={isSaving}
+          aria-label={t("set_category_icon", { category: props.category })}
           onClick={(e) => {
             e.stopPropagation();
             if (isPickerOpen) {

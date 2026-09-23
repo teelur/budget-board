@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Badge,
   Flex,
   Group,
@@ -7,7 +6,7 @@ import {
   SegmentedControl,
   Stack,
 } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -167,18 +166,20 @@ const CustomAssetTypeCard = (
             {!props.isBuiltIn && (
               <>
                 <ActionIcon
-                  size="sm"
-                  variant="subtle"
+                  variant="ghost"
+                  color="primary"
+                  size="compact-sm"
                   onClick={() => setIsEditing(true)}
                 >
                   <PencilIcon size="1rem" />
                 </ActionIcon>
                 <ActionIcon
-                  size="sm"
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   onClick={() =>
                     deleteAssetTypeMutation.mutateAsync(props.assetType.id)
                   }
-                  bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />
                 </ActionIcon>

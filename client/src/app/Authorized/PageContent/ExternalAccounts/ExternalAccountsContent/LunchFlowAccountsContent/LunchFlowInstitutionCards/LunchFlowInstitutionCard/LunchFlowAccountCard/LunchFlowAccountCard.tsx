@@ -1,4 +1,5 @@
-import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -160,8 +161,10 @@ const LunchFlowAccountCard = (
             <Group gap="0.5rem">
               <PrimaryText size="sm">{props.lunchFlowAccount.name}</PrimaryText>
               <ActionIcon
-                variant={isEditable ? "outline" : "transparent"}
-                size="md"
+                variant="ghost"
+                color="primary"
+                size="compact-xs"
+                selected={isEditable}
                 onClick={(e) => {
                   e.stopPropagation();
                   toggle();
@@ -291,9 +294,10 @@ const LunchFlowAccountCard = (
         {isEditable && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon
+              variant="filled"
+              color="error"
+              size="compact-sm"
               h="100%"
-              size="sm"
-              color="var(--button-color-destructive)"
               onClick={() =>
                 deleteLunchFlowAccountMutation.mutate(props.lunchFlowAccount.id)
               }

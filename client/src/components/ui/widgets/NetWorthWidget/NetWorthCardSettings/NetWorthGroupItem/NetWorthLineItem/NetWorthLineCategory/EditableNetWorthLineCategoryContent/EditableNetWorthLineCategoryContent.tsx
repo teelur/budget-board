@@ -1,4 +1,5 @@
-import { ActionIcon, Flex, Group } from "@mantine/core";
+import { Flex, Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { ChevronRightIcon, PencilIcon, TrashIcon } from "lucide-react";
@@ -225,7 +226,12 @@ const EditableNetWorthLineCategoryContent = (
           {...subtypeField.getInputProps()}
           elevation={2}
         />
-        <ActionIcon variant="outline" size="sm" onClick={props.disableEdit}>
+        <ActionIcon
+          variant="outline"
+          color="primary"
+          size="compact-xs"
+          onClick={props.disableEdit}
+        >
           <PencilIcon size={14} />
         </ActionIcon>
       </Group>
@@ -236,10 +242,11 @@ const EditableNetWorthLineCategoryContent = (
         )}
         <Flex style={{ alignSelf: "stretch" }}>
           <ActionIcon
-            color="var(--button-color-destructive)"
-            h="100%"
-            size="md"
+            variant="filled"
+            color="error"
+            size="compact-sm"
             loading={deleteNetWorthWidgetCategoryMutation.isPending}
+            h="100%"
             onClick={async () =>
               await deleteNetWorthWidgetCategoryMutation.mutateAsync({
                 categoryId: props.category.id,

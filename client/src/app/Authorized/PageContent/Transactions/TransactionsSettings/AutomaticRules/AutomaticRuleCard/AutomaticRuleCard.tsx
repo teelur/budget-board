@@ -1,5 +1,5 @@
-import { ActionIcon, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { PencilIcon, PlayIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -153,7 +153,9 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
         </Stack>
         <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
           <ActionIcon
-            variant="outline"
+            variant="filled"
+            color="secondary"
+            size="compact-sm"
             onClick={() => {
               if (!hasValidActions()) {
                 return;
@@ -178,23 +180,28 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
             <PlayIcon size="1rem" />
           </ActionIcon>
           <ActionIcon
+            variant="outline"
+            color="primary"
+            size="compact-sm"
+            h="100%"
             onClick={() => {
               setConditionItems(props.rule.conditions ?? []);
               setActionItems(props.rule.actions ?? []);
               setIsSelected(true);
             }}
-            h="100%"
           >
             <PencilIcon size="1rem" />
           </ActionIcon>
           <ActionIcon
-            color="var(--button-color-destructive)"
+            variant="filled"
+            color="error"
+            size="compact-sm"
+            loading={deleteAutomaticRuleMutation.isPending}
+            h="100%"
             onClick={(e) => {
               e.stopPropagation();
               deleteAutomaticRuleMutation.mutate(props.rule.id);
             }}
-            h="100%"
-            loading={deleteAutomaticRuleMutation.isPending}
           >
             <TrashIcon size="1rem" />
           </ActionIcon>

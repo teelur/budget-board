@@ -1,4 +1,5 @@
-import { ActionIcon, Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
+import { Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -91,8 +92,9 @@ const EditableAssetItemContent = (
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon
                 variant="outline"
+                color="primary"
+                size="xs"
                 h="100%"
-                size="md"
                 onClick={(e) => {
                   e.stopPropagation();
                   props.toggle();
@@ -105,7 +107,7 @@ const EditableAssetItemContent = (
               variant="filled"
               color="primary"
               size="sm"
-              selected={hideAssetField.getValue()}
+              selected={!hideAssetField.getValue()}
               onClick={() => {
                 updateAssetMutation.mutate(
                   {
@@ -245,9 +247,10 @@ const EditableAssetItemContent = (
       </Stack>
       <Group style={{ alignSelf: "stretch" }}>
         <ActionIcon
-          h="100%"
+          variant="filled"
+          color="error"
           size="sm"
-          bg="var(--button-color-destructive)"
+          h="100%"
           onClick={() => deleteAssetMutation.mutate(props.asset.id)}
         >
           <Trash2Icon size={16} />

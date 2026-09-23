@@ -1,5 +1,5 @@
-import { ActionIcon, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
 import Modal from "~/components/core/Modal/Modal";
@@ -152,8 +152,11 @@ const NetWorthCardSettings = ({
             </Stack>
           </DragDropProvider>
           <ActionIcon
-            w="100%"
+            variant="filled"
+            color="primary"
+            size="compact-sm"
             loading={createNetWorthWidgetGroupMutation.isPending}
+            w="100%"
             onClick={() =>
               createNetWorthWidgetGroupMutation.mutate({
                 widgetSettingsId: widget.id,

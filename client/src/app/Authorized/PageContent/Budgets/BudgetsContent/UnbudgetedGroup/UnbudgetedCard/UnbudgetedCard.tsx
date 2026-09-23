@@ -1,4 +1,5 @@
-import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { ICategoryNode } from "~/models/category";
@@ -113,7 +114,9 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
             </PrimaryText>
             {props.selectedDate && props.categoryTree.value.length !== 0 && (
               <ActionIcon
-                size="sm"
+                variant="filled"
+                color="primary"
+                size="compact-xs"
                 onClick={(event) => {
                   event.stopPropagation();
                   createBudgetMutation.mutate([
@@ -131,7 +134,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
                   ]);
                 }}
               >
-                <PlusIcon />
+                <PlusIcon size={20} />
               </ActionIcon>
             )}
           </Group>

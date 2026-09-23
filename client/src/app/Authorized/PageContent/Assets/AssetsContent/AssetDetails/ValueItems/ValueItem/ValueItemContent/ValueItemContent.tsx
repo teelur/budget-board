@@ -1,4 +1,5 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { PencilIcon } from "lucide-react";
 import StatusText from "~/components/core/Text/StatusText/StatusText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -21,8 +22,9 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
           {dayjs(props.value.date).format(longDateFormat)}
         </PrimaryText>
         <ActionIcon
-          variant="transparent"
-          size="md"
+          variant="ghost"
+          color="primary"
+          size="compact-xs"
           onClick={(e) => {
             e.stopPropagation();
             props.doSelect();

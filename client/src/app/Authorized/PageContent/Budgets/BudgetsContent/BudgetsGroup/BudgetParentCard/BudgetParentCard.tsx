@@ -3,7 +3,6 @@ import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
 import {
-  ActionIcon,
   Box,
   Flex,
   Group,
@@ -11,7 +10,7 @@ import {
   Popover as MantinePopover,
   Stack,
 } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
@@ -233,8 +232,9 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               <Group gap="0.25rem" align="center">
                 {childCards.length > 0 && (
                   <ActionIcon
-                    variant="transparent"
-                    size="md"
+                    variant="ghost"
+                    color="primary"
+                    size="compact-xs"
                     aria-label={t("toggle_budget_category", {
                       category: props.categoryTree.value,
                     })}
@@ -266,8 +266,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   {props.categoryTree.value}
                 </PrimaryHeading>
                 <ActionIcon
-                  variant={isSelected ? "outline" : "transparent"}
-                  size="md"
+                  variant="ghost"
+                  color="primary"
+                  size="compact-xs"
+                  selected={isSelected}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (id.length > 0) {
@@ -391,7 +393,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
             >
               <Popover>
                 <MantinePopover.Target>
-                  <ActionIcon color="var(--button-color-destructive)" h="100%">
+                  <ActionIcon
+                    variant="filled"
+                    color="error"
+                    size="compact-sm"
+                    h="100%"
+                  >
                     <TrashIcon size="1rem" />
                   </ActionIcon>
                 </MantinePopover.Target>

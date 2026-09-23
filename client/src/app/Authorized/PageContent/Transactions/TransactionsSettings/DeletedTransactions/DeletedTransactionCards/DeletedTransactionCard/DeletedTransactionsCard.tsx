@@ -1,7 +1,8 @@
 import classes from "./DeletedTransactionsCard.module.css";
 
 import { getDaysSinceDate } from "~/helpers/datetime";
-import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
@@ -37,6 +38,9 @@ const DeletedTransactionsCard = (
         </Stack>
         <Group className={classes.buttonGroup}>
           <ActionIcon
+            variant="filled"
+            color="primary"
+            size="compact-sm"
             h="100%"
             onClick={() =>
               restoreTransactionMutation.mutate([props.deletedTransaction.id])

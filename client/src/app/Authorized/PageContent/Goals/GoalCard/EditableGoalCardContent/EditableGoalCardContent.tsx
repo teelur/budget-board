@@ -1,14 +1,7 @@
 import classes from "./EditableGoalCardContent.module.css";
 
-import {
-  ActionIcon,
-  Badge,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Badge, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
@@ -135,7 +128,8 @@ const EditableGoalCardContent = (
               )}
               <ActionIcon
                 variant="outline"
-                size="md"
+                color="primary"
+                size="compact-sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   props.toggleIsSelected();
@@ -362,12 +356,14 @@ const EditableGoalCardContent = (
         </Stack>
         <Group style={{ alignSelf: "stretch" }}>
           <ActionIcon
-            color="var(--button-color-destructive)"
+            variant="filled"
+            color="error"
+            size="compact-sm"
+            h="100%"
             onClick={(e) => {
               e.stopPropagation();
               deleteGoalMutation.mutate(props.goal.id);
             }}
-            h="100%"
           >
             <TrashIcon size="1rem" />
           </ActionIcon>

@@ -1,5 +1,5 @@
-import { ActionIcon, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { INetWorthWidgetLine } from "~/models/widgetSettings";
@@ -92,8 +92,10 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                 <DimmedText size="sm">{t("no_name")}</DimmedText>
               )}
               <ActionIcon
-                size="sm"
-                variant={isEditing ? "outline" : "transparent"}
+                variant="ghost"
+                color="primary"
+                size="compact-xs"
+                selected={isEditing}
                 onClick={toggle}
               >
                 <PencilIcon size={16} />
@@ -101,7 +103,9 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
             </Group>
 
             <ActionIcon
-              size="sm"
+              variant="filled"
+              color="primary"
+              size="compact-xs"
               loading={createNetWorthWidgetCategoryMutation.isPending}
               onClick={async () =>
                 await createNetWorthWidgetCategoryMutation.mutateAsync({
@@ -113,7 +117,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                 } as INetWorthWidgetCategoryCreateRequest)
               }
             >
-              <PlusIcon />
+              <PlusIcon size={20} />
             </ActionIcon>
           </Group>
           <Stack gap="0.25rem">
@@ -137,10 +141,11 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
         {isEditing && (
           <Flex style={{ alignSelf: "stretch" }}>
             <ActionIcon
-              color="var(--button-color-destructive)"
-              h="100%"
-              size="md"
+              variant="filled"
+              color="error"
+              size="compact-sm"
               loading={deleteNetWorthWidgetLineMutation.isPending}
+              h="100%"
               onClick={async () =>
                 await deleteNetWorthWidgetLineMutation.mutateAsync({
                   lineId: props.line.id,
