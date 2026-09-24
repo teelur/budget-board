@@ -124,7 +124,7 @@ const NavbarFooter = ({
         <Tooltip label={t("github_repository")} position="right">
           <ActionIcon
             variant="ghost"
-            color="muted"
+            color="contrast"
             size="xs"
             onClick={() => openExternalLink(repositoryUrl)}
             aria-label={t("github_repository")}

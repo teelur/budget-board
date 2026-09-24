@@ -40,7 +40,7 @@ const WidgetShell = ({
           {onSettingsOpen && (
             <ActionIcon
               variant="ghost"
-              color="primary"
+              color="contrast"
               size="compact-sm"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {

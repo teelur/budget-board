@@ -59,7 +59,7 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
         {SortOptions.map((sortOption: SortOption) => (
           <SortButton
             variant="filled"
-            color="secondary"
+            color="muted"
             size="compact-sm"
             key={sortOption.value}
             label={sortOption.label}

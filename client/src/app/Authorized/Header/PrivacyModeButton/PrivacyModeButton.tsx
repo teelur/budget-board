@@ -19,7 +19,7 @@ const PrivacyModeButton = (): React.ReactNode => {
     <Tooltip label={label}>
       <ActionIcon
         variant="ghost"
-        color="primary"
+        color="contrast"
         size="sm"
         aria-label={label}
         onClick={togglePrivacyMode}
