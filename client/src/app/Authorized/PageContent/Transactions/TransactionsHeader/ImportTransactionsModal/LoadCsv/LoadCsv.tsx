@@ -1,4 +1,4 @@
-import { Group, LoadingOverlay, Stack, Switch } from "@mantine/core";
+import { Group, Stack, Switch } from "@mantine/core";
 import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { NotificationType, showNotification } from "~/helpers/notifications";
