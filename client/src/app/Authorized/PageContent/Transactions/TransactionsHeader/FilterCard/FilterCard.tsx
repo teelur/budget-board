@@ -47,7 +47,7 @@ const FilterCard = (): React.ReactNode => {
             variant="filled"
             color="primary"
             size="compact-sm"
-            selected={transactionFilters.isEqual(new Filters())}
+selected={!transactionFilters.isEqual(new Filters())}
             onClick={() => {
               setTransactionFilters(new Filters());
             }}
