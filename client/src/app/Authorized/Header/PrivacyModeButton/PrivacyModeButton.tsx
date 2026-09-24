@@ -1,4 +1,5 @@
-import { ActionIcon, Tooltip } from "@mantine/core";
+import { Tooltip } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -17,10 +18,11 @@ const PrivacyModeButton = (): React.ReactNode => {
   return (
     <Tooltip label={label}>
       <ActionIcon
+        variant="ghost"
+        color="contrast"
+        size="sm"
         aria-label={label}
         onClick={togglePrivacyMode}
-        size="lg"
-        variant="subtle"
       >
         <Icon size={20} />
       </ActionIcon>

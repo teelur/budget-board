@@ -1,4 +1,5 @@
-import { Button, Group, SegmentedControl, Stack } from "@mantine/core";
+import { Group, SegmentedControl, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { Repeat2Icon } from "lucide-react";
 import React from "react";
@@ -77,9 +78,10 @@ const BulkRecurringRuleAction = (
   return (
     <>
       <Button
+        variant="ghost"
+        color="primary"
         size="compact-sm"
-        variant="subtle"
-        leftSection={<Repeat2Icon size="0.85rem" />}
+        rightSection={<Repeat2Icon size="0.85rem" />}
         onClick={() => {
           setMode("new");
           setSelectedRuleID(null);
@@ -145,7 +147,10 @@ const BulkRecurringRuleAction = (
               />
               <Group>
                 <Button
-                  variant="outline"
+                  variant="filled"
+                  color="primary"
+                  size="compact-sm"
+                  fullWidth
                   disabled={!selectedRuleID || !hasSingleAccount}
                   loading={assignMutation.isPending}
                   onClick={assignExistingRule}

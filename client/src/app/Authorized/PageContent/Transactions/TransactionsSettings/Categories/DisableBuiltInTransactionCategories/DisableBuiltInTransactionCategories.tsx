@@ -1,10 +1,10 @@
 import {
-  Button,
   Group,
   Popover as MantinePopover,
   Skeleton,
   Stack,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -86,13 +86,9 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
 
   const toggleButton = (
     <Button
-      bg={
-        disableBuiltInTransactionCategories
-          ? "var(--button-color-destructive)"
-          : ""
-      }
-      variant="primary"
-      size="xs"
+      variant="filled"
+      color={disableBuiltInTransactionCategories ? "error" : "primary"}
+      size="compact-sm"
       loading={updateUserSettingsMutation.isPending}
       onClick={
         shouldConfirmDisable ? () => setIsConfirmationOpen(true) : handleToggle
@@ -104,10 +100,10 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
 
   return (
     <Stack gap="0.25rem">
-      <PrimaryText size="sm">
+      <PrimaryText size="md">
         {t("built_in_transaction_categories")}
       </PrimaryText>
-      <DimmedText size="xs">
+      <DimmedText size="sm">
         {t("disable_built_in_transaction_categories_description")}
       </DimmedText>
       {hasBlockingReferences &&
@@ -136,14 +132,16 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
               ))}
               <Group justify="flex-end" gap="0.5rem">
                 <Button
-                  variant="subtle"
+                  variant="filled"
+                  color="neutral"
                   size="xs"
                   onClick={() => setIsConfirmationOpen(false)}
                 >
                   {t("cancel")}
                 </Button>
                 <Button
-                  color="var(--button-color-destructive)"
+                  variant="filled"
+                  color="error"
                   size="xs"
                   loading={updateUserSettingsMutation.isPending}
                   onClick={() => {

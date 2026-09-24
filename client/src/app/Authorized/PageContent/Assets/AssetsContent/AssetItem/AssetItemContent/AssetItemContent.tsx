@@ -1,4 +1,5 @@
-import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
+import { Badge, Group, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import React from "react";
 import { SignDisplay } from "~/helpers/currency";
@@ -58,8 +59,9 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
         <Group gap="0.5rem" align="center">
           <PrimaryText size="md">{props.asset.name}</PrimaryText>
           <ActionIcon
-            variant="transparent"
-            size="md"
+            variant="ghost"
+            color="primary"
+            size="compact-xs"
             onClick={(e) => {
               e.stopPropagation();
               props.toggle();

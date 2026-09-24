@@ -1,4 +1,5 @@
-import { Button, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { IInstitution } from "~/models/institution";
 import AccountItem from "./AccountItem/AccountItem";
 import { GripVertical } from "lucide-react";
@@ -131,7 +132,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
       <Group w="100%" p={0} wrap="nowrap" gap="0.25rem" align="flex-start">
         {props.isSortable && (
           <Flex m="0.25rem" ref={handleRef} style={{ alignSelf: "stretch" }}>
-            <Button h="100%" px={0} w={30} radius="lg">
+            <Button variant="filled" color="primary" h="100%" px={0} w={30}>
               <GripVertical size={25} />
             </Button>
           </Flex>

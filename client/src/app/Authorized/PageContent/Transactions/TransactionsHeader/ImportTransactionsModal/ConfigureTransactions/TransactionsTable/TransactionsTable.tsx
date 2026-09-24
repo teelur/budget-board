@@ -1,11 +1,5 @@
-import {
-  ActionIcon,
-  Divider,
-  Flex,
-  Pagination,
-  Stack,
-  Table,
-} from "@mantine/core";
+import { Divider, Flex, Pagination, Stack, Table } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
@@ -53,14 +47,14 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                   <Table.Td>
                     <Flex justify="center" align="center">
                       <ActionIcon
-                        size="sm"
-                        color="var(--button-color-destructive)"
-                        variant="subtle"
+                        variant="ghost"
+                        color="error"
+                        size="compact-xs"
                         onClick={() => {
                           props.delete(row.uid);
                         }}
                       >
-                        <SquareXIcon />
+                        <SquareXIcon size={20} />
                       </ActionIcon>
                     </Flex>
                   </Table.Td>

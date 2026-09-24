@@ -2,14 +2,8 @@ import classes from "./BudgetChildCard.module.css";
 import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
-import {
-  ActionIcon,
-  Box,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { Box, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import React from "react";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
@@ -106,7 +100,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 <CategoryIconPicker
                   category={props.categoryValue}
                   icon={props.icon}
-                  size="sm"
+                  size="compact-xs"
                 />
               )}
               <PrimaryText className={classes.title} elevation={1}>
@@ -114,8 +108,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 {props.categoryValue}
               </PrimaryText>
               <ActionIcon
-                variant={isSelected ? "outline" : "transparent"}
-                size="sm"
+                variant="ghost"
+                color="primary"
+                size="compact-xs"
+                selected={isSelected}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (props.id.length > 0) {
@@ -239,12 +235,14 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
         {isSelected && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon
-              color="var(--button-color-destructive)"
+              variant="filled"
+              color="error"
+              size="compact-sm"
+              h="100%"
               onClick={(e) => {
                 e.stopPropagation();
                 deleteBudgetMutation.mutate(props.id);
               }}
-              h="100%"
             >
               <TrashIcon size="1rem" />
             </ActionIcon>

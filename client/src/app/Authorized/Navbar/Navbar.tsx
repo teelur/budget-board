@@ -1,7 +1,6 @@
 import classes from "./Navbar.module.css";
 
 import {
-  ActionIcon,
   Burger,
   Collapse,
   Group,
@@ -9,6 +8,7 @@ import {
   Stack,
   Tooltip,
 } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import {
   ArrowLeftFromLineIcon,
   ArrowRightFromLineIcon,
@@ -197,8 +197,9 @@ const Navbar = (props: NavbarProps) => {
               transitionProps={{ duration: 0 }}
             >
               <ActionIcon
-                variant="subtle"
-                className={classes.groupToggle}
+                variant="ghost"
+                color="muted"
+                size="sm"
                 aria-label={
                   isGroupExpanded
                     ? t("collapse_sidebar_group")
@@ -260,7 +261,9 @@ const Navbar = (props: NavbarProps) => {
             transitionProps={{ duration: 0 }}
           >
             <ActionIcon
-              variant="subtle"
+              variant="ghost"
+              color="muted"
+              size="sm"
               visibleFrom="xs"
               className={`${classes.sidebarToggle} ${props.isNavbarExpanded ? classes.sidebarToggleExpanded : ""}`}
               aria-label={

@@ -1,4 +1,5 @@
-import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
+import { Group, LoadingOverlay } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon } from "lucide-react";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
@@ -40,7 +41,8 @@ const EditableInstitutionItemContent = (
         />
         <ActionIcon
           variant="outline"
-          size="md"
+          color="primary"
+          size="xs"
           onClick={(e) => {
             e.stopPropagation();
             props.toggle();

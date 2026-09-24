@@ -1,6 +1,7 @@
 import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import { buildTimeToMonthlyTotalsMap } from "~/helpers/transactions";
-import { Button, Flex, Group, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import SpendingCategoriesChart from "~/components/Charts/SpendingCategoriesChart/SpendingCategoriesChart";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -8,10 +9,9 @@ import { useTranslation } from "react-i18next";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { CategoryTypes } from "~/models/category";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import SelectLastNMonths from "~/components/SelectLastNMonths/SelectLastNMonths";
 
 const SpendingCategoriesTab = (): React.ReactNode => {
-  const monthButtons = [3, 6, 12];
-
   const { t } = useTranslation();
   const { dayjs } = useLocale();
   const { allTransactionCategories } = useTransactionCategories();
@@ -69,41 +69,23 @@ const SpendingCategoriesTab = (): React.ReactNode => {
       />
       <Group w="100%" justify="space-between">
         <Button
+          variant="filled"
+          color="primary"
           size="compact-sm"
-          variant="subtle"
+          selected={showSubcategories}
           onClick={() => setShowSubcategories((v) => !v)}
         >
           {showSubcategories
-            ? t("hide_subcategories")
-            : t("show_subcategories")}
+            ? t("show_subcategories")
+            : t("hide_subcategories")}
         </Button>
-        <Group gap="xs">
-          {monthButtons.map((months) => (
-            <Button
-              key={months}
-              size="compact-sm"
-              variant="light"
-              onClick={() => {
-                const newMonths: Date[] = [];
-                for (let i = 0; i < months; i++) {
-                  newMonths.push(
-                    dayjs().subtract(i, "month").startOf("month").toDate(),
-                  );
-                }
-                setSelectedMonths(newMonths);
-              }}
-            >
-              {t("last_n_months", { count: months })}
-            </Button>
-          ))}
-          <Button
-            size="compact-sm"
-            variant="primary"
-            onClick={() => setSelectedMonths([])}
-          >
-            {t("clear_selection")}
-          </Button>
-        </Group>
+        <SelectLastNMonths
+          monthButtons={[3, 6, 12]}
+          selectedMonths={selectedMonths}
+          setSelectedMonths={setSelectedMonths}
+          size="compact-sm"
+          showClearButton
+        />
       </Group>
       <Flex justify="center">
         <SpendingCategoriesChart

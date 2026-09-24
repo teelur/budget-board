@@ -1,4 +1,5 @@
-import { ActionIcon, Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
 import { IAccountResponse } from "~/models/account";
@@ -42,6 +43,9 @@ const DeletedAccountCard = (
         </Group>
         <Group style={{ alignSelf: "stretch" }} wrap="nowrap" gap="0.5rem">
           <ActionIcon
+            variant="outline"
+            color="primary"
+            size="compact-sm"
             h="100%"
             onClick={() => doRestoreAccount.mutate(props.account.id)}
           >

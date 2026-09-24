@@ -1,4 +1,5 @@
-import { Button, LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
+import { LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -103,7 +104,10 @@ const AddAccountType = (): React.ReactNode => {
           </Stack>
         )}
         <Button
-          w="100%"
+          variant="filled"
+          color="primary"
+          size="xs"
+          fullWidth
           onClick={() => {
             createAccountTypeMutation.mutate(
               {

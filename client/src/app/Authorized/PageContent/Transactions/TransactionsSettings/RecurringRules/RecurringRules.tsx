@@ -1,12 +1,5 @@
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  Group,
-  Skeleton,
-  Stack,
-  Tooltip,
-} from "@mantine/core";
+import { Badge, Group, Skeleton, Stack, Tooltip } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -84,7 +77,7 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
             </DimmedText>
           )}
         </Stack>
-        <Group gap="0.25rem" wrap="nowrap">
+        <Group gap="0.25rem" wrap="nowrap" style={{ alignSelf: "stretch" }}>
           <Tooltip
             label={
               hasUnsupportedCadence
@@ -93,8 +86,12 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
             }
           >
             <ActionIcon
-              aria-label={t("edit")}
+              variant="outline"
+              color="primary"
+              size="compact-sm"
               disabled={hasUnsupportedCadence}
+              h="100%"
+              aria-label={t("edit")}
               onClick={() => props.onEdit(props.rule)}
             >
               <PencilIcon size="1rem" />
@@ -102,9 +99,12 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
           </Tooltip>
           <Tooltip label={t("delete")}>
             <ActionIcon
-              aria-label={t("delete")}
-              color="var(--button-color-destructive)"
+              variant="filled"
+              color="error"
+              size="compact-sm"
               loading={deleteMutation.isPending}
+              h="100%"
+              aria-label={t("delete")}
               onClick={() => deleteMutation.mutate(props.rule.id)}
             >
               <TrashIcon size="1rem" />
@@ -135,8 +135,16 @@ const RecurringRules = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
+      <PrimaryText size="md">{t("recurring_rules")}</PrimaryText>
       <DimmedText size="sm">{t("recurring_rules_description")}</DimmedText>
-      <Button leftSection={<PlusIcon size="1rem" />} onClick={openCreate}>
+      <Button
+        variant="filled"
+        color="primary"
+        size="compact-sm"
+        fullWidth
+        rightSection={<PlusIcon size="1rem" />}
+        onClick={openCreate}
+      >
         {t("add_recurring_rule")}
       </Button>
       {rulesQuery.isPending ? (

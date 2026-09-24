@@ -1,11 +1,5 @@
-import {
-  ActionIcon,
-  Divider,
-  Flex,
-  Pagination,
-  Stack,
-  Table,
-} from "@mantine/core";
+import { Divider, Flex, Pagination, Stack, Table } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
@@ -95,14 +89,15 @@ const DuplicateTransactionTable = (
                   <Table.Tr>
                     <Table.Td>
                       <ActionIcon
-                        size="sm"
-                        variant="subtle"
+                        variant="ghost"
+                        color="primary"
+                        size="compact-xs"
                         aria-label={t("restore_transaction")}
                         onClick={() => {
                           props.restoreTransaction(row.importedTransaction.uid);
                         }}
                       >
-                        <Undo2Icon />
+                        <Undo2Icon size={20} />
                       </ActionIcon>
                     </Table.Td>
                     <Table.Td>

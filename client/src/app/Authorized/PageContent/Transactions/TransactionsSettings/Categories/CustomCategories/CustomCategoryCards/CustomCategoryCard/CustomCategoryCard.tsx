@@ -1,13 +1,12 @@
 import {
-  ActionIcon,
   Badge,
-  Button,
   Flex,
   Group,
   LoadingOverlay,
   SegmentedControl,
   Stack,
 } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -155,10 +154,22 @@ const CustomCategoryCard = (
               </Stack>
             )}
             <Group justify="flex-end" gap="0.5rem">
-              <Button variant="default" size="xs" onClick={handleCancel}>
+              <Button
+                variant="filled"
+                color="neutral"
+                size="xs"
+                flex="1 1 0"
+                onClick={handleCancel}
+              >
                 {t("cancel")}
               </Button>
-              <Button size="xs" onClick={handleSave}>
+              <Button
+                variant="filled"
+                color="primary"
+                size="xs"
+                flex="1 1 0"
+                onClick={handleSave}
+              >
                 {t("save")}
               </Button>
             </Group>
@@ -190,14 +201,17 @@ const CustomCategoryCard = (
             {!props.isBuiltIn && (
               <>
                 <ActionIcon
-                  size="sm"
-                  variant="subtle"
+                  variant="outline"
+                  color="primary"
+                  size="compact-sm"
                   onClick={() => setIsEditing(true)}
                 >
                   <PencilIcon size="1rem" />
                 </ActionIcon>
                 <ActionIcon
-                  size="sm"
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   onClick={() => {
                     if (!props.isBuiltIn) {
                       deleteTransactionCategoryMutation.mutate(
@@ -205,7 +219,6 @@ const CustomCategoryCard = (
                       );
                     }
                   }}
-                  bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />
                 </ActionIcon>

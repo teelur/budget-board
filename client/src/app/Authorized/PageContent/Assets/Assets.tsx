@@ -8,7 +8,7 @@ const Assets = (): React.ReactNode => {
   const [isSortable, { toggle }] = useDisclosure(false);
 
   return (
-    <Stack w="100%" maw={1400}>
+    <Stack w="100%" maw={1400} gap="0.75rem">
       <AssetsHeader isSortable={isSortable} toggleSort={toggle} />
       <AssetsContent isSortable={isSortable} />
     </Stack>

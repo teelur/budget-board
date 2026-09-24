@@ -1,4 +1,5 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { Maximize2Icon, SettingsIcon, XIcon } from "lucide-react";
 import React from "react";
 import { useDeleteWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useDeleteWidgetSettingsMutation";
@@ -38,9 +39,9 @@ const WidgetShell = ({
         >
           {onSettingsOpen && (
             <ActionIcon
-              color="var(--base-color-text-secondary)"
-              variant="subtle"
-              size="md"
+              variant="ghost"
+              color="contrast"
+              size="compact-sm"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
@@ -53,8 +54,8 @@ const WidgetShell = ({
           )}
           <ActionIcon
             variant="filled"
-            color="var(--button-color-destructive)"
-            size="md"
+            color="error"
+            size="compact-sm"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();

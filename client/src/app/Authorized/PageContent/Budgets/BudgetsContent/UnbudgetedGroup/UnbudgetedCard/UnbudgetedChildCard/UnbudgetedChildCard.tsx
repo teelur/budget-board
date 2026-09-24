@@ -1,6 +1,7 @@
 import classes from "./UnbudgetedChildCard.module.css";
 
-import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
+import { Group, LoadingOverlay } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { CornerDownRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 import { roundAwayFromZero } from "~/helpers/utils";
@@ -54,7 +55,9 @@ const UnbudgetedChildCard = (
             </PrimaryText>
             {props.selectedDate && (
               <ActionIcon
-                size="sm"
+                variant="filled"
+                color="primary"
+                size="compact-xs"
                 onClick={(e) => {
                   e.stopPropagation();
                   createBudgetMutation.mutate([
@@ -66,7 +69,7 @@ const UnbudgetedChildCard = (
                   ]);
                 }}
               >
-                <PlusIcon />
+                <PlusIcon size={20} />
               </ActionIcon>
             )}
           </Group>
