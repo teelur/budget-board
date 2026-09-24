@@ -6,6 +6,7 @@ namespace BudgetBoard.Service.Models;
 public interface IUserSettingsResponse
 {
     string Currency { get; }
+    int DecimalPlaces { get; }
     string Language { get; }
     string DateFormat { get; }
     int BudgetWarningThreshold { get; }
@@ -24,6 +25,7 @@ public interface IUserSettingsResponse
 public class UserSettingsResponse : IUserSettingsResponse
 {
     public string Currency { get; set; }
+    public int DecimalPlaces { get; set; }
     public string Language { get; set; }
     public string DateFormat { get; set; }
     public int BudgetWarningThreshold { get; set; }
@@ -42,6 +44,7 @@ public class UserSettingsResponse : IUserSettingsResponse
     public UserSettingsResponse()
     {
         Currency = "USD";
+        DecimalPlaces = 2;
         Language = "default";
         DateFormat = "default";
         BudgetWarningThreshold = 80;
@@ -56,6 +59,7 @@ public class UserSettingsResponse : IUserSettingsResponse
     public UserSettingsResponse(UserSettings userSettings)
     {
         Currency = userSettings.Currency.ToString();
+        DecimalPlaces = userSettings.DecimalPlaces;
         Language = userSettings.Language.ToString();
         DateFormat = userSettings.DateFormat.ToString();
         BudgetWarningThreshold = userSettings.BudgetWarningThreshold;
@@ -76,6 +80,7 @@ public class UserSettingsResponse : IUserSettingsResponse
 public interface IUserSettingsUpdateRequest
 {
     public string? Currency { get; }
+    public int? DecimalPlaces { get; }
     public string? Language { get; }
     public string? DateFormat { get; }
     public int? BudgetWarningThreshold { get; }
@@ -91,6 +96,7 @@ public interface IUserSettingsUpdateRequest
 public class UserSettingsUpdateRequest() : IUserSettingsUpdateRequest
 {
     public string? Currency { get; set; } = null;
+    public int? DecimalPlaces { get; set; } = null;
     public string? Language { get; set; } = null;
     public string? DateFormat { get; set; } = null;
     public int? BudgetWarningThreshold { get; set; } = null;

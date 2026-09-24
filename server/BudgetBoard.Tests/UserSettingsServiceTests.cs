@@ -125,6 +125,7 @@ public class UserSettingsServiceTests
         var userSettingsUpdateRequest = new UserSettingsUpdateRequest
         {
             Currency = "GBP",
+            DecimalPlaces = 3,
             Language = "en-US",
             DateFormat = "MM/DD/YYYY",
             BudgetWarningThreshold = 50,
@@ -144,6 +145,7 @@ public class UserSettingsServiceTests
         // Assert
         var settings = helper.demoUser.UserSettings;
         settings.Currency.Should().Be(userSettingsUpdateRequest.Currency);
+        settings.DecimalPlaces.Should().Be(userSettingsUpdateRequest.DecimalPlaces);
         settings.Language.Should().Be(userSettingsUpdateRequest.Language.ToLower());
         settings.DateFormat.Should().Be(userSettingsUpdateRequest.DateFormat);
         settings
@@ -274,6 +276,60 @@ public class UserSettingsServiceTests
             .Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("InvalidCurrencyCodeError");
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(4)]
+    public async Task UpdateUserSettingsAsync_WhenInvalidDecimalPlaces_ThrowsInvalidDecimalPlacesError(
+        int invalidDecimalPlaces
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = CreateUserSettingsService(helper);
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DecimalPlaces = invalidDecimalPlaces };
+
+        // Act
+        var updateUserSettingsAct = async () =>
+            await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        await updateUserSettingsAct
+            .Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("InvalidDecimalPlacesError");
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    public async Task UpdateUserSettingsAsync_WhenValidDecimalPlaces_UpdatesUserSettings(
+        int decimalPlaces
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+
+        var userSettingsService = CreateUserSettingsService(helper);
+
+        helper.demoUser.UserSettings = new UserSettings { UserID = helper.demoUser.Id };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        helper.UserDataContext.SaveChanges();
+
+        var request = new UserSettingsUpdateRequest { DecimalPlaces = decimalPlaces };
+
+        // Act
+        await userSettingsService.UpdateUserSettingsAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.demoUser.UserSettings.DecimalPlaces.Should().Be(decimalPlaces);
     }
 
     [Fact]
